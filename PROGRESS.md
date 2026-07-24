@@ -6,7 +6,7 @@
 ## 🔵 Trạng thái hiện tại
 
 - Phase đang làm: **Phase 0 — Nền tảng & Hạ tầng**
-- Task tiếp theo cần làm: Cấu hình dark mode (xem `ROADMAP.md`)
+- Task tiếp theo cần làm: Cấu hình sitemap.xml tự động sinh + robots.txt (xem `ROADMAP.md`)
 - Ghi chú đặc biệt: dự án dùng Node.js 22.23.1 độc lập trong `.tools/` (xem log bên dưới),
   không phải Node hệ thống (20.19.0). Luôn `export PATH` trỏ vào
   `.tools/node-v22.23.1-win-x64` trước khi chạy `npm`/`node` trong phiên terminal mới.
@@ -30,6 +30,42 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-24 — Cấu hình dark mode
+- Đã làm:
+  - `global.css` đã có sẵn biến `.dark {...}` + `@custom-variant dark (&:is(.dark *));` từ
+    lúc cài Shadcn — nghĩa là dark mode ở dự án này là **class-based** (bật bằng cách thêm
+    class `dark` vào `<html>`), không phải theo `prefers-color-scheme` cứng — chỉ cần thêm
+    cơ chế toggle + lưu lựa chọn của người dùng.
+  - Thêm script `is:inline` (chạy đồng bộ, KHÔNG qua Vite bundle) làm phần tử đầu tiên
+    trong `<head>` của `Layout.astro` (ngay sau `<meta charset>`): đọc `localStorage.theme`,
+    nếu chưa có thì theo `prefers-color-scheme` hệ điều hành, rồi add class `dark` vào
+    `document.documentElement` — chạy trước khi trình duyệt paint nên không bị hiện tượng
+    "flash of wrong theme" (nhấp nháy sai giao diện) khi tải trang.
+  - Tạo `src/components/layout/ThemeToggle.astro`: nút icon mặt trời/mặt trăng (inline SVG,
+    ẩn/hiện qua class `dark:hidden`/`dark:block` của chính theme hiện tại — không cần JS để
+    biết đang ở theme nào, chỉ CSS), gắn vào `Header.astro` cạnh `LanguageSwitcher`.
+  - Thêm script xử lý click ở cuối `Layout.astro` (cùng chỗ với script toggle sidebar có sẵn):
+    toggle class `dark` trên `<html>` + ghi lại lựa chọn vào `localStorage.theme`.
+  - Thêm `color-scheme: light` / `html.dark { color-scheme: dark }` vào `global.css` để các
+    control gốc của trình duyệt (scrollbar, input...) cũng đổi theo theme.
+  - Thêm key i18n `nav.toggleTheme` (aria-label nút) cho cả 8 ngôn ngữ.
+  - `npm run build` sinh đủ 89 trang; đọc `dist/en/index.html` xác nhận: script anti-flash
+    là phần tử đầu tiên trong `<head>` (ngay sau `<meta charset>`), nút `#theme-toggle` có
+    đúng `aria-label="Toggle theme"`, và script cuối trang có gắn listener
+    `theme-toggle` → toggle class `dark` + `localStorage.setItem`.
+- Quyết định kỹ thuật quan trọng:
+  - Dùng `<script is:inline>` (không phải `<script>` thường) cho đoạn đọc theme ban đầu —
+    bắt buộc, vì `<script>` thường bị Astro/Vite xử lý thành module bundle (tải/thực thi trễ
+    hơn một nhịp), sẽ KHÔNG kịp chặn flash; `is:inline` giữ nguyên script y hệt, chạy ngay
+    lúc parser gặp nó.
+  - Không dùng React/`next-themes`-style solution vì toàn bộ trang là Astro tĩnh, vanilla JS
+    nhỏ gọn là đủ, tránh tải thêm JS không cần thiết (đúng triết lý zero-cost).
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Chưa test bằng mắt trên trình duyệt thật (chỉ verify qua HTML/script sinh ra) — nên
+    click thử nút theme khi có dịp mở dev server.
+- Task tiếp theo: Cấu hình sitemap.xml tự động sinh + robots.txt (task thứ 8 trong Phase 0
+  của `ROADMAP.md`).
 
 ### 2026-07-24 — Cấu hình cấu trúc URL chuẩn `/{lang}/tools/{slug}`
 - Đã làm:

@@ -10,6 +10,7 @@
   },
   "nav": {
     "toggleMenu": "Bật/tắt menu",
+    "toggleTheme": "Chuyển giao diện sáng/tối",
     "categories": {
       "image": "Ảnh",
       "pdf": "PDF",

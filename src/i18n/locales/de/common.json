@@ -10,6 +10,7 @@
   },
   "nav": {
     "toggleMenu": "Menü umschalten",
+    "toggleTheme": "Design umschalten",
     "categories": {
       "image": "Bilder",
       "pdf": "PDF",

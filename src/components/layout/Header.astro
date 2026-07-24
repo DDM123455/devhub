@@ -2,6 +2,7 @@
 import { getFixedT } from '@/i18n/i18next';
 import type { Locale } from '@/i18n/config';
 import LanguageSwitcher from './LanguageSwitcher.astro';
+import ThemeToggle from './ThemeToggle.astro';
 
 interface Props {
 	lang: Locale;
@@ -15,6 +16,7 @@ const t = getFixedT(lang);
 	<a href={`/${lang}/`} class="text-lg font-semibold text-foreground">Web Tool Hub</a>
 	<div class="flex items-center gap-3">
 		<LanguageSwitcher lang={lang} />
+		<ThemeToggle lang={lang} />
 		<button
 			id="sidebar-toggle"
 			type="button"

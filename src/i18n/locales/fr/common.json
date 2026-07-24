@@ -10,6 +10,7 @@
   },
   "nav": {
     "toggleMenu": "Basculer le menu",
+    "toggleTheme": "Changer de thème",
     "categories": {
       "image": "Images",
       "pdf": "PDF",

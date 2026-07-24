@@ -1,0 +1,46 @@
+---
+import { getFixedT } from '@/i18n/i18next';
+import type { Locale } from '@/i18n/config';
+
+interface Props {
+	lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getFixedT(lang);
+---
+
+<button
+	id="theme-toggle"
+	type="button"
+	class="rounded-md border border-border p-1.5 text-foreground"
+	aria-label={t('nav.toggleTheme')}
+>
+	<svg
+		aria-hidden="true"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		stroke-width="2"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		class="block size-4 dark:hidden"
+	>
+		<circle cx="12" cy="12" r="4"></circle>
+		<path
+			d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+		></path>
+	</svg>
+	<svg
+		aria-hidden="true"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		stroke-width="2"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		class="hidden size-4 dark:block"
+	>
+		<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path>
+	</svg>
+</button>

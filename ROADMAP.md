@@ -14,7 +14,7 @@
 - [x] Xây layout chung: Header (menu danh mục công cụ), Footer, Sidebar
 - [x] Thêm banner cố định "100% Privacy — Files Stay On Your Device" trong layout
 - [x] Cấu hình cấu trúc URL chuẩn: `/{lang}/tools/{slug-ban-dia-hoa}`
-- [ ] Cấu hình dark mode
+- [x] Cấu hình dark mode
 - [ ] Cấu hình sitemap.xml tự động sinh + robots.txt
 - [ ] Setup CI/CD: deploy tự động lên Cloudflare Pages khi push
 - [ ] Kiểm tra Lighthouse trên trang chủ rỗng (mục tiêu ≥ 90 mọi mục)

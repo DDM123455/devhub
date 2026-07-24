@@ -10,6 +10,7 @@
   },
   "nav": {
     "toggleMenu": "メニュー切替",
+    "toggleTheme": "テーマ切替",
     "categories": {
       "image": "画像",
       "pdf": "PDF",
