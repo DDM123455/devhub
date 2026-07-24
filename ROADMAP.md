@@ -8,7 +8,7 @@
 ## Phase 0 — Nền tảng & Hạ tầng
 
 - [x] Khởi tạo dự án Astro + TypeScript
-- [ ] Cài Tailwind CSS + Shadcn/UI
+- [x] Cài Tailwind CSS + Shadcn/UI
 - [ ] Cấu hình astro-i18next cho 8 ngôn ngữ: en, vi, es, pt, fr, de, ja, ko
 - [ ] Xây layout chung: Header (menu danh mục công cụ), Footer, Sidebar
 - [ ] Thêm banner cố định "100% Privacy — Files Stay On Your Device" trong layout

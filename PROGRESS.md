@@ -6,7 +6,7 @@
 ## 🔵 Trạng thái hiện tại
 
 - Phase đang làm: **Phase 0 — Nền tảng & Hạ tầng**
-- Task tiếp theo cần làm: Cài Tailwind CSS + Shadcn/UI (xem `ROADMAP.md`)
+- Task tiếp theo cần làm: Cấu hình astro-i18next cho 8 ngôn ngữ (xem `ROADMAP.md`)
 - Ghi chú đặc biệt: dự án dùng Node.js 22.23.1 độc lập trong `.tools/` (xem log bên dưới),
   không phải Node hệ thống (20.19.0). Luôn `export PATH` trỏ vào
   `.tools/node-v22.23.1-win-x64` trước khi chạy `npm`/`node` trong phiên terminal mới.
@@ -14,6 +14,41 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-24 — Cài Tailwind CSS + Shadcn/UI
+- Đã làm:
+  - Tailwind CSS v4 qua `npx astro add tailwind` — dùng Vite plugin
+    (`@tailwindcss/vite`), không cần `tailwind.config.js` truyền thống, chỉ
+    `src/styles/global.css` với `@import "tailwindcss";`.
+  - Tạo `src/layouts/Layout.astro` (layout tối giản, chỉ đủ để import `global.css` và
+    có `<slot />`) và cập nhật `src/pages/index.astro` dùng layout này. Layout đầy đủ
+    Header/Footer/Sidebar sẽ làm ở task riêng kế tiếp.
+  - Thêm React integration (`@astrojs/react@6.0.1`, `react`/`react-dom@^19.2.8`) vì
+    Shadcn/UI **chính thức chỉ hỗ trợ Astro qua kiến trúc Islands + React** (không có
+    bản thuần Astro) — xác nhận qua tài liệu chính thức ui.shadcn.com/docs/installation/astro.
+  - Thêm path alias `@/*` → `./src/*` vào `tsconfig.json` (bắt buộc để Shadcn CLI hoạt động).
+  - Chạy `npx shadcn@latest init` (CLI `shadcn@4.14.1`, style `base-nova`, base color
+    `neutral`) — sinh `components.json`, `src/lib/utils.ts`, component mẫu
+    `src/components/ui/button.tsx`, và tự thêm các dependency đi kèm mặc định của CLI
+    (`class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`, `@base-ui/react`,
+    `@fontsource-variable/geist`, `tw-animate-css`).
+  - Nhúng thử `<Button client:load>` vào `index.astro` để verify pipeline; `npm run build`
+    thành công, `dist/index.html` chứa `astro-island` đã hydrate đúng (có bundle JS
+    riêng cho `button` và `react` client runtime).
+- Quyết định kỹ thuật quan trọng:
+  - Chấp nhận thêm React làm dependency vì đây là cách Shadcn/UI chính thức hỗ trợ
+    Astro (islands architecture), không phải lựa chọn tuỳ tiện ngoài kế hoạch — vẫn giữ
+    đúng triết lý 100% client-side/zero-server vì Astro build static, React chỉ hydrate
+    phía client qua `client:*` directive, không có SSR server.
+  - Chỉ thêm 1 component mẫu (`button`) để verify — các component Shadcn khác sẽ thêm
+    theo nhu cầu thực tế của từng công cụ ở Phase 1, tránh cài dư thừa.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Layout hiện tại chỉ tối giản (chưa có Header/Footer/Sidebar, chưa có banner Privacy
+    bắt buộc theo `CLAUDE.md`) — sẽ làm ở task "Xây layout chung" kế tiếp trong Phase 0.
+  - Khi dùng component Shadcn cần tương tác, nhớ thêm `client:load`/`client:visible`
+    phù hợp — Astro islands không tự share React context giữa các đảo.
+- Task tiếp theo: Cấu hình astro-i18next cho 8 ngôn ngữ (task thứ 3 trong Phase 0 của
+  `ROADMAP.md`).
 
 ### 2026-07-24 — Khởi tạo dự án Astro + TypeScript
 - Đã làm:
