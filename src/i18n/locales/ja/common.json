@@ -5,6 +5,19 @@
   },
   "home": {
     "heading": "Web Tool Hub",
-    "tagline": "100%ブラウザ上で動作する無料ツール — ファイルは端末から一切送信されません。"
+    "tagline": "100%ブラウザ上で動作する無料ツール — ファイルは端末から一切送信されません。",
+    "comingSoon": "ツールは近日公開予定です。"
+  },
+  "nav": {
+    "toggleMenu": "メニュー切替",
+    "categories": {
+      "image": "画像",
+      "pdf": "PDF",
+      "text": "テキスト",
+      "dev": "開発ツール"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Web Tool Hub"
   }
 }

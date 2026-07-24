@@ -5,6 +5,19 @@
   },
   "home": {
     "heading": "Web Tool Hub",
-    "tagline": "Free tools that run 100% in your browser — your files never leave your device."
+    "tagline": "Free tools that run 100% in your browser — your files never leave your device.",
+    "comingSoon": "Tools coming soon."
+  },
+  "nav": {
+    "toggleMenu": "Toggle menu",
+    "categories": {
+      "image": "Images",
+      "pdf": "PDF",
+      "text": "Text",
+      "dev": "Dev Tools"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Web Tool Hub"
   }
 }

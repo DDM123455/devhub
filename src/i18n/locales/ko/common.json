@@ -5,6 +5,19 @@
   },
   "home": {
     "heading": "Web Tool Hub",
-    "tagline": "100% 브라우저에서 실행되는 무료 도구 — 파일이 절대 기기 밖으로 나가지 않습니다."
+    "tagline": "100% 브라우저에서 실행되는 무료 도구 — 파일이 절대 기기 밖으로 나가지 않습니다.",
+    "comingSoon": "도구가 곧 출시됩니다."
+  },
+  "nav": {
+    "toggleMenu": "메뉴 전환",
+    "categories": {
+      "image": "이미지",
+      "pdf": "PDF",
+      "text": "텍스트",
+      "dev": "개발 도구"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Web Tool Hub"
   }
 }

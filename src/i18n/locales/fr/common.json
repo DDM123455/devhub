@@ -5,6 +5,19 @@
   },
   "home": {
     "heading": "Web Tool Hub",
-    "tagline": "Des outils gratuits qui fonctionnent à 100 % dans votre navigateur — vos fichiers ne quittent jamais votre appareil."
+    "tagline": "Des outils gratuits qui fonctionnent à 100 % dans votre navigateur — vos fichiers ne quittent jamais votre appareil.",
+    "comingSoon": "Outils à venir."
+  },
+  "nav": {
+    "toggleMenu": "Basculer le menu",
+    "categories": {
+      "image": "Images",
+      "pdf": "PDF",
+      "text": "Texte",
+      "dev": "Outils Dev"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Web Tool Hub"
   }
 }

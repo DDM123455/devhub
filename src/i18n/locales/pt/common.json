@@ -5,6 +5,19 @@
   },
   "home": {
     "heading": "Web Tool Hub",
-    "tagline": "Ferramentas gratuitas que rodam 100% no navegador — seus arquivos nunca saem do seu dispositivo."
+    "tagline": "Ferramentas gratuitas que rodam 100% no navegador — seus arquivos nunca saem do seu dispositivo.",
+    "comingSoon": "Ferramentas em breve."
+  },
+  "nav": {
+    "toggleMenu": "Alternar menu",
+    "categories": {
+      "image": "Imagens",
+      "pdf": "PDF",
+      "text": "Texto",
+      "dev": "Ferramentas Dev"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Web Tool Hub"
   }
 }

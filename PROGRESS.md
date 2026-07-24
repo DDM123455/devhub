@@ -6,8 +6,8 @@
 ## 🔵 Trạng thái hiện tại
 
 - Phase đang làm: **Phase 0 — Nền tảng & Hạ tầng**
-- Task tiếp theo cần làm: Xây layout chung — Header (menu danh mục công cụ), Footer,
-  Sidebar (xem `ROADMAP.md`)
+- Task tiếp theo cần làm: Thêm banner cố định "100% Privacy — Files Stay On Your Device"
+  trong layout (xem `ROADMAP.md`)
 - Ghi chú đặc biệt: dự án dùng Node.js 22.23.1 độc lập trong `.tools/` (xem log bên dưới),
   không phải Node hệ thống (20.19.0). Luôn `export PATH` trỏ vào
   `.tools/node-v22.23.1-win-x64` trước khi chạy `npm`/`node` trong phiên terminal mới.
@@ -18,10 +18,62 @@
   (`[locale]/tools/[slug].astro`). `src/pages/index.astro` vẫn phải tồn tại (dù rỗng) vì
   Astro cần một trang index gốc để tự thay bằng redirect `/` → `/en/` lúc build — xoá file
   này sẽ làm `npm run build` lỗi `MissingIndexForInternationalizationError`.
+- Ghi chú layout: `Header`/`Sidebar`/`Footer` nằm ở `src/components/layout/`, đều nhận
+  prop `lang: Locale` và tự gọi `getFixedT(lang)` bên trong — mọi trang mới bọc trong
+  `Layout.astro` sẽ tự động có đủ 3 phần này, không cần import lại thủ công.
 
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-24 — Xây layout chung: Header, Footer, Sidebar
+- Đã làm:
+  - Tạo `src/components/layout/Header.astro`: thanh trên cùng (sticky) gồm logo/tên site
+    (link về trang chủ theo ngôn ngữ hiện tại), `LanguageSwitcher`, và nút hamburger
+    (chỉ hiện trên mobile, `md:hidden`) để bật/tắt Sidebar.
+  - Tạo `src/components/layout/LanguageSwitcher.astro`: `<select>` liệt kê 8 ngôn ngữ theo
+    tên bản địa (English, Tiếng Việt, Español...), tự tính lại URL đích bằng cách thay thế
+    segment locale đầu tiên trong `Astro.url.pathname`, giữ nguyên phần path còn lại — dùng
+    `onchange="window.location.href=this.value"` (native HTML, không cần JS framework/React
+    island, giữ đúng tinh thần zero-cost).
+  - Tạo `src/components/layout/Sidebar.astro`: nav dọc liệt kê danh mục công cụ (đọc từ
+    `src/data/categories.ts`: `image`, `pdf`, `text`, `dev`), mỗi mục link tới
+    `/{lang}/#category-{slug}` trên trang chủ (chưa có trang danh mục riêng vì Phase 1 chưa
+    làm tool nào — tránh link chết). Ẩn mặc định trên mobile (`hidden`), luôn hiện trên
+    `md:block`; nút hamburger ở Header toggle class `hidden` qua 1 đoạn `<script>` thuần
+    (không React) đặt cuối `Layout.astro`.
+  - Tạo `src/components/layout/Footer.astro`: dòng copyright `© {year} Web Tool Hub` dịch
+    qua key i18n `footer.copyright` (dùng interpolation `{{year}}` của i18next).
+  - Cập nhật `src/layouts/Layout.astro`: bọc `<slot />` giữa `Header`/`Sidebar` (trong flex
+    row) và `Footer`; thêm prop `description?` optional để set `<meta name="description">`
+    khi trang truyền vào (trang chủ đã dùng `t('meta.description')`).
+  - Cập nhật trang chủ (`src/pages/[locale]/index.astro`): thêm section liệt kê 4 danh mục
+    (mỗi khối có `id="category-{slug}"` khớp anchor từ Sidebar) với text placeholder
+    `home.comingSoon` — tránh anchor link chết, đồng thời có nội dung thật cho khi
+    Lighthouse crawl.
+  - Thêm key i18n mới cho cả 8 ngôn ngữ: `nav.toggleMenu`, `nav.categories.{image,pdf,text,
+    dev}`, `home.comingSoon`, `footer.copyright`.
+  - `npm run build` chạy sạch, sinh đủ 9 trang; đọc trực tiếp `dist/{vi,ja,en}/index.html`
+    xác nhận Header/Sidebar/Footer/categories render đúng ngôn ngữ, đúng aria-label dịch,
+    `<select>` đánh dấu đúng option `selected` theo locale hiện tại.
+- Quyết định kỹ thuật quan trọng:
+  - Không dùng icon (lucide-react) trong Sidebar để tránh phải hydrate thêm React island chỉ
+    vì icon trang trí — Sidebar/Header/Footer đều là Astro component thuần, 0 JS runtime
+    ngoại trừ 1 script toggle rất nhỏ.
+  - Chưa build trang danh mục (`/{lang}/tools/{category}`) riêng — Sidebar/nav tạm trỏ vào
+    anchor trên trang chủ, sẽ thay bằng URL slug bản địa hóa thật khi làm task "Cấu hình cấu
+    trúc URL chuẩn" và các tool ở Phase 1.
+  - KHÔNG làm banner Privacy trong task này dù `CLAUDE.md` nói banner phải nằm trong layout
+    chung — `ROADMAP.md` liệt kê banner Privacy là task RIÊNG kế tiếp, giữ đúng nguyên tắc
+    "một task tại một thời điểm".
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Chưa có dark mode toggle (task riêng kế tiếp sau banner Privacy) — Header hiện chưa có
+    chỗ cho nút này, sẽ thêm khi làm task đó.
+  - Banner Privacy "100% Privacy — Files Stay On Your Device" CHƯA có — là task ngay sau.
+- Task tiếp theo: Thêm banner cố định "100% Privacy — Files Stay On Your Device" trong
+  layout (task thứ 5 trong Phase 0 của `ROADMAP.md`).
+
+### 2026-07-24 — Cấu hình i18n cho 8 ngôn ngữ (đổi từ astro-i18next)
 
 ### 2026-07-24 — Cấu hình i18n cho 8 ngôn ngữ (đổi từ astro-i18next)
 - Đã làm:

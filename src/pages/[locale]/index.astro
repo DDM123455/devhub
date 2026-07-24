@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import { Button } from '@/components/ui/button';
 import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
+import { categories } from '@/data/categories';
 
 export function getStaticPaths() {
 	return locales.map((locale) => ({ params: { locale } }));
@@ -12,8 +13,22 @@ const { locale } = Astro.params as { locale: Locale };
 const t = getFixedT(locale);
 ---
 
-<Layout title={t('meta.title')} lang={locale}>
-	<h1>{t('home.heading')}</h1>
-	<p>{t('home.tagline')}</p>
-	<Button client:load>Shadcn Button OK</Button>
+<Layout title={t('meta.title')} description={t('meta.description')} lang={locale}>
+	<section class="px-4 py-10">
+		<h1 class="text-3xl font-bold text-foreground">{t('home.heading')}</h1>
+		<p class="mt-2 text-muted-foreground">{t('home.tagline')}</p>
+		<div class="mt-4">
+			<Button client:load>Shadcn Button OK</Button>
+		</div>
+	</section>
+	<section class="grid gap-4 px-4 pb-10 sm:grid-cols-2">
+		{
+			categories.map((category) => (
+				<div id={`category-${category.slug}`} class="rounded-lg border border-border p-4">
+					<h2 class="font-semibold text-foreground">{t(`nav.categories.${category.slug}`)}</h2>
+					<p class="text-sm text-muted-foreground">{t('home.comingSoon')}</p>
+				</div>
+			))
+		}
+	</section>
 </Layout>

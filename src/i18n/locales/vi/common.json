@@ -5,6 +5,19 @@
   },
   "home": {
     "heading": "Web Tool Hub",
-    "tagline": "Công cụ miễn phí chạy 100% trên trình duyệt — tệp của bạn không bao giờ rời khỏi thiết bị."
+    "tagline": "Công cụ miễn phí chạy 100% trên trình duyệt — tệp của bạn không bao giờ rời khỏi thiết bị.",
+    "comingSoon": "Công cụ sắp ra mắt."
+  },
+  "nav": {
+    "toggleMenu": "Bật/tắt menu",
+    "categories": {
+      "image": "Ảnh",
+      "pdf": "PDF",
+      "text": "Văn bản",
+      "dev": "Công cụ Dev"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Web Tool Hub"
   }
 }

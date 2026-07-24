@@ -1,0 +1,31 @@
+---
+import { getFixedT } from '@/i18n/i18next';
+import type { Locale } from '@/i18n/config';
+import { categories } from '@/data/categories';
+
+interface Props {
+	lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getFixedT(lang);
+---
+
+<aside id="sidebar" class="hidden w-56 shrink-0 border-r border-border bg-background p-4 md:block">
+	<nav>
+		<ul class="flex flex-col gap-1">
+			{
+				categories.map((category) => (
+					<li>
+						<a
+							href={`/${lang}/#category-${category.slug}`}
+							class="block rounded-md px-2 py-1.5 text-sm text-foreground hover:bg-muted"
+						>
+							{t(`nav.categories.${category.slug}`)}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</nav>
+</aside>

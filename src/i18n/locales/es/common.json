@@ -5,6 +5,19 @@
   },
   "home": {
     "heading": "Web Tool Hub",
-    "tagline": "Herramientas gratuitas que se ejecutan 100% en tu navegador — tus archivos nunca salen de tu dispositivo."
+    "tagline": "Herramientas gratuitas que se ejecutan 100% en tu navegador — tus archivos nunca salen de tu dispositivo.",
+    "comingSoon": "Herramientas próximamente."
+  },
+  "nav": {
+    "toggleMenu": "Alternar menú",
+    "categories": {
+      "image": "Imágenes",
+      "pdf": "PDF",
+      "text": "Texto",
+      "dev": "Herramientas Dev"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Web Tool Hub"
   }
 }
