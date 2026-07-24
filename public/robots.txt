@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://web-tool-hub.pages.dev/sitemap-index.xml

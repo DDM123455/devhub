@@ -6,7 +6,12 @@
 ## 🔵 Trạng thái hiện tại
 
 - Phase đang làm: **Phase 0 — Nền tảng & Hạ tầng**
-- Task tiếp theo cần làm: Cấu hình sitemap.xml tự động sinh + robots.txt (xem `ROADMAP.md`)
+- Task tiếp theo cần làm: Setup CI/CD — deploy tự động lên Cloudflare Pages khi push (xem
+  `ROADMAP.md`)
+- Ghi chú domain: `site` trong `astro.config.mjs` đang là placeholder
+  `https://web-tool-hub.pages.dev` (chưa deploy thật) — PHẢI sửa lại đúng domain/tên
+  project Cloudflare Pages thật khi làm task CI/CD kế tiếp, đồng thời sửa luôn dòng
+  `Sitemap:` trong `public/robots.txt` cho khớp.
 - Ghi chú đặc biệt: dự án dùng Node.js 22.23.1 độc lập trong `.tools/` (xem log bên dưới),
   không phải Node hệ thống (20.19.0). Luôn `export PATH` trỏ vào
   `.tools/node-v22.23.1-win-x64` trước khi chạy `npm`/`node` trong phiên terminal mới.
@@ -30,6 +35,40 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-24 — Cấu hình sitemap.xml + robots.txt
+- Đã làm:
+  - Cài `@astrojs/sitemap` (integration chính thức của Astro, tự sinh sitemap lúc
+    `astro build`, không cần script riêng).
+  - Thêm `site: 'https://web-tool-hub.pages.dev'` vào `astro.config.mjs` — **placeholder**,
+    bắt buộc phải có (dù chỉ là URL tạm) vì integration cần domain tuyệt đối để sinh
+    `<loc>`. Đã hỏi người dùng trước khi chọn URL này (dự án chưa deploy, chưa có domain
+    thật — xem ghi chú domain ở mục "Trạng thái hiện tại").
+  - Thêm `sitemap()` vào mảng `integrations`, kèm option `i18n.locales`/`i18n.defaultLocale`
+    (khớp 8 ngôn ngữ trong `i18n` config) để Astro tự chèn `<xhtml:link rel="alternate"
+    hreflang="...">` giữa các bản dịch của CÙNG một trang.
+  - Tạo `public/robots.txt`: `Allow: /` cho mọi bot + dòng `Sitemap:` trỏ tới
+    `sitemap-index.xml`.
+  - `npm run build` sinh `dist/sitemap-index.xml` (trỏ `sitemap-0.xml`) và
+    `dist/sitemap-0.xml` (89 URL, khớp đúng 89 trang tĩnh) + `dist/robots.txt` copy nguyên
+    từ `public/`. Đếm bằng `grep` xác nhận: 93 thẻ `xhtml:link` hreflang được sinh cho các
+    trang có path giống hệt nhau giữa các ngôn ngữ (trang chủ 8 ngôn ngữ) — với trang công
+    cụ (`/en/tools/compress-image/` khác `/vi/tools/nen-anh/`), plugin KHÔNG tự đoán ra
+    alternate (vì slug khác nhau giữa ngôn ngữ) nên bỏ trống thay vì sinh link sai — hành vi
+    an toàn, không phải lỗi.
+- Quyết định kỹ thuật quan trọng:
+  - Domain thật cho `site` sẽ được xác nhận/sửa lại ở task CI/CD Cloudflare Pages kế tiếp —
+    đã ghi rõ vào "Trạng thái hiện tại" để không quên.
+  - CHƯA tự viết `<link rel="alternate" hreflang>` thủ công cho từng trang công cụ (dù đã
+    có đủ dữ liệu mapping slug trong `src/data/tools.ts` để làm việc này chính xác hơn
+    plugin) — để dành cho Phase 2 (mục "Soát lại toàn bộ 10 trang công cụ để đảm bảo schema
+    JSON-LD đúng chuẩn") khi các trang công cụ đã có nội dung thật, tránh làm hreflang cho
+    placeholder rồi phải sửa lại.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - `site` trong `astro.config.mjs` VÀ dòng `Sitemap:` trong `public/robots.txt` đều đang
+    trỏ placeholder `web-tool-hub.pages.dev` — phải đồng bộ sửa cả 2 chỗ khi có domain thật.
+- Task tiếp theo: Setup CI/CD — deploy tự động lên Cloudflare Pages khi push (task thứ 9
+  trong Phase 0 của `ROADMAP.md`).
 
 ### 2026-07-24 — Cấu hình dark mode
 - Đã làm:
