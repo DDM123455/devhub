@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://web-tool-hub.pages.dev/sitemap-index.xml
+Sitemap: https://devhub.duongdangmanh01.workers.dev/sitemap-index.xml

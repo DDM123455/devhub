@@ -6,12 +6,14 @@
 ## 🔵 Trạng thái hiện tại
 
 - Phase đang làm: **Phase 0 — Nền tảng & Hạ tầng**
-- Task tiếp theo cần làm: Setup CI/CD — deploy tự động lên Cloudflare Pages khi push (xem
-  `ROADMAP.md`)
-- Ghi chú domain: `site` trong `astro.config.mjs` đang là placeholder
-  `https://web-tool-hub.pages.dev` (chưa deploy thật) — PHẢI sửa lại đúng domain/tên
-  project Cloudflare Pages thật khi làm task CI/CD kế tiếp, đồng thời sửa luôn dòng
-  `Sitemap:` trong `public/robots.txt` cho khớp.
+- Task tiếp theo cần làm: Kiểm tra Lighthouse trên trang chủ rỗng, mục tiêu ≥ 90 mọi mục
+  (xem `ROADMAP.md`)
+- Ghi chú repo/deploy: repo đã push lên GitHub tại `DDM123455/devhub`
+  (`https://github.com/DDM123455/devhub`), nhánh mặc định `main`. Deploy qua Cloudflare
+  Git integration (Workers static assets, không phải `*.pages.dev` cổ điển) — domain thật:
+  `https://devhub.duongdangmanh01.workers.dev` (đã cập nhật vào `astro.config.mjs`
+  (`site`) và `public/robots.txt`). Mỗi lần push lên `main` sẽ tự deploy, không cần GitHub
+  Actions/wrangler trong repo.
 - Ghi chú đặc biệt: dự án dùng Node.js 22.23.1 độc lập trong `.tools/` (xem log bên dưới),
   không phải Node hệ thống (20.19.0). Luôn `export PATH` trỏ vào
   `.tools/node-v22.23.1-win-x64` trước khi chạy `npm`/`node` trong phiên terminal mới.
@@ -35,6 +37,40 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-24 — Setup CI/CD: deploy tự động lên Cloudflare khi push
+- Đã làm:
+  - Push repo local lên GitHub: tạo remote `origin` trỏ
+    `https://github.com/DDM123455/devhub.git` (repo do người dùng tự tạo rỗng trên
+    github.com), đổi tên nhánh `master` → `main` cho khớp mặc định GitHub, `git push -u
+    origin main`.
+  - Thêm `.node-version` (nội dung `22`) ở root — Cloudflare build system đọc file này để
+    chọn đúng Node runtime (dự án yêu cầu Node ≥ 22.12.0, mặc định Cloudflare có thể dùng
+    bản cũ hơn nếu không chỉ định).
+  - Người dùng tự kết nối repo trong Cloudflare dashboard (Workers & Pages → Connect to
+    Git) — build command `npm run build`, output directory `dist`. Cloudflare hiện thống
+    nhất Pages vào nền tảng Workers nên domain cấp ra có dạng
+    `<project>.workers.dev` (KHÔNG phải `*.pages.dev` như các dự án Cloudflare Pages cũ) —
+    domain thật: `https://devhub.duongdangmanh01.workers.dev`.
+  - Cập nhật `site` trong `astro.config.mjs` và dòng `Sitemap:` trong `public/robots.txt`
+    từ placeholder `web-tool-hub.pages.dev` sang domain thật ở trên; `npm run build` lại,
+    xác nhận `dist/sitemap-index.xml` và `dist/robots.txt` đều trỏ đúng domain mới.
+- Quyết định kỹ thuật quan trọng:
+  - Dùng Cloudflare Git integration (native, connect trực tiếp trong dashboard) thay vì
+    GitHub Actions + `wrangler pages deploy` — đã hỏi và người dùng chọn hướng này vì đơn
+    giản hơn (không cần tạo/API token + GitHub secrets, không cần workflow YAML trong
+    repo). Do đó repo này KHÔNG có file `.github/workflows/*.yml` nào cho việc deploy —
+    đúng như thiết kế, không phải thiếu sót.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Domain sản phẩm thực tế là subdomain `workers.dev` do Cloudflare cấp tự động — nếu sau
+    này gắn custom domain riêng, phải cập nhật lại `site` (`astro.config.mjs`) và
+    `Sitemap:` (`public/robots.txt`) thêm 1 lần nữa, y hệt bước vừa làm ở đây.
+  - Chưa xác nhận bằng mắt là deploy trên Cloudflare thực sự thành công cho code MỚI NHẤT
+    (chỉ xác nhận Worker URL tồn tại từ dashboard người dùng cung cấp) — nên tự mở
+    `https://devhub.duongdangmanh01.workers.dev` kiểm tra sau khi Cloudflare build xong lần
+    push gần nhất.
+- Task tiếp theo: Kiểm tra Lighthouse trên trang chủ rỗng, mục tiêu ≥ 90 mọi mục (task cuối
+  Phase 0 trong `ROADMAP.md`).
 
 ### 2026-07-24 — Cấu hình sitemap.xml + robots.txt
 - Đã làm:

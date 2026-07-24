@@ -8,8 +8,8 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  // Placeholder cho tới khi có domain/tên project Cloudflare Pages thật (xem task CI/CD kế tiếp).
-  site: 'https://web-tool-hub.pages.dev',
+  // Domain thật do Cloudflare cấp sau khi connect Git (Workers static assets, không phải *.pages.dev cổ điển).
+  site: 'https://devhub.duongdangmanh01.workers.dev',
 
   i18n: {
     locales: ['en', 'vi', 'es', 'pt', 'fr', 'de', 'ja', 'ko'],
