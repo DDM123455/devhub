@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "title": "Chuyển đổi định dạng ảnh JPEG, PNG, WebP miễn phí — Web Tool Hub",
+    "description": "Chuyển đổi ảnh giữa JPEG, PNG và WebP miễn phí, xử lý hoàn toàn trên trình duyệt bằng Canvas API. Không upload, không cần đăng ký — ảnh không rời khỏi thiết bị."
+  },
+  "heading": "Chuyển đổi định dạng ảnh",
+  "tagline": "Chuyển đổi qua lại giữa JPEG, PNG và WebP ngay trên trình duyệt.",
+  "ui": {
+    "selectFiles": "Chọn ảnh",
+    "dropHint": "hoặc kéo thả ảnh vào đây",
+    "targetFormat": "Chuyển sang",
+    "quality": "Chất lượng",
+    "convert": "Chuyển đổi",
+    "converting": "Đang chuyển đổi…",
+    "download": "Tải xuống",
+    "original": "Gốc",
+    "converted": "Đã chuyển đổi",
+    "noFiles": "Chưa chọn ảnh nào.",
+    "errorGeneric": "Có lỗi khi chuyển đổi ảnh này. Vui lòng thử lại."
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "JPEG, PNG hay WebP — nên dùng định dạng nào?",
+    "p1": "JPEG, PNG và WebP đều dùng để lưu ảnh, nhưng mỗi định dạng đánh đổi giữa chất lượng, khả năng trong suốt và dung lượng theo cách khác nhau — chọn sai định dạng là lý do phổ biến khiến ảnh trông tệ hơn cần thiết hoặc nặng hơn mức cần có. Chuyển đổi định dạng giúp bạn chọn đúng định dạng phù hợp với nhu cầu thực tế, thay vì giữ nguyên định dạng mà máy ảnh hay công cụ chụp màn hình mặc định lưu.",
+    "p2": "JPEG phù hợp với ảnh chụp thông thường: nén chi tiết ảnh rất hiệu quả nhưng không hỗ trợ trong suốt và mất một chút chất lượng mỗi lần lưu lại. PNG nén không mất dữ liệu và hỗ trợ trong suốt, phù hợp hơn cho ảnh chụp màn hình, logo, hình có mảng màu phẳng hoặc viền sắc nét — đổi lại dung lượng thường lớn hơn nhiều với ảnh chụp thực tế. WebP mới hơn và thường tốt hơn cả hai: vừa hỗ trợ trong suốt như PNG, vừa nén ảnh gần bằng JPEG, thường cho dung lượng nhỏ hơn ở cùng chất lượng hình ảnh, dù một số công cụ hoặc email client cũ vẫn chưa hỗ trợ.",
+    "p3": "Công cụ này chuyển đổi hoàn toàn trên trình duyệt bằng Canvas API có sẵn của trình duyệt — ảnh được giải mã, vẽ lên một canvas ẩn, rồi mã hóa lại theo định dạng mới mà không gửi đi đâu cả. Chọn một hoặc nhiều ảnh JPEG, PNG hoặc WebP, chọn định dạng muốn chuyển sang, chỉnh thanh trượt chất lượng nếu chuyển sang JPEG hoặc WebP, rồi bấm Chuyển đổi. Khi chuyển sang JPEG, phần trong suốt sẽ tự động được tô trắng vì JPEG không có kênh alpha.",
+    "p4": "Quy tắc đơn giản: chuyển ảnh chụp sang WebP (hoặc JPEG nếu cần tương thích rộng nhất) để có dung lượng nhỏ hơn, còn ảnh chụp màn hình, icon hay bất cứ gì cần trong suốt thì nên giữ ở PNG hoặc WebP thay vì JPEG. Nếu chưa chắc chắn, chuyển sang WebP ở mức chất lượng 80% là lựa chọn an toàn, thường trông gần như bản gốc mà nhẹ hơn đáng kể."
+  }
+}

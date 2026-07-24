@@ -18,6 +18,15 @@ import deImageCompress from './locales/de/tool-image-compress.json';
 import jaImageCompress from './locales/ja/tool-image-compress.json';
 import koImageCompress from './locales/ko/tool-image-compress.json';
 
+import enImageConvert from './locales/en/tool-image-convert.json';
+import viImageConvert from './locales/vi/tool-image-convert.json';
+import esImageConvert from './locales/es/tool-image-convert.json';
+import ptImageConvert from './locales/pt/tool-image-convert.json';
+import frImageConvert from './locales/fr/tool-image-convert.json';
+import deImageConvert from './locales/de/tool-image-convert.json';
+import jaImageConvert from './locales/ja/tool-image-convert.json';
+import koImageConvert from './locales/ko/tool-image-convert.json';
+
 import { defaultLocale, type Locale } from './config';
 
 void i18next.init({
@@ -25,14 +34,14 @@ void i18next.init({
   fallbackLng: defaultLocale,
   defaultNS: 'common',
   resources: {
-    en: { common: en, 'tool-image-compress': enImageCompress },
-    vi: { common: vi, 'tool-image-compress': viImageCompress },
-    es: { common: es, 'tool-image-compress': esImageCompress },
-    pt: { common: pt, 'tool-image-compress': ptImageCompress },
-    fr: { common: fr, 'tool-image-compress': frImageCompress },
-    de: { common: de, 'tool-image-compress': deImageCompress },
-    ja: { common: ja, 'tool-image-compress': jaImageCompress },
-    ko: { common: ko, 'tool-image-compress': koImageCompress },
+    en: { common: en, 'tool-image-compress': enImageCompress, 'tool-image-convert': enImageConvert },
+    vi: { common: vi, 'tool-image-compress': viImageCompress, 'tool-image-convert': viImageConvert },
+    es: { common: es, 'tool-image-compress': esImageCompress, 'tool-image-convert': esImageConvert },
+    pt: { common: pt, 'tool-image-compress': ptImageCompress, 'tool-image-convert': ptImageConvert },
+    fr: { common: fr, 'tool-image-compress': frImageCompress, 'tool-image-convert': frImageConvert },
+    de: { common: de, 'tool-image-compress': deImageCompress, 'tool-image-convert': deImageConvert },
+    ja: { common: ja, 'tool-image-compress': jaImageCompress, 'tool-image-convert': jaImageConvert },
+    ko: { common: ko, 'tool-image-compress': koImageCompress, 'tool-image-convert': koImageConvert },
   },
   interpolation: {
     escapeValue: false,

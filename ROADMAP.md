@@ -26,7 +26,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 8 ngôn ngữ.
 
 - [x] 1. Nén ảnh (JPEG/PNG/WebP) — `browser-image-compression`
-- [ ] 2. Chuyển đổi định dạng ảnh — HTML5 Canvas API
+- [x] 2. Chuyển đổi định dạng ảnh — HTML5 Canvas API
 - [ ] 3. Xóa nền ảnh (AI, chạy local) — `@imgly/background-removal`
 - [ ] 4. Gộp PDF (Merge) — `pdf-lib`
 - [ ] 5. Tách PDF (Split) — `pdf-lib`

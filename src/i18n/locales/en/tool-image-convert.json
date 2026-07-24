@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "title": "Convert Image Format Online Free (JPEG, PNG, WebP) — Web Tool Hub",
+    "description": "Convert images between JPEG, PNG, and WebP online for free, entirely in your browser using the Canvas API. No upload, no signup — your photos never leave your device."
+  },
+  "heading": "Convert Image Format",
+  "tagline": "Switch between JPEG, PNG, and WebP right in your browser.",
+  "ui": {
+    "selectFiles": "Select images",
+    "dropHint": "or drag and drop images here",
+    "targetFormat": "Convert to",
+    "quality": "Quality",
+    "convert": "Convert",
+    "converting": "Converting…",
+    "download": "Download",
+    "original": "Original",
+    "converted": "Converted",
+    "noFiles": "No images selected yet.",
+    "errorGeneric": "Something went wrong converting this image. Please try again."
+  },
+  "related": "Related tools",
+  "article": {
+    "heading": "JPEG, PNG, or WebP — which format should you use?",
+    "p1": "JPEG, PNG, and WebP all store an image, but they trade off quality, transparency, and file size differently, and picking the wrong one is a common reason a photo looks worse than it should or takes up far more space than necessary. Converting between formats lets you match the format to what the image actually needs, instead of just keeping whatever your camera or screenshot tool happened to save.",
+    "p2": "JPEG is the right choice for ordinary photos: it compresses photographic detail very efficiently but doesn't support transparency and loses a little quality every time it's re-saved. PNG is lossless and supports transparency, which makes it the better pick for screenshots, logos, and graphics with flat colors or sharp edges — at the cost of noticeably larger files for photographic content. WebP is newer and generally beats both: it supports transparency like PNG and compresses photos nearly as well as JPEG, often producing a smaller file at the same visual quality, though a handful of very old tools and email clients still don't support it.",
+    "p3": "This tool converts everything locally using your browser's built-in Canvas API — the image is decoded, drawn onto an invisible canvas, and re-encoded in the target format without ever being sent anywhere. Select one or more JPEG, PNG, or WebP files, choose the format you want to convert to, adjust the quality slider if you're converting to JPEG or WebP, and press Convert. When converting to JPEG, any transparent areas are automatically filled with white, since JPEG has no transparency channel.",
+    "p4": "As a rule of thumb: convert photos to WebP (or JPEG if you need maximum compatibility) for smaller files, and keep screenshots, icons, and anything needing transparency as PNG or WebP rather than JPEG. If you're not sure, converting to WebP at 80% quality is a safe default that usually looks identical to the original while taking up noticeably less space."
+  }
+}

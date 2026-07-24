@@ -1,6 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import ImageCompressPage from '@/components/tools/ImageCompressPage.astro';
+import ImageConvertPage from '@/components/tools/ImageConvertPage.astro';
 import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { tools } from '@/data/tools';
@@ -24,6 +25,8 @@ const name = tool.names[locale];
 {
 	toolId === 'image-compress' ? (
 		<ImageCompressPage lang={locale} />
+	) : toolId === 'image-convert' ? (
+		<ImageConvertPage lang={locale} />
 	) : (
 		<Layout title={`${name} — Web Tool Hub`} description={name} lang={locale}>
 			<section class="px-4 py-10">

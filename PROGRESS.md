@@ -5,9 +5,9 @@
 
 ## 🔵 Trạng thái hiện tại
 
-- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (1/10 xong)
-- Task tiếp theo cần làm: Công cụ #2 "Chuyển đổi định dạng ảnh" dùng HTML5 Canvas API (xem
-  `ROADMAP.md` Phase 1)
+- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (2/10 xong)
+- Task tiếp theo cần làm: Công cụ #3 "Xóa nền ảnh (AI, chạy local)" dùng
+  `@imgly/background-removal` (xem `ROADMAP.md` Phase 1)
 - Ghi chú kiến trúc tool page: `src/pages/[locale]/tools/[slug].astro` giờ rẽ nhánh theo
   `toolId` — nếu là tool đã có UI thật thì render component riêng
   (`src/components/tools/<Ten>Page.astro`), còn lại vẫn rơi vào nhánh "coming soon" mặc
@@ -47,6 +47,45 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-24 — Phase 1, công cụ #2: Chuyển đổi định dạng ảnh
+- Đã làm:
+  - Tạo `src/components/tools/ImageFormatConverter.tsx` (React, `client:load`): chọn nhiều
+    ảnh (kéo-thả hoặc click, tái dùng đúng pattern UI từ tool #1), dropdown chọn định dạng
+    đích (WebP/JPEG/PNG), thanh trượt chất lượng (ẩn khi đích là PNG vì PNG không nén theo
+    quality), nút Chuyển đổi xử lý tuần tự, hiển thị định dạng+dung lượng gốc/sau khi
+    chuyển, nút tải xuống đổi đúng phần mở rộng file theo định dạng đích.
+  - Dùng thẳng `createImageBitmap()` + `<canvas>` + `canvas.toBlob()` (HTML5 Canvas API
+    thuần, đúng như chỉ định trong `ROADMAP.md`) — KHÔNG bọc trong Web Worker riêng, vì thao
+    tác decode/draw/encode 1 ảnh qua canvas là tác vụ nhẹ, được trình duyệt tăng tốc phần
+    cứng, khác với thuật toán nén lặp nhiều vòng của công cụ #1 (lý do tool #1 cần
+    `browser-image-compression` với Worker nội bộ). Khi chuyển sang JPEG, tự động tô nền
+    trắng trước khi vẽ ảnh vì JPEG không có kênh alpha (tránh vùng trong suốt bị đổi thành
+    màu đen mặc định).
+  - Tạo `src/components/tools/ImageConvertPage.astro`: đầy đủ checklist SEO giống tool #1
+    (title/description riêng theo từ khóa, JSON-LD `WebApplication` giá 0 USD, nội dung
+    hướng dẫn 4 đoạn/ngôn ngữ giải thích JPEG/PNG/WebP khác nhau thế nào, 2 link tới tool
+    cùng nhóm `image`).
+  - Namespace i18n riêng `tool-image-convert` (8 file JSON) đăng ký vào
+    `src/i18n/i18next.ts` — đúng pattern namespace-per-tool đã đặt ra từ tool #1.
+  - Sửa `src/pages/[locale]/tools/[slug].astro` thêm nhánh `toolId === 'image-convert'` →
+    `<ImageConvertPage lang={locale} />`, giữ nguyên nhánh `image-compress` và "coming soon".
+  - `npm run build` sinh đủ 89 trang không lỗi. Đọc `dist/en/tools/convert-image-format/
+    index.html` và `dist/vi/tools/doi-dinh-dang-anh/index.html` xác nhận title/heading/link
+    liên quan đúng; đếm từ script Node xác nhận đoạn nội dung EN 316 từ (trong khoảng
+    300-500). Lighthouse trên `http://localhost:4325/en/tools/convert-image-format/`:
+    **Performance 100, Accessibility 100, Best Practices 100, SEO 100**.
+- Quyết định kỹ thuật quan trọng:
+  - Không dùng Web Worker cho tool này (khác tool #1) — lý do nêu ở trên; đây là quyết định
+    có chủ đích chứ không phải bỏ sót quy tắc Web Worker trong `CLAUDE.md`.
+  - Không hỗ trợ chuyển đổi sang GIF/BMP/TIFF hay các định dạng khác — `ROADMAP.md` chỉ nêu
+    "chuyển đổi định dạng ảnh" chung chung nhưng ngữ cảnh 10 công cụ đều xoay quanh
+    JPEG/PNG/WebP (khớp tool #1), nên giới hạn 3 định dạng này cho nhất quán.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Cũng như tool #1: chưa test tương tác thật (chọn ảnh/kéo-thả/xem preview) trên trình
+    duyệt thật, chỉ verify qua HTML tĩnh + Lighthouse.
+- Task tiếp theo: Phase 1, công cụ #3 "Xóa nền ảnh (AI, chạy local)" dùng
+  `@imgly/background-removal`.
 
 ### 2026-07-24 — Phase 1, công cụ #1: Nén ảnh (JPEG/PNG/WebP)
 - Đã làm:
