@@ -6,14 +6,70 @@
 ## 🔵 Trạng thái hiện tại
 
 - Phase đang làm: **Phase 0 — Nền tảng & Hạ tầng**
-- Task tiếp theo cần làm: Cấu hình astro-i18next cho 8 ngôn ngữ (xem `ROADMAP.md`)
+- Task tiếp theo cần làm: Xây layout chung — Header (menu danh mục công cụ), Footer,
+  Sidebar (xem `ROADMAP.md`)
 - Ghi chú đặc biệt: dự án dùng Node.js 22.23.1 độc lập trong `.tools/` (xem log bên dưới),
   không phải Node hệ thống (20.19.0). Luôn `export PATH` trỏ vào
   `.tools/node-v22.23.1-win-x64` trước khi chạy `npm`/`node` trong phiên terminal mới.
+- Ghi chú i18n: cấu trúc URL đang là `/{lang}/...` cho MỌI ngôn ngữ kể cả `en`
+  (`i18n.routing.prefixDefaultLocale: true` trong `astro.config.mjs`). Trang chủ hiện là
+  route động `src/pages/[locale]/index.astro` (dùng `getStaticPaths()` sinh 8 trang), KHÔNG
+  phải 8 thư mục vật lý — giữ nguyên pattern này cho các trang công cụ ở Phase 1
+  (`[locale]/tools/[slug].astro`). `src/pages/index.astro` vẫn phải tồn tại (dù rỗng) vì
+  Astro cần một trang index gốc để tự thay bằng redirect `/` → `/en/` lúc build — xoá file
+  này sẽ làm `npm run build` lỗi `MissingIndexForInternationalizationError`.
 
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-24 — Cấu hình i18n cho 8 ngôn ngữ (đổi từ astro-i18next)
+- Đã làm:
+  - Trước khi cài `astro-i18next` như `CLAUDE.md` chỉ định, kiểm tra thấy package này đã
+    ngừng phát triển thực chất: bản mới nhất `1.0.0-beta.21` phát hành 2023-03-09 (chưa
+    từng lên 1.0), repo có issue mở chưa fix "Can't install astro-i18next on Astro 5.0
+    Beta" (từ 10/2024) và lỗi Vite module externalization (issue 12/2025) — rủi ro cao khi
+    dùng với Astro 7.1.3 hiện tại của dự án. Đã hỏi người dùng và được xác nhận đổi sang
+    phương án: **i18n routing built-in của Astro** (ổn định từ Astro 3.5, chắc chắn tương
+    thích 7.x) + **thư viện `i18next` thuần** (không qua wrapper Astro nào) để quản lý
+    dictionary.
+  - Cài `i18next` (core package, không cần `react-i18next`/`i18next-http-backend` vì các
+    trang tĩnh chỉ cần `i18next.getFixedT(locale)` lấy hàm dịch cố định 1 ngôn ngữ tại build
+    time — không cần detect/switch runtime).
+  - Thêm `i18n` config vào `astro.config.mjs`: 8 locale (`en, vi, es, pt, fr, de, ja, ko`),
+    `defaultLocale: 'en'`, `routing.prefixDefaultLocale: true` (URL luôn có prefix `/{lang}/`
+    kể cả tiếng Anh, khớp chuẩn `/{lang}/tools/{slug}` sẽ dùng ở task URL structure kế
+    tiếp), `routing.redirectToDefaultLocale: true` (tự sinh redirect tĩnh `/` → `/en/`).
+  - Tạo `src/i18n/config.ts` (export `locales`, type `Locale`, `defaultLocale`) và
+    `src/i18n/i18next.ts` (khởi tạo 1 instance `i18next` với `resources` là 8 file JSON
+    import tĩnh, export `getFixedT(locale)`).
+  - Tạo 8 file dictionary `src/i18n/locales/{lang}/common.json` với key `meta.title`,
+    `meta.description`, `home.heading`, `home.tagline` — dịch tay ngắn gọn cho cả 8 ngôn
+    ngữ (chưa phải nội dung SEO 300-500 từ đầy đủ, việc đó thuộc Phase 1/2 theo từng công
+    cụ).
+  - Thêm prop `lang` vào `src/layouts/Layout.astro` để set `<html lang={lang}>` động thay
+    vì hardcode `"en"`.
+  - Chuyển trang chủ từ `src/pages/index.astro` tĩnh sang route động
+    `src/pages/[locale]/index.astro` dùng `getStaticPaths()` sinh 8 trang theo `locales`,
+    lấy `t = getFixedT(locale)` để render heading/tagline đã dịch.
+  - `npm run build` sinh đúng 9 trang: `/en/`, `/vi/`, `/es/`, `/pt/`, `/fr/`, `/de/`,
+    `/ja/`, `/ko/` (mỗi trang có `<html lang>` đúng và nội dung đã dịch, xác nhận bằng cách
+    đọc trực tiếp `dist/*/index.html`) và `/index.html` (redirect HTML tĩnh — meta refresh
+    + link — sang `/en/`).
+- Quyết định kỹ thuật quan trọng:
+  - Bỏ `astro-i18next` dù `CLAUDE.md` ghi rõ (đã hỏi và được người dùng xác nhận trước khi
+    đổi, đúng quy tắc "tech stack đã chốt — không tự đổi nếu chưa hỏi").
+  - Dùng route động `[locale]/index.astro` thay vì 8 thư mục vật lý `en/`, `vi/`... để
+    tránh nhân bản code — đây sẽ là pattern chuẩn cho mọi trang công cụ ở Phase 1.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Chưa có UI chuyển đổi ngôn ngữ (language switcher) — sẽ làm cùng lúc với task "Xây
+    layout chung" (Header) kế tiếp.
+  - `src/pages/index.astro` phải giữ nguyên (dù nội dung rỗng) — xem ghi chú ở mục
+    "Trạng thái hiện tại" phía trên.
+  - Chưa xử lý slug bản địa hóa cho URL công cụ (`/vi/tools/nen-anh` khác `/en/tools/...`)
+    — đó là task riêng "Cấu hình cấu trúc URL chuẩn" kế tiếp trong Phase 0.
+- Task tiếp theo: Xây layout chung — Header (menu danh mục công cụ), Footer, Sidebar (task
+  thứ 4 trong Phase 0 của `ROADMAP.md`).
 
 ### 2026-07-24 — Cài Tailwind CSS + Shadcn/UI
 - Đã làm:

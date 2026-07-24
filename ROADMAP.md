@@ -9,7 +9,8 @@
 
 - [x] Khởi tạo dự án Astro + TypeScript
 - [x] Cài Tailwind CSS + Shadcn/UI
-- [ ] Cấu hình astro-i18next cho 8 ngôn ngữ: en, vi, es, pt, fr, de, ja, ko
+- [x] Cấu hình i18n cho 8 ngôn ngữ: en, vi, es, pt, fr, de, ja, ko (đổi từ astro-i18next
+      sang i18n routing native của Astro + i18next thuần — xem lý do trong `PROGRESS.md`)
 - [ ] Xây layout chung: Header (menu danh mục công cụ), Footer, Sidebar
 - [ ] Thêm banner cố định "100% Privacy — Files Stay On Your Device" trong layout
 - [ ] Cấu hình cấu trúc URL chuẩn: `/{lang}/tools/{slug-ban-dia-hoa}`

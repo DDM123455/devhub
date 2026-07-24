@@ -1,9 +1,4 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { Button } from '@/components/ui/button';
+// Astro auto-generates a redirect to /en/ here at build time because
+// i18n.routing.redirectToDefaultLocale is enabled in astro.config.mjs.
 ---
-
-<Layout title="Astro">
-	<h1>Astro</h1>
-	<Button client:load>Shadcn Button OK</Button>
-</Layout>
