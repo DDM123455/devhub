@@ -5,9 +5,10 @@
 
 ## 🔵 Trạng thái hiện tại
 
-- Phase đang làm: **Phase 0 — Nền tảng & Hạ tầng**
-- Task tiếp theo cần làm: Kiểm tra Lighthouse trên trang chủ rỗng, mục tiêu ≥ 90 mọi mục
-  (xem `ROADMAP.md`)
+- Phase đang làm: **Phase 0 hoàn tất → chuyển sang Phase 1 — 10 công cụ cốt lõi**
+- Task tiếp theo cần làm: Công cụ #1 "Nén ảnh (JPEG/PNG/WebP)" dùng
+  `browser-image-compression` (xem `ROADMAP.md` Phase 1) — thay nội dung placeholder trong
+  `src/pages/[locale]/tools/[slug].astro` cho `toolId === 'image-compress'`
 - Ghi chú repo/deploy: repo đã push lên GitHub tại `DDM123455/devhub`
   (`https://github.com/DDM123455/devhub`), nhánh mặc định `main`. Deploy qua Cloudflare
   Git integration (Workers static assets, không phải `*.pages.dev` cổ điển) — domain thật:
@@ -37,6 +38,35 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-24 — Kiểm tra Lighthouse trang chủ (hoàn tất Phase 0)
+- Đã làm:
+  - `npm run build` rồi `npm run preview --port 4321` để có server tĩnh thật (không phải
+    dev server, sát với production hơn).
+  - Chạy `npx lighthouse http://localhost:4321/en/ --only-categories=performance,
+    accessibility,best-practices,seo` bằng Chrome headless cài sẵn trên máy
+    (`C:\Program Files\Google\Chrome\Application\chrome.exe`), xuất báo cáo JSON+HTML vào
+    thư mục scratchpad.
+  - Kết quả: **Performance 99, Accessibility 100, Best Practices 100, SEO 100** — vượt mục
+    tiêu ≥ 90 ở cả 4 mục.
+  - Soát các audit chưa đạt điểm tuyệt đối (không kéo tổng điểm xuống dưới 90 nên không bắt
+    buộc sửa ngay): `first-contentful-paint` (0.96), `largest-contentful-paint` (0.98),
+    `unused-javascript` (do bundle React/`client:load` của nút Button demo), và cảnh báo
+    render-blocking từ file CSS — ghi lại để lưu ý khi Phase 1 thêm nhiều JS/component thật,
+    tránh điểm Performance tụt dần.
+- Quyết định kỹ thuật quan trọng: không tối ưu thêm vì đã vượt ngưỡng yêu cầu của task; tối
+  ưu sâu hơn (code-splitting, lazy-load Button demo...) để dành khi có tín hiệu thực tế điểm
+  giảm ở Phase 1.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Component `<Button client:load>` ở trang chủ chỉ là demo verify Shadcn từ task đầu tiên
+    — cân nhắc xoá hẳn khi bắt đầu Phase 1 vì không phục vụ mục đích thật nào nữa và là
+    nguồn `unused-javascript` chính hiện tại.
+  - Lighthouse mới chạy trên trang chủ (`/en/`) theo đúng phạm vi task — CHƯA chạy cho các
+    trang `/tools/{slug}` (những trang đó sẽ có audit riêng theo checklist SEO trong
+    `CLAUDE.md` khi làm từng tool ở Phase 1).
+- **Phase 0 — Nền tảng & Hạ tầng: HOÀN TẤT toàn bộ 9 task.**
+- Task tiếp theo: bắt đầu Phase 1 — công cụ #1 "Nén ảnh (JPEG/PNG/WebP)" với
+  `browser-image-compression` (xem `ROADMAP.md`).
 
 ### 2026-07-24 — Setup CI/CD: deploy tự động lên Cloudflare khi push
 - Đã làm:

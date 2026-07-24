@@ -17,7 +17,7 @@
 - [x] Cấu hình dark mode
 - [x] Cấu hình sitemap.xml tự động sinh + robots.txt
 - [x] Setup CI/CD: deploy tự động lên Cloudflare Pages khi push
-- [ ] Kiểm tra Lighthouse trên trang chủ rỗng (mục tiêu ≥ 90 mọi mục)
+- [x] Kiểm tra Lighthouse trên trang chủ rỗng (mục tiêu ≥ 90 mọi mục)
 
 ## Phase 1 — 10 công cụ cốt lõi
 
