@@ -6,8 +6,8 @@
 ## 🔵 Trạng thái hiện tại
 
 - Phase đang làm: **Phase 0 — Nền tảng & Hạ tầng**
-- Task tiếp theo cần làm: Thêm banner cố định "100% Privacy — Files Stay On Your Device"
-  trong layout (xem `ROADMAP.md`)
+- Task tiếp theo cần làm: Cấu hình cấu trúc URL chuẩn `/{lang}/tools/{slug-ban-dia-hoa}`
+  (xem `ROADMAP.md`)
 - Ghi chú đặc biệt: dự án dùng Node.js 22.23.1 độc lập trong `.tools/` (xem log bên dưới),
   không phải Node hệ thống (20.19.0). Luôn `export PATH` trỏ vào
   `.tools/node-v22.23.1-win-x64` trước khi chạy `npm`/`node` trong phiên terminal mới.
@@ -25,6 +25,31 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-24 — Thêm banner Privacy cố định trong layout chung
+- Đã làm:
+  - Tạo `src/components/layout/PrivacyBanner.astro`: dải banner nằm ngay dưới `Header`,
+    icon ổ khóa (inline SVG, không cần thêm icon library) + text dịch qua key i18n
+    `banner.privacy`, style `bg-primary`/`text-primary-foreground` để nổi bật nhưng vẫn
+    theo đúng theme token của shadcn (tự đổi màu khi có dark mode ở task sau).
+  - Nhúng `<PrivacyBanner lang={lang} />` trực tiếp trong `src/layouts/Layout.astro` (ngay
+    sau `<Header />`, trước phần Sidebar/main) — do đó xuất hiện ở MỌI trang bọc `Layout`,
+    đúng yêu cầu "phải xuất hiện ở layout chung, không chỉ ở 1 trang riêng lẻ" trong
+    `CLAUDE.md`.
+  - Thêm key `banner.privacy` cho cả 8 ngôn ngữ (dịch tay, giữ sát nghĩa gốc "100% Privacy
+    — Files Stay On Your Device").
+  - `npm run build` chạy sạch; đọc trực tiếp `dist/{en,vi,de,ko}/index.html` xác nhận banner
+    render đúng text dịch cho từng ngôn ngữ.
+- Quyết định kỹ thuật quan trọng:
+  - Banner là static (không sticky, không dismiss được) — ưu tiên đơn giản và đảm bảo luôn
+    hiển thị (đúng tinh thần "cố định" là luôn có mặt trong layout, không phải yêu cầu CSS
+    position:fixed). Có thể nâng cấp thành sticky sau nếu cần, không phải việc bắt buộc của
+    task này.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Chưa có dark mode — màu `bg-primary` hiện là màu tối/sáng theo theme mặc định, cần theo
+    dõi lại độ tương phản khi làm task "Cấu hình dark mode".
+- Task tiếp theo: Cấu hình cấu trúc URL chuẩn `/{lang}/tools/{slug-ban-dia-hoa}` (task thứ 6
+  trong Phase 0 của `ROADMAP.md`).
 
 ### 2026-07-24 — Xây layout chung: Header, Footer, Sidebar
 - Đã làm:

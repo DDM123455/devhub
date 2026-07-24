@@ -19,5 +19,8 @@
   },
   "footer": {
     "copyright": "© {{year}} Web Tool Hub"
+  },
+  "banner": {
+    "privacy": "100% Riêng tư — Tệp luôn ở trên thiết bị của bạn"
   }
 }

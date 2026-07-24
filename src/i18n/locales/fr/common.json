@@ -19,5 +19,8 @@
   },
   "footer": {
     "copyright": "© {{year}} Web Tool Hub"
+  },
+  "banner": {
+    "privacy": "100% Confidentialité — Vos fichiers restent sur votre appareil"
   }
 }
