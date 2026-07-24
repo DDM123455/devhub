@@ -27,6 +27,7 @@
     "i18next": "^26.3.6",
     "lucide-react": "^1.26.0",
     "onnxruntime-web": "^1.21.0",
+    "pdf-lib": "^1.17.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "shadcn": "^4.14.1",

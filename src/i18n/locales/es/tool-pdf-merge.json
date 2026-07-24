@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "title": "Unir archivos PDF gratis online — Web Tool Hub",
+    "description": "Combina varios archivos PDF en uno solo, gratis y directamente en tu navegador. Reordena las páginas antes de unir — sin subidas, sin marcas de agua, sin registro."
+  },
+  "heading": "Unir archivos PDF",
+  "tagline": "Combina varios PDF en un único archivo, directamente en tu navegador.",
+  "ui": {
+    "selectFiles": "Seleccionar archivos PDF",
+    "dropHint": "o arrastra y suelta los archivos PDF aquí",
+    "merge": "Unir PDF",
+    "merging": "Uniendo…",
+    "download": "Descargar merged.pdf",
+    "moveUp": "Subir",
+    "moveDown": "Bajar",
+    "remove": "Quitar",
+    "noFiles": "Aún no has seleccionado ningún archivo PDF.",
+    "errorGeneric": "Ocurrió un error al leer este PDF. Comprueba que no esté dañado ni protegido con contraseña e inténtalo de nuevo."
+  },
+  "related": "Herramientas relacionadas",
+  "article": {
+    "heading": "¿Por qué unir archivos PDF en local en vez de subirlos a internet?",
+    "p1": "Contratos escaneados, formularios firmados, lotes de facturas, capítulos de un informe: tarde o temprano casi todo el mundo termina con varios archivos PDF que en realidad deberían ser un único documento. Enviar cinco archivos adjuntos por separado o pedirle a un cliente que abra cinco enlaces en lugar de uno es incómodo, y la mayoría de los sitios gratuitos para \"unir PDF\" resuelven esto subiendo tus archivos a un servidor sin que te des cuenta, algo que pocas personas quieren hacer con un documento que puede contener una firma, un número de identificación o datos financieros.",
+    "p2": "Esta herramienta nunca hace eso. Todo se ejecuta dentro de tu navegador gracias a una librería de JavaScript llamada pdf-lib, que lee la estructura interna de cada PDF, copia sus páginas en un nuevo documento y reconstruye el resultado, todo en memoria, en tu propio dispositivo. Ningún archivo se envía a ningún sitio, ni siquiera para comprobar si es un PDF válido: esa comprobación también ocurre en local, por lo que un archivo poco habitual o protegido con contraseña se detecta al instante en lugar de fallar en silencio en algún servidor remoto.",
+    "p3": "Añade tus archivos PDF pulsando el botón o arrastrándolos a la zona indicada; puedes seguir añadiendo más en cualquier momento. Cada archivo aparece en una lista en el orden en que saldrá en el documento final; usa las flechas arriba y abajo junto a un archivo para cambiar su posición, o el botón de quitar si añadiste alguno por error. Cuando el orden te parezca correcto, pulsa Unir PDF. El archivo combinado se genera enteramente en memoria y el enlace de descarga aparece en cuanto está listo, guardado como merged.pdf.",
+    "p4": "La herramienta no impone un límite de páginas, aunque lotes muy grandes de PDF escaneados con muchas imágenes tardarán lógicamente más, ya que todo se procesa en tu propio dispositivo y no en un servidor potente. Si uno de los archivos falla, por ejemplo por estar cifrado con contraseña o por haberse dañado al descargarlo, la herramienta te indica exactamente cuál es para que puedas corregirlo o eliminarlo, en lugar de generar un resultado defectuoso sin avisar. Para dividir después un PDF grande en partes más pequeñas, la herramienta Dividir PDF funciona con el mismo enfoque centrado en la privacidad."
+  }
+}

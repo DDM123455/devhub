@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "title": "Gộp file PDF miễn phí trực tuyến — Web Tool Hub",
+    "description": "Gộp nhiều file PDF thành một tài liệu duy nhất, miễn phí, xử lý hoàn toàn trên trình duyệt. Sắp xếp lại thứ tự trước khi gộp — không upload, không watermark, không cần đăng ký."
+  },
+  "heading": "Gộp file PDF",
+  "tagline": "Kết hợp nhiều file PDF thành một, ngay trên trình duyệt của bạn.",
+  "ui": {
+    "selectFiles": "Chọn file PDF",
+    "dropHint": "hoặc kéo thả file PDF vào đây",
+    "merge": "Gộp PDF",
+    "merging": "Đang gộp…",
+    "download": "Tải xuống merged.pdf",
+    "moveUp": "Di chuyển lên",
+    "moveDown": "Di chuyển xuống",
+    "remove": "Xóa",
+    "noFiles": "Chưa chọn file PDF nào.",
+    "errorGeneric": "Có lỗi khi đọc file PDF này. Hãy kiểm tra xem file có bị hỏng hoặc đặt mật khẩu không, rồi thử lại."
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Vì sao nên gộp PDF ngay trên máy thay vì upload lên mạng?",
+    "p1": "Hợp đồng scan, biểu mẫu đã ký, hóa đơn từng đợt, các chương của một báo cáo — hầu như ai cũng có lúc cầm trong tay vài file PDF lẽ ra nên là một tài liệu duy nhất. Gửi năm file đính kèm riêng lẻ hoặc bắt khách hàng mở năm đường link thay vì một là rất bất tiện, và phần lớn các trang \"gộp PDF\" miễn phí trên mạng giải quyết việc này bằng cách âm thầm upload file của bạn lên máy chủ trước — điều mà không phải ai cũng muốn với một tài liệu có thể chứa chữ ký, số CMND/CCCD hay thông tin tài chính.",
+    "p2": "Công cụ này không làm vậy. Mọi thứ chạy ngay trong trình duyệt của bạn nhờ thư viện JavaScript pdf-lib — thư viện này đọc cấu trúc gốc của từng file PDF, sao chép các trang vào một tài liệu mới rồi ghép lại, tất cả đều diễn ra trong bộ nhớ, trên chính thiết bị của bạn. Không file nào được gửi đi bất cứ đâu, kể cả để kiểm tra xem nó có phải PDF hợp lệ hay không — việc kiểm tra đó cũng diễn ra ngay tại chỗ, đó cũng là lý do một file lạ hoặc có mật khẩu sẽ được báo lỗi ngay lập tức thay vì âm thầm thất bại ở đâu đó trên máy chủ.",
+    "p3": "Thêm file PDF bằng cách bấm nút chọn hoặc kéo thả vào khung — bạn có thể thêm tiếp bất cứ lúc nào. Mỗi file hiện trong danh sách theo đúng thứ tự sẽ xuất hiện trong tài liệu cuối cùng; dùng mũi tên lên/xuống cạnh mỗi file để đổi thứ tự, hoặc nút xóa nếu lỡ thêm nhầm. Khi thứ tự đã ổn, bấm Gộp PDF. File kết quả được tạo hoàn toàn trong bộ nhớ và liên kết tải xuống hiện ra ngay khi xong, lưu với tên merged.pdf.",
+    "p4": "Công cụ không giới hạn số trang, tuy nhiên nếu gộp nhiều file PDF scan chứa toàn hình ảnh dung lượng lớn thì quá trình sẽ mất nhiều thời gian hơn vì mọi thứ được xử lý trên chính thiết bị của bạn chứ không phải trên một cụm máy chủ mạnh. Nếu một file trong danh sách bị lỗi — chẳng hạn vì được mã hóa bằng mật khẩu hoặc bị hỏng khi tải về — công cụ sẽ báo rõ file nào để bạn sửa hoặc loại bỏ, thay vì âm thầm trả về kết quả bị lỗi. Nếu sau này cần tách một file PDF lớn thành nhiều phần nhỏ, công cụ Tách PDF cũng xử lý theo đúng nguyên tắc bảo mật tương tự."
+  }
+}

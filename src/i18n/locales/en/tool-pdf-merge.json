@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "title": "Merge PDF Files Online Free — Web Tool Hub",
+    "description": "Combine multiple PDF files into one document online for free, entirely in your browser. Reorder pages before merging — no upload, no watermark, no signup."
+  },
+  "heading": "Merge PDF Files",
+  "tagline": "Combine several PDFs into a single file, right in your browser.",
+  "ui": {
+    "selectFiles": "Select PDF files",
+    "dropHint": "or drag and drop PDF files here",
+    "merge": "Merge PDFs",
+    "merging": "Merging…",
+    "download": "Download merged.pdf",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "remove": "Remove",
+    "noFiles": "No PDF files selected yet.",
+    "errorGeneric": "Something went wrong reading this PDF. Make sure it isn't corrupted or password-protected, then try again."
+  },
+  "related": "Related tools",
+  "article": {
+    "heading": "Why merge PDF files locally instead of uploading them?",
+    "p1": "Scanned contracts, signed forms, invoice batches, chapters of a report — sooner or later almost everyone ends up with several PDF files that really belong together as one document. Mailing five separate attachments or asking a client to open five links instead of one is clumsy, and most free online \"PDF merger\" sites solve this by quietly uploading your files to a server first, which is exactly the kind of trust few people want to extend to a document that might contain a signature, an ID number, or financial details.",
+    "p2": "This tool never does that. Everything runs inside your browser using a JavaScript library called pdf-lib, which reads the raw structure of each PDF, copies its pages into a new document, and reassembles the result — all in memory, on your device. No file is ever sent anywhere, not even to check if it's a valid PDF; the validation itself happens locally, which is also why an unusual or password-protected file is flagged immediately instead of failing silently on some remote server.",
+    "p3": "Add your PDF files by clicking the button or dragging them into the drop zone — you can add more at any point. Each file appears in a list in the order it will appear in the final document; use the up and down arrows next to a file to reorder it, or the remove button to drop one you added by mistake. Once the order looks right, press Merge PDFs. The combined file is built entirely in memory and a download link appears as soon as it's ready, with the file saved as merged.pdf.",
+    "p4": "There's no page limit built into the tool, though very large batches of scanned, image-heavy PDFs will naturally take longer since everything is processed by your own device rather than a server farm. If one file in the batch fails — for instance because it's encrypted with a password or the file got corrupted during download — this tool tells you exactly which one so you can fix or remove it, rather than silently producing a broken result. For splitting a large PDF back into smaller pieces afterward, the Split PDF tool handles that the same privacy-first way."
+  }
+}
