@@ -1,0 +1,80 @@
+# ROADMAP.md — Web Tool Hub (Client-Side, Zero Server Cost)
+
+> Mỗi dòng `- [ ]` là MỘT task. Tick thành `- [x]` ngay khi xong theo quy trình trong
+> `CLAUDE.md`. Không được tick nếu chưa build thử thành công.
+
+---
+
+## Phase 0 — Nền tảng & Hạ tầng
+
+- [x] Khởi tạo dự án Astro + TypeScript
+- [ ] Cài Tailwind CSS + Shadcn/UI
+- [ ] Cấu hình astro-i18next cho 8 ngôn ngữ: en, vi, es, pt, fr, de, ja, ko
+- [ ] Xây layout chung: Header (menu danh mục công cụ), Footer, Sidebar
+- [ ] Thêm banner cố định "100% Privacy — Files Stay On Your Device" trong layout
+- [ ] Cấu hình cấu trúc URL chuẩn: `/{lang}/tools/{slug-ban-dia-hoa}`
+- [ ] Cấu hình dark mode
+- [ ] Cấu hình sitemap.xml tự động sinh + robots.txt
+- [ ] Setup CI/CD: deploy tự động lên Cloudflare Pages khi push
+- [ ] Kiểm tra Lighthouse trên trang chủ rỗng (mục tiêu ≥ 90 mọi mục)
+
+## Phase 1 — 10 công cụ cốt lõi
+
+Mỗi công cụ = 1 task riêng biệt. Với mỗi công cụ: build UI, tích hợp thư viện, dùng
+Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm string i18n cho cả
+8 ngôn ngữ.
+
+- [ ] 1. Nén ảnh (JPEG/PNG/WebP) — `browser-image-compression`
+- [ ] 2. Chuyển đổi định dạng ảnh — HTML5 Canvas API
+- [ ] 3. Xóa nền ảnh (AI, chạy local) — `@imgly/background-removal`
+- [ ] 4. Gộp PDF (Merge) — `pdf-lib`
+- [ ] 5. Tách PDF (Split) — `pdf-lib`
+- [ ] 6. So sánh văn bản (Diff Checker) — `diff` (jsdiff)
+- [ ] 7. Đếm từ & ký tự — JS thuần
+- [ ] 8. JSON Formatter & Validator — Monaco editor hoặc jsoneditor
+- [ ] 9. QR Code Generator (tùy chỉnh màu, logo giữa) — `qrcode.react` + Canvas
+- [ ] 10. Chuyển đổi Case văn bản (upper/lower/Title/camelCase/snake_case) — JS thuần
+
+## Phase 2 — SEO chuyên sâu & nhân bản đa ngôn ngữ
+
+- [ ] Mở rộng i18n từ 8 lên 15–20 ngôn ngữ
+- [ ] Viết lại meta title/description tối ưu từ khóa cho từng ngôn ngữ (không dịch máy thô)
+- [ ] Soát lại toàn bộ 10 trang công cụ để đảm bảo schema JSON-LD đúng chuẩn
+- [ ] Viết nội dung SEO 300–500 từ riêng biệt cho từng công cụ × từng ngôn ngữ chính
+- [ ] Xây internal linking map giữa các công cụ cùng nhóm (ảnh↔ảnh, PDF↔PDF...)
+- [ ] Submit sitemap lên Google Search Console
+- [ ] Submit sitemap lên Bing Webmaster Tools
+- [ ] Audit Core Web Vitals toàn site, fix mọi trang < 90 điểm
+
+## Phase 3 — Mở rộng công cụ ngách (Long-tail)
+
+- [ ] JWT Decoder
+- [ ] Base64 Encode/Decode
+- [ ] Regex Tester
+- [ ] SVG Optimizer — `svgo`
+- [ ] Color Picker & Palette Generator
+- [ ] CSV ↔ JSON Converter
+- [ ] JSON → Excel Converter
+- [ ] Markdown Viewer/Editor
+- [ ] Trim video ngắn — `ffmpeg.wasm`
+- [ ] Chuyển đổi Audio MP3 ↔ WAV
+
+## Phase 4 — Kiếm tiền & PWA
+
+- [ ] Tích hợp Google AdSense: banner dưới nav
+- [ ] Tích hợp Google AdSense: sidebar phải
+- [ ] Tích hợp Google AdSense: banner dưới khu vực kết quả (sau khi bấm "Nén"/"Chuyển đổi")
+- [ ] Affiliate banner ngữ cảnh cho nhóm Dev Tools (Vultr, DigitalOcean, Supabase)
+- [ ] Affiliate banner ngữ cảnh cho nhóm PDF/Văn bản (office software, NordVPN)
+- [ ] Nút "Buy Me a Coffee" ở footer
+- [ ] PWA: manifest.json + service worker (dùng offline được)
+- [ ] Cookie consent / GDPR banner (bắt buộc nếu có ads + traffic EU)
+
+## Phase 5 — Launch & Growth
+
+- [ ] QA cross-browser (Chrome, Firefox, Safari) + mobile
+- [ ] Đăng ProductHunt
+- [ ] Đăng Reddit: r/webdev, r/AlternativeTo, r/FreeTools
+- [ ] Đăng Hacker News (Show HN)
+- [ ] Setup Google Analytics hoặc Plausible (privacy-friendly)
+- [ ] Theo dõi index coverage trên Search Console hàng tuần
