@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { categories } from '@/data/categories';
+import { tools } from '@/data/tools';
 
 export function getStaticPaths() {
 	return locales.map((locale) => ({ params: { locale } }));
@@ -26,7 +27,20 @@ const t = getFixedT(locale);
 			categories.map((category) => (
 				<div id={`category-${category.slug}`} class="rounded-lg border border-border p-4">
 					<h2 class="font-semibold text-foreground">{t(`nav.categories.${category.slug}`)}</h2>
-					<p class="text-sm text-muted-foreground">{t('home.comingSoon')}</p>
+					<ul class="mt-2 flex flex-col gap-1">
+						{tools
+							.filter((tool) => tool.category === category.slug)
+							.map((tool) => (
+								<li>
+									<a
+										href={`/${locale}/tools/${tool.slugs[locale]}/`}
+										class="text-sm text-primary hover:underline"
+									>
+										{tool.names[locale]}
+									</a>
+								</li>
+							))}
+					</ul>
 				</div>
 			))
 		}

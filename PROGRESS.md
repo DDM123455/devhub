@@ -6,8 +6,7 @@
 ## 🔵 Trạng thái hiện tại
 
 - Phase đang làm: **Phase 0 — Nền tảng & Hạ tầng**
-- Task tiếp theo cần làm: Cấu hình cấu trúc URL chuẩn `/{lang}/tools/{slug-ban-dia-hoa}`
-  (xem `ROADMAP.md`)
+- Task tiếp theo cần làm: Cấu hình dark mode (xem `ROADMAP.md`)
 - Ghi chú đặc biệt: dự án dùng Node.js 22.23.1 độc lập trong `.tools/` (xem log bên dưới),
   không phải Node hệ thống (20.19.0). Luôn `export PATH` trỏ vào
   `.tools/node-v22.23.1-win-x64` trước khi chạy `npm`/`node` trong phiên terminal mới.
@@ -21,10 +20,58 @@
 - Ghi chú layout: `Header`/`Sidebar`/`Footer` nằm ở `src/components/layout/`, đều nhận
   prop `lang: Locale` và tự gọi `getFixedT(lang)` bên trong — mọi trang mới bọc trong
   `Layout.astro` sẽ tự động có đủ 3 phần này, không cần import lại thủ công.
+- Ghi chú URL công cụ: danh sách 10 công cụ Phase 1 (id, category, slug + tên hiển thị cho
+  cả 8 ngôn ngữ) đã được định nghĩa trước trong `src/data/tools.ts` — khi làm từng tool ở
+  Phase 1, chỉ cần thay nội dung placeholder trong
+  `src/pages/[locale]/tools/[slug].astro` bằng UI thật cho đúng `toolId`, KHÔNG cần tạo lại
+  route hay nghĩ lại slug (trừ khi phát hiện slug đã chọn chưa tối ưu SEO, thì sửa trực tiếp
+  trong `tools.ts`, mọi link liên quan tự cập nhật theo vì đều build từ cùng 1 nguồn).
 
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-24 — Cấu hình cấu trúc URL chuẩn `/{lang}/tools/{slug}`
+- Đã làm:
+  - Tạo `src/data/tools.ts`: định nghĩa trước cả 10 công cụ của Phase 1 (theo đúng thứ tự
+    trong `ROADMAP.md`) — mỗi tool có `id` (định danh nội bộ ổn định), `category` (khớp
+    `src/data/categories.ts`), `slugs` (slug bản địa hóa cho cả 8 ngôn ngữ, VD
+    `vi: 'nen-anh'`, KHÔNG dịch nguyên văn slug tiếng Anh — đúng ví dụ trong `CLAUDE.md`),
+    và `names` (tên hiển thị dịch cho từng ngôn ngữ). Với `ja`/`ko` giữ nguyên chữ bản ngữ
+    trong slug (VD `/ja/tools/画像圧縮/`) thay vì romaji — cách này được nhiều site lớn
+    (Wikipedia...) dùng, URL Unicode hoạt động bình thường qua UTF-8/IRI, Astro build ra file
+    trực tiếp bằng tên Unicode không lỗi.
+  - Tạo route động `src/pages/[locale]/tools/[slug].astro`: `getStaticPaths()` sinh
+    `locales.length × tools.length = 80` trang tĩnh (8 ngôn ngữ × 10 công cụ), truyền
+    `toolId` qua `props` để trang tra lại đúng tên hiển thị theo `locale`. Nội dung hiện tại
+    CHỈ LÀ placeholder (tiêu đề + `home.comingSoon`) — xây UI/tính năng thật cho từng công cụ
+    thuộc về từng task riêng ở Phase 1, không làm ở đây.
+  - Cập nhật trang chủ (`src/pages/[locale]/index.astro`): mỗi khối danh mục giờ liệt kê
+    link thật tới các trang công cụ thuộc danh mục đó (`/{lang}/tools/{slug}/`) thay vì chỉ
+    dòng text tĩnh — chứng minh cấu trúc URL hoạt động end-to-end, không phải chỉ tồn tại
+    trên lý thuyết.
+  - `npm run build` sinh tổng cộng 89 trang (80 tool + 8 home + 1 redirect) không lỗi. Đọc
+    trực tiếp `dist/vi/index.html` (link đúng slug `nen-anh`, `gop-pdf`...),
+    `dist/vi/tools/nen-anh/index.html` (title "Nén ảnh — Web Tool Hub"), và
+    `dist/ja/tools/画像圧縮/index.html` (heading đúng, thư mục Unicode tạo thành công trên
+    Windows) để xác nhận.
+- Quyết định kỹ thuật quan trọng:
+  - Định nghĩa slug/tên cho toàn bộ 10 tool ngay từ bây giờ (thay vì để tới lúc làm từng
+    tool ở Phase 1) để tránh phải đổi URL về sau (đổi slug sau khi đã index sẽ hại SEO) —
+    chi phí thêm không lớn vì đằng nào cũng cần nghĩ tên/slug khi bắt đầu mỗi tool.
+  - Dữ liệu tool (`id`, `category`, `slugs`, `names`) đặt trong 1 file TS
+    (`src/data/tools.ts`) thay vì rải rác thêm 80 key vào 8 file JSON i18n — vì đây là dữ
+    liệu có cấu trúc gắn chặt với từng tool (không phải chuỗi UI chung), gom 1 chỗ dễ soát
+    và sửa hơn.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Khi bắt đầu tool đầu tiên ở Phase 1 (Nén ảnh), SỬA nội dung placeholder trong
+    `[slug].astro` cho `toolId === 'image-compress'` — cân nhắc tách route dùng chung hiện
+    tại thành nhiều file riêng nếu UI mỗi tool khác biệt quá nhiều để dùng chung 1 template.
+  - Slug cho `ja`/`ko` dùng script bản ngữ có dấu gạch nối trộn với ASCII ở một số chỗ (VD
+    `pdf-병합`, `qrコード生成`) — chưa kiểm tra kỹ quy tắc URL-casing tối ưu SEO cho 2 ngôn
+    ngữ này, có thể cần audit lại ở Phase 2 (phần "viết lại meta title/description... không
+    dịch máy thô").
+- Task tiếp theo: Cấu hình dark mode (task thứ 7 trong Phase 0 của `ROADMAP.md`).
 
 ### 2026-07-24 — Thêm banner Privacy cố định trong layout chung
 - Đã làm:

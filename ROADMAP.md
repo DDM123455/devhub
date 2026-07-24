@@ -13,7 +13,7 @@
       sang i18n routing native của Astro + i18next thuần — xem lý do trong `PROGRESS.md`)
 - [x] Xây layout chung: Header (menu danh mục công cụ), Footer, Sidebar
 - [x] Thêm banner cố định "100% Privacy — Files Stay On Your Device" trong layout
-- [ ] Cấu hình cấu trúc URL chuẩn: `/{lang}/tools/{slug-ban-dia-hoa}`
+- [x] Cấu hình cấu trúc URL chuẩn: `/{lang}/tools/{slug-ban-dia-hoa}`
 - [ ] Cấu hình dark mode
 - [ ] Cấu hình sitemap.xml tự động sinh + robots.txt
 - [ ] Setup CI/CD: deploy tự động lên Cloudflare Pages khi push
