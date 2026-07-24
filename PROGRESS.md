@@ -5,19 +5,24 @@
 
 ## 🔵 Trạng thái hiện tại
 
-- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (2/10 xong)
-- Task tiếp theo cần làm: Công cụ #3 "Xóa nền ảnh (AI, chạy local)" dùng
-  `@imgly/background-removal` (xem `ROADMAP.md` Phase 1)
+- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (3/10 xong)
+- Task tiếp theo cần làm: Công cụ #4 "Gộp PDF (Merge)" dùng `pdf-lib` (xem `ROADMAP.md`
+  Phase 1)
 - Ghi chú kiến trúc tool page: `src/pages/[locale]/tools/[slug].astro` giờ rẽ nhánh theo
   `toolId` — nếu là tool đã có UI thật thì render component riêng
   (`src/components/tools/<Ten>Page.astro`), còn lại vẫn rơi vào nhánh "coming soon" mặc
-  định. Khi làm tool #2, thêm 1 nhánh `toolId === 'image-convert'` mới tương tự, KHÔNG sửa
-  nhánh `image-compress` đã xong.
+  định. Khi làm tool mới, thêm 1 nhánh `toolId === '<id-trong-tools.ts>'` mới tương tự,
+  KHÔNG sửa các nhánh tool đã xong.
 - Ghi chú i18n: mỗi tool có file dictionary namespace RIÊNG
-  (`src/i18n/locales/{lang}/tool-<id>.json`, đăng ký namespace trong `src/i18n/i18next.ts`),
-  không dồn hết vào `common.json` — giữ `common.json` gọn cho các chuỗi UI dùng chung
-  (Header/Sidebar/Footer/Banner). `getFixedT(lang, 'tool-image-compress')` là ví dụ cách
-  gọi namespace riêng.
+  (`src/i18n/locales/{lang}/tool-<id>.json`). **`src/i18n/i18next.ts` đã refactor dùng
+  `import.meta.glob('./locales/*/*.json', { eager: true })` để tự động nạp MỌI file JSON
+  trong `src/i18n/locales/` theo đúng `{locale}/{namespace}.json`** — thêm file JSON tool
+  mới KHÔNG cần sửa `i18next.ts` nữa, chỉ cần tạo đủ 8 file theo đúng tên
+  `tool-<id>.json` và gọi `getFixedT(lang, 'tool-<id>')`.
+- Ghi chú dependency AI: `@imgly/background-removal` có `onnxruntime-web` là
+  **peerDependency** — npm KHÔNG tự cài kèm, phải `npm install onnxruntime-web@<version
+  khớp>` thủ công, nếu không `npm run build` sẽ lỗi
+  `Rolldown failed to resolve import "onnxruntime-web/webgpu"`.
 - Ghi chú repo/deploy: repo đã push lên GitHub tại `DDM123455/devhub`
   (`https://github.com/DDM123455/devhub`), nhánh mặc định `main`. Deploy qua Cloudflare
   Git integration (Workers static assets, không phải `*.pages.dev` cổ điển) — domain thật:
@@ -47,6 +52,61 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-24 — Phase 1, công cụ #3: Xóa nền ảnh (AI, chạy local)
+- Đã làm:
+  - Cài `@imgly/background-removal` — build lỗi ngay lần đầu vì package này khai báo
+    `onnxruntime-web` là **peerDependency** (không phải dependency thường), npm không tự
+    cài kèm nên Vite/Rolldown báo lỗi không resolve được `onnxruntime-web/webgpu` (import
+    động có điều kiện trong package, dùng khi bật tăng tốc WebGPU). Sửa bằng cách
+    `npm install onnxruntime-web@1.21.0` (đúng version peer yêu cầu) — build sạch ngay sau
+    đó.
+  - Tạo `src/components/tools/BackgroundRemover.tsx` (React, `client:load`): chọn ảnh
+    (kéo-thả/click), gọi `removeBackground(file, { output: { format: 'image/png' },
+    progress })` — callback `progress` cập nhật % hiển thị trực tiếp trên từng ảnh đang xử
+    lý. Hiển thị thumbnail ảnh gốc VÀ ảnh kết quả (nền trong suốt, có pattern caro làm nền
+    thumbnail để nhìn rõ vùng trong suốt) — đây là tool đầu tiên có `<img>` thật, đã thêm
+    `alt` mô tả đầy đủ theo đúng checklist SEO. Tải xuống luôn là PNG (bắt buộc vì cần kênh
+    alpha).
+  - Có 1 dòng `modelNotice` ngay dưới khung chọn ảnh, giải thích rõ: lần đầu bấm sẽ tải một
+    model AI nhỏ (vài MB) về máy, sau đó chạy hoàn toàn offline — nhấn mạnh ảnh CỦA NGƯỜI
+    DÙNG không bao giờ được tải lên, phân biệt rõ với việc tải model (dữ liệu công khai, đi
+    một chiều xuống máy) để không gây hiểu lầm với banner "100% Privacy" toàn site.
+  - Tạo `src/components/tools/BackgroundRemoverPage.astro`: đầy đủ checklist SEO như 2 tool
+    trước (title/description/JSON-LD/4 đoạn nội dung ~300-350 từ mỗi ngôn ngữ/2 link liên
+    quan cùng nhóm `image`).
+  - **Refactor `src/i18n/i18next.ts`**: file này đang phình to dần (mỗi tool mới cộng thêm 8
+    dòng import + phải sửa object `resources`). Đổi sang dùng
+    `import.meta.glob('./locales/*/*.json', { eager: true })` của Vite để tự động quét và
+    nạp MỌI file JSON trong `src/i18n/locales/{locale}/{namespace}.json` — từ giờ thêm tool
+    mới chỉ cần tạo đúng 8 file JSON `tool-<id>.json`, KHÔNG cần đụng vào `i18next.ts`.
+    Build lại xác nhận 2 tool cũ (`image-compress`, `image-convert`) vẫn hoạt động đúng sau
+    refactor.
+  - Sửa `src/pages/[locale]/tools/[slug].astro` thêm nhánh `toolId === 'background-remover'`.
+  - `npm run build` sinh đủ 89 trang. Đọc `dist/en/tools/remove-background/index.html` xác
+    nhận title/heading/link liên quan đúng. Chạy Lighthouse trên
+    `http://localhost:4326/en/tools/remove-background/`: **Performance 99, Accessibility
+    100, Best Practices 100, SEO 100**; kiểm tra thêm bằng `network-requests` audit của
+    Lighthouse xác nhận tổng dung lượng tải khi MỞ TRANG chỉ ~147 KB — model AI (WASM
+    runtime ~23 MB + trọng số model) KHÔNG được tải cho tới khi người dùng thật sự bấm nút
+    "Xóa nền", đúng như UI đã thông báo.
+- Quyết định kỹ thuật quan trọng:
+  - Không tự viết Web Worker — `proxyToWorker` là option của `@imgly/background-removal`
+    và mặc định `true` theo schema của package, nên thư viện đã tự lo việc này (giống lý do
+    ở tool #1).
+  - Không tự host model AI trong `public/` (dù có thể) — để mặc định tải từ CDN publicPath
+    của package, vì đây là dữ liệu công khai tải VỀ máy người dùng, không phải dữ liệu
+    người dùng gửi ĐI, nên không vi phạm nguyên tắc zero-server-cost/privacy của
+    `CLAUDE.md`. Tự host sẽ chỉ làm phình kích thước repo mà không có lợi ích rõ ràng.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Cũng như 2 tool trước: chưa test tương tác thật (chọn ảnh, xem thanh tiến trình chạy,
+    xem kết quả xóa nền thực tế) trên trình duyệt thật — Lighthouse + đọc HTML tĩnh không
+    verify được việc model AI có thực sự chạy đúng.
+  - `package.json` giờ có thêm `onnxruntime-web` như dependency trực tiếp (dù về bản chất
+    là peer dep của `@imgly/background-removal`) — nếu sau này nâng cấp
+    `@imgly/background-removal`, nhớ kiểm tra lại version `onnxruntime-web` yêu cầu có đổi
+    không.
+- Task tiếp theo: Phase 1, công cụ #4 "Gộp PDF (Merge)" dùng `pdf-lib`.
 
 ### 2026-07-24 — Phase 1, công cụ #2: Chuyển đổi định dạng ảnh
 - Đã làm:

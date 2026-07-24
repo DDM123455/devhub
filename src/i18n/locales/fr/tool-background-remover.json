@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "title": "Supprimer l'arrière-plan d'une image gratuitement (IA, sans envoi) — Web Tool Hub",
+    "description": "Supprimez l'arrière-plan d'une photo gratuitement grâce à un modèle d'IA local qui s'exécute entièrement dans votre navigateur. Sans envoi, sans inscription — votre photo ne quitte jamais votre appareil."
+  },
+  "heading": "Supprimer l'arrière-plan",
+  "tagline": "Détourez automatiquement une photo, directement dans votre navigateur.",
+  "ui": {
+    "selectFiles": "Sélectionner une image",
+    "dropHint": "ou glissez-déposez une image ici",
+    "remove": "Supprimer l'arrière-plan",
+    "removing": "Suppression de l'arrière-plan… {{percent}} %",
+    "download": "Télécharger",
+    "original": "Original",
+    "result": "Résultat",
+    "noFiles": "Aucune image sélectionnée pour le moment.",
+    "errorGeneric": "Une erreur est survenue lors de la suppression de l'arrière-plan de cette image. Réessayez.",
+    "modelNotice": "Le premier clic télécharge un petit modèle d'IA (quelques Mo) dans votre navigateur — ensuite, tout fonctionne hors ligne. Votre photo n'est quant à elle jamais envoyée où que ce soit."
+  },
+  "related": "Outils associés",
+  "article": {
+    "heading": "Comment fonctionne la suppression d'arrière-plan par IA locale dans le navigateur ?",
+    "p1": "Auparavant, supprimer l'arrière-plan d'une photo signifiait soit utiliser un outil par abonnement qui envoie votre image vers un serveur, soit détourer le sujet à la main dans un éditeur d'images. Cet outil ne fait ni l'un ni l'autre : il exécute un petit modèle d'IA de segmentation directement dans votre onglet de navigateur pour déterminer quels pixels appartiennent au sujet et lesquels appartiennent à l'arrière-plan, puis rend l'arrière-plan transparent — le tout sans que votre photo ne soit jamais envoyée où que ce soit. C'est le même type de retouche souvent utilisé pour les photos de produits, les photos de profil ou les stickers — ce qui prenait autrefois des minutes dans un éditeur d'images ne prend désormais que quelques secondes.",
+    "p2": "La première fois que vous l'utilisez, votre navigateur télécharge le modèle d'IA lui-même — quelques mégaoctets — de la même façon qu'il téléchargerait n'importe quelle image ou script d'un site web. Ce téléchargement n'a lieu qu'une seule fois et reste en cache pour la prochaine fois. Votre photo, elle, est totalement distincte : elle est chargée directement dans la mémoire du navigateur et traitée là, sans jamais être envoyée vers un serveur, pas même temporairement.",
+    "p3": "L'utilisation est simple : sélectionnez une photo, patientez quelques secondes pendant que le modèle l'analyse (un indicateur de progression affiche l'avancement), puis téléchargez le résultat sous forme de PNG transparent. Le traitement s'exécutant dans un Web Worker, le reste de la page reste réactif pendant l'analyse, même sur une photo volumineuse.",
+    "p4": "Les meilleurs résultats s'obtiennent généralement sur des photos avec un sujet net et distinct — personnes, animaux, produits, véhicules — sur un fond d'une couleur différente de celle du sujet. Les détails très fins, comme des mèches de cheveux ou du pelage, peuvent ne pas ressortir parfaitement, et un arrière-plan chargé peut parfois perturber le modèle. Si le résultat n'est pas tout à fait satisfaisant, recadrer la photo plus près du sujet avant de l'envoyer aide souvent beaucoup. Photographier le sujet sur un fond uni et bien éclairé dès le départ facilite aussi, pour n'importe quel outil — humain ou IA —, un détourage plus propre."
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "title": "Remove Background from Image Free (AI, No Upload) — Web Tool Hub",
+    "description": "Remove the background from a photo for free using a local AI model that runs entirely in your browser. No upload, no signup — your photo never leaves your device."
+  },
+  "heading": "Remove Background",
+  "tagline": "Cut out the background from a photo automatically, right in your browser.",
+  "ui": {
+    "selectFiles": "Select image",
+    "dropHint": "or drag and drop an image here",
+    "remove": "Remove Background",
+    "removing": "Removing background… {{percent}}%",
+    "download": "Download",
+    "original": "Original",
+    "result": "Result",
+    "noFiles": "No image selected yet.",
+    "errorGeneric": "Something went wrong removing the background from this image. Please try again.",
+    "modelNotice": "The first click downloads a small AI model (a few MB) to your browser — after that it works fully offline. Your photo itself is never uploaded anywhere."
+  },
+  "related": "Related tools",
+  "article": {
+    "heading": "How does local, in-browser background removal work?",
+    "p1": "Removing the background from a photo used to mean either a subscription tool that uploads your image to a server, or manually tracing around the subject in an image editor. This tool does neither: it runs a small AI segmentation model directly in your browser tab to figure out which pixels belong to the subject and which belong to the background, then makes the background transparent — all without your photo ever being sent anywhere. It's the same kind of edit often used for product photos, profile pictures, and stickers — the sort of thing that used to take minutes in an image editor now takes seconds.",
+    "p2": "The first time you use it, your browser downloads the AI model itself — a few megabytes of data — the same way it would download any image or script from a website. That download only happens once and is cached for next time. Your photo is a completely separate thing: it's loaded straight into the browser's memory and processed there, and at no point does it get uploaded to a server, not even temporarily.",
+    "p3": "Using it is simple: select a photo, wait a few seconds while the model analyzes it (a progress indicator shows how far along it is), and download the result as a transparent PNG. Because the process runs in a Web Worker, the rest of the page stays responsive while the analysis is happening, even on a large photo.",
+    "p4": "Results are usually best on photos with a clear, distinct subject — people, animals, products, vehicles — against a background that isn't the same color as the subject. Very fine details like loose hair strands or fur may not come out perfectly, and busy or cluttered backgrounds can sometimes confuse the model. If the result isn't quite right, cropping the photo tighter around the subject before uploading it often helps. Photographing the subject against an evenly lit, plain background in the first place also makes a noticeably cleaner cutout easier for any tool — human or AI — to produce."
+  }
+}

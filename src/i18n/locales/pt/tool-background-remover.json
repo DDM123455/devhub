@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "title": "Remover fundo de imagem grátis com IA (sem upload) — Web Tool Hub",
+    "description": "Remova o fundo de uma foto grátis com um modelo de IA local que roda totalmente no seu navegador. Sem upload, sem cadastro — sua foto nunca sai do seu dispositivo."
+  },
+  "heading": "Remover fundo",
+  "tagline": "Remova o fundo de uma foto automaticamente, direto no navegador.",
+  "ui": {
+    "selectFiles": "Selecionar imagem",
+    "dropHint": "ou arraste e solte uma imagem aqui",
+    "remove": "Remover fundo",
+    "removing": "Removendo o fundo… {{percent}}%",
+    "download": "Baixar",
+    "original": "Original",
+    "result": "Resultado",
+    "noFiles": "Nenhuma imagem selecionada ainda.",
+    "errorGeneric": "Ocorreu um erro ao remover o fundo desta imagem. Tente novamente.",
+    "modelNotice": "O primeiro clique baixa um pequeno modelo de IA (alguns MB) para o seu navegador — depois disso funciona totalmente offline. Sua foto nunca é enviada a lugar nenhum."
+  },
+  "related": "Ferramentas relacionadas",
+  "article": {
+    "heading": "Como funciona a remoção de fundo com IA local no navegador?",
+    "p1": "Antes, remover o fundo de uma foto geralmente exigia uma ferramenta paga que enviava sua imagem para um servidor, ou recortar manualmente o contorno do assunto em um editor de imagens. Esta ferramenta não faz nenhuma das duas coisas: ela roda um pequeno modelo de IA de segmentação direto na aba do seu navegador para identificar quais pixels pertencem ao assunto e quais pertencem ao fundo, e então torna o fundo transparente — tudo sem que sua foto seja enviada a lugar nenhum. É o mesmo tipo de edição usada para fotos de produtos, fotos de perfil ou stickers — algo que antes levava minutos em um editor de imagens agora leva segundos.",
+    "p2": "Na primeira vez que você usar, seu navegador vai baixar o próprio modelo de IA — apenas alguns megabytes — da mesma forma que baixaria qualquer imagem ou script de um site. Esse download acontece só uma vez e fica em cache para a próxima. Sua foto é algo completamente separado: ela é carregada direto na memória do navegador e processada ali, sem nunca ser enviada a um servidor, nem mesmo temporariamente.",
+    "p3": "É simples de usar: selecione uma foto, espere alguns segundos enquanto o modelo analisa (um indicador de progresso mostra o andamento), e baixe o resultado como um PNG transparente. Como o processo roda em um Web Worker, o resto da página continua respondendo enquanto a análise acontece, mesmo em uma foto grande.",
+    "p4": "Os melhores resultados costumam vir de fotos com um assunto claro e bem definido — pessoas, animais, produtos, veículos — sobre um fundo de cor diferente do assunto. Detalhes bem finos, como fios soltos de cabelo ou pelos, podem não sair perfeitos, e fundos muito carregados às vezes confundem o modelo. Se o resultado não ficar bom, recortar a foto mais próxima do assunto antes de enviar costuma ajudar bastante. Fotografar o assunto sobre um fundo liso e com iluminação uniforme desde o início também ajuda qualquer ferramenta — humana ou de IA — a produzir um recorte mais limpo."
+  }
+}

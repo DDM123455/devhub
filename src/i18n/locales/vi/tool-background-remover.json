@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "title": "Xóa nền ảnh miễn phí bằng AI (không upload) — Web Tool Hub",
+    "description": "Xóa nền ảnh miễn phí bằng mô hình AI chạy hoàn toàn trên trình duyệt. Không upload, không cần đăng ký — ảnh không rời khỏi thiết bị."
+  },
+  "heading": "Xóa nền ảnh",
+  "tagline": "Tự động xóa nền ảnh ngay trên trình duyệt, không cần chỉnh tay.",
+  "ui": {
+    "selectFiles": "Chọn ảnh",
+    "dropHint": "hoặc kéo thả ảnh vào đây",
+    "remove": "Xóa nền",
+    "removing": "Đang xóa nền… {{percent}}%",
+    "download": "Tải xuống",
+    "original": "Gốc",
+    "result": "Kết quả",
+    "noFiles": "Chưa chọn ảnh nào.",
+    "errorGeneric": "Có lỗi khi xóa nền ảnh này. Vui lòng thử lại.",
+    "modelNotice": "Lần bấm đầu tiên sẽ tải một mô hình AI nhỏ (vài MB) về trình duyệt — sau đó hoạt động hoàn toàn offline. Ảnh của bạn không bao giờ được tải lên bất cứ đâu."
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Xóa nền ảnh bằng AI ngay trên trình duyệt hoạt động thế nào?",
+    "p1": "Trước đây, xóa nền ảnh thường phải dùng công cụ trả phí upload ảnh lên server, hoặc tự tay cắt viền chủ thể trong phần mềm chỉnh ảnh. Công cụ này không làm theo cả hai cách đó: nó chạy một mô hình AI phân vùng ảnh nhỏ gọn ngay trong tab trình duyệt để xác định pixel nào thuộc chủ thể, pixel nào thuộc nền, rồi làm phần nền trong suốt — tất cả mà không cần gửi ảnh của bạn đi bất cứ đâu.",
+    "p2": "Lần đầu sử dụng, trình duyệt sẽ tải về mô hình AI — chỉ vài megabyte dữ liệu — giống như khi tải bất kỳ hình ảnh hay đoạn mã nào từ một trang web. Việc tải này chỉ diễn ra một lần và được lưu cache cho lần sau. Ảnh của bạn là một thứ hoàn toàn tách biệt: nó được nạp thẳng vào bộ nhớ trình duyệt và xử lý tại đó, không có lúc nào bị tải lên server, kể cả tạm thời.",
+    "p3": "Cách dùng rất đơn giản: chọn một ảnh, chờ vài giây trong khi mô hình phân tích (có thanh tiến trình hiển thị mức độ hoàn thành), rồi tải kết quả về dưới dạng PNG trong suốt. Vì quá trình chạy trong một Web Worker, phần còn lại của trang vẫn phản hồi mượt mà trong lúc phân tích, kể cả với ảnh dung lượng lớn.",
+    "p4": "Kết quả thường tốt nhất với ảnh có chủ thể rõ ràng, tách biệt — người, động vật, sản phẩm, xe cộ — trên nền không cùng màu với chủ thể. Các chi tiết rất nhỏ như sợi tóc lòa xòa hay lông thú có thể không ra hoàn hảo, và nền quá rối mắt đôi khi khiến mô hình nhận diện sai. Nếu kết quả chưa ưng ý, thử cắt ảnh sát chủ thể hơn trước khi tải lên thường sẽ cải thiện đáng kể."
+  }
+}

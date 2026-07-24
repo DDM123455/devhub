@@ -27,7 +27,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 
 - [x] 1. Nén ảnh (JPEG/PNG/WebP) — `browser-image-compression`
 - [x] 2. Chuyển đổi định dạng ảnh — HTML5 Canvas API
-- [ ] 3. Xóa nền ảnh (AI, chạy local) — `@imgly/background-removal`
+- [x] 3. Xóa nền ảnh (AI, chạy local) — `@imgly/background-removal`
 - [ ] 4. Gộp PDF (Merge) — `pdf-lib`
 - [ ] 5. Tách PDF (Split) — `pdf-lib`
 - [ ] 6. So sánh văn bản (Diff Checker) — `diff` (jsdiff)
