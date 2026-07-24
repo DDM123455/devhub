@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "title": "So sánh văn bản trực tuyến miễn phí — Web Tool Hub",
+    "description": "So sánh hai đoạn văn bản miễn phí, nhìn thấy ngay từng từ hoặc từng dòng đã thay đổi. Xử lý hoàn toàn trên trình duyệt — không có gì được gửi đi."
+  },
+  "heading": "So sánh văn bản (Diff Checker)",
+  "tagline": "Dán hai phiên bản văn bản để xem chính xác điều gì đã thay đổi, theo từng từ hoặc từng dòng.",
+  "ui": {
+    "originalLabel": "Văn bản gốc",
+    "changedLabel": "Văn bản đã sửa",
+    "compare": "So sánh",
+    "modeWord": "Theo từ",
+    "modeLine": "Theo dòng",
+    "noChanges": "Không có khác biệt — hai văn bản giống hệt nhau.",
+    "placeholder": "Dán hoặc nhập văn bản vào đây…"
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Vì sao cần công cụ so sánh văn bản?",
+    "p1": "Khi có hai phiên bản của cùng một tài liệu — hợp đồng trước và sau khi luật sư chỉnh sửa, bài viết trước và sau khi biên tập góp ý, file cấu hình trước và sau khi đồng nghiệp commit — câu hỏi quan trọng hiếm khi là \"hai file này có giống nhau không\" mà là \"chính xác điều gì đã thay đổi\". Đọc song song hai bản và cố gắng phát hiện từng dấu phẩy được thêm, từng câu bị xoá hay viết lại bằng mắt thường rất chậm và dễ bỏ sót, nhất là khi tài liệu dài hơn một trang. Công cụ so sánh văn bản tự động hoá việc này, làm nổi bật chính xác những từ hoặc dòng khác nhau, giúp bạn rà soát một thay đổi trong vài giây thay vì vài phút.",
+    "p2": "Công cụ này chạy hoàn toàn trên trình duyệt của bạn. Hai ô văn bản chỉ tồn tại trong bộ nhớ thiết bị, và việc so sánh được tính toán bởi một thư viện JavaScript chạy ngay tại chỗ — không có nội dung nào bạn gõ hay dán được gửi lên máy chủ, ghi log hay lưu trữ ở bất kỳ đâu. Điều này quan trọng nếu bạn đang so sánh một hợp đồng với khách hàng, một file chứa mật khẩu, hay bất kỳ văn bản nào bạn không muốn đưa qua dịch vụ bên thứ ba. Đóng tab trình duyệt là mọi thứ biến mất, không có lịch sử nào để lo lắng.",
+    "p3": "Cách dùng: dán văn bản gốc vào ô bên trái, văn bản đã sửa vào ô bên phải, rồi chọn cách so sánh. Chế độ theo từ coi văn bản như một chuỗi các từ, phù hợp nhất với văn xuôi — nó chỉ ra chính xác từ nào được thêm, xoá hoặc thay thế trong một câu. Chế độ theo dòng so sánh cả dòng một lúc, hữu ích hơn cho nội dung có cấu trúc như code, JSON hay danh sách theo dòng, khi bạn quan tâm dòng nào được thêm hay xoá toàn bộ hơn là từng từ bên trong. Bấm So sánh, kết quả hiện ngay bên dưới: phần bị xoá có nền đỏ và gạch ngang, phần được thêm có nền xanh.",
+    "p4": "Trong thực tế công cụ này hữu ích hơn nhiều so với việc chỉ soát lỗi chính tả. Lập trình viên dùng chế độ theo dòng để nhìn nhanh một thay đổi code trước khi commit, người viết dùng chế độ theo từ để thấy chính xác biên tập viên đã sửa gì trong một đoạn văn, và bất kỳ ai đang đàm phán lại hợp đồng đều có thể dán hai bản nháp vào để xác nhận chỉ những điều khoản đã thoả thuận mới thay đổi. Nếu hai văn bản giống hệt nhau, công cụ sẽ báo rõ điều đó thay vì hiển thị một kết quả trống khó hiểu."
+  }
+}
