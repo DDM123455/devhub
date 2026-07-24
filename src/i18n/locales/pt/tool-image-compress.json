@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "title": "Comprimir imagens JPEG, PNG e WebP grátis online — Web Tool Hub",
+    "description": "Comprima imagens JPEG, PNG e WebP grátis, direto no seu navegador. Sem upload, sem limite de tamanho, sem cadastro — suas fotos nunca saem do seu dispositivo."
+  },
+  "heading": "Comprimir imagem (JPEG/PNG/WebP)",
+  "tagline": "Reduza o tamanho das suas fotos em segundos, direto no navegador.",
+  "ui": {
+    "selectFiles": "Selecionar imagens",
+    "dropHint": "ou arraste e solte as imagens aqui",
+    "quality": "Qualidade",
+    "compress": "Comprimir",
+    "compressing": "Comprimindo…",
+    "download": "Baixar",
+    "original": "Original",
+    "compressed": "Comprimido",
+    "reduced": "{{percent}}% a menos",
+    "noFiles": "Nenhuma imagem selecionada ainda.",
+    "errorGeneric": "Ocorreu um erro ao comprimir esta imagem. Tente novamente."
+  },
+  "related": "Ferramentas relacionadas",
+  "article": {
+    "heading": "Por que comprimir imagens antes de publicá-las?",
+    "p1": "Uma foto tirada direto de um celular moderno pode pesar de 4 a 8 MB, mas a maioria dos sites só precisa de uma fração desse peso para ficar nítida. Imagens muito pesadas são uma das causas mais comuns de um site lento, e sites lentos costumam perder visitantes e posições nas Core Web Vitals do Google. Comprimir uma imagem antes de publicá-la remove os dados extras que o olho praticamente não percebe no tamanho normal de exibição.",
+    "p2": "Todo o processo acontece localmente, no seu navegador. A compressão roda dentro de um Web Worker — uma thread separada disponível nos navegadores modernos — para que a página continue respondendo mesmo comprimindo várias fotos grandes ao mesmo tempo. Nenhum arquivo é enviado a um servidor, nem mesmo temporariamente: sem espera de upload, sem limite de tamanho imposto por servidor, e suas imagens nunca saem do seu dispositivo.",
+    "p3": "É simples de usar: selecione uma ou mais imagens JPEG, PNG ou WebP, ajuste o nível de qualidade no controle deslizante e clique em Comprimir. Cada imagem é processada uma de cada vez e o resultado aparece na hora, com o tamanho original, o novo tamanho e a porcentagem economizada, para você comparar antes de baixar. Se o resultado não ficar bom, é só ajustar o controle e comprimir de novo — sem limite de tentativas.",
+    "p4": "Como ponto de partida, uma qualidade de 70-80% costuma ficar praticamente idêntica ao original para a maioria das pessoas, reduzindo o tamanho pela metade ou mais. Imagens com cores chapadas, como capturas de tela, ilustrações e logotipos, comprimem muito bem mesmo em ajustes baixos. Fotos com muito detalhe fino, ruído ou gradientes — como folhas de uma floresta ou um céu estrelado — mantêm mais peso na mesma qualidade, e costumam se beneficiar mais de redimensionar do que de reduzir ainda mais a qualidade."
+  }
+}

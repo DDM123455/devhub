@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "title": "Compress Images Online Free (JPEG, PNG, WebP) — Web Tool Hub",
+    "description": "Compress JPEG, PNG, and WebP images online for free, entirely in your browser. No upload, no size limit, no signup — your photos never leave your device."
+  },
+  "heading": "Compress Image (JPEG/PNG/WebP)",
+  "tagline": "Shrink your photos in seconds, right in your browser.",
+  "ui": {
+    "selectFiles": "Select images",
+    "dropHint": "or drag and drop images here",
+    "quality": "Quality",
+    "compress": "Compress",
+    "compressing": "Compressing…",
+    "download": "Download",
+    "original": "Original",
+    "compressed": "Compressed",
+    "reduced": "{{percent}}% smaller",
+    "noFiles": "No images selected yet.",
+    "errorGeneric": "Something went wrong compressing this image. Please try again."
+  },
+  "related": "Related tools",
+  "article": {
+    "heading": "Why compress images before publishing them?",
+    "p1": "A photo straight out of a modern phone camera can easily be 4–8 MB, yet most websites only need a fraction of that to look sharp on screen. Oversized images are one of the most common reasons a web page loads slowly, and slow pages lose visitors and rank lower in Google's Core Web Vitals. Compressing an image before you publish it strips out the extra data your eyes never actually use, without changing how the picture looks at normal viewing sizes.",
+    "p2": "Everything here happens locally in your browser. The compression itself runs inside a Web Worker, a separate thread built into modern browsers, so the page stays responsive even while you're compressing a whole batch of large photos at once. No file is ever uploaded to a server — not even temporarily — which means there's no upload wait, no server-side size limit, and nothing about your images ever leaves your device.",
+    "p3": "Using it is straightforward: select one or more JPEG, PNG, or WebP files, choose a quality level with the slider, and press Compress. Each image is processed one at a time and the result appears immediately with the original size, the new size, and the percentage saved, so you can compare before downloading anything. If a result doesn't look right, just adjust the slider and compress again — there's no limit on how many times you try.",
+    "p4": "As a starting point, 70–80% quality keeps photos visually identical to the original for most people while typically cutting the file size in half or more. Flat-color images like screenshots, illustrations, and logos compress especially well even at lower settings. Photos with a lot of fine texture, noise, or gradients — think forest leaves or a starry sky — hold on to more of their size at the same quality level, and often benefit more from resizing the dimensions than from lowering the quality further."
+  }
+}

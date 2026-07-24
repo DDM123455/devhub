@@ -1,5 +1,6 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
+import ImageCompressPage from '@/components/tools/ImageCompressPage.astro';
 import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { tools } from '@/data/tools';
@@ -20,9 +21,15 @@ const tool = tools.find((item) => item.id === toolId)!;
 const name = tool.names[locale];
 ---
 
-<Layout title={`${name} — Web Tool Hub`} description={name} lang={locale}>
-	<section class="px-4 py-10">
-		<h1 class="text-2xl font-bold text-foreground">{name}</h1>
-		<p class="mt-2 text-muted-foreground">{t('home.comingSoon')}</p>
-	</section>
-</Layout>
+{
+	toolId === 'image-compress' ? (
+		<ImageCompressPage lang={locale} />
+	) : (
+		<Layout title={`${name} — Web Tool Hub`} description={name} lang={locale}>
+			<section class="px-4 py-10">
+				<h1 class="text-2xl font-bold text-foreground">{name}</h1>
+				<p class="mt-2 text-muted-foreground">{t('home.comingSoon')}</p>
+			</section>
+		</Layout>
+	)
+}

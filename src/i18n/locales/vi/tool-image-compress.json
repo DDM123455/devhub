@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "title": "Nén ảnh JPEG, PNG, WebP miễn phí trực tuyến — Web Tool Hub",
+    "description": "Nén ảnh JPEG, PNG, WebP miễn phí, xử lý hoàn toàn trên trình duyệt. Không upload, không giới hạn dung lượng, không cần đăng ký — ảnh không rời khỏi thiết bị."
+  },
+  "heading": "Nén ảnh (JPEG/PNG/WebP)",
+  "tagline": "Giảm dung lượng ảnh trong vài giây, ngay trên trình duyệt.",
+  "ui": {
+    "selectFiles": "Chọn ảnh",
+    "dropHint": "hoặc kéo thả ảnh vào đây",
+    "quality": "Chất lượng",
+    "compress": "Nén ảnh",
+    "compressing": "Đang nén…",
+    "download": "Tải xuống",
+    "original": "Gốc",
+    "compressed": "Đã nén",
+    "reduced": "Giảm {{percent}}%",
+    "noFiles": "Chưa chọn ảnh nào.",
+    "errorGeneric": "Có lỗi khi nén ảnh này. Vui lòng thử lại."
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Vì sao nên nén ảnh trước khi đăng lên web?",
+    "p1": "Một tấm ảnh chụp thẳng từ điện thoại đời mới có thể nặng tới 4-8 MB, trong khi phần lớn website chỉ cần một phần nhỏ dung lượng đó là đủ để hiển thị sắc nét. Ảnh quá nặng là một trong những nguyên nhân phổ biến nhất khiến trang web tải chậm, và trang tải chậm thường mất khách truy cập lẫn thứ hạng trên Google (Core Web Vitals). Nén ảnh trước khi đăng lên giúp loại bỏ phần dữ liệu dư thừa mà mắt người gần như không nhận ra ở kích thước hiển thị thông thường.",
+    "p2": "Toàn bộ quá trình diễn ra ngay trên trình duyệt của bạn. Việc nén ảnh chạy trong một Web Worker — một luồng xử lý riêng có sẵn trong trình duyệt hiện đại — nên trang vẫn mượt mà kể cả khi bạn nén cùng lúc nhiều ảnh dung lượng lớn. Không có tệp nào được tải lên máy chủ, dù chỉ là tạm thời — nghĩa là không phải chờ upload, không bị giới hạn dung lượng từ server, và ảnh của bạn không bao giờ rời khỏi thiết bị.",
+    "p3": "Cách dùng rất đơn giản: chọn một hoặc nhiều ảnh JPEG, PNG hoặc WebP, chỉnh mức chất lượng bằng thanh trượt, rồi bấm Nén ảnh. Mỗi ảnh được xử lý lần lượt và kết quả hiện ra ngay lập tức kèm dung lượng gốc, dung lượng sau khi nén và phần trăm đã giảm, giúp bạn so sánh trước khi tải xuống. Nếu kết quả chưa ưng ý, chỉ cần chỉnh lại thanh trượt và nén lại — không giới hạn số lần thử.",
+    "p4": "Mức chất lượng 70-80% thường là điểm khởi đầu hợp lý: ảnh gần như không khác biệt so với bản gốc khi nhìn bằng mắt thường, trong khi dung lượng thường giảm một nửa hoặc hơn. Ảnh có nhiều mảng màu phẳng như ảnh chụp màn hình, minh họa, logo nén rất tốt kể cả ở mức chất lượng thấp. Ảnh có nhiều chi tiết nhỏ, nhiễu hạt hoặc chuyển màu mượt (như tán lá rừng hay bầu trời đầy sao) thường giữ dung lượng cao hơn ở cùng mức chất lượng, và thường hiệu quả hơn nếu giảm kích thước thay vì chỉ giảm chất lượng."
+  }
+}

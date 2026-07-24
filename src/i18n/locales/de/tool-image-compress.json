@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "title": "JPEG-, PNG- und WebP-Bilder kostenlos komprimieren — Web Tool Hub",
+    "description": "Komprimiere JPEG-, PNG- und WebP-Bilder kostenlos direkt im Browser. Kein Upload, keine Größenbeschränkung, keine Anmeldung — deine Fotos verlassen nie dein Gerät."
+  },
+  "heading": "Bild komprimieren (JPEG/PNG/WebP)",
+  "tagline": "Verkleinere deine Fotos in Sekunden, direkt im Browser.",
+  "ui": {
+    "selectFiles": "Bilder auswählen",
+    "dropHint": "oder Bilder hierher ziehen",
+    "quality": "Qualität",
+    "compress": "Komprimieren",
+    "compressing": "Wird komprimiert…",
+    "download": "Herunterladen",
+    "original": "Original",
+    "compressed": "Komprimiert",
+    "reduced": "{{percent}} % kleiner",
+    "noFiles": "Noch keine Bilder ausgewählt.",
+    "errorGeneric": "Beim Komprimieren dieses Bildes ist ein Fehler aufgetreten. Bitte versuche es erneut."
+  },
+  "related": "Ähnliche Tools",
+  "article": {
+    "heading": "Warum Bilder vor der Veröffentlichung komprimieren?",
+    "p1": "Ein Foto direkt aus einem modernen Smartphone kann 4 bis 8 MB groß sein, obwohl die meisten Websites nur einen Bruchteil davon brauchen, um scharf auszusehen. Zu große Bilder sind einer der häufigsten Gründe für eine langsame Website, und langsame Seiten verlieren oft Besucher sowie Punkte bei Googles Core Web Vitals. Ein Bild vor der Veröffentlichung zu komprimieren entfernt überflüssige Daten, die das Auge bei normaler Anzeigegröße kaum wahrnimmt.",
+    "p2": "Der gesamte Vorgang läuft direkt in deinem Browser ab. Die Komprimierung läuft in einem Web Worker — einem eigenen Thread, den moderne Browser mitbringen —, sodass die Seite reaktionsfähig bleibt, selbst wenn du mehrere große Fotos gleichzeitig komprimierst. Keine Datei wird an einen Server gesendet, nicht einmal vorübergehend: kein Warten auf einen Upload, keine vom Server vorgegebene Größenbeschränkung, und deine Bilder verlassen niemals dein Gerät.",
+    "p3": "Die Bedienung ist einfach: Wähle ein oder mehrere JPEG-, PNG- oder WebP-Bilder aus, stelle die Qualität mit dem Regler ein und klicke auf Komprimieren. Jedes Bild wird nacheinander verarbeitet, und das Ergebnis erscheint sofort mit Originalgröße, neuer Größe und der eingesparten Prozentzahl, sodass du vor dem Download vergleichen kannst. Gefällt dir das Ergebnis nicht, stelle einfach den Regler neu ein und komprimiere erneut — beliebig oft.",
+    "p4": "Als Ausgangspunkt eignet sich meist eine Qualität von 70-80 %: Für die meisten Menschen sieht das Bild praktisch identisch zum Original aus, während die Dateigröße sich oft mehr als halbiert. Bilder mit flächigen Farben wie Screenshots, Illustrationen und Logos komprimieren selbst bei niedrigen Einstellungen besonders gut. Fotos mit vielen feinen Details, Bildrauschen oder Farbverläufen — etwa Blätter im Wald oder ein Sternenhimmel — behalten bei gleicher Qualität mehr von ihrer Größe und profitieren oft mehr von einer Verkleinerung der Abmessungen als von einer weiteren Qualitätsreduzierung."
+  }
+}

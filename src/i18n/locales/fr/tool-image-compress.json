@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "title": "Compresser des images JPEG, PNG et WebP gratuitement — Web Tool Hub",
+    "description": "Compressez des images JPEG, PNG et WebP gratuitement, directement dans votre navigateur. Sans envoi, sans limite de taille, sans inscription — vos photos ne quittent jamais votre appareil."
+  },
+  "heading": "Compresser une image (JPEG/PNG/WebP)",
+  "tagline": "Réduisez le poids de vos photos en quelques secondes, dans votre navigateur.",
+  "ui": {
+    "selectFiles": "Sélectionner des images",
+    "dropHint": "ou glissez-déposez vos images ici",
+    "quality": "Qualité",
+    "compress": "Compresser",
+    "compressing": "Compression…",
+    "download": "Télécharger",
+    "original": "Original",
+    "compressed": "Compressé",
+    "reduced": "{{percent}} % de moins",
+    "noFiles": "Aucune image sélectionnée pour le moment.",
+    "errorGeneric": "Une erreur est survenue lors de la compression de cette image. Réessayez."
+  },
+  "related": "Outils associés",
+  "article": {
+    "heading": "Pourquoi compresser les images avant de les publier ?",
+    "p1": "Une photo prise directement avec un smartphone récent peut peser 4 à 8 Mo, alors que la plupart des sites web n'ont besoin que d'une fraction de ce poids pour rester nets. Des images trop lourdes sont l'une des causes les plus courantes de lenteur d'un site, et un site lent perd souvent des visiteurs ainsi que des positions dans les Core Web Vitals de Google. Compresser une image avant de la publier retire les données superflues que l'œil ne perçoit presque jamais à la taille d'affichage normale.",
+    "p2": "Tout se passe directement dans votre navigateur. La compression s'exécute dans un Web Worker — un thread séparé intégré aux navigateurs modernes — afin que la page reste réactive même en compressant plusieurs photos volumineuses à la fois. Aucun fichier n'est envoyé vers un serveur, pas même temporairement : pas d'attente d'envoi, pas de limite de taille imposée par un serveur, et vos images ne quittent jamais votre appareil.",
+    "p3": "L'utilisation est simple : sélectionnez une ou plusieurs images JPEG, PNG ou WebP, ajustez le niveau de qualité avec le curseur, puis cliquez sur Compresser. Chaque image est traitée l'une après l'autre et le résultat apparaît immédiatement avec la taille d'origine, la nouvelle taille et le pourcentage gagné, pour comparer avant de télécharger quoi que ce soit. Si le résultat ne convient pas, ajustez simplement le curseur et recompressez — aucune limite au nombre d'essais.",
+    "p4": "Comme point de départ, une qualité de 70 à 80 % reste généralement quasi identique à l'original pour la plupart des gens, tout en réduisant la taille de moitié ou plus. Les images aux couleurs unies, comme les captures d'écran, les illustrations et les logos, se compressent particulièrement bien même à des réglages bas. Les photos riches en détails fins, en bruit ou en dégradés — comme un feuillage ou un ciel étoilé — conservent davantage de poids à qualité égale, et bénéficient souvent plus d'un redimensionnement que d'une réduction supplémentaire de la qualité."
+  }
+}

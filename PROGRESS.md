@@ -5,10 +5,19 @@
 
 ## 🔵 Trạng thái hiện tại
 
-- Phase đang làm: **Phase 0 hoàn tất → chuyển sang Phase 1 — 10 công cụ cốt lõi**
-- Task tiếp theo cần làm: Công cụ #1 "Nén ảnh (JPEG/PNG/WebP)" dùng
-  `browser-image-compression` (xem `ROADMAP.md` Phase 1) — thay nội dung placeholder trong
-  `src/pages/[locale]/tools/[slug].astro` cho `toolId === 'image-compress'`
+- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (1/10 xong)
+- Task tiếp theo cần làm: Công cụ #2 "Chuyển đổi định dạng ảnh" dùng HTML5 Canvas API (xem
+  `ROADMAP.md` Phase 1)
+- Ghi chú kiến trúc tool page: `src/pages/[locale]/tools/[slug].astro` giờ rẽ nhánh theo
+  `toolId` — nếu là tool đã có UI thật thì render component riêng
+  (`src/components/tools/<Ten>Page.astro`), còn lại vẫn rơi vào nhánh "coming soon" mặc
+  định. Khi làm tool #2, thêm 1 nhánh `toolId === 'image-convert'` mới tương tự, KHÔNG sửa
+  nhánh `image-compress` đã xong.
+- Ghi chú i18n: mỗi tool có file dictionary namespace RIÊNG
+  (`src/i18n/locales/{lang}/tool-<id>.json`, đăng ký namespace trong `src/i18n/i18next.ts`),
+  không dồn hết vào `common.json` — giữ `common.json` gọn cho các chuỗi UI dùng chung
+  (Header/Sidebar/Footer/Banner). `getFixedT(lang, 'tool-image-compress')` là ví dụ cách
+  gọi namespace riêng.
 - Ghi chú repo/deploy: repo đã push lên GitHub tại `DDM123455/devhub`
   (`https://github.com/DDM123455/devhub`), nhánh mặc định `main`. Deploy qua Cloudflare
   Git integration (Workers static assets, không phải `*.pages.dev` cổ điển) — domain thật:
@@ -38,6 +47,54 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-24 — Phase 1, công cụ #1: Nén ảnh (JPEG/PNG/WebP)
+- Đã làm:
+  - Cài `browser-image-compression` (thư viện chỉ định trong `ROADMAP.md`) — thư viện này
+    tự chạy nén ảnh trong Web Worker nội bộ (`useWebWorker: true`), nên KHÔNG cần tự viết
+    Worker riêng vẫn đáp ứng đúng quy tắc "xử lý file nặng luôn bọc trong Web Worker" của
+    `CLAUDE.md`.
+  - Tạo `src/components/tools/ImageCompressor.tsx` (React, hydrate qua `client:load`): chọn
+    nhiều ảnh JPEG/PNG/WebP cùng lúc, thanh trượt chất lượng (10-100%, mặc định 80%), nút
+    Nén xử lý tuần tự từng ảnh, hiển thị dung lượng gốc/sau nén/phần trăm giảm, nút tải
+    xuống riêng từng ảnh (không dùng zip vì không có trong danh sách dependency được phép).
+  - Tạo `src/components/tools/ImageCompressPage.astro`: bọc `Layout` + component React ở
+    trên + đầy đủ checklist SEO cho trang công cụ theo `CLAUDE.md`:
+    - Title/description riêng, tối ưu từ khóa, không trùng ngôn ngữ khác.
+    - JSON-LD `schema.org/WebApplication`, `price: "0"`, `priceCurrency: "USD"`.
+    - Đoạn nội dung hướng dẫn ~300-380 từ/ngôn ngữ (4 đoạn), viết riêng cho từng ngôn ngữ
+      (không dịch máy thô, không AI-spin lặp cấu trúc).
+    - Link nội bộ tới 2 tool cùng nhóm `image` (Chuyển đổi định dạng ảnh, Xóa nền ảnh).
+    - Tự động có trong sitemap (route động đã có sẵn từ task URL structure).
+  - Tạo namespace i18n riêng `tool-image-compress` (8 file JSON, xem ghi chú kiến trúc ở
+    trên) thay vì nhồi vào `common.json`.
+  - Sửa `src/pages/[locale]/tools/[slug].astro`: rẽ nhánh `toolId === 'image-compress'` →
+    render `<ImageCompressPage lang={locale} />`; các `toolId` khác vẫn giữ nhánh "coming
+    soon" cũ.
+  - `npm run build` sinh đủ 89 trang không lỗi. Đọc trực tiếp `dist/en/tools/compress-image/
+    index.html` và `dist/vi/tools/nen-anh/index.html` xác nhận: title/description/JSON-LD
+    đúng, heading dịch đúng ngôn ngữ, input file compressor có mặt, link liên quan trỏ đúng
+    2 tool cùng nhóm. Đếm số từ bằng script Node xác nhận đoạn nội dung EN (315 từ) và VI
+    (381 từ) đều nằm trong khoảng 300-500 từ yêu cầu.
+  - Chạy Lighthouse (Chrome headless local) trên `http://localhost:4322/en/tools/
+    compress-image/` qua `npm run preview`: **Performance 100, Accessibility 100, Best
+    Practices 100, SEO 100** — component React + nội dung mới không ảnh hưởng điểm số.
+- Quyết định kỹ thuật quan trọng:
+  - Không tự viết Web Worker riêng vì `browser-image-compression` đã tự quản lý Worker nội
+    bộ — viết thêm Worker riêng sẽ là trùng lặp không cần thiết.
+  - Không hỗ trợ tải xuống hàng loạt (zip) — không có trong danh sách dependency
+    `ROADMAP.md` cho phép, mỗi ảnh có nút tải riêng là đủ cho v1.
+  - Không thêm chuyển đổi định dạng (JPEG↔PNG↔WebP) vào tool này dù thư viện hỗ trợ — đó là
+    phạm vi của tool #2 "Chuyển đổi định dạng ảnh" riêng biệt trong `ROADMAP.md`, giữ đúng
+    ranh giới 1 tool = 1 chức năng.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Chưa test bằng mắt việc chọn ảnh thật + kéo thả trên trình duyệt thật (chỉ verify HTML
+    tĩnh sinh ra đúng + Lighthouse chạy trên trang tĩnh, KHÔNG verify tương tác JS runtime
+    thực tế của component React) — nên tự thử tay khi có dịp mở dev server.
+  - (Đã tự phát hiện và sửa trong lúc làm: `dropHint` ghi "hoặc kéo thả ảnh vào đây" nhưng
+    bản đầu chỉ có input click-to-select — đã thêm `onDrop`/`onDragOver` thật vào
+    `ImageCompressor.tsx` kèm hiệu ứng viền khi kéo ảnh vào, để UI không nói sai tính năng.)
+- Task tiếp theo: Phase 1, công cụ #2 "Chuyển đổi định dạng ảnh" dùng HTML5 Canvas API.
 
 ### 2026-07-24 — Kiểm tra Lighthouse trang chủ (hoàn tất Phase 0)
 - Đã làm:

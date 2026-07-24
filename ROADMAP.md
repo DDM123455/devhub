@@ -25,7 +25,7 @@ Mỗi công cụ = 1 task riêng biệt. Với mỗi công cụ: build UI, tích
 Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm string i18n cho cả
 8 ngôn ngữ.
 
-- [ ] 1. Nén ảnh (JPEG/PNG/WebP) — `browser-image-compression`
+- [x] 1. Nén ảnh (JPEG/PNG/WebP) — `browser-image-compression`
 - [ ] 2. Chuyển đổi định dạng ảnh — HTML5 Canvas API
 - [ ] 3. Xóa nền ảnh (AI, chạy local) — `@imgly/background-removal`
 - [ ] 4. Gộp PDF (Merge) — `pdf-lib`
