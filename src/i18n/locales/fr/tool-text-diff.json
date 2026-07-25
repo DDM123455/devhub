@@ -1,30 +1,46 @@
 {
   "meta": {
     "title": "Comparateur de texte en ligne gratuit — Web Tool Hub",
-    "description": "Comparez deux textes gratuitement et repérez instantanément chaque mot ou ligne modifié. Tout se passe dans votre navigateur, rien n'est envoyé à un serveur."
+    "description": "Comparez deux textes gratuitement — par caractère, mot ou ligne, en vis-à-vis avec numéros de ligne et un outil de fusion pour résoudre chaque changement. Tout se passe dans votre navigateur, rien n'est envoyé à un serveur."
   },
   "heading": "Comparateur de texte (Diff Checker)",
   "tagline": "Collez deux versions d'un texte pour voir exactement ce qui a changé, mot par mot ou ligne par ligne.",
   "ui": {
     "originalLabel": "Texte original",
     "changedLabel": "Texte modifié",
-    "compare": "Comparer",
-    "modeWord": "Par mot",
-    "modeLine": "Par ligne",
+    "modeWord": "Mot",
+    "modeLine": "Ligne",
+    "modeChar": "Caractère",
     "noChanges": "Aucune différence trouvée — les deux textes sont identiques.",
     "placeholder": "Collez ou saisissez le texte ici…",
     "ignoreWhitespace": "Ignorer les espaces",
     "ignoreCase": "Ignorer la casse",
     "statsAdded": "{{count}} ajoutés",
     "statsRemoved": "{{count}} supprimés",
-    "statsModified": "{{count}} modifiés"
+    "statsModified": "{{count}} modifiés",
+    "clear": "Effacer",
+    "swap": "Inverser",
+    "uploadFile": "Importer .txt",
+    "prevChange": "Changement précédent",
+    "nextChange": "Changement suivant",
+    "changeCounter": "{{current}} / {{total}} changements",
+    "fullscreen": "Plein écran",
+    "exitFullscreen": "Quitter le plein écran",
+    "mergeToolHeading": "Outil de fusion",
+    "mergeLeftHeading": "Version de gauche",
+    "mergeRightHeading": "Version de droite",
+    "acceptRightAria": "Utiliser la version de droite pour ce changement",
+    "acceptLeftAria": "Utiliser la version de gauche pour ce changement",
+    "copy": "Copier",
+    "copied": "Copié !",
+    "save": "Enregistrer en .txt"
   },
   "related": "Outils associés",
   "article": {
     "heading": "À quoi sert un comparateur de texte ?",
     "p1": "Dès qu'il existe deux versions d'un même document — un contrat avant et après la relecture d'un avocat, un article avant et après une correction, un fichier de configuration avant et après le commit d'un collègue — la question qui compte n'est presque jamais « ces fichiers sont-ils identiques » mais « qu'est-ce qui a exactement changé ». Lire les deux versions côte à côte en essayant de repérer chaque virgule ajoutée ou chaque phrase reformulée est lent et source d'erreurs, surtout au-delà d'une page. Un comparateur de texte automatise cette tâche et met en évidence précisément les mots ou les lignes qui diffèrent, pour que la relecture d'une modification prenne quelques secondes plutôt que plusieurs minutes.",
     "p2": "Cet outil fonctionne entièrement dans votre navigateur. Les deux zones de texte restent en mémoire sur votre appareil, et la comparaison est calculée par une bibliothèque JavaScript exécutée localement — rien de ce que vous tapez ou collez n'est jamais envoyé à un serveur, ni enregistré, ni stocké où que ce soit. C'est important si vous comparez un contrat avec un client, un fichier de mots de passe, ou tout texte que vous préférez ne pas faire transiter par un service tiers. Fermez l'onglet et tout disparaît ; aucun historique ne subsiste.",
-    "p3": "Pour l'utiliser, collez le texte original à gauche et la version modifiée à droite, puis choisissez la granularité de la comparaison. Le mode par mot traite le texte comme une suite de mots et convient le mieux à la prose : il indique précisément quels mots ont été ajoutés, supprimés ou remplacés dans une phrase. Le mode par ligne compare des lignes entières, ce qui est plus utile pour du contenu structuré comme du code, du JSON ou des listes ligne par ligne, quand ce qui compte est de savoir quelles lignes entières ont été ajoutées ou supprimées plutôt que les mots isolés qu'elles contiennent. Cliquez sur Comparer et le résultat s'affiche juste en dessous, avec le texte supprimé barré sur fond rouge et le texte ajouté surligné en vert.",
-    "p4": "En pratique, cet outil sert à bien plus qu'à corriger des fautes. Les développeurs utilisent le mode par ligne pour vérifier un changement de code avant un commit, les rédacteurs utilisent le mode par mot pour voir exactement ce qu'un relecteur a reformulé dans un paragraphe, et toute personne renégociant un contrat peut coller deux versions pour confirmer que seules les clauses convenues ont bougé. Si les deux textes s'avèrent identiques, l'outil l'indique directement plutôt que d'afficher un résultat vide et ambigu."
+    "p3": "Collez le texte original à gauche et la version modifiée à droite : les deux zones affichent des numéros de ligne et défilent de façon synchronisée, chacune avec ses propres boutons Effacer, Inverser et Importer .txt pour charger deux fichiers directement depuis le disque plutôt que de faire un copier-coller. La comparaison se met à jour en direct pendant la saisie ; il n'y a aucun bouton à cliquer. Choisissez Caractère, Mot ou Ligne pour régler la finesse de la comparaison : le mode Caractère détecte jusqu'à une simple faute de frappe, le mode Mot convient le mieux à la prose puisqu'il indique précisément quels mots ont changé dans une phrase, et le mode Ligne compare des lignes entières, ce qui convient au code, au JSON ou aux listes où ce qui compte est de savoir quelles lignes entières ont bougé plutôt que les mots isolés qu'elles contiennent. Une ligne qui n'existe que dans une version s'affiche entièrement en vert (ajoutée) ou en rouge (supprimée) ; une ligne qui existe dans les deux mais a été modifiée s'affiche en orange, avec le mot ou les caractères exacts qui ont changé surlignés plus fortement à l'intérieur — de quoi distinguer d'un coup d'œil une ligne modifiée d'une simple paire suppression-puis-ajout sans rapport.",
+    "p4": "Les compteurs d'ajouts/suppressions/modifications au-dessus de la comparaison donnent une idée rapide de l'ampleur du changement, et les boutons ↑/↓ sautent directement au changement suivant ou précédent sans faire défiler les lignes inchangées — pratique sur un document long. Un bouton Plein écran agrandit la comparaison pour l'examiner de plus près. Sous la comparaison, l'outil de fusion transforme ce diff en lecture seule en quelque chose que vous pouvez réellement résoudre : chaque changement dispose de ses propres boutons ←/→ entre les deux colonnes, permettant de faire passer la modification de la version de droite dans la colonne de gauche, ou celle de gauche dans la droite, changement par changement, jusqu'à ce que chaque colonne corresponde exactement à ce que vous voulez. Chaque colonne dispose de ses propres boutons Copier et Enregistrer, pour récupérer un résultat fusionné et propre sans rien retaper. Si les deux textes s'avèrent identiques, l'outil l'indique directement plutôt que d'afficher un résultat vide et ambigu."
   }
 }

@@ -1,30 +1,46 @@
 {
   "meta": {
     "title": "Comparador de textos online gratis — Web Tool Hub",
-    "description": "Compara dos textos gratis y descubre al instante cada palabra o línea que cambió. Funciona totalmente en tu navegador, sin subir nada a ningún servidor."
+    "description": "Compara dos textos gratis — por carácter, palabra o línea, en paralelo con números de línea y una herramienta de fusión para resolver cada cambio. Funciona totalmente en tu navegador, sin subir nada a ningún servidor."
   },
   "heading": "Comparador de textos (Diff Checker)",
   "tagline": "Pega dos versiones de un texto y descubre exactamente qué cambió, palabra por palabra o línea por línea.",
   "ui": {
     "originalLabel": "Texto original",
     "changedLabel": "Texto modificado",
-    "compare": "Comparar",
-    "modeWord": "Por palabra",
-    "modeLine": "Por línea",
+    "modeWord": "Palabra",
+    "modeLine": "Línea",
+    "modeChar": "Carácter",
     "noChanges": "No se encontraron diferencias: los dos textos son idénticos.",
     "placeholder": "Pega o escribe el texto aquí…",
     "ignoreWhitespace": "Ignorar espacios en blanco",
     "ignoreCase": "Ignorar mayúsculas/minúsculas",
     "statsAdded": "{{count}} añadidos",
     "statsRemoved": "{{count}} eliminados",
-    "statsModified": "{{count}} modificados"
+    "statsModified": "{{count}} modificados",
+    "clear": "Borrar",
+    "swap": "Intercambiar",
+    "uploadFile": "Subir .txt",
+    "prevChange": "Cambio anterior",
+    "nextChange": "Cambio siguiente",
+    "changeCounter": "{{current}} / {{total}} cambios",
+    "fullscreen": "Pantalla completa",
+    "exitFullscreen": "Salir de pantalla completa",
+    "mergeToolHeading": "Herramienta de fusión",
+    "mergeLeftHeading": "Versión izquierda",
+    "mergeRightHeading": "Versión derecha",
+    "acceptRightAria": "Usar la versión derecha para este cambio",
+    "acceptLeftAria": "Usar la versión izquierda para este cambio",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "save": "Guardar como .txt"
   },
   "related": "Herramientas relacionadas",
   "article": {
     "heading": "¿Para qué sirve un comparador de textos?",
     "p1": "Cada vez que existen dos versiones de un mismo documento —un contrato antes y después de que lo revise un abogado, un artículo antes y después de una ronda de correcciones, un archivo de configuración antes y después del commit de un compañero— la pregunta importante casi nunca es si los archivos son iguales, sino qué ha cambiado exactamente. Leer las dos versiones en paralelo intentando detectar cada coma añadida o cada frase reescrita es lento y propenso a errores, sobre todo cuando el documento ocupa más de una página. Un comparador de textos automatiza esa tarea y resalta con precisión las palabras o líneas que difieren, para que revisar un cambio te lleve segundos en lugar de minutos.",
     "p2": "Esta herramienta funciona por completo en tu navegador. Ambos cuadros de texto permanecen en la memoria de tu dispositivo y la comparación la calcula una librería de JavaScript que se ejecuta localmente: nada de lo que escribas o pegues se envía nunca a un servidor, ni se registra ni se guarda en ningún sitio. Esto importa si estás comparando un contrato con un cliente, un archivo con contraseñas o cualquier texto que prefieras no pasar por un servicio externo. Cierra la pestaña y todo desaparece; no queda ningún historial del que preocuparse.",
-    "p3": "Para usarla, pega el texto original a la izquierda y la versión actualizada a la derecha, y elige cómo quieres desglosar la comparación. El modo por palabra trata el texto como una secuencia de palabras y es el más adecuado para prosa: muestra exactamente qué palabras se añadieron, eliminaron o sustituyeron dentro de una frase. El modo por línea compara líneas completas, lo cual resulta más útil para contenido estructurado como código, JSON o listas línea por línea, donde importa qué líneas enteras se añadieron o eliminaron y no las palabras sueltas dentro de ellas. Pulsa Comparar y el resultado aparece debajo, con el texto eliminado tachado sobre fondo rojo y el texto añadido resaltado en verde.",
-    "p4": "En la práctica esto sirve para mucho más que corregir erratas. Los desarrolladores usan el modo por línea para revisar un cambio de código antes de hacer commit, los redactores usan el modo por palabra para ver exactamente qué reescribió un editor en un párrafo, y cualquiera que esté renegociando un contrato puede pegar dos borradores para confirmar que solo cambiaron las cláusulas acordadas. Si los dos textos resultan ser idénticos, la herramienta lo indica directamente en lugar de mostrar un resultado vacío y ambiguo."
+    "p3": "Pega el texto original a la izquierda y la versión actualizada a la derecha: ambos cuadros muestran números de línea y se desplazan de forma sincronizada, y cada uno tiene sus propios botones Borrar, Intercambiar y Subir .txt para cargar dos archivos directamente desde el disco en vez de copiar y pegar. La comparación se actualiza en vivo mientras escribes; no hay ningún botón que pulsar. Elige Carácter, Palabra o Línea para controlar con qué precisión se desglosan las diferencias: el modo Carácter detecta hasta un simple error de tecleo, el modo Palabra es el más adecuado para prosa porque muestra exactamente qué palabras cambiaron dentro de una frase, y el modo Línea compara líneas completas, lo cual conviene a código, JSON o listas donde importa qué líneas enteras se movieron y no las palabras sueltas dentro de ellas. Una línea que solo existe en una versión se muestra totalmente en verde (añadida) o rojo (eliminada); una línea que existe en ambas pero fue editada se muestra en naranja, con la palabra o los caracteres exactos que cambiaron resaltados con más fuerza dentro de ella, para que puedas distinguir a simple vista una línea editada de un par de eliminación-e-inserción sin relación.",
+    "p4": "Los contadores de añadidos/eliminados/modificados encima de la comparación te dan una idea rápida de la magnitud del cambio, y los botones ↑/↓ saltan directamente al cambio siguiente o anterior sin desplazarte por líneas sin modificar, algo muy útil en un documento largo. Un botón de Pantalla completa expande la comparación para revisarla con más detalle. Debajo de la comparación, la herramienta de fusión convierte este diff de solo lectura en algo que realmente puedes resolver: cada cambio tiene sus propios botones ←/→ entre las dos columnas, que te permiten llevar la edición de la versión derecha a la columna izquierda, o llevar la versión izquierda a la derecha, cambio por cambio, hasta que ambas columnas queden exactamente como quieres. Cada columna tiene sus propios botones Copiar y Guardar, para que puedas extraer un resultado fusionado y limpio sin volver a escribir nada. Si los dos textos resultan ser idénticos, la herramienta lo indica directamente en lugar de mostrar un resultado vacío y ambiguo."
   }
 }

@@ -1,30 +1,46 @@
 {
   "meta": {
     "title": "So sánh văn bản trực tuyến miễn phí — Web Tool Hub",
-    "description": "So sánh hai đoạn văn bản miễn phí, nhìn thấy ngay từng từ hoặc từng dòng đã thay đổi. Xử lý hoàn toàn trên trình duyệt — không có gì được gửi đi."
+    "description": "So sánh hai đoạn văn bản miễn phí — theo ký tự, từ hoặc dòng, xem song song kèm số dòng, có sẵn công cụ hợp nhất để xử lý từng thay đổi. Xử lý hoàn toàn trên trình duyệt — không có gì được gửi đi."
   },
   "heading": "So sánh văn bản (Diff Checker)",
   "tagline": "Dán hai phiên bản văn bản để xem chính xác điều gì đã thay đổi, theo từng từ hoặc từng dòng.",
   "ui": {
     "originalLabel": "Văn bản gốc",
     "changedLabel": "Văn bản đã sửa",
-    "compare": "So sánh",
-    "modeWord": "Theo từ",
-    "modeLine": "Theo dòng",
+    "modeWord": "Từ",
+    "modeLine": "Dòng",
+    "modeChar": "Ký tự",
     "noChanges": "Không có khác biệt — hai văn bản giống hệt nhau.",
     "placeholder": "Dán hoặc nhập văn bản vào đây…",
     "ignoreWhitespace": "Bỏ qua khoảng trắng",
     "ignoreCase": "Không phân biệt hoa/thường",
     "statsAdded": "{{count}} thêm",
     "statsRemoved": "{{count}} xóa",
-    "statsModified": "{{count}} sửa"
+    "statsModified": "{{count}} sửa",
+    "clear": "Xóa",
+    "swap": "Hoán đổi",
+    "uploadFile": "Tải tệp .txt",
+    "prevChange": "Thay đổi trước",
+    "nextChange": "Thay đổi kế tiếp",
+    "changeCounter": "{{current}} / {{total}} thay đổi",
+    "fullscreen": "Toàn màn hình",
+    "exitFullscreen": "Thoát toàn màn hình",
+    "mergeToolHeading": "Công cụ hợp nhất",
+    "mergeLeftHeading": "Bản bên trái",
+    "mergeRightHeading": "Bản bên phải",
+    "acceptRightAria": "Lấy nội dung bên phải cho thay đổi này",
+    "acceptLeftAria": "Lấy nội dung bên trái cho thay đổi này",
+    "copy": "Sao chép",
+    "copied": "Đã sao chép!",
+    "save": "Lưu file .txt"
   },
   "related": "Công cụ liên quan",
   "article": {
     "heading": "Vì sao cần công cụ so sánh văn bản?",
     "p1": "Khi có hai phiên bản của cùng một tài liệu — hợp đồng trước và sau khi luật sư chỉnh sửa, bài viết trước và sau khi biên tập góp ý, file cấu hình trước và sau khi đồng nghiệp commit — câu hỏi quan trọng hiếm khi là \"hai file này có giống nhau không\" mà là \"chính xác điều gì đã thay đổi\". Đọc song song hai bản và cố gắng phát hiện từng dấu phẩy được thêm, từng câu bị xoá hay viết lại bằng mắt thường rất chậm và dễ bỏ sót, nhất là khi tài liệu dài hơn một trang. Công cụ so sánh văn bản tự động hoá việc này, làm nổi bật chính xác những từ hoặc dòng khác nhau, giúp bạn rà soát một thay đổi trong vài giây thay vì vài phút.",
     "p2": "Công cụ này chạy hoàn toàn trên trình duyệt của bạn. Hai ô văn bản chỉ tồn tại trong bộ nhớ thiết bị, và việc so sánh được tính toán bởi một thư viện JavaScript chạy ngay tại chỗ — không có nội dung nào bạn gõ hay dán được gửi lên máy chủ, ghi log hay lưu trữ ở bất kỳ đâu. Điều này quan trọng nếu bạn đang so sánh một hợp đồng với khách hàng, một file chứa mật khẩu, hay bất kỳ văn bản nào bạn không muốn đưa qua dịch vụ bên thứ ba. Đóng tab trình duyệt là mọi thứ biến mất, không có lịch sử nào để lo lắng.",
-    "p3": "Cách dùng: dán văn bản gốc vào ô bên trái, văn bản đã sửa vào ô bên phải, rồi chọn cách so sánh. Chế độ theo từ coi văn bản như một chuỗi các từ, phù hợp nhất với văn xuôi — nó chỉ ra chính xác từ nào được thêm, xoá hoặc thay thế trong một câu. Chế độ theo dòng so sánh cả dòng một lúc, hữu ích hơn cho nội dung có cấu trúc như code, JSON hay danh sách theo dòng, khi bạn quan tâm dòng nào được thêm hay xoá toàn bộ hơn là từng từ bên trong. Bấm So sánh, kết quả hiện ngay bên dưới: phần bị xoá có nền đỏ và gạch ngang, phần được thêm có nền xanh.",
-    "p4": "Trong thực tế công cụ này hữu ích hơn nhiều so với việc chỉ soát lỗi chính tả. Lập trình viên dùng chế độ theo dòng để nhìn nhanh một thay đổi code trước khi commit, người viết dùng chế độ theo từ để thấy chính xác biên tập viên đã sửa gì trong một đoạn văn, và bất kỳ ai đang đàm phán lại hợp đồng đều có thể dán hai bản nháp vào để xác nhận chỉ những điều khoản đã thoả thuận mới thay đổi. Nếu hai văn bản giống hệt nhau, công cụ sẽ báo rõ điều đó thay vì hiển thị một kết quả trống khó hiểu."
+    "p3": "Dán văn bản gốc vào ô bên trái, văn bản đã sửa vào ô bên phải — cả hai ô đều hiện số thứ tự dòng và cuộn đồng bộ với nhau, mỗi ô có sẵn nút Xóa, Hoán đổi và Tải tệp .txt riêng để nạp thẳng file từ máy thay vì copy-paste. Kết quả so sánh cập nhật ngay khi bạn gõ, không cần bấm nút nào. Chọn Ký tự, Từ hoặc Dòng để quyết định độ chi tiết của so sánh: chế độ Ký tự bắt được cả một lỗi gõ nhỏ, chế độ Từ phù hợp nhất với văn xuôi vì chỉ rõ chính xác từ nào thay đổi trong câu, còn chế độ Dòng so sánh cả dòng một lúc, hợp với code, JSON hay danh sách theo dòng khi bạn quan tâm dòng nào thay đổi toàn bộ hơn là từng từ bên trong. Một dòng chỉ tồn tại ở một bên sẽ hiện toàn bộ màu xanh (thêm) hoặc đỏ (xóa); một dòng tồn tại ở cả hai bên nhưng bị sửa sẽ hiện màu cam, với đúng phần từ hoặc ký tự đã đổi được tô đậm hơn bên trong — nhờ vậy bạn phân biệt được ngay một dòng bị SỬA với một cặp xóa-rồi-thêm không liên quan.",
+    "p4": "Ba badge đếm số dòng thêm/xóa/sửa phía trên khung so sánh cho bạn cái nhìn nhanh về mức độ thay đổi, còn 2 nút ↑/↓ giúp nhảy thẳng tới thay đổi kế tiếp hoặc trước đó mà không cần cuộn qua các dòng không đổi — rất tiện với tài liệu dài. Nút Toàn màn hình phóng to khung so sánh chiếm hết màn hình để xem kỹ hơn. Phía dưới khung so sánh là công cụ hợp nhất, biến bản so sánh chỉ-để-xem thành thứ bạn thực sự xử lý được: mỗi thay đổi có cặp nút ←/→ riêng nằm giữa 2 cột, cho phép kéo bản sửa bên phải sang cột trái, hoặc đẩy bản gốc bên trái sang cột phải, xử lý từng thay đổi một cho tới khi cả hai cột đúng như ý muốn. Mỗi cột có nút Sao chép và Lưu riêng, giúp bạn lấy ra kết quả đã hợp nhất sạch sẽ mà không cần gõ lại gì. Nếu hai văn bản giống hệt nhau, công cụ sẽ báo rõ điều đó thay vì hiển thị một kết quả trống khó hiểu."
   }
 }

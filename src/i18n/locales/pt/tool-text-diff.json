@@ -1,30 +1,46 @@
 {
   "meta": {
     "title": "Comparador de textos online grátis — Web Tool Hub",
-    "description": "Compare dois textos gratuitamente e veja na hora cada palavra ou linha que mudou. Tudo roda no seu navegador, sem enviar nada para nenhum servidor."
+    "description": "Compare dois textos gratuitamente — por caractere, palavra ou linha, lado a lado com números de linha e uma ferramenta de mesclagem para resolver cada mudança. Tudo roda no seu navegador, sem enviar nada para nenhum servidor."
   },
   "heading": "Comparador de textos (Diff Checker)",
   "tagline": "Cole duas versões de um texto e veja exatamente o que mudou, palavra por palavra ou linha por linha.",
   "ui": {
     "originalLabel": "Texto original",
     "changedLabel": "Texto alterado",
-    "compare": "Comparar",
-    "modeWord": "Por palavra",
-    "modeLine": "Por linha",
+    "modeWord": "Palavra",
+    "modeLine": "Linha",
+    "modeChar": "Caractere",
     "noChanges": "Nenhuma diferença encontrada — os dois textos são idênticos.",
     "placeholder": "Cole ou digite o texto aqui…",
     "ignoreWhitespace": "Ignorar espaços em branco",
     "ignoreCase": "Ignorar maiúsculas/minúsculas",
     "statsAdded": "{{count}} adicionados",
     "statsRemoved": "{{count}} removidos",
-    "statsModified": "{{count}} modificados"
+    "statsModified": "{{count}} modificados",
+    "clear": "Limpar",
+    "swap": "Trocar",
+    "uploadFile": "Enviar .txt",
+    "prevChange": "Mudança anterior",
+    "nextChange": "Próxima mudança",
+    "changeCounter": "{{current}} / {{total}} mudanças",
+    "fullscreen": "Tela cheia",
+    "exitFullscreen": "Sair da tela cheia",
+    "mergeToolHeading": "Ferramenta de mesclagem",
+    "mergeLeftHeading": "Versão da esquerda",
+    "mergeRightHeading": "Versão da direita",
+    "acceptRightAria": "Usar a versão da direita para esta mudança",
+    "acceptLeftAria": "Usar a versão da esquerda para esta mudança",
+    "copy": "Copiar",
+    "copied": "Copiado!",
+    "save": "Salvar como .txt"
   },
   "related": "Ferramentas relacionadas",
   "article": {
     "heading": "Para que serve um comparador de textos?",
     "p1": "Sempre que existem duas versões do mesmo documento — um contrato antes e depois da revisão de um advogado, um texto antes e depois de uma rodada de feedback, um arquivo de configuração antes e depois do commit de um colega —, a pergunta que realmente importa quase nunca é \"esses arquivos são iguais\", e sim \"o que exatamente mudou\". Ler as duas versões lado a lado tentando notar cada vírgula adicionada ou frase reescrita é lento e sujeito a erros, ainda mais quando o documento passa de uma página. Um comparador de textos automatiza essa tarefa e destaca com precisão as palavras ou linhas que diferem, transformando uma revisão de minutos em segundos.",
     "p2": "Esta ferramenta roda inteiramente no seu navegador. As duas caixas de texto ficam apenas na memória do seu dispositivo, e a comparação é calculada por uma biblioteca JavaScript executada localmente — nada do que você digita ou cola é enviado a um servidor, registrado ou armazenado em lugar nenhum. Isso importa quando você está comparando um contrato com um cliente, um arquivo de senhas ou qualquer texto que prefira não passar por um serviço de terceiros. Feche a aba e tudo desaparece; não sobra histórico nenhum para se preocupar.",
-    "p3": "Para usar, cole o texto original à esquerda e a versão atualizada à direita, depois escolha como quer dividir a comparação. O modo por palavra trata o texto como uma sequência de palavras e é o mais indicado para prosa: mostra exatamente quais palavras foram adicionadas, removidas ou substituídas dentro de uma frase. O modo por linha compara linhas inteiras de cada vez, o que é mais útil para conteúdo estruturado como código, JSON ou listas linha a linha, quando o que importa é quais linhas inteiras foram adicionadas ou removidas, não as palavras isoladas dentro delas. Clique em Comparar e o resultado aparece logo abaixo, com o texto removido riscado sobre fundo vermelho e o texto adicionado destacado em verde.",
-    "p4": "Na prática, isso serve para muito mais do que revisar ortografia. Desenvolvedores usam o modo por linha para conferir uma mudança de código antes de um commit, redatores usam o modo por palavra para ver exatamente o que um editor reescreveu num parágrafo, e quem está renegociando um contrato pode colar dois rascunhos para confirmar que só as cláusulas combinadas foram alteradas. Se os dois textos forem idênticos, a ferramenta avisa isso diretamente, em vez de mostrar um resultado vazio e ambíguo."
+    "p3": "Cole o texto original à esquerda e a versão atualizada à direita — as duas caixas mostram números de linha e rolam de forma sincronizada, e cada uma tem seus próprios botões Limpar, Trocar e Enviar .txt para carregar dois arquivos direto do disco em vez de copiar e colar. A comparação atualiza ao vivo enquanto você digita; não há botão nenhum para clicar. Escolha Caractere, Palavra ou Linha para controlar o nível de detalhe das diferenças: o modo Caractere pega até um erro de digitação isolado, o modo Palavra é o mais indicado para prosa porque mostra exatamente quais palavras mudaram dentro de uma frase, e o modo Linha compara linhas inteiras de cada vez, o que combina com código, JSON ou listas onde importa quais linhas inteiras mudaram, não as palavras isoladas dentro delas. Uma linha que só existe em uma versão aparece totalmente verde (adicionada) ou vermelha (removida); uma linha que existe nas duas mas foi editada aparece em laranja, com a palavra ou os caracteres exatos que mudaram destacados com mais força dentro dela — assim dá para diferenciar de cara uma linha editada de um par de remoção-e-inserção sem relação.",
+    "p4": "Os contadores de adicionados/removidos/modificados acima da comparação dão uma ideia rápida do tamanho da mudança, e os botões ↑/↓ pulam direto para a próxima mudança ou a anterior sem precisar rolar por linhas inalteradas — útil num documento longo. Um botão de Tela cheia expande a comparação para ocupar a tela toda para uma revisão mais de perto. Abaixo da comparação, a ferramenta de mesclagem transforma esse diff somente leitura em algo que você realmente resolve: cada mudança tem seus próprios botões ←/→ entre as duas colunas, permitindo puxar a edição da versão da direita para a coluna da esquerda, ou empurrar a versão da esquerda para a direita, mudança por mudança, até as duas colunas ficarem exatamente como você quer. Cada coluna tem seus próprios botões Copiar e Salvar, para você extrair um resultado mesclado e limpo sem digitar nada de novo. Se os dois textos forem idênticos, a ferramenta avisa isso diretamente, em vez de mostrar um resultado vazio e ambíguo."
   }
 }

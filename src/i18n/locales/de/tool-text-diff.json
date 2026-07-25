@@ -1,30 +1,46 @@
 {
   "meta": {
     "title": "Textvergleich online kostenlos — Web Tool Hub",
-    "description": "Vergleichen Sie zwei Texte kostenlos und sehen Sie sofort jedes geänderte Wort oder jede geänderte Zeile. Alles läuft im Browser, nichts wird an einen Server gesendet."
+    "description": "Vergleichen Sie zwei Texte kostenlos — nach Zeichen, Wort oder Zeile, nebeneinander mit Zeilennummern und einem Merge-Tool, um jede Änderung aufzulösen. Alles läuft im Browser, nichts wird an einen Server gesendet."
   },
   "heading": "Textvergleich (Diff Checker)",
   "tagline": "Fügen Sie zwei Textversionen ein und sehen Sie genau, was sich geändert hat — Wort für Wort oder Zeile für Zeile.",
   "ui": {
     "originalLabel": "Originaltext",
     "changedLabel": "Geänderter Text",
-    "compare": "Vergleichen",
-    "modeWord": "Nach Wort",
-    "modeLine": "Nach Zeile",
+    "modeWord": "Wort",
+    "modeLine": "Zeile",
+    "modeChar": "Zeichen",
     "noChanges": "Keine Unterschiede gefunden — beide Texte sind identisch.",
     "placeholder": "Text hier einfügen oder eingeben…",
     "ignoreWhitespace": "Leerzeichen ignorieren",
     "ignoreCase": "Groß-/Kleinschreibung ignorieren",
     "statsAdded": "{{count}} hinzugefügt",
     "statsRemoved": "{{count}} entfernt",
-    "statsModified": "{{count}} geändert"
+    "statsModified": "{{count}} geändert",
+    "clear": "Leeren",
+    "swap": "Tauschen",
+    "uploadFile": ".txt hochladen",
+    "prevChange": "Vorherige Änderung",
+    "nextChange": "Nächste Änderung",
+    "changeCounter": "{{current}} / {{total}} Änderungen",
+    "fullscreen": "Vollbild",
+    "exitFullscreen": "Vollbild beenden",
+    "mergeToolHeading": "Merge-Tool",
+    "mergeLeftHeading": "Linke Version",
+    "mergeRightHeading": "Rechte Version",
+    "acceptRightAria": "Rechte Version für diese Änderung übernehmen",
+    "acceptLeftAria": "Linke Version für diese Änderung übernehmen",
+    "copy": "Kopieren",
+    "copied": "Kopiert!",
+    "save": "Als .txt speichern"
   },
   "related": "Verwandte Tools",
   "article": {
     "heading": "Wozu dient ein Textvergleich?",
     "p1": "Sobald zwei Versionen desselben Dokuments existieren — ein Vertrag vor und nach der Prüfung durch einen Anwalt, ein Text vor und nach einer Feedbackrunde, eine Konfigurationsdatei vor und nach dem Commit eines Kollegen —, lautet die eigentlich wichtige Frage fast nie 'sind diese Dateien gleich', sondern 'was genau hat sich geändert'. Beide Versionen nebeneinander zu lesen und jedes hinzugefügte Komma oder jeden umformulierten Satz von Hand zu finden, ist langsam und fehleranfällig, besonders wenn das Dokument mehr als eine Seite umfasst. Ein Textvergleich automatisiert genau das und hebt exakt die Wörter oder Zeilen hervor, die sich unterscheiden — eine Änderung lässt sich so in Sekunden statt Minuten prüfen.",
     "p2": "Dieses Tool läuft vollständig in Ihrem Browser. Beide Textfelder bleiben ausschließlich im Speicher Ihres Geräts, und der Vergleich wird von einer lokal ausgeführten JavaScript-Bibliothek berechnet — nichts, was Sie eingeben oder einfügen, wird jemals an einen Server gesendet, protokolliert oder irgendwo gespeichert. Das ist wichtig, wenn Sie einen Kundenvertrag, eine Passwortdatei oder einen anderen sensiblen Text vergleichen, den Sie nicht durch einen externen Dienst schicken möchten. Schließen Sie den Tab, und alles ist verschwunden — es bleibt kein Verlauf zurück, um den man sich sorgen müsste.",
-    "p3": "Zur Nutzung fügen Sie den Originaltext links und die aktualisierte Version rechts ein und wählen dann, wie fein der Vergleich sein soll. Der Wortmodus behandelt den Text als Abfolge von Wörtern und eignet sich am besten für Fließtext: Er zeigt genau, welche Wörter innerhalb eines Satzes hinzugefügt, entfernt oder ersetzt wurden. Der Zeilenmodus vergleicht dagegen ganze Zeilen auf einmal, was für strukturierte Inhalte wie Code, JSON oder zeilenweise Listen nützlicher ist, wenn es darauf ankommt, welche ganzen Zeilen hinzugefügt oder entfernt wurden, statt einzelner Wörter darin. Klicken Sie auf Vergleichen, und das Ergebnis erscheint direkt darunter — entfernter Text durchgestrichen auf rotem Hintergrund, hinzugefügter Text grün hervorgehoben.",
-    "p4": "In der Praxis eignet sich das für weit mehr als Korrekturlesen. Entwickler nutzen den Zeilenmodus, um eine Codeänderung vor dem Commit zu überprüfen, Autoren nutzen den Wortmodus, um genau zu sehen, was ein Lektor in einem Absatz umformuliert hat, und wer einen Vertrag neu verhandelt, kann zwei Entwürfe einfügen, um zu bestätigen, dass sich nur die vereinbarten Klauseln geändert haben. Sind beide Texte identisch, teilt das Tool das direkt mit, statt ein leeres, mehrdeutiges Ergebnis anzuzeigen."
+    "p3": "Fügen Sie den Originaltext links und die aktualisierte Version rechts ein — beide Felder zeigen Zeilennummern an und scrollen synchron, und jedes hat eigene Schaltflächen Leeren, Tauschen und .txt hochladen, um zwei Dateien direkt von der Festplatte zu laden statt zu kopieren und einzufügen. Der Vergleich aktualisiert sich live beim Tippen; es gibt keine Schaltfläche zum Klicken. Wählen Sie Zeichen, Wort oder Zeile, um die Feinheit der Unterschiede zu steuern: Der Zeichenmodus erkennt selbst einen einzelnen Tippfehler, der Wortmodus eignet sich am besten für Fließtext, da er genau zeigt, welche Wörter sich innerhalb eines Satzes geändert haben, und der Zeilenmodus vergleicht ganze Zeilen auf einmal, was zu Code, JSON oder Listen passt, bei denen es darauf ankommt, welche ganzen Zeilen sich verschoben haben statt einzelner Wörter darin. Eine Zeile, die nur in einer Version existiert, wird vollständig grün (hinzugefügt) oder rot (entfernt) angezeigt; eine Zeile, die in beiden existiert, aber bearbeitet wurde, wird orange angezeigt, wobei das genaue geänderte Wort oder die Zeichen darin stärker hervorgehoben sind — so erkennen Sie auf einen Blick eine bearbeitete Zeile von einem unabhängigen Lösch-dann-Einfüge-Paar.",
+    "p4": "Die Zähler für Hinzugefügt/Entfernt/Geändert über dem Vergleich geben auf einen Blick ein Gefühl dafür, wie groß eine Änderung ist, und die Schaltflächen ↑/↓ springen direkt zur nächsten oder vorherigen Änderung, ohne durch unveränderte Zeilen zu scrollen — praktisch bei einem langen Dokument. Eine Vollbild-Schaltfläche erweitert den Vergleich auf die gesamte Bildschirmfläche für eine genauere Prüfung. Unter dem Vergleich verwandelt das Merge-Tool diesen reinen Lese-Diff in etwas, das Sie tatsächlich auflösen können: Jede Änderung hat eigene ←/→-Schaltflächen zwischen den beiden Spalten, mit denen Sie die Bearbeitung der rechten Version in die linke Spalte übernehmen oder die linke Version in die rechte schieben können, Änderung für Änderung, bis jede Spalte genau so aussieht, wie Sie es möchten. Jede Spalte hat eigene Schaltflächen Kopieren und Speichern, damit Sie ein sauberes, zusammengeführtes Ergebnis herausziehen können, ohne etwas neu einzutippen. Sind beide Texte identisch, teilt das Tool das direkt mit, statt ein leeres, mehrdeutiges Ergebnis anzuzeigen."
   }
 }

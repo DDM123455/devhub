@@ -12,11 +12,15 @@
   nâng cấp).
 - Task tiếp theo cần làm: **Phase 1.5**, tool #1, #2, #3, #6, #7, #8, #9 đã xong (đủ điều
   kiện tick). Tool #4 & #5 "Gộp/Tách PDF" đã build+test xong 3/4 mục con (còn thiếu nén
-  PDF, để sau) — xem log 2026-07-25 bên dưới. Task kế tiếp khi mở phiên mới: tool **#10
-  "Chuyển đổi Case văn bản"** trong Phase 1.5 (benchmark ConvertCase.net — thêm Sentence
-  case/aLtErNaTiNg/iNVERSE, xóa khoảng trắng thừa/xuống dòng thừa, sắp xếp dòng theo
-  alphabet). Đây là tool CUỐI CÙNG của Phase 1.5 — sau khi xong tool #10 (trừ mục nén PDF
-  còn treo của #4/#5), toàn bộ Phase 1.5 coi như hoàn tất, chuyển sang Phase 2.
+  PDF, để sau) — xem log 2026-07-25 bên dưới. Tool #6 "So sánh văn bản" vừa được nâng cấp
+  THÊM MỘT LẦN NỮA vượt xa checklist gốc của Phase 1.5 theo yêu cầu trực tiếp của người
+  dùng (xem log riêng ngay bên dưới) — không phải task tiếp theo trong ROADMAP, chỉ là một
+  yêu cầu chen ngang hợp lệ, đã làm xong, quay lại đúng trình tự ROADMAP sau đó. Task kế
+  tiếp khi mở phiên mới: tool **#10 "Chuyển đổi Case văn bản"** trong Phase 1.5 (benchmark
+  ConvertCase.net — thêm Sentence case/aLtErNaTiNg/iNVERSE, xóa khoảng trắng thừa/xuống
+  dòng thừa, sắp xếp dòng theo alphabet). Đây là tool CUỐI CÙNG của Phase 1.5 — sau khi
+  xong tool #10 (trừ mục nén PDF còn treo của #4/#5), toàn bộ Phase 1.5 coi như hoàn tất,
+  chuyển sang Phase 2.
 - Ghi chú thiết kế (2026-07-25): đã redesign toàn bộ giao diện site (không phải task trong
   `ROADMAP.md`, làm theo yêu cầu trực tiếp của người dùng) dựa trên file mockup
   `Web Tool Hub.dc.html` ở gốc repo (file KHÔNG được commit vào git — chỉ là tài liệu tham
@@ -88,6 +92,108 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Nâng cấp lần 2 "So sánh văn bản" theo yêu cầu trực tiếp của người dùng
+  (vượt checklist gốc của Phase 1.5, tool #6) — XONG
+- **Bối cảnh**: tool #6 đã được tick 4/4 trong `ROADMAP.md` Phase 1.5 ở một lượt trước đó
+  trong cùng phiên (xem log "tool #6" bên dưới). Người dùng sau đó yêu cầu TRỰC TIẾP một
+  danh sách nâng cấp lớn hơn nhiều, KHÔNG có trong `ROADMAP.md` — coi đây là yêu cầu chen
+  ngang hợp lệ (đúng như `CLAUDE.md` cho phép: "không nhảy cóc sang task khác... trừ khi
+  người dùng yêu cầu"), không phải một task mới trong checklist nên không thêm checkbox
+  ROADMAP nào cho việc này.
+- Yêu cầu gốc của người dùng: số dòng đồng bộ cuộn ở 2 khung nhập; thanh công cụ mỗi khung
+  (Xóa/Hoán đổi/Tải file .txt); bảng thống kê 3 badge xanh/đỏ/cam; 3 chế độ so sánh Ký tự/
+  Từ/Dòng; khu vực so sánh song song có highlight cam/đỏ/xanh + icon nhảy tới thay đổi kế
+  tiếp/trước + nút toàn màn hình; và một "Công cụ hợp nhất" (Merge Tool) riêng bên dưới với
+  2 cột + nút mũi tên ←/→ theo từng đoạn thay đổi + Sao chép/Lưu/toàn màn hình mỗi cột.
+- **Kiến trúc**: viết lại gần như toàn bộ, tách phần lõi thuật toán ra file dùng chung mới
+  `src/lib/text-diff.ts` (không đặt trong component vì cả khu "so sánh song song" lẫn "công
+  cụ hợp nhất" đều cần dùng chung 1 kết quả diff):
+  - `buildLineDiff()`: xây mô hình diff theo TỪNG DÒNG một — mỗi dòng nguồn thành đúng 1
+    "entry" loại `unchanged`/`added`/`removed`/`modified`. Điểm mấu chốt: một khối dòng bị
+    xóa đứng NGAY TRƯỚC một khối dòng được thêm (`diffLines` trả về 2 phần liên tiếp
+    removed→added) được ghép cặp theo chỉ số (dòng xóa thứ i ghép với dòng thêm thứ i) và
+    phân loại là `modified` — đúng cách các công cụ diff lớn (GitHub split view, Beyond
+    Compare, WinMerge) phân biệt "dòng bị SỬA" với "1 dòng xóa không liên quan + 1 dòng
+    thêm không liên quan". Trong từng cặp `modified`, chạy thêm 1 lượt `diffChars`/
+    `diffWords` (tùy chế độ Ký tự/Từ đang chọn; chế độ Dòng thì bỏ qua bước này) để tô đậm
+    đúng phần từ/ký tự đã đổi bên trong dòng.
+  - `getHunkStartRows()`: gom các entry liền kề khác `unchanged` thành từng "hunk" (cụm
+    thay đổi), dùng chung cho cả nút nhảy tới thay đổi kế tiếp/trước VÀ vị trí đặt nút mũi
+    tên của Merge Tool.
+  - `renderMergedColumn()`: tính văn bản thực tế của 1 cột trong Merge Tool từ dữ liệu diff
+    GỐC + một Map "hunk nào đã được người dùng bấm mũi tên đổi bên" — KHÔNG sửa trực tiếp
+    vào text rồi diff lại từ đầu, vì làm vậy sẽ khiến ranh giới các hunk bị xê dịch liên tục
+    sau mỗi lần bấm (trải nghiệm rất khó chịu khi đang xử lý merge từng cụm một) — quyết
+    định kiến trúc quan trọng nhất của phần này.
+- **UI/UX** (`src/components/tools/TextDiffChecker.tsx`, viết lại hoàn toàn):
+  - Bỏ nút "So sánh" — so sánh giờ chạy LIVE ngay khi gõ (có debounce 150ms tránh tính lại
+    diff trên từng phím gõ với văn bản dài), khớp UX hiện đại hơn (giống Diffchecker.com).
+  - `LineNumberedTextarea`: component dùng chung cho cả 2 khung nhập — gutter số dòng đồng
+    bộ cuộn với chính khung nhập đó qua `onScroll`, ĐỔI 2 khung nhập sang font-mono +
+    line-height cố định (24px, khớp `leading-6`) để số dòng luôn thẳng hàng chính xác với
+    nội dung — trước đó dùng font thường co giãn không đảm bảo được điều này.
+  - 2 khung nhập ("Văn bản gốc"/"Văn bản đã sửa") giờ CŨNG cuộn đồng bộ với NHAU (không chỉ
+    số dòng với nội dung riêng khung đó) — suy luận hợp lý từ yêu cầu dù câu gốc hơi mơ hồ,
+    khớp hành vi công cụ diff chuyên nghiệp thường thấy.
+  - Thanh công cụ mỗi khung: Xóa (clear state), Hoán đổi (swap 2 state cho nhau), Tải tệp
+    .txt (input file ẩn + `FileReader.readAsText`).
+  - Bảng thống kê tái dùng lại 3 badge `statsAdded/statsRemoved/statsModified` đã có sẵn từ
+    lần nâng cấp trước, đổi màu modified từ amber sang đúng cam (`bg-orange-500/15`) theo
+    yêu cầu.
+  - 3 nút chuyển granularity Ký tự/Từ/Dòng (thêm mới "Ký tự" dùng `diffChars`, trước đây
+    chỉ có Từ/Dòng).
+  - Khung so sánh song song: 2 cột cuộn đồng bộ (kỹ thuật `isSyncingRef` chặn vòng lặp
+    feedback, tái dùng ý tưởng từ lần nâng cấp trước nhưng viết lại thành hook
+    `useSyncedScroll()` tái sử dụng được cho cả cặp khung nhập lẫn cặp cột kết quả), số
+    dòng riêng từng cột (chỉ tăng khi cột đó thực sự có dòng ở vị trí đó), nút ↑/↓ +
+    counter "X / Y changes" nhảy tới từng hunk bằng `scrollIntoView`, nút Toàn màn hình
+    dùng Fullscreen API chuẩn (`requestFullscreen`/`exitFullscreen`, hook `useFullscreen()`
+    theo dõi qua sự kiện `fullscreenchange`).
+  - **Công cụ hợp nhất** (khu vực mới hoàn toàn): 3 cột dạng grid (trái | gutter mũi tên |
+    phải) — gutter chỉ hiện cặp nút ←/→ ở DÒNG ĐẦU TIÊN của mỗi hunk (không phải mỗi dòng,
+    để tránh rối mắt với hunk nhiều dòng); bấm → = cột trái mượn nội dung cột phải cho hunk
+    đó (dùng để "chèn thêm"/"chấp nhận xóa"/"thay thế" tùy loại hunk), bấm ← ngược lại;
+    click lại lần 2 vào cùng 1 mũi tên sẽ HỦY lựa chọn đó (toggle, không phải chỉ 1 chiều).
+    Mỗi cột có nút Sao chép (Clipboard API) + Lưu (tải file .txt) + Toàn màn hình riêng.
+  - Giới hạn đã biết, ghi lại minh bạch: gutter mũi tên của Merge Tool ẩn hoàn toàn trên
+    mobile (`hidden md:flex`) vì bố cục 3-cột-cạnh-nhau không hợp lý trên màn hình hẹp —
+    người dùng mobile vẫn xem được nội dung 2 cột merge (xếp dọc) nhưng không thao tác được
+    nút ←/→; đây là đánh đổi có chủ đích cho một công cụ vốn thiên về desktop, không phải
+    lỗi bỏ sót.
+- Test tương tác qua Puppeteer (3 file `test-textdiff.mjs`/`test-textdiff2.mjs`/
+  `test-textdiff3.mjs` trong scratchpad, không commit) — chạy đủ cả trên dev server LẪN
+  bundle production thật (`npm run build` + `npm run preview`), bao phủ:
+  - Số dòng hiển thị đúng số lượng dòng thực tế.
+  - Nút Xóa/Hoán đổi/Tải file hoạt động đúng (test Tải file bằng cách tạo file `.txt` thật
+    trên đĩa rồi dùng `elementHandle.uploadFile()`, không giả lập).
+  - So sánh chạy live không cần bấm nút.
+  - Phân loại added/removed/modified ĐÚNG với 1 kịch bản dựng có chủ đích tách biệt rõ 3
+    loại thay đổi bằng các dòng neo không đổi — bài test ban đầu tự đoán sai kết quả phân
+    loại cho 1 kịch bản mơ hồ hơn (2 dòng xóa/3 dòng thêm cạnh nhau), tự phát hiện qua lỗi
+    test thật rồi sửa lại kịch bản test cho rõ ràng, không hạ thấp tiêu chuẩn kiểm tra.
+  - Cả 3 nút granularity tồn tại; **quan trọng nhất**: xác nhận chuyển Từ→Ký tự thực sự đổi
+    ĐỘ MỊN của highlight (chế độ Từ tô cả từ "brown"/"brwon", chế độ Ký tự chỉ tô đúng ký tự
+    "o" bị hoán đổi vị trí) — không chỉ kiểm tra nút bấm được mà xác nhận thuật toán con
+    thực sự chạy khác nhau theo chế độ. Chế độ Dòng xác nhận KHÔNG có highlight con nào.
+  - Cả 3 màu xanh/đỏ/cam đều xuất hiện đúng trong DOM thật.
+  - Điều hướng ↑/↓ đổi đúng counter.
+  - Nút Toàn màn hình không throw lỗi (dù Chrome headless thường từ chối cấp quyền
+    fullscreen do thiếu user-activation thật — chấp nhận không thể test chính event
+    fullscreenchange có bắn ra hay không trong môi trường headless, chỉ xác nhận không có
+    lỗi JS không bắt được).
+  - **Merge Tool cả 2 chiều ←/→**: bấm → rồi TẢI FILE THẬT qua nút Lưu, đọc lại nội dung
+    file từ đĩa để xác nhận cột trái đã đổi đúng nội dung — không chỉ tin vào việc UI hiện
+    đúng chữ. Tương tự chiều ←. Xác nhận bấm lại cùng 1 mũi tên sẽ hủy lựa chọn (revert).
+  - Cuộn đồng bộ: cả cặp khung nhập VÀ cặp cột kết quả, xác nhận scrollTop thực sự đồng bộ
+    hai chiều bằng cách đọc giá trị `scrollTop` thật sau khi bắn sự kiện scroll.
+  - `ignoreCase`/`ignoreWhitespace` (tính năng cũ) vẫn hoạt động đúng sau khi viết lại toàn
+    bộ engine.
+- `npm run build` sạch cả trước và sau khi test. Đã cập nhật lại toàn bộ nội dung SEO (bài
+  viết p3/p4 + meta description) ở cả 8 ngôn ngữ để mô tả đúng bộ tính năng mới (không còn
+  nhắc tới nút "So sánh" đã bị bỏ) — viết lại tay cho từng ngôn ngữ, không dịch máy nguyên
+  khối. Đã bỏ key i18n `compare` không còn dùng ở cả 8 file.
+
 
 ### 2026-07-25 — Phase 1.5, tool #9: Nâng cấp "QR Code Generator" lên Feature Parity — XONG
 - Benchmark: qr-code-generator.com.
