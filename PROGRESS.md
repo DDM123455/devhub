@@ -12,13 +12,16 @@
 - **ĐANG LÀM (2026-07-25, phiên hiện tại): QA audit toàn site theo yêu cầu trực tiếp của
   người dùng** (không phải task trong ROADMAP — đóng vai Senior QA/Frontend/UI-UX kiểm tra
   lại toàn bộ chức năng + UI/UX của cả 10 tool trước khi coi dự án "hoàn thành"). Đã xong:
-  layout dùng chung + 5/10 tool (Nén ảnh, Chuyển đổi định dạng ảnh, Xóa nền ảnh, Gộp PDF,
-  Tách PDF) — xem log chi tiết ngay bên dưới, mỗi tool đã build + test tương tác Puppeteer
-  + commit riêng. CÒN LẠI cần audit: So sánh văn bản (đang làm dở, đã phát hiện 1 bug UX
-  đáng kể trong Merge Tool — xem ghi chú), Đếm từ & ký tự, JSON Formatter, QR Generator,
-  Text Case Converter, trang chủ, responsive/dark mode toàn site, rồi tổng hợp báo cáo cuối
-  cùng dạng bảng. Task tiếp theo khi mở phiên mới (nếu bị ngắt giữa chừng): tiếp tục audit
-  từ "So sánh văn bản" theo đúng thứ tự trên.
+  layout dùng chung + 9/10 tool (Nén ảnh, Chuyển đổi định dạng ảnh, Xóa nền ảnh, Gộp PDF,
+  Tách PDF, So sánh văn bản, Đếm từ & ký tự, JSON Formatter, QR Generator) — xem log chi
+  tiết ngay bên dưới, mỗi tool đã build + test tương tác Puppeteer + commit riêng. Đếm từ &
+  ký tự và JSON Formatter đều SẠCH, không cần sửa gì. QR Generator có 1 bug **Critical** đã
+  sửa (xem log). CÒN LẠI cần audit: Text Case Converter (tool vừa build xong ở phiên trước,
+  rủi ro thấp nhưng vẫn cần audit đầy đủ theo đúng quy trình), trang chủ (đã audit sơ bộ cùng
+  layout dùng chung ở lượt đầu — chỉ còn phần responsive/dark mode toàn site sâu hơn), rồi
+  tổng hợp báo cáo cuối cùng dạng bảng theo đúng yêu cầu gốc của người dùng. Task tiếp theo
+  khi mở phiên mới (nếu bị ngắt giữa chừng): tiếp tục audit từ "Text Case Converter" theo
+  đúng thứ tự trên.
 - Task tiếp theo sau khi audit xong: bắt đầu **Phase 2 — SEO chuyên sâu & nhân bản đa ngôn
   ngữ** (xem `ROADMAP.md` từ dòng "## Phase 2"), việc đầu tiên là mở rộng i18n từ 8 lên
   15–20 ngôn ngữ. Có thể tranh thủ làm nốt mục nén PDF còn treo của Phase 1.5 trước nếu
@@ -95,6 +98,54 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — QA Audit toàn site (tiếp tục): tool #6-#9 — XONG, đã build + test + commit
+  riêng từng phần
+- **Tool #6 So sánh văn bản**: sửa đúng 1 bug UX đã phát hiện ở log trước — Merge Tool bấm
+  mũi tên ←/→ giờ cột xem trước ĐÃ đổi nội dung hiển thị thật (mã màu nền xanh dương riêng
+  cho dòng "được merge từ phía kia", phân biệt với đỏ/xanh lá/cam của diff gốc), khớp đúng
+  nội dung sẽ Copy/Save. Test Puppeteer đầy đủ (`test-textdiff.mjs`): tất cả chế độ granularity,
+  ignoreCase/ignoreWhitespace, prev/next change, swap, clear, upload file, merge tool cả 2
+  chiều + toggle-off, fullscreen không lỗi, hiệu năng diff 5000 dòng (~1.3s, chấp nhận
+  được), refresh sạch — tất cả pass.
+- **Tool #7 Đếm từ & ký tự**: audit đầy đủ (đếm từ/câu/đoạn văn với case biết trước, whitespace-only
+  input, từ đơn không dấu câu, bảng keyword density giới hạn đúng 10 dòng, hiệu năng với văn
+  bản ~225.000 ký tự chỉ mất 68ms) — **SẠCH, không tìm thấy bug, không cần sửa gì**.
+- **Tool #8 JSON Formatter & Validator**: audit đầy đủ (Beautify/Compact, chuyển Tree mode,
+  báo lỗi cú pháp kèm số dòng + Go to error line thật sự bôi chọn đúng dòng, export XML/YAML/CSV
+  với JSON lồng nhau xác nhận đúng nội dung, export khi JSON lỗi hiện thông báo rõ ràng thay
+  vì crash) — **SẠCH, không tìm thấy bug, không cần sửa gì**.
+- **Tool #9 QR Code Generator**: phát hiện 1 bug **🔴 Critical** — khi nội dung (URL/text/
+  vCard/WiFi/...) vượt quá sức chứa QR code ở mức sửa lỗi hiện tại, `qrcode.react` ném
+  `RangeError: Data too long` KHÔNG ĐƯỢC BẮT, khiến React unmount toàn bộ component (xác
+  nhận qua `hasCanvas/hasTextarea/hasSelect` đều `false` sau lỗi — không chỉ canvas mà CẢ
+  form chọn loại nội dung cũng biến mất khỏi DOM), không có thông báo lỗi, người dùng chỉ
+  còn cách refresh trang. Tái hiện bằng cách nhập 5000 ký tự vào ô Text.
+  - Sửa bằng React Error Boundary (`QrErrorBoundary`) bọc quanh cả 3 nơi render QR (canvas
+    hiển thị + canvas/SVG ẩn dùng để xuất file) — khi lỗi xảy ra, hiện thông báo rõ ràng
+    ("This content is too long...") thay vì crash, đồng thời khóa 2 nút Download.
+  - **Gặp 1 race condition trong chính lần sửa đầu tiên**: dùng `useEffect` riêng để reset
+    trạng thái lỗi mỗi khi giá trị thay đổi — nhưng effect này chạy SAU `componentDidCatch`
+    trong cùng 1 chu kỳ commit, nên vô tình GHI ĐÈ lại trạng thái lỗi vừa được set thành
+    `false`, khiến thông báo lỗi không bao giờ hiện ra dù DOM đã không còn canvas (tự phát
+    hiện qua test thực tế báo "error message shown: false" dù biết chắc boundary đã bắt được
+    lỗi). Sửa triệt để bằng cách bỏ hẳn `useEffect`, chuyển sang **tính toán trực tiếp trong
+    lúc render**: so sánh khóa của lần render hiện tại (`renderValue-level`) với khóa đã từng
+    lỗi lưu trong state — nếu trùng thì coi là đang lỗi, không trùng thì tự động "thử lại"
+    mà không cần effect nào cả. Đây là bài học kỹ thuật đáng ghi nhớ: hai state update từ
+    2 nguồn khác nhau nhắm cùng 1 biến trong cùng 1 chu kỳ render/commit rất dễ đua nhau,
+    nên ưu tiên suy ra (derive) giá trị từ dữ liệu đã có sẵn thay vì đồng bộ 2 state riêng
+    biệt bằng effect.
+  - Test Puppeteer (`test-qrgenerator.mjs`): xác nhận không còn `pageerror` nào bắn ra (trước
+    đây bắt được `RangeError: Data too long` ở mức window), form vẫn còn nguyên vẹn và
+    tương tác được sau lỗi, thông báo lỗi hiện đúng, cả 2 nút Download bị khóa đúng lúc,
+    phục hồi bình thường khi rút ngắn nội dung; đồng thời hồi quy đầy đủ WiFi ký tự đặc biệt,
+    vCard, chuyển đổi loại nội dung giữ nguyên dữ liệu từng loại, tự nâng mức sửa lỗi khi
+    thêm logo, nút xóa logo — tất cả pass.
+- Ghi chú kỹ thuật jsoneditor (tool #8, để phiên sau khỏi mất công dò lại DOM): nút chuyển
+  mode Text/Tree là `<button class="jsoneditor-modes">` (không phải `<select>`), bấm vào nó
+  mới hiện ra `<ul class="jsoneditor-menu">` chứa các `<button class="jsoneditor-type-modes">`
+  cho từng lựa chọn — không thể chọn mode bằng CSS selector đơn giản như `select`.
 
 ### 2026-07-25 — QA Audit toàn site (đang làm dở): Layout dùng chung + 5 tool đầu — XONG,
   đã build + test + commit riêng từng phần
