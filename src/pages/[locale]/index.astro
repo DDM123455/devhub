@@ -1,6 +1,5 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { Button } from '@/components/ui/button';
 import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { categories } from '@/data/categories';
@@ -12,37 +11,114 @@ export function getStaticPaths() {
 
 const { locale } = Astro.params as { locale: Locale };
 const t = getFixedT(locale);
+
+const toolCount = tools.length;
+const categoryCount = categories.length;
 ---
 
-<Layout title={t('meta.title')} description={t('meta.description')} lang={locale}>
-	<section class="px-4 py-10">
-		<h1 class="text-3xl font-bold text-foreground">{t('home.heading')}</h1>
-		<p class="mt-2 text-muted-foreground">{t('home.tagline')}</p>
-		<div class="mt-4">
-			<Button client:load>Shadcn Button OK</Button>
+<Layout title={t('meta.title')} description={t('meta.description')} lang={locale} showSearch>
+	<section class="max-w-2xl px-4 pt-8 pb-9 sm:px-8 sm:pt-9">
+		<p class="mb-3.5 font-mono text-xs tracking-wide text-emerald-700 dark:text-emerald-400">{t('home.kicker')}</p>
+		<h1 class="mb-3.5 text-[2rem] leading-tight font-bold tracking-tight text-foreground sm:text-[2.375rem]">
+			{t('home.heading')}
+		</h1>
+		<p class="mb-6 text-[15.5px] leading-relaxed text-muted-foreground">{t('home.tagline')}</p>
+		<div class="flex flex-wrap gap-2.5">
+			<div class="flex items-baseline gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs text-muted-foreground">
+				<strong class="font-mono text-sm font-normal text-foreground">{toolCount}</strong>
+				<span>{t('home.stats.tools')}</span>
+			</div>
+			<div class="flex items-baseline gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs text-muted-foreground">
+				<strong class="font-mono text-sm font-normal text-foreground">{categoryCount}</strong>
+				<span>{t('home.stats.categories')}</span>
+			</div>
+			<div class="flex items-baseline gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs text-muted-foreground">
+				<strong class="font-mono text-sm font-normal text-foreground">0 KB</strong>
+				<span>{t('home.stats.uploaded')}</span>
+			</div>
 		</div>
 	</section>
-	<section class="grid gap-4 px-4 pb-10 sm:grid-cols-2">
+
+	<p id="tool-search-empty" class="hidden px-4 py-8 text-sm text-muted-foreground sm:px-8">
+		{t('search.noResults')} <span id="tool-search-empty-query" class="font-medium text-foreground"></span>
+	</p>
+
+	<section class="grid grid-cols-1 gap-5 px-4 pb-16 sm:px-8 lg:grid-cols-2">
 		{
 			categories.map((category) => (
-				<div id={`category-${category.slug}`} class="rounded-lg border border-border p-4">
-					<h2 class="font-semibold text-foreground">{t(`nav.categories.${category.slug}`)}</h2>
-					<ul class="mt-2 flex flex-col gap-1">
+				<div
+					id={`category-${category.slug}`}
+					data-category-card
+					class="rounded-2xl border border-border bg-card p-6"
+				>
+					<div class="mb-4 flex items-center gap-3">
+						<span
+							class="flex size-10 shrink-0 items-center justify-center rounded-[10px] font-mono text-[10px] font-semibold tracking-wide text-white"
+							style={`background: var(--color-primary); filter: hue-rotate(${category.hue}deg);`}
+						>
+							{category.letter}
+						</span>
+						<h2 class="text-[17px] font-semibold tracking-tight text-foreground">
+							{t(`nav.categories.${category.slug}`)}
+						</h2>
+					</div>
+					<div class="flex flex-col gap-0.5">
 						{tools
 							.filter((tool) => tool.category === category.slug)
 							.map((tool) => (
-								<li>
-									<a
-										href={`/${locale}/tools/${tool.slugs[locale]}/`}
-										class="text-sm text-primary hover:underline"
+								<a
+									href={`/${locale}/tools/${tool.slugs[locale]}/`}
+									data-tool-item
+									data-tool-name={tool.names[locale].toLowerCase()}
+									class="group flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+								>
+									<span class="flex-1">{tool.names[locale]}</span>
+									<svg
+										aria-hidden="true"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.4"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										class="size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
 									>
-										{tool.names[locale]}
-									</a>
-								</li>
+										<path d="M5 12h14M13 6l6 6-6 6" />
+									</svg>
+								</a>
 							))}
-					</ul>
+					</div>
 				</div>
 			))
 		}
 	</section>
 </Layout>
+
+<script>
+	const searchInput = document.getElementById('tool-search') as HTMLInputElement | null;
+	const emptyState = document.getElementById('tool-search-empty');
+	const emptyStateQuery = document.getElementById('tool-search-empty-query');
+	const toolItems = Array.from(document.querySelectorAll<HTMLElement>('[data-tool-item]'));
+	const categoryCards = Array.from(document.querySelectorAll<HTMLElement>('[data-category-card]'));
+
+	searchInput?.addEventListener('input', () => {
+		const query = searchInput.value.trim().toLowerCase();
+
+		for (const item of toolItems) {
+			const name = item.dataset.toolName ?? '';
+			item.classList.toggle('hidden', query !== '' && !name.includes(query));
+		}
+
+		let anyVisible = false;
+		for (const card of categoryCards) {
+			const hasVisibleTool = Array.from(card.querySelectorAll<HTMLElement>('[data-tool-item]')).some(
+				(item) => !item.classList.contains('hidden'),
+			);
+			card.classList.toggle('hidden', !hasVisibleTool);
+			if (hasVisibleTool) anyVisible = true;
+		}
+
+		if (emptyStateQuery) emptyStateQuery.textContent = `"${searchInput.value.trim()}"`;
+		emptyState?.classList.toggle('hidden', query === '' || anyVisible);
+	});
+</script>

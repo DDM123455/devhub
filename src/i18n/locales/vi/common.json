@@ -4,9 +4,22 @@
     "description": "Công cụ trực tuyến miễn phí, xử lý hoàn toàn trên trình duyệt. Tệp của bạn không bao giờ rời khỏi thiết bị."
   },
   "home": {
-    "heading": "Web Tool Hub",
-    "tagline": "Công cụ miễn phí chạy 100% trên trình duyệt — tệp của bạn không bao giờ rời khỏi thiết bị.",
-    "comingSoon": "Công cụ sắp ra mắt."
+    "kicker": "Xử lý tại trình duyệt · Không tải lên · Miễn phí mãi mãi",
+    "heading": "Mọi công cụ bạn cần. Không dữ liệu nào rời khỏi trình duyệt.",
+    "tagline": "Tiện ích nhanh, chạy được cả khi offline cho ảnh, PDF, văn bản và mã nguồn — xử lý hoàn toàn cục bộ, ngay trong tab này.",
+    "comingSoon": "Công cụ sắp ra mắt.",
+    "stats": {
+      "tools": "công cụ",
+      "categories": "nhóm",
+      "uploaded": "từng tải lên"
+    }
+  },
+  "search": {
+    "placeholder": "Tìm công cụ…",
+    "noResults": "Không tìm thấy công cụ nào khớp với"
+  },
+  "sidebar": {
+    "note": "Công cụ mới được bổ sung thường xuyên. Không gì bạn dùng ở đây từng chạm tới máy chủ."
   },
   "nav": {
     "toggleMenu": "Bật/tắt menu",
@@ -19,7 +32,8 @@
     }
   },
   "footer": {
-    "copyright": "© {{year}} Web Tool Hub"
+    "copyright": "© {{year}} Web Tool Hub",
+    "tagline": "Xây dựng cho những ai muốn tệp của mình luôn thuộc về mình."
   },
   "banner": {
     "privacy": "100% Riêng tư — Tệp luôn ở trên thiết bị của bạn"

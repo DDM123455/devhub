@@ -5,9 +5,31 @@
 
 ## 🔵 Trạng thái hiện tại
 
-- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi: HOÀN TẤT 10/10** ✅
-- Task tiếp theo cần làm: Bắt đầu **Phase 2 — SEO chuyên sâu & nhân bản đa ngôn ngữ** (xem
-  `ROADMAP.md`) — task đầu tiên: mở rộng i18n từ 8 lên 15-20 ngôn ngữ.
+- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi: HOÀN TẤT 10/10** ✅. Người dùng đã tự
+  thêm **Phase 1.5 — Rà soát & Nâng cấp Feature Parity** vào `ROADMAP.md` (giữa Phase 1 và
+  Phase 2) + mục "Checklist Feature Parity" vào `CLAUDE.md` — mục tiêu đưa từng tool từ
+  "MVP chạy được" lên "ngang tầm đối thủ đầu ngành" (benchmark, so sánh feature-by-feature,
+  nâng cấp).
+- Task tiếp theo cần làm: Bắt đầu **Phase 1.5**, task đầu tiên trong danh sách — công cụ
+  #1 "Nén ảnh" (benchmark TinyPNG/Squoosh/iLoveIMG): batch upload nhiều ảnh, quality
+  slider + preview trước/sau, hiển thị % giảm dung lượng, nút "Download All" dạng .zip,
+  kéo-thả file. **Lưu ý dependency mới**: mục "Download All .zip" cần thêm thư viện zip
+  (chưa có trong danh sách hiện tại của `ROADMAP.md`/`package.json` — ví dụ `jszip`) — hỏi
+  người dùng trước khi cài theo đúng quy tắc "không thêm dependency ngoài danh sách" trong
+  `CLAUDE.md`.
+- Ghi chú thiết kế (2026-07-25): đã redesign toàn bộ giao diện site (không phải task trong
+  `ROADMAP.md`, làm theo yêu cầu trực tiếp của người dùng) dựa trên file mockup
+  `Web Tool Hub.dc.html` ở gốc repo (file KHÔNG được commit vào git — chỉ là tài liệu tham
+  khảo thiết kế, dùng 1 template engine riêng "x-dc" không liên quan tới Astro/Tailwind
+  của dự án, không xoá vì có thể còn cần tham khảo sau). Đã áp dụng: font Space Grotesk
+  (chữ chính) + JetBrains Mono (số liệu/badge/logo mark) tự host qua `@fontsource-variable`
+  (gỡ Geist cũ), bảng màu accent emerald (`#047857` cho nền đặc/nút — đã tối hơn màu gốc
+  `#10B981` trong mockup để đạt contrast ratio ≥4.5:1 theo WCAG AA, xem chi tiết trong log
+  bên dưới), thanh privacy bar tối màu riêng biệt với theme, sidebar có badge chữ viết tắt
+  theo màu xoay hue (`hue-rotate`) + đếm số tool, trang chủ có ô tìm kiếm lọc tool trực
+  tiếp bằng JS thuần (không React), hero + stat chip, grid card danh mục. Áp dụng đồng bộ
+  cho TOÀN BỘ site qua `Layout.astro`/`Header`/`Sidebar`/`Footer`/`PrivacyBanner` dùng
+  chung nên cả 10 trang tool tự động thừa hưởng, không cần sửa riêng từng trang.
 - Ghi chú dependency: đã chọn **jsoneditor** (không phải Monaco) cho tool #8 — nhẹ hơn
   nhiều, phù hợp triết lý Lighthouse/hiệu năng của dự án. Dùng bản **minimalist**
   (`jsoneditor/dist/jsoneditor-minimalist.js`, ~70KB gzip thay vì ~210KB bản đầy đủ) vì
@@ -66,6 +88,100 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Redesign toàn site theo mockup `Web Tool Hub.dc.html` (ngoài ROADMAP.md)
+- Bối cảnh: sau khi hoàn tất Phase 1, người dùng để lại 1 file mockup thiết kế
+  `Web Tool Hub.dc.html` ở gốc repo và yêu cầu trực tiếp "dùng thiết kế của file đó" +
+  "thiết kế các màn hình khác dựa trên file đó". File này xuất từ 1 công cụ thiết kế khác
+  (dùng custom element `<x-dc>`, style dạng JS object + template `{{ }}`) — KHÔNG copy
+  nguyên code (không tương thích Astro/Tailwind/Shadcn), chỉ dùng làm tài liệu tham khảo
+  ngôn ngữ thiết kế (màu sắc, font, layout, spacing).
+- Đã hỏi người dùng 2 câu hỏi phạm vi trước khi làm: (1) áp dụng toàn site hay chỉ trang
+  chủ → chọn **toàn site**; (2) nguồn font Space Grotesk/JetBrains Mono — Google Fonts CDN
+  (như mockup) hay tự host → chọn **tự host qua `@fontsource-variable`** (khớp cách dự án
+  đã làm với font Geist cũ, tránh gọi ra ngoài).
+- Đã làm:
+  - Gỡ `@fontsource-variable/geist`, cài `@fontsource-variable/space-grotesk` +
+    `@fontsource-variable/jetbrains-mono`. Cập nhật `src/styles/global.css`: `--font-sans`
+    → Space Grotesk, thêm `--font-mono` → JetBrains Mono.
+  - Viết lại toàn bộ token màu Shadcn (`:root`/`.dark` trong `global.css`) sang bảng màu
+    của mockup (bg/card/border/text riêng cho light và dark, accent emerald, thêm 2 biến
+    mới `--privacy-bar-bg`/`--privacy-bar-fg` cho thanh privacy bar tối màu cố định không
+    theo theme).
+  - Thêm `letter` (IMG/PDF/TXT/DEV — mã hiển thị cố định, không dịch, giống cách "PDF"
+    không dịch) và `hue` (0/45/100/160) vào `src/data/categories.ts` để tô màu badge từng
+    danh mục bằng kỹ thuật CSS `filter: hue-rotate()` trên cùng 1 màu accent — đúng kỹ
+    thuật mockup dùng để có 4 màu hài hòa từ 1 token duy nhất thay vì tự định nghĩa 4 màu
+    rời rạc.
+  - Viết lại `PrivacyBanner.astro` (thanh mono nhỏ, nền tối cố định), `Header.astro` (logo
+    mark `>_` + tên site, ô tìm kiếm CÓ ĐIỀU KIỆN qua prop `showSearch` — chỉ hiện ở trang
+    có JS lọc thật, tránh UI giả không hoạt động trên trang tool), `Sidebar.astro` (badge
+    chữ viết tắt + đếm số tool mỗi nhóm, đọc trực tiếp từ `tools.ts`), `Footer.astro` (1
+    dòng giữa trang, có thêm key `footer.tagline` mới), restyle nhẹ `ThemeToggle.astro`/
+    `LanguageSwitcher.astro` cho khớp bo góc/kích thước mới.
+  - Viết lại hoàn toàn trang chủ `src/pages/[locale]/index.astro`: hero (kicker + heading +
+    tagline + 3 stat chip: số tool/số nhóm/"0 KB ever uploaded"), grid card danh mục (2
+    cột), MỖI card liệt kê tool kèm mũi tên hiện khi hover. **Nhân tiện dọn nợ kỹ thuật cũ**
+    đã ghi trong log Phase 0: xoá nút `<Button client:load>Shadcn Button OK</Button>` demo
+    còn sót lại từ lúc setup Shadcn, không phục vụ mục đích gì từ Phase 1.
+  - **Thêm tính năng tìm kiếm lọc tool trực tiếp trên trang chủ** (không có trong scope gốc
+    của `ROADMAP.md`, nhưng mockup thể hiện rõ đây là 1 phần thiết kế/tương tác, không chỉ
+    trang trí) — dùng JS thuần (không React) trong `<script>` cuối `index.astro`: input với
+    id `tool-search` (render trong `Header` qua prop `showSearch`), lọc bằng cách so khớp
+    `data-tool-name` trên từng link tool, ẩn/hiện qua class `hidden`, ẩn card danh mục nếu
+    không còn tool nào khớp, hiện thông báo "không tìm thấy" khi cần. Không dùng React vì
+    đây chỉ là filter DOM đơn giản, đúng tinh thần "JS thuần khi có thể" đã áp dụng cho các
+    tool JS-only trước đó.
+  - Thêm key i18n mới cho cả 8 ngôn ngữ trong `common.json`: `home.kicker`,
+    `home.stats.{tools,categories,uploaded}`, `search.{placeholder,noResults}`,
+    `sidebar.note`, `footer.tagline`; viết lại nội dung `home.heading`/`home.tagline` theo
+    đúng câu chữ mockup (dịch tự nhiên riêng từng ngôn ngữ, không máy móc).
+  - `npm run build` sinh đủ 89 trang không lỗi. Chạy `npm run preview` + chụp ảnh bằng
+    Chrome headless (`--screenshot`, và `--force-dark-mode` để xem đúng theme tối) cho cả
+    trang chủ và 1 trang tool (`split-pdf`) — xác nhận bằng mắt giao diện khớp mockup ở cả
+    2 theme, không chỉ tin vào build sạch/HTML tĩnh như các task trước.
+  - Chạy Lighthouse trên trang chủ sau khi đổi giao diện: phát hiện Accessibility tụt còn
+    95 (trước đó 100) do `color-contrast` — chữ mono nhỏ màu accent (`text-primary`) trên
+    nền sáng chỉ đạt tỉ lệ tương phản 2.36 (cần ≥4.5), tương tự badge chữ trắng trên nền
+    accent (2.53) và text phụ dùng `/70` opacity ở Footer/Sidebar (2.87). Đây là lỗi thật
+    (ảnh hưởng người dùng khiếm thị), không bỏ qua dù 95 điểm đã đạt ngưỡng ≥90 của
+    `CLAUDE.md`.
+  - **Sửa contrast**: đổi `--primary` (nền đặc dùng cho nút/badge, CẢ 2 theme) từ
+    `#10B981` sang `#047857` (đậm hơn, vẫn rõ ràng là "xanh emerald" nhưng chữ trắng trên
+    nền này đạt ~5.3:1). Với 2 chỗ dùng màu accent làm CHỮ trực tiếp trên nền trang (kicker
+    ở hero, logo mark `>_`), tách riêng dùng `text-emerald-700 dark:text-emerald-400`
+    (không qua token `--primary` dùng chung) vì 2 theme cần độ sáng khác nhau để đủ tương
+    phản trên nền riêng của từng theme. Bỏ hết `/70` opacity ở text phụ trong
+    `Footer.astro`/`Sidebar.astro`, vì bản thân `--muted-foreground` đã đủ tương phản
+    (~5.2:1) — giảm opacity là nguyên nhân duy nhất gây lỗi.
+  - Build lại + chạy Lighthouse lần 2: **Performance 99, Accessibility 100, Best Practices
+    100, SEO 100**. Chụp lại ảnh xác nhận màu emerald đậm hơn vẫn giữ đúng tinh thần thiết
+    kế, không bị "chìm"/xỉn màu.
+- Quyết định kỹ thuật quan trọng:
+  - KHÔNG commit file mockup `Web Tool Hub.dc.html` vào git — không phải mã nguồn dự án,
+    chỉ là tài liệu thiết kế tham khảo của người dùng, để nguyên trong working directory
+    (không xoá).
+  - Ô tìm kiếm trong `Header` chỉ hiện khi trang truyền `showSearch` (hiện tại chỉ trang
+    chủ) — tránh hiển thị UI tìm kiếm "chết" (không hoạt động) trên 10 trang tool, đúng
+    nguyên tắc "không xây UI nửa vời" đã nêu trong hướng dẫn hành vi chung.
+  - Không thêm badge "New" cho tool nào trên trang chủ dù mockup có ví dụ minh hoạ badge
+    này — dự án không có dữ liệu "tool nào thực sự mới" đáng tin cậy trong `tools.ts`, thêm
+    badge tuỳ tiện sẽ là bịa dữ liệu thay vì phản ánh thực tế.
+  - Giữ nguyên cấu trúc token Shadcn hiện có (`--primary`, `--card`, `--muted`...) thay vì
+    viết CSS tuỳ biến riêng — đảm bảo `Button`/component Shadcn khác ở 10 trang tool tự
+    động ăn theme mới mà không cần sửa từng trang.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Chưa test tương tác thật bằng chuột/bàn phím thật (gõ vào ô tìm kiếm xem lọc đúng
+    không, bấm toggle sidebar mobile, bấm đổi theme) — chỉ verify qua ảnh chụp Chrome
+    headless tĩnh (2 theme) + đọc code logic script. Nên tự thử tay khi có dịp.
+  - Thanh JSON editor (`jsoneditor`, tool #8) vẫn giữ theme sáng riêng bất kể theme site
+    (giới hạn đã ghi nhận từ trước, không đổi trong lần redesign này).
+  - Category `DEV` hiện chỉ có 2 tool thật (JSON Formatter, QR Generator) — card "Dev
+    Tools" trên trang chủ có khoảng trống dưới do card khác trong hàng cao hơn (grid 2 cột
+    không đồng chiều cao) — chấp nhận được ở v1, có thể cân nhắc `items-start` hoặc masonry
+    nếu thấy chưa ổn khi có thêm tool Phase 3.
+- Task tiếp theo: theo con trỏ ROADMAP.md mới nhất — **Phase 1.5**, bắt đầu từ công cụ #1
+  "Nén ảnh" (xem "Trạng thái hiện tại" phía trên).
 
 ### 2026-07-25 — Phase 1, công cụ #10 (CUỐI CÙNG): Chuyển đổi Case văn bản — HOÀN TẤT Phase 1
 - Đã làm:

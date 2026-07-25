@@ -2,6 +2,7 @@
 import { getFixedT } from '@/i18n/i18next';
 import type { Locale } from '@/i18n/config';
 import { categories } from '@/data/categories';
+import { tools } from '@/data/tools';
 
 interface Props {
 	lang: Locale;
@@ -11,21 +12,33 @@ const { lang } = Astro.props;
 const t = getFixedT(lang);
 ---
 
-<aside id="sidebar" class="hidden w-56 shrink-0 border-r border-border bg-background p-4 md:block">
-	<nav>
-		<ul class="flex flex-col gap-1">
-			{
-				categories.map((category) => (
-					<li>
-						<a
-							href={`/${lang}/#category-${category.slug}`}
-							class="block rounded-md px-2 py-1.5 text-sm text-foreground hover:bg-muted"
+<aside
+	id="sidebar"
+	class="hidden w-56 shrink-0 flex-col gap-0.5 border-r border-border p-4 md:sticky md:top-[57px] md:flex md:h-[calc(100vh-57px)]"
+>
+	<nav class="flex flex-col gap-0.5">
+		{
+			categories.map((category) => {
+				const count = tools.filter((tool) => tool.category === category.slug).length;
+				return (
+					<a
+						href={`/${lang}/#category-${category.slug}`}
+						class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+					>
+						<span
+							class="flex size-[22px] shrink-0 items-center justify-center rounded-md font-mono text-[7.5px] font-semibold text-white"
+							style={`background: var(--color-primary); filter: hue-rotate(${category.hue}deg);`}
 						>
-							{t(`nav.categories.${category.slug}`)}
-						</a>
-					</li>
-				))
-			}
-		</ul>
+							{category.letter}
+						</span>
+						<span class="flex-1">{t(`nav.categories.${category.slug}`)}</span>
+						<span class="font-mono text-[10.5px] text-muted-foreground">{count}</span>
+					</a>
+				);
+			})
+		}
 	</nav>
+
+	<div class="my-4 h-px bg-border"></div>
+	<p class="px-2.5 text-[11.5px] leading-relaxed text-muted-foreground">{t('sidebar.note')}</p>
 </aside>

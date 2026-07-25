@@ -4,9 +4,22 @@
     "description": "Herramientas en línea 100% gratuitas que se ejecutan por completo en tu navegador. Tus archivos nunca salen de tu dispositivo."
   },
   "home": {
-    "heading": "Web Tool Hub",
-    "tagline": "Herramientas gratuitas que se ejecutan 100% en tu navegador — tus archivos nunca salen de tu dispositivo.",
-    "comingSoon": "Herramientas próximamente."
+    "kicker": "Procesamiento local · Sin subidas · Gratis para siempre",
+    "heading": "Todas las herramientas que necesitas. Cero datos salen de tu navegador.",
+    "tagline": "Utilidades rápidas, capaces de funcionar sin conexión, para imágenes, PDF, texto y código — todo procesado localmente, justo en esta pestaña.",
+    "comingSoon": "Herramientas próximamente.",
+    "stats": {
+      "tools": "herramientas",
+      "categories": "categorías",
+      "uploaded": "subidos jamás"
+    }
+  },
+  "search": {
+    "placeholder": "Buscar herramientas…",
+    "noResults": "Ninguna herramienta coincide con"
+  },
+  "sidebar": {
+    "note": "Añadimos herramientas nuevas con regularidad. Nada de lo que toques aquí llega jamás a un servidor."
   },
   "nav": {
     "toggleMenu": "Alternar menú",
@@ -19,7 +32,8 @@
     }
   },
   "footer": {
-    "copyright": "© {{year}} Web Tool Hub"
+    "copyright": "© {{year}} Web Tool Hub",
+    "tagline": "Creado para quienes prefieren que sus archivos sigan siendo suyos."
   },
   "banner": {
     "privacy": "100% Privacidad — Tus archivos permanecen en tu dispositivo"

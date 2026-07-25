@@ -17,7 +17,8 @@ server-side code để "cho xong việc" — phải dừng lại và hỏi ngư�
 
 - Framework: **Astro** (SSG, static export) — ưu tiên vì Lighthouse 100/100, SEO tốt nhất
 - UI: **Tailwind CSS + Shadcn/UI**, có Dark Mode
-- i18n: **astro-i18next**
+- i18n: **i18n routing native của Astro + i18next thuần** (đổi từ `astro-i18next` trong
+  Phase 0 — xem lý do trong `PROGRESS.md`; không đổi lại nếu chưa hỏi)
 - Hosting: **Cloudflare Pages** (free tier, không giới hạn băng thông)
 - Xử lý file nặng: luôn bọc trong **Web Worker**, không block main thread
 
@@ -52,6 +53,19 @@ xác phải làm gì tiếp — chỉ cần đọc `PROGRESS.md` + `ROADMAP.md`.
 - [ ] Internal link tới 2–3 công cụ liên quan.
 - [ ] Trang tự động có mặt trong `sitemap.xml` (không thao tác tay).
 - [ ] Lighthouse Performance + SEO ≥ 90 trước khi coi task là "xong".
+
+## 🏆 Checklist Feature Parity (bắt buộc trước khi coi 1 công cụ là "Done")
+
+Một công cụ KHÔNG được tick `[x]` chỉ vì nó "chạy được". Trước khi coi là hoàn thành:
+
+- [ ] Liệt kê tối thiểu 2 đối thủ đầu ngành cho công cụ đó (ví dụ: nén ảnh → TinyPNG,
+      Squoosh; so sánh văn bản → Diffchecker.com; QR code → qr-code-generator.com...).
+- [ ] So sánh feature-by-feature: công cụ của mình đang thiếu gì so với họ?
+- [ ] Không dừng ở bản MVP tối giản — nếu đối thủ hỗ trợ N định dạng/tùy chọn, công cụ
+      của mình phải hỗ trợ tương đương hoặc nêu rõ lý do kỹ thuật nếu không thể (ví dụ:
+      một số định dạng không decode được bằng JS thuần trên trình duyệt).
+- [ ] Ưu tiên các tính năng UX mà đối thủ có nhưng dễ bị bỏ quên: preview trước/sau,
+      xử lý hàng loạt (batch), kéo-thả, thanh trạng thái tiến trình, export nhiều định dạng.
 
 ## ⚙️ Quy tắc kỹ thuật khác
 

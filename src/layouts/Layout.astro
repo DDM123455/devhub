@@ -10,9 +10,10 @@ interface Props {
 	title: string;
 	lang: Locale;
 	description?: string;
+	showSearch?: boolean;
 }
 
-const { title, lang, description } = Astro.props;
+const { title, lang, description, showSearch = false } = Astro.props;
 ---
 
 <html lang={lang}>
@@ -41,8 +42,8 @@ const { title, lang, description } = Astro.props;
 		{description && <meta name="description" content={description} />}
 	</head>
 	<body class="flex min-h-screen flex-col">
-		<Header lang={lang} />
 		<PrivacyBanner lang={lang} />
+		<Header lang={lang} showSearch={showSearch} />
 		<div class="flex flex-1">
 			<Sidebar lang={lang} />
 			<main class="flex-1">

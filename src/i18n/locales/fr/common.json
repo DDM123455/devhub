@@ -4,9 +4,22 @@
     "description": "Des outils en ligne 100 % gratuits qui s'exécutent entièrement dans votre navigateur. Vos fichiers ne quittent jamais votre appareil."
   },
   "home": {
-    "heading": "Web Tool Hub",
-    "tagline": "Des outils gratuits qui fonctionnent à 100 % dans votre navigateur — vos fichiers ne quittent jamais votre appareil.",
-    "comingSoon": "Outils à venir."
+    "kicker": "Traitement local · Aucun envoi · Gratuit pour toujours",
+    "heading": "Tous les outils dont vous avez besoin. Zéro donnée ne quitte votre navigateur.",
+    "tagline": "Des utilitaires rapides, utilisables hors ligne, pour les images, PDF, texte et code — tout est traité localement, directement dans cet onglet.",
+    "comingSoon": "Outils à venir.",
+    "stats": {
+      "tools": "outils",
+      "categories": "catégories",
+      "uploaded": "jamais envoyés"
+    }
+  },
+  "search": {
+    "placeholder": "Rechercher un outil…",
+    "noResults": "Aucun outil ne correspond à"
+  },
+  "sidebar": {
+    "note": "De nouveaux outils sont ajoutés régulièrement. Rien de ce que vous touchez ici n'atteint jamais un serveur."
   },
   "nav": {
     "toggleMenu": "Basculer le menu",
@@ -19,7 +32,8 @@
     }
   },
   "footer": {
-    "copyright": "© {{year}} Web Tool Hub"
+    "copyright": "© {{year}} Web Tool Hub",
+    "tagline": "Conçu pour celles et ceux qui préfèrent que leurs fichiers leur appartiennent."
   },
   "banner": {
     "privacy": "100% Confidentialité — Vos fichiers restent sur votre appareil"

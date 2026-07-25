@@ -4,9 +4,22 @@
     "description": "100% free online tools that run entirely in your browser. Your files never leave your device."
   },
   "home": {
-    "heading": "Web Tool Hub",
-    "tagline": "Free tools that run 100% in your browser — your files never leave your device.",
-    "comingSoon": "Tools coming soon."
+    "kicker": "Client-side · No uploads · Free forever",
+    "heading": "Every tool you need. Zero data leaves your browser.",
+    "tagline": "Fast, offline-capable utilities for images, PDFs, text and code — all processed locally, right in this tab.",
+    "comingSoon": "Tools coming soon.",
+    "stats": {
+      "tools": "tools",
+      "categories": "categories",
+      "uploaded": "ever uploaded"
+    }
+  },
+  "search": {
+    "placeholder": "Search tools…",
+    "noResults": "No tools match"
+  },
+  "sidebar": {
+    "note": "New tools are added regularly. Nothing you touch here ever reaches a server."
   },
   "nav": {
     "toggleMenu": "Toggle menu",
@@ -19,7 +32,8 @@
     }
   },
   "footer": {
-    "copyright": "© {{year}} Web Tool Hub"
+    "copyright": "© {{year}} Web Tool Hub",
+    "tagline": "Built for people who like their files to stay theirs."
   },
   "banner": {
     "privacy": "100% Privacy — Files Stay On Your Device"

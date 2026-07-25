@@ -11,6 +11,8 @@ const t = getFixedT(lang);
 const year = new Date().getFullYear();
 ---
 
-<footer class="border-t border-border px-4 py-6 text-sm text-muted-foreground">
-	<p>{t('footer.copyright', { year })}</p>
+<footer class="flex items-center justify-center gap-2 border-t border-border px-4 py-5 text-center text-xs text-muted-foreground">
+	<span>{t('footer.copyright', { year })}</span>
+	<span aria-hidden="true">·</span>
+	<span>{t('footer.tagline')}</span>
 </footer>

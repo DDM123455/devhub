@@ -6,21 +6,52 @@ import ThemeToggle from './ThemeToggle.astro';
 
 interface Props {
 	lang: Locale;
+	showSearch?: boolean;
 }
 
-const { lang } = Astro.props;
+const { lang, showSearch = false } = Astro.props;
 const t = getFixedT(lang);
 ---
 
-<header class="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-border bg-background px-4 py-3">
-	<a href={`/${lang}/`} class="text-lg font-semibold text-foreground">Web Tool Hub</a>
-	<div class="flex items-center gap-3">
+<header class="sticky top-0 z-30 flex items-center gap-6 border-b border-border bg-background px-4 py-3.5 sm:px-8">
+	<a href={`/${lang}/`} class="flex items-center gap-2.5">
+		<span class="font-mono text-base font-bold tracking-tight text-emerald-700 dark:text-emerald-400">&gt;_</span>
+		<span class="text-lg font-bold tracking-tight text-foreground">Web Tool Hub</span>
+	</a>
+
+	{
+		showSearch && (
+			<div class="flex max-w-[380px] flex-1 items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+				<svg
+					aria-hidden="true"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.2"
+					stroke-linecap="round"
+					class="size-4 shrink-0 text-muted-foreground"
+				>
+					<circle cx="11" cy="11" r="7" />
+					<path d="M21 21l-4.3-4.3" />
+				</svg>
+				<input
+					id="tool-search"
+					type="text"
+					placeholder={t('search.placeholder')}
+					class="w-full border-none bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+					autocomplete="off"
+				/>
+			</div>
+		)
+	}
+
+	<div class="ml-auto flex items-center gap-2.5">
 		<LanguageSwitcher lang={lang} />
 		<ThemeToggle lang={lang} />
 		<button
 			id="sidebar-toggle"
 			type="button"
-			class="rounded-md border border-border px-2 py-1 text-sm text-foreground md:hidden"
+			class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground md:hidden"
 			aria-label={t('nav.toggleMenu')}
 			aria-controls="sidebar"
 		>

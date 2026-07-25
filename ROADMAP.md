@@ -36,6 +36,68 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] 9. QR Code Generator (tùy chỉnh màu, logo giữa) — `qrcode.react` + Canvas
 - [x] 10. Chuyển đổi Case văn bản (upper/lower/Title/camelCase/snake_case) — JS thuần
 
+## Phase 1.5 — Rà soát & Nâng cấp 10 công cụ cốt lõi (Feature Parity)
+
+> Mục tiêu: đưa 10 công cụ từ mức "MVP chạy được" lên mức "ngang tầm đối thủ đầu ngành".
+> Với mỗi công cụ: liệt kê đối thủ → so sánh gap → nâng cấp → build thử → tick → log.
+> Áp dụng đúng "Checklist Feature Parity" trong `CLAUDE.md`.
+
+- [ ] **1. Nén ảnh** — benchmark: TinyPNG, Squoosh, iLoveIMG
+  - [ ] Upload/xử lý hàng loạt (nhiều ảnh cùng lúc), không chỉ 1 ảnh
+  - [ ] Thanh trượt điều chỉnh mức nén (quality slider), xem preview trước/sau
+  - [ ] Hiển thị % giảm dung lượng, so sánh before/after side-by-side
+  - [ ] Nút "Download All" dưới dạng .zip khi xử lý nhiều ảnh
+  - [ ] Kéo-thả (drag & drop) file vào khung upload
+
+- [ ] **2. Chuyển đổi định dạng ảnh** — benchmark: Convertio, CloudConvert, iLoveIMG
+  - [ ] Hiện tại chỉ hỗ trợ 3 định dạng → mở rộng tối thiểu: JPG, PNG, WebP, AVIF, BMP,
+        GIF (tĩnh), ICO
+  - [ ] Thêm hỗ trợ đọc file HEIC (dùng `heic2any` hoặc tương đương chạy client-side)
+        vì ảnh từ iPhone rất phổ biến
+  - [ ] Xử lý hàng loạt + chọn định dạng đích chung cho tất cả file
+  - [ ] Cho chọn chất lượng output khi convert sang định dạng có nén (JPG/WebP)
+
+- [ ] **3. Xóa nền ảnh** — benchmark: remove.bg, Adobe Express Background Remover
+  - [ ] Preview dạng slider kéo qua lại trước/sau khi xóa nền
+  - [ ] Cho phép thay nền bằng màu solid hoặc ảnh khác sau khi xóa
+  - [ ] Xử lý hàng loạt nhiều ảnh
+  - [ ] Nút tinh chỉnh viền (edge refinement) nếu thư viện hỗ trợ
+
+- [ ] **4 & 5. Gộp/Tách PDF** — benchmark: iLovePDF, Smallpdf, PDF2GO
+  - [ ] Hiển thị thumbnail từng trang, cho kéo-thả sắp xếp lại thứ tự trước khi gộp
+  - [ ] Tách PDF: cho chọn theo range trang, tách mỗi N trang, hoặc extract trang chỉ định
+  - [ ] Thêm chức năng xoay trang, xóa trang riêng lẻ
+  - [ ] Thêm chức năng nén PDF (giảm dung lượng) nếu khả thi client-side
+
+- [ ] **6. So sánh văn bản (Diff Checker)** — benchmark: Diffchecker.com
+  - [ ] **Ưu tiên cao nhất**: highlight trực tiếp (inline) phần khác biệt ngay trên khung
+        văn bản — thêm/xóa/sửa từng từ hoặc ký tự phải tô màu ngay tại chỗ, không chỉ in
+        ra danh sách khác biệt bên dưới
+  - [ ] Chế độ xem song song (side-by-side) có cuộn đồng bộ 2 khung
+  - [ ] Tùy chọn: ignore khoảng trắng, ignore hoa/thường, so sánh theo dòng hoặc theo từ
+  - [ ] Đếm số dòng/từ đã thêm, xóa, sửa
+
+- [ ] **7. Đếm từ & ký tự** — benchmark: WordCounter.net
+  - [ ] Thêm: thời gian đọc ước tính, thời gian nói ước tính
+  - [ ] Đếm số đoạn văn (paragraph), số câu
+  - [ ] Bảng tần suất từ xuất hiện nhiều nhất (keyword density)
+
+- [ ] **8. JSON Formatter & Validator** — benchmark: JSONFormatter.org, JSONLint
+  - [ ] Chế độ xem dạng cây (tree view) có thể thu gọn/mở rộng từng node
+  - [ ] Toggle nhanh giữa Beautify và Minify
+  - [ ] Báo lỗi cú pháp kèm số dòng chính xác, highlight dòng lỗi
+  - [ ] Convert JSON → XML/YAML/CSV
+
+- [ ] **9. QR Code Generator** — benchmark: qr-code-generator.com
+  - [ ] Hỗ trợ nhiều loại nội dung: URL, plain text, WiFi, vCard, email, SMS
+  - [ ] Tùy chỉnh màu sắc, chèn logo giữa, chọn mức error correction (L/M/Q/H)
+  - [ ] Export ở nhiều định dạng: PNG (chọn độ phân giải), SVG
+
+- [ ] **10. Chuyển đổi Case văn bản** — benchmark: ConvertCase.net
+  - [ ] Thêm các kiểu: Sentence case, aLtErNaTiNg CaSe, iNVERSE cASE
+  - [ ] Thêm tiện ích phụ: xóa khoảng trắng thừa, xóa xuống dòng thừa, sắp xếp các dòng
+        theo alphabet
+
 ## Phase 2 — SEO chuyên sâu & nhân bản đa ngôn ngữ
 
 - [ ] Mở rộng i18n từ 8 lên 15–20 ngôn ngữ

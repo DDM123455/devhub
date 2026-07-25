@@ -4,9 +4,22 @@
     "description": "100 % kostenlose Online-Tools, die vollständig in deinem Browser laufen. Deine Dateien verlassen niemals dein Gerät."
   },
   "home": {
-    "heading": "Web Tool Hub",
-    "tagline": "Kostenlose Tools, die zu 100 % im Browser laufen — deine Dateien verlassen niemals dein Gerät.",
-    "comingSoon": "Tools folgen in Kürze."
+    "kicker": "Lokale Verarbeitung · Kein Upload · Für immer kostenlos",
+    "heading": "Jedes Tool, das du brauchst. Null Daten verlassen deinen Browser.",
+    "tagline": "Schnelle, offlinefähige Tools für Bilder, PDFs, Text und Code — alles wird lokal verarbeitet, direkt in diesem Tab.",
+    "comingSoon": "Tools folgen in Kürze.",
+    "stats": {
+      "tools": "Tools",
+      "categories": "Kategorien",
+      "uploaded": "je hochgeladen"
+    }
+  },
+  "search": {
+    "placeholder": "Tools durchsuchen…",
+    "noResults": "Kein Tool passt zu"
+  },
+  "sidebar": {
+    "note": "Neue Tools kommen regelmäßig dazu. Nichts, was du hier anfasst, erreicht jemals einen Server."
   },
   "nav": {
     "toggleMenu": "Menü umschalten",
@@ -19,7 +32,8 @@
     }
   },
   "footer": {
-    "copyright": "© {{year}} Web Tool Hub"
+    "copyright": "© {{year}} Web Tool Hub",
+    "tagline": "Gemacht für alle, die wollen, dass ihre Dateien auch ihre bleiben."
   },
   "banner": {
     "privacy": "100% Privatsphäre — Deine Dateien bleiben auf deinem Gerät"
