@@ -96,9 +96,9 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
   - [x] Tùy chỉnh màu sắc, chèn logo giữa, chọn mức error correction (L/M/Q/H)
   - [x] Export ở nhiều định dạng: PNG (chọn độ phân giải), SVG
 
-- [ ] **10. Chuyển đổi Case văn bản** — benchmark: ConvertCase.net
-  - [ ] Thêm các kiểu: Sentence case, aLtErNaTiNg CaSe, iNVERSE cASE
-  - [ ] Thêm tiện ích phụ: xóa khoảng trắng thừa, xóa xuống dòng thừa, sắp xếp các dòng
+- [x] **10. Chuyển đổi Case văn bản** — benchmark: ConvertCase.net
+  - [x] Thêm các kiểu: Sentence case, aLtErNaTiNg CaSe, iNVERSE cASE
+  - [x] Thêm tiện ích phụ: xóa khoảng trắng thừa, xóa xuống dòng thừa, sắp xếp các dòng
         theo alphabet
 
 ## Phase 2 — SEO chuyên sâu & nhân bản đa ngôn ngữ

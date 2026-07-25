@@ -1,10 +1,10 @@
 {
   "meta": {
     "title": "Convertisseur de casse de texte gratuit en ligne — Web Tool Hub",
-    "description": "Convertissez du texte entre MAJUSCULES, minuscules, Title Case, camelCase et snake_case instantanément, gratuitement et directement dans votre navigateur. Sans envoi sur un serveur, sans inscription."
+    "description": "Convertissez du texte entre MAJUSCULES, minuscules, Title Case, camelCase, snake_case, Sentence case et plus instantanément, gratuitement et directement dans votre navigateur. Sans envoi sur un serveur, sans inscription."
   },
   "heading": "Convertisseur de casse de texte",
-  "tagline": "Convertissez du texte entre MAJUSCULES, minuscules, Title Case, camelCase et snake_case instantanément.",
+  "tagline": "Convertissez du texte entre MAJUSCULES, minuscules, Title Case, camelCase, snake_case et plus — avec des utilitaires de nettoyage de texte.",
   "ui": {
     "placeholder": "Tapez ou collez du texte ici…",
     "outputLabel": "Résultat",
@@ -13,6 +13,14 @@
     "caseTitle": "Title Case",
     "caseCamel": "camelCase",
     "caseSnake": "snake_case",
+    "caseSentence": "Sentence case",
+    "caseAlternating": "aLtErNaTiNg CaSe",
+    "caseInverse": "iNVERSE cASE",
+    "caseOptionsHeading": "Options de casse",
+    "utilRemoveSpaces": "Supprimer les espaces superflus",
+    "utilRemoveLineBreaks": "Supprimer les sauts de ligne superflus",
+    "utilSortLines": "Trier les lignes de A à Z",
+    "utilitiesHeading": "Utilitaires",
     "copy": "Copier",
     "copied": "Copié !",
     "clear": "Effacer"
@@ -23,6 +31,7 @@
     "p1": "Le besoin de convertir la casse d'un texte revient sans cesse, de façon minime mais agaçante : un paragraphe tapé avec le Verrouillage Majuscules resté activé par erreur, une spécification rédigée en Title Case qui doit devenir un nom de variable en camelCase, l'en-tête d'une colonne CSV qui doit devenir un champ de base de données en snake_case, un titre qui a besoin d'une capitalisation correcte avant publication. Rien de tout cela n'est difficile à faire à la main pour un seul mot, mais retaper tout un paragraphe ou une longue liste de noms de champs à la main est lent et source d'erreurs.",
     "p2": "Cet outil effectue la conversion avec un peu de JavaScript pur qui s'exécute directement dans votre navigateur — aucune bibliothèque à charger, rien à envoyer vers un serveur. Pendant que vous tapez ou collez du texte et que vous changez d'option de casse, le résultat se met à jour instantanément, recalculé en mémoire sur votre propre appareil à chaque fois.",
     "p3": "Collez ou tapez votre texte, choisissez MAJUSCULES, minuscules, Title Case, camelCase ou snake_case, puis cliquez sur Copier pour récupérer le résultat. Pour camelCase et snake_case en particulier, le convertisseur traite les espaces, tirets, underscores et signes de ponctuation comme des séparateurs de mots — il détecte aussi les frontières camelCase ou PascalCase déjà présentes, si bien que coller « hello-world », « Hello World » ou même un « helloWorld » déjà casé donne tous le même résultat propre, plutôt que quelque chose de cassé comme « helloworld » ou « hello-World ».",
-    "p4": "Les développeurs s'en servent surtout pour renommer des variables ou des champs entre les conventions de nommage utilisées par différents langages et bases de données, les rédacteurs pour corriger une phrase tapée entièrement en majuscules par erreur, et les éditeurs pour obtenir une capitalisation de titre cohérente sans avoir à retenir quels petits mots ignorer. Si vous devez aussi comparer deux versions d'un texte ou simplement compter des mots et des caractères, les outils Comparateur de texte et Compteur de mots et de caractères couvrent cela selon la même approche locale, sans rien envoyer."
+    "p4": "Les développeurs s'en servent surtout pour renommer des variables ou des champs entre les conventions de nommage utilisées par différents langages et bases de données, les rédacteurs pour corriger une phrase tapée entièrement en majuscules par erreur, et les éditeurs pour obtenir une capitalisation de titre cohérente sans avoir à retenir quels petits mots ignorer. Si vous devez aussi comparer deux versions d'un texte ou simplement compter des mots et des caractères, les outils Comparateur de texte et Compteur de mots et de caractères couvrent cela selon la même approche locale, sans rien envoyer.",
+    "p5": "Au-delà des formats classiques, Sentence case corrige un texte tapé par erreur entièrement en majuscules en ne mettant en majuscule que la première lettre de chaque phrase, tandis qu'aLtErNaTiNg CaSe et iNVERSE cASE sont deux styles fantaisistes utilisés pour faire ressortir un commentaire ou lui donner un ton sarcastique sur les réseaux sociaux — l'un alterne majuscule et minuscule lettre par lettre, l'autre inverse la casse de chaque lettre par rapport au texte d'origine. En plus des options de casse, trois utilitaires de nettoyage règlent le désordre de mise en forme qui accompagne souvent un texte collé depuis ailleurs : Supprimer les espaces superflus réduit les espaces et tabulations répétés à un seul, sans toucher aux sauts de ligne, Supprimer les sauts de ligne superflus élimine les lignes vides restantes après un copier-coller, et Trier les lignes de A à Z classe une liste par ordre alphabétique — pratique pour nettoyer une liste de noms, de tags ou de lignes façon CSV avant de les réutiliser ailleurs."
   }
 }

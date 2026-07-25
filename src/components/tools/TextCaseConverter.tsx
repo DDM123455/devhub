@@ -9,12 +9,31 @@ interface Messages {
 	caseTitle: string;
 	caseCamel: string;
 	caseSnake: string;
+	caseSentence: string;
+	caseAlternating: string;
+	caseInverse: string;
+	caseOptionsHeading: string;
+	utilRemoveSpaces: string;
+	utilRemoveLineBreaks: string;
+	utilSortLines: string;
+	utilitiesHeading: string;
 	copy: string;
 	copied: string;
 	clear: string;
 }
 
-type CaseMode = 'upper' | 'lower' | 'title' | 'camel' | 'snake';
+type CaseMode =
+	| 'upper'
+	| 'lower'
+	| 'title'
+	| 'camel'
+	| 'snake'
+	| 'sentence'
+	| 'alternating'
+	| 'inverse'
+	| 'removeSpaces'
+	| 'removeLineBreaks'
+	| 'sortLines';
 
 // Normalizes any mix of spaces, hyphens, underscores, punctuation, and
 // existing camelCase/PascalCase boundaries into a flat list of lowercase-able
@@ -45,6 +64,46 @@ function convertCase(text: string, mode: CaseMode): string {
 			return splitWords(text)
 				.map((word) => word.toLowerCase())
 				.join('_');
+		case 'sentence': {
+			const lower = text.toLowerCase();
+			return lower.replace(/(^\s*[a-z])|([.!?]\s+[a-z])/g, (match) => match.toUpperCase());
+		}
+		case 'alternating': {
+			let letterIndex = 0;
+			return text
+				.split('')
+				.map((char) => {
+					const upper = char.toUpperCase();
+					const lower = char.toLowerCase();
+					if (upper === lower) return char; // not a cased letter, don't advance the counter
+					const result = letterIndex % 2 === 0 ? lower : upper;
+					letterIndex++;
+					return result;
+				})
+				.join('');
+		}
+		case 'inverse':
+			return text
+				.split('')
+				.map((char) => {
+					const upper = char.toUpperCase();
+					const lower = char.toLowerCase();
+					if (upper === lower) return char;
+					return char === upper ? lower : upper;
+				})
+				.join('');
+		case 'removeSpaces':
+			return text
+				.replace(/\r\n/g, '\n')
+				.replace(/[ \t]+/g, ' ')
+				.replace(/^ +| +$/gm, '');
+		case 'removeLineBreaks': {
+			const normalized = text.replace(/\r\n/g, '\n');
+			const collapsed = normalized.replace(/[ \t]*\n(?:[ \t]*\n)+/g, '\n');
+			return collapsed.replace(/^[ \t]*\n+/, '').replace(/\n+[ \t]*$/, '');
+		}
+		case 'sortLines':
+			return text.split('\n').sort((a, b) => a.localeCompare(b)).join('\n');
 	}
 }
 
@@ -55,12 +114,21 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 
 	const output = useMemo(() => convertCase(text, mode), [text, mode]);
 
-	const modes: Array<{ value: CaseMode; label: string }> = [
+	const caseModes: Array<{ value: CaseMode; label: string }> = [
 		{ value: 'upper', label: messages.caseUpper },
 		{ value: 'lower', label: messages.caseLower },
 		{ value: 'title', label: messages.caseTitle },
 		{ value: 'camel', label: messages.caseCamel },
 		{ value: 'snake', label: messages.caseSnake },
+		{ value: 'sentence', label: messages.caseSentence },
+		{ value: 'alternating', label: messages.caseAlternating },
+		{ value: 'inverse', label: messages.caseInverse },
+	];
+
+	const utilityModes: Array<{ value: CaseMode; label: string }> = [
+		{ value: 'removeSpaces', label: messages.utilRemoveSpaces },
+		{ value: 'removeLineBreaks', label: messages.utilRemoveLineBreaks },
+		{ value: 'sortLines', label: messages.utilSortLines },
 	];
 
 	const handleCopy = async () => {
@@ -80,21 +148,44 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 				className="w-full resize-y rounded-md border border-border bg-background p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
 			/>
 
-			<div className="flex flex-wrap gap-2">
-				{modes.map((item) => (
-					<button
-						key={item.value}
-						type="button"
-						onClick={() => setMode(item.value)}
-						className={`rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${
-							mode === item.value
-								? 'border-primary bg-primary text-primary-foreground'
-								: 'border-border text-foreground hover:bg-muted'
-						}`}
-					>
-						{item.label}
-					</button>
-				))}
+			<div className="flex flex-col gap-2">
+				<h3 className="text-sm font-semibold text-foreground">{messages.caseOptionsHeading}</h3>
+				<div className="flex flex-wrap gap-2">
+					{caseModes.map((item) => (
+						<button
+							key={item.value}
+							type="button"
+							onClick={() => setMode(item.value)}
+							className={`rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${
+								mode === item.value
+									? 'border-primary bg-primary text-primary-foreground'
+									: 'border-border text-foreground hover:bg-muted'
+							}`}
+						>
+							{item.label}
+						</button>
+					))}
+				</div>
+			</div>
+
+			<div className="flex flex-col gap-2">
+				<h3 className="text-sm font-semibold text-foreground">{messages.utilitiesHeading}</h3>
+				<div className="flex flex-wrap gap-2">
+					{utilityModes.map((item) => (
+						<button
+							key={item.value}
+							type="button"
+							onClick={() => setMode(item.value)}
+							className={`rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${
+								mode === item.value
+									? 'border-primary bg-primary text-primary-foreground'
+									: 'border-border text-foreground hover:bg-muted'
+							}`}
+						>
+							{item.label}
+						</button>
+					))}
+				</div>
 			</div>
 
 			<div className="flex flex-col gap-2">

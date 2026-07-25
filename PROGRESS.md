@@ -5,22 +5,15 @@
 
 ## 🔵 Trạng thái hiện tại
 
-- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi: HOÀN TẤT 10/10** ✅. Người dùng đã tự
-  thêm **Phase 1.5 — Rà soát & Nâng cấp Feature Parity** vào `ROADMAP.md` (giữa Phase 1 và
-  Phase 2) + mục "Checklist Feature Parity" vào `CLAUDE.md` — mục tiêu đưa từng tool từ
-  "MVP chạy được" lên "ngang tầm đối thủ đầu ngành" (benchmark, so sánh feature-by-feature,
-  nâng cấp).
-- Task tiếp theo cần làm: **Phase 1.5**, tool #1, #2, #3, #6, #7, #8, #9 đã xong (đủ điều
-  kiện tick). Tool #4 & #5 "Gộp/Tách PDF" đã build+test xong 3/4 mục con (còn thiếu nén
-  PDF, để sau) — xem log 2026-07-25 bên dưới. Tool #6 "So sánh văn bản" vừa được nâng cấp
-  THÊM MỘT LẦN NỮA vượt xa checklist gốc của Phase 1.5 theo yêu cầu trực tiếp của người
-  dùng (xem log riêng ngay bên dưới) — không phải task tiếp theo trong ROADMAP, chỉ là một
-  yêu cầu chen ngang hợp lệ, đã làm xong, quay lại đúng trình tự ROADMAP sau đó. Task kế
-  tiếp khi mở phiên mới: tool **#10 "Chuyển đổi Case văn bản"** trong Phase 1.5 (benchmark
-  ConvertCase.net — thêm Sentence case/aLtErNaTiNg/iNVERSE, xóa khoảng trắng thừa/xuống
-  dòng thừa, sắp xếp dòng theo alphabet). Đây là tool CUỐI CÙNG của Phase 1.5 — sau khi
-  xong tool #10 (trừ mục nén PDF còn treo của #4/#5), toàn bộ Phase 1.5 coi như hoàn tất,
-  chuyển sang Phase 2.
+- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi: HOÀN TẤT 10/10** ✅. **Phase 1.5 — Rà
+  soát & Nâng cấp Feature Parity: HOÀN TẤT 10/10 tool** ✅ (tool #10 "Chuyển đổi Case văn
+  bản" vừa xong — xem log ngay bên dưới), CHỈ CÒN treo lại đúng 1 mục con nhỏ: nén PDF cho
+  tool #4/#5 (chưa làm, không phải lỗi chặn, xem log 2026-07-25 "Gộp/Tách PDF" bên dưới).
+- Task tiếp theo khi mở phiên mới: bắt đầu **Phase 2 — SEO chuyên sâu & nhân bản đa ngôn
+  ngữ** (xem `ROADMAP.md` từ dòng "## Phase 2"), việc đầu tiên là mở rộng i18n từ 8 lên
+  15–20 ngôn ngữ. Có thể tranh thủ làm nốt mục nén PDF còn treo của Phase 1.5 trước nếu
+  người dùng muốn dứt điểm Phase 1.5 100% trước khi sang Phase 2, nhưng đây không phải yêu
+  cầu bắt buộc theo `ROADMAP.md` (mục đó đã được đánh dấu rõ là "để lại cho sau").
 - Ghi chú thiết kế (2026-07-25): đã redesign toàn bộ giao diện site (không phải task trong
   `ROADMAP.md`, làm theo yêu cầu trực tiếp của người dùng) dựa trên file mockup
   `Web Tool Hub.dc.html` ở gốc repo (file KHÔNG được commit vào git — chỉ là tài liệu tham
@@ -92,6 +85,79 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 1.5, tool #10 (CUỐI CÙNG): Nâng cấp "Chuyển đổi Case văn bản" lên
+  Feature Parity — XONG, HOÀN TẤT PHASE 1.5
+- Benchmark: ConvertCase.net.
+- Trạng thái trước khi nâng cấp: `TextCaseConverter.tsx` chỉ có 5 kiểu case
+  (UPPERCASE/lowercase/Title Case/camelCase/snake_case), kiến trúc 2 khung (nhập → xuất)
+  riêng biệt với nút chọn `mode`, khác thiết kế 1-khung-sửa-tại-chỗ của ConvertCase.net —
+  đây là quyết định kiến trúc CŨ từ Phase 1, giữ nguyên không đổi lại ở lượt nâng cấp này.
+- Đã làm: mở rộng union `CaseMode` và switch `convertCase()` thêm 6 mode mới (3 kiểu case +
+  3 tiện ích), tái dùng ĐÚNG kiến trúc cũ (mode → tính lại `output` qua `useMemo`) thay vì
+  đổi sang kiểu "sửa tại chỗ trên 1 khung" của đối thủ — quyết định có chủ đích giữ tối
+  thiểu diff, không đổi UX đã chốt từ Phase 1 nếu không được yêu cầu:
+  - `sentence`: lowercase toàn bộ rồi viết hoa chữ đầu văn bản + chữ đầu sau mỗi `. `/`! `/
+    `? `.
+  - `alternating` (aLtErNaTiNg CaSe) và `inverse` (iNVERSE cASE): dùng phép thử
+    `char.toUpperCase() !== char.toLowerCase()` để xác định "có phải chữ cái có phân biệt
+    hoa/thường" thay vì regex ASCII `[a-zA-Z]` — Unicode-aware nên chữ có dấu (é, ñ, ü...)
+    cũng được xử lý đúng, phù hợp site 8 ngôn ngữ hơn là chỉ xử lý đúng ASCII. Bộ đếm xen kẽ
+    của `alternating` CHỈ tăng khi gặp ký tự có phân biệt hoa/thường (dấu cách/dấu câu không
+    làm lệch nhịp xen kẽ) — xác nhận khớp ví dụ kinh điển "Hello World" → "hElLo WoRlD".
+  - `removeSpaces`: gộp các khoảng trắng/tab liên tiếp thành 1 khoảng trắng, cắt khoảng
+    trắng đầu/cuối MỖI DÒNG (dùng cờ `gm`), giữ nguyên dấu xuống dòng.
+  - `removeLineBreaks`: coi CẢ dòng chỉ toàn khoảng trắng/tab (không chỉ dòng rỗng tuyệt
+    đối) là "dòng trống" khi gộp — dùng regex `[ \t]*\n(?:[ \t]*\n)+` gộp mọi cụm 2+ dòng
+    trống liên tiếp (kể cả dòng có vài dấu cách/tab bên trong) về đúng 1 dấu xuống dòng, rồi
+    cắt bỏ toàn bộ dòng trống ở đầu/cuối văn bản — quyết định chủ động rộng hơn cách hiểu
+    "chỉ dòng rỗng tuyệt đối", vì khớp đúng tinh thần "xóa xuống dòng THỪA" hơn.
+  - Cả `removeSpaces`/`removeLineBreaks` đều chuẩn hóa `\r\n` → `\n` trước khi xử lý (phòng
+    hờ văn bản dán vào có xuống dòng kiểu Windows).
+  - `sortLines`: tách theo `\n`, sắp xếp bằng `localeCompare`, nối lại.
+  - JSX: tách 1 hàng nút `modes` cũ thành 2 hàng có tiêu đề riêng (`caseModes`/
+    `utilityModes`), mỗi hàng có `<h3>` tiêu đề (`caseOptionsHeading`/`utilitiesHeading`) —
+    COPY nguyên logic style nút cũ cho cả 2 hàng thay vì tách thành sub-component dùng
+    chung, vì chỉ có 2 nơi gọi, tránh trừu tượng hóa sớm không cần thiết cho 1 file nhỏ.
+  - Thêm 8 key i18n mới (`caseSentence`, `caseAlternating`, `caseInverse`,
+    `caseOptionsHeading`, `utilRemoveSpaces`, `utilRemoveLineBreaks`, `utilSortLines`,
+    `utilitiesHeading`) cho đủ 8 ngôn ngữ. 3 label case mới (`caseSentence`/
+    `caseAlternating`/`caseInverse`) giữ NGUYÊN VĂN tiếng Anh ở cả 8 file — khớp quy ước có
+    sẵn của tool này (`caseUpper`/`caseTitle`... vốn đã luôn là token tiếng Anh chưa dịch kể
+    cả ở bản vi/es/pt/fr/de/ja/ko). 2 tiêu đề + 3 nhãn tiện ích thì dịch riêng theo từng
+    ngôn ngữ. Thêm `article.p5` mới (không nhét vào p3/p4 cũ) ở cả 8 ngôn ngữ giới thiệu 3
+    kiểu case mới + 3 tiện ích, viết riêng theo giọng văn từng ngôn ngữ, không dịch máy
+    nguyên khối từ bản tiếng Anh. Cập nhật `meta.description`/`tagline` thêm 1 câu ngắn nhắc
+    tới tính năng mới, có kiểm soát không để `meta.description` vượt quá xa ngưỡng SEO
+    ~155-160 ký tự.
+- Test tương tác qua Puppeteer (`test-textcase.mjs` trong scratchpad, không commit, cài tạm
+  `puppeteer-core` CHỈ trong scratchpad để chạy Chrome thật đã có sẵn trên máy) — chạy đủ cả
+  trên dev server LẪN bundle production thật (`npm run build` + `npm run preview`), bao phủ:
+  - Hồi quy 5 mode cũ (upper/lower/title/camel/snake) vẫn đúng sau khi tách lại JSX thành 2
+    mảng/2 hàng nút.
+  - Sentence case: `"hello world. this is great! are you SURE?"` → đúng
+    `"Hello world. This is great! Are you sure?"`.
+  - Alternating case: `"Hello World"` → đúng `"hElLo WoRlD"`; thêm input bắt đầu bằng dấu
+    cách/dấu câu (`"  hi!"`) → đúng `"  hI!"`, xác nhận bộ đếm không lệch nhịp vì ký tự
+    không phân biệt hoa/thường.
+  - Inverse case: `"Hello World"` → đúng `"hELLO wORLD"`.
+  - Remove extra spaces: input nhiều dòng có khoảng trắng/tab thừa cả giữa dòng lẫn đầu/cuối
+    dòng → gộp đúng còn 1 khoảng trắng mỗi chỗ, số dòng/dấu xuống dòng giữ nguyên.
+  - Remove extra line breaks: input có nhiều dòng trống liên tiếp XEN LẪN 1 dòng chỉ có
+    khoảng trắng (`"   "`) ở giữa, cộng dòng trống đầu/cuối văn bản → gộp về đúng 1 dấu
+    xuống dòng, cắt sạch dòng trống đầu/cuối — xác nhận đúng cách hiểu "dòng chỉ có khoảng
+    trắng cũng tính là dòng trống" đã chọn.
+  - Sort lines: `"banana\napple\ncherry"` → đúng `"apple\nbanana\ncherry"`.
+  - Nút Copy/Clear vẫn hoạt động đúng (enable/disable theo nội dung, Clear xóa sạch khung
+    nhập) sau khi thêm 6 mode mới.
+  - Kiểm tra i18n trên bản `vi`: 2 tiêu đề mới + 3 nhãn tiện ích hiện đúng bản dịch tiếng
+    Việt, 3 nhãn case mới hiện ĐÚNG nguyên văn tiếng Anh như thiết kế (không bị dịch nhầm).
+  - Không có console error nào trong suốt luồng test.
+- `npm run build` sạch cả trước và sau khi test (89 trang tĩnh, đủ 8 ngôn ngữ × 10 tool +
+  trang chủ). Đã tick đủ 2/2 checkbox con + dòng cha "10. Chuyển đổi Case văn bản" trong
+  `ROADMAP.md` Phase 1.5 — đây là tool cuối cùng, Phase 1.5 coi như HOÀN TẤT (trừ mục nén
+  PDF còn treo riêng của tool #4/#5, đã ghi chú từ trước, không phải lỗi mới).
+- CHƯA hỏi người dùng về việc push commit này lên `origin/main` (chỉ mới commit local).
 
 ### 2026-07-25 — Nâng cấp lần 2 "So sánh văn bản" theo yêu cầu trực tiếp của người dùng
   (vượt checklist gốc của Phase 1.5, tool #6) — XONG

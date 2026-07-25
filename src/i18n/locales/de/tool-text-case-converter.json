@@ -1,10 +1,10 @@
 {
   "meta": {
     "title": "Text-Case-Konverter kostenlos online — Web Tool Hub",
-    "description": "Wandle Text sofort zwischen GROSSBUCHSTABEN, Kleinbuchstaben, Title Case, camelCase und snake_case um — kostenlos, direkt in deinem Browser. Kein Upload, keine Anmeldung."
+    "description": "Wandle Text sofort zwischen GROSSBUCHSTABEN, Kleinbuchstaben, Title Case, camelCase, snake_case, Sentence case und mehr um — kostenlos, direkt in deinem Browser. Kein Upload, keine Anmeldung."
   },
   "heading": "Text-Case-Konverter",
-  "tagline": "Wandle Text sofort zwischen GROSSBUCHSTABEN, Kleinbuchstaben, Title Case, camelCase und snake_case um.",
+  "tagline": "Wandle Text sofort zwischen GROSSBUCHSTABEN, Kleinbuchstaben, Title Case, camelCase, snake_case und mehr um — inklusive Tools zum Aufräumen von Text.",
   "ui": {
     "placeholder": "Text hier eingeben oder einfügen…",
     "outputLabel": "Ergebnis",
@@ -13,6 +13,14 @@
     "caseTitle": "Title Case",
     "caseCamel": "camelCase",
     "caseSnake": "snake_case",
+    "caseSentence": "Sentence case",
+    "caseAlternating": "aLtErNaTiNg CaSe",
+    "caseInverse": "iNVERSE cASE",
+    "caseOptionsHeading": "Case-Optionen",
+    "utilRemoveSpaces": "Überflüssige Leerzeichen entfernen",
+    "utilRemoveLineBreaks": "Überflüssige Zeilenumbrüche entfernen",
+    "utilSortLines": "Zeilen A-Z sortieren",
+    "utilitiesHeading": "Werkzeuge",
     "copy": "Kopieren",
     "copied": "Kopiert!",
     "clear": "Leeren"
@@ -23,6 +31,7 @@
     "p1": "Der Bedarf, Groß-/Kleinschreibung umzuwandeln, taucht ständig auf kleine, aber lästige Weise auf: ein Absatz, der versehentlich bei aktivierter Feststelltaste getippt wurde, eine in Title Case verfasste Spezifikation, die zu einem camelCase-Variablennamen werden soll, eine CSV-Spaltenüberschrift, die zu einem snake_case-Datenbankfeld werden muss, eine Überschrift, die vor der Veröffentlichung eine korrekte Großschreibung braucht. Nichts davon ist für ein einzelnes Wort schwer von Hand zu erledigen, aber einen ganzen Absatz oder eine lange Liste von Feldnamen von Hand neu zu tippen ist langsam und fehleranfällig.",
     "p2": "Dieses Tool erledigt die Umwandlung mit einem kleinen Stück reinem JavaScript, das direkt in deinem Browser läuft — es gibt keine Bibliothek zu laden und nichts, das an einen Server gesendet wird. Während du Text eingibst oder einfügst und zwischen den Case-Optionen wechselst, aktualisiert sich das Ergebnis sofort, jedes Mal frisch im Arbeitsspeicher auf deinem eigenen Gerät berechnet.",
     "p3": "Füge deinen Text ein oder tippe ihn, wähle GROSSBUCHSTABEN, Kleinbuchstaben, Title Case, camelCase oder snake_case, und klicke auf Kopieren, um das Ergebnis zu übernehmen. Speziell bei camelCase und snake_case behandelt der Konverter Leerzeichen, Bindestriche, Unterstriche und Satzzeichen als Worttrennungen — und erkennt außerdem bereits vorhandene camelCase- oder PascalCase-Grenzen, sodass das Einfügen von \"hello-world\", \"Hello World\" oder sogar eines bereits camelCase-formatierten \"helloWorld\" jeweils zum selben sauberen Ergebnis führt, statt zu etwas Kaputtem wie \"helloworld\" oder \"hello-World\".",
-    "p4": "Entwicklerinnen und Entwickler greifen darauf am häufigsten zurück, wenn sie Variablen oder Felder zwischen den Namenskonventionen verschiedener Sprachen und Datenbanken umbenennen, Autorinnen und Autoren nutzen es, um einen versehentlich komplett in Großbuchstaben getippten Satz zu korrigieren, und Redakteurinnen und Redakteure nutzen Title Case für eine einheitliche Überschriften-Großschreibung, ohne sich merken zu müssen, welche kleinen Wörter ausgelassen werden. Musst du außerdem zwei Textversionen vergleichen oder einfach nur Wörter und Zeichen zählen, decken das die Tools Textvergleich und Wörter- und Zeichenzähler nach demselben lokalen Prinzip ohne Upload ab."
+    "p4": "Entwicklerinnen und Entwickler greifen darauf am häufigsten zurück, wenn sie Variablen oder Felder zwischen den Namenskonventionen verschiedener Sprachen und Datenbanken umbenennen, Autorinnen und Autoren nutzen es, um einen versehentlich komplett in Großbuchstaben getippten Satz zu korrigieren, und Redakteurinnen und Redakteure nutzen Title Case für eine einheitliche Überschriften-Großschreibung, ohne sich merken zu müssen, welche kleinen Wörter ausgelassen werden. Musst du außerdem zwei Textversionen vergleichen oder einfach nur Wörter und Zeichen zählen, decken das die Tools Textvergleich und Wörter- und Zeichenzähler nach demselben lokalen Prinzip ohne Upload ab.",
+    "p5": "Neben den klassischen Formaten korrigiert Sentence case einen versehentlich komplett in Großbuchstaben getippten Text, indem nur der erste Buchstabe jedes Satzes großgeschrieben wird, während aLtErNaTiNg CaSe und iNVERSE cASE zwei verspielte Stile sind, mit denen ein Kommentar in sozialen Netzwerken auffällt oder sarkastisch wirkt — der eine wechselt Buchstabe für Buchstabe zwischen Groß- und Kleinschreibung, der andere kehrt bei jedem einzelnen Buchstaben die Groß-/Kleinschreibung gegenüber dem Original um. Neben den Case-Optionen räumen drei Werkzeuge das Format-Chaos auf, das beim Einfügen von Text aus anderen Quellen oft entsteht: Überflüssige Leerzeichen entfernen fasst mehrfache Leerzeichen und Tabs zu einem einzigen zusammen, ohne Zeilenumbrüche anzutasten, Überflüssige Zeilenumbrüche entfernen beseitigt übrig gebliebene Leerzeilen nach dem Kopieren und Einfügen, und Zeilen A-Z sortieren bringt eine Liste in alphabetische Reihenfolge — praktisch, um eine eingefügte Liste von Namen, Tags oder CSV-artigen Zeilen aufzuräumen, bevor du sie weiterverwendest."
   }
 }

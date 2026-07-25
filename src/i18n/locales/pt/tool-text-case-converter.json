@@ -1,10 +1,10 @@
 {
   "meta": {
     "title": "Conversor de maiúsculas e minúsculas grátis online — Web Tool Hub",
-    "description": "Converta texto entre MAIÚSCULAS, minúsculas, Title Case, camelCase e snake_case instantaneamente, de graça e direto no seu navegador. Sem upload, sem cadastro."
+    "description": "Converta texto entre MAIÚSCULAS, minúsculas, Title Case, camelCase, snake_case, Sentence case e mais instantaneamente, de graça e direto no seu navegador. Sem upload, sem cadastro."
   },
   "heading": "Conversor de maiúsculas e minúsculas",
-  "tagline": "Converta texto entre MAIÚSCULAS, minúsculas, Title Case, camelCase e snake_case instantaneamente.",
+  "tagline": "Converta texto entre MAIÚSCULAS, minúsculas, Title Case, camelCase, snake_case e mais — com utilitários para limpar o texto.",
   "ui": {
     "placeholder": "Digite ou cole o texto aqui…",
     "outputLabel": "Resultado",
@@ -13,6 +13,14 @@
     "caseTitle": "Title Case",
     "caseCamel": "camelCase",
     "caseSnake": "snake_case",
+    "caseSentence": "Sentence case",
+    "caseAlternating": "aLtErNaTiNg CaSe",
+    "caseInverse": "iNVERSE cASE",
+    "caseOptionsHeading": "Opções de maiúsculas/minúsculas",
+    "utilRemoveSpaces": "Remover espaços extras",
+    "utilRemoveLineBreaks": "Remover quebras de linha extras",
+    "utilSortLines": "Ordenar linhas A-Z",
+    "utilitiesHeading": "Utilitários",
     "copy": "Copiar",
     "copied": "Copiado!",
     "clear": "Limpar"
@@ -23,6 +31,7 @@
     "p1": "A necessidade de converter maiúsculas e minúsculas aparece o tempo todo de formas pequenas, mas irritantes: um parágrafo digitado com o Caps Lock preso ligado sem querer, uma especificação escrita em Title Case que precisa virar o nome de uma variável em camelCase, o cabeçalho de uma coluna de CSV que precisa virar um campo de banco de dados em snake_case, uma manchete que precisa de capitalização correta antes de ir ao ar. Nada disso é difícil de fazer à mão com uma única palavra, mas redigitar um parágrafo inteiro ou uma lista longa de nomes de campos manualmente é lento e fácil de errar.",
     "p2": "Esta ferramenta faz a conversão com um pequeno trecho de JavaScript puro rodando direto no seu navegador — não há nenhuma biblioteca para carregar nem nada para enviar a um servidor. Conforme você digita ou cola o texto e alterna entre as opções de formato, o resultado é atualizado instantaneamente, recalculado na memória do seu próprio dispositivo a cada vez.",
     "p3": "Cole ou digite seu texto, escolha MAIÚSCULAS, minúsculas, Title Case, camelCase ou snake_case, e clique em Copiar para pegar o resultado. Especificamente para camelCase e snake_case, o conversor trata espaços, hífens, underscores e pontuação como separadores de palavra — e também detecta limites de camelCase ou PascalCase já existentes, então colar \"hello-world\", \"Hello World\" ou até um \"helloWorld\" já formatado gera o mesmo resultado corretamente, em vez de algo quebrado como \"helloworld\" ou \"hello-World\".",
-    "p4": "Desenvolvedores usam isso principalmente ao renomear variáveis ou campos entre as convenções de nomenclatura usadas por diferentes linguagens e bancos de dados, quem escreve usa para corrigir uma frase que foi digitada toda em maiúsculas por engano, e editores usam Title Case para obter uma capitalização de manchete consistente sem precisar decorar quais palavras curtas pular. Se você também precisa comparar duas versões de um texto ou simplesmente contar palavras e caracteres, as ferramentas Comparador de textos e Contador de palavras e caracteres cobrem isso com a mesma abordagem local, sem enviar nada."
+    "p4": "Desenvolvedores usam isso principalmente ao renomear variáveis ou campos entre as convenções de nomenclatura usadas por diferentes linguagens e bancos de dados, quem escreve usa para corrigir uma frase que foi digitada toda em maiúsculas por engano, e editores usam Title Case para obter uma capitalização de manchete consistente sem precisar decorar quais palavras curtas pular. Se você também precisa comparar duas versões de um texto ou simplesmente contar palavras e caracteres, as ferramentas Comparador de textos e Contador de palavras e caracteres cobrem isso com a mesma abordagem local, sem enviar nada.",
+    "p5": "Além dos formatos clássicos, o Sentence case corrige um texto digitado todo em maiúsculas por engano, deixando maiúscula apenas a primeira letra de cada frase, enquanto aLtErNaTiNg CaSe e iNVERSE cASE são dois estilos curiosos usados para destacar um comentário ou dar um tom de sarcasmo nas redes sociais — um alterna maiúscula e minúscula letra por letra, o outro inverte a caixa de cada letra em relação ao texto original. Além das opções de maiúsculas/minúsculas, três utilitários de limpeza resolvem a bagunça de formatação que costuma vir junto com texto colado de outro lugar: Remover espaços extras reduz espaços e tabulações repetidos a um único espaço sem mexer nas quebras de linha, Remover quebras de linha extras elimina as linhas em branco sobrando de um copiar-e-colar, e Ordenar linhas A-Z coloca uma lista em ordem alfabética — ótimo para organizar nomes, tags ou linhas em formato CSV antes de usá-las em outro lugar."
   }
 }
