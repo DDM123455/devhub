@@ -1,0 +1,19 @@
+{
+  "meta": {
+    "title": "Định dạng & kiểm tra JSON miễn phí trực tuyến — Web Tool Hub",
+    "description": "Định dạng, kiểm tra và duyệt JSON miễn phí, xử lý hoàn toàn trên trình duyệt. Dán JSON đã nén, chuyển sang chế độ cây tương tác, phát hiện lỗi cú pháp ngay lập tức — không upload, không cần đăng ký."
+  },
+  "heading": "Định dạng & kiểm tra JSON",
+  "tagline": "Định dạng, kiểm tra và khám phá dữ liệu JSON, ngay trên trình duyệt của bạn.",
+  "ui": {
+    "themeNotice": "Khung soạn thảo này giữ giao diện sáng riêng, không đổi theo dark mode của trang — giống cách một trình soạn code nhúng vào bất kỳ trang nào thường hoạt động."
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Vì sao nên định dạng và kiểm tra JSON ngay trên máy?",
+    "p1": "JSON xuất hiện liên tục trong công việc của lập trình viên: một phản hồi API bị nén không xuống dòng, một file config bị ai đó sửa tay thành một dòng dài không đọc nổi, một payload bạn đang debug lúc 11 giờ đêm cố tìm cho ra dấu phẩy thừa duy nhất. Phần lớn công cụ \"định dạng JSON\" online giải quyết vấn đề dễ đọc bằng cách gửi văn bản bạn dán lên máy chủ trước — một sự đánh đổi khó chịu khi JSON đó có thể chứa API key, access token, hay dữ liệu cá nhân của khách hàng.",
+    "p2": "Công cụ này không bao giờ gửi bất cứ thứ gì đi đâu cả. Nó được xây trên jsoneditor — thư viện JavaScript phân tích và render lại JSON hoàn toàn trong bộ nhớ trình duyệt của bạn. Việc phân tích cú pháp, in đẹp (pretty-print) và kiểm tra hợp lệ đều diễn ra tại chỗ bằng engine JavaScript có sẵn của trình duyệt — không có máy chủ nào tham gia, nên không có gì bạn dán vào đây rời khỏi thiết bị của bạn.",
+    "p3": "Dán JSON vào khung soạn thảo ở chế độ text rồi dùng nút Format trên thanh công cụ để in đẹp, hoặc Compact để nén lại về một dòng. Nếu JSON có lỗi cú pháp — dấu phẩy thừa cuối cùng, thiếu dấu ngoặc kép, dấu ngoặc không khớp — trình soạn thảo sẽ báo ngay với thông báo lỗi rõ ràng thay vì bắt bạn dò mắt cả tài liệu. Chuyển sang chế độ tree qua menu thả xuống ở trên để duyệt cùng dữ liệu đó dưới dạng cây có thể thu gọn, tương tác được: mở/đóng các object và array lồng nhau, sửa từng giá trị ngay tại chỗ, sắp xếp lại hoặc xóa trường trực tiếp — thay đổi sẽ phản ánh ngay vào phần text ngay khi bạn chuyển chế độ trở lại.",
+    "p4": "Sự kết hợp này bao phủ hầu hết công việc JSON hàng ngày: dọn sạch một phản hồi API trước khi dán vào tài liệu, kiểm tra một file config trước khi commit, hay khám phá một payload lồng sâu nhiều tầng mà không bị lạc mất đang ở array nào. Vì mọi thứ chỉ tồn tại trong tab trình duyệt, đóng tab là trình soạn thảo xóa sạch hoàn toàn — không có lịch sử hay bản nháp nào được lưu lại, đúng là điều bạn muốn khi JSON đang xử lý có thể chứa dữ liệu nhạy cảm."
+  }
+}

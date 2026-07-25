@@ -1,0 +1,19 @@
+{
+  "meta": {
+    "title": "Formateur et validateur JSON gratuit en ligne — Web Tool Hub",
+    "description": "Formatez, validez et explorez du JSON gratuitement, directement dans votre navigateur. Collez du JSON minifié, passez à une vue arborescente interactive et repérez les erreurs de syntaxe instantanément — sans envoi sur un serveur, sans inscription."
+  },
+  "heading": "Formateur et validateur JSON",
+  "tagline": "Formatez, validez et explorez des données JSON, directement dans votre navigateur.",
+  "ui": {
+    "themeNotice": "Cet éditeur conserve son propre thème clair quel que soit le mode sombre du site, comme le fait généralement un éditeur de code intégré à n'importe quelle page."
+  },
+  "related": "Outils associés",
+  "article": {
+    "heading": "Pourquoi formater et valider du JSON en local ?",
+    "p1": "Le JSON revient sans cesse dans le quotidien d'un développeur : une réponse d'API minifiée sans saut de ligne, un fichier de configuration qu'une personne a modifié à la main jusqu'à en faire une seule ligne illisible, un payload que vous déboguez à 23h en cherchant cette unique virgule en trop. La plupart des outils en ligne de « formatage JSON » résolvent le problème de lisibilité en envoyant d'abord le texte collé vers un serveur — un compromis inconfortable quand ce JSON peut contenir une clé d'API, un jeton d'accès ou des données personnelles d'un client.",
+    "p2": "Cet outil n'envoie jamais rien nulle part. Il repose sur jsoneditor, une bibliothèque JavaScript qui analyse et réaffiche votre JSON entièrement dans la mémoire de votre navigateur. L'analyse, la mise en forme lisible et la validation de syntaxe se font toutes en local, via le moteur JavaScript du navigateur lui-même — aucun serveur n'intervient, donc rien de ce que vous collez ici ne quitte jamais votre appareil.",
+    "p3": "Collez votre JSON dans l'éditeur en mode texte et utilisez le bouton Format de la barre d'outils pour le mettre en forme lisible, ou Compact pour le recompresser sur une seule ligne. Si le JSON contient une erreur de syntaxe — une virgule superflue, une guillemet manquante, un crochet non fermé —, l'éditeur la signale immédiatement avec un message d'erreur clair, plutôt que de vous laisser relire tout le document à l'œil nu. Passez au mode arbre via le menu déroulant en haut pour parcourir les mêmes données sous forme d'arborescence interactive et repliable : développez et repliez les objets et tableaux imbriqués, modifiez chaque valeur sur place, réordonnez ou supprimez des champs directement, le changement se répercutant dans le texte dès que vous repassez en mode texte.",
+    "p4": "Cette combinaison couvre l'essentiel du travail JSON quotidien : nettoyer une réponse d'API avant de la coller dans une documentation, valider un fichier de configuration avant de le committer, ou explorer un payload profondément imbriqué sans perdre le fil du tableau dans lequel vous vous trouvez. Comme tout ne vit que dans l'onglet du navigateur, le fermer efface entièrement l'éditeur — aucun historique ni brouillon enregistré à surveiller, exactement le comportement souhaité quand le JSON manipulé peut être sensible."
+  }
+}

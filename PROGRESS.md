@@ -5,9 +5,16 @@
 
 ## 🔵 Trạng thái hiện tại
 
-- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (7/10 xong)
-- Task tiếp theo cần làm: Công cụ #8 "JSON Formatter & Validator" dùng Monaco editor hoặc
-  jsoneditor (xem `ROADMAP.md` Phase 1).
+- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (8/10 xong)
+- Task tiếp theo cần làm: Công cụ #9 "QR Code Generator" (tùy chỉnh màu, logo giữa) dùng
+  `qrcode.react` + Canvas (xem `ROADMAP.md` Phase 1).
+- Ghi chú dependency: đã chọn **jsoneditor** (không phải Monaco) cho tool #8 — nhẹ hơn
+  nhiều, phù hợp triết lý Lighthouse/hiệu năng của dự án. Dùng bản **minimalist**
+  (`jsoneditor/dist/jsoneditor-minimalist.js`, ~70KB gzip thay vì ~210KB bản đầy đủ) vì
+  không cần chế độ `code` (Ace editor) hay JSON Schema validation (ajv) — chỉ dùng 2 chế
+  độ `text`/`tree` đã đủ cho "Formatter & Validator". Có file khai báo type riêng
+  `src/types/jsoneditor-minimalist.d.ts` (tái dùng type từ `@types/jsoneditor` vì package
+  gốc không export type cho subpath `dist/jsoneditor-minimalist.js`).
 - Ghi chú kiến trúc tool page: `src/pages/[locale]/tools/[slug].astro` giờ rẽ nhánh theo
   `toolId` — nếu là tool đã có UI thật thì render component riêng
   (`src/components/tools/<Ten>Page.astro`), còn lại vẫn rơi vào nhánh "coming soon" mặc
@@ -52,6 +59,61 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 1, công cụ #8: JSON Formatter & Validator
+- Đã làm:
+  - Hỏi người dùng chọn giữa Monaco editor và jsoneditor (2 lựa chọn `ROADMAP.md` để mở)
+    — người dùng chọn **jsoneditor** vì nhẹ hơn, ít rủi ro ảnh hưởng điểm Lighthouse
+    Performance hơn Monaco (Monaco nặng ~2-3MB và cần cấu hình Web Worker riêng cho ngôn
+    ngữ, phức tạp hơn nhiều so với nhu cầu thực tế của 1 tool định dạng JSON).
+  - Cài `jsoneditor` (dependency) + `@types/jsoneditor` (devDependency, vì package gốc
+    không kèm sẵn type declaration).
+  - Tạo `src/types/jsoneditor-minimalist.d.ts`: khai báo ambient module cho subpath
+    `jsoneditor/dist/jsoneditor-minimalist.js` (bản **minimalist** — loại bỏ Ace editor,
+    ajv, vanilla-picker — giảm từ ~210KB xuống ~70KB gzip), tái sử dụng type có sẵn từ
+    `@types/jsoneditor` vì bản đầy đủ và bản minimalist có cùng API bề mặt (chỉ khác chế
+    độ `code` không khả dụng, mà tool này không dùng chế độ đó).
+  - Tạo `src/components/tools/JsonFormatter.tsx` (React, `client:load`): widget
+    `jsoneditor` là thư viện vanilla JS tự quản lý DOM riêng, nên khởi tạo bằng
+    `useEffect` (tạo instance khi mount, `destroy()` khi unmount) thay vì điều khiển qua
+    React state như các component khác — đây là cách chuẩn để bọc 1 thư viện widget
+    non-React trong React island. Bật 2 chế độ `text` (dán JSON thô, có nút Format/Compact
+    sẵn trong thanh công cụ mặc định của thư viện) và `tree` (duyệt cây tương tác,
+    mở/đóng/sửa từng node) — validate lỗi cú pháp tự động hiển thị sẵn trong UI của thư
+    viện (không cần tự viết thêm UI báo lỗi).
+  - Tạo `src/components/tools/JsonFormatterPage.astro`: theo khuôn các trang tool trước —
+    title/description theo từ khóa "json formatter"/"json validator", JSON-LD
+    `WebApplication` (`applicationCategory: DeveloperApplication` thay vì
+    `UtilitiesApplication` vì đây rõ ràng là công cụ cho dev), nội dung hướng dẫn 4
+    đoạn/ngôn ngữ, link tới tool cùng category `dev` (QR Code Generator — dù chưa có UI
+    thật, route vẫn tồn tại nên link không chết, chỉ tạm rơi vào trang "coming soon").
+  - Tạo 8 file dictionary i18n `tool-json-formatter.json`. **Tự phát hiện và sửa 1 lỗi gõ
+    nhầm** trong bản tiếng Pháp (`p2` ban đầu lỡ gõ "Il repose sur pdf-lib — non, sur
+    jsoneditor..." — vết tích copy nhầm từ ngữ cảnh tool PDF trước đó) trước khi commit.
+  - Sửa `src/pages/[locale]/tools/[slug].astro` thêm nhánh `toolId === 'json-formatter'`.
+  - `npm run build` sinh đủ 89 trang không lỗi; đọc thử
+    `dist/en/tools/json-formatter/index.html` xác nhận title/heading đúng.
+- Quyết định kỹ thuật quan trọng:
+  - Không theme lại `jsoneditor` để khớp dark mode của site — thư viện này không hỗ trợ
+    dark theme sẵn cho chế độ `text`/`tree` (chỉ chế độ `code` dùng Ace mới có option
+    `theme`, mà bản minimalist không dùng chế độ đó). Chấp nhận widget giữ giao diện sáng
+    riêng (ghi rõ 1 dòng chú thích nhỏ ngay dưới editor cho người dùng biết đây là hành vi
+    có chủ đích, không phải lỗi UI) thay vì tự viết CSS override phức tạp cho một thư viện
+    bên thứ ba — đúng tinh thần "không over-engineer" của dự án.
+  - Không dùng JSON Schema validation (`ajv`, option `schema`) — tool này chỉ cần validate
+    cú pháp JSON cơ bản, không có khái niệm "schema chuẩn" nào để so khớp; đây cũng là lý
+    do chọn bản minimalist thay vì bản đầy đủ.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Chưa test tương tác thật (dán JSON lỗi, xem thông báo lỗi, chuyển đổi qua lại
+    text/tree mode) trên trình duyệt thật — chỉ verify qua `npm run build` + đọc HTML
+    tĩnh. Vì đây là lần đầu tích hợp một thư viện widget non-React khá phức tạp
+    (`useEffect` + cleanup + DOM ngoài React), nên ưu tiên test tay thật sớm nếu có dịp mở
+    dev server, rủi ro cao hơn các tool JS thuần trước.
+  - Chưa chạy Lighthouse riêng cho trang này để xác nhận `jsoneditor` (dù đã chọn bản nhẹ
+    nhất) không kéo điểm Performance xuống dưới ngưỡng 90 — nên làm ở lần kiểm tra
+    Lighthouse toàn site kế tiếp (Phase 2).
+- Task tiếp theo: Phase 1, công cụ #9 "QR Code Generator" (tùy chỉnh màu, logo giữa) dùng
+  `qrcode.react` + Canvas.
 
 ### 2026-07-25 — Phase 1, công cụ #7: Đếm từ & ký tự
 - Đã làm:
