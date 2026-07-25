@@ -135,14 +135,36 @@ function lineBackgroundClass(type: DiffLineEntry['type']): string {
 	return '';
 }
 
-function DiffRowContent({ entry, side }: { entry: DiffLineEntry; side: 'left' | 'right' }) {
-	const text = side === 'left' ? entry.leftText : entry.rightText;
-	const segments = side === 'left' ? entry.leftSegments : entry.rightSegments;
+function DiffRowContent({
+	entry,
+	side,
+	override,
+}: {
+	entry: DiffLineEntry;
+	side: 'left' | 'right';
+	override?: HunkOverride;
+}) {
+	// In the Merge Tool, an accepted hunk swaps which side's line is actually
+	// displayed — otherwise the two preview columns would keep showing the raw
+	// diff forever and clicking accept would look like it did nothing.
+	const adoptedFromOtherSide = side === 'left' ? override?.leftUsesRight : override?.rightUsesLeft;
+	const text = adoptedFromOtherSide
+		? side === 'left'
+			? entry.rightText
+			: entry.leftText
+		: side === 'left'
+			? entry.leftText
+			: entry.rightText;
+	const segments = adoptedFromOtherSide ? undefined : side === 'left' ? entry.leftSegments : entry.rightSegments;
 	if (text === undefined) {
 		return <div className="h-6" />;
 	}
 	return (
-		<div className={`h-6 whitespace-pre px-2 font-mono text-sm leading-6 text-foreground ${lineBackgroundClass(entry.type)}`}>
+		<div
+			className={`h-6 whitespace-pre px-2 font-mono text-sm leading-6 text-foreground ${
+				adoptedFromOtherSide ? 'bg-blue-500/15' : lineBackgroundClass(entry.type)
+			}`}
+		>
 			{segments
 				? segments.map((seg, index) => {
 						const isChangedPart = side === 'left' ? seg.removed : seg.added;
@@ -473,7 +495,12 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							</div>
 							<div className="h-72 overflow-auto rounded-md border border-border">
 								{entries.map((entry, index) => (
-									<DiffRowContent key={index} entry={entry} side="left" />
+									<DiffRowContent
+										key={index}
+										entry={entry}
+										side="left"
+										override={entry.hunkIndex !== null ? hunkOverrides.get(entry.hunkIndex) : undefined}
+									/>
 								))}
 							</div>
 						</div>
@@ -533,7 +560,12 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							</div>
 							<div className="h-72 overflow-auto rounded-md border border-border">
 								{entries.map((entry, index) => (
-									<DiffRowContent key={index} entry={entry} side="right" />
+									<DiffRowContent
+										key={index}
+										entry={entry}
+										side="right"
+										override={entry.hunkIndex !== null ? hunkOverrides.get(entry.hunkIndex) : undefined}
+									/>
 								))}
 							</div>
 						</div>
