@@ -22,7 +22,10 @@
     "backgroundImage": "Custom image",
     "backgroundImageSelect": "Choose background image",
     "backgroundImageClear": "Remove",
-    "edgeSoftnessLabel": "Edge softness"
+    "edgeSoftnessLabel": "Edge softness",
+    "removeItem": "Remove",
+    "clearAll": "Clear all",
+    "skippedFiles": "{{count}} file(s) were skipped because they're not a supported image format."
   },
   "related": "Related tools",
   "article": {

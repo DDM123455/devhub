@@ -22,7 +22,10 @@
     "backgroundImage": "Eigenes Bild",
     "backgroundImageSelect": "Hintergrundbild wählen",
     "backgroundImageClear": "Entfernen",
-    "edgeSoftnessLabel": "Kantenweichheit"
+    "edgeSoftnessLabel": "Kantenweichheit",
+    "removeItem": "Entfernen",
+    "clearAll": "Alle entfernen",
+    "skippedFiles": "{{count}} Datei(en) wurden übersprungen, da es sich nicht um ein unterstütztes Bildformat handelt."
   },
   "related": "Ähnliche Tools",
   "article": {

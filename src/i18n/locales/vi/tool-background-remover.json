@@ -22,7 +22,10 @@
     "backgroundImage": "Ảnh tùy chọn",
     "backgroundImageSelect": "Chọn ảnh nền",
     "backgroundImageClear": "Xóa",
-    "edgeSoftnessLabel": "Làm mềm viền"
+    "edgeSoftnessLabel": "Làm mềm viền",
+    "removeItem": "Xóa",
+    "clearAll": "Xóa tất cả",
+    "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ."
   },
   "related": "Công cụ liên quan",
   "article": {

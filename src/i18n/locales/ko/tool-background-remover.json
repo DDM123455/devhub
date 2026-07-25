@@ -22,7 +22,10 @@
     "backgroundImage": "사용자 지정 이미지",
     "backgroundImageSelect": "배경 이미지 선택",
     "backgroundImageClear": "제거",
-    "edgeSoftnessLabel": "가장자리 부드럽게"
+    "edgeSoftnessLabel": "가장자리 부드럽게",
+    "removeItem": "삭제",
+    "clearAll": "전체 삭제",
+    "skippedFiles": "지원되지 않는 이미지 형식이라 {{count}}개 파일을 건너뛰었습니다."
   },
   "related": "관련 도구",
   "article": {

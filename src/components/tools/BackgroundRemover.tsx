@@ -20,6 +20,9 @@ interface Messages {
 	backgroundImageSelect: string;
 	backgroundImageClear: string;
 	edgeSoftnessLabel: string;
+	removeItem: string;
+	clearAll: string;
+	skippedFiles: string;
 }
 
 type BackgroundMode = 'transparent' | 'color' | 'image';
@@ -131,6 +134,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 	const [backgroundColor, setBackgroundColor] = useState('#22C55E');
 	const [backgroundImageUrl, setBackgroundImageUrl] = useState<string | null>(null);
 	const [edgeSoftness, setEdgeSoftness] = useState(0);
+	const [skippedCount, setSkippedCount] = useState(0);
 	const objectUrls = useRef<Set<string>>(new Set());
 
 	useEffect(() => {
@@ -169,16 +173,26 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList) return;
-		const newItems: ImageItem[] = Array.from(fileList)
-			.filter((file) => file.type.startsWith('image/'))
-			.map((file) => ({
-				id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
-				file,
-				previewUrl: trackUrl(URL.createObjectURL(file)),
-				status: 'pending' as const,
-				comparePosition: 50,
-			}));
+		const allFiles = Array.from(fileList);
+		const imageFiles = allFiles.filter((file) => file.type.startsWith('image/'));
+		setSkippedCount(allFiles.length - imageFiles.length);
+		const newItems: ImageItem[] = imageFiles.map((file) => ({
+			id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
+			file,
+			previewUrl: trackUrl(URL.createObjectURL(file)),
+			status: 'pending' as const,
+			comparePosition: 50,
+		}));
 		setItems((prev) => [...prev, ...newItems]);
+	}, []);
+
+	const handleRemoveItem = useCallback((id: string) => {
+		setItems((prev) => prev.filter((item) => item.id !== id));
+	}, []);
+
+	const handleClearAll = useCallback(() => {
+		setItems([]);
+		setSkippedCount(0);
 	}, []);
 
 	const handleBackgroundImageFile = useCallback((fileList: FileList | null) => {
@@ -261,6 +275,12 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 				/>
 				<p className="text-xs text-muted-foreground">{messages.dropHint}</p>
 			</div>
+
+			{skippedCount > 0 && (
+				<p className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
+					{messages.skippedFiles.replace('{{count}}', String(skippedCount))}
+				</p>
+			)}
 
 			<p className="text-xs text-muted-foreground">{messages.modelNotice}</p>
 
@@ -391,17 +411,29 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 									<span className="text-destructive">{messages.errorGeneric}</span>
 								)}
 							</div>
-							{item.status === 'done' && item.resultBlob && (
-								<Button type="button" size="sm" onClick={() => handleDownload(item)}>
-									{messages.download}
+							<div className="flex shrink-0 items-center gap-2">
+								{item.status === 'done' && item.resultBlob && (
+									<Button type="button" size="sm" onClick={() => handleDownload(item)}>
+										{messages.download}
+									</Button>
+								)}
+								<Button
+									type="button"
+									size="sm"
+									variant="ghost"
+									onClick={() => handleRemoveItem(item.id)}
+									disabled={item.status === 'processing'}
+									aria-label={messages.removeItem}
+								>
+									✕
 								</Button>
-							)}
+							</div>
 						</li>
 					))}
 				</ul>
 			)}
 
-			<div>
+			<div className="flex flex-wrap items-center gap-3">
 				<Button type="button" onClick={handleRemove} disabled={!canRemove}>
 					{isProcessing
 						? messages.removing.replace(
@@ -410,6 +442,11 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 							)
 						: messages.remove}
 				</Button>
+				{items.length > 0 && (
+					<Button type="button" variant="outline" onClick={handleClearAll} disabled={isProcessing}>
+						{messages.clearAll}
+					</Button>
+				)}
 			</div>
 		</div>
 	);

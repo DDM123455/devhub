@@ -22,7 +22,10 @@
     "backgroundImage": "Image personnalisée",
     "backgroundImageSelect": "Choisir une image de fond",
     "backgroundImageClear": "Retirer",
-    "edgeSoftnessLabel": "Adoucissement des bords"
+    "edgeSoftnessLabel": "Adoucissement des bords",
+    "removeItem": "Retirer",
+    "clearAll": "Tout retirer",
+    "skippedFiles": "{{count}} fichier(s) ignoré(s) car ce n'est pas un format d'image pris en charge."
   },
   "related": "Outils associés",
   "article": {

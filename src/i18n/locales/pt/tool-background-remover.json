@@ -22,7 +22,10 @@
     "backgroundImage": "Imagem personalizada",
     "backgroundImageSelect": "Escolher imagem de fundo",
     "backgroundImageClear": "Remover",
-    "edgeSoftnessLabel": "Suavização de borda"
+    "edgeSoftnessLabel": "Suavização de borda",
+    "removeItem": "Remover",
+    "clearAll": "Remover tudo",
+    "skippedFiles": "{{count}} arquivo(s) foram ignorados por não serem um formato de imagem compatível."
   },
   "related": "Ferramentas relacionadas",
   "article": {
