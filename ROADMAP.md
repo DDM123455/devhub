@@ -72,13 +72,13 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
   - [ ] Thêm chức năng nén PDF (giảm dung lượng) nếu khả thi client-side — CHƯA làm, để lại
         cho một lượt sau (không phải lỗi chặn, chỉ là hạng mục chưa bắt đầu)
 
-- [ ] **6. So sánh văn bản (Diff Checker)** — benchmark: Diffchecker.com
-  - [ ] **Ưu tiên cao nhất**: highlight trực tiếp (inline) phần khác biệt ngay trên khung
+- [x] **6. So sánh văn bản (Diff Checker)** — benchmark: Diffchecker.com
+  - [x] **Ưu tiên cao nhất**: highlight trực tiếp (inline) phần khác biệt ngay trên khung
         văn bản — thêm/xóa/sửa từng từ hoặc ký tự phải tô màu ngay tại chỗ, không chỉ in
         ra danh sách khác biệt bên dưới
-  - [ ] Chế độ xem song song (side-by-side) có cuộn đồng bộ 2 khung
-  - [ ] Tùy chọn: ignore khoảng trắng, ignore hoa/thường, so sánh theo dòng hoặc theo từ
-  - [ ] Đếm số dòng/từ đã thêm, xóa, sửa
+  - [x] Chế độ xem song song (side-by-side) có cuộn đồng bộ 2 khung
+  - [x] Tùy chọn: ignore khoảng trắng, ignore hoa/thường, so sánh theo dòng hoặc theo từ
+  - [x] Đếm số dòng/từ đã thêm, xóa, sửa
 
 - [ ] **7. Đếm từ & ký tự** — benchmark: WordCounter.net
   - [ ] Thêm: thời gian đọc ước tính, thời gian nói ước tính

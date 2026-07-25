@@ -12,7 +12,12 @@
     "modeWord": "Por palabra",
     "modeLine": "Por línea",
     "noChanges": "No se encontraron diferencias: los dos textos son idénticos.",
-    "placeholder": "Pega o escribe el texto aquí…"
+    "placeholder": "Pega o escribe el texto aquí…",
+    "ignoreWhitespace": "Ignorar espacios en blanco",
+    "ignoreCase": "Ignorar mayúsculas/minúsculas",
+    "statsAdded": "{{count}} añadidos",
+    "statsRemoved": "{{count}} eliminados",
+    "statsModified": "{{count}} modificados"
   },
   "related": "Herramientas relacionadas",
   "article": {

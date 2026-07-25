@@ -12,7 +12,12 @@
     "modeWord": "単語単位",
     "modeLine": "行単位",
     "noChanges": "違いは見つかりませんでした。2つのテキストは完全に一致しています。",
-    "placeholder": "ここにテキストを貼り付けるか入力してください…"
+    "placeholder": "ここにテキストを貼り付けるか入力してください…",
+    "ignoreWhitespace": "空白を無視",
+    "ignoreCase": "大文字・小文字を区別しない",
+    "statsAdded": "追加: {{count}}",
+    "statsRemoved": "削除: {{count}}",
+    "statsModified": "変更: {{count}}"
   },
   "related": "関連ツール",
   "article": {

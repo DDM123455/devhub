@@ -12,7 +12,12 @@
     "modeWord": "Theo từ",
     "modeLine": "Theo dòng",
     "noChanges": "Không có khác biệt — hai văn bản giống hệt nhau.",
-    "placeholder": "Dán hoặc nhập văn bản vào đây…"
+    "placeholder": "Dán hoặc nhập văn bản vào đây…",
+    "ignoreWhitespace": "Bỏ qua khoảng trắng",
+    "ignoreCase": "Không phân biệt hoa/thường",
+    "statsAdded": "{{count}} thêm",
+    "statsRemoved": "{{count}} xóa",
+    "statsModified": "{{count}} sửa"
   },
   "related": "Công cụ liên quan",
   "article": {

@@ -12,7 +12,12 @@
     "modeWord": "Nach Wort",
     "modeLine": "Nach Zeile",
     "noChanges": "Keine Unterschiede gefunden — beide Texte sind identisch.",
-    "placeholder": "Text hier einfügen oder eingeben…"
+    "placeholder": "Text hier einfügen oder eingeben…",
+    "ignoreWhitespace": "Leerzeichen ignorieren",
+    "ignoreCase": "Groß-/Kleinschreibung ignorieren",
+    "statsAdded": "{{count}} hinzugefügt",
+    "statsRemoved": "{{count}} entfernt",
+    "statsModified": "{{count}} geändert"
   },
   "related": "Verwandte Tools",
   "article": {

@@ -12,7 +12,12 @@
     "modeWord": "By word",
     "modeLine": "By line",
     "noChanges": "No differences found — the two texts are identical.",
-    "placeholder": "Paste or type text here…"
+    "placeholder": "Paste or type text here…",
+    "ignoreWhitespace": "Ignore whitespace",
+    "ignoreCase": "Ignore case",
+    "statsAdded": "{{count}} added",
+    "statsRemoved": "{{count}} removed",
+    "statsModified": "{{count}} modified"
   },
   "related": "Related tools",
   "article": {

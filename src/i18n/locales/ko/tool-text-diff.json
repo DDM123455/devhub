@@ -12,7 +12,12 @@
     "modeWord": "단어 단위",
     "modeLine": "줄 단위",
     "noChanges": "차이가 없습니다 — 두 텍스트가 완전히 동일합니다.",
-    "placeholder": "여기에 텍스트를 붙여넣거나 입력하세요…"
+    "placeholder": "여기에 텍스트를 붙여넣거나 입력하세요…",
+    "ignoreWhitespace": "공백 무시",
+    "ignoreCase": "대소문자 구분 안 함",
+    "statsAdded": "추가 {{count}}개",
+    "statsRemoved": "삭제 {{count}}개",
+    "statsModified": "수정 {{count}}개"
   },
   "related": "관련 도구",
   "article": {

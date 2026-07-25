@@ -10,10 +10,11 @@
   Phase 2) + mục "Checklist Feature Parity" vào `CLAUDE.md` — mục tiêu đưa từng tool từ
   "MVP chạy được" lên "ngang tầm đối thủ đầu ngành" (benchmark, so sánh feature-by-feature,
   nâng cấp).
-- Task tiếp theo cần làm: **Phase 1.5**, tool #1, #2, #3 đã xong. Tool #4 & #5 "Gộp/Tách
-  PDF" đã build+test xong 3/4 mục con (còn thiếu nén PDF, để sau) — xem log 2026-07-25 bên
-  dưới. Đang chuyển sang tool **#6 "So sánh văn bản (Diff Checker)"**, ưu tiên cao nhất:
-  highlight inline trực tiếp trên khung văn bản.
+- Task tiếp theo cần làm: **Phase 1.5**, tool #1, #2, #3, #6 đã xong (đủ điều kiện tick).
+  Tool #4 & #5 "Gộp/Tách PDF" đã build+test xong 3/4 mục con (còn thiếu nén PDF, để sau) —
+  xem log 2026-07-25 bên dưới. Task kế tiếp khi mở phiên mới: tool **#7 "Đếm từ & ký tự"**
+  trong Phase 1.5 (benchmark WordCounter.net — thêm thời gian đọc/nói ước tính, đếm đoạn
+  văn/câu, bảng tần suất từ).
 - Ghi chú thiết kế (2026-07-25): đã redesign toàn bộ giao diện site (không phải task trong
   `ROADMAP.md`, làm theo yêu cầu trực tiếp của người dùng) dựa trên file mockup
   `Web Tool Hub.dc.html` ở gốc repo (file KHÔNG được commit vào git — chỉ là tài liệu tham
@@ -85,6 +86,55 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 1.5, tool #6: Nâng cấp "So sánh văn bản" lên Feature Parity — XONG
+- Benchmark: Diffchecker.com.
+- Trạng thái trước khi nâng cấp: đã có so sánh theo từ/dòng bằng `diffWords`/`diffLines`
+  của thư viện `diff` (jsdiff), nhưng kết quả chỉ hiện ra 1 đoạn văn bản GỘP CHUNG cả phần
+  thêm (xanh) và xóa (đỏ gạch ngang) thành 1 khối duy nhất bên dưới 2 khung nhập — không
+  giống cách Diffchecker.com hiển thị (2 khung riêng biệt, mỗi khung tô màu phần khác biệt
+  của chính văn bản đó). Không có tùy chọn ignore case/whitespace, không đếm số thay đổi.
+- Đã làm (`src/components/tools/TextDiffChecker.tsx` viết lại gần như toàn bộ):
+  - Đổi kết quả so sánh từ 1 khối gộp chung sang **2 khung riêng biệt đặt đúng vị trí 2 ô
+    nhập ban đầu** (khung trái = văn bản gốc với phần bị xóa tô đỏ-gạch-ngang tại chỗ,
+    khung phải = văn bản đã sửa với phần thêm mới tô xanh tại chỗ) — dùng CHUNG 1 kết quả
+    `diffWords`/`diffLines` từ jsdiff, chỉ lọc khác nhau: khung trái ẩn phần `added`, khung
+    phải ẩn phần `removed`. Đây là cách hiểu đúng của yêu cầu "highlight ngay trên khung
+    văn bản" trong `ROADMAP.md` — phân biệt với thiết kế cũ vốn có thể bị coi là "in ra 1
+    danh sách khác biệt bên dưới" dù đã tô màu.
+  - Thêm cuộn đồng bộ 2 khung kết quả bằng 1 handler `onScroll` gán chéo `scrollTop`/
+    `scrollLeft` sang khung còn lại, có cờ `isSyncingScrollRef` chặn vòng lặp feedback vô
+    hạn (khung B tự kích hoạt scroll → lại đồng bộ ngược về khung A → ...).
+  - Thêm 2 checkbox tùy chọn "Ignore whitespace"/"Ignore case", áp dụng cho cả 2 chế độ
+    từ/dòng. Ghi chú kỹ thuật: `diffLines` của jsdiff không khai báo `ignoreCase` trong
+    kiểu TypeScript (`DiffLinesOptionsNonabortable`), NHƯNG đọc mã nguồn đã biên dịch
+    (`node_modules/diff/libcjs/diff/base.js`, hàm `equals()`) xác nhận nó vẫn đọc
+    `options.ignoreCase` ở runtime bất kể đơn vị so sánh (dòng hay từ) — dùng kiểu giao
+    `DiffLinesOptionsNonabortable & { ignoreCase?: boolean }` để truyền tham số đúng mà
+    không cần ép kiểu `any`.
+  - Thêm 3 badge thống kê "X added / X removed / X modified": viết hàm `summarizeChanges()`
+    coi 1 cặp block `removed` rồi ngay sau đó `added` liền kề là "modified" (tính theo phần
+    chồng lấn nhỏ hơn giữa 2 block, phần dư mới tính là thêm/xóa thuần) — đúng cách con
+    người thường đọc diff, dù bản thân thuật toán diff chỉ biết add/remove thuần.
+  - Thêm 5 key i18n mới (`ignoreWhitespace`, `ignoreCase`, `statsAdded`, `statsRemoved`,
+    `statsModified`) cho đủ cả 8 ngôn ngữ trong `src/i18n/locales/*/tool-text-diff.json` +
+    cập nhật `TextDiffPage.astro` truyền các key này vào component.
+- Test tương tác qua Puppeteer (`test-diff.mjs`, `test-diff-ws.mjs` trong thư mục
+  scratchpad, không commit): xác nhận 2 khung hiện đúng nội dung riêng của từng bên (khung
+  gốc không hiện từ mới thêm, khung sửa không hiện từ đã xóa), class CSS tô màu/gạch ngang
+  có áp dụng thật (không chỉ đúng text), badge thống kê ra số khác 0, cuộn 1 khung tự động
+  kéo khung kia theo (test ban đầu viết sai cách truyền `ElementHandle[]` vào
+  `page.evaluate` khiến `scrollTop` đọc ra `null` và pass giả — đã phát hiện và sửa lại
+  cách gọi cho từng phần tử riêng lẻ trước khi tin kết quả), `ignoreCase` khiến
+  "Hello World" vs "hello world" báo không có khác biệt, `ignoreWhitespace` ở chế độ dòng
+  khiến dòng chỉ khác nhau về khoảng trắng cuối dòng cũng báo không có khác biệt.
+- `npm run build` sạch sau khi sửa. Không có công cụ `typescript`/`astro check` cài trong
+  dự án để chạy typecheck tĩnh (chỉ có thể dựa vào build — vốn chỉ strip type bằng esbuild
+  chứ không kiểm tra type — và test tương tác thật) — ghi chú lại để phiên sau biết, có thể
+  cân nhắc thêm `typescript`/`@astrojs/check` làm devDependency nếu muốn kiểm type chặt hơn
+  (chưa làm vì chưa được hỏi ý kiến người dùng, đúng quy tắc "không thêm dependency mới nếu
+  chưa thực sự cần thiết" trong `CLAUDE.md`).
+- Đã tick đủ 4/4 checkbox con + dòng cha "6. So sánh văn bản" trong `ROADMAP.md` Phase 1.5.
 
 ### 2026-07-25 — Phase 1.5, tool #4 & #5: Build + test tương tác "Gộp/Tách PDF" — XONG
   (còn thiếu nén PDF)
