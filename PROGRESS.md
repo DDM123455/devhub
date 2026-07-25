@@ -10,11 +10,12 @@
   Phase 2) + mục "Checklist Feature Parity" vào `CLAUDE.md` — mục tiêu đưa từng tool từ
   "MVP chạy được" lên "ngang tầm đối thủ đầu ngành" (benchmark, so sánh feature-by-feature,
   nâng cấp).
-- Task tiếp theo cần làm: **Phase 1.5**, tool #1, #2, #3, #6 đã xong (đủ điều kiện tick).
-  Tool #4 & #5 "Gộp/Tách PDF" đã build+test xong 3/4 mục con (còn thiếu nén PDF, để sau) —
-  xem log 2026-07-25 bên dưới. Task kế tiếp khi mở phiên mới: tool **#7 "Đếm từ & ký tự"**
-  trong Phase 1.5 (benchmark WordCounter.net — thêm thời gian đọc/nói ước tính, đếm đoạn
-  văn/câu, bảng tần suất từ).
+- Task tiếp theo cần làm: **Phase 1.5**, tool #1, #2, #3, #6, #7 đã xong (đủ điều kiện
+  tick). Tool #4 & #5 "Gộp/Tách PDF" đã build+test xong 3/4 mục con (còn thiếu nén PDF, để
+  sau) — xem log 2026-07-25 bên dưới. Task kế tiếp khi mở phiên mới: tool **#8 "JSON
+  Formatter & Validator"** trong Phase 1.5 (benchmark JSONFormatter.org, JSONLint — tree
+  view thu gọn/mở rộng, toggle Beautify/Minify, báo lỗi kèm số dòng, convert JSON→XML/
+  YAML/CSV).
 - Ghi chú thiết kế (2026-07-25): đã redesign toàn bộ giao diện site (không phải task trong
   `ROADMAP.md`, làm theo yêu cầu trực tiếp của người dùng) dựa trên file mockup
   `Web Tool Hub.dc.html` ở gốc repo (file KHÔNG được commit vào git — chỉ là tài liệu tham
@@ -86,6 +87,42 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 1.5, tool #7: Nâng cấp "Đếm từ & ký tự" lên Feature Parity — XONG
+- Benchmark: WordCounter.net.
+- Trạng thái trước khi nâng cấp: component `WordCounter.tsx` hoá ra ĐÃ có sẵn "thời gian
+  đọc ước tính", "đếm số câu", "đếm số đoạn văn" từ trước (không rõ từ Phase 1 hay một lượt
+  nâng cấp Phase 1.5 chưa ghi log) — 2/3 mục con coi như đã xong sẵn, chỉ thật sự còn thiếu
+  "thời gian nói ước tính" và "bảng tần suất từ khóa (keyword density)".
+- Đã làm:
+  - Thêm `speakingMinutes` vào `countStats()`: dùng tốc độ thuyết trình trung bình 130
+    từ/phút (khác với 200 từ/phút của tốc độ đọc) — cùng công thức làm tròn lên tối thiểu 1
+    phút như thời gian đọc đã có, hiển thị thành 1 ô số liệu mới cạnh "Thời gian đọc".
+  - Thêm `computeTopWords()`: tách từ bằng regex Unicode-aware `[\p{L}\p{N}']+` (chuyển
+    thường trước khi đếm), đếm tần suất bằng `Map`, sắp xếp giảm dần, lấy top 10, tính %
+    trên tổng số từ. Quyết định KHÔNG lọc bỏ "stop word" (the/and/là/và...) — kiểm tra thực
+    tế cách WordCounter.net làm: họ cũng đếm tất cả các từ kể cả từ phổ biến, vì mục đích
+    thật của "keyword density" là phát hiện một từ khóa SEO có bị lặp quá dày hay không,
+    bao gồm cả trường hợp từ khóa đó vô tình trùng với từ thông dụng.
+  - Thêm bảng hiển thị top từ khóa (từ / số lần / % trên tổng) ngay dưới lưới số liệu, chỉ
+    hiện khi có ít nhất 1 từ (ẩn hoàn toàn khi ô nhập trống).
+  - Thêm 7 key i18n mới (`speakingTimeLabel`, `speakingTimeValue`, `keywordDensityHeading`,
+    `keywordDensityWordColumn`, `keywordDensityCountColumn`, `keywordDensityPercentColumn`)
+    cho đủ 8 ngôn ngữ + cập nhật `WordCounterPage.astro` truyền các key này vào component.
+  - Cập nhật đoạn nội dung SEO (bài viết p3/p4) ở cả 8 ngôn ngữ để nhắc tới 2 tính năng mới
+    (thời gian nói, bảng tần suất từ khóa) — viết thêm câu mới bằng tay cho từng ngôn ngữ
+    (không dịch máy nguyên khối), giữ đúng văn phong đoạn văn gốc của từng bản.
+- Test tương tác qua Puppeteer (`test-wordcounter.mjs` trong scratchpad, không commit):
+  nhập 208 từ có tần suất biết trước ("apple" × 20, "banana" × 10, còn lại là từ duy nhất)
+  → xác nhận số liệu cập nhật TRỰC TIẾP không cần nút bấm (đúng UX gốc của tool này), thời
+  gian nói (130 wpm) LUÔN ≥ thời gian đọc (200 wpm) với cùng số từ — đúng quan hệ toán học
+  kỳ vọng, bảng tần suất xếp đúng "apple" hạng 1 (20 lần, đúng %), "banana" hạng 2 (10
+  lần), giới hạn đúng tối đa 10 dòng, bảng biến mất khi xóa hết văn bản. Test ban đầu viết
+  sai kỳ vọng số câu (đếm nhầm 3 thay vì 4 vì quên rằng đoạn cuối cùng "New paragraph
+  starts." cũng kết thúc bằng dấu chấm) — đã tự phát hiện qua lỗi test thật (không phải lỗi
+  ứng dụng) và sửa lại kỳ vọng trước khi tin kết quả.
+- `npm run build` sạch. Đã tick đủ 3/3 checkbox con + dòng cha "7. Đếm từ & ký tự" trong
+  `ROADMAP.md` Phase 1.5.
 
 ### 2026-07-25 — Phase 1.5, tool #6: Nâng cấp "So sánh văn bản" lên Feature Parity — XONG
 - Benchmark: Diffchecker.com.

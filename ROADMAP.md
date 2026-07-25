@@ -80,10 +80,10 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
   - [x] Tùy chọn: ignore khoảng trắng, ignore hoa/thường, so sánh theo dòng hoặc theo từ
   - [x] Đếm số dòng/từ đã thêm, xóa, sửa
 
-- [ ] **7. Đếm từ & ký tự** — benchmark: WordCounter.net
-  - [ ] Thêm: thời gian đọc ước tính, thời gian nói ước tính
-  - [ ] Đếm số đoạn văn (paragraph), số câu
-  - [ ] Bảng tần suất từ xuất hiện nhiều nhất (keyword density)
+- [x] **7. Đếm từ & ký tự** — benchmark: WordCounter.net
+  - [x] Thêm: thời gian đọc ước tính, thời gian nói ước tính
+  - [x] Đếm số đoạn văn (paragraph), số câu
+  - [x] Bảng tần suất từ xuất hiện nhiều nhất (keyword density)
 
 - [ ] **8. JSON Formatter & Validator** — benchmark: JSONFormatter.org, JSONLint
   - [ ] Chế độ xem dạng cây (tree view) có thể thu gọn/mở rộng từng node
