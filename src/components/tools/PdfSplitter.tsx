@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, degrees } from 'pdf-lib';
+import { renderPdfThumbnails } from '@/lib/pdf-thumbnails';
 import { Button } from '@/components/ui/button';
 
 interface Messages {
@@ -7,7 +8,14 @@ interface Messages {
 	dropHint: string;
 	noFile: string;
 	changeFile: string;
+	loadingThumbnails: string;
 	pageCount: string;
+	rotate: string;
+	deletePage: string;
+	modeLabel: string;
+	modeRanges: string;
+	modeEveryN: string;
+	everyNLabel: string;
 	rangesLabel: string;
 	rangesPlaceholder: string;
 	rangesHint: string;
@@ -17,6 +25,14 @@ interface Messages {
 	download: string;
 	errorGeneric: string;
 	errorInvalidRange: string;
+	errorInvalidEveryN: string;
+}
+
+interface PageEntry {
+	id: string;
+	pageIndex: number;
+	dataUrl: string;
+	rotation: 0 | 90 | 180 | 270;
 }
 
 interface ResultFile {
@@ -25,10 +41,12 @@ interface ResultFile {
 	blob: Blob;
 }
 
-interface PageRange {
+interface PositionRange {
 	start: number;
 	end: number;
 }
+
+type SplitMode = 'ranges' | 'everyN';
 
 class RangeParseError extends Error {
 	constructor(public token: string) {
@@ -36,7 +54,7 @@ class RangeParseError extends Error {
 	}
 }
 
-function parseRanges(input: string, pageCount: number): PageRange[] {
+function parseRanges(input: string, pageCount: number): PositionRange[] {
 	const trimmed = input.trim();
 	if (trimmed === '') {
 		return Array.from({ length: pageCount }, (_, index) => ({ start: index + 1, end: index + 1 }));
@@ -65,13 +83,25 @@ function parseRanges(input: string, pageCount: number): PageRange[] {
 	});
 }
 
+function everyNRanges(n: number, pageCount: number): PositionRange[] {
+	const chunks: PositionRange[] = [];
+	for (let start = 1; start <= pageCount; start += n) {
+		chunks.push({ start, end: Math.min(start + n - 1, pageCount) });
+	}
+	return chunks;
+}
+
 // Splitting with pdf-lib is byte-level page copying, no ML inference or pixel
 // decoding involved, so it stays fast on the main thread — same reasoning as
-// the Merge PDF tool for not needing a dedicated Web Worker.
+// the Merge PDF tool for not needing a dedicated Web Worker. Page thumbnails
+// are rendered separately with pdf.js purely for the visual picker.
 export default function PdfSplitter({ messages }: { messages: Messages }) {
 	const [file, setFile] = useState<File | null>(null);
-	const [pageCount, setPageCount] = useState<number | null>(null);
+	const [pages, setPages] = useState<PageEntry[]>([]);
+	const [isLoadingThumbnails, setIsLoadingThumbnails] = useState(false);
+	const [splitMode, setSplitMode] = useState<SplitMode>('ranges');
 	const [rangesInput, setRangesInput] = useState('');
+	const [everyN, setEveryN] = useState(1);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [results, setResults] = useState<ResultFile[]>([]);
@@ -81,15 +111,24 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 		setError(null);
 		setResults([]);
 		setFile(null);
-		setPageCount(null);
+		setPages([]);
+		setIsLoadingThumbnails(true);
 		try {
 			const bytes = await candidate.arrayBuffer();
-			const doc = await PDFDocument.load(bytes);
+			const thumbnails = await renderPdfThumbnails(bytes);
 			setFile(candidate);
-			setPageCount(doc.getPageCount());
+			setPages(
+				thumbnails.map((thumb) => ({
+					id: `page-${thumb.pageIndex}`,
+					pageIndex: thumb.pageIndex,
+					dataUrl: thumb.dataUrl,
+					rotation: 0,
+				})),
+			);
 		} catch {
 			setError(messages.errorGeneric);
 		}
+		setIsLoadingThumbnails(false);
 	}, [messages.errorGeneric]);
 
 	const handleFiles = useCallback((fileList: FileList | null) => {
@@ -100,26 +139,55 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 		if (candidate) void loadFile(candidate);
 	}, [loadFile]);
 
+	const handleDeletePage = useCallback((id: string) => {
+		setResults([]);
+		setPages((prev) => prev.filter((page) => page.id !== id));
+	}, []);
+
+	const handleRotatePage = useCallback((id: string) => {
+		setResults([]);
+		setPages((prev) =>
+			prev.map((page) =>
+				page.id === id ? { ...page, rotation: ((page.rotation + 90) % 360) as PageEntry['rotation'] } : page,
+			),
+		);
+	}, []);
+
 	const handleSplit = useCallback(async () => {
-		if (!file || !pageCount) return;
+		if (!file || pages.length === 0) return;
 		setIsProcessing(true);
 		setError(null);
 		setResults([]);
 
 		try {
-			const ranges = parseRanges(rangesInput, pageCount);
+			let ranges: PositionRange[];
+			if (splitMode === 'everyN') {
+				if (!Number.isInteger(everyN) || everyN < 1) {
+					setError(messages.errorInvalidEveryN);
+					setIsProcessing(false);
+					return;
+				}
+				ranges = everyNRanges(everyN, pages.length);
+			} else {
+				ranges = parseRanges(rangesInput, pages.length);
+			}
+
 			const bytes = await file.arrayBuffer();
 			const sourceDoc = await PDFDocument.load(bytes);
 
 			const newResults: ResultFile[] = [];
 			for (const range of ranges) {
+				const entries = pages.slice(range.start - 1, range.end);
 				const outDoc = await PDFDocument.create();
-				const indices = Array.from(
-					{ length: range.end - range.start + 1 },
-					(_, i) => range.start - 1 + i,
+				const copiedPages = await outDoc.copyPages(
+					sourceDoc,
+					entries.map((entry) => entry.pageIndex),
 				);
-				const copiedPages = await outDoc.copyPages(sourceDoc, indices);
-				copiedPages.forEach((page) => outDoc.addPage(page));
+				copiedPages.forEach((copiedPage, i) => {
+					const rotation = entries[i].rotation;
+					if (rotation !== 0) copiedPage.setRotation(degrees(rotation));
+					outDoc.addPage(copiedPage);
+				});
 				const outBytes = await outDoc.save();
 				const label = range.start === range.end
 					? `page-${range.start}.pdf`
@@ -136,14 +204,14 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 				setError(
 					messages.errorInvalidRange
 						.replace('{{range}}', err.token)
-						.replace('{{max}}', String(pageCount)),
+						.replace('{{max}}', String(pages.length)),
 				);
 			} else {
 				setError(messages.errorGeneric);
 			}
 		}
 		setIsProcessing(false);
-	}, [file, pageCount, rangesInput, messages.errorInvalidRange, messages.errorGeneric]);
+	}, [file, pages, splitMode, rangesInput, everyN, messages]);
 
 	const handleDownload = useCallback((result: ResultFile) => {
 		const url = URL.createObjectURL(result.blob);
@@ -154,7 +222,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 		URL.revokeObjectURL(url);
 	}, []);
 
-	const canSplit = !isProcessing && file !== null && pageCount !== null;
+	const canSplit = !isProcessing && file !== null && pages.length > 0;
 
 	return (
 		<div className="flex flex-col gap-4 rounded-lg border border-border p-4">
@@ -189,26 +257,104 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 				<p className="text-xs text-muted-foreground">{messages.dropHint}</p>
 			</div>
 
-			{!file || pageCount === null ? (
-				<p className="text-sm text-muted-foreground">{messages.noFile}</p>
+			{isLoadingThumbnails && <p className="text-sm text-muted-foreground">{messages.loadingThumbnails}</p>}
+
+			{!file || pages.length === 0 ? (
+				!isLoadingThumbnails && <p className="text-sm text-muted-foreground">{messages.noFile}</p>
 			) : (
-				<div className="flex flex-col gap-3">
+				<div className="flex flex-col gap-4">
 					<p className="text-sm text-foreground">
-						{file.name} — {messages.pageCount.replace('{{count}}', String(pageCount))}
+						{file.name} — {messages.pageCount.replace('{{count}}', String(pages.length))}
 					</p>
-					<div className="flex flex-col gap-1">
-						<label htmlFor="pdf-splitter-ranges" className="text-sm font-medium text-foreground">
-							{messages.rangesLabel}
-						</label>
-						<input
-							id="pdf-splitter-ranges"
-							type="text"
-							value={rangesInput}
-							onChange={(event) => setRangesInput(event.target.value)}
-							placeholder={messages.rangesPlaceholder}
-							className="w-full max-w-sm rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground"
-						/>
-						<p className="text-xs text-muted-foreground">{messages.rangesHint}</p>
+
+					<ul className="flex flex-wrap gap-3">
+						{pages.map((page, index) => (
+							<li key={page.id} className="flex w-28 flex-col gap-1 rounded-md border border-border bg-card p-1.5">
+								<div className="relative overflow-hidden rounded bg-muted">
+									<img
+										src={page.dataUrl}
+										alt={`${file.name} — page ${page.pageIndex + 1}`}
+										className="w-full"
+										style={{ transform: `rotate(${page.rotation}deg)` }}
+									/>
+									<span className="absolute bottom-1 right-1 rounded bg-black/60 px-1 text-[10px] font-medium text-white">
+										{index + 1}
+									</span>
+								</div>
+								<div className="flex items-center justify-between gap-1">
+									<Button
+										type="button"
+										size="icon-xs"
+										variant="outline"
+										aria-label={messages.rotate}
+										onClick={() => handleRotatePage(page.id)}
+									>
+										⟳
+									</Button>
+									<Button
+										type="button"
+										size="icon-xs"
+										variant="destructive"
+										aria-label={messages.deletePage}
+										onClick={() => handleDeletePage(page.id)}
+									>
+										×
+									</Button>
+								</div>
+							</li>
+						))}
+					</ul>
+
+					<div className="flex flex-col gap-2">
+						<span className="text-sm font-medium text-foreground">{messages.modeLabel}</span>
+						<div className="flex flex-wrap gap-2">
+							<button
+								type="button"
+								onClick={() => setSplitMode('ranges')}
+								className={`rounded-md border px-2.5 py-1 text-xs font-medium ${splitMode === 'ranges' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
+							>
+								{messages.modeRanges}
+							</button>
+							<button
+								type="button"
+								onClick={() => setSplitMode('everyN')}
+								className={`rounded-md border px-2.5 py-1 text-xs font-medium ${splitMode === 'everyN' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
+							>
+								{messages.modeEveryN}
+							</button>
+						</div>
+
+						{splitMode === 'ranges' ? (
+							<div className="flex flex-col gap-1">
+								<label htmlFor="pdf-splitter-ranges" className="text-sm font-medium text-foreground">
+									{messages.rangesLabel}
+								</label>
+								<input
+									id="pdf-splitter-ranges"
+									type="text"
+									value={rangesInput}
+									onChange={(event) => setRangesInput(event.target.value)}
+									placeholder={messages.rangesPlaceholder}
+									className="w-full max-w-sm rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground"
+								/>
+								<p className="text-xs text-muted-foreground">{messages.rangesHint}</p>
+							</div>
+						) : (
+							<div className="flex items-center gap-2">
+								<label htmlFor="pdf-splitter-every-n" className="text-sm font-medium text-foreground">
+									{messages.everyNLabel}
+								</label>
+								<input
+									id="pdf-splitter-every-n"
+									type="number"
+									min={1}
+									max={pages.length}
+									value={everyN}
+									onChange={(event) => setEveryN(Number(event.target.value))}
+									className="w-20 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+								/>
+							</div>
+						)}
 					</div>
 				</div>
 			)}

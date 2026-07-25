@@ -1,16 +1,23 @@
 {
   "meta": {
     "title": "Dividir arquivos PDF grátis online — Web Tool Hub",
-    "description": "Divida um PDF em vários arquivos ou extraia páginas específicas de graça, direto no seu navegador. Divida por intervalos de páginas personalizados ou extraia cada página — sem upload, sem marca d'água, sem cadastro."
+    "description": "Divida um PDF em vários arquivos ou extraia páginas específicas de graça, direto no seu navegador. Visualize cada página em miniatura, gire ou exclua páginas, divida por intervalos personalizados ou a cada N páginas — sem upload, sem marca d'água, sem cadastro."
   },
   "heading": "Dividir arquivos PDF",
-  "tagline": "Extraia páginas ou divida um PDF em vários arquivos, direto no seu navegador.",
+  "tagline": "Visualize cada página em miniatura e divida um PDF em vários arquivos, direto no seu navegador.",
   "ui": {
     "selectFile": "Selecionar arquivo PDF",
     "dropHint": "ou arraste e solte um arquivo PDF aqui",
     "noFile": "Nenhum arquivo PDF selecionado ainda.",
     "changeFile": "Escolher outro arquivo",
+    "loadingThumbnails": "Lendo páginas…",
     "pageCount": "{{count}} páginas",
+    "rotate": "Girar página",
+    "deletePage": "Excluir página",
+    "modeLabel": "Modo de divisão",
+    "modeRanges": "Intervalos personalizados",
+    "modeEveryN": "A cada N páginas",
+    "everyNLabel": "Páginas por arquivo",
     "rangesLabel": "Intervalos de páginas (opcional)",
     "rangesPlaceholder": "ex.: 1-3, 4, 5-7",
     "rangesHint": "Deixe em branco para dividir cada página em um arquivo PDF separado.",
@@ -19,14 +26,15 @@
     "resultsHeading": "Arquivos resultantes",
     "download": "Baixar",
     "errorGeneric": "Algo deu errado ao ler este PDF. Verifique se ele não está corrompido ou protegido por senha e tente novamente.",
-    "errorInvalidRange": "O intervalo de páginas \"{{range}}\" é inválido. Use um formato como 1-3, 4, 5-7, com páginas entre 1 e {{max}}."
+    "errorInvalidRange": "O intervalo de páginas \"{{range}}\" é inválido. Use um formato como 1-3, 4, 5-7, com páginas entre 1 e {{max}}.",
+    "errorInvalidEveryN": "Digite um número inteiro de 1 ou mais."
   },
   "related": "Ferramentas relacionadas",
   "article": {
     "heading": "Por que dividir um PDF localmente em vez de enviá-lo para a internet?",
     "p1": "Um livro digitalizado, um lote de extratos mensais juntados, um relatório de 200 páginas do qual você só precisa de três — mais cedo ou mais tarde um PDF acaba ficando grande demais ou misturando coisas demais para o que você realmente precisa. A maioria dos sites gratuitos de \"dividir PDF\" resolve isso do mesmo jeito que os de \"juntar PDF\": enviando seu arquivo para um servidor sem você perceber antes de fazer qualquer coisa com ele. É um nível de confiança um tanto estranho para um documento que pode conter uma assinatura, um extrato bancário ou uma página que você preferiria não ver parar no disco de outra pessoa.",
-    "p2": "Esta ferramenta nunca envia nada. Tudo roda dentro do seu navegador usando o pdf-lib, uma biblioteca JavaScript que lê a estrutura interna do seu PDF, copia apenas as páginas que você pediu para documentos totalmente novos e monta os resultados na memória, no seu próprio dispositivo. Até o primeiro passo — apenas contar quantas páginas o arquivo tem — acontece localmente, por isso um arquivo corrompido ou protegido por senha é sinalizado na hora, em vez de falhar silenciosamente em algum servidor remoto.",
-    "p3": "Selecione um arquivo PDF ou arraste-o até a área indicada; a ferramenta o lê localmente e mostra o número total de páginas. Digite as páginas que você quer no campo de intervalos usando um formato simples como \"1-3, 4, 5-7\" — cada grupo separado por vírgula vira um arquivo de saída próprio. Deixe o campo vazio e clique em Dividir PDF para, em vez disso, extrair cada página como um arquivo individual, útil quando você só quer separar o documento por completo. Cada resultado aparece em uma lista com seu próprio botão de download, então você só salva as partes que realmente precisa.",
-    "p4": "Não há limite de páginas embutido na ferramenta, embora PDFs escaneados muito grandes e cheios de imagens naturalmente demorem um pouco mais, já que tudo é processado pelo seu próprio dispositivo, e não por um servidor potente. Se você digitar um intervalo que não faz sentido — um número de página além do tamanho do documento, ou um texto que não é um intervalo válido —, a ferramenta informa exatamente qual parte estava errada, em vez de gerar um arquivo quebrado. Se depois você precisar juntar páginas de vários PDFs novamente, a ferramenta Juntar PDF funciona com a mesma abordagem focada em privacidade."
+    "p2": "Esta ferramenta nunca envia nada. Tudo roda dentro do seu navegador usando o pdf-lib, uma biblioteca JavaScript que lê a estrutura interna do seu PDF e copia apenas as páginas que você pediu para documentos totalmente novos, montados na memória do seu próprio dispositivo. As miniaturas de página também são geradas localmente com o pdf.js — o mesmo mecanismo embutido no Firefox —, então você vê exatamente o que há em cada página antes de decidir como dividir.",
+    "p3": "Selecione um arquivo PDF ou arraste-o até a área indicada; cada página aparece como sua própria miniatura para você ver o documento de relance. Gire uma página 90° por vez, ou exclua-a por completo se ela não deveria estar em nenhum dos arquivos de saída — uma folha digitalizada em branco, por exemplo. Depois escolha como dividir: Intervalos personalizados permite digitar grupos como \"1-3, 4, 5-7\", onde cada grupo separado por vírgula vira um arquivo próprio, enquanto A cada N páginas divide automaticamente o documento em partes de tamanho igual — útil para separar uma digitalização longa em, digamos, partes de 10 páginas sem digitar cada intervalo manualmente. Clique em Dividir PDF e cada resultado aparece com seu próprio botão de download.",
+    "p4": "Não há limite de páginas embutido na ferramenta, embora PDFs escaneados muito grandes e cheios de imagens naturalmente demorem um pouco mais para renderizar as miniaturas, já que tudo é processado pelo seu próprio dispositivo, e não por um servidor potente. Se você digitar um intervalo que não faz sentido — um número de página além do tamanho do documento, ou um texto que não é um intervalo válido —, a ferramenta informa exatamente qual parte estava errada, em vez de gerar um arquivo quebrado. Se depois você precisar juntar páginas de vários PDFs novamente, a ferramenta Juntar PDF funciona com a mesma abordagem focada em privacidade e compartilha os mesmos controles de girar e excluir página."
   }
 }

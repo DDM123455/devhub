@@ -21,7 +21,14 @@ const messages = {
 	dropHint: t('ui.dropHint'),
 	noFile: t('ui.noFile'),
 	changeFile: t('ui.changeFile'),
+	loadingThumbnails: t('ui.loadingThumbnails'),
 	pageCount: t('ui.pageCount'),
+	rotate: t('ui.rotate'),
+	deletePage: t('ui.deletePage'),
+	modeLabel: t('ui.modeLabel'),
+	modeRanges: t('ui.modeRanges'),
+	modeEveryN: t('ui.modeEveryN'),
+	everyNLabel: t('ui.everyNLabel'),
 	rangesLabel: t('ui.rangesLabel'),
 	rangesPlaceholder: t('ui.rangesPlaceholder'),
 	rangesHint: t('ui.rangesHint'),
@@ -31,6 +38,7 @@ const messages = {
 	download: t('ui.download'),
 	errorGeneric: t('ui.errorGeneric'),
 	errorInvalidRange: t('ui.errorInvalidRange'),
+	errorInvalidEveryN: t('ui.errorInvalidEveryN'),
 };
 
 const schema = {
@@ -54,7 +62,7 @@ const schema = {
 	<section class="px-4 py-10">
 		<h1 class="text-3xl font-bold text-foreground">{t('heading')}</h1>
 		<p class="mt-2 text-muted-foreground">{t('tagline')}</p>
-		<div class="mt-6 max-w-2xl">
+		<div class="mt-6 max-w-4xl">
 			<PdfSplitter client:load messages={messages} />
 		</div>
 	</section>

@@ -1,19 +1,22 @@
 {
   "meta": {
     "title": "Juntar arquivos PDF grátis online — Web Tool Hub",
-    "description": "Combine vários arquivos PDF em um só documento, de graça, direto no seu navegador. Reordene as páginas antes de juntar — sem upload, sem marca d'água, sem cadastro."
+    "description": "Combine vários arquivos PDF em um só documento, de graça, direto no seu navegador. Veja cada página em miniatura, arraste para reordenar, gire ou exclua páginas antes de juntar — sem upload, sem marca d'água, sem cadastro."
   },
   "heading": "Juntar arquivos PDF",
-  "tagline": "Combine vários PDFs em um único arquivo, direto no seu navegador.",
+  "tagline": "Combine vários PDFs em um único arquivo, com visualização em miniatura página por página, direto no seu navegador.",
   "ui": {
     "selectFiles": "Selecionar arquivos PDF",
     "dropHint": "ou arraste e solte os arquivos PDF aqui",
     "merge": "Juntar PDFs",
     "merging": "Juntando…",
     "download": "Baixar merged.pdf",
-    "moveUp": "Mover para cima",
-    "moveDown": "Mover para baixo",
-    "remove": "Remover",
+    "moveUp": "Mover para antes",
+    "moveDown": "Mover para depois",
+    "remove": "Excluir página",
+    "rotate": "Girar página",
+    "loadingThumbnails": "Lendo páginas…",
+    "dragHint": "Arraste qualquer página para reordenar, ou use as setas.",
     "noFiles": "Nenhum arquivo PDF selecionado ainda.",
     "errorGeneric": "Algo deu errado ao ler este PDF. Verifique se ele não está corrompido ou protegido por senha e tente novamente."
   },
@@ -21,8 +24,8 @@
   "article": {
     "heading": "Por que juntar PDFs localmente em vez de enviá-los para a internet?",
     "p1": "Contratos digitalizados, formulários assinados, lotes de notas fiscais, capítulos de um relatório — mais cedo ou mais tarde, quase todo mundo acaba com vários arquivos PDF que, na verdade, deveriam ser um único documento. Mandar cinco anexos separados ou pedir para um cliente abrir cinco links em vez de um é desajeitado, e a maioria dos sites gratuitos de \"juntar PDF\" resolve isso enviando seus arquivos para um servidor sem você perceber — algo que poucas pessoas querem fazer com um documento que pode conter uma assinatura, um número de identidade ou dados financeiros.",
-    "p2": "Esta ferramenta nunca faz isso. Tudo roda dentro do seu navegador usando uma biblioteca JavaScript chamada pdf-lib, que lê a estrutura interna de cada PDF, copia suas páginas para um novo documento e monta o resultado — tudo na memória, no seu próprio dispositivo. Nenhum arquivo é enviado para lugar nenhum, nem mesmo para checar se é um PDF válido: essa verificação também acontece localmente, por isso um arquivo incomum ou protegido por senha é sinalizado na hora, em vez de falhar silenciosamente em algum servidor remoto.",
-    "p3": "Adicione seus arquivos PDF clicando no botão ou arrastando-os até a área indicada — você pode adicionar mais a qualquer momento. Cada arquivo aparece em uma lista na ordem em que vai aparecer no documento final; use as setas para cima e para baixo ao lado de um arquivo para reordená-lo, ou o botão remover para tirar algum que você adicionou por engano. Quando a ordem estiver certa, clique em Juntar PDFs. O arquivo combinado é montado inteiramente na memória e o link de download aparece assim que fica pronto, salvo como merged.pdf.",
-    "p4": "Não há limite de páginas embutido na ferramenta, embora lotes muito grandes de PDFs digitalizados cheios de imagens naturalmente demorem mais, já que tudo é processado pelo seu próprio dispositivo, e não por um servidor potente. Se um arquivo do lote falhar — por exemplo, por estar criptografado com senha ou ter sido corrompido durante o download — a ferramenta informa exatamente qual foi, para que você possa corrigi-lo ou removê-lo, em vez de gerar silenciosamente um resultado quebrado. Para depois dividir um PDF grande em partes menores, a ferramenta Dividir PDF funciona com a mesma abordagem focada em privacidade."
+    "p2": "Esta ferramenta nunca faz isso. Tudo roda dentro do seu navegador usando o pdf-lib, uma biblioteca JavaScript que lê a estrutura interna de cada PDF, copia suas páginas para um novo documento e monta o resultado — tudo na memória, no seu próprio dispositivo. As miniaturas de página também são geradas localmente com o pdf.js — o mesmo mecanismo de renderização embutido no Firefox —, então você vê exatamente com o que está trabalhando antes de combinar qualquer coisa.",
+    "p3": "Adicione seus arquivos PDF clicando no botão ou arrastando-os até a área indicada — cada página de cada arquivo aparece como sua própria miniatura, em uma única grade combinada, não agrupada por arquivo. Arraste qualquer miniatura para reordená-la em relação às demais, mesmo entre arquivos de origem diferentes, ou use as setas se arrastar não for conveniente. Clique no botão de girar de uma página para rotacioná-la 90° por vez, ou no de excluir para deixá-la de fora do documento final por completo — útil para tirar uma capa digitalizada em branco ou uma página duplicada. Quando tudo estiver certo, clique em Juntar PDFs; o arquivo combinado é montado inteiramente na memória e baixado como merged.pdf.",
+    "p4": "Não há limite de páginas embutido na ferramenta, embora lotes muito grandes de PDFs digitalizados cheios de imagens naturalmente demorem mais para renderizar as miniaturas, já que tudo é processado pelo seu próprio dispositivo, e não por um servidor potente. Se um arquivo não puder ser lido — por exemplo, por estar criptografado com senha ou ter sido corrompido durante o download — a ferramenta avisa em vez de gerar silenciosamente um resultado quebrado. Para depois dividir um PDF já juntado em partes menores, a ferramenta Dividir PDF funciona com a mesma abordagem focada em privacidade e compartilha os mesmos controles de girar e excluir página."
   }
 }

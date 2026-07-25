@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, degrees } from 'pdf-lib';
+import { renderPdfThumbnails } from '@/lib/pdf-thumbnails';
 import { Button } from '@/components/ui/button';
 
 interface Messages {
@@ -11,58 +12,92 @@ interface Messages {
 	moveUp: string;
 	moveDown: string;
 	remove: string;
+	rotate: string;
+	loadingThumbnails: string;
+	dragHint: string;
 	noFiles: string;
 	errorGeneric: string;
 }
 
-interface PdfItem {
+interface PageItem {
+	id: string;
+	fileId: string;
+	file: File;
+	pageIndex: number;
+	dataUrl: string;
+	rotation: 0 | 90 | 180 | 270;
+}
+
+interface FileEntry {
 	id: string;
 	file: File;
-	status: 'pending' | 'error';
-	errorMessage?: string;
+	status: 'loading' | 'done' | 'error';
 }
 
-function formatBytes(bytes: number): string {
-	if (bytes < 1024) return `${bytes} B`;
-	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-	return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-}
-
-// Note: unlike the AI background remover, merging PDFs with pdf-lib is a fast,
-// synchronous byte-manipulation task (copying page objects, no ML inference or
-// pixel decoding), so a handful of typical PDF files merge in well under a second.
-// A dedicated Web Worker isn't needed here for the same reason it wasn't needed
-// for the image format converter — the main thread stays responsive regardless.
 export default function PdfMerger({ messages }: { messages: Messages }) {
-	const [items, setItems] = useState<PdfItem[]>([]);
+	const [files, setFiles] = useState<FileEntry[]>([]);
+	const [pages, setPages] = useState<PageItem[]>([]);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isDragOver, setIsDragOver] = useState(false);
+	const [dragPageId, setDragPageId] = useState<string | null>(null);
 	const [mergedBlob, setMergedBlob] = useState<Blob | null>(null);
 	const [mergeError, setMergeError] = useState<string | null>(null);
 
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList) return;
-		const newItems: PdfItem[] = Array.from(fileList)
-			.filter((file) => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))
-			.map((file) => ({
-				id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
-				file,
-				status: 'pending' as const,
-			}));
+		const newFiles = Array.from(fileList).filter(
+			(file) => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'),
+		);
 		setMergedBlob(null);
 		setMergeError(null);
-		setItems((prev) => [...prev, ...newItems]);
+
+		for (const file of newFiles) {
+			const fileId = `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`;
+			setFiles((prev) => [...prev, { id: fileId, file, status: 'loading' }]);
+
+			void (async () => {
+				try {
+					const bytes = await file.arrayBuffer();
+					const thumbnails = await renderPdfThumbnails(bytes);
+					setPages((prev) => [
+						...prev,
+						...thumbnails.map(
+							(thumb): PageItem => ({
+								id: `${fileId}-${thumb.pageIndex}`,
+								fileId,
+								file,
+								pageIndex: thumb.pageIndex,
+								dataUrl: thumb.dataUrl,
+								rotation: 0,
+							}),
+						),
+					]);
+					setFiles((prev) => prev.map((f) => (f.id === fileId ? { ...f, status: 'done' } : f)));
+				} catch {
+					setFiles((prev) => prev.map((f) => (f.id === fileId ? { ...f, status: 'error' } : f)));
+				}
+			})();
+		}
 	}, []);
 
-	const handleRemove = useCallback((id: string) => {
+	const handleRemovePage = useCallback((id: string) => {
 		setMergedBlob(null);
-		setItems((prev) => prev.filter((item) => item.id !== id));
+		setPages((prev) => prev.filter((page) => page.id !== id));
+	}, []);
+
+	const handleRotatePage = useCallback((id: string) => {
+		setMergedBlob(null);
+		setPages((prev) =>
+			prev.map((page) =>
+				page.id === id ? { ...page, rotation: ((page.rotation + 90) % 360) as PageItem['rotation'] } : page,
+			),
+		);
 	}, []);
 
 	const handleMove = useCallback((id: string, direction: -1 | 1) => {
 		setMergedBlob(null);
-		setItems((prev) => {
-			const index = prev.findIndex((item) => item.id === id);
+		setPages((prev) => {
+			const index = prev.findIndex((page) => page.id === id);
 			const targetIndex = index + direction;
 			if (index === -1 || targetIndex < 0 || targetIndex >= prev.length) return prev;
 			const next = [...prev];
@@ -71,49 +106,51 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 		});
 	}, []);
 
+	const handleDrop = useCallback((targetId: string) => {
+		setMergedBlob(null);
+		setPages((prev) => {
+			if (!dragPageId || dragPageId === targetId) return prev;
+			const fromIndex = prev.findIndex((page) => page.id === dragPageId);
+			const toIndex = prev.findIndex((page) => page.id === targetId);
+			if (fromIndex === -1 || toIndex === -1) return prev;
+			const next = [...prev];
+			const [moved] = next.splice(fromIndex, 1);
+			next.splice(toIndex, 0, moved);
+			return next;
+		});
+		setDragPageId(null);
+	}, [dragPageId]);
+
 	const handleMerge = useCallback(async () => {
 		setIsProcessing(true);
 		setMergeError(null);
 		setMergedBlob(null);
-		setItems((prev) => prev.map((item) => ({ ...item, status: 'pending', errorMessage: undefined })));
 
 		try {
 			const mergedDoc = await PDFDocument.create();
-			let failedFile: string | null = null;
+			const sourceDocCache = new Map<string, PDFDocument>();
 
-			for (const item of items) {
-				try {
-					const bytes = await item.file.arrayBuffer();
-					const sourceDoc = await PDFDocument.load(bytes);
-					const copiedPages = await mergedDoc.copyPages(sourceDoc, sourceDoc.getPageIndices());
-					copiedPages.forEach((page) => mergedDoc.addPage(page));
-				} catch {
-					failedFile = item.file.name;
-					setItems((prev) =>
-						prev.map((it) =>
-							it.id === item.id
-								? { ...it, status: 'error', errorMessage: messages.errorGeneric }
-								: it,
-						),
-					);
-					break;
+			for (const pageItem of pages) {
+				let sourceDoc = sourceDocCache.get(pageItem.fileId);
+				if (!sourceDoc) {
+					const bytes = await pageItem.file.arrayBuffer();
+					sourceDoc = await PDFDocument.load(bytes);
+					sourceDocCache.set(pageItem.fileId, sourceDoc);
 				}
-			}
-
-			if (failedFile) {
-				setMergeError(`${messages.errorGeneric} (${failedFile})`);
-				setIsProcessing(false);
-				return;
+				const [copiedPage] = await mergedDoc.copyPages(sourceDoc, [pageItem.pageIndex]);
+				if (pageItem.rotation !== 0) {
+					copiedPage.setRotation(degrees(pageItem.rotation));
+				}
+				mergedDoc.addPage(copiedPage);
 			}
 
 			const mergedBytes = await mergedDoc.save();
-			const blob = new Blob([mergedBytes], { type: 'application/pdf' });
-			setMergedBlob(blob);
+			setMergedBlob(new Blob([mergedBytes], { type: 'application/pdf' }));
 		} catch {
 			setMergeError(messages.errorGeneric);
 		}
 		setIsProcessing(false);
-	}, [items, messages.errorGeneric]);
+	}, [pages, messages.errorGeneric]);
 
 	const handleDownload = useCallback(() => {
 		if (!mergedBlob) return;
@@ -125,7 +162,8 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 		URL.revokeObjectURL(url);
 	}, [mergedBlob]);
 
-	const canMerge = !isProcessing && items.length >= 2;
+	const isLoadingAny = files.some((f) => f.status === 'loading');
+	const canMerge = !isProcessing && !isLoadingAny && pages.length >= 2;
 
 	return (
 		<div className="flex flex-col gap-4 rounded-lg border border-border p-4">
@@ -161,55 +199,85 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 				<p className="text-xs text-muted-foreground">{messages.dropHint}</p>
 			</div>
 
-			{items.length === 0 ? (
+			{files.some((f) => f.status === 'loading') && (
+				<p className="text-sm text-muted-foreground">{messages.loadingThumbnails}</p>
+			)}
+
+			{pages.length === 0 ? (
 				<p className="text-sm text-muted-foreground">{messages.noFiles}</p>
 			) : (
-				<ul className="flex flex-col gap-2">
-					{items.map((item, index) => (
-						<li
-							key={item.id}
-							className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-2 text-sm"
-						>
-							<span className="truncate text-foreground">
-								{index + 1}. {item.file.name}
-							</span>
-							<span className="flex items-center gap-2">
-								<span className="text-muted-foreground">{formatBytes(item.file.size)}</span>
-								{item.status === 'error' && (
-									<span className="text-destructive">{item.errorMessage ?? messages.errorGeneric}</span>
-								)}
-								<Button
-									type="button"
-									size="icon-sm"
-									variant="outline"
-									aria-label={messages.moveUp}
-									disabled={index === 0}
-									onClick={() => handleMove(item.id, -1)}
-								>
-									↑
-								</Button>
-								<Button
-									type="button"
-									size="icon-sm"
-									variant="outline"
-									aria-label={messages.moveDown}
-									disabled={index === items.length - 1}
-									onClick={() => handleMove(item.id, 1)}
-								>
-									↓
-								</Button>
-								<Button
-									type="button"
-									size="sm"
-									variant="destructive"
-									onClick={() => handleRemove(item.id)}
-								>
-									{messages.remove}
-								</Button>
-							</span>
-						</li>
-					))}
-				</ul>
+				<>
+					<p className="text-xs text-muted-foreground">{messages.dragHint}</p>
+					<ul className="flex flex-wrap gap-3">
+						{pages.map((page, index) => (
+							<li
+								key={page.id}
+								draggable
+								onDragStart={() => setDragPageId(page.id)}
+								onDragOver={(event) => event.preventDefault()}
+								onDrop={(event) => {
+									event.preventDefault();
+									handleDrop(page.id);
+								}}
+								className={`flex w-28 cursor-grab flex-col gap-1 rounded-md border border-border bg-card p-1.5 ${
+									dragPageId === page.id ? 'opacity-50' : ''
+								}`}
+							>
+								<div className="relative overflow-hidden rounded bg-muted">
+									<img
+										src={page.dataUrl}
+										alt={`${page.file.name} — page ${page.pageIndex + 1}`}
+										className="w-full"
+										style={{ transform: `rotate(${page.rotation}deg)` }}
+									/>
+									<span className="absolute bottom-1 right-1 rounded bg-black/60 px-1 text-[10px] font-medium text-white">
+										{index + 1}
+									</span>
+								</div>
+								<div className="flex items-center justify-between gap-0.5">
+									<Button
+										type="button"
+										size="icon-xs"
+										variant="outline"
+										aria-label={messages.moveUp}
+										disabled={index === 0}
+										onClick={() => handleMove(page.id, -1)}
+									>
+										←
+									</Button>
+									<Button
+										type="button"
+										size="icon-xs"
+										variant="outline"
+										aria-label={messages.rotate}
+										onClick={() => handleRotatePage(page.id)}
+									>
+										⟳
+									</Button>
+									<Button
+										type="button"
+										size="icon-xs"
+										variant="outline"
+										aria-label={messages.moveDown}
+										disabled={index === pages.length - 1}
+										onClick={() => handleMove(page.id, 1)}
+									>
+										→
+									</Button>
+									<Button
+										type="button"
+										size="icon-xs"
+										variant="destructive"
+										aria-label={messages.remove}
+										onClick={() => handleRemovePage(page.id)}
+									>
+										×
+									</Button>
+								</div>
+							</li>
+						))}
+					</ul>
+				</>
 			)}
 
 			{mergeError && <p className="text-sm text-destructive">{mergeError}</p>}

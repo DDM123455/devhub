@@ -1,19 +1,22 @@
 {
   "meta": {
     "title": "PDF-Dateien kostenlos online zusammenfügen — Web Tool Hub",
-    "description": "Kombiniere mehrere PDF-Dateien kostenlos zu einem einzigen Dokument, direkt in deinem Browser. Reihenfolge vor dem Zusammenfügen anpassen — kein Upload, kein Wasserzeichen, keine Anmeldung."
+    "description": "Kombiniere mehrere PDF-Dateien kostenlos zu einem einzigen Dokument, direkt in deinem Browser. Sieh jede Seite als Vorschaubild, ziehe sie zum Umsortieren, drehe oder lösche einzelne Seiten vor dem Zusammenfügen — kein Upload, kein Wasserzeichen, keine Anmeldung."
   },
   "heading": "PDF-Dateien zusammenfügen",
-  "tagline": "Kombiniere mehrere PDFs zu einer Datei, direkt in deinem Browser.",
+  "tagline": "Kombiniere mehrere PDFs zu einer Datei, mit Seite-für-Seite-Vorschau, direkt in deinem Browser.",
   "ui": {
     "selectFiles": "PDF-Dateien auswählen",
     "dropHint": "oder PDF-Dateien per Drag & Drop hierher ziehen",
     "merge": "PDFs zusammenfügen",
     "merging": "Wird zusammengefügt…",
     "download": "merged.pdf herunterladen",
-    "moveUp": "Nach oben",
-    "moveDown": "Nach unten",
-    "remove": "Entfernen",
+    "moveUp": "Nach vorne",
+    "moveDown": "Nach hinten",
+    "remove": "Seite löschen",
+    "rotate": "Seite drehen",
+    "loadingThumbnails": "Seiten werden gelesen…",
+    "dragHint": "Ziehe eine beliebige Seite, um sie umzusortieren, oder nutze die Pfeile.",
     "noFiles": "Noch keine PDF-Dateien ausgewählt.",
     "errorGeneric": "Beim Lesen dieser PDF ist ein Fehler aufgetreten. Prüfe, ob die Datei beschädigt oder passwortgeschützt ist, und versuche es erneut."
   },
@@ -21,8 +24,8 @@
   "article": {
     "heading": "Warum PDFs lokal zusammenfügen statt sie hochzuladen?",
     "p1": "Eingescannte Verträge, unterschriebene Formulare, Rechnungsstapel, Kapitel eines Berichts — früher oder später landen bei fast jedem mehrere PDF-Dateien, die eigentlich ein einziges Dokument sein sollten. Fünf separate Anhänge zu verschicken oder einen Kunden fünf Links statt einem öffnen zu lassen, ist umständlich, und die meisten kostenlosen \"PDF zusammenfügen\"-Websites lösen das, indem sie deine Dateien unbemerkt auf einen Server hochladen — genau das Vertrauen, das kaum jemand einem Dokument entgegenbringen möchte, das eine Unterschrift, eine Ausweisnummer oder Finanzdaten enthalten kann.",
-    "p2": "Dieses Tool tut das nie. Alles läuft in deinem Browser über eine JavaScript-Bibliothek namens pdf-lib, die die Rohstruktur jeder PDF liest, ihre Seiten in ein neues Dokument kopiert und das Ergebnis zusammensetzt — komplett im Arbeitsspeicher, auf deinem eigenen Gerät. Keine Datei wird jemals irgendwohin gesendet, nicht einmal um zu prüfen, ob es sich um eine gültige PDF handelt: Diese Prüfung geschieht ebenfalls lokal, weshalb eine ungewöhnliche oder passwortgeschützte Datei sofort gemeldet wird, statt auf irgendeinem entfernten Server stillschweigend zu scheitern.",
-    "p3": "Füge deine PDF-Dateien per Klick auf die Schaltfläche oder per Drag & Drop in die Ablagefläche hinzu — du kannst jederzeit weitere hinzufügen. Jede Datei erscheint in einer Liste in der Reihenfolge, in der sie im fertigen Dokument auftauchen wird; nutze die Pfeile nach oben und unten neben einer Datei, um die Reihenfolge zu ändern, oder die Entfernen-Schaltfläche für versehentlich hinzugefügte Dateien. Wenn die Reihenfolge stimmt, klicke auf PDFs zusammenfügen. Die kombinierte Datei wird vollständig im Arbeitsspeicher erstellt, und sobald sie fertig ist, erscheint ein Download-Link — gespeichert als merged.pdf.",
-    "p4": "Das Tool hat keine eingebaute Seitenbegrenzung, allerdings dauern sehr große Stapel gescannter, bildlastiger PDFs naturgemäß länger, da alles auf deinem eigenen Gerät verarbeitet wird und nicht auf einer Serverfarm. Schlägt eine Datei im Stapel fehl — etwa weil sie passwortverschlüsselt oder beim Download beschädigt wurde —, zeigt dir das Tool genau, welche das ist, damit du sie korrigieren oder entfernen kannst, statt stillschweigend ein fehlerhaftes Ergebnis zu erzeugen. Um eine große PDF später wieder in kleinere Teile zu zerlegen, arbeitet das Tool PDF teilen nach demselben datenschutzfreundlichen Prinzip."
+    "p2": "Dieses Tool tut das nie. Alles läuft in deinem Browser über pdf-lib, eine JavaScript-Bibliothek, die die Rohstruktur jeder PDF liest, ihre Seiten in ein neues Dokument kopiert und das Ergebnis zusammensetzt — komplett im Arbeitsspeicher, auf deinem eigenen Gerät. Auch die Seitenvorschaubilder werden lokal erzeugt, mit pdf.js — derselben Rendering-Engine, die in Firefox eingebaut ist —, sodass du genau siehst, womit du arbeitest, bevor überhaupt etwas zusammengefügt wird.",
+    "p3": "Füge deine PDF-Dateien per Klick auf die Schaltfläche oder per Drag & Drop in die Ablagefläche hinzu — jede Seite jeder Datei erscheint als eigenes Vorschaubild in einem gemeinsamen Raster, nicht nach Datei gruppiert. Ziehe ein beliebiges Vorschaubild, um es relativ zu den anderen neu anzuordnen, sogar über verschiedene Ausgangsdateien hinweg, oder nutze die Pfeile, wenn Ziehen unpraktisch ist. Klicke auf die Dreh-Schaltfläche einer Seite, um sie jeweils um 90° zu drehen, oder auf die Lösch-Schaltfläche, um sie komplett aus dem fertigen Dokument auszuschließen — praktisch, um ein leeres gescanntes Deckblatt oder eine doppelte Seite loszuwerden. Wenn alles passt, klicke auf PDFs zusammenfügen; die kombinierte Datei wird vollständig im Arbeitsspeicher erstellt und als merged.pdf heruntergeladen.",
+    "p4": "Das Tool hat keine eingebaute Seitenbegrenzung, allerdings dauert das Rendern der Vorschaubilder bei sehr großen Stapeln gescannter, bildlastiger PDFs naturgemäß länger, da alles auf deinem eigenen Gerät verarbeitet wird und nicht auf einer Serverfarm. Kann eine Datei nicht gelesen werden — etwa weil sie passwortverschlüsselt oder beim Download beschädigt wurde —, meldet dir das Tool das, statt stillschweigend ein fehlerhaftes Ergebnis zu erzeugen. Um eine zusammengefügte PDF später wieder in kleinere Teile zu zerlegen, arbeitet das Tool PDF teilen nach demselben datenschutzfreundlichen Prinzip und nutzt dieselben Dreh- und Lösch-Steuerelemente für Seiten."
   }
 }

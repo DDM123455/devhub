@@ -1,16 +1,23 @@
 {
   "meta": {
     "title": "Diviser un PDF gratuitement en ligne — Web Tool Hub",
-    "description": "Divisez un PDF en plusieurs fichiers ou extrayez des pages précises gratuitement, directement dans votre navigateur. Divisez par plages de pages personnalisées ou extrayez chaque page — sans envoi sur un serveur, sans filigrane, sans inscription."
+    "description": "Divisez un PDF en plusieurs fichiers ou extrayez des pages précises gratuitement, directement dans votre navigateur. Prévisualisez chaque page en miniature, pivotez ou supprimez des pages, divisez par plages personnalisées ou toutes les N pages — sans envoi sur un serveur, sans filigrane, sans inscription."
   },
   "heading": "Diviser un fichier PDF",
-  "tagline": "Extrayez des pages ou divisez un PDF en plusieurs fichiers, directement dans votre navigateur.",
+  "tagline": "Prévisualisez chaque page en miniature et divisez un PDF en plusieurs fichiers, directement dans votre navigateur.",
   "ui": {
     "selectFile": "Sélectionner un fichier PDF",
     "dropHint": "ou glissez-déposez un fichier PDF ici",
     "noFile": "Aucun fichier PDF sélectionné pour le moment.",
     "changeFile": "Choisir un autre fichier",
+    "loadingThumbnails": "Lecture des pages…",
     "pageCount": "{{count}} pages",
+    "rotate": "Pivoter la page",
+    "deletePage": "Supprimer la page",
+    "modeLabel": "Mode de division",
+    "modeRanges": "Plages personnalisées",
+    "modeEveryN": "Toutes les N pages",
+    "everyNLabel": "Pages par fichier",
     "rangesLabel": "Plages de pages (facultatif)",
     "rangesPlaceholder": "ex. 1-3, 4, 5-7",
     "rangesHint": "Laissez vide pour extraire chaque page dans son propre fichier PDF.",
@@ -19,14 +26,15 @@
     "resultsHeading": "Fichiers résultants",
     "download": "Télécharger",
     "errorGeneric": "Une erreur est survenue lors de la lecture de ce PDF. Vérifiez qu'il n'est ni corrompu ni protégé par un mot de passe, puis réessayez.",
-    "errorInvalidRange": "La plage de pages « {{range}} » n'est pas valide. Utilisez un format comme 1-3, 4, 5-7, avec des pages comprises entre 1 et {{max}}."
+    "errorInvalidRange": "La plage de pages « {{range}} » n'est pas valide. Utilisez un format comme 1-3, 4, 5-7, avec des pages comprises entre 1 et {{max}}.",
+    "errorInvalidEveryN": "Saisissez un nombre entier de 1 ou plus."
   },
   "related": "Outils associés",
   "article": {
     "heading": "Pourquoi diviser un PDF en local plutôt que de l'envoyer sur internet ?",
     "p1": "Un livre scanné, un lot de relevés mensuels assemblés, un rapport de 200 pages dont vous n'avez besoin que de trois — tôt ou tard, un PDF finit par devenir trop volumineux ou par mélanger trop de choses par rapport à ce dont vous avez réellement besoin. La plupart des sites gratuits de « division de PDF » règlent ce problème de la même façon que ceux de « fusion de PDF » : en envoyant discrètement votre fichier sur un serveur avant d'en faire quoi que ce soit. C'est un niveau de confiance assez étrange à accorder pour un document pouvant contenir une signature, un relevé bancaire ou une page que vous préféreriez ne pas voir atterrir sur le disque de quelqu'un d'autre.",
-    "p2": "Cet outil n'envoie jamais rien. Tout s'exécute dans votre navigateur grâce à pdf-lib, une bibliothèque JavaScript qui lit la structure brute de votre PDF, copie uniquement les pages demandées dans des documents entièrement nouveaux, puis assemble les résultats en mémoire, sur votre propre appareil. Même la toute première étape — simplement compter le nombre de pages du fichier — se fait en local, ce qui explique pourquoi un fichier corrompu ou protégé par mot de passe est signalé immédiatement plutôt que d'échouer silencieusement sur un serveur distant.",
-    "p3": "Sélectionnez un fichier PDF ou glissez-le dans la zone prévue ; l'outil le lit en local et affiche le nombre total de pages. Saisissez les pages voulues dans le champ des plages avec un format simple comme « 1-3, 4, 5-7 » — chaque groupe séparé par une virgule devient un fichier de sortie distinct. Laissez le champ vide et cliquez sur Diviser le PDF pour extraire à la place chaque page en tant que fichier individuel, pratique lorsque vous voulez simplement tout séparer. Chaque résultat apparaît dans une liste avec son propre bouton de téléchargement, afin que vous ne conserviez que les parties dont vous avez réellement besoin.",
-    "p4": "L'outil n'impose aucune limite de pages, mais les très gros PDF scannés remplis d'images prendront naturellement un peu plus de temps, puisque tout est traité par votre propre appareil et non par une ferme de serveurs. Si vous saisissez une plage incohérente — un numéro de page dépassant la longueur du document, ou un texte qui n'est pas une plage valide —, l'outil vous indique précisément quelle partie posait problème plutôt que de produire un fichier défectueux. Si vous devez plus tard réunir des pages provenant de plusieurs PDF, l'outil Fusionner des PDF fonctionne selon la même approche respectueuse de la vie privée."
+    "p2": "Cet outil n'envoie jamais rien. Tout s'exécute dans votre navigateur grâce à pdf-lib, une bibliothèque JavaScript qui lit la structure brute de votre PDF et copie uniquement les pages demandées dans des documents entièrement nouveaux, assemblés en mémoire sur votre propre appareil. Les vignettes de page sont elles aussi générées en local avec pdf.js — le même moteur intégré à Firefox —, ce qui vous permet de voir exactement ce que contient chaque page avant de décider comment la diviser.",
+    "p3": "Sélectionnez un fichier PDF ou glissez-le dans la zone prévue ; chaque page apparaît sous forme de vignette individuelle pour que vous puissiez voir le document en un coup d'œil. Pivotez une page de 90° à chaque fois, ou supprimez-la entièrement si elle ne devrait figurer dans aucun des fichiers de sortie — une page de garde scannée vierge, par exemple. Choisissez ensuite comment diviser : Plages personnalisées vous permet de saisir des groupes comme « 1-3, 4, 5-7 », où chaque groupe séparé par une virgule devient son propre fichier, tandis que Toutes les N pages découpe automatiquement le document en morceaux de taille égale — pratique pour scinder un long scan en, par exemple, tranches de 10 pages sans saisir chaque plage à la main. Cliquez sur Diviser le PDF et chaque résultat apparaît avec son propre bouton de téléchargement.",
+    "p4": "L'outil n'impose aucune limite de pages, mais les très gros PDF scannés remplis d'images prendront naturellement un peu plus de temps à générer leurs vignettes, puisque tout est traité par votre propre appareil et non par une ferme de serveurs. Si vous saisissez une plage incohérente — un numéro de page dépassant la longueur du document, ou un texte qui n'est pas une plage valide —, l'outil vous indique précisément quelle partie posait problème plutôt que de produire un fichier défectueux. Si vous devez plus tard réunir des pages provenant de plusieurs PDF, l'outil Fusionner des PDF fonctionne selon la même approche respectueuse de la vie privée et partage les mêmes contrôles de rotation et de suppression de page."
   }
 }

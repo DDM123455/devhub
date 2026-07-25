@@ -1,16 +1,23 @@
 {
   "meta": {
     "title": "Split PDF Files Online Free — Web Tool Hub",
-    "description": "Split a PDF into multiple files or extract specific pages online for free, entirely in your browser. Split by custom page ranges or extract every page — no upload, no watermark, no signup."
+    "description": "Split a PDF into multiple files or extract specific pages online for free, entirely in your browser. Preview every page as a thumbnail, rotate or delete pages, split by custom ranges or every N pages. No upload, no watermark, no signup."
   },
   "heading": "Split PDF Files",
-  "tagline": "Extract pages or split a PDF into several files, right in your browser.",
+  "tagline": "Preview every page as a thumbnail and split a PDF into several files, right in your browser.",
   "ui": {
     "selectFile": "Select PDF file",
     "dropHint": "or drag and drop a PDF file here",
     "noFile": "No PDF file selected yet.",
     "changeFile": "Choose a different file",
+    "loadingThumbnails": "Reading pages…",
     "pageCount": "{{count}} pages",
+    "rotate": "Rotate page",
+    "deletePage": "Delete page",
+    "modeLabel": "Split mode",
+    "modeRanges": "Custom ranges",
+    "modeEveryN": "Every N pages",
+    "everyNLabel": "Pages per file",
     "rangesLabel": "Page ranges (optional)",
     "rangesPlaceholder": "e.g. 1-3, 4, 5-7",
     "rangesHint": "Leave empty to split every page into its own PDF file.",
@@ -19,14 +26,15 @@
     "resultsHeading": "Result files",
     "download": "Download",
     "errorGeneric": "Something went wrong reading this PDF. Make sure it isn't corrupted or password-protected, then try again.",
-    "errorInvalidRange": "Invalid page range \"{{range}}\". Use a format like 1-3, 4, 5-7, with pages between 1 and {{max}}."
+    "errorInvalidRange": "Invalid page range \"{{range}}\". Use a format like 1-3, 4, 5-7, with pages between 1 and {{max}}.",
+    "errorInvalidEveryN": "Enter a whole number of 1 or more."
   },
   "related": "Related tools",
   "article": {
     "heading": "Why split a PDF locally instead of uploading it?",
     "p1": "A scanned book, a bundle of monthly statements, a 200-page report you only need three pages from — sooner or later a PDF grows too large or too mixed-purpose for what you actually need. Most free \"split PDF\" websites handle this the same way the free \"merge PDF\" sites do: by quietly uploading your file to a server before doing anything with it. That's a strange amount of trust to hand over for a document that might contain a signature, a bank statement, or a page you'd rather not have sitting on someone else's disk.",
-    "p2": "This tool never uploads anything. It runs entirely in your browser using pdf-lib, a JavaScript library that reads the raw structure of your PDF, copies only the pages you asked for into brand-new documents, and assembles the results in memory, on your own device. The very first step — even just counting how many pages the file has — happens locally too, which is why a corrupted or password-protected file is flagged immediately instead of failing silently somewhere on a remote server.",
-    "p3": "Select a PDF file or drag it into the drop zone; the tool reads it locally and shows you the total page count. Type the pages you want in the ranges field using a simple format like \"1-3, 4, 5-7\" — each comma-separated group becomes its own output file. Leave the field empty and press Split PDF to instead extract every single page as its own file, useful when you just want to break a document apart completely. Each result appears in a list with its own download button, so you only save the pieces you actually need.",
-    "p4": "There's no page limit built into the tool, though very large scanned PDFs full of images will naturally take a little longer since everything runs on your own device rather than a server farm. If you type a range that doesn't make sense — a page number beyond the document's length, or text that isn't a valid range — the tool tells you exactly which part was invalid instead of producing a broken file. If you later need to put pages from several PDFs back together, the Merge PDF tool works the same privacy-first way."
+    "p2": "This tool never uploads anything. It runs entirely in your browser using pdf-lib, a JavaScript library that reads the raw structure of your PDF and copies only the pages you asked for into brand-new documents, assembled in memory on your own device. Page thumbnails are rendered locally too, with pdf.js — the same engine built into Firefox — so you can see exactly what's on each page before deciding how to split it.",
+    "p3": "Select a PDF file or drag it into the drop zone; every page appears as its own thumbnail so you can see the document at a glance. Rotate a page 90° at a time or delete one entirely if it shouldn't be in any of the output files — a blank scanned sheet, for instance. Then choose how to split: Custom ranges lets you type groups like \"1-3, 4, 5-7\" where each comma-separated group becomes its own file, while Every N pages automatically chops the document into equal-sized chunks — useful for breaking a long scan into, say, 10-page pieces without typing out every range by hand. Press Split PDF and each result appears with its own download button.",
+    "p4": "There's no page limit built into the tool, though very large scanned PDFs full of images will naturally take a little longer to render thumbnails for since everything runs on your own device rather than a server farm. If you type a range that doesn't make sense — a page number beyond the document's length, or text that isn't a valid range — the tool tells you exactly which part was invalid instead of producing a broken file. If you later need to put pages from several PDFs back together, the Merge PDF tool works the same privacy-first way and shares the same rotate-and-delete page controls."
   }
 }

@@ -1,19 +1,22 @@
 {
   "meta": {
     "title": "Fusionner des fichiers PDF gratuitement en ligne — Web Tool Hub",
-    "description": "Combinez plusieurs fichiers PDF en un seul document, gratuitement, directement dans votre navigateur. Réorganisez l'ordre avant de fusionner — sans envoi sur un serveur, sans filigrane, sans inscription."
+    "description": "Combinez plusieurs fichiers PDF en un seul document, gratuitement, directement dans votre navigateur. Visualisez chaque page en miniature, glissez-déposez pour réorganiser, pivotez ou supprimez des pages avant de fusionner — sans envoi sur un serveur, sans filigrane, sans inscription."
   },
   "heading": "Fusionner des fichiers PDF",
-  "tagline": "Combinez plusieurs PDF en un seul fichier, directement dans votre navigateur.",
+  "tagline": "Combinez plusieurs PDF en un seul fichier, avec un aperçu en miniature page par page, directement dans votre navigateur.",
   "ui": {
     "selectFiles": "Sélectionner des fichiers PDF",
     "dropHint": "ou glissez-déposez des fichiers PDF ici",
     "merge": "Fusionner les PDF",
     "merging": "Fusion en cours…",
     "download": "Télécharger merged.pdf",
-    "moveUp": "Monter",
-    "moveDown": "Descendre",
-    "remove": "Retirer",
+    "moveUp": "Déplacer avant",
+    "moveDown": "Déplacer après",
+    "remove": "Supprimer la page",
+    "rotate": "Pivoter la page",
+    "loadingThumbnails": "Lecture des pages…",
+    "dragHint": "Glissez n'importe quelle page pour la réorganiser, ou utilisez les flèches.",
     "noFiles": "Aucun fichier PDF sélectionné pour le moment.",
     "errorGeneric": "Une erreur est survenue lors de la lecture de ce PDF. Vérifiez qu'il n'est ni corrompu ni protégé par un mot de passe, puis réessayez."
   },
@@ -21,8 +24,8 @@
   "article": {
     "heading": "Pourquoi fusionner des PDF en local plutôt que de les envoyer sur internet ?",
     "p1": "Contrats scannés, formulaires signés, lots de factures, chapitres d'un rapport : tôt ou tard, presque tout le monde se retrouve avec plusieurs fichiers PDF qui devraient en réalité former un seul document. Envoyer cinq pièces jointes séparées ou demander à un client d'ouvrir cinq liens plutôt qu'un seul est peu pratique, et la plupart des sites gratuits de « fusion de PDF » règlent ce problème en envoyant discrètement vos fichiers sur un serveur — ce que peu de gens souhaitent faire avec un document pouvant contenir une signature, un numéro d'identité ou des informations financières.",
-    "p2": "Cet outil ne fait jamais cela. Tout s'exécute dans votre navigateur grâce à une bibliothèque JavaScript appelée pdf-lib, qui lit la structure brute de chaque PDF, copie ses pages dans un nouveau document et reconstitue le résultat — entièrement en mémoire, sur votre appareil. Aucun fichier n'est jamais envoyé où que ce soit, pas même pour vérifier qu'il s'agit bien d'un PDF valide : cette vérification se fait elle aussi en local, ce qui explique pourquoi un fichier inhabituel ou protégé par mot de passe est signalé immédiatement plutôt que d'échouer silencieusement sur un serveur distant.",
-    "p3": "Ajoutez vos fichiers PDF en cliquant sur le bouton ou en les glissant dans la zone prévue — vous pouvez en ajouter d'autres à tout moment. Chaque fichier apparaît dans une liste, dans l'ordre où il figurera dans le document final ; utilisez les flèches haut et bas à côté d'un fichier pour le repositionner, ou le bouton retirer pour enlever un fichier ajouté par erreur. Une fois l'ordre correct, cliquez sur Fusionner les PDF. Le fichier combiné est entièrement construit en mémoire et un lien de téléchargement apparaît dès qu'il est prêt, enregistré sous le nom merged.pdf.",
-    "p4": "L'outil n'impose aucune limite de pages, mais de très gros lots de PDF scannés remplis d'images prendront naturellement plus de temps, puisque tout est traité par votre propre appareil et non par une ferme de serveurs. Si l'un des fichiers du lot échoue — par exemple parce qu'il est chiffré par un mot de passe ou qu'il a été corrompu pendant le téléchargement — l'outil vous indique précisément lequel, afin que vous puissiez le corriger ou le retirer, plutôt que de produire silencieusement un résultat défectueux. Pour ensuite diviser un gros PDF en fichiers plus petits, l'outil Diviser un PDF fonctionne selon la même approche respectueuse de la vie privée."
+    "p2": "Cet outil ne fait jamais cela. Tout s'exécute dans votre navigateur grâce à pdf-lib, une bibliothèque JavaScript qui lit la structure brute de chaque PDF, copie ses pages dans un nouveau document et reconstitue le résultat — entièrement en mémoire, sur votre appareil. Les vignettes de page sont elles aussi générées en local avec pdf.js — le même moteur de rendu intégré à Firefox —, ce qui vous permet de voir exactement avec quoi vous travaillez avant de fusionner quoi que ce soit.",
+    "p3": "Ajoutez vos fichiers PDF en cliquant sur le bouton ou en les glissant dans la zone prévue — chaque page de chaque fichier apparaît sous forme de vignette individuelle, dans une seule grille combinée, sans regroupement par fichier. Faites glisser n'importe quelle vignette pour la repositionner par rapport aux autres, même entre différents fichiers source, ou utilisez les flèches si le glisser-déposer n'est pas pratique. Cliquez sur le bouton de rotation d'une page pour la faire pivoter de 90° à chaque fois, ou sur le bouton de suppression pour l'exclure entièrement du document final — utile pour retirer une page de couverture scannée vierge ou une page en double. Une fois que tout vous convient, cliquez sur Fusionner les PDF ; le fichier combiné est entièrement construit en mémoire et téléchargé sous le nom merged.pdf.",
+    "p4": "L'outil n'impose aucune limite de pages, mais de très gros lots de PDF scannés remplis d'images prendront naturellement plus de temps à générer leurs vignettes, puisque tout est traité par votre propre appareil et non par une ferme de serveurs. Si un fichier ne peut pas être lu — par exemple parce qu'il est chiffré par un mot de passe ou qu'il a été corrompu pendant le téléchargement — l'outil vous le signale plutôt que de produire silencieusement un résultat défectueux. Pour ensuite diviser un PDF fusionné en fichiers plus petits, l'outil Diviser un PDF fonctionne selon la même approche respectueuse de la vie privée et partage les mêmes contrôles de rotation et de suppression de page."
   }
 }

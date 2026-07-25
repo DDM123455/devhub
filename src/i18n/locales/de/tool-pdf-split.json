@@ -1,16 +1,23 @@
 {
   "meta": {
     "title": "PDF-Dateien kostenlos online teilen — Web Tool Hub",
-    "description": "Teile eine PDF kostenlos in mehrere Dateien auf oder extrahiere bestimmte Seiten, direkt in deinem Browser. Nach eigenen Seitenbereichen teilen oder jede Seite einzeln extrahieren — kein Upload, kein Wasserzeichen, keine Anmeldung."
+    "description": "Teile eine PDF kostenlos in mehrere Dateien auf oder extrahiere bestimmte Seiten, direkt in deinem Browser. Vorschau jeder Seite als Miniaturbild, Seiten drehen oder löschen, nach eigenen Bereichen oder je N Seiten teilen — kein Upload, kein Wasserzeichen, keine Anmeldung."
   },
   "heading": "PDF-Dateien teilen",
-  "tagline": "Extrahiere Seiten oder teile eine PDF in mehrere Dateien, direkt in deinem Browser.",
+  "tagline": "Sieh dir jede Seite als Vorschaubild an und teile eine PDF in mehrere Dateien, direkt in deinem Browser.",
   "ui": {
     "selectFile": "PDF-Datei auswählen",
     "dropHint": "oder eine PDF-Datei per Drag & Drop hierher ziehen",
     "noFile": "Noch keine PDF-Datei ausgewählt.",
     "changeFile": "Andere Datei wählen",
+    "loadingThumbnails": "Seiten werden gelesen…",
     "pageCount": "{{count}} Seiten",
+    "rotate": "Seite drehen",
+    "deletePage": "Seite löschen",
+    "modeLabel": "Teilungsmodus",
+    "modeRanges": "Eigene Bereiche",
+    "modeEveryN": "Je N Seiten",
+    "everyNLabel": "Seiten pro Datei",
     "rangesLabel": "Seitenbereiche (optional)",
     "rangesPlaceholder": "z. B. 1-3, 4, 5-7",
     "rangesHint": "Leer lassen, um jede Seite in eine eigene PDF-Datei aufzuteilen.",
@@ -19,14 +26,15 @@
     "resultsHeading": "Ergebnisdateien",
     "download": "Herunterladen",
     "errorGeneric": "Beim Lesen dieser PDF ist ein Fehler aufgetreten. Prüfe, ob die Datei beschädigt oder passwortgeschützt ist, und versuche es erneut.",
-    "errorInvalidRange": "Der Seitenbereich \"{{range}}\" ist ungültig. Verwende ein Format wie 1-3, 4, 5-7, mit Seiten zwischen 1 und {{max}}."
+    "errorInvalidRange": "Der Seitenbereich \"{{range}}\" ist ungültig. Verwende ein Format wie 1-3, 4, 5-7, mit Seiten zwischen 1 und {{max}}.",
+    "errorInvalidEveryN": "Gib eine ganze Zahl von 1 oder mehr ein."
   },
   "related": "Ähnliche Tools",
   "article": {
     "heading": "Warum eine PDF lokal teilen statt sie hochzuladen?",
     "p1": "Ein eingescanntes Buch, ein Stapel zusammengefügter Monatsabrechnungen, ein 200-seitiger Bericht, von dem du nur drei Seiten brauchst — früher oder später wird eine PDF zu groß oder vermischt zu viel für das, was du eigentlich brauchst. Die meisten kostenlosen \"PDF teilen\"-Websites lösen das genau wie die \"PDF zusammenfügen\"-Seiten: indem sie deine Datei unbemerkt auf einen Server hochladen, bevor überhaupt etwas damit passiert. Das ist ein ziemlich seltsames Maß an Vertrauen für ein Dokument, das eine Unterschrift, einen Kontoauszug oder eine Seite enthalten kann, die du lieber nicht auf der Festplatte einer fremden Firma sehen möchtest.",
-    "p2": "Dieses Tool lädt niemals etwas hoch. Alles läuft in deinem Browser über pdf-lib, eine JavaScript-Bibliothek, die die Rohstruktur deiner PDF liest, nur die angeforderten Seiten in brandneue Dokumente kopiert und die Ergebnisse im Arbeitsspeicher auf deinem eigenen Gerät zusammensetzt. Sogar der allererste Schritt — einfach nur zu zählen, wie viele Seiten die Datei hat — geschieht lokal, weshalb eine beschädigte oder passwortgeschützte Datei sofort gemeldet wird, statt auf irgendeinem entfernten Server stillschweigend zu scheitern.",
-    "p3": "Wähle eine PDF-Datei aus oder ziehe sie in die Ablagefläche; das Tool liest sie lokal ein und zeigt dir die Gesamtseitenzahl. Gib die gewünschten Seiten im Bereichsfeld mit einem einfachen Format wie \"1-3, 4, 5-7\" ein — jede durch Komma getrennte Gruppe wird zu einer eigenen Ausgabedatei. Lass das Feld leer und klicke auf PDF teilen, um stattdessen jede einzelne Seite als eigene Datei zu extrahieren — praktisch, wenn du ein Dokument einfach komplett auftrennen willst. Jedes Ergebnis erscheint in einer Liste mit eigenem Download-Button, sodass du nur die Teile speicherst, die du wirklich brauchst.",
-    "p4": "Das Tool hat keine eingebaute Seitenbegrenzung, allerdings dauern sehr große, bildlastige gescannte PDFs naturgemäß etwas länger, da alles auf deinem eigenen Gerät verarbeitet wird und nicht auf einer Serverfarm. Gibst du einen Bereich ein, der keinen Sinn ergibt — eine Seitenzahl jenseits der Dokumentlänge oder einen Text, der kein gültiger Bereich ist —, zeigt dir das Tool genau, welcher Teil ungültig war, statt eine fehlerhafte Datei zu erzeugen. Musst du später Seiten aus mehreren PDFs wieder zusammenführen, arbeitet das Tool PDF zusammenfügen nach demselben datenschutzfreundlichen Prinzip."
+    "p2": "Dieses Tool lädt niemals etwas hoch. Alles läuft in deinem Browser über pdf-lib, eine JavaScript-Bibliothek, die die Rohstruktur deiner PDF liest und nur die angeforderten Seiten in brandneue Dokumente kopiert, zusammengesetzt im Arbeitsspeicher auf deinem eigenen Gerät. Auch die Seitenvorschaubilder werden lokal erzeugt, mit pdf.js — derselben Engine, die in Firefox eingebaut ist —, sodass du genau siehst, was auf jeder Seite steht, bevor du entscheidest, wie geteilt werden soll.",
+    "p3": "Wähle eine PDF-Datei aus oder ziehe sie in die Ablagefläche; jede Seite erscheint als eigenes Vorschaubild, sodass du das Dokument auf einen Blick erfassen kannst. Drehe eine Seite jeweils um 90° oder lösche sie komplett, wenn sie in keiner der Ausgabedateien vorkommen soll — etwa ein leeres gescanntes Blatt. Wähle dann die Teilungsart: Eigene Bereiche lässt dich Gruppen wie \"1-3, 4, 5-7\" eingeben, wobei jede durch Komma getrennte Gruppe zu einer eigenen Datei wird, während Je N Seiten das Dokument automatisch in gleich große Abschnitte zerlegt — praktisch, um einen langen Scan in z. B. 10-seitige Teile aufzuteilen, ohne jeden Bereich von Hand einzutippen. Klicke auf PDF teilen, und jedes Ergebnis erscheint mit eigenem Download-Button.",
+    "p4": "Das Tool hat keine eingebaute Seitenbegrenzung, allerdings dauert das Rendern der Vorschaubilder bei sehr großen, bildlastigen gescannten PDFs naturgemäß etwas länger, da alles auf deinem eigenen Gerät verarbeitet wird und nicht auf einer Serverfarm. Gibst du einen Bereich ein, der keinen Sinn ergibt — eine Seitenzahl jenseits der Dokumentlänge oder einen Text, der kein gültiger Bereich ist —, zeigt dir das Tool genau, welcher Teil ungültig war, statt eine fehlerhafte Datei zu erzeugen. Musst du später Seiten aus mehreren PDFs wieder zusammenführen, arbeitet das Tool PDF zusammenfügen nach demselben datenschutzfreundlichen Prinzip und nutzt dieselben Dreh- und Lösch-Steuerelemente für Seiten."
   }
 }

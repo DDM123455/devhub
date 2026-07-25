@@ -25,6 +25,9 @@ const messages = {
 	moveUp: t('ui.moveUp'),
 	moveDown: t('ui.moveDown'),
 	remove: t('ui.remove'),
+	rotate: t('ui.rotate'),
+	loadingThumbnails: t('ui.loadingThumbnails'),
+	dragHint: t('ui.dragHint'),
 	noFiles: t('ui.noFiles'),
 	errorGeneric: t('ui.errorGeneric'),
 };
@@ -50,7 +53,7 @@ const schema = {
 	<section class="px-4 py-10">
 		<h1 class="text-3xl font-bold text-foreground">{t('heading')}</h1>
 		<p class="mt-2 text-muted-foreground">{t('tagline')}</p>
-		<div class="mt-6 max-w-2xl">
+		<div class="mt-6 max-w-4xl">
 			<PdfMerger client:load messages={messages} />
 		</div>
 	</section>

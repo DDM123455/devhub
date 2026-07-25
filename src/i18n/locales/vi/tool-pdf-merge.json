@@ -1,19 +1,22 @@
 {
   "meta": {
     "title": "Gộp file PDF miễn phí trực tuyến — Web Tool Hub",
-    "description": "Gộp nhiều file PDF thành một tài liệu duy nhất, miễn phí, xử lý hoàn toàn trên trình duyệt. Sắp xếp lại thứ tự trước khi gộp — không upload, không watermark, không cần đăng ký."
+    "description": "Gộp nhiều file PDF thành một tài liệu duy nhất, miễn phí, xử lý hoàn toàn trên trình duyệt. Xem thumbnail từng trang, kéo-thả sắp xếp lại, xoay hoặc xóa từng trang trước khi gộp — không upload, không watermark, không cần đăng ký."
   },
   "heading": "Gộp file PDF",
-  "tagline": "Kết hợp nhiều file PDF thành một, ngay trên trình duyệt của bạn.",
+  "tagline": "Kết hợp nhiều file PDF thành một, xem trước từng trang bằng thumbnail, ngay trên trình duyệt của bạn.",
   "ui": {
     "selectFiles": "Chọn file PDF",
     "dropHint": "hoặc kéo thả file PDF vào đây",
     "merge": "Gộp PDF",
     "merging": "Đang gộp…",
     "download": "Tải xuống merged.pdf",
-    "moveUp": "Di chuyển lên",
-    "moveDown": "Di chuyển xuống",
-    "remove": "Xóa",
+    "moveUp": "Chuyển lên trước",
+    "moveDown": "Chuyển xuống sau",
+    "remove": "Xóa trang",
+    "rotate": "Xoay trang",
+    "loadingThumbnails": "Đang đọc trang…",
+    "dragHint": "Kéo bất kỳ trang nào để sắp xếp lại, hoặc dùng nút mũi tên.",
     "noFiles": "Chưa chọn file PDF nào.",
     "errorGeneric": "Có lỗi khi đọc file PDF này. Hãy kiểm tra xem file có bị hỏng hoặc đặt mật khẩu không, rồi thử lại."
   },
@@ -21,8 +24,8 @@
   "article": {
     "heading": "Vì sao nên gộp PDF ngay trên máy thay vì upload lên mạng?",
     "p1": "Hợp đồng scan, biểu mẫu đã ký, hóa đơn từng đợt, các chương của một báo cáo — hầu như ai cũng có lúc cầm trong tay vài file PDF lẽ ra nên là một tài liệu duy nhất. Gửi năm file đính kèm riêng lẻ hoặc bắt khách hàng mở năm đường link thay vì một là rất bất tiện, và phần lớn các trang \"gộp PDF\" miễn phí trên mạng giải quyết việc này bằng cách âm thầm upload file của bạn lên máy chủ trước — điều mà không phải ai cũng muốn với một tài liệu có thể chứa chữ ký, số CMND/CCCD hay thông tin tài chính.",
-    "p2": "Công cụ này không làm vậy. Mọi thứ chạy ngay trong trình duyệt của bạn nhờ thư viện JavaScript pdf-lib — thư viện này đọc cấu trúc gốc của từng file PDF, sao chép các trang vào một tài liệu mới rồi ghép lại, tất cả đều diễn ra trong bộ nhớ, trên chính thiết bị của bạn. Không file nào được gửi đi bất cứ đâu, kể cả để kiểm tra xem nó có phải PDF hợp lệ hay không — việc kiểm tra đó cũng diễn ra ngay tại chỗ, đó cũng là lý do một file lạ hoặc có mật khẩu sẽ được báo lỗi ngay lập tức thay vì âm thầm thất bại ở đâu đó trên máy chủ.",
-    "p3": "Thêm file PDF bằng cách bấm nút chọn hoặc kéo thả vào khung — bạn có thể thêm tiếp bất cứ lúc nào. Mỗi file hiện trong danh sách theo đúng thứ tự sẽ xuất hiện trong tài liệu cuối cùng; dùng mũi tên lên/xuống cạnh mỗi file để đổi thứ tự, hoặc nút xóa nếu lỡ thêm nhầm. Khi thứ tự đã ổn, bấm Gộp PDF. File kết quả được tạo hoàn toàn trong bộ nhớ và liên kết tải xuống hiện ra ngay khi xong, lưu với tên merged.pdf.",
-    "p4": "Công cụ không giới hạn số trang, tuy nhiên nếu gộp nhiều file PDF scan chứa toàn hình ảnh dung lượng lớn thì quá trình sẽ mất nhiều thời gian hơn vì mọi thứ được xử lý trên chính thiết bị của bạn chứ không phải trên một cụm máy chủ mạnh. Nếu một file trong danh sách bị lỗi — chẳng hạn vì được mã hóa bằng mật khẩu hoặc bị hỏng khi tải về — công cụ sẽ báo rõ file nào để bạn sửa hoặc loại bỏ, thay vì âm thầm trả về kết quả bị lỗi. Nếu sau này cần tách một file PDF lớn thành nhiều phần nhỏ, công cụ Tách PDF cũng xử lý theo đúng nguyên tắc bảo mật tương tự."
+    "p2": "Công cụ này không làm vậy. Mọi thứ chạy ngay trong trình duyệt của bạn nhờ pdf-lib — thư viện JavaScript đọc cấu trúc gốc của từng file PDF, sao chép các trang vào một tài liệu mới rồi ghép lại, tất cả đều diễn ra trong bộ nhớ, trên chính thiết bị của bạn. Thumbnail từng trang cũng được vẽ ngay tại chỗ bằng pdf.js (đúng công cụ render PDF có sẵn trong Firefox), nên bạn thấy rõ mình đang làm việc với gì trước khi ghép bất cứ thứ gì.",
+    "p3": "Thêm file PDF bằng cách bấm nút chọn hoặc kéo thả vào khung — mọi trang của mọi file đều hiện thành thumbnail riêng, gộp chung vào 1 lưới duy nhất, không tách nhóm theo từng file. Kéo bất kỳ thumbnail nào để đổi vị trí so với các trang khác, kể cả giữa các file nguồn khác nhau, hoặc dùng nút mũi tên nếu kéo-thả không tiện. Bấm nút xoay trên 1 trang để xoay 90° mỗi lần, hoặc nút xóa để loại hẳn trang đó khỏi tài liệu cuối cùng — hữu ích khi cần bỏ 1 trang bìa scan trống hay trang bị trùng. Khi mọi thứ đã ổn, bấm Gộp PDF; file kết quả được tạo hoàn toàn trong bộ nhớ và tải xuống với tên merged.pdf.",
+    "p4": "Công cụ không giới hạn số trang, tuy nhiên nếu gộp nhiều file PDF scan chứa toàn hình ảnh dung lượng lớn thì việc render thumbnail sẽ mất nhiều thời gian hơn vì mọi thứ được xử lý trên chính thiết bị của bạn chứ không phải trên một cụm máy chủ mạnh. Nếu một file không đọc được — chẳng hạn vì được mã hóa bằng mật khẩu hoặc bị hỏng khi tải về — công cụ sẽ báo rõ thay vì âm thầm trả về kết quả bị lỗi. Nếu sau này cần tách một file PDF đã gộp thành nhiều phần nhỏ, công cụ Tách PDF xử lý theo đúng nguyên tắc bảo mật tương tự và dùng chung các nút xoay/xóa trang."
   }
 }
