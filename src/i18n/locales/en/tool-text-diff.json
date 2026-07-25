@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "title": "Text Diff Checker Online Free — Compare Two Texts — Web Tool Hub",
+    "description": "Compare two blocks of text online for free and instantly see every word or line that changed. Runs entirely in your browser — nothing is uploaded, ever."
+  },
+  "heading": "Text Diff Checker — Compare Two Texts",
+  "tagline": "Paste two versions of a text and see exactly what changed, word by word or line by line.",
+  "ui": {
+    "originalLabel": "Original text",
+    "changedLabel": "Changed text",
+    "compare": "Compare",
+    "modeWord": "By word",
+    "modeLine": "By line",
+    "noChanges": "No differences found — the two texts are identical.",
+    "placeholder": "Paste or type text here…"
+  },
+  "related": "Related tools",
+  "article": {
+    "heading": "Why use a text diff checker?",
+    "p1": "Anytime two versions of the same document exist — a contract before and after a lawyer's edits, an essay before and after a round of feedback, a config file before and after a teammate's commit — the important question is rarely \"are these the same file\" but \"what exactly changed.\" Reading both versions side by side and trying to spot every added comma, deleted clause, or reworded sentence is slow and error-prone, especially once a document runs past a page or two. A diff checker automates that comparison and highlights precisely the words or lines that differ, so you can review a change in seconds instead of minutes.",
+    "p2": "This tool runs entirely in your browser. Both text boxes stay in memory on your device and the comparison itself is computed by a JavaScript diffing library running locally — nothing you type or paste is ever sent to a server, logged, or stored anywhere. That matters if you're comparing a client contract, a password file, or any text you'd rather not put through a third-party service. Close the tab and everything is gone; there's no history to worry about.",
+    "p3": "To use it, paste the original text on the left and the updated version on the right, then choose how you want the comparison broken down. Word mode treats the text as a stream of words and is best for prose — it highlights exactly which words were added, removed, or replaced inside a sentence. Line mode instead compares whole lines at a time, which is more useful for structured content like code, JSON, or line-by-line lists, where you care about which entire lines were added or removed rather than individual words within them. Press Compare and the result appears below, with removed text struck through on a red background and added text highlighted in green.",
+    "p4": "In practice this is handy for far more than proofreading. Developers use line mode to eyeball a code change before committing it, writers use word mode to see exactly what an editor rewrote in a paragraph, and anyone renegotiating a contract can paste in two drafts to confirm that only the agreed-upon clauses moved. If the two texts turn out to be identical, the tool tells you so directly instead of showing a blank, ambiguous result — one less thing to second-guess."
+  }
+}

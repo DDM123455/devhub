@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "title": "Textvergleich online kostenlos — Web Tool Hub",
+    "description": "Vergleichen Sie zwei Texte kostenlos und sehen Sie sofort jedes geänderte Wort oder jede geänderte Zeile. Alles läuft im Browser, nichts wird an einen Server gesendet."
+  },
+  "heading": "Textvergleich (Diff Checker)",
+  "tagline": "Fügen Sie zwei Textversionen ein und sehen Sie genau, was sich geändert hat — Wort für Wort oder Zeile für Zeile.",
+  "ui": {
+    "originalLabel": "Originaltext",
+    "changedLabel": "Geänderter Text",
+    "compare": "Vergleichen",
+    "modeWord": "Nach Wort",
+    "modeLine": "Nach Zeile",
+    "noChanges": "Keine Unterschiede gefunden — beide Texte sind identisch.",
+    "placeholder": "Text hier einfügen oder eingeben…"
+  },
+  "related": "Verwandte Tools",
+  "article": {
+    "heading": "Wozu dient ein Textvergleich?",
+    "p1": "Sobald zwei Versionen desselben Dokuments existieren — ein Vertrag vor und nach der Prüfung durch einen Anwalt, ein Text vor und nach einer Feedbackrunde, eine Konfigurationsdatei vor und nach dem Commit eines Kollegen —, lautet die eigentlich wichtige Frage fast nie 'sind diese Dateien gleich', sondern 'was genau hat sich geändert'. Beide Versionen nebeneinander zu lesen und jedes hinzugefügte Komma oder jeden umformulierten Satz von Hand zu finden, ist langsam und fehleranfällig, besonders wenn das Dokument mehr als eine Seite umfasst. Ein Textvergleich automatisiert genau das und hebt exakt die Wörter oder Zeilen hervor, die sich unterscheiden — eine Änderung lässt sich so in Sekunden statt Minuten prüfen.",
+    "p2": "Dieses Tool läuft vollständig in Ihrem Browser. Beide Textfelder bleiben ausschließlich im Speicher Ihres Geräts, und der Vergleich wird von einer lokal ausgeführten JavaScript-Bibliothek berechnet — nichts, was Sie eingeben oder einfügen, wird jemals an einen Server gesendet, protokolliert oder irgendwo gespeichert. Das ist wichtig, wenn Sie einen Kundenvertrag, eine Passwortdatei oder einen anderen sensiblen Text vergleichen, den Sie nicht durch einen externen Dienst schicken möchten. Schließen Sie den Tab, und alles ist verschwunden — es bleibt kein Verlauf zurück, um den man sich sorgen müsste.",
+    "p3": "Zur Nutzung fügen Sie den Originaltext links und die aktualisierte Version rechts ein und wählen dann, wie fein der Vergleich sein soll. Der Wortmodus behandelt den Text als Abfolge von Wörtern und eignet sich am besten für Fließtext: Er zeigt genau, welche Wörter innerhalb eines Satzes hinzugefügt, entfernt oder ersetzt wurden. Der Zeilenmodus vergleicht dagegen ganze Zeilen auf einmal, was für strukturierte Inhalte wie Code, JSON oder zeilenweise Listen nützlicher ist, wenn es darauf ankommt, welche ganzen Zeilen hinzugefügt oder entfernt wurden, statt einzelner Wörter darin. Klicken Sie auf Vergleichen, und das Ergebnis erscheint direkt darunter — entfernter Text durchgestrichen auf rotem Hintergrund, hinzugefügter Text grün hervorgehoben.",
+    "p4": "In der Praxis eignet sich das für weit mehr als Korrekturlesen. Entwickler nutzen den Zeilenmodus, um eine Codeänderung vor dem Commit zu überprüfen, Autoren nutzen den Wortmodus, um genau zu sehen, was ein Lektor in einem Absatz umformuliert hat, und wer einen Vertrag neu verhandelt, kann zwei Entwürfe einfügen, um zu bestätigen, dass sich nur die vereinbarten Klauseln geändert haben. Sind beide Texte identisch, teilt das Tool das direkt mit, statt ein leeres, mehrdeutiges Ergebnis anzuzeigen."
+  }
+}

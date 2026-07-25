@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "title": "Comparador de textos online grátis — Web Tool Hub",
+    "description": "Compare dois textos gratuitamente e veja na hora cada palavra ou linha que mudou. Tudo roda no seu navegador, sem enviar nada para nenhum servidor."
+  },
+  "heading": "Comparador de textos (Diff Checker)",
+  "tagline": "Cole duas versões de um texto e veja exatamente o que mudou, palavra por palavra ou linha por linha.",
+  "ui": {
+    "originalLabel": "Texto original",
+    "changedLabel": "Texto alterado",
+    "compare": "Comparar",
+    "modeWord": "Por palavra",
+    "modeLine": "Por linha",
+    "noChanges": "Nenhuma diferença encontrada — os dois textos são idênticos.",
+    "placeholder": "Cole ou digite o texto aqui…"
+  },
+  "related": "Ferramentas relacionadas",
+  "article": {
+    "heading": "Para que serve um comparador de textos?",
+    "p1": "Sempre que existem duas versões do mesmo documento — um contrato antes e depois da revisão de um advogado, um texto antes e depois de uma rodada de feedback, um arquivo de configuração antes e depois do commit de um colega —, a pergunta que realmente importa quase nunca é \"esses arquivos são iguais\", e sim \"o que exatamente mudou\". Ler as duas versões lado a lado tentando notar cada vírgula adicionada ou frase reescrita é lento e sujeito a erros, ainda mais quando o documento passa de uma página. Um comparador de textos automatiza essa tarefa e destaca com precisão as palavras ou linhas que diferem, transformando uma revisão de minutos em segundos.",
+    "p2": "Esta ferramenta roda inteiramente no seu navegador. As duas caixas de texto ficam apenas na memória do seu dispositivo, e a comparação é calculada por uma biblioteca JavaScript executada localmente — nada do que você digita ou cola é enviado a um servidor, registrado ou armazenado em lugar nenhum. Isso importa quando você está comparando um contrato com um cliente, um arquivo de senhas ou qualquer texto que prefira não passar por um serviço de terceiros. Feche a aba e tudo desaparece; não sobra histórico nenhum para se preocupar.",
+    "p3": "Para usar, cole o texto original à esquerda e a versão atualizada à direita, depois escolha como quer dividir a comparação. O modo por palavra trata o texto como uma sequência de palavras e é o mais indicado para prosa: mostra exatamente quais palavras foram adicionadas, removidas ou substituídas dentro de uma frase. O modo por linha compara linhas inteiras de cada vez, o que é mais útil para conteúdo estruturado como código, JSON ou listas linha a linha, quando o que importa é quais linhas inteiras foram adicionadas ou removidas, não as palavras isoladas dentro delas. Clique em Comparar e o resultado aparece logo abaixo, com o texto removido riscado sobre fundo vermelho e o texto adicionado destacado em verde.",
+    "p4": "Na prática, isso serve para muito mais do que revisar ortografia. Desenvolvedores usam o modo por linha para conferir uma mudança de código antes de um commit, redatores usam o modo por palavra para ver exatamente o que um editor reescreveu num parágrafo, e quem está renegociando um contrato pode colar dois rascunhos para confirmar que só as cláusulas combinadas foram alteradas. Se os dois textos forem idênticos, a ferramenta avisa isso diretamente, em vez de mostrar um resultado vazio e ambíguo."
+  }
+}
