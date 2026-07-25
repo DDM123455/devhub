@@ -18,7 +18,10 @@
     "noFiles": "Aucune image sélectionnée pour le moment.",
     "errorGeneric": "Une erreur est survenue lors de la conversion de cette image. Réessayez.",
     "errorAvifUnsupported": "Ce navigateur ne peut pas exporter en AVIF. Essayez une version récente de Chrome ou Firefox, ou choisissez un autre format.",
-    "formatsNote": "Le format ICO est redimensionné à un maximum de 256×256 (la taille d'icône standard). L'export AVIF nécessite une version récente de Chrome ou Firefox. Les photos HEIC/HEIF issues d'un iPhone sont lues automatiquement, sans étape de conversion séparée."
+    "formatsNote": "Le format ICO est redimensionné à un maximum de 256×256 (la taille d'icône standard). L'export AVIF nécessite une version récente de Chrome ou Firefox. Les photos HEIC/HEIF issues d'un iPhone sont lues automatiquement, sans étape de conversion séparée.",
+    "remove": "Retirer",
+    "clearAll": "Tout retirer",
+    "skippedFiles": "{{count}} fichier(s) ignoré(s) car ce n'est pas un format d'image pris en charge."
   },
   "related": "Outils associés",
   "article": {

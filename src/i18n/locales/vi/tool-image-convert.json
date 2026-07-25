@@ -18,7 +18,10 @@
     "noFiles": "Chưa chọn ảnh nào.",
     "errorGeneric": "Có lỗi khi chuyển đổi ảnh này. Vui lòng thử lại.",
     "errorAvifUnsupported": "Trình duyệt này chưa hỗ trợ xuất AVIF. Hãy thử bản Chrome hoặc Firefox mới, hoặc chọn định dạng khác.",
-    "formatsNote": "Ảnh ICO được tự động thu nhỏ về tối đa 256×256 (kích thước icon chuẩn). Xuất AVIF cần trình duyệt Chrome hoặc Firefox bản mới. Ảnh HEIC/HEIF từ iPhone được tự động đọc — không cần bước chuyển đổi riêng."
+    "formatsNote": "Ảnh ICO được tự động thu nhỏ về tối đa 256×256 (kích thước icon chuẩn). Xuất AVIF cần trình duyệt Chrome hoặc Firefox bản mới. Ảnh HEIC/HEIF từ iPhone được tự động đọc — không cần bước chuyển đổi riêng.",
+    "remove": "Xóa",
+    "clearAll": "Xóa tất cả",
+    "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ."
   },
   "related": "Công cụ liên quan",
   "article": {

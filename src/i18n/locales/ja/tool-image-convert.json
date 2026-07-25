@@ -18,7 +18,10 @@
     "noFiles": "まだ画像が選択されていません。",
     "errorGeneric": "この画像の変換中にエラーが発生しました。もう一度お試しください。",
     "errorAvifUnsupported": "このブラウザはAVIFの書き出しに対応していません。最新のChromeまたはFirefoxを試すか、別の形式を選んでください。",
-    "formatsNote": "ICO出力は標準アイコンサイズである最大256×256に自動リサイズされます。AVIF書き出しには最新のChromeまたはFirefoxが必要です。iPhoneのHEIC/HEIF写真は自動的に読み込まれ、別途変換する手順は不要です。"
+    "formatsNote": "ICO出力は標準アイコンサイズである最大256×256に自動リサイズされます。AVIF書き出しには最新のChromeまたはFirefoxが必要です。iPhoneのHEIC/HEIF写真は自動的に読み込まれ、別途変換する手順は不要です。",
+    "remove": "削除",
+    "clearAll": "すべて削除",
+    "skippedFiles": "対応していない画像形式のため、{{count}}件のファイルをスキップしました。"
   },
   "related": "関連ツール",
   "article": {

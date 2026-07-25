@@ -15,6 +15,9 @@ interface Messages {
 	errorGeneric: string;
 	errorAvifUnsupported: string;
 	formatsNote: string;
+	remove: string;
+	clearAll: string;
+	skippedFiles: string;
 }
 
 type TargetFormat =
@@ -222,23 +225,33 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 	const [quality, setQuality] = useState(0.8);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isDragOver, setIsDragOver] = useState(false);
+	const [skippedCount, setSkippedCount] = useState(0);
 
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList) return;
-		const newItems: ImageItem[] = Array.from(fileList)
-			.filter((file) => file.type.startsWith('image/') || isHeic(file))
-			.map((file) => ({
-				id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
-				file,
-				status: 'pending' as const,
-			}));
+		const allFiles = Array.from(fileList);
+		const acceptedFiles = allFiles.filter((file) => file.type.startsWith('image/') || isHeic(file));
+		setSkippedCount(allFiles.length - acceptedFiles.length);
+		const newItems: ImageItem[] = acceptedFiles.map((file) => ({
+			id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
+			file,
+			status: 'pending' as const,
+		}));
 		setItems((prev) => [...prev, ...newItems]);
+	}, []);
+
+	const handleRemove = useCallback((id: string) => {
+		setItems((prev) => prev.filter((item) => item.id !== id));
+	}, []);
+
+	const handleClearAll = useCallback(() => {
+		setItems([]);
+		setSkippedCount(0);
 	}, []);
 
 	const handleConvert = useCallback(async () => {
 		setIsProcessing(true);
 		for (const item of items) {
-			if (item.status === 'done') continue;
 			setItems((prev) =>
 				prev.map((it) => (it.id === item.id ? { ...it, status: 'processing' } : it)),
 			);
@@ -271,8 +284,7 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 		[targetFormat],
 	);
 
-	const canConvert =
-		!isProcessing && items.length > 0 && items.some((item) => item.status !== 'done');
+	const canConvert = !isProcessing && items.length > 0;
 
 	return (
 		<div className="flex flex-col gap-4 rounded-lg border border-border p-4">
@@ -307,6 +319,12 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 				/>
 				<p className="text-xs text-muted-foreground">{messages.dropHint}</p>
 			</div>
+
+			{skippedCount > 0 && (
+				<p className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
+					{messages.skippedFiles.replace('{{count}}', String(skippedCount))}
+				</p>
+			)}
 
 			<div className="flex flex-wrap items-center gap-3">
 				<label htmlFor="image-converter-format" className="shrink-0 text-sm text-foreground">
@@ -357,33 +375,52 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 							key={item.id}
 							className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-2 text-sm"
 						>
-							<span className="truncate text-foreground">{item.file.name}</span>
-							<span className="text-muted-foreground">
-								{messages.original}: {formatBytes(item.file.size)} ({item.file.type || '—'})
+							<div className="flex min-w-0 flex-1 flex-col gap-0.5">
+								<span className="truncate text-foreground">{item.file.name}</span>
+								<span className="text-muted-foreground">
+									{messages.original}: {formatBytes(item.file.size)} ({item.file.type || '—'})
+									{item.status === 'done' && item.resultBlob && (
+										<>
+											{' '}
+											→ {messages.converted}: {formatBytes(item.resultBlob.size)} ({targetFormat})
+										</>
+									)}
+									{item.status === 'error' && (
+										<span className="text-destructive"> {item.errorMessage ?? messages.errorGeneric}</span>
+									)}
+								</span>
+							</div>
+							<div className="flex shrink-0 items-center gap-2">
 								{item.status === 'done' && item.resultBlob && (
-									<>
-										{' '}
-										→ {messages.converted}: {formatBytes(item.resultBlob.size)} ({targetFormat})
-									</>
+									<Button type="button" size="sm" onClick={() => handleDownload(item)}>
+										{messages.download}
+									</Button>
 								)}
-								{item.status === 'error' && (
-									<span className="text-destructive"> {item.errorMessage ?? messages.errorGeneric}</span>
-								)}
-							</span>
-							{item.status === 'done' && item.resultBlob && (
-								<Button type="button" size="sm" onClick={() => handleDownload(item)}>
-									{messages.download}
+								<Button
+									type="button"
+									size="sm"
+									variant="ghost"
+									onClick={() => handleRemove(item.id)}
+									disabled={item.status === 'processing'}
+									aria-label={messages.remove}
+								>
+									✕
 								</Button>
-							)}
+							</div>
 						</li>
 					))}
 				</ul>
 			)}
 
-			<div>
+			<div className="flex flex-wrap items-center gap-3">
 				<Button type="button" onClick={handleConvert} disabled={!canConvert}>
 					{isProcessing ? messages.converting : messages.convert}
 				</Button>
+				{items.length > 0 && (
+					<Button type="button" variant="outline" onClick={handleClearAll} disabled={isProcessing}>
+						{messages.clearAll}
+					</Button>
+				)}
 			</div>
 		</div>
 	);

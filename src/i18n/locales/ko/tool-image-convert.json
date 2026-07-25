@@ -18,7 +18,10 @@
     "noFiles": "아직 선택된 이미지가 없습니다.",
     "errorGeneric": "이 이미지를 변환하는 중 오류가 발생했습니다. 다시 시도해 주세요.",
     "errorAvifUnsupported": "이 브라우저는 AVIF 내보내기를 지원하지 않습니다. 최신 Chrome이나 Firefox를 사용하거나 다른 형식을 선택해 주세요.",
-    "formatsNote": "ICO 출력은 표준 아이콘 크기인 최대 256×256으로 자동 조정됩니다. AVIF 내보내기에는 최신 Chrome 또는 Firefox가 필요합니다. 아이폰의 HEIC/HEIF 사진은 별도 변환 과정 없이 자동으로 읽힙니다."
+    "formatsNote": "ICO 출력은 표준 아이콘 크기인 최대 256×256으로 자동 조정됩니다. AVIF 내보내기에는 최신 Chrome 또는 Firefox가 필요합니다. 아이폰의 HEIC/HEIF 사진은 별도 변환 과정 없이 자동으로 읽힙니다.",
+    "remove": "삭제",
+    "clearAll": "전체 삭제",
+    "skippedFiles": "지원되지 않는 이미지 형식이라 {{count}}개 파일을 건너뛰었습니다."
   },
   "related": "관련 도구",
   "article": {
