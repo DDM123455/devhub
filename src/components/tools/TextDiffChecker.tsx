@@ -320,7 +320,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 			<div className="flex flex-col gap-4 rounded-lg border border-border p-4">
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 					<div className="flex flex-col gap-2">
-						<div className="flex items-center justify-between">
+						<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
 							<label htmlFor="text-diff-original" className="text-sm font-medium text-foreground">
 								{messages.originalLabel}
 							</label>
@@ -354,7 +354,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 						/>
 					</div>
 					<div className="flex flex-col gap-2">
-						<div className="flex items-center justify-between">
+						<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
 							<label htmlFor="text-diff-changed" className="text-sm font-medium text-foreground">
 								{messages.changedLabel}
 							</label>
@@ -479,7 +479,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 					<h2 className="text-sm font-semibold text-foreground">{messages.mergeToolHeading}</h2>
 					<div className="grid grid-cols-1 gap-0 md:grid-cols-[1fr_2.5rem_1fr]">
 						<div ref={mergeLeftContainerRef} className={`flex flex-col gap-2 ${isMergeLeftFullscreen ? 'bg-background p-4' : ''}`}>
-							<div className="flex items-center justify-between">
+							<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
 								<span className="text-sm font-medium text-foreground">{messages.mergeLeftHeading}</span>
 								<div className="flex gap-1">
 									<Button type="button" size="sm" variant="ghost" onClick={() => handleCopy('left', mergedLeftText)}>
@@ -544,7 +544,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 						</div>
 
 						<div ref={mergeRightContainerRef} className={`flex flex-col gap-2 ${isMergeRightFullscreen ? 'bg-background p-4' : ''}`}>
-							<div className="flex items-center justify-between">
+							<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
 								<span className="text-sm font-medium text-foreground">{messages.mergeRightHeading}</span>
 								<div className="flex gap-1">
 									<Button type="button" size="sm" variant="ghost" onClick={() => handleCopy('right', mergedRightText)}>
