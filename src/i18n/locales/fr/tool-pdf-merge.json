@@ -18,7 +18,8 @@
     "loadingThumbnails": "Lecture des pages…",
     "dragHint": "Glissez n'importe quelle page pour la réorganiser, ou utilisez les flèches.",
     "noFiles": "Aucun fichier PDF sélectionné pour le moment.",
-    "errorGeneric": "Une erreur est survenue lors de la lecture de ce PDF. Vérifiez qu'il n'est ni corrompu ni protégé par un mot de passe, puis réessayez."
+    "errorGeneric": "Une erreur est survenue lors de la lecture de ce PDF. Vérifiez qu'il n'est ni corrompu ni protégé par un mot de passe, puis réessayez.",
+    "skippedFiles": "{{count}} fichier(s) ignoré(s) car ce n'est pas un PDF."
   },
   "related": "Outils associés",
   "article": {

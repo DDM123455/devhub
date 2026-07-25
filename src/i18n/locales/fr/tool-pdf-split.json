@@ -25,6 +25,7 @@
     "splitting": "Division en cours…",
     "resultsHeading": "Fichiers résultants",
     "download": "Télécharger",
+    "downloadAll": "Tout télécharger (.zip)",
     "errorGeneric": "Une erreur est survenue lors de la lecture de ce PDF. Vérifiez qu'il n'est ni corrompu ni protégé par un mot de passe, puis réessayez.",
     "errorInvalidRange": "La plage de pages « {{range}} » n'est pas valide. Utilisez un format comme 1-3, 4, 5-7, avec des pages comprises entre 1 et {{max}}.",
     "errorInvalidEveryN": "Saisissez un nombre entier de 1 ou plus."

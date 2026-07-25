@@ -18,7 +18,8 @@
     "loadingThumbnails": "Lendo páginas…",
     "dragHint": "Arraste qualquer página para reordenar, ou use as setas.",
     "noFiles": "Nenhum arquivo PDF selecionado ainda.",
-    "errorGeneric": "Algo deu errado ao ler este PDF. Verifique se ele não está corrompido ou protegido por senha e tente novamente."
+    "errorGeneric": "Algo deu errado ao ler este PDF. Verifique se ele não está corrompido ou protegido por senha e tente novamente.",
+    "skippedFiles": "{{count}} arquivo(s) foram ignorados por não serem um PDF."
   },
   "related": "Ferramentas relacionadas",
   "article": {

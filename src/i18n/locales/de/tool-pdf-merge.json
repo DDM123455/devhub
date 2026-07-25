@@ -18,7 +18,8 @@
     "loadingThumbnails": "Seiten werden gelesen…",
     "dragHint": "Ziehe eine beliebige Seite, um sie umzusortieren, oder nutze die Pfeile.",
     "noFiles": "Noch keine PDF-Dateien ausgewählt.",
-    "errorGeneric": "Beim Lesen dieser PDF ist ein Fehler aufgetreten. Prüfe, ob die Datei beschädigt oder passwortgeschützt ist, und versuche es erneut."
+    "errorGeneric": "Beim Lesen dieser PDF ist ein Fehler aufgetreten. Prüfe, ob die Datei beschädigt oder passwortgeschützt ist, und versuche es erneut.",
+    "skippedFiles": "{{count}} Datei(en) wurden übersprungen, da es sich nicht um ein PDF handelt."
   },
   "related": "Ähnliche Tools",
   "article": {

@@ -23,6 +23,7 @@ interface Messages {
 	splitting: string;
 	resultsHeading: string;
 	download: string;
+	downloadAll: string;
 	errorGeneric: string;
 	errorInvalidRange: string;
 	errorInvalidEveryN: string;
@@ -106,6 +107,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [results, setResults] = useState<ResultFile[]>([]);
 	const [error, setError] = useState<string | null>(null);
+	const [isZipping, setIsZipping] = useState(false);
 
 	const loadFile = useCallback(async (candidate: File) => {
 		setError(null);
@@ -221,6 +223,24 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 		link.click();
 		URL.revokeObjectURL(url);
 	}, []);
+
+	const handleDownloadAll = useCallback(async () => {
+		setIsZipping(true);
+		try {
+			const { default: JSZip } = await import('jszip');
+			const zip = new JSZip();
+			for (const result of results) zip.file(result.label, result.blob);
+			const zipBlob = await zip.generateAsync({ type: 'blob' });
+			const url = URL.createObjectURL(zipBlob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = 'split-pages.zip';
+			link.click();
+			URL.revokeObjectURL(url);
+		} finally {
+			setIsZipping(false);
+		}
+	}, [results]);
 
 	const canSplit = !isProcessing && file !== null && pages.length > 0;
 
@@ -369,8 +389,15 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 
 			{results.length > 0 && (
 				<div className="flex flex-col gap-2">
-					<h3 className="text-sm font-semibold text-foreground">{messages.resultsHeading}</h3>
-					<ul className="flex flex-col gap-2">
+					<div className="flex flex-wrap items-center justify-between gap-2">
+						<h3 className="text-sm font-semibold text-foreground">{messages.resultsHeading}</h3>
+						{results.length > 1 && (
+							<Button type="button" size="sm" variant="outline" onClick={handleDownloadAll} disabled={isZipping}>
+								{messages.downloadAll}
+							</Button>
+						)}
+					</div>
+					<ul id="split-results" className="flex flex-col gap-2">
 						{results.map((result) => (
 							<li
 								key={result.id}

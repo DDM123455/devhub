@@ -18,7 +18,8 @@
     "loadingThumbnails": "Leyendo páginas…",
     "dragHint": "Arrastra cualquier página para reordenarla, o usa las flechas.",
     "noFiles": "Aún no has seleccionado ningún archivo PDF.",
-    "errorGeneric": "Ocurrió un error al leer este PDF. Comprueba que no esté dañado ni protegido con contraseña e inténtalo de nuevo."
+    "errorGeneric": "Ocurrió un error al leer este PDF. Comprueba que no esté dañado ni protegido con contraseña e inténtalo de nuevo.",
+    "skippedFiles": "Se omitieron {{count}} archivo(s) porque no son un PDF."
   },
   "related": "Herramientas relacionadas",
   "article": {

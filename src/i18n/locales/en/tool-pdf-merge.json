@@ -18,7 +18,8 @@
     "loadingThumbnails": "Reading pages…",
     "dragHint": "Drag any page to reorder it, or use the arrow buttons.",
     "noFiles": "No PDF files selected yet.",
-    "errorGeneric": "Something went wrong reading this PDF. Make sure it isn't corrupted or password-protected, then try again."
+    "errorGeneric": "Something went wrong reading this PDF. Make sure it isn't corrupted or password-protected, then try again.",
+    "skippedFiles": "{{count}} file(s) were skipped because they're not a PDF."
   },
   "related": "Related tools",
   "article": {

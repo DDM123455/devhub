@@ -25,6 +25,7 @@
     "splitting": "Splitting…",
     "resultsHeading": "Result files",
     "download": "Download",
+    "downloadAll": "Download All (.zip)",
     "errorGeneric": "Something went wrong reading this PDF. Make sure it isn't corrupted or password-protected, then try again.",
     "errorInvalidRange": "Invalid page range \"{{range}}\". Use a format like 1-3, 4, 5-7, with pages between 1 and {{max}}.",
     "errorInvalidEveryN": "Enter a whole number of 1 or more."

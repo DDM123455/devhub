@@ -17,6 +17,7 @@ interface Messages {
 	dragHint: string;
 	noFiles: string;
 	errorGeneric: string;
+	skippedFiles: string;
 }
 
 interface PageItem {
@@ -42,12 +43,15 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 	const [dragPageId, setDragPageId] = useState<string | null>(null);
 	const [mergedBlob, setMergedBlob] = useState<Blob | null>(null);
 	const [mergeError, setMergeError] = useState<string | null>(null);
+	const [skippedCount, setSkippedCount] = useState(0);
 
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList) return;
-		const newFiles = Array.from(fileList).filter(
+		const allFiles = Array.from(fileList);
+		const newFiles = allFiles.filter(
 			(file) => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'),
 		);
+		setSkippedCount(allFiles.length - newFiles.length);
 		if (newFiles.length === 0) return;
 		setMergedBlob(null);
 		setMergeError(null);
@@ -205,6 +209,12 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 				/>
 				<p className="text-xs text-muted-foreground">{messages.dropHint}</p>
 			</div>
+
+			{skippedCount > 0 && (
+				<p className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
+					{messages.skippedFiles.replace('{{count}}', String(skippedCount))}
+				</p>
+			)}
 
 			{files.some((f) => f.status === 'loading') && (
 				<p className="text-sm text-muted-foreground">{messages.loadingThumbnails}</p>
