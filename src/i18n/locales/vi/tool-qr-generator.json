@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "title": "Tạo mã QR miễn phí trực tuyến — Web Tool Hub",
+    "description": "Tạo mã QR tùy chỉnh với màu sắc riêng và logo ở giữa, miễn phí, xử lý hoàn toàn trên trình duyệt. Tải xuống PNG ngay lập tức — không upload, không cần đăng ký, không bị theo dõi."
+  },
+  "heading": "Tạo mã QR",
+  "tagline": "Tạo mã QR tùy chỉnh với màu sắc và logo riêng, ngay trên trình duyệt của bạn.",
+  "ui": {
+    "textLabel": "Văn bản hoặc URL",
+    "textPlaceholder": "https://example.com",
+    "fgColorLabel": "Màu chính",
+    "bgColorLabel": "Màu nền",
+    "sizeLabel": "Kích thước: {{size}}px",
+    "logoLabel": "Logo (không bắt buộc)",
+    "removeLogo": "Xóa logo",
+    "download": "Tải xuống PNG"
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Vì sao nên tạo mã QR ngay trên máy thay vì qua một công cụ \"miễn phí\" có theo dõi?",
+    "p1": "Mã QR xuất hiện ở khắp mọi nơi — trên danh thiếp, thực đơn nhà hàng, mật khẩu Wi-Fi dán trên router, poster sự kiện. Nhiều trang \"tạo mã QR\" miễn phí thực ra không mã hóa trực tiếp đường link của bạn; thay vào đó chúng tạo một link rút gọn trỏ về máy chủ của chính họ rồi mã hóa link đó, nghĩa là mỗi lần quét sẽ âm thầm đi qua — và bị ghi lại — bởi một công ty bạn chưa từng nghe tên. Nếu công ty đó ngừng dịch vụ redirect, mọi mã QR bạn từng in ra sẽ lặng lẽ ngừng hoạt động, kể cả nhiều năm sau.",
+    "p2": "Công cụ này không làm vậy. Nó dùng qrcode.react để mã hóa trực tiếp đúng văn bản hoặc URL bạn nhập vào ngay trong hoa văn mã QR, render lên canvas HTML hoàn toàn trong trình duyệt của bạn. Không có máy chủ trung gian, không redirect, không theo dõi lượt quét — vì đơn giản là không có gì để một máy chủ đứng giữa cả. Mã bạn tải về sẽ tiếp tục hoạt động chừng nào máy đọc QR còn tồn tại, hoàn toàn độc lập với trang web này.",
+    "p3": "Gõ văn bản hoặc URL bạn muốn mã hóa, rồi chọn màu chính và màu nền theo đúng thương hiệu của bạn. Upload một hình ảnh để đặt logo ở giữa — công cụ tự động nâng mức sửa lỗi của mã QR lên mức cao nhất (mức H, dự phòng khoảng 30%) mỗi khi có logo, giúp mã vẫn quét được ổn định dù một phần hoa văn bị che. Điều chỉnh thanh trượt kích thước cho phù hợp nhu cầu, từ nhãn dán nhỏ tới poster lớn, rồi bấm Tải xuống PNG.",
+    "p4": "Có vài yếu tố ảnh hưởng tới việc mã QR có quét được tốt trong thực tế hay không: giữ đủ độ tương phản giữa màu chính và màu nền — màu xám nhạt trên nền trắng trông đẹp nhưng thường không quét được — và tránh để logo quá to so với mã, vì ngay cả mức sửa lỗi cao nhất cũng có giới hạn. Nếu bạn mã hóa một URL dài, hãy cân nhắc rút gọn trước; mã QR cho văn bản ngắn sẽ có lưới đơn giản, ít dày đặc hơn, giúp camera điện thoại bắt nét dễ hơn nhiều so với mã phức tạp cho văn bản dài. Nếu bạn cũng làm việc với dữ liệu có cấu trúc phía dev, công cụ Định dạng & kiểm tra JSON xử lý theo đúng nguyên tắc tại chỗ, ưu tiên quyền riêng tư tương tự."
+  }
+}

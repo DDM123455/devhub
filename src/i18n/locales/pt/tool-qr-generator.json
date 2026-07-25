@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "title": "Gerador de código QR grátis online — Web Tool Hub",
+    "description": "Crie um código QR personalizado com suas próprias cores e um logo no centro, de graça e direto no seu navegador. Baixe como PNG na hora — sem upload, sem cadastro, sem rastreamento."
+  },
+  "heading": "Gerador de código QR",
+  "tagline": "Crie um código QR personalizado com suas próprias cores e logo, direto no seu navegador.",
+  "ui": {
+    "textLabel": "Texto ou URL",
+    "textPlaceholder": "https://exemplo.com",
+    "fgColorLabel": "Cor principal",
+    "bgColorLabel": "Cor de fundo",
+    "sizeLabel": "Tamanho: {{size}}px",
+    "logoLabel": "Logo (opcional)",
+    "removeLogo": "Remover logo",
+    "download": "Baixar PNG"
+  },
+  "related": "Ferramentas relacionadas",
+  "article": {
+    "heading": "Por que gerar códigos QR localmente em vez de usar um serviço \"grátis\" que rastreia?",
+    "p1": "Códigos QR aparecem em toda parte — em um cartão de visita, no cardápio de um restaurante, na senha do Wi-Fi colada no roteador, em um cartaz de evento. Muitos sites gratuitos de \"gerador de código QR\" na verdade não codificam seu link diretamente; em vez disso, geram um link curto para o próprio servidor deles e codificam esse link, então cada leitura passa discretamente por — e é registrada por — uma empresa que você nunca ouviu falar. Se essa empresa encerrar o serviço de redirecionamento, todo código QR que você já imprimiu para de funcionar silenciosamente, mesmo anos depois.",
+    "p2": "Esta ferramenta não faz isso. Ela usa o qrcode.react para codificar seu texto ou URL exatos diretamente no próprio padrão do código QR, renderizado em um canvas HTML totalmente dentro do seu navegador. Não há servidor intermediário, nem redirecionamento, nem rastreamento de leituras, porque não há nada para um servidor se intrometer: o código que você baixar vai continuar funcionando enquanto existirem leitores de QR, totalmente independente deste site.",
+    "p3": "Digite o texto ou a URL que você quer codificar e escolha uma cor principal e de fundo de acordo com sua marca. Envie uma imagem para colocar um logo no centro — a ferramenta aumenta automaticamente o nível de correção de erros do código QR para o mais alto (nível H, com cerca de 30% de redundância) sempre que há um logo, o que mantém o código lido de forma confiável mesmo com parte do padrão coberta. Ajuste o controle deslizante de tamanho conforme seu uso, de um pequeno adesivo a um cartaz grande, e clique em Baixar PNG.",
+    "p4": "Algumas coisas afetam se um código QR realmente é lido bem na prática: mantenha contraste suficiente entre a cor principal e a de fundo — um cinza claro sobre fundo branco fica bonito, mas costuma falhar na leitura — e evite deixar o logo grande demais em relação ao código, já que mesmo o nível mais alto de correção de erros tem limites. Se você está codificando uma URL longa, considere encurtá-la antes; códigos QR para textos curtos ficam com uma grade mais simples e menos densa, mais fácil para a câmera do celular focar do que uma muito longa e complexa. Se você também trabalha com dados estruturados no lado de desenvolvimento, a ferramenta Formatador e validador JSON funciona com a mesma abordagem local focada em privacidade."
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "title": "Générateur de QR code gratuit en ligne — Web Tool Hub",
+    "description": "Créez un QR code personnalisé avec vos propres couleurs et un logo au centre, gratuitement et directement dans votre navigateur. Téléchargez-le en PNG instantanément — sans envoi sur un serveur, sans inscription, sans suivi."
+  },
+  "heading": "Générateur de QR code",
+  "tagline": "Créez un QR code personnalisé avec vos propres couleurs et logo, directement dans votre navigateur.",
+  "ui": {
+    "textLabel": "Texte ou URL",
+    "textPlaceholder": "https://exemple.com",
+    "fgColorLabel": "Couleur principale",
+    "bgColorLabel": "Couleur de fond",
+    "sizeLabel": "Taille : {{size}}px",
+    "logoLabel": "Logo (facultatif)",
+    "removeLogo": "Retirer le logo",
+    "download": "Télécharger le PNG"
+  },
+  "related": "Outils associés",
+  "article": {
+    "heading": "Pourquoi générer des QR codes en local plutôt qu'avec un service « gratuit » qui vous piste ?",
+    "p1": "Les QR codes se retrouvent partout : sur une carte de visite, le menu d'un restaurant, un mot de passe Wi-Fi collé sur la box, une affiche d'événement. De nombreux sites gratuits de « générateur de QR code » n'encodent en réalité pas votre lien directement ; ils génèrent plutôt un lien court vers leur propre serveur et encodent celui-ci, si bien que chaque scan transite discrètement par — et est enregistré par — une entreprise dont vous n'avez jamais entendu parler. Si cette entreprise arrête son service de redirection, tous les QR codes que vous avez imprimés cessent silencieusement de fonctionner, parfois des années plus tard.",
+    "p2": "Cet outil ne fait pas cela. Il utilise qrcode.react pour encoder votre texte ou URL exact directement dans le motif même du QR code, rendu sur un canvas HTML entièrement dans votre navigateur. Il n'y a aucun serveur intermédiaire, aucune redirection, aucun suivi des scans, parce qu'il n'y a rien dans quoi un serveur pourrait s'interposer : le code que vous téléchargez continuera de fonctionner tant que des lecteurs de QR code existeront, en toute indépendance de ce site.",
+    "p3": "Tapez le texte ou l'URL à encoder, puis choisissez une couleur principale et une couleur de fond assorties à votre identité visuelle. Importez une image pour placer un logo au centre — l'outil augmente automatiquement le niveau de correction d'erreur du QR code à son réglage maximal (niveau H, environ 30 % de redondance) dès qu'un logo est présent, ce qui garde le code lisible de façon fiable même avec une partie du motif recouverte. Ajustez le curseur de taille selon votre usage, d'un petit autocollant à une grande affiche, puis cliquez sur Télécharger le PNG.",
+    "p4": "Plusieurs éléments influencent la lisibilité réelle d'un QR code : conservez un contraste suffisant entre vos couleurs principale et de fond — un gris clair sur fond blanc est esthétique mais échoue souvent au scan — et évitez un logo trop grand par rapport au code, car même le niveau de correction d'erreur le plus élevé a ses limites. Si vous encodez une URL longue, envisagez de la raccourcir au préalable : les QR codes pour un texte court affichent une grille plus simple et moins dense, plus facile à cadrer pour l'appareil photo d'un téléphone qu'un motif long et complexe. Si vous travaillez aussi avec des données structurées côté développement, l'outil Formateur et validateur JSON fonctionne selon la même approche locale et respectueuse de la vie privée."
+  }
+}

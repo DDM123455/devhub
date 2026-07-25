@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "title": "QR Code Generator Online Free — Web Tool Hub",
+    "description": "Create a custom QR code with your own colors and a logo in the center, free and entirely in your browser. Download as PNG instantly — no upload, no signup, no tracking."
+  },
+  "heading": "QR Code Generator",
+  "tagline": "Create a custom QR code with your own colors and logo, right in your browser.",
+  "ui": {
+    "textLabel": "Text or URL",
+    "textPlaceholder": "https://example.com",
+    "fgColorLabel": "Foreground color",
+    "bgColorLabel": "Background color",
+    "sizeLabel": "Size: {{size}}px",
+    "logoLabel": "Logo (optional)",
+    "removeLogo": "Remove logo",
+    "download": "Download PNG"
+  },
+  "related": "Related tools",
+  "article": {
+    "heading": "Why generate QR codes locally instead of through a \"free\" tracker?",
+    "p1": "QR codes end up everywhere — a business card, a restaurant menu, a Wi-Fi password taped to a router, a poster for an event. Many free \"QR code generator\" sites don't actually encode your link directly; instead they generate a short link to their own server and encode that, so every scan is quietly routed through — and logged by — a company you've never heard of. If that company ever shuts the redirect service down, every QR code you ever printed silently stops working, even years later.",
+    "p2": "This tool doesn't do that. It uses qrcode.react to encode your exact text or URL directly into the QR code pattern itself, rendered onto an HTML canvas entirely in your browser. There's no intermediary server, no redirect, and no scan tracking, because there's nothing for a server to be in the middle of — the code you download will keep working for as long as QR readers exist, completely independent of this website.",
+    "p3": "Type the text or URL you want to encode, then pick a foreground and background color to match your branding. Upload an image to place a logo in the center — the tool automatically increases the QR code's error correction level to its highest setting (level H, roughly 30% redundancy) whenever a logo is present, which keeps the code reliably scannable even with a chunk of the pattern covered. Adjust the size slider to fit your use case, from a small sticker to a large poster, then press Download PNG.",
+    "p4": "A couple of things affect whether a QR code actually scans well in practice: keep enough contrast between your foreground and background colors — a light gray on white background looks nice but often fails to scan — and avoid making the logo too large relative to the code, since even the highest error correction level has limits. If you're encoding a long URL, consider shortening it first; QR codes for short text render as a simpler, denser-looking grid that's easier for phone cameras to lock onto than a very long, complex one. If you also work with structured data on the developer side, the JSON Formatter & Validator tool handles that with the same local, privacy-first approach."
+  }
+}

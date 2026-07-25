@@ -5,9 +5,10 @@
 
 ## 🔵 Trạng thái hiện tại
 
-- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (8/10 xong)
-- Task tiếp theo cần làm: Công cụ #9 "QR Code Generator" (tùy chỉnh màu, logo giữa) dùng
-  `qrcode.react` + Canvas (xem `ROADMAP.md` Phase 1).
+- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (9/10 xong)
+- Task tiếp theo cần làm: Công cụ #10 "Chuyển đổi Case văn bản"
+  (upper/lower/Title/camelCase/snake_case) dùng JS thuần (xem `ROADMAP.md` Phase 1) — TASK
+  CUỐI CÙNG của Phase 1.
 - Ghi chú dependency: đã chọn **jsoneditor** (không phải Monaco) cho tool #8 — nhẹ hơn
   nhiều, phù hợp triết lý Lighthouse/hiệu năng của dự án. Dùng bản **minimalist**
   (`jsoneditor/dist/jsoneditor-minimalist.js`, ~70KB gzip thay vì ~210KB bản đầy đủ) vì
@@ -15,6 +16,13 @@
   độ `text`/`tree` đã đủ cho "Formatter & Validator". Có file khai báo type riêng
   `src/types/jsoneditor-minimalist.d.ts` (tái dùng type từ `@types/jsoneditor` vì package
   gốc không export type cho subpath `dist/jsoneditor-minimalist.js`).
+- Ghi chú kỹ thuật (từ tool #8): thư viện vanilla-JS nào chạm vào global browser-only
+  (`self`, `window`, `document`) ngay ở module scope SẼ LÀM CRASH `npm run build` (không
+  chỉ warning) vì Astro SSR-render component `client:load` một lần trong lúc build để sinh
+  HTML tĩnh, và bước đó chạy trong Node — không có các global đó. Cách sửa chuẩn: nạp thư
+  viện bằng `await import(...)` (dynamic import) BÊN TRONG `useEffect` thay vì `import`
+  tĩnh ở đầu file, vì effect không chạy trong lượt SSR của React. Nhớ áp dụng cho mọi thư
+  viện non-React tương tự ở các tool sau nếu có.
 - Ghi chú kiến trúc tool page: `src/pages/[locale]/tools/[slug].astro` giờ rẽ nhánh theo
   `toolId` — nếu là tool đã có UI thật thì render component riêng
   (`src/components/tools/<Ten>Page.astro`), còn lại vẫn rơi vào nhánh "coming soon" mặc
@@ -59,6 +67,45 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 1, công cụ #9: QR Code Generator
+- Đã làm:
+  - Cài `qrcode.react` (đã kèm sẵn type TypeScript, không cần `@types` riêng như
+    `jsoneditor`). Component `QRCodeCanvas` của thư viện này có sẵn prop `imageSettings`
+    (src/height/width/excavate) — đúng khớp yêu cầu "logo giữa" của `ROADMAP.md`, không
+    cần tự viết logic vẽ logo đè lên canvas bằng tay.
+  - Tạo `src/components/tools/QrCodeGenerator.tsx` (React, `client:load`): ô nhập
+    text/URL, 2 input `type="color"` (màu chính/màu nền), thanh trượt kích thước
+    (128-512px), input file chọn logo (đọc qua `FileReader.readAsDataURL` — không upload
+    đi đâu), nút xóa logo, nút tải PNG (lấy `canvasRef.current.toDataURL('image/png')` —
+    `QRCodeCanvas` forward ref thẳng ra thẻ `<canvas>` nên không cần `querySelector`).
+    Luôn set `level="H"` (mức sửa lỗi cao nhất, ~30% dự phòng) vì logo đè lên giữa mã sẽ
+    che mất một phần dữ liệu — mức H đảm bảo mã vẫn quét được.
+  - Tạo `src/components/tools/QrCodeGeneratorPage.astro`: theo khuôn các trang tool
+    trước, JSON-LD `WebApplication` (`DeveloperApplication`), nội dung hướng dẫn 4
+    đoạn/ngôn ngữ giải thích vì sao nên tạo QR tại chỗ thay vì qua dịch vụ rút gọn link có
+    theo dõi, link tới tool cùng category `dev` (JSON Formatter).
+  - Tạo 8 file dictionary i18n `tool-qr-generator.json`.
+  - Sửa `src/pages/[locale]/tools/[slug].astro` thêm nhánh `toolId === 'qr-generator'`.
+  - `npm run build` sinh đủ 89 trang không lỗi ngay từ lần đầu (không gặp vấn đề SSR như
+    tool #8 vì `qrcode.react` là component React chuẩn, không đụng global browser-only ở
+    module scope).
+- Quyết định kỹ thuật quan trọng:
+  - Không tự vẽ QR code bằng canvas tay (dù `ROADMAP.md` có nhắc "Canvas") — dùng
+    `QRCodeCanvas` của `qrcode.react` vì nó ĐÃ render ra đúng 1 thẻ `<canvas>` HTML thật
+    (đáp ứng đúng yêu cầu công nghệ), tự lo phần mã hóa QR (thuật toán Reed-Solomon phức
+    tạp) và excavate vùng logo — tự viết lại từ đầu là việc thừa, rủi ro cao hơn.
+  - Mặc định luôn dùng `level="H"` kể cả khi không có logo — đơn giản hóa logic (không cần
+    tính lại mức sửa lỗi mỗi khi bật/tắt logo), và mức H không có nhược điểm đáng kể ngoài
+    mã hơi dày hơn cho cùng nội dung, chấp nhận được.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Chưa test tương tác thật (đổi màu, upload logo thật, quét thử mã QR bằng điện thoại)
+    trên trình duyệt thật — chỉ verify qua `npm run build` + đọc HTML tĩnh.
+  - Chưa validate URL hợp lệ hay giới hạn độ dài text đầu vào — người dùng nhập gì cũng
+    được mã hóa (kể cả text thường, không nhất thiết phải là URL), đúng tinh thần tên tool
+    "QR Code Generator" chung chung, không giới hạn riêng cho URL.
+- Task tiếp theo: Phase 1, công cụ #10 (CUỐI CÙNG) "Chuyển đổi Case văn bản"
+  (upper/lower/Title/camelCase/snake_case), JS thuần.
 
 ### 2026-07-25 — Phase 1, công cụ #8: JSON Formatter & Validator
 - Đã làm:

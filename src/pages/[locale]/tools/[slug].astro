@@ -8,6 +8,7 @@ import PdfSplitPage from '@/components/tools/PdfSplitPage.astro';
 import TextDiffPage from '@/components/tools/TextDiffPage.astro';
 import WordCounterPage from '@/components/tools/WordCounterPage.astro';
 import JsonFormatterPage from '@/components/tools/JsonFormatterPage.astro';
+import QrCodeGeneratorPage from '@/components/tools/QrCodeGeneratorPage.astro';
 import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { tools } from '@/data/tools';
@@ -45,6 +46,8 @@ const name = tool.names[locale];
 		<WordCounterPage lang={locale} />
 	) : toolId === 'json-formatter' ? (
 		<JsonFormatterPage lang={locale} />
+	) : toolId === 'qr-generator' ? (
+		<QrCodeGeneratorPage lang={locale} />
 	) : (
 		<Layout title={`${name} — Web Tool Hub`} description={name} lang={locale}>
 			<section class="px-4 py-10">
