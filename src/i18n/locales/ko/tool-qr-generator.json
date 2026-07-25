@@ -47,7 +47,8 @@
     "removeLogo": "로고 제거",
     "pngResolutionLabel": "PNG 해상도",
     "downloadPng": "PNG 다운로드",
-    "downloadSvg": "SVG 다운로드"
+    "downloadSvg": "SVG 다운로드",
+    "errorTooLong": "이 내용은 현재 오류 복원 수준에서 QR 코드에 담기에 너무 깁니다. 내용을 줄이거나 아래 오류 복원 수준을 낮춰 보세요."
   },
   "related": "관련 도구",
   "article": {

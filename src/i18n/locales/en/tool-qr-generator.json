@@ -47,7 +47,8 @@
     "removeLogo": "Remove logo",
     "pngResolutionLabel": "PNG resolution",
     "downloadPng": "Download PNG",
-    "downloadSvg": "Download SVG"
+    "downloadSvg": "Download SVG",
+    "errorTooLong": "This content is too long to fit in a QR code at the current error correction level. Try shortening it, or lower the error correction level below."
   },
   "related": "Related tools",
   "article": {

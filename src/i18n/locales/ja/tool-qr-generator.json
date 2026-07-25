@@ -47,7 +47,8 @@
     "removeLogo": "ロゴを削除",
     "pngResolutionLabel": "PNG解像度",
     "downloadPng": "PNGをダウンロード",
-    "downloadSvg": "SVGをダウンロード"
+    "downloadSvg": "SVGをダウンロード",
+    "errorTooLong": "この内容は現在の誤り訂正レベルではQRコードに収まらないほど長すぎます。内容を短くするか、下の誤り訂正レベルを下げてください。"
   },
   "related": "関連ツール",
   "article": {

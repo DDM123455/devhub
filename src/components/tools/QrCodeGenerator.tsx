@@ -1,6 +1,25 @@
-import { useMemo, useRef, useState } from 'react';
+import { Component, useMemo, useRef, useState, type ReactNode } from 'react';
 import { QRCodeCanvas, QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
+
+// qrcode.react throws a plain RangeError ("Data too long") when the payload
+// doesn't fit the QR code's capacity at the chosen error-correction level —
+// with no error boundary that uncaught render error unmounts this entire
+// component (React's default behavior), leaving a blank tool with no way to
+// recover except a full page reload. This boundary catches it so a too-long
+// vCard/WiFi/URL/etc. degrades to an inline message instead of a blank page.
+class QrErrorBoundary extends Component<{ children: ReactNode; onError: () => void }, { hasError: boolean }> {
+	state = { hasError: false };
+	static getDerivedStateFromError() {
+		return { hasError: true };
+	}
+	componentDidCatch() {
+		this.props.onError();
+	}
+	render() {
+		return this.state.hasError ? null : this.props.children;
+	}
+}
 
 interface Messages {
 	contentTypeLabel: string;
@@ -45,6 +64,7 @@ interface Messages {
 	pngResolutionLabel: string;
 	downloadPng: string;
 	downloadSvg: string;
+	errorTooLong: string;
 }
 
 type ContentType = 'url' | 'text' | 'wifi' | 'vcard' | 'email' | 'sms';
@@ -140,6 +160,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	const [level, setLevel] = useState<ErrorCorrectionLevel>('M');
 	const [logoUrl, setLogoUrl] = useState<string | null>(null);
 	const [pngResolution, setPngResolution] = useState(1024);
+	const [erroredRenderKey, setErroredRenderKey] = useState<string | null>(null);
 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const exportCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -166,6 +187,12 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	}, [contentType, urlValue, textValue, wifi, vcard, email, sms]);
 
 	const renderValue = isEmpty ? ' ' : qrValue;
+	const renderKey = `${renderValue}-${level}`;
+	// Derived (not stored via a separate reset effect) so there's no race between
+	// "a new value should optimistically retry" and "onError just marked this
+	// value as failing" — whichever runs, this always reflects the current attempt.
+	const tooLong = erroredRenderKey === renderKey;
+
 	const logoSize = Math.round(size * 0.2);
 	const exportLogoSize = Math.round(pngResolution * 0.2);
 	const svgLogoSize = Math.round(SVG_EXPORT_SIZE * 0.2);
@@ -572,26 +599,32 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 				</div>
 
 				<div className="flex flex-wrap gap-2">
-					<Button type="button" onClick={handleDownloadPng} disabled={isEmpty}>
+					<Button type="button" onClick={handleDownloadPng} disabled={isEmpty || tooLong}>
 						{messages.downloadPng}
 					</Button>
-					<Button type="button" variant="secondary" onClick={handleDownloadSvg} disabled={isEmpty}>
+					<Button type="button" variant="secondary" onClick={handleDownloadSvg} disabled={isEmpty || tooLong}>
 						{messages.downloadSvg}
 					</Button>
 				</div>
 			</div>
 
 			<div className="flex flex-1 items-center justify-center rounded-md border border-border p-6">
-				<QRCodeCanvas
-					ref={canvasRef}
-					value={renderValue}
-					size={size}
-					fgColor={fgColor}
-					bgColor={bgColor}
-					level={level}
-					marginSize={2}
-					imageSettings={logoUrl ? { src: logoUrl, height: logoSize, width: logoSize, excavate: true } : undefined}
-				/>
+				{tooLong ? (
+					<p className="max-w-xs text-center text-sm text-destructive">{messages.errorTooLong}</p>
+				) : (
+					<QrErrorBoundary key={renderKey} onError={() => setErroredRenderKey(renderKey)}>
+						<QRCodeCanvas
+							ref={canvasRef}
+							value={renderValue}
+							size={size}
+							fgColor={fgColor}
+							bgColor={bgColor}
+							level={level}
+							marginSize={2}
+							imageSettings={logoUrl ? { src: logoUrl, height: logoSize, width: logoSize, excavate: true } : undefined}
+						/>
+					</QrErrorBoundary>
+				)}
 			</div>
 
 			{/* Hidden renders used purely as export sources: a high-resolution canvas for the
@@ -600,30 +633,32 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 			    preview so the user can pick a PNG resolution independent of what looks good
 			    on screen. */}
 			<div className="pointer-events-none absolute h-0 w-0 overflow-hidden" aria-hidden="true">
-				<QRCodeCanvas
-					ref={exportCanvasRef}
-					value={renderValue}
-					size={pngResolution}
-					fgColor={fgColor}
-					bgColor={bgColor}
-					level={level}
-					marginSize={2}
-					imageSettings={
-						logoUrl ? { src: logoUrl, height: exportLogoSize, width: exportLogoSize, excavate: true } : undefined
-					}
-				/>
-				<QRCodeSVG
-					ref={svgRef}
-					value={renderValue}
-					size={SVG_EXPORT_SIZE}
-					fgColor={fgColor}
-					bgColor={bgColor}
-					level={level}
-					marginSize={2}
-					imageSettings={
-						logoUrl ? { src: logoUrl, height: svgLogoSize, width: svgLogoSize, excavate: true } : undefined
-					}
-				/>
+				<QrErrorBoundary key={`export-${renderKey}`} onError={() => setErroredRenderKey(renderKey)}>
+					<QRCodeCanvas
+						ref={exportCanvasRef}
+						value={renderValue}
+						size={pngResolution}
+						fgColor={fgColor}
+						bgColor={bgColor}
+						level={level}
+						marginSize={2}
+						imageSettings={
+							logoUrl ? { src: logoUrl, height: exportLogoSize, width: exportLogoSize, excavate: true } : undefined
+						}
+					/>
+					<QRCodeSVG
+						ref={svgRef}
+						value={renderValue}
+						size={SVG_EXPORT_SIZE}
+						fgColor={fgColor}
+						bgColor={bgColor}
+						level={level}
+						marginSize={2}
+						imageSettings={
+							logoUrl ? { src: logoUrl, height: svgLogoSize, width: svgLogoSize, excavate: true } : undefined
+						}
+					/>
+				</QrErrorBoundary>
 			</div>
 		</div>
 	);

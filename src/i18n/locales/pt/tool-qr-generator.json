@@ -47,7 +47,8 @@
     "removeLogo": "Remover logo",
     "pngResolutionLabel": "Resolução do PNG",
     "downloadPng": "Baixar PNG",
-    "downloadSvg": "Baixar SVG"
+    "downloadSvg": "Baixar SVG",
+    "errorTooLong": "Este conteúdo é longo demais para caber em um código QR no nível de correção de erro atual. Tente encurtá-lo ou reduza o nível de correção de erro abaixo."
   },
   "related": "Ferramentas relacionadas",
   "article": {
