@@ -6,14 +6,25 @@
   "heading": "JSON Formatter & Validator",
   "tagline": "Format, validate, and explore JSON data, right in your browser.",
   "ui": {
-    "themeNotice": "This editor widget keeps its own light theme regardless of the site's dark mode — the same way a code editor embedded on any page usually does."
+    "themeNotice": "This editor widget keeps its own light theme regardless of the site's dark mode — the same way a code editor embedded on any page usually does.",
+    "errorWithLine": "Syntax error on line {{line}}: {{message}}",
+    "errorNoLine": "Syntax error: {{message}}",
+    "goToErrorLine": "Go to error line",
+    "exportHeading": "Convert to another format",
+    "exportXml": "Export as XML",
+    "exportYaml": "Export as YAML",
+    "exportCsv": "Export as CSV",
+    "exportInvalidJson": "Fix the JSON syntax error above before converting.",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "download": "Download"
   },
   "related": "Related tools",
   "article": {
     "heading": "Why format and validate JSON locally?",
     "p1": "JSON shows up constantly in a developer's day: a minified API response with no line breaks, a config file someone hand-edited into a single unreadable line, a payload you're debugging at 11pm trying to spot the one missing comma. Most online \"JSON formatter\" tools solve the readability problem by sending your pasted text to a server first — which is an uncomfortable trade-off when that JSON might contain an API key, an access token, or a customer's personal data.",
     "p2": "This tool never sends anything anywhere. It's built on jsoneditor, a JavaScript library that parses and re-renders your JSON entirely inside your browser's memory. The parsing, the pretty-printing, and the syntax validation all happen locally using the browser's own JavaScript engine — there's no server in the loop, so nothing you paste here ever leaves your device.",
-    "p3": "Paste your JSON into the editor in text mode and use the Format button in the toolbar to pretty-print it, or Compact to squeeze it back down to a single line. If the JSON has a syntax error — a trailing comma, a missing quote, an unmatched bracket — the editor highlights it immediately with a clear error message instead of leaving you to eyeball the whole document. Switch to tree mode from the dropdown at the top to browse the same data as a collapsible, interactive tree: expand and collapse nested objects and arrays, edit individual values in place, and reorder or delete fields directly, with the change reflected back into the text the moment you switch modes again.",
-    "p4": "This combination covers most everyday JSON work: cleaning up an API response before pasting it into documentation, validating a config file before committing it, or exploring a deeply nested payload without losing track of which array you're inside. Since everything lives only in the browser tab, closing it clears the editor completely — there's no saved history or draft to worry about, which is exactly the behavior you want when the JSON you're working with might be sensitive."
+    "p3": "Paste your JSON into the editor in text mode and use the Format button in the toolbar to pretty-print it, or Compact to squeeze it back down to a single line. If the JSON has a syntax error — a trailing comma, a missing quote, an unmatched bracket — the editor highlights it immediately with a clear error message and the exact line number instead of leaving you to eyeball the whole document; a \"Go to error line\" button jumps straight to that line and selects it so you don't have to scroll and hunt for it in a long file. Switch to tree mode from the dropdown at the top to browse the same data as a collapsible, interactive tree: expand and collapse nested objects and arrays, edit individual values in place, and reorder or delete fields directly, with the change reflected back into the text the moment you switch modes again.",
+    "p4": "This combination covers most everyday JSON work: cleaning up an API response before pasting it into documentation, validating a config file before committing it, or exploring a deeply nested payload without losing track of which array you're inside. Need the data in a different format? The buttons below the editor convert the current JSON straight to XML, YAML, or CSV — handy when a teammate's script expects a YAML config file or a spreadsheet needs plain rows and columns instead of nested JSON — with the converted result shown inline for a quick copy or a full download. Since everything lives only in the browser tab, closing it clears the editor completely — there's no saved history or draft to worry about, which is exactly the behavior you want when the JSON you're working with might be sensitive."
   }
 }

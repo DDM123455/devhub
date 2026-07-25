@@ -6,14 +6,25 @@
   "heading": "Formatador e validador JSON",
   "tagline": "Formate, valide e explore dados JSON, direto no seu navegador.",
   "ui": {
-    "themeNotice": "Este editor mantém seu próprio tema claro independente do modo escuro do site, assim como costuma acontecer com um editor de código incorporado em qualquer página."
+    "themeNotice": "Este editor mantém seu próprio tema claro independente do modo escuro do site, assim como costuma acontecer com um editor de código incorporado em qualquer página.",
+    "errorWithLine": "Erro de sintaxe na linha {{line}}: {{message}}",
+    "errorNoLine": "Erro de sintaxe: {{message}}",
+    "goToErrorLine": "Ir para a linha do erro",
+    "exportHeading": "Converter para outro formato",
+    "exportXml": "Exportar como XML",
+    "exportYaml": "Exportar como YAML",
+    "exportCsv": "Exportar como CSV",
+    "exportInvalidJson": "Corrija o erro de sintaxe do JSON acima antes de converter.",
+    "copy": "Copiar",
+    "copied": "Copiado!",
+    "download": "Baixar"
   },
   "related": "Ferramentas relacionadas",
   "article": {
     "heading": "Por que formatar e validar JSON localmente?",
     "p1": "JSON aparece o tempo todo no dia a dia de quem desenvolve: uma resposta de API minificada sem quebras de linha, um arquivo de configuração que alguém editou à mão até virar uma única linha ilegível, um payload que você está depurando às 23h tentando achar aquela única vírgula sobrando. A maioria das ferramentas online de \"formatar JSON\" resolve o problema de legibilidade enviando o texto colado para um servidor primeiro — uma troca desconfortável quando esse JSON pode conter uma chave de API, um token de acesso ou dados pessoais de um cliente.",
     "p2": "Esta ferramenta nunca envia nada para lugar nenhum. Ela é construída sobre o jsoneditor, uma biblioteca JavaScript que analisa e renderiza novamente o seu JSON inteiramente dentro da memória do seu navegador. A análise, a formatação legível e a validação de sintaxe acontecem localmente usando o próprio motor JavaScript do navegador — não há servidor nenhum no meio do caminho, então nada do que você cola aqui sai do seu dispositivo.",
-    "p3": "Cole seu JSON no editor em modo texto e use o botão Format na barra de ferramentas para formatá-lo de forma legível, ou Compact para comprimi-lo de volta em uma única linha. Se o JSON tiver um erro de sintaxe — uma vírgula sobrando, uma aspas faltando, um colchete sem fechar —, o editor destaca isso imediatamente com uma mensagem de erro clara, em vez de deixar você procurar visualmente no documento inteiro. Mude para o modo árvore pelo menu suspenso no topo para navegar pelos mesmos dados como uma árvore interativa e recolhível: expanda e recolha objetos e arrays aninhados, edite valores individuais na hora, e reordene ou exclua campos diretamente, com a mudança refletida no texto assim que você trocar de modo de novo.",
-    "p4": "Essa combinação cobre a maior parte do trabalho diário com JSON: limpar uma resposta de API antes de colar em uma documentação, validar um arquivo de configuração antes de fazer o commit, ou explorar um payload profundamente aninhado sem perder de vista em qual array você está. Como tudo existe apenas na aba do navegador, fechá-la limpa completamente o editor — não há histórico nem rascunho salvo para se preocupar, exatamente o comportamento que você quer quando o JSON com o qual está trabalhando pode ser sensível."
+    "p3": "Cole seu JSON no editor em modo texto e use o botão Format na barra de ferramentas para formatá-lo de forma legível, ou Compact para comprimi-lo de volta em uma única linha. Se o JSON tiver um erro de sintaxe — uma vírgula sobrando, uma aspas faltando, um colchete sem fechar —, o editor destaca isso imediatamente com uma mensagem de erro clara e o número exato da linha, em vez de deixar você procurar visualmente no documento inteiro; um botão \"Ir para a linha do erro\" leva direto até ela e já a seleciona, para você não precisar rolar a tela procurando em um arquivo longo. Mude para o modo árvore pelo menu suspenso no topo para navegar pelos mesmos dados como uma árvore interativa e recolhível: expanda e recolha objetos e arrays aninhados, edite valores individuais na hora, e reordene ou exclua campos diretamente, com a mudança refletida no texto assim que você trocar de modo de novo.",
+    "p4": "Essa combinação cobre a maior parte do trabalho diário com JSON: limpar uma resposta de API antes de colar em uma documentação, validar um arquivo de configuração antes de fazer o commit, ou explorar um payload profundamente aninhado sem perder de vista em qual array você está. Precisa dos dados em outro formato? Os botões abaixo do editor convertem o JSON atual direto para XML, YAML ou CSV — útil quando o script de um colega espera um arquivo YAML de configuração ou uma planilha precisa de linhas e colunas simples em vez de JSON aninhado — com o resultado exibido ali mesmo para copiar rápido ou baixar o arquivo completo. Como tudo existe apenas na aba do navegador, fechá-la limpa completamente o editor — não há histórico nem rascunho salvo para se preocupar, exatamente o comportamento que você quer quando o JSON com o qual está trabalhando pode ser sensível."
   }
 }

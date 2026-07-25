@@ -10,12 +10,12 @@
   Phase 2) + mục "Checklist Feature Parity" vào `CLAUDE.md` — mục tiêu đưa từng tool từ
   "MVP chạy được" lên "ngang tầm đối thủ đầu ngành" (benchmark, so sánh feature-by-feature,
   nâng cấp).
-- Task tiếp theo cần làm: **Phase 1.5**, tool #1, #2, #3, #6, #7 đã xong (đủ điều kiện
+- Task tiếp theo cần làm: **Phase 1.5**, tool #1, #2, #3, #6, #7, #8 đã xong (đủ điều kiện
   tick). Tool #4 & #5 "Gộp/Tách PDF" đã build+test xong 3/4 mục con (còn thiếu nén PDF, để
-  sau) — xem log 2026-07-25 bên dưới. Task kế tiếp khi mở phiên mới: tool **#8 "JSON
-  Formatter & Validator"** trong Phase 1.5 (benchmark JSONFormatter.org, JSONLint — tree
-  view thu gọn/mở rộng, toggle Beautify/Minify, báo lỗi kèm số dòng, convert JSON→XML/
-  YAML/CSV).
+  sau) — xem log 2026-07-25 bên dưới. Task kế tiếp khi mở phiên mới: tool **#9 "QR Code
+  Generator"** trong Phase 1.5 (benchmark qr-code-generator.com — nhiều loại nội dung
+  URL/text/WiFi/vCard/email/SMS, tùy chỉnh màu/logo/error correction, export PNG nhiều độ
+  phân giải + SVG).
 - Ghi chú thiết kế (2026-07-25): đã redesign toàn bộ giao diện site (không phải task trong
   `ROADMAP.md`, làm theo yêu cầu trực tiếp của người dùng) dựa trên file mockup
   `Web Tool Hub.dc.html` ở gốc repo (file KHÔNG được commit vào git — chỉ là tài liệu tham
@@ -87,6 +87,69 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 1.5, tool #8: Nâng cấp "JSON Formatter & Validator" lên Feature
+  Parity — XONG
+- Benchmark: JSONFormatter.org, JSONLint.
+- Khảo sát trước khi sửa: đọc thẳng mã nguồn đã biên dịch của `jsoneditor-minimalist.js`
+  (không chỉ dựa vào tài liệu) để biết chính xác bản "minimalist" (đã chọn ở Phase 1 để
+  tránh Ace editor, xem log cũ) hỗ trợ sẵn những gì:
+  - **Tree view thu gọn/mở rộng**: có sẵn 100% (tính năng gốc của jsoneditor ở `mode:
+    'tree'`) — không cần code gì thêm, chỉ cần xác nhận bằng test tương tác.
+  - **Toggle Beautify/Minify**: có sẵn 100% — `mainMenuBar: true` ở `mode: 'text'` tự hiện
+    2 nút `.jsoneditor-format` ("Format JSON data...") và `.jsoneditor-compact` ("Compact
+    JSON data..."). Cũng không cần code thêm.
+  - **Báo lỗi kèm số dòng + highlight dòng lỗi**: đây là phần thật sự thiếu. Bản minimalist
+    dùng `<textarea>` thuần cho mode text (không phải Ace hay contenteditable) — xác nhận
+    qua dòng "load a plain text textarea ... plain text editor (fallback when Ace is not
+    available)" trong mã nguồn. Một `<textarea>` thuần KHÔNG thể tô màu nền riêng cho 1
+    dòng cụ thể bằng CSS (không có khái niệm "dòng" trong DOM của nó). Quyết định KHÔNG
+    đổi sang bản jsoneditor đầy đủ kèm Ace (sẽ vi phạm quyết định giảm bundle size đã chốt
+    trước đó) và cũng không thêm CodeMirror/Monaco (vi phạm "không thêm dependency mới nếu
+    không thực sự cần thiết"). Giải pháp chọn: dùng callback có sẵn `onValidationError` của
+    jsoneditor (đã tự tính sẵn `line` từ lỗi parse của jsonlint nội bộ, xác nhận qua đọc mã
+    nguồn hàm `validate()` — `_this5.options.onValidationError` nhận mảng lỗi có field
+    `line`) để hiện 1 banner đỏ rõ ràng "Syntax error on line X: <message>" — rõ hơn hẳn
+    icon nhỏ có sẵn của jsoneditor. Cho "highlight dòng lỗi", thay vì cố overlay pixel lên
+    textarea (rủi ro cao, dễ vỡ khi cuộn/resize), dùng API chuẩn `textarea.setSelectionRange()`
+    để BÔI CHỌN (native browser selection highlight) đúng dòng lỗi khi người dùng bấm nút
+    "Go to error line" — an toàn hơn nhiều so với tự động tô mỗi lần gõ phím (sẽ cướp mất
+    con trỏ/selection liên tục trong lúc gõ), đồng thời trình duyệt tự cuộn tới dòng đó.
+  - **Convert JSON → XML/YAML/CSV**: không có trong ROADMAP.md danh sách thư viện được phép
+    dùng sẵn cho tool này. Tự viết 3 hàm chuyển đổi thuần JS (không thêm dependency mới):
+    `convertJsonToXml` (đệ quy, escape `&<>`, tên tag không hợp lệ tự thay ký tự lạ bằng
+    `_`, mảng bọc trong nhiều `<item>`), `convertJsonToYaml` (block style chuẩn, tự quote
+    chuỗi khi cần theo các quy tắc dễ gây nhầm lẫn: giống true/false/null, giống số, có dấu
+    `: `, khoảng trắng đầu/cuối...), `convertJsonToCsv` (JSON là mảng object → mỗi object 1
+    dòng, object lồng nhau được làm phẳng theo dot-notation, mảng trong 1 ô thì
+    `JSON.stringify` lại vì CSV không biểu diễn được list trong 1 ô).
+- Test tương tác qua Puppeteer (`test-json.mjs`, `test-yaml-roundtrip.mjs` trong scratchpad,
+  không commit):
+  - Xác nhận nút Format/Compact hoạt động thật (so sánh có/không có `\n` trong nội dung
+    textarea trước/sau khi bấm).
+  - Chuyển sang tree mode, đếm số nút thu gọn/mở rộng có mặt, bấm thu gọn node gốc và xác
+    nhận số field hiển thị giảm về 0 (đúng hành vi thu gọn).
+  - Nhập JSON lỗi cú pháp cố ý (thiếu dấu phẩy khiến parser bối rối ở dòng 4) → xác nhận
+    banner hiện đúng "line 4", bấm "Go to error line" → xác nhận `textarea.selectionStart
+    !== selectionEnd` (có bôi chọn thật, không phải chỉ đặt con trỏ) và
+    `document.activeElement` đúng là textarea đó. Sửa lại JSON hợp lệ → xác nhận banner tự
+    biến mất.
+  - Xuất thử cả 3 định dạng XML/YAML/CSV với 1 JSON có object lồng nhau + mảng, so khớp nội
+    dung mong đợi. Xuất khi JSON đang lỗi → xác nhận hiện thông báo `exportInvalidJson`
+    thay vì crash.
+  - **Kiểm tra bổ sung riêng cho YAML** (rủi ro cao nhất vì tự viết serializer thủ công,
+    không dùng thư viện): cài tạm `js-yaml` CHỈ trong thư mục scratchpad (không phải
+    dependency của dự án, chỉ dùng để kiểm chứng, không commit) để PARSE NGƯỢC lại kết quả
+    YAML do tool sinh ra và so sánh bằng `JSON.stringify` với JSON gốc — chạy qua 3 case:
+    object lồng nhau + mảng object + mảng rỗng + chuỗi khó (chứa dấu `"`, dấu `:`, số dạng
+    chuỗi, khoảng trắng đầu dòng), mảng ở cấp gốc, và lồng sâu 3-4 cấp có mảng-trong-mảng —
+    cả 3 case round-trip CHÍNH XÁC tuyệt đối, xác nhận serializer tự viết đúng cú pháp YAML
+    thật chứ không chỉ "nhìn giống đúng".
+- `npm run build` sạch. Đã tick đủ 4/4 checkbox con + dòng cha "8. JSON Formatter &
+  Validator" trong `ROADMAP.md` Phase 1.5.
+- Cập nhật đoạn nội dung SEO (bài viết p3/p4) ở cả 8 ngôn ngữ để nhắc tới "Go to error
+  line" và tính năng export XML/YAML/CSV — viết thêm câu mới bằng tay cho từng ngôn ngữ,
+  không dịch máy nguyên khối.
 
 ### 2026-07-25 — Phase 1.5, tool #7: Nâng cấp "Đếm từ & ký tự" lên Feature Parity — XONG
 - Benchmark: WordCounter.net.

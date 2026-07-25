@@ -85,11 +85,11 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
   - [x] Đếm số đoạn văn (paragraph), số câu
   - [x] Bảng tần suất từ xuất hiện nhiều nhất (keyword density)
 
-- [ ] **8. JSON Formatter & Validator** — benchmark: JSONFormatter.org, JSONLint
-  - [ ] Chế độ xem dạng cây (tree view) có thể thu gọn/mở rộng từng node
-  - [ ] Toggle nhanh giữa Beautify và Minify
-  - [ ] Báo lỗi cú pháp kèm số dòng chính xác, highlight dòng lỗi
-  - [ ] Convert JSON → XML/YAML/CSV
+- [x] **8. JSON Formatter & Validator** — benchmark: JSONFormatter.org, JSONLint
+  - [x] Chế độ xem dạng cây (tree view) có thể thu gọn/mở rộng từng node
+  - [x] Toggle nhanh giữa Beautify và Minify
+  - [x] Báo lỗi cú pháp kèm số dòng chính xác, highlight dòng lỗi
+  - [x] Convert JSON → XML/YAML/CSV
 
 - [ ] **9. QR Code Generator** — benchmark: qr-code-generator.com
   - [ ] Hỗ trợ nhiều loại nội dung: URL, plain text, WiFi, vCard, email, SMS

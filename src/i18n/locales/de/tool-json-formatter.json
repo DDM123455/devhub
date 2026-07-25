@@ -6,14 +6,25 @@
   "heading": "JSON-Formatierer & Validator",
   "tagline": "Formatiere, validiere und erkunde JSON-Daten, direkt in deinem Browser.",
   "ui": {
-    "themeNotice": "Dieses Editor-Widget behält sein eigenes helles Theme unabhängig vom Dark Mode der Seite bei — genau wie ein in eine Seite eingebetteter Code-Editor das normalerweise tut."
+    "themeNotice": "Dieses Editor-Widget behält sein eigenes helles Theme unabhängig vom Dark Mode der Seite bei — genau wie ein in eine Seite eingebetteter Code-Editor das normalerweise tut.",
+    "errorWithLine": "Syntaxfehler in Zeile {{line}}: {{message}}",
+    "errorNoLine": "Syntaxfehler: {{message}}",
+    "goToErrorLine": "Zur Fehlerzeile springen",
+    "exportHeading": "In ein anderes Format konvertieren",
+    "exportXml": "Als XML exportieren",
+    "exportYaml": "Als YAML exportieren",
+    "exportCsv": "Als CSV exportieren",
+    "exportInvalidJson": "Behebe zuerst den JSON-Syntaxfehler oben, bevor du konvertierst.",
+    "copy": "Kopieren",
+    "copied": "Kopiert!",
+    "download": "Herunterladen"
   },
   "related": "Ähnliche Tools",
   "article": {
     "heading": "Warum JSON lokal formatieren und validieren?",
     "p1": "JSON begegnet Entwicklerinnen und Entwicklern ständig: eine minifizierte API-Antwort ohne Zeilenumbrüche, eine Konfigurationsdatei, die jemand von Hand zu einer einzigen unlesbaren Zeile zusammengeschoben hat, ein Payload, das du um 23 Uhr debuggst und bei dem du das eine überzählige Komma suchst. Die meisten Online-\"JSON-Formatierer\" lösen das Lesbarkeitsproblem, indem sie deinen eingefügten Text zuerst an einen Server senden — ein unangenehmer Kompromiss, wenn dieses JSON einen API-Schlüssel, ein Zugriffstoken oder personenbezogene Daten eines Kunden enthalten kann.",
     "p2": "Dieses Tool sendet niemals irgendetwas irgendwohin. Es basiert auf jsoneditor, einer JavaScript-Bibliothek, die dein JSON vollständig im Arbeitsspeicher deines Browsers parst und neu rendert. Das Parsen, die lesbare Formatierung und die Syntaxprüfung laufen alle lokal über die eigene JavaScript-Engine des Browsers ab — es ist kein Server involviert, also verlässt nichts, was du hier einfügst, jemals dein Gerät.",
-    "p3": "Füge dein JSON im Textmodus in den Editor ein und nutze die Schaltfläche Format in der Werkzeugleiste, um es lesbar zu formatieren, oder Compact, um es wieder auf eine Zeile zu komprimieren. Enthält das JSON einen Syntaxfehler — ein überzähliges Komma, ein fehlendes Anführungszeichen, eine nicht geschlossene Klammer —, markiert der Editor das sofort mit einer klaren Fehlermeldung, statt dich das ganze Dokument mit den Augen durchsuchen zu lassen. Wechsle über das Dropdown-Menü oben in den Baummodus, um dieselben Daten als aufklappbaren, interaktiven Baum zu durchsuchen: verschachtelte Objekte und Arrays auf- und zuklappen, einzelne Werte direkt vor Ort bearbeiten, Felder umsortieren oder löschen — die Änderung spiegelt sich sofort im Text wider, sobald du wieder in den Textmodus wechselst.",
-    "p4": "Diese Kombination deckt den größten Teil der alltäglichen JSON-Arbeit ab: eine API-Antwort bereinigen, bevor du sie in eine Dokumentation einfügst, eine Konfigurationsdatei validieren, bevor du sie committest, oder ein tief verschachteltes Payload erkunden, ohne den Überblick zu verlieren, in welchem Array du dich gerade befindest. Da alles nur im Browser-Tab existiert, löscht das Schließen des Tabs den Editor vollständig — es gibt keinen gespeicherten Verlauf oder Entwurf, um den man sich sorgen müsste, genau das Verhalten, das du willst, wenn das JSON, mit dem du arbeitest, sensibel sein könnte."
+    "p3": "Füge dein JSON im Textmodus in den Editor ein und nutze die Schaltfläche Format in der Werkzeugleiste, um es lesbar zu formatieren, oder Compact, um es wieder auf eine Zeile zu komprimieren. Enthält das JSON einen Syntaxfehler — ein überzähliges Komma, ein fehlendes Anführungszeichen, eine nicht geschlossene Klammer —, markiert der Editor das sofort mit einer klaren Fehlermeldung und der genauen Zeilennummer, statt dich das ganze Dokument mit den Augen durchsuchen zu lassen; eine Schaltfläche „Zur Fehlerzeile springen“ führt dich direkt dorthin und markiert die Zeile, damit du in einer langen Datei nicht danach suchen musst. Wechsle über das Dropdown-Menü oben in den Baummodus, um dieselben Daten als aufklappbaren, interaktiven Baum zu durchsuchen: verschachtelte Objekte und Arrays auf- und zuklappen, einzelne Werte direkt vor Ort bearbeiten, Felder umsortieren oder löschen — die Änderung spiegelt sich sofort im Text wider, sobald du wieder in den Textmodus wechselst.",
+    "p4": "Diese Kombination deckt den größten Teil der alltäglichen JSON-Arbeit ab: eine API-Antwort bereinigen, bevor du sie in eine Dokumentation einfügst, eine Konfigurationsdatei validieren, bevor du sie committest, oder ein tief verschachteltes Payload erkunden, ohne den Überblick zu verlieren, in welchem Array du dich gerade befindest. Brauchst du die Daten in einem anderen Format? Die Schaltflächen unter dem Editor wandeln das aktuelle JSON direkt in XML, YAML oder CSV um — praktisch, wenn das Skript einer Kollegin eine YAML-Konfigurationsdatei erwartet oder eine Tabelle einfache Zeilen und Spalten statt verschachteltem JSON braucht — das Ergebnis wird direkt zum schnellen Kopieren oder vollständigen Herunterladen angezeigt. Da alles nur im Browser-Tab existiert, löscht das Schließen des Tabs den Editor vollständig — es gibt keinen gespeicherten Verlauf oder Entwurf, um den man sich sorgen müsste, genau das Verhalten, das du willst, wenn das JSON, mit dem du arbeitest, sensibel sein könnte."
   }
 }
