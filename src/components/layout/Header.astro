@@ -13,15 +13,15 @@ const { lang, showSearch = false } = Astro.props;
 const t = getFixedT(lang);
 ---
 
-<header class="sticky top-0 z-30 flex items-center gap-6 border-b border-border bg-background px-4 py-3.5 sm:px-8">
-	<a href={`/${lang}/`} class="flex items-center gap-2.5">
+<header class="sticky top-0 z-30 flex flex-wrap items-center gap-3 border-b border-border bg-background px-4 py-3.5 sm:px-8 md:flex-nowrap md:gap-6">
+	<a href={`/${lang}/`} class="order-1 flex shrink-0 items-center gap-2.5">
 		<span class="font-mono text-base font-bold tracking-tight text-emerald-700 dark:text-emerald-400">&gt;_</span>
-		<span class="text-lg font-bold tracking-tight text-foreground">Web Tool Hub</span>
+		<span class="hidden text-lg font-bold tracking-tight text-foreground sm:inline">Web Tool Hub</span>
 	</a>
 
 	{
 		showSearch && (
-			<div class="flex max-w-[380px] flex-1 items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+			<div class="order-3 flex w-full items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 md:order-2 md:w-auto md:max-w-[380px] md:flex-1">
 				<svg
 					aria-hidden="true"
 					viewBox="0 0 24 24"
@@ -45,7 +45,7 @@ const t = getFixedT(lang);
 		)
 	}
 
-	<div class="ml-auto flex items-center gap-2.5">
+	<div class="order-2 ml-auto flex shrink-0 items-center gap-2.5 md:order-3">
 		<LanguageSwitcher lang={lang} />
 		<ThemeToggle lang={lang} />
 		<button

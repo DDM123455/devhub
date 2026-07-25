@@ -52,9 +52,34 @@ const { title, lang, description, showSearch = false } = Astro.props;
 		</div>
 		<Footer lang={lang} />
 		<script>
+			const sidebar = document.getElementById('sidebar');
+			const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+			function openSidebar() {
+				sidebar?.classList.remove('-translate-x-full');
+				sidebarBackdrop?.classList.remove('hidden');
+				document.body.classList.add('overflow-hidden');
+			}
+
+			function closeSidebar() {
+				sidebar?.classList.add('-translate-x-full');
+				sidebarBackdrop?.classList.add('hidden');
+				document.body.classList.remove('overflow-hidden');
+			}
+
 			document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
-				document.getElementById('sidebar')?.classList.toggle('hidden');
+				const isOpen = sidebar && !sidebar.classList.contains('-translate-x-full');
+				if (isOpen) closeSidebar();
+				else openSidebar();
 			});
+			sidebarBackdrop?.addEventListener('click', closeSidebar);
+			sidebar?.addEventListener('click', (event) => {
+				if ((event.target as HTMLElement)?.closest('a')) closeSidebar();
+			});
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape') closeSidebar();
+			});
+
 			document.getElementById('theme-toggle')?.addEventListener('click', () => {
 				const isDark = document.documentElement.classList.toggle('dark');
 				try {
