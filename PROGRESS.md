@@ -5,10 +5,9 @@
 
 ## 🔵 Trạng thái hiện tại
 
-- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (9/10 xong)
-- Task tiếp theo cần làm: Công cụ #10 "Chuyển đổi Case văn bản"
-  (upper/lower/Title/camelCase/snake_case) dùng JS thuần (xem `ROADMAP.md` Phase 1) — TASK
-  CUỐI CÙNG của Phase 1.
+- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi: HOÀN TẤT 10/10** ✅
+- Task tiếp theo cần làm: Bắt đầu **Phase 2 — SEO chuyên sâu & nhân bản đa ngôn ngữ** (xem
+  `ROADMAP.md`) — task đầu tiên: mở rộng i18n từ 8 lên 15-20 ngôn ngữ.
 - Ghi chú dependency: đã chọn **jsoneditor** (không phải Monaco) cho tool #8 — nhẹ hơn
   nhiều, phù hợp triết lý Lighthouse/hiệu năng của dự án. Dùng bản **minimalist**
   (`jsoneditor/dist/jsoneditor-minimalist.js`, ~70KB gzip thay vì ~210KB bản đầy đủ) vì
@@ -67,6 +66,51 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 1, công cụ #10 (CUỐI CÙNG): Chuyển đổi Case văn bản — HOÀN TẤT Phase 1
+- Đã làm:
+  - Tạo `src/components/tools/TextCaseConverter.tsx` (React, `client:load`), JS thuần
+    không dùng thư viện: 1 textarea nhập, hàng nút chọn 1 trong 5 kiểu case
+    (UPPERCASE/lowercase/Title Case/camelCase/snake_case), 1 textarea kết quả read-only
+    tính bằng `useMemo` (cập nhật ngay khi đổi text hoặc đổi nút chọn), nút Sao chép
+    (`navigator.clipboard.writeText`) và nút Xóa hết.
+  - Viết hàm `splitWords()` dùng chung cho camelCase/snake_case: trước khi tách từ theo
+    khoảng trắng/gạch ngang/gạch dưới/dấu câu, tự động chèn khoảng trắng tại các ranh giới
+    chữ-thường-sang-chữ-hoa và CHUỖI-HOA-sang-Chữ-hoa-thường có sẵn — nghĩa là dán
+    `"hello-world"`, `"Hello World"`, hay thậm chí `"helloWorld"` đã có case sẵn đều ra
+    cùng 1 kết quả đúng, không bị dính chữ thành `"helloworld"` hay tách sai.
+  - Tạo `src/components/tools/TextCaseConverterPage.astro`: theo khuôn các trang tool
+    trước, JSON-LD `WebApplication`, nội dung hướng dẫn 4 đoạn/ngôn ngữ, link tới 2 tool
+    cùng category `text` (So sánh văn bản, Đếm từ & ký tự). Với `ja`/`ko`, ghi rõ trong
+    bài viết rằng bản thân văn bản tiếng Nhật/Hàn không có khái niệm hoa/thường như chữ
+    Latin, nên tính năng này chủ yếu hữu ích với định danh/từ tiếng Anh xen trong văn bản.
+  - Tạo 8 file dictionary i18n `tool-text-case-converter.json`.
+  - Sửa `src/pages/[locale]/tools/[slug].astro` thêm nhánh
+    `toolId === 'text-case-converter'` — đây là nhánh cuối cùng, tất cả 10 tool trong
+    `src/data/tools.ts` giờ đều có UI thật, không còn tool nào rơi vào nhánh "coming soon"
+    mặc định.
+  - `npm run build` sinh đủ 89 trang không lỗi; đọc thử
+    `dist/en/tools/text-case-converter/index.html` xác nhận title/heading/UI đúng.
+- Quyết định kỹ thuật quan trọng:
+  - Chỉ làm đúng 5 kiểu case nêu trong `ROADMAP.md` (không tự thêm PascalCase/kebab-case/
+    CONSTANT_CASE dù kỹ thuật rất dễ thêm) — giữ đúng phạm vi task đã định, tránh
+    over-engineer.
+  - UI dùng nút bấm + 1 khung kết quả (thay vì hiện cả 5 kết quả cùng lúc) — nhất quán với
+    cách chọn 1-trong-nhiều bằng radio ở Text Diff Checker, và tránh màn hình bị rối với 5
+    khung văn bản cùng lúc.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Chưa test tương tác thật (gõ trực tiếp, bấm từng nút case, bấm Sao chép xem có copy
+    đúng vào clipboard) trên trình duyệt thật — chỉ verify qua `npm run build` + đọc HTML
+    tĩnh, giống tình trạng chung của các tool trước.
+  - `navigator.clipboard.writeText` yêu cầu HTTPS hoặc `localhost` mới hoạt động (Clipboard
+    API bị trình duyệt chặn trên HTTP thường) — không phải vấn đề vì Cloudflare luôn phục
+    vụ qua HTTPS, nhưng cần nhớ nếu sau này test bằng `npm run preview` qua HTTP thuần trên
+    mạng LAN thì nút Sao chép có thể không hoạt động.
+- **Phase 1 — 10 công cụ cốt lõi: HOÀN TẤT toàn bộ 10/10 task.** Toàn bộ 10 trang công cụ
+  đều có UI thật, đủ 8 ngôn ngữ, đủ checklist SEO (title/description riêng, JSON-LD,
+  nội dung 300-500 từ, link liên quan, sitemap tự động).
+- Task tiếp theo: Bắt đầu Phase 2 — mở rộng i18n từ 8 lên 15-20 ngôn ngữ (xem `ROADMAP.md`
+  Phase 2, task đầu tiên).
 
 ### 2026-07-25 — Phase 1, công cụ #9: QR Code Generator
 - Đã làm:

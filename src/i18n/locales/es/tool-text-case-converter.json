@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "title": "Convertidor de mayúsculas y minúsculas gratis online — Web Tool Hub",
+    "description": "Convierte texto entre MAYÚSCULAS, minúsculas, Title Case, camelCase y snake_case al instante, gratis y directamente en tu navegador. Sin subidas, sin registro."
+  },
+  "heading": "Convertidor de mayúsculas y minúsculas",
+  "tagline": "Convierte texto entre MAYÚSCULAS, minúsculas, Title Case, camelCase y snake_case al instante.",
+  "ui": {
+    "placeholder": "Escribe o pega texto aquí…",
+    "outputLabel": "Resultado",
+    "caseUpper": "MAYÚSCULAS",
+    "caseLower": "minúsculas",
+    "caseTitle": "Title Case",
+    "caseCamel": "camelCase",
+    "caseSnake": "snake_case",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "clear": "Borrar"
+  },
+  "related": "Herramientas relacionadas",
+  "article": {
+    "heading": "¿Por qué usar un convertidor de mayúsculas y minúsculas?",
+    "p1": "La necesidad de cambiar el formato de mayúsculas y minúsculas aparece constantemente de formas pequeñas pero molestas: un párrafo escrito con el Bloq Mayús activado sin querer, una especificación redactada en Title Case que necesita convertirse en el nombre de una variable en camelCase, el encabezado de una columna CSV que debe pasar a ser un campo de base de datos en snake_case, un titular que necesita una capitalización correcta antes de publicarse. Nada de esto es difícil de hacer a mano con una sola palabra, pero volver a escribir un párrafo entero o una larga lista de nombres de campos a mano es lento y propenso a errores.",
+    "p2": "Esta herramienta hace la conversión con una pequeña cantidad de JavaScript puro que se ejecuta directamente en tu navegador: no hay ninguna librería que cargar ni nada que enviar a un servidor. A medida que escribes o pegas texto y cambias entre las opciones de formato, el resultado se actualiza al instante, calculado de nuevo en memoria en tu propio dispositivo cada vez.",
+    "p3": "Pega o escribe tu texto, elige MAYÚSCULAS, minúsculas, Title Case, camelCase o snake_case, y pulsa Copiar para obtener el resultado. En concreto para camelCase y snake_case, el conversor trata los espacios, guiones, guiones bajos y signos de puntuación como separadores de palabra, y también detecta los límites de camelCase o PascalCase ya existentes, así que pegar \"hello-world\", \"Hello World\" o incluso un \"helloWorld\" ya formateado da como resultado lo mismo en lugar de algo roto como \"helloworld\" o \"hello-World\".",
+    "p4": "Los desarrolladores recurren a esto sobre todo al renombrar variables o campos entre las convenciones de nomenclatura usadas por distintos lenguajes y bases de datos, quienes escriben lo usan para corregir una frase que se tecleó por error toda en mayúsculas, y las personas que editan contenido usan Title Case para lograr una capitalización de titulares coherente sin tener que memorizar qué palabras cortas omitir. Si además necesitas comparar dos versiones de un texto o simplemente contar palabras y caracteres, las herramientas Comparador de textos y Contador de palabras y caracteres cubren eso con el mismo enfoque local, sin subir nada."
+  }
+}

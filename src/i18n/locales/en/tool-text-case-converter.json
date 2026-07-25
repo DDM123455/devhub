@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "title": "Text Case Converter Online Free — Web Tool Hub",
+    "description": "Convert text between UPPERCASE, lowercase, Title Case, camelCase, and snake_case instantly, free and entirely in your browser. No upload, no signup."
+  },
+  "heading": "Text Case Converter",
+  "tagline": "Convert text between UPPERCASE, lowercase, Title Case, camelCase, and snake_case instantly.",
+  "ui": {
+    "placeholder": "Type or paste text here…",
+    "outputLabel": "Result",
+    "caseUpper": "UPPERCASE",
+    "caseLower": "lowercase",
+    "caseTitle": "Title Case",
+    "caseCamel": "camelCase",
+    "caseSnake": "snake_case",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "clear": "Clear"
+  },
+  "related": "Related tools",
+  "article": {
+    "heading": "Why use a text case converter?",
+    "p1": "Case conversion needs come up in small but annoying ways all the time: a paragraph typed with Caps Lock stuck on, a spec written in Title Case that needs to become a camelCase variable name, a CSV column header that has to turn into a snake_case database field, a headline that needs proper title capitalization before it goes live. None of this is hard to do by hand for one word, but retyping an entire paragraph or a long list of field names by hand is slow and easy to get wrong.",
+    "p2": "This tool does the conversion with a small amount of plain JavaScript running directly in your browser — there's no library to load and nothing to send to a server. As you type or paste text and switch between case options, the result updates instantly, computed fresh in memory on your own device every time.",
+    "p3": "Paste or type your text, then pick UPPERCASE, lowercase, Title Case, camelCase, or snake_case, and press Copy to grab the result. For camelCase and snake_case specifically, the converter treats spaces, hyphens, underscores, and punctuation as word breaks — and it also detects existing camelCase or PascalCase boundaries, so pasting \"hello-world\", \"Hello World\", or even an already-cased \"helloWorld\" all convert cleanly to the same result instead of producing something broken like \"helloworld\" or \"hello-World\".",
+    "p4": "Developers reach for this most often when renaming variables or fields between naming conventions used by different languages and databases, writers use it to fix a sentence that got typed in all caps by accident, and editors use Title Case to get consistent headline capitalization without memorizing which small words to skip. If you also need to compare two versions of text or just count words and characters, the Text Diff Checker and Word & Character Counter tools cover that with the same local, nothing-uploaded approach."
+  }
+}

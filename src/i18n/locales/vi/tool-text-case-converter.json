@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "title": "Chuyển đổi Case văn bản miễn phí trực tuyến — Web Tool Hub",
+    "description": "Chuyển đổi văn bản giữa UPPERCASE, lowercase, Title Case, camelCase và snake_case ngay lập tức, miễn phí, xử lý hoàn toàn trên trình duyệt. Không upload, không cần đăng ký."
+  },
+  "heading": "Chuyển đổi Case văn bản",
+  "tagline": "Chuyển đổi văn bản giữa UPPERCASE, lowercase, Title Case, camelCase và snake_case ngay lập tức.",
+  "ui": {
+    "placeholder": "Gõ hoặc dán văn bản vào đây…",
+    "outputLabel": "Kết quả",
+    "caseUpper": "UPPERCASE",
+    "caseLower": "lowercase",
+    "caseTitle": "Title Case",
+    "caseCamel": "camelCase",
+    "caseSnake": "snake_case",
+    "copy": "Sao chép",
+    "copied": "Đã sao chép!",
+    "clear": "Xóa hết"
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Vì sao nên dùng công cụ chuyển đổi case văn bản?",
+    "p1": "Nhu cầu đổi case xuất hiện liên tục theo những cách nhỏ nhưng phiền toái: một đoạn văn gõ nhầm vì Caps Lock đang bật, một đặc tả viết theo Title Case cần chuyển thành tên biến camelCase, tiêu đề cột CSV cần đổi thành tên trường database dạng snake_case, một tiêu đề bài viết cần viết hoa chuẩn trước khi xuất bản. Không cái nào khó làm tay với một từ, nhưng gõ lại cả đoạn văn hay danh sách dài tên trường thì chậm và dễ sai.",
+    "p2": "Công cụ này xử lý việc chuyển đổi bằng một đoạn JavaScript thuần nhỏ chạy ngay trong trình duyệt của bạn — không cần tải thư viện nào, không có gì gửi lên máy chủ. Khi bạn gõ hoặc dán văn bản và chuyển giữa các lựa chọn case, kết quả cập nhật ngay lập tức, tính toán lại tại chỗ trong bộ nhớ trên chính thiết bị của bạn.",
+    "p3": "Dán hoặc gõ văn bản, chọn UPPERCASE, lowercase, Title Case, camelCase hoặc snake_case, rồi bấm Sao chép để lấy kết quả. Riêng với camelCase và snake_case, công cụ coi khoảng trắng, dấu gạch ngang, gạch dưới và dấu câu là ranh giới từ — đồng thời cũng nhận diện ranh giới camelCase hoặc PascalCase có sẵn, nên dù bạn dán \"hello-world\", \"Hello World\", hay thậm chí \"helloWorld\" đã có case sẵn, kết quả chuyển đổi vẫn ra đúng thay vì thành thứ lỗi như \"helloworld\" hay \"hello-World\".",
+    "p4": "Lập trình viên dùng công cụ này nhiều nhất khi cần đổi tên biến hoặc tên trường giữa các quy ước đặt tên khác nhau của từng ngôn ngữ và database, người viết dùng để sửa một câu lỡ gõ toàn chữ hoa, còn biên tập viên dùng Title Case để viết hoa tiêu đề nhất quán mà không cần nhớ từ nhỏ nào nên bỏ qua. Nếu bạn cũng cần so sánh hai phiên bản văn bản hoặc chỉ đơn giản đếm từ và ký tự, công cụ So sánh văn bản và Đếm từ & ký tự cũng xử lý theo đúng nguyên tắc tại chỗ, không upload gì tương tự."
+  }
+}

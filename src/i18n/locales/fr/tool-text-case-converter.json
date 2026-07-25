@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "title": "Convertisseur de casse de texte gratuit en ligne — Web Tool Hub",
+    "description": "Convertissez du texte entre MAJUSCULES, minuscules, Title Case, camelCase et snake_case instantanément, gratuitement et directement dans votre navigateur. Sans envoi sur un serveur, sans inscription."
+  },
+  "heading": "Convertisseur de casse de texte",
+  "tagline": "Convertissez du texte entre MAJUSCULES, minuscules, Title Case, camelCase et snake_case instantanément.",
+  "ui": {
+    "placeholder": "Tapez ou collez du texte ici…",
+    "outputLabel": "Résultat",
+    "caseUpper": "MAJUSCULES",
+    "caseLower": "minuscules",
+    "caseTitle": "Title Case",
+    "caseCamel": "camelCase",
+    "caseSnake": "snake_case",
+    "copy": "Copier",
+    "copied": "Copié !",
+    "clear": "Effacer"
+  },
+  "related": "Outils associés",
+  "article": {
+    "heading": "Pourquoi utiliser un convertisseur de casse de texte ?",
+    "p1": "Le besoin de convertir la casse d'un texte revient sans cesse, de façon minime mais agaçante : un paragraphe tapé avec le Verrouillage Majuscules resté activé par erreur, une spécification rédigée en Title Case qui doit devenir un nom de variable en camelCase, l'en-tête d'une colonne CSV qui doit devenir un champ de base de données en snake_case, un titre qui a besoin d'une capitalisation correcte avant publication. Rien de tout cela n'est difficile à faire à la main pour un seul mot, mais retaper tout un paragraphe ou une longue liste de noms de champs à la main est lent et source d'erreurs.",
+    "p2": "Cet outil effectue la conversion avec un peu de JavaScript pur qui s'exécute directement dans votre navigateur — aucune bibliothèque à charger, rien à envoyer vers un serveur. Pendant que vous tapez ou collez du texte et que vous changez d'option de casse, le résultat se met à jour instantanément, recalculé en mémoire sur votre propre appareil à chaque fois.",
+    "p3": "Collez ou tapez votre texte, choisissez MAJUSCULES, minuscules, Title Case, camelCase ou snake_case, puis cliquez sur Copier pour récupérer le résultat. Pour camelCase et snake_case en particulier, le convertisseur traite les espaces, tirets, underscores et signes de ponctuation comme des séparateurs de mots — il détecte aussi les frontières camelCase ou PascalCase déjà présentes, si bien que coller « hello-world », « Hello World » ou même un « helloWorld » déjà casé donne tous le même résultat propre, plutôt que quelque chose de cassé comme « helloworld » ou « hello-World ».",
+    "p4": "Les développeurs s'en servent surtout pour renommer des variables ou des champs entre les conventions de nommage utilisées par différents langages et bases de données, les rédacteurs pour corriger une phrase tapée entièrement en majuscules par erreur, et les éditeurs pour obtenir une capitalisation de titre cohérente sans avoir à retenir quels petits mots ignorer. Si vous devez aussi comparer deux versions d'un texte ou simplement compter des mots et des caractères, les outils Comparateur de texte et Compteur de mots et de caractères couvrent cela selon la même approche locale, sans rien envoyer."
+  }
+}
