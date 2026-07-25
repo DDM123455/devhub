@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Web Tool Hub — Gratis online tools",
+    "description": "100% gratis online tools die volledig in je browser draaien. Je bestanden verlaten nooit je apparaat."
+  },
+  "home": {
+    "kicker": "Lokale verwerking · Geen uploads · Voor altijd gratis",
+    "heading": "Elke tool die je nodig hebt. Geen data verlaat je browser.",
+    "tagline": "Snelle, offline bruikbare tools voor afbeeldingen, PDF's, tekst en code — allemaal lokaal verwerkt, gewoon in dit tabblad.",
+    "comingSoon": "Binnenkort meer tools.",
+    "stats": {
+      "tools": "tools",
+      "categories": "categorieën",
+      "uploaded": "ooit geüpload"
+    }
+  },
+  "search": {
+    "placeholder": "Zoek tools…",
+    "noResults": "Geen tools gevonden"
+  },
+  "sidebar": {
+    "note": "Er worden regelmatig nieuwe tools toegevoegd. Niets van wat je hier doet, bereikt ooit een server."
+  },
+  "nav": {
+    "toggleMenu": "Menu openen/sluiten",
+    "toggleTheme": "Thema wisselen",
+    "categories": {
+      "image": "Afbeeldingen",
+      "pdf": "PDF",
+      "text": "Tekst",
+      "dev": "Devtools"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Web Tool Hub",
+    "tagline": "Gemaakt voor mensen die willen dat hun bestanden van henzelf blijven."
+  },
+  "banner": {
+    "privacy": "100% Privacy — Bestanden blijven op je eigen apparaat"
+  }
+}

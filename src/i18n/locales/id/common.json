@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Web Tool Hub — Alat Online Gratis",
+    "description": "Alat online 100% gratis yang berjalan sepenuhnya di browser Anda. File Anda tidak pernah meninggalkan perangkat Anda."
+  },
+  "home": {
+    "kicker": "Diproses lokal · Tanpa unggah · Gratis selamanya",
+    "heading": "Setiap alat yang Anda butuhkan. Tidak ada data yang meninggalkan browser Anda.",
+    "tagline": "Alat cepat yang bisa dipakai offline untuk gambar, PDF, teks, dan kode — semuanya diproses secara lokal, langsung di tab ini.",
+    "comingSoon": "Alat baru akan segera hadir.",
+    "stats": {
+      "tools": "alat",
+      "categories": "kategori",
+      "uploaded": "total diunggah"
+    }
+  },
+  "search": {
+    "placeholder": "Cari alat…",
+    "noResults": "Tidak ada alat yang cocok"
+  },
+  "sidebar": {
+    "note": "Alat baru ditambahkan secara rutin. Tidak ada yang Anda lakukan di sini yang pernah sampai ke server."
+  },
+  "nav": {
+    "toggleMenu": "Buka/tutup menu",
+    "toggleTheme": "Ganti tema",
+    "categories": {
+      "image": "Gambar",
+      "pdf": "PDF",
+      "text": "Teks",
+      "dev": "Alat Developer"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Web Tool Hub",
+    "tagline": "Dibuat untuk orang yang ingin filenya tetap menjadi milik mereka sendiri."
+  },
+  "banner": {
+    "privacy": "100% Privasi — File Tetap di Perangkat Anda"
+  }
+}

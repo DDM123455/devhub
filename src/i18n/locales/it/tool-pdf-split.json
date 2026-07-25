@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Dividi file PDF online gratis — Web Tool Hub",
+    "description": "Dividi un PDF in più file o estrai pagine specifiche online gratis, direttamente nel tuo browser. Anteprima di ogni pagina come miniatura, ruota o elimina pagine, dividi per intervalli personalizzati o ogni N pagine. Senza upload, senza filigrana, senza registrazione."
+  },
+  "heading": "Dividi file PDF",
+  "tagline": "Anteprima di ogni pagina come miniatura e dividi un PDF in più file, direttamente nel browser.",
+  "ui": {
+    "selectFile": "Seleziona file PDF",
+    "dropHint": "oppure trascina qui un file PDF",
+    "noFile": "Nessun file PDF selezionato.",
+    "changeFile": "Scegli un file diverso",
+    "loadingThumbnails": "Lettura pagine…",
+    "pageCount": "{{count}} pagine",
+    "rotate": "Ruota pagina",
+    "deletePage": "Elimina pagina",
+    "modeLabel": "Modalità divisione",
+    "modeRanges": "Intervalli personalizzati",
+    "modeEveryN": "Ogni N pagine",
+    "everyNLabel": "Pagine per file",
+    "rangesLabel": "Intervalli di pagine (opzionale)",
+    "rangesPlaceholder": "es. 1-3, 4, 5-7",
+    "rangesHint": "Lascia vuoto per dividere ogni pagina nel proprio file PDF.",
+    "split": "Dividi PDF",
+    "splitting": "Divisione…",
+    "resultsHeading": "File risultanti",
+    "download": "Scarica",
+    "downloadAll": "Scarica tutto (.zip)",
+    "errorGeneric": "Si è verificato un errore leggendo questo PDF. Assicurati che non sia corrotto o protetto da password, poi riprova.",
+    "errorInvalidRange": "Intervallo di pagine non valido \"{{range}}\". Usa un formato come 1-3, 4, 5-7, con pagine tra 1 e {{max}}.",
+    "errorInvalidEveryN": "Inserisci un numero intero di 1 o superiore."
+  },
+  "related": "Strumenti correlati",
+  "article": {
+    "heading": "Perché dividere un PDF localmente invece di caricarlo online?",
+    "p1": "Un libro scansionato, un fascio di estratti conto mensili, un rapporto di 200 pagine di cui ti servono solo tre — prima o poi un PDF diventa troppo grande o troppo eterogeneo rispetto a ciò di cui hai davvero bisogno. La maggior parte dei siti gratuiti di \"divisione PDF\" gestisce questo allo stesso modo dei siti gratuiti di \"unione PDF\": caricando silenziosamente il tuo file su un server prima di fare qualsiasi cosa con esso. È una strana quantità di fiducia da concedere per un documento che potrebbe contenere una firma, un estratto conto bancario o una pagina che preferiresti non lasciare sul disco di qualcun altro.",
+    "p2": "Questo strumento non carica mai nulla. Funziona interamente nel tuo browser usando pdf-lib, una libreria JavaScript che legge la struttura grezza del tuo PDF e copia solo le pagine richieste in documenti nuovi, assemblati in memoria sul tuo dispositivo. Anche le miniature delle pagine vengono renderizzate localmente, con pdf.js — lo stesso motore integrato in Firefox — così puoi vedere esattamente cosa c'è su ogni pagina prima di decidere come dividerla.",
+    "p3": "Seleziona un file PDF o trascinalo nell'area di rilascio; ogni pagina appare come una propria miniatura così puoi vedere il documento a colpo d'occhio. Ruota una pagina di 90° alla volta o eliminala completamente se non dovrebbe essere in nessuno dei file di output — un foglio scansionato vuoto, per esempio. Poi scegli come dividere: Intervalli personalizzati ti permette di digitare gruppi come \"1-3, 4, 5-7\" dove ogni gruppo separato da virgola diventa un proprio file, mentre Ogni N pagine suddivide automaticamente il documento in blocchi di uguale dimensione — utile per spezzare una scansione lunga in, diciamo, pezzi da 10 pagine senza digitare ogni intervallo a mano. Premi Dividi PDF e ogni risultato appare con il proprio pulsante di download.",
+    "p4": "Non c'è alcun limite di pagine integrato nello strumento, anche se PDF scansionati molto grandi pieni di immagini richiederanno naturalmente un po' più di tempo per renderizzare le miniature poiché tutto funziona sul tuo dispositivo anziché su un server farm. Se digiti un intervallo che non ha senso — un numero di pagina oltre la lunghezza del documento, o testo che non è un intervallo valido — lo strumento ti dice esattamente quale parte non era valida invece di produrre un file rotto. Se in seguito hai bisogno di rimettere insieme pagine da più PDF, lo strumento Unisci PDF funziona allo stesso modo orientato alla privacy e condivide gli stessi controlli di rotazione ed eliminazione pagina."
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Web Tool Hub — Strumenti online gratuiti",
+    "description": "Strumenti online gratuiti al 100% che funzionano interamente nel tuo browser. I tuoi file non lasciano mai il tuo dispositivo."
+  },
+  "home": {
+    "kicker": "Elaborazione locale · Nessun upload · Gratis per sempre",
+    "heading": "Ogni strumento di cui hai bisogno. Zero dati lasciano il tuo browser.",
+    "tagline": "Strumenti veloci, utilizzabili offline, per immagini, PDF, testo e codice — tutto elaborato localmente, proprio in questa scheda.",
+    "comingSoon": "Presto nuovi strumenti.",
+    "stats": {
+      "tools": "strumenti",
+      "categories": "categorie",
+      "uploaded": "mai caricato"
+    }
+  },
+  "search": {
+    "placeholder": "Cerca strumenti…",
+    "noResults": "Nessuno strumento corrisponde"
+  },
+  "sidebar": {
+    "note": "Nuovi strumenti vengono aggiunti regolarmente. Niente di ciò che tocchi qui raggiunge mai un server."
+  },
+  "nav": {
+    "toggleMenu": "Apri/chiudi menu",
+    "toggleTheme": "Cambia tema",
+    "categories": {
+      "image": "Immagini",
+      "pdf": "PDF",
+      "text": "Testo",
+      "dev": "Strumenti dev"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Web Tool Hub",
+    "tagline": "Creato per chi vuole che i propri file restino suoi."
+  },
+  "banner": {
+    "privacy": "100% Privacy — I file restano sul tuo dispositivo"
+  }
+}

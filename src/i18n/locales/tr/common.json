@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Web Tool Hub — Ücretsiz Çevrimiçi Araçlar",
+    "description": "Tamamen tarayıcınızda çalışan %100 ücretsiz çevrimiçi araçlar. Dosyalarınız cihazınızdan asla ayrılmaz."
+  },
+  "home": {
+    "kicker": "Cihazda işlenir · Yükleme yok · Sonsuza dek ücretsiz",
+    "heading": "İhtiyacınız olan her araç. Tarayıcınızdan hiçbir veri çıkmaz.",
+    "tagline": "Görseller, PDF'ler, metin ve kod için hızlı, çevrimdışı çalışabilen araçlar — hepsi bu sekmede, yerel olarak işlenir.",
+    "comingSoon": "Yakında yeni araçlar geliyor.",
+    "stats": {
+      "tools": "araç",
+      "categories": "kategori",
+      "uploaded": "toplam yüklenen"
+    }
+  },
+  "search": {
+    "placeholder": "Araç ara…",
+    "noResults": "Eşleşen araç yok"
+  },
+  "sidebar": {
+    "note": "Düzenli olarak yeni araçlar ekleniyor. Burada yaptığınız hiçbir şey bir sunucuya ulaşmaz."
+  },
+  "nav": {
+    "toggleMenu": "Menüyü aç/kapat",
+    "toggleTheme": "Temayı değiştir",
+    "categories": {
+      "image": "Görseller",
+      "pdf": "PDF",
+      "text": "Metin",
+      "dev": "Geliştirici Araçları"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Web Tool Hub",
+    "tagline": "Dosyalarının kendine ait kalmasını isteyenler için yapıldı."
+  },
+  "banner": {
+    "privacy": "%100 Gizlilik — Dosyalar Cihazınızda Kalır"
+  }
+}

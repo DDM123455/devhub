@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Web Tool Hub — Darmowe narzędzia online",
+    "description": "W 100% darmowe narzędzia online działające całkowicie w Twojej przeglądarce. Twoje pliki nigdy nie opuszczają Twojego urządzenia."
+  },
+  "home": {
+    "kicker": "Przetwarzanie lokalne · Bez przesyłania na serwer · Zawsze za darmo",
+    "heading": "Każde narzędzie, jakiego potrzebujesz. Żadne dane nie opuszczają przeglądarki.",
+    "tagline": "Szybkie narzędzia do obrazów, plików PDF, tekstu i kodu, działające nawet offline — wszystko przetwarzane lokalnie, w tej właśnie karcie.",
+    "comingSoon": "Wkrótce więcej narzędzi.",
+    "stats": {
+      "tools": "narzędzi",
+      "categories": "kategorii",
+      "uploaded": "przesłano łącznie"
+    }
+  },
+  "search": {
+    "placeholder": "Szukaj narzędzi…",
+    "noResults": "Brak pasujących narzędzi"
+  },
+  "sidebar": {
+    "note": "Regularnie dodajemy nowe narzędzia. Nic z tego, co tu robisz, nigdy nie trafia na serwer."
+  },
+  "nav": {
+    "toggleMenu": "Przełącz menu",
+    "toggleTheme": "Przełącz motyw",
+    "categories": {
+      "image": "Obrazy",
+      "pdf": "PDF",
+      "text": "Tekst",
+      "dev": "Narzędzia dev"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Web Tool Hub",
+    "tagline": "Stworzone dla tych, którzy chcą, by ich pliki należały tylko do nich."
+  },
+  "banner": {
+    "privacy": "100% Prywatności — Pliki zostają na Twoim urządzeniu"
+  }
+}

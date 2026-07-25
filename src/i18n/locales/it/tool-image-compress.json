@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Comprimi immagini online gratis (JPEG, PNG, WebP) — Web Tool Hub",
+    "description": "Comprimi immagini JPEG, PNG e WebP online gratis, direttamente nel tuo browser. Senza upload, senza limiti di dimensione, senza registrazione — le tue foto non lasciano mai il tuo dispositivo."
+  },
+  "heading": "Comprimi immagine (JPEG/PNG/WebP)",
+  "tagline": "Riduci il peso delle tue foto in pochi secondi, direttamente nel browser.",
+  "ui": {
+    "selectFiles": "Seleziona immagini",
+    "dropHint": "oppure trascina qui le immagini",
+    "quality": "Qualità",
+    "compress": "Comprimi",
+    "compressing": "Compressione…",
+    "download": "Scarica",
+    "downloadAll": "Scarica tutto (.zip)",
+    "original": "Originale",
+    "compressed": "Compresso",
+    "reduced": "{{percent}}% più piccolo",
+    "noFiles": "Nessuna immagine selezionata.",
+    "errorGeneric": "Si è verificato un errore durante la compressione di questa immagine. Riprova.",
+    "remove": "Rimuovi",
+    "clearAll": "Cancella tutto",
+    "skippedFiles": "{{count}} file ignorati perché non sono un formato immagine supportato."
+  },
+  "related": "Strumenti correlati",
+  "article": {
+    "heading": "Perché comprimere le immagini prima di pubblicarle?",
+    "p1": "Una foto scattata con uno smartphone moderno può facilmente pesare 4-8 MB, ma la maggior parte dei siti web ha bisogno solo di una frazione di quel peso per apparire nitida a schermo. Le immagini troppo pesanti sono una delle cause più comuni di caricamento lento delle pagine, e le pagine lente perdono visitatori e posizioni nei Core Web Vitals di Google. Comprimere un'immagine prima di pubblicarla elimina i dati superflui che l'occhio non percepisce comunque alle dimensioni di visualizzazione normali.",
+    "p2": "Tutto avviene localmente nel tuo browser. La compressione stessa gira dentro un Web Worker, un thread separato integrato nei browser moderni, così la pagina resta reattiva anche mentre comprimi un intero lotto di foto pesanti. Nessun file viene mai caricato su un server — nemmeno temporaneamente — quindi non c'è attesa di upload, nessun limite di dimensione imposto dal server, e le tue immagini non lasciano mai il tuo dispositivo.",
+    "p3": "L'uso è semplice: seleziona uno o più file JPEG, PNG o WebP, scegli un livello di qualità con il cursore e premi Comprimi. Ogni immagine viene elaborata una alla volta e il risultato appare subito con la dimensione originale, quella nuova e la percentuale risparmiata, così puoi confrontare prima di scaricare qualsiasi cosa. Se il risultato non ti convince, basta regolare il cursore e comprimere di nuovo — puoi provare tutte le volte che vuoi.",
+    "p4": "Come punto di partenza, una qualità del 70-80% mantiene le foto visivamente identiche all'originale per la maggior parte delle persone, riducendo comunque la dimensione della metà o più. Le immagini a colori piatti come screenshot, illustrazioni e loghi si comprimono particolarmente bene anche a impostazioni basse. Le foto con molti dettagli fini, rumore o gradienti — pensa a foglie di un bosco o a un cielo stellato — mantengono più peso alla stessa qualità, e spesso traggono più beneficio dal ridimensionamento che da un'ulteriore riduzione della qualità."
+  }
+}

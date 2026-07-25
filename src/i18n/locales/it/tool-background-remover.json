@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "title": "Rimuovi lo sfondo da un'immagine gratis (IA, senza upload) — Web Tool Hub",
+    "description": "Rimuovi lo sfondo da una foto gratuitamente usando un modello IA locale che funziona interamente nel tuo browser. Sostituiscilo con un colore o un'altra immagine, confronta prima/dopo con un cursore. Senza upload, senza registrazione."
+  },
+  "heading": "Rimuovi sfondo",
+  "tagline": "Ritaglia automaticamente lo sfondo da una foto, sostituiscilo con un colore o un'immagine, direttamente nel browser.",
+  "ui": {
+    "selectFiles": "Seleziona immagini",
+    "dropHint": "oppure trascina qui le immagini",
+    "remove": "Rimuovi sfondo",
+    "removing": "Rimozione sfondo… {{percent}}%",
+    "download": "Scarica",
+    "original": "Originale",
+    "result": "Risultato",
+    "noFiles": "Nessuna immagine selezionata.",
+    "errorGeneric": "Si è verificato un errore durante la rimozione dello sfondo da questa immagine. Riprova.",
+    "modelNotice": "Il primo click scarica un piccolo modello IA (alcuni MB) nel tuo browser — dopodiché funziona completamente offline. Le tue foto non vengono mai caricate da nessuna parte.",
+    "backgroundLabel": "Sfondo",
+    "backgroundTransparent": "Trasparente",
+    "backgroundColor": "Colore pieno",
+    "backgroundImage": "Immagine personalizzata",
+    "backgroundImageSelect": "Scegli immagine di sfondo",
+    "backgroundImageClear": "Rimuovi",
+    "edgeSoftnessLabel": "Morbidezza bordi",
+    "removeItem": "Rimuovi",
+    "clearAll": "Cancella tutto",
+    "skippedFiles": "{{count}} file ignorati perché non sono un formato immagine supportato."
+  },
+  "related": "Strumenti correlati",
+  "article": {
+    "heading": "Come funziona la rimozione locale dello sfondo nel browser?",
+    "p1": "Rimuovere lo sfondo da una foto un tempo significava usare uno strumento in abbonamento che carica la tua immagine su un server, oppure tracciare manualmente il soggetto in un editor di immagini. Questo strumento non fa nessuna delle due cose: esegue un piccolo modello IA di segmentazione direttamente nella scheda del tuo browser per capire quali pixel appartengono al soggetto e quali allo sfondo, poi rende lo sfondo trasparente — tutto senza che la tua foto venga mai inviata da nessuna parte. È lo stesso tipo di modifica spesso usata per foto di prodotti, immagini profilo e adesivi — cose che un tempo richiedevano minuti in un editor di immagini e ora richiedono secondi.",
+    "p2": "La prima volta che lo usi, il tuo browser scarica il modello IA stesso — pochi megabyte di dati — allo stesso modo in cui scaricherebbe qualsiasi immagine o script da un sito web. Quel download avviene solo una volta e viene memorizzato nella cache per la prossima volta. Le tue foto sono una cosa completamente separata: ognuna viene caricata direttamente nella memoria del browser ed elaborata lì, e in nessun momento viene caricata su un server, nemmeno temporaneamente.",
+    "p3": "Seleziona una o più foto e premi Rimuovi sfondo — ognuna viene elaborata una alla volta, con un indicatore di avanzamento, in un Web Worker così il resto della pagina rimane reattivo. Una volta pronto un risultato, trascina il cursore sulla sua miniatura per confrontare l'originale con il ritaglio fianco a fianco. Per impostazione predefinita lo sfondo diventa trasparente (mostrato come un motivo a scacchi), ma puoi sostituirlo con un colore pieno o una tua immagine di sfondo usando i controlli sopra l'elenco — ogni foto completata si aggiorna istantaneamente poiché ricomporre uno sfondo è economico, a differenza di rieseguire il modello IA. Il cursore di morbidezza dei bordi sfoca leggermente solo il bordo alfa del ritaglio, il che può far apparire capelli o pelliccia sottili meno ritagliati e più naturali; è disattivato per impostazione predefinita poiché la maggior parte dei soggetti appare meglio con il bordo netto già prodotto dal modello.",
+    "p4": "I risultati sono solitamente migliori su foto con un soggetto chiaro e distinto — persone, animali, prodotti, veicoli — su uno sfondo che non ha lo stesso colore del soggetto. Dettagli molto fini come ciocche di capelli sciolte o pelliccia potrebbero non venire perfettamente anche con la morbidezza dei bordi attivata, e sfondi affollati o disordinati a volte possono confondere il modello. Se il risultato non è del tutto corretto, ritagliare la foto più strettamente attorno al soggetto prima di caricarla spesso aiuta. Fotografare il soggetto contro uno sfondo uniformemente illuminato e semplice fin dall'inizio rende anche più facile per qualsiasi strumento — umano o IA — produrre un ritaglio notevolmente più pulito."
+  }
+}

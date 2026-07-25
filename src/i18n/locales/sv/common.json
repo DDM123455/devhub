@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Web Tool Hub — Gratis onlineverktyg",
+    "description": "100 % gratis onlineverktyg som körs helt i din webbläsare. Dina filer lämnar aldrig din enhet."
+  },
+  "home": {
+    "kicker": "Lokal bearbetning · Inga uppladdningar · Gratis för alltid",
+    "heading": "Varje verktyg du behöver. Ingen data lämnar din webbläsare.",
+    "tagline": "Snabba verktyg som fungerar offline för bilder, PDF:er, text och kod — allt bearbetas lokalt, direkt i den här fliken.",
+    "comingSoon": "Fler verktyg är på väg.",
+    "stats": {
+      "tools": "verktyg",
+      "categories": "kategorier",
+      "uploaded": "någonsin uppladdat"
+    }
+  },
+  "search": {
+    "placeholder": "Sök verktyg…",
+    "noResults": "Inga matchande verktyg"
+  },
+  "sidebar": {
+    "note": "Nya verktyg läggs till regelbundet. Inget du gör här når någonsin en server."
+  },
+  "nav": {
+    "toggleMenu": "Visa/dölj meny",
+    "toggleTheme": "Växla tema",
+    "categories": {
+      "image": "Bilder",
+      "pdf": "PDF",
+      "text": "Text",
+      "dev": "Dev-verktyg"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Web Tool Hub",
+    "tagline": "Byggt för dig som vill att dina filer ska förbli dina."
+  },
+  "banner": {
+    "privacy": "100 % integritet — Filerna stannar på din enhet"
+  }
+}

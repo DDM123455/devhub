@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "title": "Unisci file PDF online gratis — Web Tool Hub",
+    "description": "Combina più file PDF in un unico documento online gratis, direttamente nel tuo browser. Vedi ogni pagina come miniatura, trascina per riordinare, ruota o elimina singole pagine prima di unire. Senza upload, senza filigrana, senza registrazione."
+  },
+  "heading": "Unisci file PDF",
+  "tagline": "Combina più PDF in un unico file, con anteprima miniatura pagina per pagina, direttamente nel browser.",
+  "ui": {
+    "selectFiles": "Seleziona file PDF",
+    "dropHint": "oppure trascina qui i file PDF",
+    "merge": "Unisci PDF",
+    "merging": "Unione…",
+    "download": "Scarica merged.pdf",
+    "moveUp": "Sposta prima",
+    "moveDown": "Sposta dopo",
+    "remove": "Elimina pagina",
+    "rotate": "Ruota pagina",
+    "loadingThumbnails": "Lettura pagine…",
+    "dragHint": "Trascina qualsiasi pagina per riordinarla, oppure usa i pulsanti freccia.",
+    "noFiles": "Nessun file PDF selezionato.",
+    "errorGeneric": "Si è verificato un errore leggendo questo PDF. Assicurati che non sia corrotto o protetto da password, poi riprova.",
+    "skippedFiles": "{{count}} file ignorati perché non sono un PDF."
+  },
+  "related": "Strumenti correlati",
+  "article": {
+    "heading": "Perché unire i PDF localmente invece di caricarli online?",
+    "p1": "Contratti scansionati, moduli firmati, lotti di fatture, capitoli di un rapporto — prima o poi quasi tutti si ritrovano con più file PDF che in realtà appartengono insieme come un unico documento. Inviare per email cinque allegati separati o chiedere a un cliente di aprire cinque link invece di uno è scomodo, e la maggior parte dei siti gratuiti di \"unione PDF\" risolve questo problema caricando silenziosamente i tuoi file su un server, il che è esattamente il tipo di fiducia che poche persone vogliono concedere a un documento che potrebbe contenere una firma, un numero di identificazione o dettagli finanziari.",
+    "p2": "Questo strumento non lo fa mai. Tutto funziona dentro il tuo browser usando pdf-lib, una libreria JavaScript che legge la struttura grezza di ogni PDF, copia le sue pagine in un nuovo documento e riassembla il risultato — tutto in memoria, sul tuo dispositivo. Anche le miniature delle pagine vengono renderizzate localmente, con pdf.js (lo stesso motore di rendering integrato in Firefox), così puoi vedere esattamente con cosa stai lavorando prima che qualcosa venga combinato.",
+    "p3": "Aggiungi i tuoi file PDF cliccando il pulsante o trascinandoli nell'area di rilascio — ogni pagina di ogni file appare come una propria miniatura, in un'unica griglia combinata, non raggruppata per file. Trascina qualsiasi miniatura per riordinarla rispetto a tutte le altre, anche tra file di origine diversi, oppure usa i pulsanti freccia se trascinare non è comodo. Clicca il pulsante di rotazione di una pagina per ruotarla di 90° alla volta, o il pulsante di eliminazione per escluderla completamente dal documento finale — utile per rimuovere una copertina scansionata vuota o una pagina duplicata. Una volta che tutto sembra corretto, premi Unisci PDF; il file combinato viene costruito interamente in memoria e scaricato come merged.pdf.",
+    "p4": "Non c'è alcun limite di pagine integrato nello strumento, anche se lotti molto grandi di PDF scansionati e pieni di immagini richiederanno naturalmente più tempo per renderizzare le miniature poiché tutto viene elaborato dal tuo dispositivo anziché da un server farm. Se un file non riesce a caricarsi — ad esempio perché è criptato con una password o si è corrotto durante il download — questo strumento te lo dice invece di produrre silenziosamente un risultato rotto. Per andare nella direzione opposta e dividere un PDF unito in pezzi più piccoli, lo strumento Dividi PDF funziona allo stesso modo orientato alla privacy e condivide gli stessi controlli di rotazione ed eliminazione pagina."
+  }
+}

@@ -19,11 +19,19 @@
   bên dưới cho từng tool. 2 tool (Đếm từ & ký tự, JSON Formatter) và Text Case Converter đều
   SẠCH ngay từ đầu, không cần sửa gì. Báo cáo tổng kết dạng bảng đã gửi cho người dùng trong
   chính phiên chat này (không lưu file riêng, xem lại lịch sử chat nếu cần).
-- Task tiếp theo khi mở phiên mới: bắt đầu **Phase 2 — SEO chuyên sâu & nhân bản đa ngôn
-  ngữ** (xem `ROADMAP.md` từ dòng "## Phase 2"), việc đầu tiên là mở rộng i18n từ 8 lên
-  15–20 ngôn ngữ. Có thể tranh thủ làm nốt mục nén PDF còn treo của Phase 1.5 trước nếu
-  người dùng muốn dứt điểm Phase 1.5 100% trước khi sang Phase 2, nhưng đây không phải yêu
-  cầu bắt buộc theo `ROADMAP.md` (mục đó đã được đánh dấu rõ là "để lại cho sau").
+- **ĐANG LÀM DỞ (2026-07-25, TẠM DỪNG theo yêu cầu người dùng — xem hướng dẫn tiếp tục chi
+  tiết bên dưới): Phase 2, task đầu tiên "Mở rộng i18n từ 8 lên 20 ngôn ngữ"**. Người dùng
+  đã chốt: thêm đúng 12 ngôn ngữ mới (zh, zh-tw, it, ru, nl, pl, tr, id, ar, hi, th, sv) để
+  đạt tổng 20, làm tuần tự không dừng hỏi. Phần HẠ TẦNG đã xong 100% (xem log chi tiết bên
+  dưới) — chỉ còn thiếu NỘI DUNG (file JSON dịch cho từng tool) cho 11.5/12 ngôn ngữ. Task
+  tiếp theo khi mở phiên mới: đọc kỹ log "2026-07-25 — Phase 2 (đang làm dở)" ngay bên dưới
+  để biết chính xác còn thiếu file nào, rồi tiếp tục viết nốt — **không viết lại phần đã
+  xong**, không lặp lại hạ tầng đã có.
+- Task sau khi xong toàn bộ Phase 2 mục i18n: tick checkbox "Mở rộng i18n..." trong
+  `ROADMAP.md`, rồi làm tiếp các mục còn lại của Phase 2 (viết meta/description tối ưu SEO
+  cho từng ngôn ngữ, soát schema JSON-LD, nội dung SEO 300–500 từ, internal linking, Core
+  Web Vitals). Có thể tranh thủ làm nốt mục nén PDF còn treo của Phase 1.5 nếu người dùng
+  muốn dứt điểm Phase 1.5 100% trước, nhưng không bắt buộc.
 - Ghi chú thiết kế (2026-07-25): đã redesign toàn bộ giao diện site (không phải task trong
   `ROADMAP.md`, làm theo yêu cầu trực tiếp của người dùng) dựa trên file mockup
   `Web Tool Hub.dc.html` ở gốc repo (file KHÔNG được commit vào git — chỉ là tài liệu tham
@@ -95,6 +103,80 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 2 (ĐANG LÀM DỞ, TẠM DỪNG theo yêu cầu người dùng): Mở rộng i18n lên
+  20 ngôn ngữ — hạ tầng XONG 100%, nội dung dịch còn dở
+- **Quyết định đã chốt với người dùng** (hỏi qua `AskUserQuestion`, không tự đoán): thêm
+  đúng **12 ngôn ngữ mới** để đạt tổng 20 (8 cũ + 12 mới), làm tuần tự tất cả không dừng lại
+  hỏi giữa chừng. 12 ngôn ngữ mới, mã locale chính xác đã dùng trong code:
+  `zh` (Trung giản thể), `zh-tw` (Trung phồn thể), `it` (Ý), `ru` (Nga), `nl` (Hà Lan),
+  `pl` (Ba Lan), `tr` (Thổ Nhĩ Kỳ), `id` (Indonesia), `ar` (Ả Rập — RTL), `hi` (Hindi),
+  `th` (Thái), `sv` (Thụy Điển).
+- **HẠ TẦNG — ĐÃ XONG HOÀN TOÀN, không cần động vào lại**:
+  - `src/i18n/config.ts`: mảng `locales` đã có đủ 20 mã (thứ tự: 8 cũ trước, 12 mã mới theo
+    đúng thứ tự liệt kê ở trên). Thêm mới `export const rtlLocales: ReadonlySet<Locale> =
+    new Set(['ar'])` để đánh dấu ngôn ngữ viết phải-sang-trái.
+  - `src/layouts/Layout.astro`: đã thêm `const dir = rtlLocales.has(lang) ? 'rtl' : 'ltr'`
+    và `<html lang={lang} dir={dir}>` — CHỈ set thuộc tính `dir` (đổi hướng chữ/canh lề mặc
+    định của trình duyệt), CHƯA làm mirror toàn bộ layout (icon mũi tên, margin trái/phải
+    trong Sidebar/Header vẫn cố định vật lý, không tự lật theo RTL) — đây là quyết định có
+    chủ đích đã nói rõ với người dùng khi hỏi (họ đã chọn phương án "đủ 20 ngôn ngữ" biết
+    trước chi phí kỹ thuật này), COI LÀ ĐỦ cho Phase 2, có thể nâng cấp mirror layout đầy đủ
+    ở một lượt UI polish riêng sau này nếu cần, KHÔNG phải việc phải làm ngay.
+  - `src/components/layout/LanguageSwitcher.astro`: `nativeNames` đã có đủ 20 mục (tên bản
+    ngữ hiển thị trong dropdown chọn ngôn ngữ).
+  - `src/data/tools.ts`: CẢ 10 tool đã có đủ `slugs`/`names` cho toàn bộ 20 locale (đã viết
+    script Node kiểm tra tự động xác nhận: đúng 200 slug — 10 tool × 20 ngôn ngữ — KHÔNG
+    trùng nhau trong cùng 1 ngôn ngữ, KHÔNG thiếu mã nào; script kiểm tra này không được lưu
+    lại, nếu cần soát lại chỉ cần viết lại nhanh 1 script tương tự đọc `tools.ts` bằng regex
+    theo mốc `id: '...'` của từng tool). Slug cho ngôn ngữ dùng chữ Latin (it/ru dùng ký tự
+    Cyrillic giữ nguyên, nl/pl/tr/id/sv) đều dùng dạng ASCII-hoá/kebab-case; slug cho ngôn
+    ngữ script riêng (zh/zh-tw/ar/hi/th) dùng THẲNG ký tự bản ngữ trong URL — giống pattern
+    đã có sẵn từ trước với `ja`/`ko`.
+  - `src/i18n/i18next.ts` KHÔNG cần sửa gì — tự động glob-load mọi file JSON mới thêm vào
+    `src/i18n/locales/*/*.json`, và có `fallbackLng: defaultLocale` nên NGAY CẢ TRƯỚC khi
+    file `tool-*.json` của 1 ngôn ngữ mới tồn tại, trang tool vẫn build được (tự fallback
+    hiện text tiếng Anh) — đã xác nhận qua `npm run build` chạy sạch 221 trang (20 ngôn ngữ
+    × (10 tool + trang chủ) + 1 root index) ngay sau khi CHỈ MỚI thêm hạ tầng + `common.json`
+    cho 12 ngôn ngữ, TRƯỚC KHI viết bất kỳ file `tool-*.json` nào — nghĩa là an toàn tuyệt
+    đối, không có rủi ro "build gãy giữa chừng" khi làm dở phần nội dung dịch.
+  - `common.json` (namespace dùng chung: nav/search/footer/banner/home...) đã viết ĐẦY ĐỦ,
+    tự nhiên (không dịch máy) cho **CẢ 12 NGÔN NGỮ MỚI** — không cần động vào lại các file
+    này: `src/i18n/locales/{zh,zh-tw,it,ru,nl,pl,tr,id,ar,hi,th,sv}/common.json`.
+- **NỘI DUNG DỊCH TỪNG TOOL (`tool-*.json`, 10 file mỗi ngôn ngữ) — ĐANG LÀM DỞ, đây là phần
+  còn thiếu, chiếm phần lớn khối lượng công việc còn lại**:
+  - **`it` (Ý) — 5/10 XONG**: đã viết `tool-image-compress.json`, `tool-image-convert.json`,
+    `tool-background-remover.json`, `tool-pdf-merge.json`, `tool-pdf-split.json`. **CÒN
+    THIẾU đúng 5 file**: `tool-text-diff.json`, `tool-word-counter.json`,
+    `tool-json-formatter.json`, `tool-qr-generator.json`, `tool-text-case-converter.json`.
+  - **11 ngôn ngữ còn lại (`nl`, `pl`, `sv`, `tr`, `id`, `zh`, `zh-tw`, `ru`, `ar`, `hi`,
+    `th`) — CHƯA VIẾT FILE `tool-*.json` NÀO CẢ**, chỉ mới có `common.json`. Mỗi ngôn ngữ
+    cần đủ 10 file y hệt danh sách trên.
+  - Tổng khối lượng còn lại: 5 file (nốt `it`) + 11 × 10 = 110 file = **115 file JSON** cần
+    viết, mỗi file gồm `meta.title`/`meta.description`, `heading`, `tagline`, khối `ui.*`
+    (15–30 chuỗi ngắn tuỳ tool), và `article.heading` + 4-5 đoạn văn (`p1`...`p4`/`p5`,
+    tổng ~300–500 từ) viết TỰ NHIÊN riêng cho từng ngôn ngữ (không dịch máy nguyên khối,
+    đúng quy tắc SEO trong `CLAUDE.md`).
+- **NGUỒN THAM CHIẾU DUY NHẤT dùng để dịch** (đã đọc đầy đủ nội dung trong phiên này, xem
+  lại nếu cần bằng Read tool, không cần đoán lại cấu trúc key): 10 file tiếng Anh tại
+  `src/i18n/locales/en/tool-{image-compress,image-convert,background-remover,pdf-merge,
+  pdf-split,text-diff,word-counter,json-formatter,qr-generator,text-case-converter}.json`
+  — SAO CHÉP ĐÚNG CẤU TRÚC KEY (không thêm/bớt key nào), chỉ dịch GIÁ TRỊ. Đối chiếu thêm
+  1 ngôn ngữ Latin đã có sẵn nếu cần ví dụ văn phong (ví dụ bản `es`/`fr` cùng tool) để thấy
+  cách các phiên trước đã "viết lại tự nhiên" chứ không dịch nguyên văn.
+- **Task tiếp theo khi mở phiên mới, THEO ĐÚNG THỨ TỰ**: (1) làm nốt 5 file còn thiếu của
+  `it`, (2) rồi lần lượt từng ngôn ngữ trong danh sách 11 ngôn ngữ trên (thứ tự không quan
+  trọng, có thể theo đúng thứ tự liệt kê để dễ theo dõi), mỗi ngôn ngữ viết đủ 10 file
+  `tool-*.json`, (3) sau khi XONG CẢ 12 ngôn ngữ mới (đủ 10/10 file mỗi ngôn ngữ), chạy
+  `npm run build` xác nhận sạch, test nhanh vài trang mẫu (đặc biệt `ar` để xác nhận
+  `dir="rtl"` hiển thị đúng), rồi tick checkbox "Mở rộng i18n từ 8 lên 15–20 ngôn ngữ" trong
+  `ROADMAP.md`, ghi log hoàn tất, và commit. Danh sách task chi tiết (mỗi ngôn ngữ 1 task
+  riêng) đã được tạo trong task tracker của phiên này (task #14 "it" đang `in_progress`,
+  #15-#25 mỗi ngôn ngữ 1 task còn `pending`, #26 là task tổng kết cuối cùng) — nếu task
+  tracker của phiên mới không còn giữ các task này, cứ tạo lại tương tự hoặc bỏ qua và làm
+  thẳng theo danh sách ở log này, không bắt buộc phải dùng task tracker.
+- Đã commit hạ tầng + `common.json` × 12 + 5 file `it` đã xong (xem commit gần nhất trên
+  `main`, message bắt đầu bằng `feat(i18n):`) — **CHƯA push lên `origin/main`**.
 
 ### 2026-07-25 — QA Audit toàn site (hoàn tất): Text Case Converter + responsive/dark mode
   sweep + báo cáo tổng kết — XONG

@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Web Tool Hub — 免費線上工具集",
+    "description": "100% 免費的線上工具，完全在瀏覽器中執行。你的檔案永遠不會離開你的裝置。"
+  },
+  "home": {
+    "kicker": "本地處理 · 無需上傳 · 永久免費",
+    "heading": "你需要的每一個工具。資料永不離開瀏覽器。",
+    "tagline": "快速、可離線使用的圖片、PDF、文字和程式碼處理工具 —— 全部在這個分頁裡本地完成。",
+    "comingSoon": "更多工具即將上線。",
+    "stats": {
+      "tools": "個工具",
+      "categories": "個分類",
+      "uploaded": "累計上傳量"
+    }
+  },
+  "search": {
+    "placeholder": "搜尋工具…",
+    "noResults": "沒有符合的工具"
+  },
+  "sidebar": {
+    "note": "我們會持續新增工具。你在這裡做的任何操作都不會傳到伺服器。"
+  },
+  "nav": {
+    "toggleMenu": "切換選單",
+    "toggleTheme": "切換主題",
+    "categories": {
+      "image": "圖片",
+      "pdf": "PDF",
+      "text": "文字",
+      "dev": "開發工具"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Web Tool Hub",
+    "tagline": "為在乎自己檔案歸屬的人打造。"
+  },
+  "banner": {
+    "privacy": "100% 隱私保護 — 檔案永遠留在你的裝置上"
+  }
+}
