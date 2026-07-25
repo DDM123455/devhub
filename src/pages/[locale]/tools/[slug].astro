@@ -4,6 +4,7 @@ import ImageCompressPage from '@/components/tools/ImageCompressPage.astro';
 import ImageConvertPage from '@/components/tools/ImageConvertPage.astro';
 import BackgroundRemoverPage from '@/components/tools/BackgroundRemoverPage.astro';
 import PdfMergePage from '@/components/tools/PdfMergePage.astro';
+import PdfSplitPage from '@/components/tools/PdfSplitPage.astro';
 import TextDiffPage from '@/components/tools/TextDiffPage.astro';
 import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
@@ -34,6 +35,8 @@ const name = tool.names[locale];
 		<BackgroundRemoverPage lang={locale} />
 	) : toolId === 'pdf-merge' ? (
 		<PdfMergePage lang={locale} />
+	) : toolId === 'pdf-split' ? (
+		<PdfSplitPage lang={locale} />
 	) : toolId === 'text-diff' ? (
 		<TextDiffPage lang={locale} />
 	) : (

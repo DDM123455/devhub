@@ -29,7 +29,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] 2. Chuyển đổi định dạng ảnh — HTML5 Canvas API
 - [x] 3. Xóa nền ảnh (AI, chạy local) — `@imgly/background-removal`
 - [x] 4. Gộp PDF (Merge) — `pdf-lib`
-- [ ] 5. Tách PDF (Split) — `pdf-lib`
+- [x] 5. Tách PDF (Split) — `pdf-lib`
 - [x] 6. So sánh văn bản (Diff Checker) — `diff` (jsdiff)
 - [ ] 7. Đếm từ & ký tự — JS thuần
 - [ ] 8. JSON Formatter & Validator — Monaco editor hoặc jsoneditor

@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "title": "Tách file PDF miễn phí trực tuyến — Web Tool Hub",
+    "description": "Tách một file PDF thành nhiều file nhỏ hoặc trích riêng vài trang, miễn phí, xử lý hoàn toàn trên trình duyệt. Tách theo khoảng trang tùy chỉnh hoặc tách từng trang riêng — không upload, không watermark, không cần đăng ký."
+  },
+  "heading": "Tách file PDF",
+  "tagline": "Trích trang hoặc tách một file PDF thành nhiều file, ngay trên trình duyệt của bạn.",
+  "ui": {
+    "selectFile": "Chọn file PDF",
+    "dropHint": "hoặc kéo thả file PDF vào đây",
+    "noFile": "Chưa chọn file PDF nào.",
+    "changeFile": "Chọn file khác",
+    "pageCount": "{{count}} trang",
+    "rangesLabel": "Khoảng trang (không bắt buộc)",
+    "rangesPlaceholder": "VD: 1-3, 4, 5-7",
+    "rangesHint": "Để trống nếu muốn tách mỗi trang thành một file PDF riêng.",
+    "split": "Tách PDF",
+    "splitting": "Đang tách…",
+    "resultsHeading": "File kết quả",
+    "download": "Tải xuống",
+    "errorGeneric": "Có lỗi khi đọc file PDF này. Hãy kiểm tra xem file có bị hỏng hoặc đặt mật khẩu không, rồi thử lại.",
+    "errorInvalidRange": "Khoảng trang \"{{range}}\" không hợp lệ. Dùng định dạng như 1-3, 4, 5-7, với số trang từ 1 đến {{max}}."
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Vì sao nên tách PDF ngay trên máy thay vì upload lên mạng?",
+    "p1": "Một cuốn sách scan, một chồng sao kê hàng tháng gộp chung, một báo cáo 200 trang mà bạn chỉ cần đúng ba trang — sớm muộn gì cũng có lúc file PDF trở nên quá lớn hoặc gộp quá nhiều thứ không liên quan tới nhu cầu thực tế. Phần lớn các trang \"tách PDF\" miễn phí trên mạng xử lý việc này giống hệt các trang \"gộp PDF\": âm thầm upload file của bạn lên máy chủ trước khi làm bất cứ điều gì. Đó là một mức độ tin tưởng khá kỳ lạ để trao cho một tài liệu có thể chứa chữ ký, sao kê ngân hàng, hay một trang bạn không muốn nằm trên ổ đĩa của người khác.",
+    "p2": "Công cụ này không bao giờ upload bất cứ thứ gì. Mọi thứ chạy ngay trong trình duyệt của bạn nhờ pdf-lib — thư viện JavaScript đọc cấu trúc gốc của file PDF, chỉ sao chép đúng những trang bạn chọn vào các tài liệu mới, rồi ghép kết quả trong bộ nhớ, ngay trên thiết bị của bạn. Ngay cả bước đầu tiên — chỉ để đếm xem file có bao nhiêu trang — cũng diễn ra tại chỗ, đó là lý do một file bị hỏng hoặc có mật khẩu sẽ được báo lỗi ngay lập tức thay vì âm thầm thất bại ở đâu đó trên máy chủ từ xa.",
+    "p3": "Chọn một file PDF hoặc kéo thả vào khung; công cụ đọc file ngay tại chỗ và hiển thị tổng số trang. Gõ các trang bạn muốn vào ô khoảng trang theo định dạng đơn giản như \"1-3, 4, 5-7\" — mỗi nhóm cách nhau bằng dấu phẩy sẽ trở thành một file kết quả riêng. Để trống ô này rồi bấm Tách PDF nếu muốn tách từng trang thành một file riêng lẻ, hữu ích khi bạn chỉ muốn chia nhỏ hoàn toàn tài liệu. Mỗi kết quả hiện trong danh sách kèm nút tải xuống riêng, nên bạn chỉ cần lưu đúng phần mình cần.",
+    "p4": "Công cụ không giới hạn số trang, tuy nhiên các file PDF scan chứa nhiều hình ảnh dung lượng lớn sẽ mất nhiều thời gian hơn một chút vì mọi thứ được xử lý trên chính thiết bị của bạn chứ không phải trên một cụm máy chủ mạnh. Nếu bạn nhập một khoảng trang không hợp lệ — số trang vượt quá độ dài tài liệu, hoặc chuỗi ký tự không đúng định dạng — công cụ sẽ báo rõ phần nào bị sai thay vì tạo ra một file lỗi. Nếu sau này cần ghép trang từ nhiều file PDF lại với nhau, công cụ Gộp PDF cũng xử lý theo đúng nguyên tắc bảo mật tương tự."
+  }
+}

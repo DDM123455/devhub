@@ -5,10 +5,9 @@
 
 ## 🔵 Trạng thái hiện tại
 
-- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (5/10 xong)
-- Task tiếp theo cần làm: Công cụ #5 "Tách PDF (Split)" dùng `pdf-lib` (xem `ROADMAP.md`
-  Phase 1) — công cụ #4 và #6 đã xong (xem log bên dưới), #5 là task duy nhất bị bỏ qua
-  giữa 2 tool đó nên vẫn còn `[ ]`.
+- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (6/10 xong)
+- Task tiếp theo cần làm: Công cụ #7 "Đếm từ & ký tự" dùng JS thuần (xem `ROADMAP.md`
+  Phase 1).
 - Ghi chú kiến trúc tool page: `src/pages/[locale]/tools/[slug].astro` giờ rẽ nhánh theo
   `toolId` — nếu là tool đã có UI thật thì render component riêng
   (`src/components/tools/<Ten>Page.astro`), còn lại vẫn rơi vào nhánh "coming soon" mặc
@@ -53,6 +52,50 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 1, công cụ #5: Tách PDF (Split)
+- Đã làm:
+  - Tạo `src/components/tools/PdfSplitter.tsx` (React, `client:load`): chọn 1 file PDF
+    (input hoặc kéo-thả), đọc bằng `PDFDocument.load` để hiển thị tổng số trang. Ô nhập
+    "khoảng trang" dạng text tự do (VD `1-3, 4, 5-7`) — mỗi nhóm cách nhau dấu phẩy tách
+    thành 1 file PDF kết quả riêng; để trống thì mặc định tách MỖI TRANG thành 1 file
+    riêng (dùng `Array.from({length: pageCount})` sinh range 1 trang). Parse range bằng
+    regex đơn giản (`^\d+$` hoặc `^\d+-\d+$`), validate trong khoảng `1..pageCount`, ném
+    lỗi kiểu `RangeParseError` riêng (không dùng string-matching mong manh) để phân biệt
+    rõ với lỗi đọc PDF khi hiển thị thông báo lỗi đúng loại. Mỗi file kết quả có nút tải
+    riêng (giống pattern `PdfMerger`/`ImageCompressor`) — không dùng zip vì không có trong
+    danh sách dependency được phép của `ROADMAP.md`.
+  - Tạo `src/components/tools/PdfSplitPage.astro`: bám sát khuôn mẫu `PdfMergePage.astro`
+    — title/description riêng theo từ khóa "split pdf"/"tách pdf", JSON-LD
+    `WebApplication` giá 0 USD, nội dung hướng dẫn 4 đoạn/ngôn ngữ (~300-400 từ), link tới
+    2 tool cùng category `pdf` (Gộp PDF, và tool #10 nếu category liên quan — thực tế
+    Phase 1 category `pdf` hiện chỉ có 2 tool nên link 1 chiều rõ ràng tới Gộp PDF).
+  - Tạo 8 file dictionary i18n `tool-pdf-split.json`, dịch tay riêng cho từng ngôn ngữ
+    (không AI-spin lặp cấu trúc y hệt nhau — mỗi bản dịch giữ đúng văn phong/cách diễn đạt
+    tự nhiên của ngôn ngữ đó, theo đúng phong cách đã dùng ở `tool-pdf-merge.json`).
+  - Sửa `src/pages/[locale]/tools/[slug].astro` thêm nhánh `toolId === 'pdf-split'` →
+    `<PdfSplitPage lang={locale} />`.
+  - `npm run build` sinh đủ 89 trang không lỗi; đọc thử
+    `dist/en/tools/split-pdf/index.html` và `dist/vi/tools/tach-pdf/index.html` xác nhận
+    title/heading/UI đúng.
+- Quyết định kỹ thuật quan trọng:
+  - Không dùng thư viện zip để gộp nhiều file kết quả thành 1 lần tải — giữ đúng nguyên
+    tắc "không thêm dependency ngoài danh sách `ROADMAP.md`", mỗi file kết quả có nút tải
+    riêng là đủ cho v1, giống cách tool Nén ảnh (#1) đã quyết định trước đó.
+  - Định dạng "khoảng trang" nhập tay dạng text (`1-3, 4, 5-7`) thay vì UI chọn trang bằng
+    checkbox/thumbnail — đơn giản, nhất quán với các input dạng text khác trong dự án,
+    tránh phải render thumbnail từng trang PDF (tốn thêm xử lý/dependency render PDF
+    không cần thiết cho v1).
+  - Không bọc trong Web Worker riêng — lý do giống hệt tool Gộp PDF (#4): thao tác copy
+    trang bằng `pdf-lib` là xử lý byte nhanh, không phải suy luận ML hay giải mã pixel.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Chưa test tương tác thật (chọn PDF thật, nhập range, tải từng file kết quả) trên
+    trình duyệt thật — chỉ verify qua `npm run build` + đọc HTML tĩnh, giống tình trạng
+    các tool PDF/ảnh trước.
+  - Category `pdf` hiện có đúng 2 tool (Gộp PDF, Tách PDF) nên phần "công cụ liên quan"
+    của cả 2 trang chỉ hiện 1 link chéo nhau — sẽ tự động có thêm lựa chọn nếu Phase 3 bổ
+    sung tool PDF khác, không cần sửa gì thêm (logic lọc theo `category` đã tổng quát).
+- Task tiếp theo: Phase 1, công cụ #7 "Đếm từ & ký tự" (JS thuần).
 
 ### 2026-07-25 — Sửa `.git/index` hỏng + gộp (merge) công cụ #4 và #6 từ worktree agent
 - Bối cảnh: người dùng yêu cầu kiểm tra xem các chức năng đã code có được gộp vào `main`

@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "title": "Dividir archivos PDF gratis online — Web Tool Hub",
+    "description": "Divide un PDF en varios archivos o extrae páginas concretas gratis, directamente en tu navegador. Divide por rangos de páginas personalizados o extrae cada página — sin subidas, sin marcas de agua, sin registro."
+  },
+  "heading": "Dividir archivos PDF",
+  "tagline": "Extrae páginas o divide un PDF en varios archivos, directamente en tu navegador.",
+  "ui": {
+    "selectFile": "Seleccionar archivo PDF",
+    "dropHint": "o arrastra y suelta un archivo PDF aquí",
+    "noFile": "Aún no has seleccionado ningún archivo PDF.",
+    "changeFile": "Elegir otro archivo",
+    "pageCount": "{{count}} páginas",
+    "rangesLabel": "Rangos de páginas (opcional)",
+    "rangesPlaceholder": "p. ej. 1-3, 4, 5-7",
+    "rangesHint": "Déjalo vacío para dividir cada página en su propio archivo PDF.",
+    "split": "Dividir PDF",
+    "splitting": "Dividiendo…",
+    "resultsHeading": "Archivos resultantes",
+    "download": "Descargar",
+    "errorGeneric": "Ocurrió un error al leer este PDF. Comprueba que no esté dañado ni protegido con contraseña e inténtalo de nuevo.",
+    "errorInvalidRange": "El rango de páginas \"{{range}}\" no es válido. Usa un formato como 1-3, 4, 5-7, con páginas entre 1 y {{max}}."
+  },
+  "related": "Herramientas relacionadas",
+  "article": {
+    "heading": "¿Por qué dividir un PDF en local en vez de subirlo a internet?",
+    "p1": "Un libro escaneado, un lote de extractos mensuales unidos, un informe de 200 páginas del que solo necesitas tres: tarde o temprano un PDF acaba siendo demasiado grande o mezclando demasiadas cosas para lo que realmente necesitas. La mayoría de los sitios gratuitos para \"dividir PDF\" resuelven esto igual que los de \"unir PDF\": subiendo tu archivo a un servidor sin que te des cuenta antes de hacer nada con él. Es un nivel de confianza bastante extraño para un documento que puede contener una firma, un extracto bancario o una página que preferirías que no acabara en el disco de otra persona.",
+    "p2": "Esta herramienta nunca sube nada. Todo se ejecuta dentro de tu navegador gracias a pdf-lib, una librería de JavaScript que lee la estructura interna de tu PDF, copia solo las páginas que pediste en documentos completamente nuevos y monta los resultados en memoria, en tu propio dispositivo. Incluso el primer paso —contar cuántas páginas tiene el archivo— ocurre en local, por lo que un archivo dañado o protegido con contraseña se detecta al instante en lugar de fallar en silencio en algún servidor remoto.",
+    "p3": "Selecciona un archivo PDF o arrástralo a la zona indicada; la herramienta lo lee en local y te muestra el número total de páginas. Escribe las páginas que quieres en el campo de rangos con un formato simple como \"1-3, 4, 5-7\": cada grupo separado por comas se convierte en un archivo de salida independiente. Deja el campo vacío y pulsa Dividir PDF para extraer, en cambio, cada página como un archivo individual, útil cuando solo quieres separar por completo el documento. Cada resultado aparece en una lista con su propio botón de descarga, así que solo guardas las partes que realmente necesitas.",
+    "p4": "La herramienta no impone un límite de páginas, aunque los PDF escaneados muy grandes y llenos de imágenes lógicamente tardarán algo más, ya que todo se procesa en tu propio dispositivo y no en un servidor potente. Si escribes un rango que no tiene sentido —un número de página que supera la longitud del documento, o un texto que no es un rango válido—, la herramienta te indica exactamente qué parte no era correcta en lugar de generar un archivo defectuoso. Si más adelante necesitas volver a unir páginas de varios PDF, la herramienta Unir PDF funciona con el mismo enfoque centrado en la privacidad."
+  }
+}
