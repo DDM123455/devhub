@@ -10,9 +10,10 @@
   Phase 2) + mục "Checklist Feature Parity" vào `CLAUDE.md` — mục tiêu đưa từng tool từ
   "MVP chạy được" lên "ngang tầm đối thủ đầu ngành" (benchmark, so sánh feature-by-feature,
   nâng cấp).
-- Task tiếp theo cần làm: **Phase 1.5**, tool #1, #2, #3 đã xong. Tool **#4 & #5
-  "Gộp/Tách PDF"** đang làm dở — xem mục log mới nhất bên dưới để biết chính xác đã làm gì
-  và còn thiếu gì trước khi tick ROADMAP.md.
+- Task tiếp theo cần làm: **Phase 1.5**, tool #1, #2, #3 đã xong. Tool #4 & #5 "Gộp/Tách
+  PDF" đã build+test xong 3/4 mục con (còn thiếu nén PDF, để sau) — xem log 2026-07-25 bên
+  dưới. Đang chuyển sang tool **#6 "So sánh văn bản (Diff Checker)"**, ưu tiên cao nhất:
+  highlight inline trực tiếp trên khung văn bản.
 - Ghi chú thiết kế (2026-07-25): đã redesign toàn bộ giao diện site (không phải task trong
   `ROADMAP.md`, làm theo yêu cầu trực tiếp của người dùng) dựa trên file mockup
   `Web Tool Hub.dc.html` ở gốc repo (file KHÔNG được commit vào git — chỉ là tài liệu tham
@@ -84,6 +85,75 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 1.5, tool #4 & #5: Build + test tương tác "Gộp/Tách PDF" — XONG
+  (còn thiếu nén PDF)
+- Chạy `npm run build`: sạch, exit 0.
+- **Phát hiện lỗi nghiêm trọng ở thượng nguồn (`pdfjs-dist`) trong lúc test tương tác**,
+  KHÔNG tick checkbox ngay mà dừng lại sửa trước, đúng quy trình `CLAUDE.md`:
+  - Test bằng Puppeteer (Chrome thật, không phải jsdom) qua `puppeteer-core` cài tạm trong
+    thư mục scratchpad (không phải dependency của dự án, chỉ dùng để test phiên này) điều
+    khiển Chrome đã cài sẵn trên máy (`C:\Program Files\Google\Chrome`), phát hiện MỌI lần
+    tải PDF qua `renderPdfThumbnails()` đều crash với lỗi
+    `TypeError: hashOriginal.toHex is not a function`.
+  - Truy nguyên: `pdfjs-dist` (bản `^6.1.200` đang cài) gọi thẳng
+    `Uint8Array.prototype.toHex()` — một API JS engine RẤT mới (theo MDN: "Baseline newly
+    available" từ tháng 9/2025) — mà KHÔNG có feature-detect fallback nào, khác với chính
+    `pdfjs-dist` các bản cũ (`<=5.0.375`) vốn luôn bọc `if (Uint8Array.prototype.toHex) {...}
+    else {...}`. Lỗi này crash 100% mọi lần load PDF vì `fingerprints` (nơi gọi `.toHex()`)
+    được tính bắt buộc trong bước khởi tạo document, không có cách nào bỏ qua qua option.
+    Xác nhận đây là lỗi có thật ở thượng nguồn, không phải lỗi môi trường test, qua GitHub
+    issue #20759 của `mozilla/pdf.js` (cùng thông điệp lỗi, tái hiện trên Chrome 139 và
+    143 — tức là ảnh hưởng cả các bản Chrome khá mới, không chỉ trình duyệt cũ).
+  - Thử vá bằng polyfill `Uint8Array.prototype.toHex/fromHex/toBase64` + `fromBase64` (áp
+    dụng cả main thread lẫn bên trong Worker riêng của pdfjs qua kỹ thuật bọc
+    `workerSrc` bằng 1 Blob module chứa polyfill rồi `import` file worker gốc) — polyfill
+    có tác dụng, nhưng lộ ra NGAY một lỗi thượng nguồn thứ hai cùng bản chất:
+    `Map.prototype.getOrInsertComputed is not a function` (một đề xuất TC39 còn mới hơn cả
+    `toHex`, gần như chưa trình duyệt nào hỗ trợ). Kết luận: bản `pdfjs-dist@6.1.200` dùng
+    quá nhiều API JS bleeding-edge không có fallback — vá từng API một là việc không có
+    điểm dừng.
+  - **Quyết định: hạ phiên bản `pdfjs-dist` xuống ghim cứng `5.0.375`** (`"pdfjs-dist":
+    "5.0.375"` trong `package.json`, không dùng `^` để tránh tự động nâng cấp lại đúng
+    bản lỗi) — bản cuối cùng còn tự bọc fallback cho các API này. Đã bỏ lại polyfill thủ
+    công (không cần thiết nữa, đúng tinh thần tối giản của `CLAUDE.md`).
+  - Bản `5.0.375` dùng API `page.render({ canvasContext, viewport })` (không phải
+    `{ canvas, viewport }` — cú pháp `canvas` trực tiếp là tiện ích mới hơn chỉ có ở bản
+    6.x), nên đã sửa `src/lib/pdf-thumbnails.ts` lấy `canvas.getContext('2d')` trước rồi
+    truyền `canvasContext` — cách này về mặt kỹ thuật tương thích với MỌI phiên bản
+    `pdfjs-dist`, không chỉ 5.0.375, nên an toàn kể cả sau này đổi phiên bản lần nữa.
+  - Ghi chú áp dụng cho các phiên sau: nếu thấy `npm run build` báo thành công nhưng tool
+    dùng `pdfjs-dist` (PDF merge/split) không hoạt động khi test tương tác thật trên trình
+    duyệt, kiểm tra ngay lỗi dạng "X is not a function" liên quan tới các API
+    `Uint8Array`/`Map` mới — rất có thể là cùng loại vấn đề (thư viện dùng browser API quá
+    mới), không phải lỗi trong code của dự án.
+- **Phát hiện lỗi thứ hai (trong chính code của dự án, không phải thượng nguồn)**: trong
+  `PdfMerger.tsx`, khi chọn nhiều file PDF cùng lúc, mỗi file được render thumbnail bằng 1
+  Promise độc lập chạy song song (`for (const file of newFiles) { void (async () => {...
+  })() }`) — nếu file chọn SAU nhưng ít trang hơn (render nhanh hơn) file chọn TRƯỚC, trang
+  của nó sẽ xuất hiện TRƯỚC trong danh sách gộp, đảo ngược thứ tự người dùng mong đợi một
+  cách âm thầm. Tái hiện được bằng test thật: upload `test-a.pdf` (3 trang) rồi
+  `test-b.pdf` (2 trang) → thứ tự thumbnail ban đầu ra `B1,B2,A1,A2,A3` thay vì
+  `A1,A2,A3,B1,B2`. Đã sửa: xử lý các file tuần tự trong 1 vòng lặp `for...of` bên trong
+  MỘT async IIFE duy nhất (thay vì 1 IIFE riêng mỗi file), đảm bảo trang luôn được thêm vào
+  đúng thứ tự chọn file, bất kể file nào render xong trước. Vẫn giữ được UI hiển thị trạng
+  thái "loading" cho tất cả file ngay lập tức (không đợi tuần tự mới hiện).
+- Sau khi sửa cả 2 lỗi trên, viết 2 bộ test Puppeteer đầy đủ
+  (`test-merge.mjs`/`test-split.mjs`, nằm trong thư mục scratchpad, không commit vào repo)
+  bao phủ: upload nhiều file thật (PDF tạo bằng `pdf-lib` ngay trong Node để test), kiểm
+  tra thumbnail render đúng số trang, kéo-thả/nút mũi tên đổi thứ tự, xoay trang, xóa
+  trang, gộp rồi tải kết quả về và MỞ LẠI bằng `pdf-lib` trong Node để xác minh số trang +
+  góc xoay đúng thật sự (không chỉ kiểm tra UI không báo lỗi) — cho `PdfSplitter.tsx` test
+  thêm cả 2 chế độ tách "Khoảng tùy chỉnh" và "Mỗi N trang". Chạy lại toàn bộ 2 bộ test
+  này LẦN NỮA sau `npm run build` + `npm run preview` (tức là kiểm tra đúng bundle production
+  thật, không chỉ dev server) — tất cả đều pass.
+- Đã tick 3/4 checkbox con của mục "4 & 5. Gộp/Tách PDF" trong `ROADMAP.md` Phase 1.5
+  (thumbnail+kéo-thả, tách theo range/mỗi-N-trang, xoay/xóa trang) — CHƯA tick mục con "nén
+  PDF" (chưa làm, để lại cho sau, không phải lỗi) và CHƯA tick dòng cha (vì chưa đủ 4/4 mục
+  con theo đúng tinh thần "Checklist Feature Parity" của `CLAUDE.md` — không tick cha khi
+  còn con dang dở).
+- CHƯA hỏi người dùng về việc push commit lên `origin/main` (commit này + commit
+  `f1dbe2b`/`4e276ab` trước đó vẫn đang chỉ ở local).
 
 ### 2026-07-25 — Phase 1.5, tool #4 & #5: Nâng cấp "Gộp/Tách PDF" — ĐANG LÀM DỞ
 - Đang làm: benchmark iLovePDF/Smallpdf/PDF2GO cho tool #4 "Gộp PDF" và #5 "Tách PDF".

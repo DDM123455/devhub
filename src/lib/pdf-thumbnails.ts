@@ -11,6 +11,15 @@ let workerConfigured = false;
 // be loaded via a URL Vite can resolve at build time. Loaded through a
 // dynamic import (not a top-level one) so nothing here executes during
 // Astro's Node-based SSR pass for client:load islands.
+//
+// Pinned to 5.0.375 (not the latest 6.x) — see PROGRESS.md for the full
+// investigation, but in short: every pdfjs-dist release after 5.0.375 calls
+// brand-new JS engine built-ins (Uint8Array.prototype.toHex(),
+// Map.prototype.getOrInsertComputed()) with no feature-detect fallback and no
+// polyfill, which crashes on any browser that doesn't yet ship them —
+// including real, currently-installed Chrome builds, not just old ones
+// (confirmed upstream via pdf.js GitHub issue #20759). 5.0.375 is the last
+// version that still guards these calls itself.
 async function loadPdfJs() {
 	const pdfjsLib = await import('pdfjs-dist');
 	if (!workerConfigured) {
@@ -34,7 +43,9 @@ export async function renderPdfThumbnails(bytes: ArrayBuffer, scale = 0.25): Pro
 		const canvas = document.createElement('canvas');
 		canvas.width = viewport.width;
 		canvas.height = viewport.height;
-		await page.render({ canvas, viewport }).promise;
+		const canvasContext = canvas.getContext('2d');
+		if (!canvasContext) throw new Error('2D canvas context unavailable');
+		await page.render({ canvasContext, viewport }).promise;
 		thumbnails.push({
 			pageIndex: i - 1,
 			dataUrl: canvas.toDataURL('image/jpeg', 0.7),

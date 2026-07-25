@@ -64,11 +64,13 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
   - [x] Nút tinh chỉnh viền (edge refinement) — thư viện không hỗ trợ trực tiếp, tự làm
         mềm alpha edge bằng box blur JS thuần thay thế
 
-- [ ] **4 & 5. Gộp/Tách PDF** — benchmark: iLovePDF, Smallpdf, PDF2GO
-  - [ ] Hiển thị thumbnail từng trang, cho kéo-thả sắp xếp lại thứ tự trước khi gộp
-  - [ ] Tách PDF: cho chọn theo range trang, tách mỗi N trang, hoặc extract trang chỉ định
-  - [ ] Thêm chức năng xoay trang, xóa trang riêng lẻ
-  - [ ] Thêm chức năng nén PDF (giảm dung lượng) nếu khả thi client-side
+- [ ] **4 & 5. Gộp/Tách PDF** — benchmark: iLovePDF, Smallpdf, PDF2GO (3/4 mục con xong, còn
+      thiếu nén PDF — xem log `PROGRESS.md` 2026-07-25)
+  - [x] Hiển thị thumbnail từng trang, cho kéo-thả sắp xếp lại thứ tự trước khi gộp
+  - [x] Tách PDF: cho chọn theo range trang, tách mỗi N trang, hoặc extract trang chỉ định
+  - [x] Thêm chức năng xoay trang, xóa trang riêng lẻ
+  - [ ] Thêm chức năng nén PDF (giảm dung lượng) nếu khả thi client-side — CHƯA làm, để lại
+        cho một lượt sau (không phải lỗi chặn, chỉ là hạng mục chưa bắt đầu)
 
 - [ ] **6. So sánh văn bản (Diff Checker)** — benchmark: Diffchecker.com
   - [ ] **Ưu tiên cao nhất**: highlight trực tiếp (inline) phần khác biệt ngay trên khung

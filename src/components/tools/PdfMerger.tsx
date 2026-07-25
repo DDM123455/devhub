@@ -48,14 +48,21 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 		const newFiles = Array.from(fileList).filter(
 			(file) => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'),
 		);
+		if (newFiles.length === 0) return;
 		setMergedBlob(null);
 		setMergeError(null);
 
-		for (const file of newFiles) {
-			const fileId = `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`;
-			setFiles((prev) => [...prev, { id: fileId, file, status: 'loading' }]);
+		const entries = newFiles.map((file) => ({
+			fileId: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
+			file,
+		}));
+		setFiles((prev) => [...prev, ...entries.map(({ fileId, file }) => ({ id: fileId, file, status: 'loading' as const }))]);
 
-			void (async () => {
+		// Processed sequentially (not one Promise per file fired in parallel) so pages land
+		// in the ul in file-selection order — a smaller/faster PDF picked second must not be
+		// able to finish rendering before a larger one picked first and jump ahead of it.
+		void (async () => {
+			for (const { fileId, file } of entries) {
 				try {
 					const bytes = await file.arrayBuffer();
 					const thumbnails = await renderPdfThumbnails(bytes);
@@ -76,8 +83,8 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 				} catch {
 					setFiles((prev) => prev.map((f) => (f.id === fileId ? { ...f, status: 'error' } : f)));
 				}
-			})();
-		}
+			}
+		})();
 	}, []);
 
 	const handleRemovePage = useCallback((id: string) => {
