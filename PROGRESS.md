@@ -7,9 +7,19 @@
 
 - Phase đang làm: **Phase 1 — 10 công cụ cốt lõi: HOÀN TẤT 10/10** ✅. **Phase 1.5 — Rà
   soát & Nâng cấp Feature Parity: HOÀN TẤT 10/10 tool** ✅ (tool #10 "Chuyển đổi Case văn
-  bản" vừa xong — xem log ngay bên dưới), CHỈ CÒN treo lại đúng 1 mục con nhỏ: nén PDF cho
+  bản" vừa xong — xem log bên dưới), CHỈ CÒN treo lại đúng 1 mục con nhỏ: nén PDF cho
   tool #4/#5 (chưa làm, không phải lỗi chặn, xem log 2026-07-25 "Gộp/Tách PDF" bên dưới).
-- Task tiếp theo khi mở phiên mới: bắt đầu **Phase 2 — SEO chuyên sâu & nhân bản đa ngôn
+- **ĐANG LÀM (2026-07-25, phiên hiện tại): QA audit toàn site theo yêu cầu trực tiếp của
+  người dùng** (không phải task trong ROADMAP — đóng vai Senior QA/Frontend/UI-UX kiểm tra
+  lại toàn bộ chức năng + UI/UX của cả 10 tool trước khi coi dự án "hoàn thành"). Đã xong:
+  layout dùng chung + 5/10 tool (Nén ảnh, Chuyển đổi định dạng ảnh, Xóa nền ảnh, Gộp PDF,
+  Tách PDF) — xem log chi tiết ngay bên dưới, mỗi tool đã build + test tương tác Puppeteer
+  + commit riêng. CÒN LẠI cần audit: So sánh văn bản (đang làm dở, đã phát hiện 1 bug UX
+  đáng kể trong Merge Tool — xem ghi chú), Đếm từ & ký tự, JSON Formatter, QR Generator,
+  Text Case Converter, trang chủ, responsive/dark mode toàn site, rồi tổng hợp báo cáo cuối
+  cùng dạng bảng. Task tiếp theo khi mở phiên mới (nếu bị ngắt giữa chừng): tiếp tục audit
+  từ "So sánh văn bản" theo đúng thứ tự trên.
+- Task tiếp theo sau khi audit xong: bắt đầu **Phase 2 — SEO chuyên sâu & nhân bản đa ngôn
   ngữ** (xem `ROADMAP.md` từ dòng "## Phase 2"), việc đầu tiên là mở rộng i18n từ 8 lên
   15–20 ngôn ngữ. Có thể tranh thủ làm nốt mục nén PDF còn treo của Phase 1.5 trước nếu
   người dùng muốn dứt điểm Phase 1.5 100% trước khi sang Phase 2, nhưng đây không phải yêu
@@ -85,6 +95,110 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — QA Audit toàn site (đang làm dở): Layout dùng chung + 5 tool đầu — XONG,
+  đã build + test + commit riêng từng phần
+- **Bối cảnh**: người dùng yêu cầu trực tiếp đóng vai Senior QA/Frontend/UI-UX kiểm tra lại
+  TOÀN BỘ website (không giả định gì đang hoạt động đúng) — test từng chức năng, từng nút
+  bấm, UI, UX, rồi xuất báo cáo phân loại mức độ. Không phải task trong `ROADMAP.md`, nhưng
+  là yêu cầu hợp lệ chen ngang theo đúng tinh thần `CLAUDE.md`. Người dùng dặn thêm: xong
+  phần nào phải commit + ghi tiến trình phần đó ngay, không dồn tới cuối.
+- Phương pháp: với mỗi phần, đọc source thật (không đoán), viết test Puppeteer tương tác
+  thật (upload/drag-drop/click/refresh/dữ liệu rỗng/dữ liệu lỗi/dữ liệu lớn), chạy trên
+  bundle production (`npm run build` + `npm run preview`), sửa bug tìm được, rồi chạy lại
+  test để xác nhận trước khi coi là xong. Ảnh test tạo bằng canvas trong trình duyệt (không
+  cần fixture có sẵn), PDF test tạo bằng `pdf-lib` cài tạm trong scratchpad.
+- **Layout dùng chung** (`Header.astro`, `Sidebar.astro`, `Layout.astro`) — phát hiện 2 bug
+  UI thật ảnh hưởng MỌI trang trên mobile:
+  1. Bấm nút hamburger mở sidebar trên mobile làm sidebar chèn ép nội dung chính xuống còn
+     ~157px (do sidebar vẫn nằm trong flex-row cùng `<main>`, chỉ toggle class `hidden`
+     chứ không tách khỏi luồng layout) — xác nhận bằng cách đọc `getBoundingClientRect()`
+     thật của sidebar/main sau khi bấm nút, không chỉ nhìn ảnh chụp. Sửa: đổi sidebar sang
+     mô hình "drawer" overlay đúng chuẩn (`fixed` + `-translate-x-full`/`translate-x-0` có
+     transition, kèm backdrop mờ, khóa scroll body, đóng khi click ra ngoài/Esc/click vào
+     link) — chỉ áp dụng dưới `md`, giữ nguyên `md:sticky` cũ ở desktop.
+  2. Header bị vỡ trên mobile: chữ "Web Tool Hub" bị ép xuống 3 dòng vì phải chia chỗ với ô
+     tìm kiếm trên CÙNG 1 hàng ở màn hình hẹp. Sửa: ô tìm kiếm tự động xuống hàng riêng dưới
+     `md` (dùng `flex-wrap` + `order-*` để giữ đúng thứ tự logo → tìm kiếm → nút phải ở
+     desktop nhưng logo+nút ở hàng 1, tìm kiếm full-width ở hàng 2 trên mobile), ẩn chữ
+     "Web Tool Hub" (chỉ giữ logomark `>_`) dưới `sm` để tránh chật chội hơn nữa.
+  - Test Puppeteer (`test-layout.mjs`): search trang chủ, dark mode + persist qua refresh,
+    language switcher, mobile sidebar mở/đóng không còn chèn ép + không tràn ngang, tất cả
+    pass sau khi sửa.
+  - Commit riêng: `fix(layout): mobile sidebar drawer overlay + responsive header search row`.
+- **Tool #1 Nén ảnh** — phát hiện 3 bug/gap thật:
+  1. Nút "Nén ảnh" bị khóa vĩnh viễn sau khi TẤT CẢ ảnh đã nén xong (`canCompress` yêu cầu
+     có ít nhất 1 ảnh chưa `done`), user không thể chỉnh lại thanh trượt chất lượng rồi nén
+     lại — MÂU THUẪN với chính nội dung SEO của trang ("If a result doesn't look right, just
+     adjust the slider and compress again — there's no limit on how many times you try").
+     Sửa: bỏ điều kiện gating theo status, nén lại LUÔN áp dụng cho mọi ảnh hiện có, đồng
+     thời revoke URL preview nén cũ trước khi tạo URL mới (tránh rò rỉ object URL khi nén
+     lại nhiều lần).
+  2. Không có cách xóa từng ảnh hoặc xóa tất cả trước khi nén — thêm nút ✕ mỗi ảnh + "Clear
+     all".
+  3. File không phải ảnh bị lọc ÂM THẦM khi kéo-thả (input click qua dialog thì trình duyệt
+     tự chặn theo `accept`, nhưng kéo-thả bỏ qua hoàn toàn thuộc tính `accept`) — không có
+     phản hồi gì cho người dùng. Thêm cảnh báo "N file(s) were skipped...".
+  - Test Puppeteer (`test-imagecompress.mjs`): upload nhiều ảnh thật (tạo bằng canvas), nén,
+    đổi chất lượng rồi nén lại xác nhận dung lượng đổi thật, xóa từng ảnh, Clear all, kéo-thả
+    file .txt xác nhận cảnh báo hiện đúng, ảnh cực lớn (3500×2500) không crash, refresh sạch
+    state. Tất cả pass. Cập nhật i18n 8 ngôn ngữ (`remove`/`clearAll`/`skippedFiles`).
+  - Commit riêng: `fix(image-compress): allow re-compress + remove/clear-all + skipped-file warning`.
+- **Tool #2 Chuyển đổi định dạng ảnh** — cùng 3 bug/gap y hệt tool #1 (canConvert bị khóa
+  sau khi done, thiếu remove/clear-all, thiếu cảnh báo file bị bỏ qua) — sửa tương tự. Thêm
+  phát hiện riêng: danh sách file bị lệch layout — nút ✕ đôi khi rớt xuống dòng riêng không
+  đều giữa các item (do `<li>` dùng `flex-wrap` phẳng thay vì nhóm khối info/khối action
+  riêng) — sửa bằng cách bọc khối info trong `min-w-0 flex-1` và khối nút trong `shrink-0`,
+  giống pattern đã đúng sẵn ở tool Nén ảnh. Test Puppeteer (`test-imageconvert.mjs`) xác
+  nhận: BMP/ICO tự viết tay encode vẫn đúng, chuyển đổi lại sang định dạng khác sau khi đã
+  xong không bị khóa, AVIF chạy được trên Chrome hiện tại, remove/clear-all/skipped-file đều
+  đúng, không lỗi console. Commit riêng: `fix(image-convert): allow re-convert + remove/clear-all + list layout consistency`.
+- **Tool #3 Xóa nền ảnh** — khác 2 tool trên: nút "Remove Background" bị khóa sau khi done
+  là ĐÚNG THIẾT KẾ (AI cutout là tất định, đổi màu nền/độ mềm viền đã tự cập nhật LIVE qua
+  `useEffect` riêng không cần bấm lại nút, nên không sửa phần này). Chỉ thêm remove/clear-all
+  + cảnh báo file bị bỏ qua (kéo-thả) cho nhất quán với 2 tool ảnh kia. Test Puppeteer
+  (`test-bgremove.mjs`) chạy được CẢ luồng AI thật (tải model ONNX từ CDN của imgly — cần
+  mạng, đã ghi chú rõ trong test rằng đây là hành vi đã được công bố sẵn trong UI "The first
+  click downloads a small AI model... after that it works fully offline", không phải lỗi
+  riêng tư dữ liệu vì model là public asset, không phải ảnh người dùng): xóa ảnh trước khi
+  xử lý, đổi nền màu/ảnh, so sánh trước/sau, làm mềm viền sau khi xong không vỡ, tải xuống
+  đúng file. Commit riêng: `fix(background-remover): add remove/clear-all + skipped-file warning`.
+- **Tool #4 & #5 Gộp/Tách PDF** — 2 gap thật:
+  1. `PdfMerger`: file không phải PDF bị lọc âm thầm khi kéo-thả, không có cảnh báo — thêm
+     giống các tool ảnh.
+  2. `PdfSplitter`: khi tách ra 3+ file (đặc biệt chế độ "Mỗi N trang" trên file nhiều
+     trang), không có cách tải tất cả cùng lúc, phải bấm Download từng file một — thêm nút
+     "Download All (.zip)" khi có >1 kết quả, dùng lại `jszip` đã có sẵn trong dự án (dynamic
+     import, không thêm dependency mới).
+  - Test Puppeteer (`test-pdf.mjs`) dùng file PDF thật tạo bằng `pdf-lib` (cài tạm trong
+    scratchpad): gộp 2 file giữ đúng thứ tự trang, xoay/di chuyển/xóa trang trước khi gộp,
+    TẢI FILE GỘP THẬT VỀ ĐĨA rồi mở lại bằng `pdf-lib` trong Node xác nhận đúng số trang
+    (không chỉ tin UI); tách theo range hợp lệ/không hợp lệ, chế độ Every-N, tải từng file
+    và tải zip đều xác nhận đúng nội dung thật. Tất cả pass. Commit riêng:
+    `fix(pdf-merge,pdf-split): skipped-file warning + download-all zip for split results`.
+- Ghi chú kỹ thuật rút ra được trong lúc audit (để phiên sau khỏi mất công điều tra lại):
+  - Dev server Vite dài lâu qua nhiều trang có thể báo lỗi giả `504 Outdated Optimize Dep`
+    khiến React hydrate lỗi — không phải bug ứng dụng, chỉ cần xóa `node_modules/.vite` và
+    dùng bundle production (`npm run build` + `npm run preview`) để test đáng tin cậy hơn.
+  - `document.querySelectorAll('li')`/text-match kiểu "body.innerText.includes(...)" trong
+    test rất dễ cho kết quả DƯƠNG TÍNH GIẢ vì khớp nhầm với phần "Related tools"/bài viết SEO
+    ở cuối mỗi trang tool — luôn scope selector chặt (theo class/id riêng của khu vực đang
+    test) thay vì query toàn `<body>`.
+  - Input `accept="image/*"` chỉ chặn được khi chọn file qua dialog click — kéo-thả (drag &
+    drop) BỎ QUA hoàn toàn thuộc tính này, nên logic lọc file phía client (và cảnh báo khi
+    lọc) phải test bằng cách giả lập sự kiện `drop` thật (dispatch `Event('drop')` kèm
+    `dataTransfer.files` giả), không thể test qua `input.uploadFile()` của Puppeteer (vốn đại
+    diện cho luồng chọn-qua-dialog, đã tự bị trình duyệt lọc trước).
+- **CÒN DANG DỞ**: đang audit tool #6 "So sánh văn bản" — đã đọc xong source, PHÁT HIỆN 1
+  bug UX đáng kể CHƯA SỬA: trong khu vực "Merge Tool", bấm mũi tên ←/→ để chấp nhận 1 phía
+  chỉ âm thầm đổi text sẽ được Copy/Save (`mergedLeftText`/`mergedRightText` qua
+  `renderMergedColumn()`) — HAI CỘT XEM TRƯỚC không hề đổi nội dung hiển thị (`DiffRowContent`
+  chỉ đọc thẳng `entry.leftText`/`entry.rightText`, không biết gì về `hunkOverrides`), khiến
+  người dùng bấm mũi tên nhưng không thấy gì thay đổi trên màn hình — chỉ có nút mũi tên tự
+  đổi màu active. Cần sửa để cột xem trước phản ánh đúng lựa chọn merge trước khi tick tool
+  #6 là xong. Task tiếp theo khi mở phiên mới: sửa bug này trước, rồi tiếp tục test tương
+  tác đầy đủ cho tool #6, sau đó qua tool #7-#10 + trang chủ + responsive/dark mode + báo
+  cáo tổng kết, theo đúng thứ tự đã liệt kê ở mục "Trạng thái hiện tại" phía trên.
 
 ### 2026-07-25 — Phase 1.5, tool #10 (CUỐI CÙNG): Nâng cấp "Chuyển đổi Case văn bản" lên
   Feature Parity — XONG, HOÀN TẤT PHASE 1.5
