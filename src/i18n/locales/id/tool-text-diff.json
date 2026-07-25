@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "title": "Text Diff Checker Online Gratis — Bandingkan Dua Teks — Web Tool Hub",
+    "description": "Bandingkan dua blok teks online secara gratis — diff per karakter, kata, atau baris, berdampingan dengan nomor baris, plus alat merge untuk menyelesaikan setiap perubahan. Berjalan sepenuhnya di browser Anda — tidak ada yang pernah diunggah."
+  },
+  "heading": "Text Diff Checker — Bandingkan Dua Teks",
+  "tagline": "Tempel dua versi teks dan lihat persis apa yang berubah, kata demi kata atau baris demi baris.",
+  "ui": {
+    "originalLabel": "Teks asli",
+    "changedLabel": "Teks yang diubah",
+    "modeWord": "Kata",
+    "modeLine": "Baris",
+    "modeChar": "Karakter",
+    "noChanges": "Tidak ditemukan perbedaan — kedua teks identik.",
+    "placeholder": "Tempel atau ketik teks di sini…",
+    "ignoreWhitespace": "Abaikan spasi",
+    "ignoreCase": "Abaikan huruf besar/kecil",
+    "statsAdded": "{{count}} ditambahkan",
+    "statsRemoved": "{{count}} dihapus",
+    "statsModified": "{{count}} diubah",
+    "clear": "Hapus",
+    "swap": "Tukar",
+    "uploadFile": "Unggah .txt",
+    "prevChange": "Perubahan sebelumnya",
+    "nextChange": "Perubahan berikutnya",
+    "changeCounter": "{{current}} / {{total}} perubahan",
+    "fullscreen": "Layar penuh",
+    "exitFullscreen": "Keluar layar penuh",
+    "mergeToolHeading": "Alat merge",
+    "mergeLeftHeading": "Versi kiri",
+    "mergeRightHeading": "Versi kanan",
+    "acceptRightAria": "Gunakan versi kanan untuk perubahan ini",
+    "acceptLeftAria": "Gunakan versi kiri untuk perubahan ini",
+    "copy": "Salin",
+    "copied": "Tersalin!",
+    "save": "Simpan sebagai .txt"
+  },
+  "related": "Alat terkait",
+  "article": {
+    "heading": "Mengapa menggunakan text diff checker?",
+    "p1": "Setiap kali ada dua versi dari dokumen yang sama — kontrak sebelum dan sesudah revisi pengacara, esai sebelum dan sesudah sesi masukan, file konfigurasi sebelum dan sesudah commit rekan tim — pertanyaan pentingnya jarang \"apakah kedua file ini sama\" melainkan \"apa sebenarnya yang berubah\". Membaca kedua versi secara berdampingan dan berusaha menemukan setiap koma yang ditambahkan, klausul yang dihapus, atau kalimat yang diubah susunannya itu lambat dan rawan salah, apalagi ketika dokumennya sudah lebih dari satu-dua halaman. Diff checker mengotomatiskan perbandingan itu dan menyoroti tepat kata atau baris mana yang berbeda, sehingga Anda bisa meninjau sebuah perubahan dalam hitungan detik, bukan menit.",
+    "p2": "Alat ini berjalan sepenuhnya di browser Anda. Kedua kotak teks tetap berada di memori perangkat Anda dan perbandingannya sendiri dihitung oleh pustaka diffing JavaScript yang berjalan secara lokal — tidak ada yang Anda ketik atau tempel yang pernah dikirim ke server, dicatat, atau disimpan di mana pun. Ini penting jika Anda membandingkan kontrak klien, file kata sandi, atau teks apa pun yang lebih baik tidak Anda lewatkan lewat layanan pihak ketiga. Tutup tab-nya dan semuanya hilang; tidak ada riwayat yang perlu dikhawatirkan.",
+    "p3": "Tempel teks asli di sebelah kiri dan versi terbaru di sebelah kanan — kedua kotak menampilkan nomor baris dan bergulir sinkron satu sama lain, dan masing-masing punya tombol Hapus, Tukar, dan Unggah .txt sendiri sehingga Anda bisa memuat dua file langsung dari disk alih-alih menyalin-tempel. Perbandingan diperbarui secara langsung saat Anda mengetik; tidak ada tombol yang perlu ditekan. Pilih Karakter, Kata, atau Baris untuk mengatur seberapa detail perbedaan dipecah: mode Karakter menangkap satu perubahan setingkat salah ketik, mode Kata paling cocok untuk prosa karena menyoroti persis kata mana yang berubah di dalam sebuah kalimat, dan mode Baris membandingkan seluruh baris sekaligus, cocok untuk kode, JSON, atau konten berbentuk daftar di mana yang Anda pedulikan adalah baris mana secara keseluruhan yang berpindah, bukan kata individual di dalamnya. Baris yang hanya ada di satu versi ditampilkan sepenuhnya hijau (ditambahkan) atau merah (dihapus); baris yang ada di kedua versi tetapi diedit ditampilkan berwarna oranye, dengan kata atau karakter yang berubah persis di dalamnya disorot lebih kuat — sehingga Anda bisa membedakan baris yang diedit dari pasangan hapus-lalu-tambah yang tidak berkaitan hanya dengan sekali lihat.",
+    "p4": "Hitungan ditambahkan/dihapus/diubah di atas perbandingan memberi Anda gambaran sekilas seberapa besar sebuah perubahan, dan tombol ↑/↓ langsung melompat ke perubahan berikutnya atau sebelumnya tanpa perlu menggulir melewati baris yang tidak berubah — praktis untuk dokumen panjang. Tombol Layar penuh memperluas tampilan perbandingan memenuhi layar untuk peninjauan yang lebih dekat. Di bawah perbandingan, alat merge mengubah ini dari sekadar diff yang hanya bisa dibaca menjadi sesuatu yang benar-benar bisa Anda selesaikan: setiap perubahan punya tombol ← / → sendiri di antara kedua kolom, memungkinkan Anda menarik hasil edit versi kanan ke kolom kiri atau mendorong versi kiri ke kanan, satu perubahan pada satu waktu, sampai salah satu kolom terbaca persis seperti yang Anda inginkan. Setiap kolom punya tombol Salin dan Simpan sendiri, sehingga Anda bisa mengambil hasil gabungan yang bersih tanpa mengetik ulang apa pun. Jika ternyata kedua teks identik, alat ini akan langsung memberi tahu Anda alih-alih menampilkan hasil kosong yang ambigu — satu hal lagi yang tidak perlu Anda ragukan."
+  }
+}

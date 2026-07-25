@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "title": "JSON-formatter en -validator online gratis — Web Tool Hub",
+    "description": "Formatteer, valideer en doorblader JSON online en gratis, volledig in je browser. Plak geminificeerde JSON, schakel over naar een interactieve boomweergave en spoor syntaxfouten direct op — geen upload, geen registratie."
+  },
+  "heading": "JSON-formatter en -validator",
+  "tagline": "Formatteer, valideer en verken JSON-data, rechtstreeks in je browser.",
+  "ui": {
+    "themeNotice": "Deze editorwidget behoudt zijn eigen lichte thema, ongeacht de donkere modus van de site — net zoals een code-editor die op een pagina is ingebed dat meestal doet.",
+    "errorWithLine": "Syntaxfout op regel {{line}}: {{message}}",
+    "errorNoLine": "Syntaxfout: {{message}}",
+    "goToErrorLine": "Ga naar foutregel",
+    "exportHeading": "Converteren naar een ander formaat",
+    "exportXml": "Exporteren als XML",
+    "exportYaml": "Exporteren als YAML",
+    "exportCsv": "Exporteren als CSV",
+    "exportInvalidJson": "Los eerst de JSON-syntaxfout hierboven op voordat je converteert.",
+    "copy": "Kopiëren",
+    "copied": "Gekopieerd!",
+    "download": "Downloaden"
+  },
+  "related": "Gerelateerde tools",
+  "article": {
+    "heading": "Waarom JSON lokaal formatteren en valideren?",
+    "p1": "JSON duikt voortdurend op in het dagelijks werk van een developer: een geminificeerd API-antwoord zonder regelafbrekingen, een configuratiebestand dat iemand met de hand tot één onleesbare regel heeft bewerkt, een payload die je om 23 uur zit te debuggen op zoek naar die ene ontbrekende komma. De meeste online \"JSON-formatter\"-tools lossen het leesbaarheidsprobleem op door je geplakte tekst eerst naar een server te sturen — een ongemakkelijke afweging als die JSON een API-sleutel, een toegangstoken of persoonlijke gegevens van een klant kan bevatten.",
+    "p2": "Deze tool stuurt nooit iets naar buiten. Hij is gebouwd op jsoneditor, een JavaScript-bibliotheek die je JSON volledig binnen het geheugen van je browser parseert en opnieuw weergeeft. Het parsen, de opmaak en de syntaxvalidatie gebeuren allemaal lokaal met de eigen JavaScript-engine van de browser — er zit geen server tussen, dus niets van wat je hier plakt verlaat ooit je apparaat.",
+    "p3": "Plak je JSON in de editor in tekstmodus en gebruik de knop Formatteren in de werkbalk om het netjes op te maken, of Compact om het weer terug te brengen tot één regel. Als de JSON een syntaxfout bevat — een overtollige komma, een ontbrekend aanhalingsteken, een niet-gesloten haakje — markeert de editor dit direct met een duidelijke foutmelding en het exacte regelnummer, in plaats van je het hele document te laten uitpluizen; een knop \"Ga naar foutregel\" springt meteen naar die regel en selecteert hem, zodat je niet hoeft te scrollen en zoeken in een lang bestand. Schakel over naar boommodus via het dropdownmenu bovenaan om dezelfde data te doorbladeren als een inklapbare, interactieve boomstructuur: klap geneste objecten en arrays in en uit, bewerk afzonderlijke waarden ter plekke, en herschik of verwijder velden rechtstreeks, waarbij de wijziging direct in de tekst wordt teruggezet zodra je weer van modus wisselt.",
+    "p4": "Deze combinatie dekt het meeste alledaagse JSON-werk: een API-antwoord opschonen voordat je het in documentatie plakt, een configuratiebestand valideren voordat je het commit, of een diep geneste payload verkennen zonder het overzicht te verliezen over in welke array je je bevindt. Heb je de data in een ander formaat nodig? De knoppen onder de editor converteren de huidige JSON rechtstreeks naar XML, YAML of CSV — handig wanneer het script van een collega een YAML-configuratiebestand verwacht of een spreadsheet gewone rijen en kolommen nodig heeft in plaats van geneste JSON — met het geconverteerde resultaat direct zichtbaar voor een snelle kopie of volledige download. Omdat alles alleen in het browsertabblad leeft, wordt de editor volledig gewist zodra je het sluit — er is geen opgeslagen geschiedenis of concept om je zorgen over te maken, precies het gedrag dat je wilt wanneer de JSON waarmee je werkt gevoelig kan zijn."
+  }
+}

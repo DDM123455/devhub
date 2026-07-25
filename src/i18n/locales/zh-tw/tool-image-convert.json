@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "title": "線上免費圖片格式轉換器（JPEG、PNG、WebP、AVIF、HEIC 等）— Web Tool Hub",
+    "description": "在瀏覽器裡免費轉換 JPEG、PNG、WebP、AVIF、GIF、BMP、ICO 等圖片格式，也能讀取 iPhone 的 HEIC 照片。完全不用上傳、不用註冊。"
+  },
+  "heading": "圖片格式轉換器",
+  "tagline": "在瀏覽器裡直接轉換 JPEG、PNG、WebP、AVIF、GIF、BMP、ICO，也能讀取 iPhone 的 HEIC 照片。",
+  "ui": {
+    "selectFiles": "選擇圖片",
+    "dropHint": "或將圖片拖曳到這裡",
+    "targetFormat": "轉換成",
+    "quality": "畫質",
+    "convert": "轉換",
+    "converting": "轉換中…",
+    "download": "下載",
+    "original": "原始檔案",
+    "converted": "轉換後",
+    "noFiles": "尚未選擇任何圖片。",
+    "errorGeneric": "轉換這張圖片時發生錯誤，請再試一次。",
+    "errorAvifUnsupported": "這個瀏覽器無法輸出 AVIF 格式，請改用最新版的 Chrome 或 Firefox，或選擇其他格式。",
+    "formatsNote": "輸出的 ICO 檔案會自動縮放到最大 256×256（標準圖示尺寸）。匯出 AVIF 需要較新版本的 Chrome 或 Firefox。iPhone 拍攝的 HEIC/HEIF 照片會自動讀取，不需要另外轉檔。",
+    "remove": "移除",
+    "clearAll": "全部清除",
+    "skippedFiles": "有 {{count}} 個檔案因為不是支援的圖片格式而被略過。"
+  },
+  "related": "相關工具",
+  "article": {
+    "heading": "JPEG、PNG、WebP、AVIF，到底該用哪個格式？",
+    "p1": "JPEG、PNG、WebP，還有愈來愈常見的 AVIF，都能用來儲存圖片，但它們在畫質、透明背景支援和檔案大小之間各有取捨，選錯格式常常是照片看起來變差、或檔案莫名其妙變大的主因。另外還有 GIF、BMP、ICO 這幾種格式，服務的是比較特定的用途，而不是日常拍照。能在這些格式之間自由轉換，就能讓圖片用最適合的格式呈現，而不是相機、截圖工具或 iPhone 存成什麼就將就用什麼。",
+    "p2": "一般照片最適合用 JPEG：它能非常有效地壓縮照片細節，但不支援透明背景，而且每重新儲存一次都會再損失一點畫質。PNG 是無損格式且支援透明背景，比較適合截圖、Logo 和色塊圖形。WebP 通常表現更全面，既能像 PNG 一樣支援透明背景，壓縮照片的效果也幾乎跟 JPEG 一樣好。AVIF 更新，往往能在相同畫質下壓得比 WebP 更小，不過目前瀏覽器對「輸出」AVIF（而不只是能瀏覽）的支援還沒完全跟上——如果你的瀏覽器沒辦法產生 AVIF 檔案，這個工具會直接告訴你，而不是默默給你一個壞掉的檔案。GIF、BMP、ICO 則各自對應特定或比較舊式的需求：GIF 適合需要相容各種老軟體的簡單色塊圖片，BMP 是未壓縮的原始像素資料，ICO 則專門用於網站的 favicon 和 Windows 應用程式圖示。",
+    "p3": "整個過程都在本機透過瀏覽器內建的 Canvas API 完成——圖片先被解碼，畫到一個看不見的畫布上，再重新編碼成目標格式，全程不會傳送到任何地方。由於沒有瀏覽器能直接從 Canvas 原生輸出 BMP、ICO 或 GIF，這個工具內建了幾段純 JavaScript 程式碼，直接從原始像素資料手動組出這些檔案格式——依然百分之百在本機完成，只是不依賴瀏覽器本身沒有提供的 API。選取一張或多張圖片（直接從 iPhone 匯出的 HEIC、HEIF 照片會先自動解碼），選擇目標格式，如果是 JPEG、WebP 或 AVIF 就再調整畫質滑桿，然後按下「轉換」即可。",
+    "p4": "簡單的原則是：一般照片轉成 WebP 或 AVIF 能得到最小的檔案，如果需要跟舊軟體最大程度相容就選 JPEG。截圖、圖示，還有任何需要透明背景的圖片，應該保留成 PNG 或 WebP，而不是 JPEG。需要 favicon 或應用程式圖示時就選 ICO，輸出會自動縮放到標準的 256×256 上限。支援讀取 HEIC 純粹是為了方便：如果相簿裡塞滿了 iPhone 的 HEIC 照片，某些應用程式或網站又不肯接受，這個工具會用跟處理其他圖片一樣的方式解碼它們，讓你可以直接轉成真正需要的格式。"
+  }
+}

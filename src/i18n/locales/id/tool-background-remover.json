@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "title": "Hapus Latar Belakang Gambar Gratis (AI, Tanpa Upload) — Web Tool Hub",
+    "description": "Hapus latar belakang foto secara gratis menggunakan model AI lokal yang berjalan sepenuhnya di browser Anda. Ganti dengan warna atau gambar lain, bandingkan sebelum/sesudah dengan penggeser. Tanpa upload, tanpa perlu daftar."
+  },
+  "heading": "Hapus Latar Belakang",
+  "tagline": "Potong latar belakang foto secara otomatis, ganti dengan warna atau gambar, langsung di browser Anda.",
+  "ui": {
+    "selectFiles": "Pilih gambar",
+    "dropHint": "atau seret dan lepas gambar di sini",
+    "remove": "Hapus Latar Belakang",
+    "removing": "Menghapus latar belakang… {{percent}}%",
+    "download": "Unduh",
+    "original": "Asli",
+    "result": "Hasil",
+    "noFiles": "Belum ada gambar yang dipilih.",
+    "errorGeneric": "Terjadi kesalahan saat menghapus latar belakang gambar ini. Silakan coba lagi.",
+    "modelNotice": "Klik pertama akan mengunduh model AI berukuran kecil (beberapa MB) ke browser Anda — setelah itu semuanya bekerja sepenuhnya offline. Foto Anda sendiri tidak pernah diunggah ke mana pun.",
+    "backgroundLabel": "Latar belakang",
+    "backgroundTransparent": "Transparan",
+    "backgroundColor": "Warna solid",
+    "backgroundImage": "Gambar khusus",
+    "backgroundImageSelect": "Pilih gambar latar belakang",
+    "backgroundImageClear": "Hapus",
+    "edgeSoftnessLabel": "Kehalusan tepi",
+    "removeItem": "Hapus",
+    "clearAll": "Hapus semua",
+    "skippedFiles": "{{count}} file dilewati karena bukan format gambar yang didukung."
+  },
+  "related": "Alat terkait",
+  "article": {
+    "heading": "Bagaimana cara kerja penghapusan latar belakang lokal di browser?",
+    "p1": "Menghapus latar belakang sebuah foto dulunya berarti harus berlangganan alat yang mengunggah gambar Anda ke server, atau menelusuri garis tepi subjek secara manual di editor gambar. Alat ini tidak melakukan keduanya: alat ini menjalankan model AI segmentasi kecil langsung di tab browser Anda untuk mengenali piksel mana yang termasuk subjek dan mana yang termasuk latar belakang, lalu membuat latar belakang tersebut transparan — semuanya tanpa foto Anda pernah dikirim ke mana pun. Ini jenis pengeditan yang sering dipakai untuk foto produk, foto profil, dan stiker — hal yang dulu memakan waktu berapa menit di editor gambar kini hanya butuh beberapa detik.",
+    "p2": "Saat pertama kali Anda memakainya, browser akan mengunduh model AI itu sendiri — data berukuran beberapa megabyte — sama seperti browser mengunduh gambar atau skrip apa pun dari sebuah situs web. Unduhan itu hanya terjadi sekali dan disimpan dalam cache untuk pemakaian berikutnya. Foto Anda adalah hal yang sepenuhnya terpisah: setiap foto dimuat langsung ke memori browser dan diproses di sana, dan pada titik mana pun tidak pernah diunggah ke server, bahkan secara sementara sekalipun.",
+    "p3": "Pilih satu atau beberapa foto dan tekan Hapus Latar Belakang — setiap foto diproses satu per satu, dengan indikator progres, di dalam Web Worker sehingga sisa halaman tetap responsif. Setelah hasilnya siap, geser penggeser pada thumbnail-nya untuk membandingkan gambar asli dengan hasil potongan secara berdampingan. Secara default latar belakang menjadi transparan (ditampilkan sebagai pola kotak-kotak), tetapi Anda bisa menggantinya dengan warna solid atau gambar latar belakang sendiri menggunakan kontrol di atas daftar — setiap foto yang sudah selesai diproses akan langsung diperbarui karena mengganti latar belakang jauh lebih ringan dibanding menjalankan ulang model AI. Penggeser kehalusan tepi sedikit mengaburkan tepi alpha dari hasil potongan, yang bisa membuat rambut atau bulu halus terlihat lebih alami dan tidak terlalu \"terpotong\"; fitur ini nonaktif secara default karena sebagian besar subjek terlihat paling baik dengan tepi tajam yang sudah dihasilkan model.",
+    "p4": "Hasil biasanya paling baik pada foto dengan subjek yang jelas dan berbeda — orang, hewan, produk, kendaraan — dengan latar belakang yang warnanya tidak sama dengan subjeknya. Detail yang sangat halus seperti helai rambut atau bulu lepas mungkin tidak sempurna hasilnya meskipun kehalusan tepi dinaikkan, dan latar belakang yang ramai atau berantakan terkadang bisa membingungkan model. Jika hasilnya kurang pas, memotong foto lebih rapat di sekitar subjek sebelum mengunggahnya sering kali membantu. Memotret subjek dengan pencahayaan merata di depan latar belakang polos sejak awal juga membuat hasil potongan yang lebih bersih jauh lebih mudah dihasilkan oleh alat apa pun — baik manusia maupun AI."
+  }
+}

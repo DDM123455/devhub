@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "title": "Ücretsiz Online Resim Format Dönüştürücü (JPEG, PNG, WebP, AVIF, HEIC ve Daha Fazlası) — Web Tool Hub",
+    "description": "JPEG, PNG, WebP, AVIF, GIF, BMP ve ICO formatları arasında resimleri tamamen tarayıcınızda, ücretsiz olarak dönüştürün. iPhone HEIC fotoğraflarını da okur. Yükleme yok, kayıt yok."
+  },
+  "heading": "Resim Format Dönüştürücü",
+  "tagline": "JPEG, PNG, WebP, AVIF, GIF, BMP ve ICO arasında dönüştürün — iPhone'un HEIC fotoğraflarını da okuyun — hepsi doğrudan tarayıcınızda.",
+  "ui": {
+    "selectFiles": "Resim seç",
+    "dropHint": "veya resimleri buraya sürükleyip bırakın",
+    "targetFormat": "Şuna dönüştür",
+    "quality": "Kalite",
+    "convert": "Dönüştür",
+    "converting": "Dönüştürülüyor…",
+    "download": "İndir",
+    "original": "Orijinal",
+    "converted": "Dönüştürüldü",
+    "noFiles": "Henüz resim seçilmedi.",
+    "errorGeneric": "Bu resmi dönüştürürken bir sorun oluştu. Lütfen tekrar deneyin.",
+    "errorAvifUnsupported": "Bu tarayıcı AVIF dışa aktaramıyor. Chrome veya Firefox'un güncel bir sürümünü deneyin ya da farklı bir format seçin.",
+    "formatsNote": "ICO çıktısı en fazla 256×256 (standart simge boyutu) olacak şekilde yeniden boyutlandırılır. AVIF dışa aktarma için güncel bir Chrome veya Firefox gerekir. iPhone'dan gelen HEIC/HEIF fotoğrafları otomatik olarak okunur — ayrı bir dönüştürme adımına gerek yoktur.",
+    "remove": "Kaldır",
+    "clearAll": "Tümünü temizle",
+    "skippedFiles": "{{count}} dosya desteklenen bir resim formatında olmadığı için atlandı."
+  },
+  "related": "İlgili araçlar",
+  "article": {
+    "heading": "JPEG, PNG, WebP, AVIF — hangi formatı kullanmalısınız?",
+    "p1": "JPEG, PNG, WebP ve giderek artan biçimde AVIF, hepsi bir resmi saklar; ancak kalite, saydamlık ve dosya boyutu arasında farklı ödünleşimler sunarlar. Yanlış formatı seçmek, bir fotoğrafın olması gerekenden kötü görünmesinin ya da gereğinden çok daha fazla yer kaplamasının yaygın nedenlerinden biridir. GIF, BMP ve ICO gibi birkaç format ise günlük fotoğrafçılıktan çok daha dar, özel işlere hizmet eder. Bunların hepsi arasında dönüştürme yapabilmek, resmi kameranızın, ekran görüntüsü aracınızın ya da iPhone'unuzun kaydettiği hangi formatta olursa olsun, gerçekte neye ihtiyacı varsa ona uydurmanızı sağlar.",
+    "p2": "Sıradan fotoğraflar için doğru seçim JPEG'dir: fotoğrafik detayı çok verimli sıkıştırır ama saydamlığı desteklemez ve her yeniden kaydedişte biraz kalite kaybeder. PNG kayıpsızdır ve saydamlığı destekler; ekran görüntüleri, logolar ve düz renkli grafikler için daha uygundur. WebP genellikle ikisini de geride bırakır, PNG gibi saydamlığı desteklerken fotoğrafları neredeyse JPEG kadar iyi sıkıştırır. AVIF daha da yenidir ve genellikle aynı görsel kalitede WebP'den bile daha sıkı sıkıştırır, ancak tarayıcıların AVIF'i (yalnızca görüntülemek değil) dışa aktarma desteği hâlâ yetişme aşamasındadır — bu araç, bozuk bir dosyayı sessizce elinize tutuşturmak yerine tarayıcınız AVIF üretemiyorsa bunu açıkça söyler. GIF, BMP ve ICO ise belirli eski veya özel amaçlı ihtiyaçlar için var olmaya devam eder: GIF, geniş eski yazılım uyumluluğu gereken basit düz renkli resimler için; BMP, sıkıştırılmamış ham piksel verisi için; ICO ise özellikle web sitesi favicon'ları ve Windows uygulama simgeleri için.",
+    "p3": "Her şey tarayıcınızın yerleşik Canvas API'sini kullanarak yerel olarak çalışır — resim çözülür, görünmez bir tuvale (canvas) çizilir ve hiçbir yere gönderilmeden hedef formatta yeniden kodlanır. Hiçbir tarayıcı bir tuvalden yerel olarak BMP, ICO veya GIF dışa aktaramadığından, bu araç bu dosya formatlarını ham piksel verisinden elle oluşturan birkaç küçük saf JavaScript parçası içerir — yine de %100 yerel, sadece var olmayan bir tarayıcı API'sine güvenmeden. Bir veya birden fazla resim seçin (iPhone'dan doğrudan gelen HEIC ve HEIF fotoğrafları önce otomatik olarak çözülür), hedef formatınızı belirleyin, JPEG, WebP veya AVIF için kalite kaydırıcısını ayarlayın ve Dönüştür'e basın.",
+    "p4": "Genel bir kural olarak: en küçük dosyalar için sıradan fotoğrafları WebP veya AVIF'e, eski yazılımlarla maksimum uyumluluk gerekiyorsa JPEG'e dönüştürün. Ekran görüntülerini, simgeleri ve saydamlık gerektiren her şeyi JPEG yerine PNG veya WebP olarak tutun. Bir favicon veya uygulama simgesine ihtiyacınız olduğunda özellikle ICO'ya yönelin — çıktı otomatik olarak standart 256×256 maksimumuna yeniden boyutlandırılır. HEIC girdi desteği tamamen kolaylık amacıyla vardır: fotoğraf kitaplığınız, bazı uygulama veya web sitelerinin kabul etmediği iPhone HEIC dosyalarıyla doluysa, bu araç onları diğer resimleri çözdüğü gibi çözer, böylece doğrudan gerçekten ihtiyacınız olan formata dönüştürebilirsiniz."
+  }
+}

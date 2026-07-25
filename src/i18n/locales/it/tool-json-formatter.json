@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "title": "Formattatore e Validatore JSON Online Gratis — Web Tool Hub",
+    "description": "Formatta, valida ed esplora JSON online gratis, interamente nel tuo browser. Incolla JSON minificato, passa a una vista ad albero interattiva e individua errori di sintassi all'istante — senza upload, senza registrazione."
+  },
+  "heading": "Formattatore e Validatore JSON",
+  "tagline": "Formatta, valida ed esplora dati JSON, direttamente nel tuo browser.",
+  "ui": {
+    "themeNotice": "Questo editor mantiene un proprio tema chiaro indipendentemente dalla modalità scura del sito — allo stesso modo in cui di solito si comporta un editor di codice incorporato in qualsiasi pagina.",
+    "errorWithLine": "Errore di sintassi alla riga {{line}}: {{message}}",
+    "errorNoLine": "Errore di sintassi: {{message}}",
+    "goToErrorLine": "Vai alla riga dell'errore",
+    "exportHeading": "Converti in un altro formato",
+    "exportXml": "Esporta come XML",
+    "exportYaml": "Esporta come YAML",
+    "exportCsv": "Esporta come CSV",
+    "exportInvalidJson": "Correggi l'errore di sintassi JSON sopra prima di convertire.",
+    "copy": "Copia",
+    "copied": "Copiato!",
+    "download": "Scarica"
+  },
+  "related": "Strumenti correlati",
+  "article": {
+    "heading": "Perché formattare e validare JSON in locale?",
+    "p1": "Il JSON compare continuamente nella giornata di uno sviluppatore: una risposta API minificata senza interruzioni di riga, un file di configurazione che qualcuno ha modificato a mano riducendolo a un'unica riga illeggibile, un payload che stai debuggando alle 23 cercando di individuare l'unica virgola mancante. La maggior parte degli strumenti online \"formattatore JSON\" risolve il problema della leggibilità inviando prima il testo incollato a un server — un compromesso scomodo quando quel JSON potrebbe contenere una chiave API, un token di accesso o i dati personali di un cliente.",
+    "p2": "Questo strumento non invia mai nulla da nessuna parte. È costruito su jsoneditor, una libreria JavaScript che analizza e ridisegna il tuo JSON interamente all'interno della memoria del browser. L'analisi, la formattazione e la validazione della sintassi avvengono tutte in locale usando il motore JavaScript del browser stesso — non c'è nessun server coinvolto, quindi nulla di ciò che incolli qui lascia mai il tuo dispositivo.",
+    "p3": "Incolla il tuo JSON nell'editor in modalità testo e usa il pulsante Formatta nella barra degli strumenti per renderlo leggibile, oppure Compatta per ridurlo di nuovo a una singola riga. Se il JSON contiene un errore di sintassi — una virgola in eccesso, una virgoletta mancante, una parentesi non bilanciata — l'editor lo evidenzia immediatamente con un messaggio di errore chiaro e il numero esatto della riga invece di lasciarti a scandagliare l'intero documento a occhio; un pulsante \"Vai alla riga dell'errore\" salta direttamente a quella riga e la seleziona così non devi scorrere e cercarla in un file lungo. Passa alla modalità ad albero dal menu a tendina in alto per esplorare gli stessi dati come una struttura interattiva e comprimibile: espandi e comprimi oggetti e array annidati, modifica singoli valori sul posto, e riordina o elimina campi direttamente, con la modifica che si riflette nel testo non appena torni alla modalità testo.",
+    "p4": "Questa combinazione copre la maggior parte del lavoro JSON quotidiano: ripulire una risposta API prima di incollarla nella documentazione, validare un file di configurazione prima di committerlo, o esplorare un payload profondamente annidato senza perdere il filo di quale array si sta guardando. Hai bisogno dei dati in un formato diverso? I pulsanti sotto l'editor convertono il JSON corrente direttamente in XML, YAML o CSV — utile quando lo script di un collega si aspetta un file di configurazione YAML o un foglio di calcolo richiede righe e colonne semplici invece di JSON annidato — con il risultato convertito mostrato in linea per una copia rapida o un download completo. Poiché tutto vive solo nella scheda del browser, chiuderla cancella completamente l'editor — nessuna cronologia salvata o bozza di cui preoccuparsi, esattamente il comportamento che si desidera quando il JSON su cui si lavora potrebbe essere sensibile."
+  }
+}

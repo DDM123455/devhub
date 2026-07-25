@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "title": "Bildformatskonverterare online gratis (JPEG, PNG, WebP, AVIF, HEIC med mera) — Web Tool Hub",
+    "description": "Konvertera bilder mellan JPEG, PNG, WebP, AVIF, GIF, BMP och ICO online gratis, helt i din webbläsare. Läser även HEIC-foton från iPhone. Ingen uppladdning, ingen registrering."
+  },
+  "heading": "Bildformatskonverterare",
+  "tagline": "Konvertera mellan JPEG, PNG, WebP, AVIF, GIF, BMP och ICO — och läs HEIC-foton från iPhone — direkt i webbläsaren.",
+  "ui": {
+    "selectFiles": "Välj bilder",
+    "dropHint": "eller dra och släpp bilder här",
+    "targetFormat": "Konvertera till",
+    "quality": "Kvalitet",
+    "convert": "Konvertera",
+    "converting": "Konverterar…",
+    "download": "Ladda ner",
+    "original": "Original",
+    "converted": "Konverterad",
+    "noFiles": "Inga bilder valda än.",
+    "errorGeneric": "Något gick fel när bilden skulle konverteras. Försök igen.",
+    "errorAvifUnsupported": "Den här webbläsaren kan inte exportera AVIF. Prova en aktuell version av Chrome eller Firefox, eller välj ett annat format.",
+    "formatsNote": "ICO-utdata skalas om till maximalt 256×256 (standardstorleken för ikoner). AVIF-export kräver en aktuell version av Chrome eller Firefox. HEIC/HEIF-foton från iPhone läses in automatiskt — inget separat konverteringssteg behövs.",
+    "remove": "Ta bort",
+    "clearAll": "Rensa allt",
+    "skippedFiles": "{{count}} fil(er) hoppades över eftersom de inte är ett bildformat som stöds."
+  },
+  "related": "Relaterade verktyg",
+  "article": {
+    "heading": "JPEG, PNG, WebP, AVIF — vilket format ska du använda?",
+    "p1": "JPEG, PNG, WebP och alltmer AVIF lagrar alla en bild, men de gör olika avvägningar mellan kvalitet, transparens och filstorlek, och att välja fel format är en vanlig orsak till att ett foto ser sämre ut än det borde eller tar upp mycket mer plats än nödvändigt. Några andra format — GIF, BMP, ICO — fyller smalare, mer specifika behov snarare än vardaglig fotografi. Att kunna konvertera mellan dem alla gör att du kan matcha formatet efter vad bilden faktiskt behöver, istället för att bara behålla vad kameran, skärmdumpsverktyget eller iPhonen råkade spara.",
+    "p2": "JPEG är rätt val för vanliga foton: det komprimerar fotografiska detaljer mycket effektivt men saknar stöd för transparens och tappar lite kvalitet varje gång filen sparas om. PNG är förlustfritt och stödjer transparens, vilket passar bättre för skärmdumpar, logotyper och grafik med platta färger. WebP slår generellt sett båda, med stöd för transparens som PNG samtidigt som foton komprimeras nästan lika bra som JPEG. AVIF är ännu nyare och komprimerar ofta ännu hårdare än WebP vid samma visuella kvalitet, även om webbläsarstödet för att exportera det (inte bara visa det) fortfarande hänger efter — det här verktyget talar tydligt om ifall din webbläsare inte kan skapa en AVIF-fil, istället för att i tysthet ge dig en trasig sådan. GIF, BMP och ICO finns för specifika äldre eller särskilda behov: GIF för enkla bilder med platta färger som behöver bred kompatibilitet med äldre program, BMP för okomprimerad rå pixeldata, och ICO specifikt för webbplatsers favicon-ikoner och Windows-programikoner.",
+    "p3": "Allt körs lokalt med webbläsarens inbyggda Canvas-API — bilden avkodas, ritas upp på en osynlig canvas och kodas om till målformatet utan att någonsin skickas någonstans. Eftersom ingen webbläsare kan exportera BMP, ICO eller GIF direkt från en canvas innehåller det här verktyget några små bitar ren JavaScript som bygger de filformaten för hand utifrån den råa pixeldatan — fortfarande 100 % lokalt, bara utan att förlita sig på ett webbläsar-API som inte finns. Välj en eller flera bilder (HEIC- och HEIF-foton direkt från en iPhone avkodas automatiskt först), välj målformat, justera kvalitetsreglaget för JPEG, WebP eller AVIF och klicka på Konvertera.",
+    "p4": "Som tumregel: konvertera vanliga foton till WebP eller AVIF för minsta möjliga filer, eller JPEG om du behöver maximal kompatibilitet med äldre program. Behåll skärmdumpar, ikoner och allt som behöver transparens som PNG eller WebP snarare än JPEG. Använd ICO specifikt när du behöver en favicon eller programikon — utdata skalas automatiskt om till standardmåttet 256×256. Stödet för HEIC-inmatning finns rent praktiskt: om ditt fotobibliotek är fullt av HEIC-filer från iPhone som en app eller webbplats vägrar acceptera, avkodar det här verktyget dem på samma sätt som det avkodar alla andra bilder, så att du kan konvertera direkt till vilket format du faktiskt behöver."
+  }
+}

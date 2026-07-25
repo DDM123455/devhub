@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Licznik słów i znaków online za darmo — Web Tool Hub",
+    "description": "Licz słowa, znaki, zdania i akapity błyskawicznie podczas pisania lub wklejania tekstu — za darmo, na żywo i w całości w przeglądarce. Bez wysyłania na serwer, bez rejestracji."
+  },
+  "heading": "Licznik słów i znaków",
+  "tagline": "Licz słowa, znaki, zdania i akapity błyskawicznie w trakcie pisania.",
+  "ui": {
+    "placeholder": "Wklej lub wpisz tekst tutaj…",
+    "charsLabel": "Znaki",
+    "charsNoSpacesLabel": "Znaki (bez spacji)",
+    "wordsLabel": "Słowa",
+    "sentencesLabel": "Zdania",
+    "paragraphsLabel": "Akapity",
+    "readingTimeLabel": "Czas czytania",
+    "readingTimeValue": "{{minutes}} min czytania",
+    "speakingTimeLabel": "Czas mówienia",
+    "speakingTimeValue": "{{minutes}} min wypowiedzi",
+    "clear": "Wyczyść",
+    "keywordDensityHeading": "Gęstość słów kluczowych",
+    "keywordDensityWordColumn": "Słowo",
+    "keywordDensityCountColumn": "Liczba wystąpień",
+    "keywordDensityPercentColumn": "% tekstu"
+  },
+  "related": "Powiązane narzędzia",
+  "article": {
+    "heading": "Dlaczego liczyć słowa i znaki lokalnie?",
+    "p1": "Zaskakująco wiele codziennych zadań pisarskich wiąże się z konkretnym limitem: esej ograniczony do 500 słów, tweet ograniczony do 280 znaków, meta opis, który zostaje obcięty po około 160 znakach, list motywacyjny, który rekruter poprosił zmieścić na jednej stronie. Ręczne liczenie tego wszystkiego jest żmudne i podatne na błędy, więc większość osób wkleja swój tekst do internetowego licznika — co zwykle oznacza wysłanie szkicu listu motywacyjnego, niepublikowanego artykułu albo poufnego briefu klienta na serwer, o którym nic nie wiadomo.",
+    "p2": "To narzędzie nigdy tego nie robi. Każdy wpisany znak jest liczony przez niewielki fragment kodu JavaScript działający bezpośrednio w Twojej przeglądarce, a liczby aktualizują się na żywo w trakcie pisania — nie ma przycisku wysyłania, bo nie ma żadnego zapytania do serwera, na które trzeba by czekać. Nic, co napiszesz, nigdy nie jest wysyłane, przechowywane ani rejestrowane; odśwież stronę, a wszystko znika — dokładnie tak, jak można się spodziewać po brudnopisie.",
+    "p3": "Wystarczy zacząć pisać lub wkleić tekst w pole. Liczba słów jest wyznaczana na podstawie białych znaków, więc „dobrze-znany” liczy się jako jedno słowo, a „dobrze znany” jako dwa. Liczba zdań szuka tekstu kończącego się kropką, znakiem zapytania lub wykrzyknikiem, co dobrze sprawdza się w zwykłej prozie, ale może zaniżyć wynik dla tekstu bez interpunkcji, na przykład listy punktowanej. Liczba akapitów traktuje każdy blok tekstu oddzielony pustą linią jako jeden akapit. Szacowany czas czytania zakłada średnią prędkość czytania dorosłej osoby na poziomie około 200 słów na minutę, zaokrągloną w górę do pełnej minuty, dzięki czemu bardzo krótkie teksty nadal pokazują „1 min czytania” zamiast „0”. Ta sama liczba słów służy też do oszacowania czasu mówienia, w oparciu o średnie tempo prezentacji wynoszące około 130 słów na minutę — przydatne przy planowaniu czasu przemówienia lub lektora do filmu bez konieczności wcześniejszego odczytania tekstu na głos.",
+    "p4": "Pisarze używają tego narzędzia, żeby trafić w limit słów zadania bez zgadywania, marketerzy — żeby utrzymać meta opis lub tekst reklamowy w granicach limitu wyświetlania, a studenci — żeby sprawdzić pracę pod kątem minimum lub maksimum wymaganego przez wykładowcę przed jej oddaniem. Liczba znaków bez spacji jest szczególnie przydatna dla platform — niektórych sieci społecznościowych i formularzy — które liczą znaki w ten sposób, zamiast uwzględniać każdą spację. Pod licznikami tabela gęstości słów kluczowych pokazuje słowa, które pojawiają się w tekście najczęściej, wraz z liczbą wystąpień i procentem całości — ten sam rodzaj sprawdzenia, którego copywriterzy SEO używają, aby upewnić się, że docelowe słowo kluczowe nie jest powtarzane tak często, że brzmi jak spam, ani tak rzadko, że praktycznie nie jest zauważalne. Jeśli musisz porównać dwie wersje tekstu słowo po słowie zamiast liczyć tylko jedną, narzędzie Porównywarka tekstów robi to w ten sam lokalny sposób, bez wysyłania czegokolwiek na serwer."
+  }
+}

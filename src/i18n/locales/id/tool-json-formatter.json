@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "title": "JSON Formatter & Validator Online Gratis — Web Tool Hub",
+    "description": "Format, validasi, dan telusuri JSON online secara gratis, sepenuhnya di browser Anda. Tempel JSON yang diminifikasi, beralih ke tampilan pohon interaktif, dan tangkap kesalahan sintaks secara instan — tanpa upload, tanpa perlu daftar."
+  },
+  "heading": "JSON Formatter & Validator",
+  "tagline": "Format, validasi, dan jelajahi data JSON, langsung di browser Anda.",
+  "ui": {
+    "themeNotice": "Widget editor ini mempertahankan tema terangnya sendiri terlepas dari mode gelap situs — sama seperti editor kode yang disematkan di halaman mana pun biasanya bekerja.",
+    "errorWithLine": "Kesalahan sintaks di baris {{line}}: {{message}}",
+    "errorNoLine": "Kesalahan sintaks: {{message}}",
+    "goToErrorLine": "Ke baris kesalahan",
+    "exportHeading": "Konversi ke format lain",
+    "exportXml": "Ekspor sebagai XML",
+    "exportYaml": "Ekspor sebagai YAML",
+    "exportCsv": "Ekspor sebagai CSV",
+    "exportInvalidJson": "Perbaiki dulu kesalahan sintaks JSON di atas sebelum mengonversi.",
+    "copy": "Salin",
+    "copied": "Tersalin!",
+    "download": "Unduh"
+  },
+  "related": "Alat terkait",
+  "article": {
+    "heading": "Mengapa memformat dan memvalidasi JSON secara lokal?",
+    "p1": "JSON muncul terus-menerus dalam keseharian seorang developer: respons API yang diminifikasi tanpa baris baru, file konfigurasi yang diedit manual seseorang menjadi satu baris yang tidak terbaca, payload yang sedang Anda debug pukul 11 malam sambil mencoba menemukan satu koma yang hilang. Kebanyakan alat \"JSON formatter\" online mengatasi masalah keterbacaan ini dengan mengirim teks yang Anda tempel ke server terlebih dahulu — kompromi yang tidak nyaman ketika JSON tersebut mungkin berisi API key, access token, atau data pribadi pelanggan.",
+    "p2": "Alat ini tidak pernah mengirim apa pun ke mana pun. Dibangun di atas jsoneditor, sebuah pustaka JavaScript yang mem-parse dan merender ulang JSON Anda sepenuhnya di dalam memori browser Anda. Proses parsing, pretty-printing, dan validasi sintaks semuanya terjadi secara lokal menggunakan mesin JavaScript bawaan browser — tidak ada server yang terlibat, sehingga tidak ada yang Anda tempel di sini yang pernah keluar dari perangkat Anda.",
+    "p3": "Tempel JSON Anda ke dalam editor dalam mode teks dan gunakan tombol Format di toolbar untuk mempercantik tampilannya, atau Compact untuk memampatkannya kembali menjadi satu baris. Jika JSON memiliki kesalahan sintaks — koma yang menggantung, tanda kutip yang hilang, kurung yang tidak berpasangan — editor langsung menyorotinya dengan pesan kesalahan yang jelas dan nomor baris yang tepat, alih-alih membiarkan Anda memeriksa seluruh dokumen dengan mata; tombol \"Ke baris kesalahan\" langsung melompat ke baris tersebut dan memilihnya sehingga Anda tidak perlu menggulir dan mencarinya di file yang panjang. Beralih ke mode pohon dari dropdown di bagian atas untuk menelusuri data yang sama sebagai pohon interaktif yang bisa dilipat: perluas dan lipat objek serta array bersarang, edit nilai individual langsung di tempat, dan urutkan ulang atau hapus field secara langsung, dengan perubahan langsung tercermin kembali ke teks begitu Anda beralih mode lagi.",
+    "p4": "Kombinasi ini mencakup sebagian besar pekerjaan JSON sehari-hari: membersihkan respons API sebelum ditempel ke dokumentasi, memvalidasi file konfigurasi sebelum melakukan commit, atau menjelajahi payload yang bersarang dalam sebelum kehilangan jejak array mana yang sedang Anda telusuri. Butuh data dalam format lain? Tombol-tombol di bawah editor mengonversi JSON saat ini langsung ke XML, YAML, atau CSV — berguna ketika skrip rekan tim mengharapkan file konfigurasi YAML atau spreadsheet membutuhkan baris dan kolom biasa alih-alih JSON bersarang — dengan hasil konversi ditampilkan inline untuk disalin cepat atau diunduh penuh. Karena semuanya hanya ada di tab browser, menutupnya akan sepenuhnya membersihkan editor — tidak ada riwayat tersimpan atau draf yang perlu dikhawatirkan, yang memang perilaku yang Anda inginkan ketika JSON yang sedang Anda kerjakan mungkin bersifat sensitif."
+  }
+}

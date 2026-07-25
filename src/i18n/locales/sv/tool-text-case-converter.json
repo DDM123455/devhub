@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "Textformatkonverterare online gratis — Web Tool Hub",
+    "description": "Konvertera text mellan VERSALER, gemener, Title Case, camelCase, snake_case, Meningscase och mer direkt, gratis och helt i din webbläsare. Ingen uppladdning, ingen registrering."
+  },
+  "heading": "Textformatkonverterare",
+  "tagline": "Konvertera text mellan VERSALER, gemener, Title Case, camelCase, snake_case och mer — plus praktiska textstädningsverktyg.",
+  "ui": {
+    "placeholder": "Skriv eller klistra in text här…",
+    "outputLabel": "Resultat",
+    "caseUpper": "VERSALER",
+    "caseLower": "gemener",
+    "caseTitle": "Title Case",
+    "caseCamel": "camelCase",
+    "caseSnake": "snake_case",
+    "caseSentence": "Meningscase",
+    "caseAlternating": "vArAnNaT sKiFtLäGe",
+    "caseInverse": "oMVÄNT skiftläge",
+    "caseOptionsHeading": "Formatalternativ",
+    "utilRemoveSpaces": "Ta bort extra mellanslag",
+    "utilRemoveLineBreaks": "Ta bort extra radbrytningar",
+    "utilSortLines": "Sortera rader A-Ö",
+    "utilitiesHeading": "Verktyg",
+    "copy": "Kopiera",
+    "copied": "Kopierat!",
+    "clear": "Rensa"
+  },
+  "related": "Relaterade verktyg",
+  "article": {
+    "heading": "Varför använda en textformatkonverterare?",
+    "p1": "Behov av att ändra skiftläge dyker upp på små men irriterande sätt hela tiden: ett stycke skrivet med Caps Lock fastlåst, en spec skriven i Title Case som måste bli ett camelCase-variabelnamn, en CSV-kolumnrubrik som måste bli ett snake_case-databasfält, en rubrik som behöver korrekt versalisering innan den publiceras. Inget av detta är svårt att göra för hand på ett enda ord, men att skriva om ett helt stycke eller en lång lista med fältnamn för hand är långsamt och lätt att göra fel på.",
+    "p2": "Det här verktyget gör konverteringen med en liten mängd ren JavaScript som körs direkt i din webbläsare — inget bibliotek behöver laddas och inget skickas till en server. När du skriver eller klistrar in text och växlar mellan formatalternativ uppdateras resultatet omedelbart, beräknat på nytt i minnet på din egen enhet varje gång.",
+    "p3": "Klistra in eller skriv din text, välj sedan VERSALER, gemener, Title Case, camelCase eller snake_case, och tryck på Kopiera för att hämta resultatet. Specifikt för camelCase och snake_case behandlar konverteraren mellanslag, bindestreck, understreck och skiljetecken som ordgränser — och den upptäcker även befintliga camelCase- eller PascalCase-gränser, så att inklistring av \"hej-värld\", \"Hej Värld\" eller till och med ett redan formaterat \"hejVärld\" alla konverteras rent till samma resultat istället för att ge något trasigt som \"hejvärld\" eller \"hej-Värld\".",
+    "p4": "Utvecklare använder det oftast när de byter namn på variabler eller fält mellan namngivningskonventioner som används av olika språk och databaser, skribenter använder det för att fixa en mening som råkade skrivas med bara versaler, och redaktörer använder Title Case för att få konsekvent versalisering i rubriker utan att behöva memorera vilka småord som ska hoppas över. Om du också behöver jämföra två versioner av en text eller bara räkna ord och tecken, hanterar verktygen Textjämförelse och Ord- och teckenräknare det på samma lokala sätt, utan att något laddas upp.",
+    "p5": "Utöver de klassiska formaten fixar Meningscase text som råkade skrivas helt i versaler genom att bara göra den första bokstaven i varje mening stor, medan vArAnNaT sKiFtLäGe och oMVÄNT skiftläge är två lekfulla stilar som folk använder för att få en kommentar att sticka ut eller läsas som sarkastisk på sociala medier — den ena växlar skiftläge på varannan bokstav, den andra vänder skiftläget på varje enskild bokstav jämfört med originalet. Vid sidan av formatalternativen hanterar tre städverktyg den röriga formatering som ofta följer med inklistrad text: Ta bort extra mellanslag komprimerar upprepade mellanslag och tabbtecken till ett per mellanrum utan att röra dina radbrytningar, Ta bort extra radbrytningar komprimerar lösa tomma rader som blivit kvar efter kopiering, och Sortera rader A-Ö sorterar en lista alfabetiskt — praktiskt för att städa upp en inklistrad lista med namn, taggar eller CSV-liknande rader innan de används någon annanstans."
+  }
+}

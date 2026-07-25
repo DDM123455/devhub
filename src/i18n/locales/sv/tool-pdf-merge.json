@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "title": "Slå ihop PDF-filer online gratis — Web Tool Hub",
+    "description": "Slå ihop flera PDF-filer till ett dokument online gratis, helt i din webbläsare. Se varje sida som en miniatyrbild, dra för att ändra ordning, rotera eller ta bort enskilda sidor innan sammanslagning. Ingen uppladdning, ingen vattenstämpel, ingen registrering."
+  },
+  "heading": "Slå ihop PDF-filer",
+  "tagline": "Kombinera flera PDF-filer till en enda fil, med sidvis miniatyrvy, direkt i webbläsaren.",
+  "ui": {
+    "selectFiles": "Välj PDF-filer",
+    "dropHint": "eller dra och släpp PDF-filer här",
+    "merge": "Slå ihop PDF-filer",
+    "merging": "Slår ihop…",
+    "download": "Ladda ner merged.pdf",
+    "moveUp": "Flytta tidigare",
+    "moveDown": "Flytta senare",
+    "remove": "Ta bort sida",
+    "rotate": "Rotera sida",
+    "loadingThumbnails": "Läser sidor…",
+    "dragHint": "Dra en sida för att ändra dess ordning, eller använd pilknapparna.",
+    "noFiles": "Inga PDF-filer valda än.",
+    "errorGeneric": "Något gick fel när PDF-filen skulle läsas. Kontrollera att den inte är skadad eller lösenordsskyddad, och försök igen.",
+    "skippedFiles": "{{count}} fil(er) hoppades över eftersom de inte är en PDF."
+  },
+  "related": "Relaterade verktyg",
+  "article": {
+    "heading": "Varför slå ihop PDF-filer lokalt istället för att ladda upp dem?",
+    "p1": "Skannade kontrakt, signerade blanketter, buntar av fakturor, kapitel i en rapport — förr eller senare hamnar nästan alla i en situation med flera PDF-filer som egentligen hör ihop som ett enda dokument. Att mejla fem separata bilagor eller be en kund öppna fem länkar istället för en är klumpigt, och de flesta gratis \"PDF-sammanslagnings\"-sajter löser det genom att i tysthet ladda upp dina filer till en server först — precis den sortens förtroende få vill ge bort för ett dokument som kan innehålla en underskrift, ett personnummer eller ekonomiska uppgifter.",
+    "p2": "Det här verktyget gör aldrig så. Allt körs i din webbläsare med pdf-lib, ett JavaScript-bibliotek som läser den råa strukturen hos varje PDF, kopierar sidorna till ett nytt dokument och sätter ihop resultatet — allt i minnet, på din enhet. Sidminiatyrer renderas också lokalt, med pdf.js (samma renderingsmotor som är inbyggd i Firefox), så att du kan se exakt vad du arbetar med innan något slås ihop.",
+    "p3": "Lägg till dina PDF-filer genom att klicka på knappen eller dra dem till släppzonen — varje sida från varje fil visas som en egen miniatyr, i ett samlat rutnät, inte grupperat per fil. Dra vilken miniatyr som helst för att ändra dess ordning i förhållande till alla andra, även mellan olika källfiler, eller använd pilknapparna om det inte passar att dra. Klicka på en sidas roteringsknapp för att vrida den 90° i taget, eller dess borttagningsknapp för att lämna sidan utanför slutdokumentet helt — praktiskt för att sortera bort ett tomt skannat försättsblad eller en dubblettsida. När allt ser rätt ut trycker du på Slå ihop PDF-filer; den sammanslagna filen byggs helt i minnet och laddas ner som merged.pdf.",
+    "p4": "Det finns ingen inbyggd sidgräns i verktyget, även om mycket stora buntar av skannade, bildtunga PDF-filer naturligt tar längre tid att rendera miniatyrer för eftersom allt bearbetas av din egen enhet istället för en serverpark. Om en fil inte går att läsa in — till exempel för att den är krypterad med lösenord eller blev skadad vid nedladdning — säger verktyget till istället för att i tysthet leverera ett trasigt resultat. Om du vill gå åt andra hållet och dela upp en sammanslagen PDF i mindre delar fungerar verktyget Dela PDF på samma integritetsfokuserade sätt och delar samma kontroller för rotera och ta bort sida."
+  }
+}

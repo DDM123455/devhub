@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "title": "PDF-bestanden samenvoegen online gratis — Web Tool Hub",
+    "description": "Combineer meerdere PDF-bestanden tot één document online en gratis, volledig in je browser. Bekijk elke pagina als miniatuur, sleep om te herschikken, roteer of verwijder afzonderlijke pagina's voordat je samenvoegt. Geen upload, geen watermerk, geen registratie."
+  },
+  "heading": "PDF-bestanden samenvoegen",
+  "tagline": "Combineer meerdere PDF's tot één bestand, met een miniatuurweergave per pagina, rechtstreeks in je browser.",
+  "ui": {
+    "selectFiles": "PDF-bestanden selecteren",
+    "dropHint": "of sleep PDF-bestanden hierheen",
+    "merge": "PDF's samenvoegen",
+    "merging": "Bezig met samenvoegen…",
+    "download": "merged.pdf downloaden",
+    "moveUp": "Naar voren verplaatsen",
+    "moveDown": "Naar achteren verplaatsen",
+    "remove": "Pagina verwijderen",
+    "rotate": "Pagina roteren",
+    "loadingThumbnails": "Pagina's worden gelezen…",
+    "dragHint": "Sleep een pagina om de volgorde te wijzigen, of gebruik de pijlknoppen.",
+    "noFiles": "Nog geen PDF-bestanden geselecteerd.",
+    "errorGeneric": "Er is iets misgegaan bij het lezen van deze PDF. Controleer of het bestand niet beschadigd of met een wachtwoord beveiligd is, en probeer het opnieuw.",
+    "skippedFiles": "{{count}} bestand(en) overgeslagen omdat het geen PDF is."
+  },
+  "related": "Gerelateerde tools",
+  "article": {
+    "heading": "Waarom PDF-bestanden lokaal samenvoegen in plaats van uploaden?",
+    "p1": "Gescande contracten, ondertekende formulieren, een reeks facturen, hoofdstukken van een rapport — vroeg of laat heeft bijna iedereen meerdere PDF-bestanden die eigenlijk bij elkaar horen als één document. Vijf losse bijlagen mailen of een klant vragen om vijf links te openen in plaats van één is onhandig, en de meeste gratis online \"PDF samenvoegen\"-sites lossen dit op door je bestanden stilletjes eerst naar een server te uploaden — precies het soort vertrouwen dat weinig mensen willen geven aan een document dat mogelijk een handtekening, een ID-nummer of financiële gegevens bevat.",
+    "p2": "Deze tool doet dat nooit. Alles draait in je browser met pdf-lib, een JavaScript-bibliotheek die de ruwe structuur van elke PDF leest, de pagina's kopieert naar een nieuw document en het resultaat weer in elkaar zet — allemaal in het geheugen, op je eigen apparaat. Ook de paginaminiaturen worden lokaal weergegeven, met pdf.js (dezelfde weergave-engine die in Firefox is ingebouwd), zodat je precies ziet waar je mee werkt voordat er iets wordt samengevoegd.",
+    "p3": "Voeg je PDF-bestanden toe door op de knop te klikken of ze in het invoervak te slepen — elke pagina van elk bestand verschijnt als eigen miniatuur, in één gecombineerd raster, niet per bestand gegroepeerd. Sleep een miniatuur om de volgorde te wijzigen ten opzichte van alle andere, zelfs tussen verschillende bronbestanden, of gebruik de pijlknoppen als slepen niet handig uitkomt. Klik op de roteerknop van een pagina om hem telkens 90° te draaien, of op de verwijderknop om hem helemaal buiten het uiteindelijke document te houden — handig om een blanco gescande voorpagina of een dubbele pagina weg te laten. Zodra alles klopt, druk je op PDF's samenvoegen; het gecombineerde bestand wordt volledig in het geheugen opgebouwd en gedownload als merged.pdf.",
+    "p4": "Er zit geen paginalimiet in de tool, al zullen zeer grote reeksen gescande, beeldrijke PDF's uiteraard wat langer duren om miniaturen voor te renderen, omdat alles door je eigen apparaat wordt verwerkt in plaats van door een serverpark. Als een bestand niet geladen kan worden — bijvoorbeeld omdat het met een wachtwoord is versleuteld of tijdens het downloaden beschadigd is geraakt — laat deze tool dat weten in plaats van stilzwijgend een kapot resultaat te produceren. Om andersom een samengevoegde PDF weer in kleinere stukken te splitsen, werkt de tool PDF splitsen op dezelfde privacy-vriendelijke manier en deelt hij dezelfde bedieningselementen voor roteren en verwijderen van pagina's."
+  }
+}

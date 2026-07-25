@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "Konverter Huruf Besar/Kecil Online Gratis — Web Tool Hub",
+    "description": "Konversi teks antara UPPERCASE, lowercase, Title Case, camelCase, snake_case, Sentence case dan lainnya secara instan, gratis dan sepenuhnya di browser Anda. Tanpa upload, tanpa perlu daftar."
+  },
+  "heading": "Konverter Huruf Besar/Kecil",
+  "tagline": "Konversi teks antara UPPERCASE, lowercase, Title Case, camelCase, snake_case, dan lainnya — plus alat pembersih teks yang praktis.",
+  "ui": {
+    "placeholder": "Ketik atau tempel teks di sini…",
+    "outputLabel": "Hasil",
+    "caseUpper": "UPPERCASE",
+    "caseLower": "lowercase",
+    "caseTitle": "Title Case",
+    "caseCamel": "camelCase",
+    "caseSnake": "snake_case",
+    "caseSentence": "Sentence case",
+    "caseAlternating": "aLtErNaTiNg CaSe",
+    "caseInverse": "iNVERSE cASE",
+    "caseOptionsHeading": "Opsi huruf besar/kecil",
+    "utilRemoveSpaces": "Hapus spasi berlebih",
+    "utilRemoveLineBreaks": "Hapus baris baru berlebih",
+    "utilSortLines": "Urutkan baris A-Z",
+    "utilitiesHeading": "Utilitas",
+    "copy": "Salin",
+    "copied": "Tersalin!",
+    "clear": "Hapus"
+  },
+  "related": "Alat terkait",
+  "article": {
+    "heading": "Mengapa menggunakan konverter huruf besar/kecil?",
+    "p1": "Kebutuhan mengonversi huruf besar/kecil muncul dengan cara yang kecil tapi menjengkelkan sepanjang waktu: paragraf yang diketik dengan Caps Lock yang tidak sengaja aktif, spesifikasi yang ditulis dalam Title Case yang perlu diubah menjadi nama variabel camelCase, header kolom CSV yang harus berubah menjadi field database snake_case, judul berita yang butuh kapitalisasi title yang benar sebelum dipublikasikan. Tidak ada satu pun dari ini yang sulit dilakukan manual untuk satu kata, tapi mengetik ulang seluruh paragraf atau daftar panjang nama field secara manual itu lambat dan mudah salah.",
+    "p2": "Alat ini melakukan konversi dengan sedikit JavaScript murni yang berjalan langsung di browser Anda — tidak ada pustaka yang perlu dimuat dan tidak ada apa pun yang dikirim ke server. Saat Anda mengetik atau menempel teks dan berpindah antar opsi huruf besar/kecil, hasilnya langsung diperbarui, dihitung ulang di dalam memori pada perangkat Anda sendiri setiap kali.",
+    "p3": "Tempel atau ketik teks Anda, lalu pilih UPPERCASE, lowercase, Title Case, camelCase, atau snake_case, dan tekan Salin untuk mengambil hasilnya. Khusus untuk camelCase dan snake_case, konverter memperlakukan spasi, tanda hubung, garis bawah, dan tanda baca sebagai pemisah kata — dan juga mendeteksi batas camelCase atau PascalCase yang sudah ada, sehingga menempel \"hello-world\", \"Hello World\", atau bahkan \"helloWorld\" yang sudah berformat pun semuanya terkonversi bersih menjadi hasil yang sama, alih-alih menghasilkan sesuatu yang rusak seperti \"helloworld\" atau \"hello-World\".",
+    "p4": "Developer paling sering memakai ini saat mengganti nama variabel atau field antar konvensi penamaan yang dipakai bahasa pemrograman dan database yang berbeda, penulis memakainya untuk memperbaiki kalimat yang tidak sengaja terketik semua huruf besar, dan editor memakai Title Case untuk mendapatkan kapitalisasi judul yang konsisten tanpa perlu menghafal kata kecil mana yang harus dilewati. Jika Anda juga perlu membandingkan dua versi teks atau sekadar menghitung kata dan karakter, alat Text Diff Checker dan Penghitung Kata & Karakter menangani itu dengan pendekatan lokal yang sama, tanpa apa pun yang diunggah.",
+    "p5": "Di luar format klasik, Sentence case memperbaiki teks yang terketik semuanya huruf besar dengan hanya mengapitalkan huruf pertama tiap kalimat, sementara aLtErNaTiNg CaSe dan iNVERSE cASE adalah dua gaya unik yang dipakai orang untuk membuat komentar menonjol atau terkesan sarkastik di media sosial — satu membalik huruf besar/kecil setiap huruf lainnya, yang lain membalik setiap huruf relatif terhadap aslinya. Di samping opsi huruf besar/kecil, tiga utilitas pembersih menangani format berantakan yang sering menyertai teks yang ditempel: Hapus spasi berlebih merapikan spasi dan tab berulang menjadi satu per celah tanpa menyentuh baris baru Anda, Hapus baris baru berlebih merapikan baris kosong tersisa akibat salin-tempel, dan Urutkan baris A-Z mengurutkan daftar secara alfabetis — berguna untuk merapikan daftar nama, tag, atau baris bergaya CSV yang ditempel sebelum dipakai di tempat lain."
+  }
+}

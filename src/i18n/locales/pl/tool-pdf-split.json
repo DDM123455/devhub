@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Dzielenie plików PDF online za darmo — Web Tool Hub",
+    "description": "Podziel plik PDF na kilka plików lub wyodrębnij wybrane strony online za darmo, w całości w przeglądarce. Podgląd każdej strony jako miniatury, obracanie i usuwanie stron, podział na niestandardowe zakresy lub co N stron. Bez wysyłania na serwer, bez znaku wodnego, bez rejestracji."
+  },
+  "heading": "Dziel pliki PDF",
+  "tagline": "Zobacz podgląd każdej strony jako miniatury i podziel plik PDF na kilka plików, prosto w przeglądarce.",
+  "ui": {
+    "selectFile": "Wybierz plik PDF",
+    "dropHint": "lub przeciągnij i upuść plik PDF tutaj",
+    "noFile": "Nie wybrano jeszcze żadnego pliku PDF.",
+    "changeFile": "Wybierz inny plik",
+    "loadingThumbnails": "Wczytywanie stron…",
+    "pageCount": "{{count}} stron",
+    "rotate": "Obróć stronę",
+    "deletePage": "Usuń stronę",
+    "modeLabel": "Tryb podziału",
+    "modeRanges": "Niestandardowe zakresy",
+    "modeEveryN": "Co N stron",
+    "everyNLabel": "Stron na plik",
+    "rangesLabel": "Zakresy stron (opcjonalnie)",
+    "rangesPlaceholder": "np. 1-3, 4, 5-7",
+    "rangesHint": "Pozostaw puste, aby podzielić każdą stronę na osobny plik PDF.",
+    "split": "Podziel PDF",
+    "splitting": "Dzielenie…",
+    "resultsHeading": "Pliki wynikowe",
+    "download": "Pobierz",
+    "downloadAll": "Pobierz wszystko (.zip)",
+    "errorGeneric": "Coś poszło nie tak podczas wczytywania tego pliku PDF. Upewnij się, że nie jest uszkodzony ani zabezpieczony hasłem, a następnie spróbuj ponownie.",
+    "errorInvalidRange": "Nieprawidłowy zakres stron „{{range}}”. Użyj formatu takiego jak 1-3, 4, 5-7, ze stronami z zakresu od 1 do {{max}}.",
+    "errorInvalidEveryN": "Wprowadź liczbę całkowitą równą 1 lub większą."
+  },
+  "related": "Powiązane narzędzia",
+  "article": {
+    "heading": "Dlaczego dzielić plik PDF lokalnie zamiast wysyłać go na serwer?",
+    "p1": "Zeskanowana książka, paczka comiesięcznych wyciągów, 200-stronicowy raport, z którego potrzebujesz tylko trzech stron — prędzej czy później plik PDF staje się zbyt duży albo zbyt wielofunkcyjny w stosunku do tego, czego naprawdę potrzebujesz. Większość darmowych stron do „dzielenia PDF” radzi sobie z tym tak samo jak darmowe strony do „łączenia PDF” — po cichu wysyłając plik na serwer, zanim cokolwiek z nim zrobią. To dziwnie duża dawka zaufania jak na dokument, który może zawierać podpis, wyciąg bankowy lub stronę, której wolałbyś nie zostawiać na cudzym dysku.",
+    "p2": "To narzędzie nigdy niczego nie wysyła. Działa w całości w Twojej przeglądarce dzięki pdf-lib, bibliotece JavaScript, która odczytuje surową strukturę pliku PDF i kopiuje tylko wybrane strony do zupełnie nowych dokumentów, składanych w pamięci na Twoim własnym urządzeniu. Miniatury stron są renderowane lokalnie za pomocą pdf.js — tego samego silnika, który jest wbudowany w Firefoksa — dzięki czemu dokładnie widzisz, co znajduje się na każdej stronie, zanim zdecydujesz, jak ją podzielić.",
+    "p3": "Wybierz plik PDF lub przeciągnij go do strefy upuszczania; każda strona pojawia się jako osobna miniatura, dzięki czemu od razu widzisz cały dokument. Obróć stronę o 90° lub usuń ją całkowicie, jeśli nie powinna znaleźć się w żadnym z plików wynikowych — na przykład pustą zeskanowaną kartkę. Następnie wybierz sposób podziału: Niestandardowe zakresy pozwalają wpisać grupy takie jak „1-3, 4, 5-7”, gdzie każda grupa oddzielona przecinkiem staje się osobnym plikiem, a Co N stron automatycznie dzieli dokument na równe fragmenty — przydatne przy rozbijaniu długiego skanu na, powiedzmy, 10-stronicowe części bez ręcznego wpisywania każdego zakresu. Naciśnij Podziel PDF, a każdy wynik pojawi się z własnym przyciskiem pobierania.",
+    "p4": "Narzędzie nie ma wbudowanego limitu liczby stron, choć bardzo duże zeskanowane pliki PDF pełne obrazów w naturalny sposób będą trochę dłużej renderować miniatury, ponieważ wszystko działa na Twoim własnym urządzeniu, a nie na farmie serwerów. Jeśli wpiszesz zakres, który nie ma sensu — numer strony wykraczający poza długość dokumentu albo tekst, który nie jest prawidłowym zakresem — narzędzie dokładnie wskaże, która część jest błędna, zamiast wygenerować uszkodzony plik. Jeśli później będziesz musiał połączyć strony z kilku plików PDF z powrotem w jeden, narzędzie Łącz PDF działa w ten sam sposób, stawiając na prywatność, i ma te same kontrolki obracania i usuwania stron."
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "title": "Afbeeldingsformaat converteren online gratis (JPEG, PNG, WebP, AVIF, HEIC en meer) — Web Tool Hub",
+    "description": "Converteer afbeeldingen tussen JPEG, PNG, WebP, AVIF, GIF, BMP en ICO online en gratis, volledig in je browser. Leest ook HEIC-foto's van iPhone. Geen upload, geen registratie."
+  },
+  "heading": "Afbeeldingsformaat-converter",
+  "tagline": "Converteer tussen JPEG, PNG, WebP, AVIF, GIF, BMP en ICO — en lees HEIC-foto's van iPhone — rechtstreeks in je browser.",
+  "ui": {
+    "selectFiles": "Afbeeldingen selecteren",
+    "dropHint": "of sleep afbeeldingen hierheen",
+    "targetFormat": "Converteren naar",
+    "quality": "Kwaliteit",
+    "convert": "Converteren",
+    "converting": "Bezig met converteren…",
+    "download": "Downloaden",
+    "original": "Origineel",
+    "converted": "Geconverteerd",
+    "noFiles": "Nog geen afbeeldingen geselecteerd.",
+    "errorGeneric": "Er is iets misgegaan bij het converteren van deze afbeelding. Probeer het opnieuw.",
+    "errorAvifUnsupported": "Deze browser kan geen AVIF exporteren. Probeer een recente versie van Chrome of Firefox, of kies een ander formaat.",
+    "formatsNote": "ICO-uitvoer wordt verkleind tot maximaal 256×256 (de standaard icoongrootte). AVIF-export vereist een recente versie van Chrome of Firefox. HEIC/HEIF-foto's van iPhone worden automatisch gelezen — geen aparte conversiestap nodig.",
+    "remove": "Verwijderen",
+    "clearAll": "Alles wissen",
+    "skippedFiles": "{{count}} bestand(en) overgeslagen omdat ze geen ondersteund afbeeldingsformaat hebben."
+  },
+  "related": "Gerelateerde tools",
+  "article": {
+    "heading": "JPEG, PNG, WebP, AVIF — welk formaat moet je gebruiken?",
+    "p1": "JPEG, PNG, WebP en steeds vaker ook AVIF slaan allemaal een afbeelding op, maar ze maken elk andere afwegingen tussen kwaliteit, transparantie en bestandsgrootte — en het verkeerde formaat kiezen is een veelvoorkomende reden waarom een foto er slechter uitziet dan nodig of veel meer ruimte inneemt dan noodzakelijk. Een paar andere formaten — GIF, BMP, ICO — dienen een smallere, specifiekere taak dan gewone fotografie. Door tussen al deze formaten te converteren, kies je precies het formaat dat bij de afbeelding past, in plaats van simpelweg te houden wat je camera, screenshot-tool of iPhone toevallig heeft opgeslagen.",
+    "p2": "JPEG is de juiste keuze voor gewone foto's: het comprimeert fotografische details heel efficiënt, maar ondersteunt geen transparantie en verliest telkens wat kwaliteit als het opnieuw wordt opgeslagen. PNG is verliesloos en ondersteunt transparantie, wat het geschikter maakt voor screenshots, logo's en afbeeldingen met vlakke kleuren. WebP overtreft over het algemeen beide: het ondersteunt transparantie zoals PNG en comprimeert foto's bijna net zo goed als JPEG. AVIF is nog nieuwer en comprimeert vaak nog strakker dan WebP bij dezelfde visuele kwaliteit, al loopt de browserondersteuning voor het exporteren ervan (niet alleen bekijken) nog wat achter — deze tool laat je duidelijk weten als je browser geen AVIF-bestand kan produceren, in plaats van je stilzwijgend een kapot bestand te geven. GIF, BMP en ICO bestaan voor specifieke, oudere of bijzondere doeleinden: GIF voor eenvoudige afbeeldingen met vlakke kleuren die brede compatibiliteit met oude software nodig hebben, BMP voor ongecomprimeerde ruwe pixeldata, en ICO specifiek voor favicons van websites en Windows-app-iconen.",
+    "p3": "Alles draait lokaal met de ingebouwde Canvas API van je browser — de afbeelding wordt gedecodeerd, getekend op een onzichtbaar canvas en opnieuw gecodeerd in het doelformaat zonder ooit ergens naartoe te worden verzonden. Omdat geen enkele browser BMP, ICO of GIF native kan exporteren vanaf een canvas, bevat deze tool een paar kleine stukjes pure JavaScript die deze bestandsformaten handmatig opbouwen uit de ruwe pixeldata — nog steeds 100% lokaal, alleen zonder te vertrouwen op een browser-API die niet bestaat. Selecteer een of meer afbeeldingen (HEIC- en HEIF-foto's rechtstreeks van een iPhone worden eerst automatisch gedecodeerd), kies je doelformaat, pas de kwaliteitsschuif aan voor JPEG, WebP of AVIF, en druk op Converteren.",
+    "p4": "Als vuistregel geldt: converteer gewone foto's naar WebP of AVIF voor de kleinste bestanden, of naar JPEG als je maximale compatibiliteit met oudere software nodig hebt. Bewaar screenshots, iconen en alles wat transparantie nodig heeft als PNG of WebP in plaats van JPEG. Kies specifiek voor ICO wanneer je een favicon of app-icoon nodig hebt — de uitvoer wordt automatisch verkleind tot het standaardmaximum van 256×256. Ondersteuning voor HEIC-invoer bestaat puur voor het gemak: als je fotobibliotheek vol staat met iPhone HEIC-bestanden die een app of website weigert te accepteren, decodeert deze tool ze op dezelfde manier als elke andere afbeelding, zodat je rechtstreeks kunt converteren naar wat je daadwerkelijk nodig hebt."
+  }
+}

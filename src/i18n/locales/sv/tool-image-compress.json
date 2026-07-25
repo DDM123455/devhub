@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Komprimera bilder online gratis (JPEG, PNG, WebP) — Web Tool Hub",
+    "description": "Komprimera JPEG-, PNG- och WebP-bilder online gratis, helt i din webbläsare. Ingen uppladdning, ingen storleksgräns, ingen registrering — dina foton lämnar aldrig din enhet."
+  },
+  "heading": "Komprimera bild (JPEG/PNG/WebP)",
+  "tagline": "Krymp dina foton på några sekunder, direkt i webbläsaren.",
+  "ui": {
+    "selectFiles": "Välj bilder",
+    "dropHint": "eller dra och släpp bilder här",
+    "quality": "Kvalitet",
+    "compress": "Komprimera",
+    "compressing": "Komprimerar…",
+    "download": "Ladda ner",
+    "downloadAll": "Ladda ner alla (.zip)",
+    "original": "Original",
+    "compressed": "Komprimerad",
+    "reduced": "{{percent}}% mindre",
+    "noFiles": "Inga bilder valda än.",
+    "errorGeneric": "Något gick fel när bilden skulle komprimeras. Försök igen.",
+    "remove": "Ta bort",
+    "clearAll": "Rensa allt",
+    "skippedFiles": "{{count}} fil(er) hoppades över eftersom de inte är ett bildformat som stöds."
+  },
+  "related": "Relaterade verktyg",
+  "article": {
+    "heading": "Varför komprimera bilder innan du publicerar dem?",
+    "p1": "Ett foto direkt från en modern mobilkamera kan lätt väga 4–8 MB, medan de flesta webbsidor bara behöver en bråkdel av det för att se skarpa ut på skärmen. Överdimensionerade bilder är en av de vanligaste orsakerna till att en sida laddar långsamt, och långsamma sidor tappar besökare och rankas lägre i Googles Core Web Vitals. Att komprimera en bild innan den publiceras tar bort den extra data som ögat ändå aldrig uppfattar, utan att bilden ser annorlunda ut vid normal visningsstorlek.",
+    "p2": "Allt sker lokalt i din webbläsare. Själva komprimeringen körs i en Web Worker — en separat tråd inbyggd i moderna webbläsare — så att sidan förblir responsiv även när du komprimerar en hel bunt stora foton samtidigt. Ingen fil laddas någonsin upp till en server, inte ens tillfälligt, vilket betyder ingen uppladdningsväntan, ingen serverbestämd storleksgräns och att dina bilder aldrig lämnar din enhet.",
+    "p3": "Att använda verktyget är enkelt: välj en eller flera JPEG-, PNG- eller WebP-filer, ställ in kvalitetsnivån med reglaget och klicka på Komprimera. Varje bild bearbetas en i taget och resultatet visas direkt tillsammans med originalstorleken, den nya storleken och hur många procent som sparats, så att du kan jämföra innan du laddar ner något. Om resultatet inte blir som du vill, justera bara reglaget och komprimera igen — det finns ingen gräns för hur många gånger du kan prova.",
+    "p4": "Som utgångspunkt ger 70–80 % kvalitet foton som ser visuellt identiska ut med originalet för de flesta, samtidigt som filstorleken vanligtvis halveras eller mer. Bilder med platta färger, som skärmdumpar, illustrationer och logotyper, komprimeras särskilt bra även vid lägre inställningar. Foton med mycket fin textur, brus eller toningar — tänk skogslöv eller en stjärnhimmel — behåller mer av sin storlek vid samma kvalitetsnivå och drar ofta mer nytta av att dimensionerna minskas än av att kvaliteten sänks ytterligare."
+  }
+}

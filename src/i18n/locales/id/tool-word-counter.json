@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Penghitung Kata & Karakter Online Gratis — Web Tool Hub",
+    "description": "Hitung kata, karakter, kalimat, dan paragraf secara instan saat Anda mengetik atau menempel teks — gratis, langsung, dan sepenuhnya di browser Anda. Tanpa upload, tanpa perlu daftar."
+  },
+  "heading": "Penghitung Kata & Karakter",
+  "tagline": "Hitung kata, karakter, kalimat, dan paragraf secara instan saat Anda mengetik.",
+  "ui": {
+    "placeholder": "Tempel atau ketik teks di sini…",
+    "charsLabel": "Karakter",
+    "charsNoSpacesLabel": "Karakter (tanpa spasi)",
+    "wordsLabel": "Kata",
+    "sentencesLabel": "Kalimat",
+    "paragraphsLabel": "Paragraf",
+    "readingTimeLabel": "Waktu baca",
+    "readingTimeValue": "{{minutes}} menit membaca",
+    "speakingTimeLabel": "Waktu bicara",
+    "speakingTimeValue": "{{minutes}} menit bicara",
+    "clear": "Hapus",
+    "keywordDensityHeading": "Kepadatan kata kunci",
+    "keywordDensityWordColumn": "Kata",
+    "keywordDensityCountColumn": "Jumlah",
+    "keywordDensityPercentColumn": "% dari teks"
+  },
+  "related": "Alat terkait",
+  "article": {
+    "heading": "Mengapa menghitung kata dan karakter secara lokal?",
+    "p1": "Cukup banyak tugas menulis sehari-hari yang datang dengan batas angka pasti: esai yang dibatasi 500 kata, tweet yang dibatasi 280 karakter, meta description yang terpotong setelah sekitar 160 karakter, surat lamaran yang diminta rekruter untuk tetap muat dalam satu halaman. Menghitung semua itu secara manual itu melelahkan dan rawan salah, sehingga kebanyakan orang menempel teks mereka ke penghitung online — yang biasanya berarti mengirim draf surat lamaran, artikel yang belum dipublikasikan, atau brief rahasia klien ke server yang tidak Anda ketahui apa-apa tentangnya.",
+    "p2": "Alat ini tidak pernah melakukan itu. Setiap karakter yang Anda ketik dihitung oleh sepotong kecil JavaScript yang berjalan langsung di browser Anda, dan angkanya diperbarui secara langsung saat Anda mengetik — tidak ada tombol kirim karena tidak ada perjalanan bolak-balik ke server yang perlu ditunggu. Tidak ada yang Anda tulis yang pernah dikirim ke mana pun, disimpan, atau dicatat; segarkan halamannya dan semuanya hilang, persis seperti yang diharapkan dari sebuah coretan sementara.",
+    "p3": "Cukup mulai mengetik atau tempel teks Anda ke dalam kotak. Hitungan kata memecah berdasarkan spasi, sehingga \"terkenal-baik\" dihitung satu kata sementara \"terkenal baik\" dihitung dua kata. Hitungan kalimat mencari teks yang diakhiri titik, tanda tanya, atau tanda seru, yang bekerja baik untuk prosa normal tapi bisa kurang menghitung teks yang melewatkan tanda baca, seperti daftar poin-poin. Hitungan paragraf memperlakukan setiap blok teks yang dipisahkan baris kosong sebagai satu paragraf. Perkiraan waktu baca mengasumsikan kecepatan membaca rata-rata orang dewasa sekitar 200 kata per menit, dibulatkan ke atas ke menit terdekat sehingga teks yang sangat pendek tetap menampilkan \"1 menit membaca\" alih-alih \"0\". Jumlah kata yang sama juga menjadi dasar perkiraan waktu bicara, berdasarkan kecepatan presentasi rata-rata sekitar 130 kata per menit — berguna untuk mengukur waktu pidato atau voice-over video tanpa perlu membacanya keras-keras terlebih dahulu.",
+    "p4": "Penulis memakai ini untuk mencapai jumlah kata tugas tanpa perlu menebak-nebak, pemasar memakainya untuk menjaga meta description atau teks iklan tetap di bawah batas tampilannya, dan mahasiswa memakainya untuk memeriksa apakah tulisan sudah memenuhi minimum atau maksimum yang diminta dosen sebelum dikumpulkan. Angka jumlah karakter tanpa spasi sangat berguna untuk platform — beberapa media sosial dan formulir — yang menghitung karakter dengan cara itu alih-alih menyertakan setiap spasi. Di bawah hitungan, tabel kepadatan kata kunci mendaftar kata-kata yang paling sering muncul dalam teks Anda beserta berapa kali dan berapa persen dari total yang mereka wakili — jenis pemeriksaan yang sama yang dipakai penulis SEO untuk memastikan kata kunci target tidak diulang terlalu sering sehingga terkesan spam, atau terlalu jarang sehingga nyaris tidak terasa. Jika Anda perlu membandingkan dua draf kata demi kata alih-alih hanya menghitung satu, alat Text Diff Checker menangani itu dengan pendekatan lokal yang sama, tanpa apa pun yang diunggah."
+  }
+}

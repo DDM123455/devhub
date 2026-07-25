@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "title": "Ta bort bakgrund från bild gratis (AI, ingen uppladdning) — Web Tool Hub",
+    "description": "Ta bort bakgrunden från ett foto gratis med en lokal AI-modell som körs helt i din webbläsare. Ersätt den med en färg eller en annan bild, jämför före/efter med ett reglage. Ingen uppladdning, ingen registrering."
+  },
+  "heading": "Ta bort bakgrund",
+  "tagline": "Klipp ut bakgrunden från ett foto automatiskt, ersätt den med en färg eller bild, direkt i webbläsaren.",
+  "ui": {
+    "selectFiles": "Välj bilder",
+    "dropHint": "eller dra och släpp bilder här",
+    "remove": "Ta bort bakgrund",
+    "removing": "Tar bort bakgrund… {{percent}}%",
+    "download": "Ladda ner",
+    "original": "Original",
+    "result": "Resultat",
+    "noFiles": "Ingen bild vald än.",
+    "errorGeneric": "Något gick fel när bakgrunden skulle tas bort från bilden. Försök igen.",
+    "modelNotice": "Första klicket laddar ner en liten AI-modell (några MB) till din webbläsare — efter det fungerar allt helt offline. Dina foton laddas aldrig upp någonstans.",
+    "backgroundLabel": "Bakgrund",
+    "backgroundTransparent": "Transparent",
+    "backgroundColor": "Enfärgad",
+    "backgroundImage": "Egen bild",
+    "backgroundImageSelect": "Välj bakgrundsbild",
+    "backgroundImageClear": "Ta bort",
+    "edgeSoftnessLabel": "Kantmjukhet",
+    "removeItem": "Ta bort",
+    "clearAll": "Rensa allt",
+    "skippedFiles": "{{count}} fil(er) hoppades över eftersom de inte är ett bildformat som stöds."
+  },
+  "related": "Relaterade verktyg",
+  "article": {
+    "heading": "Hur fungerar lokal bakgrundsborttagning i webbläsaren?",
+    "p1": "Att ta bort bakgrunden från ett foto brukade betyda antingen ett abonnemangsverktyg som laddade upp bilden till en server, eller manuell frilinjering runt motivet i en bildredigerare. Det här verktyget gör varken det ena eller det andra: det kör en liten AI-segmenteringsmodell direkt i din webbläsarflik för att avgöra vilka pixlar som hör till motivet och vilka som hör till bakgrunden, och gör sedan bakgrunden transparent — allt utan att fotot någonsin skickas någonstans. Det är samma sorts redigering som ofta används för produktbilder, profilbilder och klistermärken — sånt som förut tog minuter i en bildredigerare tar nu sekunder.",
+    "p2": "Första gången du använder verktyget laddar din webbläsare ner själva AI-modellen — några megabyte data — på samma sätt som den skulle ladda ner vilken bild eller vilket skript som helst från en webbplats. Den nedladdningen sker bara en gång och sparas i cache till nästa tillfälle. Dina foton är en helt separat sak: varje bild laddas direkt in i webbläsarens minne och bearbetas där, och den laddas aldrig upp till en server, inte ens tillfälligt.",
+    "p3": "Välj ett eller flera foton och klicka på Ta bort bakgrund — varje bild bearbetas en i taget, med en förloppsindikator, i en Web Worker så att resten av sidan förblir responsiv. När ett resultat är klart drar du reglaget över miniatyrbilden för att jämföra originalet med det urklippta motivet sida vid sida. Som standard blir bakgrunden transparent (visas som ett rutmönster), men du kan byta ut den mot en enfärgad bakgrund eller din egen bakgrundsbild med kontrollerna ovanför listan — varje färdig bild uppdateras direkt eftersom det är billigt att sätta ihop en ny bakgrund, till skillnad från att köra AI-modellen igen. Reglaget för kantmjukhet suddar ut kanten på det urklippta motivets alfakant en aning, vilket kan göra tunt hår eller päls mindre skarpt utklippt och mer naturligt; det är avstängt som standard eftersom de flesta motiv ser bäst ut med den skarpa kant modellen redan skapar.",
+    "p4": "Resultatet blir oftast bäst på foton med ett tydligt, avgränsat motiv — människor, djur, produkter, fordon — mot en bakgrund som inte har samma färg som motivet. Väldigt fina detaljer som lösa hårstrån eller päls kanske inte blir helt perfekta ens med hög kantmjukhet, och stökiga eller röriga bakgrunder kan ibland förvirra modellen. Om resultatet inte blir riktigt rätt hjälper det ofta att beskära bilden tightare runt motivet innan den laddas upp. Att redan från början fotografera motivet mot en jämnt belyst, enkel bakgrund gör det också märkbart lättare för vilket verktyg som helst — mänskligt eller AI — att skapa ett rent utklipp."
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Pisah File PDF Online Gratis — Web Tool Hub",
+    "description": "Pisahkan PDF menjadi beberapa file atau ekstrak halaman tertentu online secara gratis, sepenuhnya di browser Anda. Pratinjau setiap halaman sebagai thumbnail, putar atau hapus halaman, pisahkan berdasarkan rentang khusus atau setiap N halaman. Tanpa upload, tanpa watermark, tanpa perlu daftar."
+  },
+  "heading": "Pisah File PDF",
+  "tagline": "Pratinjau setiap halaman sebagai thumbnail dan pisahkan PDF menjadi beberapa file, langsung di browser Anda.",
+  "ui": {
+    "selectFile": "Pilih file PDF",
+    "dropHint": "atau seret dan lepas file PDF di sini",
+    "noFile": "Belum ada file PDF yang dipilih.",
+    "changeFile": "Pilih file lain",
+    "loadingThumbnails": "Membaca halaman…",
+    "pageCount": "{{count}} halaman",
+    "rotate": "Putar halaman",
+    "deletePage": "Hapus halaman",
+    "modeLabel": "Mode pemisahan",
+    "modeRanges": "Rentang khusus",
+    "modeEveryN": "Setiap N halaman",
+    "everyNLabel": "Halaman per file",
+    "rangesLabel": "Rentang halaman (opsional)",
+    "rangesPlaceholder": "mis. 1-3, 4, 5-7",
+    "rangesHint": "Biarkan kosong untuk memisahkan setiap halaman menjadi file PDF tersendiri.",
+    "split": "Pisah PDF",
+    "splitting": "Memisahkan…",
+    "resultsHeading": "File hasil",
+    "download": "Unduh",
+    "downloadAll": "Unduh Semua (.zip)",
+    "errorGeneric": "Terjadi kesalahan saat membaca PDF ini. Pastikan file tidak rusak atau terlindungi kata sandi, lalu coba lagi.",
+    "errorInvalidRange": "Rentang halaman \"{{range}}\" tidak valid. Gunakan format seperti 1-3, 4, 5-7, dengan halaman antara 1 dan {{max}}.",
+    "errorInvalidEveryN": "Masukkan bilangan bulat 1 atau lebih."
+  },
+  "related": "Alat terkait",
+  "article": {
+    "heading": "Mengapa memisahkan PDF secara lokal alih-alih mengunggahnya?",
+    "p1": "Buku hasil pindaian, kumpulan laporan bulanan, laporan 200 halaman yang hanya Anda butuhkan tiga halamannya — cepat atau lambat sebuah PDF menjadi terlalu besar atau terlalu bercampur tujuan untuk kebutuhan Anda yang sebenarnya. Kebanyakan situs \"pisah PDF\" gratis menanganinya dengan cara yang sama seperti situs \"gabung PDF\" gratis: diam-diam mengunggah file Anda ke server sebelum melakukan apa pun dengannya. Itu jumlah kepercayaan yang aneh untuk diberikan pada dokumen yang mungkin berisi tanda tangan, laporan rekening bank, atau halaman yang lebih baik tidak tersimpan di disk milik orang lain.",
+    "p2": "Alat ini tidak pernah mengunggah apa pun. Semua berjalan sepenuhnya di browser Anda menggunakan pdf-lib, sebuah pustaka JavaScript yang membaca struktur mentah PDF Anda dan hanya menyalin halaman yang Anda minta ke dokumen-dokumen baru, disusun di dalam memori pada perangkat Anda sendiri. Thumbnail halaman juga dirender secara lokal, dengan pdf.js — mesin yang sama yang tertanam di Firefox — sehingga Anda bisa melihat persis apa isi tiap halaman sebelum memutuskan cara memisahkannya.",
+    "p3": "Pilih file PDF atau seret ke zona drop; setiap halaman akan muncul sebagai thumbnail-nya sendiri sehingga Anda bisa melihat sekilas isi dokumen. Putar sebuah halaman 90° setiap kali atau hapus sepenuhnya jika tidak seharusnya ada di file hasil mana pun — misalnya halaman kosong hasil pindaian. Lalu pilih cara memisahkan: Rentang khusus memungkinkan Anda mengetik kelompok seperti \"1-3, 4, 5-7\" di mana setiap kelompok yang dipisah koma menjadi file tersendiri, sementara Setiap N halaman otomatis memotong dokumen menjadi bagian berukuran sama — berguna untuk memecah pindaian panjang menjadi, misalnya, potongan 10 halaman tanpa harus mengetik setiap rentang secara manual. Tekan Pisah PDF dan setiap hasil akan muncul dengan tombol unduhnya sendiri.",
+    "p4": "Tidak ada batas jumlah halaman yang ditetapkan pada alat ini, meskipun PDF hasil pindaian yang sangat besar dan penuh gambar tentu akan sedikit lebih lama untuk merender thumbnail-nya karena semuanya berjalan di perangkat Anda sendiri, bukan di server farm. Jika Anda mengetik rentang yang tidak masuk akal — nomor halaman melebihi panjang dokumen, atau teks yang bukan rentang valid — alat ini akan memberi tahu bagian mana persisnya yang tidak valid alih-alih menghasilkan file yang rusak. Jika nanti Anda perlu menyatukan kembali halaman dari beberapa PDF, alat Gabung PDF bekerja dengan cara yang sama mengutamakan privasi dan memiliki kontrol putar-dan-hapus halaman yang sama."
+  }
+}

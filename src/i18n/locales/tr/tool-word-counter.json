@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Ücretsiz Online Kelime ve Karakter Sayacı — Web Tool Hub",
+    "description": "Yazarken veya yapıştırırken kelimeleri, karakterleri, cümleleri ve paragrafları anında sayın — ücretsiz, canlı ve tamamen tarayıcınızda. Yükleme yok, kayıt yok."
+  },
+  "heading": "Kelime ve Karakter Sayacı",
+  "tagline": "Yazarken kelimeleri, karakterleri, cümleleri ve paragrafları anında sayın.",
+  "ui": {
+    "placeholder": "Metni buraya yapıştırın veya yazın…",
+    "charsLabel": "Karakter",
+    "charsNoSpacesLabel": "Karakter (boşluksuz)",
+    "wordsLabel": "Kelime",
+    "sentencesLabel": "Cümle",
+    "paragraphsLabel": "Paragraf",
+    "readingTimeLabel": "Okuma süresi",
+    "readingTimeValue": "{{minutes}} dk okuma",
+    "speakingTimeLabel": "Konuşma süresi",
+    "speakingTimeValue": "{{minutes}} dk konuşma",
+    "clear": "Temizle",
+    "keywordDensityHeading": "Anahtar kelime yoğunluğu",
+    "keywordDensityWordColumn": "Kelime",
+    "keywordDensityCountColumn": "Adet",
+    "keywordDensityPercentColumn": "Metnin %'si"
+  },
+  "related": "İlgili araçlar",
+  "article": {
+    "heading": "Kelimeleri ve karakterleri neden yerel olarak saymalısınız?",
+    "p1": "Şaşırtıcı sayıda günlük yazı işi, katı bir sayıyla birlikte gelir: 500 kelimeyle sınırlı bir makale, 280 karakterle sınırlı bir tweet, yaklaşık 160 karakterden sonra kesilen bir meta açıklama, bir işe alım uzmanının bir sayfayı geçmemesini istediği bir ön yazı. Bunların herhangi birini elle saymak sıkıcı ve hataya açıktır; bu yüzden çoğu insan metnini bunun yerine online bir sayaca yapıştırır — bu da genellikle taslak bir ön yazıyı, yayınlanmamış bir makaleyi ya da bir müşterinin gizli özetini hakkında hiçbir şey bilmediğiniz bir sunucuya göndermek anlamına gelir.",
+    "p2": "Bu araç bunu asla yapmaz. Yazdığınız her karakter, doğrudan tarayıcınızda çalışan küçük bir JavaScript parçası tarafından sayılır ve rakamlar siz yazdıkça canlı olarak güncellenir — beklenecek bir sunucu gidiş-dönüşü olmadığı için gönder düğmesi de yoktur. Yazdığınız hiçbir şey herhangi bir yere gönderilmez, saklanmaz ya da kaydedilmez; sayfayı yenileyin ve her şey gider — tam olarak bir karalama defterinden beklediğiniz gibi.",
+    "p3": "Sadece kutuya yazmaya ya da metninizi yapıştırmaya başlayın. Kelime sayımı boşluklara göre bölünür, bu yüzden \"iyi-bilinen\" tek kelime olarak sayılırken \"iyi bilinen\" iki kelime olarak sayılır. Cümle sayımı bir nokta, soru işareti ya da ünlem işaretiyle biten metni arar; bu, normal düzyazı için iyi çalışır ama madde işaretleri gibi noktalama işaretlerini atlayan metinlerde eksik sayabilir. Paragraf sayımı, boş bir satırla ayrılmış her metin bloğunu bir paragraf olarak ele alır. Tahmini okuma süresi, dakikada ortalama 200 kelimelik yetişkin okuma hızını varsayar ve çok kısa metinlerin bile \"0\" yerine \"1 dk okuma\" göstermesi için en yakın dakikaya yukarı yuvarlanır. Aynı kelime sayısı, dakikada ortalama 130 kelimelik bir sunum temposuna dayanan tahmini bir konuşma süresini de belirler — bir konuşmayı ya da video seslendirmesini önce yüksek sesle okumadan zamanlamak için kullanışlıdır.",
+    "p4": "Yazarlar bunu tahmin etmeden bir ödevin kelime sayısını tutturmak için kullanır, pazarlamacılar bir meta açıklamayı ya da reklam metnini görüntüleme sınırının altında tutmak için kullanır, öğrenciler ise bir ödevi göndermeden önce bir profesörün minimum ya da maksimum sınırıyla karşılaştırmak için kullanır. Boşluksuz karakter sayısı rakamı, her boşluğu saymak yerine karakterleri bu şekilde sayan platformlar — bazı sosyal ağlar ve formlar — için özellikle kullanışlıdır. Sayıların altında, bir anahtar kelime yoğunluğu tablosu metninizde en sık geçen kelimeleri, kaç kez geçtikleriyle ve toplamın yüzde kaçını oluşturduklarıyla birlikte listeler — SEO yazarlarının hedef bir anahtar kelimenin ne çok tekrarlanıp spam gibi okunduğundan ne de o kadar seyrek geçtiğinden emin olmak için kullandığı türden bir kontrol. Bir metni sadece saymak yerine iki taslağı kelime kelime karşılaştırmanız gerekirse, Metin Karşılaştırma Aracı bunu aynı yerel, hiçbir şeyin yüklenmediği yaklaşımla halleder."
+  }
+}

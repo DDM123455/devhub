@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Kompresja zdjęć online za darmo (JPEG, PNG, WebP) — Web Tool Hub",
+    "description": "Skompresuj zdjęcia JPEG, PNG i WebP online za darmo, w całości w przeglądarce. Bez wysyłania na serwer, bez limitu rozmiaru, bez rejestracji — Twoje zdjęcia nigdy nie opuszczają urządzenia."
+  },
+  "heading": "Kompresja zdjęć (JPEG/PNG/WebP)",
+  "tagline": "Zmniejsz rozmiar zdjęć w kilka sekund, prosto w przeglądarce.",
+  "ui": {
+    "selectFiles": "Wybierz zdjęcia",
+    "dropHint": "lub przeciągnij i upuść zdjęcia tutaj",
+    "quality": "Jakość",
+    "compress": "Kompresuj",
+    "compressing": "Kompresowanie…",
+    "download": "Pobierz",
+    "downloadAll": "Pobierz wszystko (.zip)",
+    "original": "Oryginał",
+    "compressed": "Skompresowane",
+    "reduced": "mniejszy o {{percent}}%",
+    "noFiles": "Nie wybrano jeszcze żadnych zdjęć.",
+    "errorGeneric": "Coś poszło nie tak podczas kompresji tego zdjęcia. Spróbuj ponownie.",
+    "remove": "Usuń",
+    "clearAll": "Wyczyść wszystko",
+    "skippedFiles": "Pominięto {{count}} plik(ów), ponieważ nie są obsługiwanym formatem obrazu."
+  },
+  "related": "Powiązane narzędzia",
+  "article": {
+    "heading": "Dlaczego warto kompresować zdjęcia przed publikacją?",
+    "p1": "Zdjęcie prosto z aparatu nowoczesnego telefonu może bez trudu ważyć 4–8 MB, choć większość stron internetowych potrzebuje ułamka tej wagi, żeby wyglądać ostro na ekranie. Zbyt duże obrazy to jedna z najczęstszych przyczyn wolnego ładowania strony, a wolne strony tracą odwiedzających i spadają w rankingu Core Web Vitals Google. Kompresja zdjęcia przed publikacją usuwa dodatkowe dane, których oko i tak nigdy nie zauważy, nie zmieniając przy tym wyglądu obrazu w typowym rozmiarze wyświetlania.",
+    "p2": "Wszystko dzieje się lokalnie, w Twojej przeglądarce. Sama kompresja działa w Web Workerze — osobnym wątku wbudowanym w nowoczesne przeglądarki — dzięki czemu strona pozostaje responsywna nawet podczas kompresowania całej partii dużych zdjęć naraz. Żaden plik nigdy nie trafia na serwer — nawet tymczasowo — co oznacza brak czasu oczekiwania na wysyłkę, brak limitu rozmiaru narzuconego przez serwer i pełną pewność, że Twoje zdjęcia nigdy nie opuszczają urządzenia.",
+    "p3": "Obsługa jest prosta: wybierz jeden lub więcej plików JPEG, PNG lub WebP, ustaw poziom jakości suwakiem i naciśnij Kompresuj. Każde zdjęcie jest przetwarzane pojedynczo, a wynik pojawia się od razu wraz z oryginalnym rozmiarem, nowym rozmiarem i procentem zaoszczędzonego miejsca, dzięki czemu możesz porównać efekt, zanim cokolwiek pobierzesz. Jeśli wynik nie wygląda dobrze, po prostu przesuń suwak i skompresuj ponownie — nie ma limitu liczby prób.",
+    "p4": "Jako punkt wyjścia, jakość na poziomie 70–80% dla większości osób wygląda wizualnie identycznie jak oryginał, a jednocześnie zwykle zmniejsza rozmiar pliku o połowę lub więcej. Obrazy z jednolitymi kolorami, takie jak zrzuty ekranu, ilustracje i logo, kompresują się szczególnie dobrze nawet przy niższych ustawieniach. Zdjęcia z dużą ilością drobnych detali, szumu lub gradientów — jak liście lasu czy rozgwieżdżone niebo — zachowują więcej swojej wagi przy tym samym poziomie jakości i częściej zyskują na zmniejszeniu wymiarów niż na dalszym obniżaniu jakości."
+  }
+}

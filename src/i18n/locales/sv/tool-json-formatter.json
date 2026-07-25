@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "title": "JSON-formaterare och validerare online gratis — Web Tool Hub",
+    "description": "Formatera, validera och bläddra i JSON online gratis, helt i din webbläsare. Klistra in minifierad JSON, växla till en interaktiv trädvy och fånga syntaxfel direkt — ingen uppladdning, ingen registrering."
+  },
+  "heading": "JSON-formaterare och validerare",
+  "tagline": "Formatera, validera och utforska JSON-data, direkt i din webbläsare.",
+  "ui": {
+    "themeNotice": "Den här editorwidgeten behåller sitt eget ljusa tema oavsett webbplatsens mörka läge — på samma sätt som en kodredigerare inbäddad på en sida vanligtvis gör.",
+    "errorWithLine": "Syntaxfel på rad {{line}}: {{message}}",
+    "errorNoLine": "Syntaxfel: {{message}}",
+    "goToErrorLine": "Gå till felraden",
+    "exportHeading": "Konvertera till ett annat format",
+    "exportXml": "Exportera som XML",
+    "exportYaml": "Exportera som YAML",
+    "exportCsv": "Exportera som CSV",
+    "exportInvalidJson": "Åtgärda JSON-syntaxfelet ovan innan du konverterar.",
+    "copy": "Kopiera",
+    "copied": "Kopierat!",
+    "download": "Ladda ner"
+  },
+  "related": "Relaterade verktyg",
+  "article": {
+    "heading": "Varför formatera och validera JSON lokalt?",
+    "p1": "JSON dyker upp ständigt i en utvecklares vardag: ett minifierat API-svar utan radbrytningar, en konfigurationsfil som någon för hand redigerat till en enda oläslig rad, en payload du felsöker klockan 23 och försöker hitta det enda saknade kommatecknet i. De flesta \"JSON-formaterare\" online löser läsbarhetsproblemet genom att skicka din inklistrade text till en server först — vilket är en obekväm avvägning när den JSON:en kan innehålla en API-nyckel, en åtkomsttoken eller en kunds personuppgifter.",
+    "p2": "Det här verktyget skickar aldrig något någonstans. Det är byggt på jsoneditor, ett JavaScript-bibliotek som tolkar och ritar om din JSON helt i webbläsarens minne. Tolkningen, den snygga formateringen och syntaxvalideringen sker allt lokalt med webbläsarens egen JavaScript-motor — ingen server är inblandad, så inget du klistrar in här lämnar någonsin din enhet.",
+    "p3": "Klistra in din JSON i editorn i textläge och använd knappen Formatera i verktygsfältet för att göra den läsbar, eller Komprimera för att klämma ihop den till en enda rad igen. Om JSON:en har ett syntaxfel — ett extra kommatecken på slutet, ett saknat citattecken, en obalanserad hakparentes — markerar editorn det omedelbart med ett tydligt felmeddelande och det exakta radnumret istället för att låta dig leta igenom hela dokumentet; en knapp för \"Gå till felraden\" hoppar direkt till den raden och markerar den så att du slipper rulla och leta i en lång fil. Växla till trädläge via rullgardinsmenyn högst upp för att bläddra i samma data som ett hopfällbart, interaktivt träd: fäll ut och ihop nästlade objekt och listor, redigera enskilda värden direkt på plats, och ändra ordning på eller ta bort fält direkt, med ändringen speglad tillbaka i texten så fort du byter läge igen.",
+    "p4": "Den här kombinationen täcker det mesta av det vardagliga JSON-arbetet: att städa upp ett API-svar innan det klistras in i dokumentation, validera en konfigurationsfil innan den committas, eller utforska en djupt nästlad payload utan att tappa bort vilken lista du befinner dig i. Behöver du datan i ett annat format? Knapparna under editorn konverterar den aktuella JSON:en direkt till XML, YAML eller CSV — praktiskt när en kollegas skript förväntar sig en YAML-konfigurationsfil eller ett kalkylark behöver enkla rader och kolumner istället för nästlad JSON — med det konverterade resultatet visat direkt för snabb kopiering eller full nedladdning. Eftersom allt bara finns i webbläsarfliken raderar en stängning editorn helt — det finns ingen sparad historik eller ett utkast att oroa sig för, vilket är precis det beteende du vill ha när JSON:en du arbetar med kan vara känslig."
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "title": "Gabung File PDF Online Gratis — Web Tool Hub",
+    "description": "Gabungkan beberapa file PDF menjadi satu dokumen online secara gratis, sepenuhnya di browser Anda. Lihat setiap halaman sebagai thumbnail, seret untuk mengurutkan ulang, putar atau hapus halaman tertentu sebelum digabung. Tanpa upload, tanpa watermark, tanpa perlu daftar."
+  },
+  "heading": "Gabung File PDF",
+  "tagline": "Gabungkan beberapa PDF menjadi satu file, dengan tampilan thumbnail per halaman, langsung di browser Anda.",
+  "ui": {
+    "selectFiles": "Pilih file PDF",
+    "dropHint": "atau seret dan lepas file PDF di sini",
+    "merge": "Gabung PDF",
+    "merging": "Menggabungkan…",
+    "download": "Unduh merged.pdf",
+    "moveUp": "Pindah ke depan",
+    "moveDown": "Pindah ke belakang",
+    "remove": "Hapus halaman",
+    "rotate": "Putar halaman",
+    "loadingThumbnails": "Membaca halaman…",
+    "dragHint": "Seret halaman mana pun untuk mengurutkan ulang, atau gunakan tombol panah.",
+    "noFiles": "Belum ada file PDF yang dipilih.",
+    "errorGeneric": "Terjadi kesalahan saat membaca PDF ini. Pastikan file tidak rusak atau terlindungi kata sandi, lalu coba lagi.",
+    "skippedFiles": "{{count}} file dilewati karena bukan file PDF."
+  },
+  "related": "Alat terkait",
+  "article": {
+    "heading": "Mengapa menggabungkan file PDF secara lokal alih-alih mengunggahnya?",
+    "p1": "Kontrak hasil pindaian, formulir yang sudah ditandatangani, kumpulan invoice, bab-bab sebuah laporan — cepat atau lambat hampir semua orang akan berakhir dengan beberapa file PDF yang sebenarnya seharusnya menjadi satu dokumen. Mengirim lima lampiran terpisah lewat email atau meminta klien membuka lima tautan alih-alih satu itu merepotkan, dan kebanyakan situs \"penggabung PDF\" gratis mengatasinya dengan diam-diam mengunggah file Anda ke server terlebih dahulu — jenis kepercayaan yang jarang ingin diberikan orang untuk dokumen yang mungkin berisi tanda tangan, nomor identitas, atau data keuangan.",
+    "p2": "Alat ini tidak pernah melakukan itu. Semua proses berjalan di dalam browser Anda menggunakan pdf-lib, sebuah pustaka JavaScript yang membaca struktur mentah tiap PDF, menyalin halaman-halamannya ke dokumen baru, dan menyusun ulang hasilnya — semuanya di dalam memori, di perangkat Anda sendiri. Thumbnail halaman juga dirender secara lokal, dengan pdf.js (mesin rendering yang sama yang tertanam di Firefox), sehingga Anda bisa melihat persis apa yang sedang Anda kerjakan sebelum apa pun digabungkan.",
+    "p3": "Tambahkan file PDF Anda dengan mengklik tombol atau menyeretnya ke zona drop — setiap halaman dari setiap file akan muncul sebagai thumbnail sendiri, dalam satu grid gabungan, tidak dikelompokkan per file. Seret thumbnail mana pun untuk mengurutkan ulang posisinya relatif terhadap semua yang lain, bahkan lintas file sumber yang berbeda, atau gunakan tombol panah jika menyeret kurang praktis. Klik tombol putar pada suatu halaman untuk memutarnya 90° setiap kali, atau tombol hapusnya untuk mengecualikan halaman itu sepenuhnya dari dokumen akhir — berguna untuk membuang halaman sampul hasil pindaian yang kosong atau halaman duplikat. Setelah semuanya terlihat pas, tekan Gabung PDF; file gabungan dibangun sepenuhnya di dalam memori dan diunduh sebagai merged.pdf.",
+    "p4": "Tidak ada batas jumlah halaman yang ditetapkan pada alat ini, meskipun kumpulan PDF hasil pindaian yang sangat besar dan penuh gambar tentu akan memakan waktu lebih lama untuk merender thumbnail-nya karena semuanya diproses oleh perangkat Anda sendiri, bukan oleh server farm. Jika satu file gagal dimuat — misalnya karena dienkripsi dengan kata sandi atau rusak saat diunduh — alat ini akan memberi tahu Anda alih-alih diam-diam menghasilkan file yang rusak. Untuk melakukan hal sebaliknya dan memecah PDF gabungan kembali menjadi bagian-bagian yang lebih kecil, alat Pisah PDF bekerja dengan cara yang sama mengutamakan privasi dan memiliki kontrol putar-dan-hapus halaman yang sama."
+  }
+}

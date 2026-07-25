@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "title": "Textjämförelse online gratis — Jämför två texter — Web Tool Hub",
+    "description": "Jämför två textblock online gratis — tecken-, ord- eller radjämförelse sida vid sida med radnummer, plus ett sammanslagningsverktyg för att lösa varje ändring. Körs helt i din webbläsare — inget laddas någonsin upp."
+  },
+  "heading": "Textjämförelse — Jämför två texter",
+  "tagline": "Klistra in två versioner av en text och se exakt vad som ändrats, ord för ord eller rad för rad.",
+  "ui": {
+    "originalLabel": "Ursprunglig text",
+    "changedLabel": "Ändrad text",
+    "modeWord": "Ord",
+    "modeLine": "Rad",
+    "modeChar": "Tecken",
+    "noChanges": "Inga skillnader hittades — de två texterna är identiska.",
+    "placeholder": "Klistra in eller skriv text här…",
+    "ignoreWhitespace": "Ignorera blanksteg",
+    "ignoreCase": "Skiftlägesokänslig",
+    "statsAdded": "{{count}} tillagda",
+    "statsRemoved": "{{count}} borttagna",
+    "statsModified": "{{count}} ändrade",
+    "clear": "Rensa",
+    "swap": "Byt plats",
+    "uploadFile": "Ladda upp .txt",
+    "prevChange": "Föregående ändring",
+    "nextChange": "Nästa ändring",
+    "changeCounter": "{{current}} / {{total}} ändringar",
+    "fullscreen": "Helskärm",
+    "exitFullscreen": "Avsluta helskärm",
+    "mergeToolHeading": "Sammanslagningsverktyg",
+    "mergeLeftHeading": "Vänster version",
+    "mergeRightHeading": "Höger version",
+    "acceptRightAria": "Använd höger version för denna ändring",
+    "acceptLeftAria": "Använd vänster version för denna ändring",
+    "copy": "Kopiera",
+    "copied": "Kopierat!",
+    "save": "Spara som .txt"
+  },
+  "related": "Relaterade verktyg",
+  "article": {
+    "heading": "Varför använda ett verktyg för textjämförelse?",
+    "p1": "Så fort det finns två versioner av samma dokument — ett kontrakt före och efter en jurists ändringar, en uppsats före och efter en omgång feedback, en konfigurationsfil före och efter en kollegas commit — är den viktiga frågan sällan \"är det här samma fil\" utan \"vad exakt har ändrats\". Att läsa båda versionerna sida vid sida och försöka upptäcka varje tillagt kommatecken, borttagen sats eller omformulerad mening är långsamt och felbenäget, särskilt när dokumentet går över en sida eller två. Ett textjämförelseverktyg automatiserar den jämförelsen och markerar precis de ord eller rader som skiljer sig åt, så att du kan granska en ändring på några sekunder istället för minuter.",
+    "p2": "Det här verktyget körs helt i din webbläsare. Båda textrutorna hålls i minnet på din enhet och själva jämförelsen beräknas av ett JavaScript-bibliotek för textjämförelse som körs lokalt — inget du skriver eller klistrar in skickas någonsin till en server, loggas eller sparas någonstans. Det spelar roll om du jämför ett kundkontrakt, en lösenordsfil eller vilken text som helst du hellre inte skickar genom en tredjepartstjänst. Stäng fliken och allt är borta; det finns ingen historik att oroa sig för.",
+    "p3": "Klistra in den ursprungliga texten till vänster och den uppdaterade versionen till höger — båda rutorna visar radnummer och rullar synkroniserat med varandra, och var och en har sina egna knappar för Rensa, Byt plats och Ladda upp .txt så att du kan läsa in två filer direkt från disken istället för att klippa och klistra. Jämförelsen uppdateras live medan du skriver; det finns ingen knapp att trycka på. Välj Tecken, Ord eller Rad för att styra hur finkorniga skillnaderna ska vara: Tecken-läge fångar en enstaka ändring på skrivfelsnivå, Ord-läge passar bäst för löpande text eftersom det markerar exakt vilka ord som ändrats inuti en mening, och Rad-läge jämför hela rader åt gången, vilket passar kod, JSON eller listliknande innehåll där du bryr dig om vilka hela rader som flyttats snarare än enskilda ord i dem. En rad som bara finns i en version visas helt grön (tillagd) eller röd (borttagen); en rad som finns i båda men har redigerats visas i orange, med de exakta ändrade orden eller tecknen inuti kraftigare markerade — så att du kan skilja en redigerad rad från ett obesläktat par av borttagning-och-tillägg med en blick.",
+    "p4": "Antalet tillagda/borttagna/ändrade delar ovanför jämförelsen ger dig en snabb känsla för hur stor en ändring är, och ↑/↓-knapparna hoppar direkt till nästa eller föregående ändring utan att du behöver rulla genom oförändrade rader — praktiskt i ett långt dokument. En Helskärm-knapp expanderar jämförelsen så att den fyller hela skärmen för närmare granskning. Under jämförelsen förvandlar sammanslagningsverktyget detta från en skrivskyddad jämförelse till något du faktiskt kan lösa: varje ändring får sina egna ←/→-knappar mellan de två kolumnerna, så att du kan dra in höger versions ändring i vänster kolumn eller föra över vänster version till höger, en ändring i taget, tills båda kolumnerna läser exakt som du vill. Varje kolumn har sina egna knappar för Kopiera och Spara, så att du kan hämta ut ett rent, sammanslaget resultat utan att skriva om något. Om de två texterna visar sig vara identiska säger verktyget det rakt ut istället för att visa ett tomt, tvetydigt resultat — en sak mindre att fundera över."
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Afbeeldingen comprimeren online gratis (JPEG, PNG, WebP) — Web Tool Hub",
+    "description": "Comprimeer JPEG-, PNG- en WebP-afbeeldingen online en gratis, volledig in je browser. Geen upload, geen bestandslimiet, geen registratie — je foto's verlaten nooit je apparaat."
+  },
+  "heading": "Afbeelding comprimeren (JPEG/PNG/WebP)",
+  "tagline": "Verklein je foto's in enkele seconden, rechtstreeks in je browser.",
+  "ui": {
+    "selectFiles": "Afbeeldingen selecteren",
+    "dropHint": "of sleep afbeeldingen hierheen",
+    "quality": "Kwaliteit",
+    "compress": "Comprimeren",
+    "compressing": "Bezig met comprimeren…",
+    "download": "Downloaden",
+    "downloadAll": "Alles downloaden (.zip)",
+    "original": "Origineel",
+    "compressed": "Gecomprimeerd",
+    "reduced": "{{percent}}% kleiner",
+    "noFiles": "Nog geen afbeeldingen geselecteerd.",
+    "errorGeneric": "Er is iets misgegaan bij het comprimeren van deze afbeelding. Probeer het opnieuw.",
+    "remove": "Verwijderen",
+    "clearAll": "Alles wissen",
+    "skippedFiles": "{{count}} bestand(en) overgeslagen omdat ze geen ondersteund afbeeldingsformaat hebben."
+  },
+  "related": "Gerelateerde tools",
+  "article": {
+    "heading": "Waarom afbeeldingen comprimeren voordat je ze publiceert?",
+    "p1": "Een foto rechtstreeks van een moderne telefooncamera weegt al snel 4 tot 8 MB, terwijl de meeste websites maar een fractie daarvan nodig hebben om er scherp uit te zien op het scherm. Te grote afbeeldingen zijn een van de meest voorkomende oorzaken van trage laadtijden, en trage pagina's verliezen bezoekers en scoren lager in Google's Core Web Vitals. Door een afbeelding te comprimeren voordat je hem publiceert, verwijder je precies de extra data die je oog toch nooit gebruikt, zonder dat de foto er anders uitziet op normale kijkgrootte.",
+    "p2": "Alles gebeurt lokaal in je browser. De compressie zelf draait in een Web Worker, een aparte thread die in moderne browsers ingebouwd zit, zodat de pagina soepel blijft reageren terwijl je een hele reeks grote foto's tegelijk comprimeert. Er wordt nooit een bestand naar een server geüpload — zelfs niet tijdelijk — waardoor er geen wachttijd voor uploaden is, geen serverlimiet voor bestandsgrootte, en niets van je afbeeldingen ooit je apparaat verlaat.",
+    "p3": "Het gebruik is simpel: selecteer een of meer JPEG-, PNG- of WebP-bestanden, kies een kwaliteitsniveau met de schuifregelaar en druk op Comprimeren. Elke afbeelding wordt één voor één verwerkt en het resultaat verschijnt direct met de originele grootte, de nieuwe grootte en het bespaarde percentage, zodat je kunt vergelijken voordat je iets downloadt. Als een resultaat er niet goed uitziet, pas dan gewoon de schuifregelaar aan en comprimeer opnieuw — er is geen limiet op het aantal pogingen.",
+    "p4": "Als vertrekpunt houdt een kwaliteit van 70-80% een foto voor de meeste mensen visueel gelijk aan het origineel, terwijl de bestandsgrootte doorgaans wordt gehalveerd of nog verder daalt. Afbeeldingen met vlakke kleuren, zoals screenshots, illustraties en logo's, comprimeren bijzonder goed, zelfs bij lagere instellingen. Foto's met veel fijne textuur, ruis of kleurverlopen — denk aan bladeren in een bos of een sterrenhemel — behouden meer van hun bestandsgrootte bij dezelfde kwaliteit, en hebben vaak meer baat bij het verkleinen van de afmetingen dan bij het verder verlagen van de kwaliteit."
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Conta Parole e Caratteri Online Gratis — Web Tool Hub",
+    "description": "Conta parole, caratteri, frasi e paragrafi all'istante mentre digiti o incolli il testo — gratis, in tempo reale e interamente nel tuo browser. Senza upload, senza registrazione."
+  },
+  "heading": "Conta Parole e Caratteri",
+  "tagline": "Conta parole, caratteri, frasi e paragrafi all'istante mentre digiti.",
+  "ui": {
+    "placeholder": "Incolla o digita il testo qui…",
+    "charsLabel": "Caratteri",
+    "charsNoSpacesLabel": "Caratteri (senza spazi)",
+    "wordsLabel": "Parole",
+    "sentencesLabel": "Frasi",
+    "paragraphsLabel": "Paragrafi",
+    "readingTimeLabel": "Tempo di lettura",
+    "readingTimeValue": "{{minutes}} min di lettura",
+    "speakingTimeLabel": "Tempo di lettura ad alta voce",
+    "speakingTimeValue": "{{minutes}} min di parlato",
+    "clear": "Cancella",
+    "keywordDensityHeading": "Densità delle parole chiave",
+    "keywordDensityWordColumn": "Parola",
+    "keywordDensityCountColumn": "Occorrenze",
+    "keywordDensityPercentColumn": "% del testo"
+  },
+  "related": "Strumenti correlati",
+  "article": {
+    "heading": "Perché contare parole e caratteri localmente?",
+    "p1": "Un numero sorprendente di attività di scrittura quotidiane ha un limite numerico preciso: un tema che non può superare le 500 parole, un tweet limitato a 280 caratteri, una meta description che viene troncata oltre circa 160 caratteri, una lettera di presentazione che un recruiter ha chiesto di tenere entro una pagina. Contare manualmente qualsiasi cosa del genere è noioso e soggetto a errori, così la maggior parte delle persone incolla il proprio testo in un contatore online — il che di solito significa inviare una bozza di lettera di presentazione, un articolo non ancora pubblicato, o il brief riservato di un cliente a un server di cui non si sa nulla.",
+    "p2": "Questo strumento non lo fa mai. Ogni carattere che digiti viene contato da un piccolo script JavaScript eseguito direttamente nel tuo browser, e i numeri si aggiornano in tempo reale mentre scrivi — non c'è un pulsante d'invio perché non c'è nessuna richiesta verso un server da attendere. Nulla di ciò che scrivi viene mai inviato, salvato o registrato da qualche parte; aggiorna la pagina e sparisce tutto, esattamente come ci si aspetta da un blocco note.",
+    "p3": "Basta iniziare a digitare o incollare il testo nella casella. Il conteggio delle parole si basa sugli spazi, quindi \"ben noto\" conta come una parola sola mentre \"ben conosciuto\" ne conta due. Il conteggio delle frasi cerca il testo che termina con un punto, un punto interrogativo o un punto esclamativo, il che funziona bene per la prosa normale ma può sottostimare testi che saltano la punteggiatura, come un elenco puntato. Il conteggio dei paragrafi tratta come un paragrafo ogni blocco di testo separato da una riga vuota. Il tempo di lettura stimato presume una velocità media di lettura di circa 200 parole al minuto, arrotondata per eccesso al minuto più vicino così anche i testi molto brevi mostrano \"1 min di lettura\" invece di \"0\". Lo stesso conteggio delle parole determina anche una stima del tempo di lettura ad alta voce, basata su un ritmo medio di presentazione di circa 130 parole al minuto — utile per cronometrare un discorso o una voce fuori campo senza doverla leggere ad alta voce in anticipo.",
+    "p4": "Gli scrittori lo usano per rispettare il limite di parole di un compito senza dover indovinare, i marketer per mantenere una meta description o un testo pubblicitario entro il limite di visualizzazione, e gli studenti per verificare un elaborato rispetto al minimo o massimo richiesto da un professore prima di consegnarlo. Il numero di caratteri senza spazi è particolarmente utile per piattaforme — alcuni social network e moduli — che contano i caratteri in questo modo invece di includere ogni spazio. Sotto i conteggi, una tabella di densità delle parole chiave elenca le parole che compaiono più spesso nel tuo testo insieme a quante volte e a quale percentuale del totale corrispondono — lo stesso tipo di controllo che gli esperti SEO usano per assicurarsi che una parola chiave target non venga ripetuta così spesso da sembrare spam, o così raramente da passare inosservata. Se hai bisogno di confrontare due bozze parola per parola invece di contarne solo una, lo strumento Confronta Testi gestisce questo caso con lo stesso approccio locale, senza alcun upload."
+  }
+}

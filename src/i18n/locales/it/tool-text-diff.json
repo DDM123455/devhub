@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "title": "Confronta Testi Online Gratis — Text Diff Checker — Web Tool Hub",
+    "description": "Confronta due blocchi di testo online gratis — differenze per carattere, parola o riga, affiancate con numeri di riga, più uno strumento di merge per risolvere ogni modifica. Funziona interamente nel tuo browser — niente viene mai caricato su un server."
+  },
+  "heading": "Confronta Testi — Text Diff Checker",
+  "tagline": "Incolla due versioni di un testo e vedi esattamente cosa è cambiato, parola per parola o riga per riga.",
+  "ui": {
+    "originalLabel": "Testo originale",
+    "changedLabel": "Testo modificato",
+    "modeWord": "Parola",
+    "modeLine": "Riga",
+    "modeChar": "Carattere",
+    "noChanges": "Nessuna differenza trovata — i due testi sono identici.",
+    "placeholder": "Incolla o digita il testo qui…",
+    "ignoreWhitespace": "Ignora spazi",
+    "ignoreCase": "Ignora maiuscole/minuscole",
+    "statsAdded": "{{count}} aggiunte",
+    "statsRemoved": "{{count}} rimosse",
+    "statsModified": "{{count}} modificate",
+    "clear": "Cancella",
+    "swap": "Scambia",
+    "uploadFile": "Carica .txt",
+    "prevChange": "Modifica precedente",
+    "nextChange": "Modifica successiva",
+    "changeCounter": "{{current}} / {{total}} modifiche",
+    "fullscreen": "Schermo intero",
+    "exitFullscreen": "Esci da schermo intero",
+    "mergeToolHeading": "Strumento di merge",
+    "mergeLeftHeading": "Versione sinistra",
+    "mergeRightHeading": "Versione destra",
+    "acceptRightAria": "Usa la versione destra per questa modifica",
+    "acceptLeftAria": "Usa la versione sinistra per questa modifica",
+    "copy": "Copia",
+    "copied": "Copiato!",
+    "save": "Salva come .txt"
+  },
+  "related": "Strumenti correlati",
+  "article": {
+    "heading": "Perché usare un confronto testi (diff checker)?",
+    "p1": "Ogni volta che esistono due versioni dello stesso documento — un contratto prima e dopo le modifiche di un avvocato, un saggio prima e dopo un giro di revisioni, un file di configurazione prima e dopo il commit di un collega — la domanda importante raramente è \"questi file sono uguali\" ma \"cosa è cambiato esattamente\". Leggere entrambe le versioni fianco a fianco cercando di individuare ogni virgola aggiunta, clausola cancellata o frase riformulata è lento e soggetto a errori, specialmente quando il documento supera una pagina o due. Uno strumento di confronto automatizza questo processo ed evidenzia con precisione le parole o le righe che differiscono, così puoi revisionare una modifica in secondi invece che in minuti.",
+    "p2": "Questo strumento funziona interamente nel tuo browser. Entrambe le caselle di testo restano in memoria sul tuo dispositivo e il confronto viene calcolato da una libreria JavaScript di diffing eseguita in locale — nulla di ciò che digiti o incolli viene mai inviato a un server, registrato o salvato da nessuna parte. Questo conta se stai confrontando un contratto con un cliente, un file di password, o qualsiasi testo che preferiresti non far passare attraverso un servizio di terze parti. Chiudi la scheda e tutto scompare — nessuna cronologia di cui preoccuparsi.",
+    "p3": "Incolla il testo originale a sinistra e la versione aggiornata a destra — entrambe le caselle mostrano i numeri di riga e scorrono in sincronia tra loro, e ciascuna ha i propri pulsanti Cancella, Scambia e Carica .txt così puoi caricare due file direttamente dal disco invece di copiare e incollare. Il confronto si aggiorna in tempo reale mentre digiti; non c'è nessun pulsante da premere. Scegli Carattere, Parola o Riga per controllare quanto finemente vengono scomposte le differenze: la modalità Carattere cattura una singola modifica a livello di refuso, la modalità Parola è ideale per la prosa perché evidenzia esattamente quali parole sono cambiate all'interno di una frase, e la modalità Riga confronta intere righe alla volta, adatta a codice, JSON o contenuti in stile elenco dove conta capire quali righe intere si sono spostate piuttosto che le singole parole al loro interno. Una riga che esiste solo in una versione viene mostrata interamente verde (aggiunta) o rossa (rimossa); una riga che esiste in entrambe ma è stata modificata viene mostrata in arancione, con la parola o i caratteri esatti cambiati evidenziati più intensamente al suo interno — così puoi distinguere a colpo d'occhio una riga modificata da una coppia scorrelata di cancellazione-e-inserimento.",
+    "p4": "I conteggi di aggiunte/rimozioni/modifiche sopra il confronto ti danno un'idea a colpo d'occhio di quanto sia grande una modifica, e i pulsanti ↑/↓ saltano direttamente alla modifica successiva o precedente senza dover scorrere righe invariate — comodo su un documento lungo. Un pulsante Schermo intero espande il confronto per riempire lo schermo per una revisione più attenta. Sotto il confronto, lo strumento di merge trasforma questo da un diff di sola lettura in qualcosa che puoi effettivamente risolvere: ogni modifica ha i propri pulsanti ← / → tra le due colonne, che ti permettono di portare la modifica della versione destra nella colonna sinistra o spingere la versione sinistra in quella destra, una modifica alla volta, finché entrambe le colonne non leggono esattamente come vuoi tu. Ogni colonna ha i propri pulsanti Copia e Salva, così puoi estrarre un risultato pulito e unito senza riscrivere nulla. Se i due testi risultano identici, lo strumento te lo dice direttamente invece di mostrare un risultato vuoto e ambiguo — una preoccupazione in meno."
+  }
+}

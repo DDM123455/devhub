@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "title": "Tekst vergelijken online gratis — Twee teksten vergelijken — Web Tool Hub",
+    "description": "Vergelijk twee tekstblokken online en gratis — verschil per teken, woord of regel, naast elkaar met regelnummers, plus een samenvoegtool om elke wijziging op te lossen. Draait volledig in je browser — er wordt nooit iets geüpload."
+  },
+  "heading": "Tekst vergelijken — twee teksten naast elkaar",
+  "tagline": "Plak twee versies van een tekst en zie precies wat er veranderd is, woord voor woord of regel voor regel.",
+  "ui": {
+    "originalLabel": "Oorspronkelijke tekst",
+    "changedLabel": "Gewijzigde tekst",
+    "modeWord": "Woord",
+    "modeLine": "Regel",
+    "modeChar": "Teken",
+    "noChanges": "Geen verschillen gevonden — beide teksten zijn identiek.",
+    "placeholder": "Plak of typ hier tekst…",
+    "ignoreWhitespace": "Witruimte negeren",
+    "ignoreCase": "Hoofdlettergevoeligheid negeren",
+    "statsAdded": "{{count}} toegevoegd",
+    "statsRemoved": "{{count}} verwijderd",
+    "statsModified": "{{count}} gewijzigd",
+    "clear": "Wissen",
+    "swap": "Omwisselen",
+    "uploadFile": ".txt uploaden",
+    "prevChange": "Vorige wijziging",
+    "nextChange": "Volgende wijziging",
+    "changeCounter": "{{current}} / {{total}} wijzigingen",
+    "fullscreen": "Volledig scherm",
+    "exitFullscreen": "Volledig scherm afsluiten",
+    "mergeToolHeading": "Samenvoegtool",
+    "mergeLeftHeading": "Linkerversie",
+    "mergeRightHeading": "Rechterversie",
+    "acceptRightAria": "Gebruik de rechterversie voor deze wijziging",
+    "acceptLeftAria": "Gebruik de linkerversie voor deze wijziging",
+    "copy": "Kopiëren",
+    "copied": "Gekopieerd!",
+    "save": "Opslaan als .txt"
+  },
+  "related": "Gerelateerde tools",
+  "article": {
+    "heading": "Waarom een tool voor tekstvergelijking gebruiken?",
+    "p1": "Zodra er twee versies van hetzelfde document bestaan — een contract voor en na de opmerkingen van een advocaat, een essay voor en na een feedbackronde, een configuratiebestand voor en na de commit van een collega — is de belangrijke vraag zelden \"zijn dit dezelfde bestanden\", maar \"wat is er precies veranderd\". Beide versies naast elkaar lezen en proberen elke toegevoegde komma, verwijderde clausule of herschreven zin te ontdekken, is traag en foutgevoelig, zeker zodra een document langer wordt dan een pagina of twee. Een diff-tool automatiseert die vergelijking en markeert precies de woorden of regels die verschillen, zodat je een wijziging in seconden kunt beoordelen in plaats van in minuten.",
+    "p2": "Deze tool draait volledig in je browser. Beide tekstvakken blijven in het geheugen op je eigen apparaat en de vergelijking zelf wordt berekend door een JavaScript-bibliotheek die lokaal draait — niets van wat je typt of plakt wordt ooit naar een server gestuurd, gelogd of ergens opgeslagen. Dat is belangrijk als je een klantcontract, een wachtwoordbestand of andere tekst vergelijkt die je liever niet door een externe dienst haalt. Sluit het tabblad en alles is verdwenen — er is geen geschiedenis om je zorgen over te maken.",
+    "p3": "Plak de oorspronkelijke tekst links en de bijgewerkte versie rechts — beide vakken tonen regelnummers en scrollen synchroon met elkaar, en elk heeft zijn eigen knoppen Wissen, Omwisselen en .txt uploaden, zodat je twee bestanden rechtstreeks vanaf schijf kunt laden in plaats van te kopiëren en plakken. De vergelijking wordt live bijgewerkt terwijl je typt; er is geen knop om op te drukken. Kies Teken, Woord of Regel om te bepalen hoe fijnmazig verschillen worden opgesplitst: Tekenmodus vangt een enkele wijziging op typfoutniveau, Woordmodus is het beste voor lopende tekst omdat het precies laat zien welke woorden binnen een zin zijn veranderd, en Regelmodus vergelijkt hele regels tegelijk, wat geschikt is voor code, JSON of lijstachtige content waarbij je vooral wilt weten welke complete regels zijn verplaatst in plaats van afzonderlijke woorden daarbinnen. Een regel die alleen in één versie bestaat, wordt volledig groen (toegevoegd) of rood (verwijderd) weergegeven; een regel die in beide bestaat maar bewerkt is, wordt oranje weergegeven, met het exacte gewijzigde woord of de gewijzigde tekens sterker gemarkeerd — zo kun je in één oogopslag een bewerkte regel onderscheiden van een ongerelateerd paar verwijderen-en-invoegen.",
+    "p4": "De tellers voor toegevoegd/verwijderd/gewijzigd boven de vergelijking geven je in één oogopslag een idee van hoe groot een wijziging is, en de ↑/↓-knoppen springen direct naar de volgende of vorige wijziging zonder door ongewijzigde regels te hoeven scrollen — handig bij een lang document. Een knop voor volledig scherm vergroot de vergelijking zodat die het hele scherm vult, voor nauwkeuriger onderzoek. Onder de vergelijking maakt de samenvoegtool hiervan meer dan een alleen-lezen diff: elke wijziging krijgt zijn eigen ←/→-knoppen tussen de twee kolommen, waarmee je de wijziging uit de rechterversie naar de linkerkolom kunt trekken of de linkerversie naar rechts kunt duwen, wijziging voor wijziging, totdat beide kolommen precies zeggen wat je wilt. Elke kolom heeft zijn eigen knoppen Kopiëren en Opslaan, zodat je een schoon, samengevoegd resultaat kunt ophalen zonder iets opnieuw te typen. Blijken de twee teksten identiek te zijn, dan laat de tool dat direct weten in plaats van een leeg, dubbelzinnig resultaat te tonen — weer iets minder om over te twijfelen."
+  }
+}

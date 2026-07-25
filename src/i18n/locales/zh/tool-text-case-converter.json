@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "免费在线英文大小写转换工具 — Web Tool Hub",
+    "description": "在 UPPERCASE、lowercase、Title Case、camelCase、snake_case、Sentence case 等格式之间即时转换文本，免费且全程在浏览器本地完成。无需上传，无需注册。"
+  },
+  "heading": "英文大小写转换工具",
+  "tagline": "在 UPPERCASE、lowercase、Title Case、camelCase、snake_case 等格式之间转换文本，外加几个实用的文本清理小工具。",
+  "ui": {
+    "placeholder": "在此输入或粘贴文字…",
+    "outputLabel": "结果",
+    "caseUpper": "UPPERCASE（全大写）",
+    "caseLower": "lowercase（全小写）",
+    "caseTitle": "Title Case（标题格式）",
+    "caseCamel": "camelCase（小驼峰）",
+    "caseSnake": "snake_case（下划线）",
+    "caseSentence": "Sentence case（句首大写）",
+    "caseAlternating": "aLtErNaTiNg CaSe（交替大小写）",
+    "caseInverse": "iNVERSE cASE（反转大小写）",
+    "caseOptionsHeading": "格式选项",
+    "utilRemoveSpaces": "去除多余空格",
+    "utilRemoveLineBreaks": "去除多余换行",
+    "utilSortLines": "按 A-Z 排序各行",
+    "utilitiesHeading": "实用工具",
+    "copy": "复制",
+    "copied": "已复制！",
+    "clear": "清空"
+  },
+  "related": "相关工具",
+  "article": {
+    "heading": "为什么要用大小写转换工具？",
+    "p1": "大小写转换的需求经常以各种小而烦人的方式冒出来：一段不小心开着大写锁定打出来的文字、一份用 Title Case 写的规范文档需要变成 camelCase 命名的变量、一个 CSV 表头需要转成 snake_case 风格的数据库字段名、一条标题在上线前需要规范的标题大小写格式。单独处理一个词都不难，但要手动重打一整段文字，或者一长串字段名，既慢又容易出错。",
+    "p2": "这个工具用一小段直接运行在浏览器里的纯 JavaScript 代码来完成转换——不需要加载任何库，也不需要把内容发送到服务器。你输入或粘贴文字、切换不同的大小写选项时，结果会立刻更新，每一次都是在你自己设备的内存里重新计算出来的。",
+    "p3": "粘贴或输入你的文字，选择 UPPERCASE、lowercase、Title Case、camelCase 或 snake_case，点击“复制”获取结果。特别是对 camelCase 和 snake_case 而言，转换器会把空格、连字符、下划线和标点符号都当作单词分隔符处理——同时它还能识别已有的 camelCase 或 PascalCase 边界，所以不管你粘贴的是“hello-world”“Hello World”，还是已经是驼峰格式的“helloWorld”，都能干净地转换成统一的结果，而不会得到“helloworld”或“hello-World”这样出错的结果。",
+    "p4": "开发者在不同语言和数据库使用的命名规范之间重命名变量或字段时最常用到这个工具，写作者用它来修正不小心整段用大写打出来的句子，编辑用 Title Case 来统一标题的大小写规则，不用死记哪些虚词该跳过。如果你还需要对比两个版本的文字，或者只是想统计字数和字符数，文本对比工具和字数与字符统计工具用的是同样本地、不上传任何内容的方式。",
+    "p5": "除了这几种经典格式，Sentence case 能修复整段被误打成全大写的文字，只保留每个句子首字母大写；aLtErNaTiNg CaSe 和 iNVERSE cASE 则是两种常被用来让评论显得醒目，或者在社交媒体上读出一种讽刺语气的花式写法——一种是把每隔一个字母的大小写翻转，另一种是把原文里每一个字母的大小写都整体反转。除了这些大小写选项之外，还有三个清理工具专门处理粘贴文字时经常带来的格式问题：去除多余空格会把连续重复的空格和制表符压缩成每处一个，同时不影响换行；去除多余换行会清理掉复制粘贴时留下的多余空行；按 A-Z 排序各行则会把一份列表按字母顺序排好——很适合在使用之前整理一份粘贴进来的人名、标签或 CSV 风格的行数据。"
+  }
+}

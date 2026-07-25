@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "title": "Ücretsiz Online Metin Karşılaştırma Aracı — İki Metni Karşılaştırın — Web Tool Hub",
+    "description": "İki metin bloğunu tamamen tarayıcınızda, ücretsiz olarak karşılaştırın — karakter, kelime veya satır bazında, satır numaralarıyla yan yana, her değişikliği çözmek için bir birleştirme aracıyla birlikte. Her şey tarayıcınızda çalışır — hiçbir şey asla yüklenmez."
+  },
+  "heading": "Metin Karşılaştırma Aracı — İki Metni Karşılaştırın",
+  "tagline": "Bir metnin iki sürümünü yapıştırın ve tam olarak ne değiştiğini kelime kelime ya da satır satır görün.",
+  "ui": {
+    "originalLabel": "Orijinal metin",
+    "changedLabel": "Değiştirilmiş metin",
+    "modeWord": "Kelime",
+    "modeLine": "Satır",
+    "modeChar": "Karakter",
+    "noChanges": "Fark bulunamadı — iki metin birbirinin aynısı.",
+    "placeholder": "Metni buraya yapıştırın veya yazın…",
+    "ignoreWhitespace": "Boşlukları yok say",
+    "ignoreCase": "Büyük/küçük harfi yok say",
+    "statsAdded": "{{count}} eklendi",
+    "statsRemoved": "{{count}} kaldırıldı",
+    "statsModified": "{{count}} değiştirildi",
+    "clear": "Temizle",
+    "swap": "Yer değiştir",
+    "uploadFile": ".txt yükle",
+    "prevChange": "Önceki değişiklik",
+    "nextChange": "Sonraki değişiklik",
+    "changeCounter": "{{current}} / {{total}} değişiklik",
+    "fullscreen": "Tam ekran",
+    "exitFullscreen": "Tam ekrandan çık",
+    "mergeToolHeading": "Birleştirme aracı",
+    "mergeLeftHeading": "Sol sürüm",
+    "mergeRightHeading": "Sağ sürüm",
+    "acceptRightAria": "Bu değişiklik için sağ sürümü kullan",
+    "acceptLeftAria": "Bu değişiklik için sol sürümü kullan",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı!",
+    "save": ".txt olarak kaydet"
+  },
+  "related": "İlgili araçlar",
+  "article": {
+    "heading": "Neden bir metin karşılaştırma aracı kullanmalısınız?",
+    "p1": "Aynı belgenin iki sürümü var olduğunda — bir avukatın düzenlemelerinden önce ve sonraki bir sözleşme, bir geri bildirim turundan önce ve sonraki bir makale, bir ekip arkadaşının commit'inden önce ve sonraki bir yapılandırma dosyası — önemli soru nadiren \"bu dosyalar aynı mı\" sorusudur; genellikle \"tam olarak ne değişti\" sorusudur. İki sürümü yan yana okuyup eklenen her virgülü, silinen her cümleyi ya da yeniden yazılan her cümleyi fark etmeye çalışmak yavaştır ve hata yapmaya açıktır; özellikle belge bir iki sayfayı aştığında. Bir karşılaştırma aracı bu kıyaslamayı otomatikleştirir ve tam olarak hangi kelimelerin ya da satırların farklı olduğunu vurgular; böylece bir değişikliği dakikalar yerine saniyeler içinde inceleyebilirsiniz.",
+    "p2": "Bu araç tamamen tarayıcınızda çalışır. İki metin kutusu da cihazınızda bellekte kalır ve karşılaştırmanın kendisi yerel olarak çalışan bir JavaScript karşılaştırma kütüphanesi tarafından hesaplanır — yazdığınız veya yapıştırdığınız hiçbir şey bir sunucuya gönderilmez, kaydedilmez ya da herhangi bir yerde saklanmaz. Bir müşteri sözleşmesi, bir parola dosyası ya da üçüncü taraf bir servisten geçirmek istemediğiniz herhangi bir metni karşılaştırıyorsanız bu önemlidir. Sekmeyi kapattığınızda her şey gider; endişelenecek bir geçmiş yoktur.",
+    "p3": "Orijinal metni sola, güncellenmiş sürümü sağa yapıştırın — her iki kutu da satır numaraları gösterir ve birbiriyle senkronize olarak kayar; her birinin kendi Temizle, Yer Değiştir ve .txt Yükle düğmeleri vardır, böylece kopyala-yapıştır yerine doğrudan diskten iki dosya yükleyebilirsiniz. Karşılaştırma siz yazdıkça anlık olarak güncellenir; basılacak bir düğme yoktur. Farkların ne kadar ince ayrıntılı bölüneceğini kontrol etmek için Karakter, Kelime veya Satır seçin: Karakter modu tek bir yazım hatası düzeyindeki düzenlemeyi yakalar, Kelime modu düzyazı için en iyisidir çünkü bir cümle içinde tam olarak hangi kelimelerin değiştiğini vurgular, Satır modu ise bütün satırları bir bütün olarak karşılaştırır ve satır içindeki tek tek kelimeler yerine hangi satırların tamamen taşındığıyla ilgilendiğiniz kod, JSON ya da liste tarzı içerikler için uygundur. Yalnızca bir sürümde bulunan bir satır tamamen yeşil (eklendi) veya kırmızı (kaldırıldı) gösterilir; her iki sürümde de bulunan ama düzenlenmiş bir satır turuncu gösterilir ve içindeki tam olarak değişen kelime ya da karakterler daha güçlü vurgulanır — böylece düzenlenmiş bir satırı, ilgisiz bir sil-sonra-ekle çiftinden bir bakışta ayırt edebilirsiniz.",
+    "p4": "Karşılaştırmanın üstündeki eklendi/kaldırıldı/değiştirildi sayıları, değişikliğin ne kadar büyük olduğu konusunda bir bakışta fikir verir; ↑/↓ düğmeleri ise değişmeyen satırlarda gezinmeden doğrudan bir sonraki ya da önceki değişikliğe atlar — uzun bir belgede oldukça kullanışlıdır. Bir Tam Ekran düğmesi, daha yakından inceleme için karşılaştırmayı ekranı kaplayacak şekilde genişletir. Karşılaştırmanın altındaki birleştirme aracı, bunu salt okunur bir farktan gerçekten çözebileceğiniz bir şeye dönüştürür: her değişikliğin iki sütun arasında kendi ← / → düğmeleri vardır, böylece sağ sürümün düzenlemesini sol sütuna çekebilir ya da sol sürümü sağa itebilirsiniz — her sütun tam olarak istediğiniz gibi okununcaya kadar, tek seferde bir değişiklik. Her sütunun kendi Kopyala ve Kaydet düğmeleri vardır, böylece hiçbir şeyi yeniden yazmadan temiz, birleştirilmiş bir sonuç elde edebilirsiniz. İki metin aynı çıkarsa, araç boş, belirsiz bir sonuç göstermek yerine bunu doğrudan size söyler — üzerinde tekrar düşünmeniz gereken bir şey daha eksilir."
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Ücretsiz Online Resim Sıkıştırma (JPEG, PNG, WebP) — Web Tool Hub",
+    "description": "JPEG, PNG ve WebP resimlerini tamamen tarayıcınızda, ücretsiz olarak sıkıştırın. Yükleme yok, boyut sınırı yok, kayıt yok — fotoğraflarınız cihazınızdan asla çıkmaz."
+  },
+  "heading": "Resim Sıkıştırma (JPEG/PNG/WebP)",
+  "tagline": "Fotoğraflarınızı saniyeler içinde, doğrudan tarayıcınızda küçültün.",
+  "ui": {
+    "selectFiles": "Resim seç",
+    "dropHint": "veya resimleri buraya sürükleyip bırakın",
+    "quality": "Kalite",
+    "compress": "Sıkıştır",
+    "compressing": "Sıkıştırılıyor…",
+    "download": "İndir",
+    "downloadAll": "Tümünü indir (.zip)",
+    "original": "Orijinal",
+    "compressed": "Sıkıştırılmış",
+    "reduced": "%{{percent}} daha küçük",
+    "noFiles": "Henüz resim seçilmedi.",
+    "errorGeneric": "Bu resmi sıkıştırırken bir sorun oluştu. Lütfen tekrar deneyin.",
+    "remove": "Kaldır",
+    "clearAll": "Tümünü temizle",
+    "skippedFiles": "{{count}} dosya desteklenen bir resim formatında olmadığı için atlandı."
+  },
+  "related": "İlgili araçlar",
+  "article": {
+    "heading": "Resimleri yayınlamadan önce neden sıkıştırmalısınız?",
+    "p1": "Modern bir telefon kamerasından çıkan bir fotoğraf kolayca 4–8 MB olabilir, oysa çoğu web sitesi ekranda keskin görünmek için bunun yalnızca küçük bir kısmına ihtiyaç duyar. Aşırı büyük resimler bir web sayfasının yavaş yüklenmesinin en yaygın nedenlerinden biridir; yavaş sayfalar ise ziyaretçi kaybeder ve Google'ın Core Web Vitals sıralamasında geride kalır. Bir resmi yayınlamadan önce sıkıştırmak, normal görüntüleme boyutlarında görünümü hiç değiştirmeden, gözünüzün zaten fark etmediği fazla veriyi ayıklar.",
+    "p2": "Burada her şey tarayıcınızda, yerel olarak gerçekleşir. Sıkıştırma işleminin kendisi bir Web Worker içinde, yani modern tarayıcılara gömülü ayrı bir iş parçacığında çalışır; böylece siz büyük fotoğraflardan oluşan bütün bir grubu tek seferde sıkıştırırken bile sayfa duyarlı kalır. Hiçbir dosya sunucuya yüklenmez — geçici olarak bile — bu da yükleme beklemesi olmadığı, sunucu tarafında boyut sınırı bulunmadığı ve resimlerinizle ilgili hiçbir şeyin cihazınızdan çıkmadığı anlamına gelir.",
+    "p3": "Kullanımı basittir: bir veya birden fazla JPEG, PNG ya da WebP dosyası seçin, kaydırıcıyla bir kalite düzeyi belirleyin ve Sıkıştır'a basın. Her resim sırayla işlenir ve sonuç; orijinal boyut, yeni boyut ve tasarruf edilen yüzdeyle birlikte anında görüntülenir, böylece herhangi bir şey indirmeden önce karşılaştırma yapabilirsiniz. Sonuç istediğiniz gibi görünmüyorsa kaydırıcıyı ayarlayıp tekrar sıkıştırmanız yeterli — deneme sayısında bir sınır yok.",
+    "p4": "Başlangıç noktası olarak %70–80 kalite, çoğu insan için fotoğrafı orijinaliyle görsel olarak neredeyse aynı tutarken dosya boyutunu genellikle yarıya ya da daha fazla indirir. Ekran görüntüleri, illüstrasyonlar ve logolar gibi düz renkli resimler, düşük ayarlarda bile özellikle iyi sıkışır. Orman yaprakları veya yıldızlı bir gökyüzü gibi ince doku, gürültü ya da geçiş (gradyan) içeren fotoğraflar aynı kalite düzeyinde boyutlarının daha büyük bir kısmını korur ve genellikle kaliteyi daha da düşürmek yerine boyutları küçültmekten daha çok fayda görür."
+  }
+}

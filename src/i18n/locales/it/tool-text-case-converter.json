@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "Convertitore di Maiuscole/Minuscole Online Gratis — Web Tool Hub",
+    "description": "Converti il testo tra MAIUSCOLO, minuscolo, Title Case, camelCase, snake_case, Sentence case e altro ancora all'istante, gratis e interamente nel tuo browser. Senza upload, senza registrazione."
+  },
+  "heading": "Convertitore di Maiuscole/Minuscole",
+  "tagline": "Converti il testo tra MAIUSCOLO, minuscolo, Title Case, camelCase, snake_case e altro — più utili strumenti di pulizia del testo.",
+  "ui": {
+    "placeholder": "Digita o incolla il testo qui…",
+    "outputLabel": "Risultato",
+    "caseUpper": "MAIUSCOLO",
+    "caseLower": "minuscolo",
+    "caseTitle": "Title Case",
+    "caseCamel": "camelCase",
+    "caseSnake": "snake_case",
+    "caseSentence": "Sentence case",
+    "caseAlternating": "aLtErNaTo MaIuScOlE",
+    "caseInverse": "iNVERTITO",
+    "caseOptionsHeading": "Opzioni di formattazione",
+    "utilRemoveSpaces": "Rimuovi spazi extra",
+    "utilRemoveLineBreaks": "Rimuovi interruzioni di riga extra",
+    "utilSortLines": "Ordina righe A-Z",
+    "utilitiesHeading": "Utilità",
+    "copy": "Copia",
+    "copied": "Copiato!",
+    "clear": "Cancella"
+  },
+  "related": "Strumenti correlati",
+  "article": {
+    "heading": "Perché usare un convertitore di maiuscole/minuscole?",
+    "p1": "Le esigenze di conversione tra maiuscole e minuscole si presentano continuamente in modi piccoli ma fastidiosi: un paragrafo digitato con il Bloc Maiuscole rimasto attivo per sbaglio, una specifica scritta in Title Case che deve diventare il nome di una variabile in camelCase, l'intestazione di una colonna CSV che deve trasformarsi in un campo database in snake_case, un titolo che ha bisogno della corretta capitalizzazione prima di essere pubblicato. Niente di tutto ciò è difficile da fare a mano per una singola parola, ma riscrivere un intero paragrafo o un lungo elenco di nomi di campo a mano è lento e facile da sbagliare.",
+    "p2": "Questo strumento esegue la conversione con una piccola quantità di JavaScript puro eseguito direttamente nel tuo browser — non c'è nessuna libreria da caricare e nulla da inviare a un server. Mentre digiti o incolli il testo e passi da un'opzione all'altra, il risultato si aggiorna istantaneamente, calcolato ogni volta in memoria sul tuo stesso dispositivo.",
+    "p3": "Incolla o digita il tuo testo, poi scegli MAIUSCOLO, minuscolo, Title Case, camelCase o snake_case, e premi Copia per ottenere il risultato. Per camelCase e snake_case in particolare, il convertitore tratta spazi, trattini, underscore e punteggiatura come separatori di parola — e riconosce anche i confini camelCase o PascalCase già esistenti, così incollare \"ciao-mondo\", \"Ciao Mondo\", o persino un già formattato \"ciaoMondo\" converte tutto in modo pulito allo stesso risultato invece di produrre qualcosa di rotto come \"ciaomondo\" o \"ciao-Mondo\".",
+    "p4": "Gli sviluppatori lo usano più spesso quando rinominano variabili o campi tra convenzioni di denominazione usate da linguaggi e database diversi, gli scrittori lo usano per correggere una frase digitata tutta in maiuscolo per sbaglio, e i redattori usano il Title Case per ottenere una capitalizzazione coerente dei titoli senza dover memorizzare quali parole brevi saltare. Se hai anche bisogno di confrontare due versioni di un testo o semplicemente contare parole e caratteri, gli strumenti Confronta Testi e Conta Parole e Caratteri coprono questo con lo stesso approccio locale, senza alcun upload.",
+    "p5": "Oltre ai formati classici, Sentence case corregge un testo digitato interamente in maiuscolo capitalizzando solo la prima lettera di ogni frase, mentre aLtErNaTo MaIuScOlE e iNVERTITO sono i due stili curiosi a cui si ricorre per far risaltare un commento o farlo sembrare sarcastico sui social — uno alterna maiuscola e minuscola lettera per lettera, l'altro inverte ogni singola lettera rispetto all'originale. Accanto alle opzioni di case, tre utilità di pulizia gestiscono la formattazione disordinata che spesso accompagna il testo incollato: Rimuovi spazi extra riduce spazi e tabulazioni ripetuti a uno solo per intervallo senza toccare le interruzioni di riga, Rimuovi interruzioni di riga extra elimina le righe vuote di troppo lasciate da un copia-incolla, e Ordina righe A-Z mette in ordine alfabetico un elenco — utile per ripulire una lista incollata di nomi, tag o righe in stile CSV prima di usarli altrove."
+  }
+}

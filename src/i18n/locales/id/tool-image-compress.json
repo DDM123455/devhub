@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Kompres Gambar Online Gratis (JPEG, PNG, WebP) — Web Tool Hub",
+    "description": "Kompres gambar JPEG, PNG, dan WebP online secara gratis, sepenuhnya di browser Anda. Tanpa upload, tanpa batas ukuran, tanpa perlu daftar — foto Anda tidak pernah meninggalkan perangkat."
+  },
+  "heading": "Kompres Gambar (JPEG/PNG/WebP)",
+  "tagline": "Perkecil ukuran foto Anda dalam hitungan detik, langsung di browser.",
+  "ui": {
+    "selectFiles": "Pilih gambar",
+    "dropHint": "atau seret dan lepas gambar di sini",
+    "quality": "Kualitas",
+    "compress": "Kompres",
+    "compressing": "Mengompres…",
+    "download": "Unduh",
+    "downloadAll": "Unduh Semua (.zip)",
+    "original": "Asli",
+    "compressed": "Terkompres",
+    "reduced": "Lebih kecil {{percent}}%",
+    "noFiles": "Belum ada gambar yang dipilih.",
+    "errorGeneric": "Terjadi kesalahan saat mengompres gambar ini. Silakan coba lagi.",
+    "remove": "Hapus",
+    "clearAll": "Hapus semua",
+    "skippedFiles": "{{count}} file dilewati karena bukan format gambar yang didukung."
+  },
+  "related": "Alat terkait",
+  "article": {
+    "heading": "Mengapa perlu mengompres gambar sebelum mempublikasikannya?",
+    "p1": "Foto langsung dari kamera ponsel modern dengan mudah bisa berukuran 4–8 MB, padahal kebanyakan situs web hanya membutuhkan sebagian kecil dari itu agar tetap terlihat tajam di layar. Gambar yang terlalu besar adalah salah satu penyebab paling umum sebuah halaman web memuat lambat, dan halaman yang lambat kehilangan pengunjung serta mendapat peringkat lebih rendah di Core Web Vitals Google. Mengompres gambar sebelum dipublikasikan akan membuang data ekstra yang sebenarnya tidak pernah terlihat oleh mata, tanpa mengubah tampilan gambar pada ukuran tampilan normal.",
+    "p2": "Semua proses ini berjalan secara lokal di browser Anda. Kompresi itu sendiri dijalankan di dalam Web Worker, sebuah thread terpisah yang sudah tersedia di browser modern, sehingga halaman tetap responsif meskipun Anda sedang mengompres banyak foto besar sekaligus. Tidak ada file yang pernah diunggah ke server — bahkan secara sementara sekalipun — artinya tidak ada waktu tunggu unggahan, tidak ada batas ukuran dari sisi server, dan tidak ada apa pun dari gambar Anda yang pernah keluar dari perangkat.",
+    "p3": "Cara pakainya sederhana: pilih satu atau beberapa file JPEG, PNG, atau WebP, atur tingkat kualitas dengan penggeser, lalu tekan Kompres. Setiap gambar diproses satu per satu dan hasilnya langsung muncul beserta ukuran asli, ukuran baru, dan persentase penghematan, sehingga Anda bisa membandingkan sebelum mengunduh apa pun. Jika hasilnya belum sesuai, cukup sesuaikan penggeser dan kompres ulang — tidak ada batasan berapa kali Anda mencoba.",
+    "p4": "Sebagai titik awal, kualitas 70–80% membuat foto tetap terlihat identik secara visual dengan aslinya bagi kebanyakan orang, sambil biasanya memangkas ukuran file hingga setengah atau lebih. Gambar berwarna datar seperti tangkapan layar, ilustrasi, dan logo terkompres dengan sangat baik bahkan pada pengaturan yang lebih rendah. Foto dengan banyak tekstur halus, noise, atau gradasi warna — seperti dedaunan hutan atau langit berbintang — cenderung mempertahankan ukurannya lebih besar pada tingkat kualitas yang sama, dan sering kali lebih diuntungkan dengan mengubah dimensinya daripada menurunkan kualitas lebih jauh lagi."
+  }
+}

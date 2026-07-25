@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Ücretsiz Online PDF Bölme — Web Tool Hub",
+    "description": "Bir PDF'yi tamamen tarayıcınızda, ücretsiz olarak birden fazla dosyaya bölün veya belirli sayfaları çıkarın. Her sayfayı küçük resim olarak önizleyin, sayfaları döndürün veya silin, özel aralıklara ya da her N sayfada bir bölün. Yükleme yok, filigran yok, kayıt yok."
+  },
+  "heading": "PDF Dosyalarını Böl",
+  "tagline": "Her sayfayı küçük resim olarak önizleyin ve bir PDF'yi birden fazla dosyaya bölün — hepsi doğrudan tarayıcınızda.",
+  "ui": {
+    "selectFile": "PDF dosyası seç",
+    "dropHint": "veya bir PDF dosyasını buraya sürükleyip bırakın",
+    "noFile": "Henüz PDF dosyası seçilmedi.",
+    "changeFile": "Farklı bir dosya seç",
+    "loadingThumbnails": "Sayfalar okunuyor…",
+    "pageCount": "{{count}} sayfa",
+    "rotate": "Sayfayı döndür",
+    "deletePage": "Sayfayı sil",
+    "modeLabel": "Bölme modu",
+    "modeRanges": "Özel aralıklar",
+    "modeEveryN": "Her N sayfada bir",
+    "everyNLabel": "Dosya başına sayfa",
+    "rangesLabel": "Sayfa aralıkları (isteğe bağlı)",
+    "rangesPlaceholder": "ör. 1-3, 4, 5-7",
+    "rangesHint": "Her sayfayı ayrı bir PDF dosyasına bölmek için boş bırakın.",
+    "split": "PDF'yi Böl",
+    "splitting": "Bölünüyor…",
+    "resultsHeading": "Sonuç dosyaları",
+    "download": "İndir",
+    "downloadAll": "Tümünü indir (.zip)",
+    "errorGeneric": "Bu PDF'yi okurken bir sorun oluştu. Bozuk veya parola korumalı olmadığından emin olup tekrar deneyin.",
+    "errorInvalidRange": "Geçersiz sayfa aralığı \"{{range}}\". 1-3, 4, 5-7 gibi bir format kullanın; sayfalar 1 ile {{max}} arasında olmalıdır.",
+    "errorInvalidEveryN": "1 veya daha büyük bir tam sayı girin."
+  },
+  "related": "İlgili araçlar",
+  "article": {
+    "heading": "Bir PDF'yi sunucuya yüklemek yerine yerel olarak neden bölmelisiniz?",
+    "p1": "Taranmış bir kitap, bir aylık ekstre paketi, yalnızca üç sayfasına ihtiyacınız olan 200 sayfalık bir rapor — er ya da geç bir PDF, gerçekte ihtiyacınız olan şey için ya çok büyür ya da çok karışık amaçlı hale gelir. Çoğu ücretsiz \"PDF böl\" web sitesi bunu tıpkı ücretsiz \"PDF birleştir\" siteleri gibi ele alır: herhangi bir şey yapmadan önce dosyanızı sessizce bir sunucuya yükleyerek. Bu, bir imza, bir banka ekstresi ya da başkasının diskinde durmasını istemeyeceğiniz bir sayfa içerebilecek bir belge için garip derecede fazla bir güven.",
+    "p2": "Bu araç hiçbir şey yüklemez. Tamamen tarayıcınızda, PDF'nizin ham yapısını okuyan ve yalnızca istediğiniz sayfaları kendi cihazınızda bellekte oluşturulan yepyeni belgelere kopyalayan bir JavaScript kütüphanesi olan pdf-lib kullanılarak çalışır. Sayfa küçük resimleri de yerel olarak, Firefox'a gömülü aynı motor olan pdf.js ile oluşturulur; böylece nasıl böleceğinize karar vermeden önce her sayfada tam olarak ne olduğunu görebilirsiniz.",
+    "p3": "Bir PDF dosyası seçin ya da bırakma alanına sürükleyin; her sayfa kendi küçük resmi olarak görünür, böylece belgeyi bir bakışta görebilirsiniz. Bir sayfayı 90° döndürün ya da hiçbir çıktı dosyasında yer almaması gerekiyorsa — örneğin boş bir tarama sayfası — tamamen silin. Ardından nasıl böleceğinizi seçin: Özel aralıklar, her virgülle ayrılmış grubun kendi dosyası haline geldiği \"1-3, 4, 5-7\" gibi grupları yazmanıza olanak tanırken, Her N sayfada bir, belgeyi otomatik olarak eşit boyutlu parçalara ayırır — uzun bir taramayı her aralığı elle yazmadan, örneğin 10 sayfalık parçalara bölmek için kullanışlıdır. PDF'yi Böl'e basın ve her sonuç kendi indirme düğmesiyle görünür.",
+    "p4": "Araca gömülü bir sayfa sınırı yoktur; ancak her şey bir sunucu çiftliği yerine kendi cihazınızda çalıştığından, resim ağırlıklı çok büyük taranmış PDF'lerde küçük resimlerin oluşturulması doğal olarak biraz daha uzun sürer. Anlamlı olmayan bir aralık yazarsanız — belgenin uzunluğunu aşan bir sayfa numarası ya da geçerli bir aralık olmayan bir metin — araç, bozuk bir dosya üretmek yerine tam olarak hangi kısmın geçersiz olduğunu size söyler. Daha sonra birkaç PDF'den gelen sayfaları tekrar bir araya getirmeniz gerekirse, PDF Birleştirme aracı aynı gizlilik öncelikli yaklaşımla çalışır ve aynı döndür-ve-sil sayfa kontrollerini paylaşır."
+  }
+}

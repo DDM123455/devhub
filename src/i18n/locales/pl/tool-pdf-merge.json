@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "title": "Łączenie plików PDF online za darmo — Web Tool Hub",
+    "description": "Połącz wiele plików PDF w jeden dokument online za darmo, w całości w przeglądarce. Zobacz każdą stronę jako miniaturę, przeciągnij, aby zmienić kolejność, obróć lub usuń pojedyncze strony przed połączeniem. Bez wysyłania na serwer, bez znaku wodnego, bez rejestracji."
+  },
+  "heading": "Łącz pliki PDF",
+  "tagline": "Połącz kilka plików PDF w jeden, z podglądem każdej strony jako miniatury, prosto w przeglądarce.",
+  "ui": {
+    "selectFiles": "Wybierz pliki PDF",
+    "dropHint": "lub przeciągnij i upuść pliki PDF tutaj",
+    "merge": "Połącz PDF-y",
+    "merging": "Łączenie…",
+    "download": "Pobierz merged.pdf",
+    "moveUp": "Przenieś wcześniej",
+    "moveDown": "Przenieś później",
+    "remove": "Usuń stronę",
+    "rotate": "Obróć stronę",
+    "loadingThumbnails": "Wczytywanie stron…",
+    "dragHint": "Przeciągnij dowolną stronę, aby zmienić jej kolejność, lub użyj przycisków strzałek.",
+    "noFiles": "Nie wybrano jeszcze żadnych plików PDF.",
+    "errorGeneric": "Coś poszło nie tak podczas wczytywania tego pliku PDF. Upewnij się, że nie jest uszkodzony ani zabezpieczony hasłem, a następnie spróbuj ponownie.",
+    "skippedFiles": "Pominięto {{count}} plik(ów), ponieważ nie są plikami PDF."
+  },
+  "related": "Powiązane narzędzia",
+  "article": {
+    "heading": "Dlaczego łączyć pliki PDF lokalnie zamiast wysyłać je na serwer?",
+    "p1": "Zeskanowane umowy, podpisane formularze, partie faktur, rozdziały raportu — prędzej czy później niemal każdy ma kilka plików PDF, które tak naprawdę powinny stanowić jeden dokument. Wysyłanie pięciu osobnych załączników albo proszenie klienta o otwarcie pięciu linków zamiast jednego jest niewygodne, a większość darmowych stron do „łączenia PDF” rozwiązuje ten problem, po cichu wysyłając Twoje pliki najpierw na serwer — a to dokładnie ten rodzaj zaufania, którego mało kto chce udzielić w przypadku dokumentu zawierającego być może podpis, numer dowodu osobistego czy dane finansowe.",
+    "p2": "To narzędzie nigdy tego nie robi. Wszystko działa w Twojej przeglądarce dzięki pdf-lib, bibliotece JavaScript, która odczytuje surową strukturę każdego pliku PDF, kopiuje jego strony do nowego dokumentu i składa wynik w całości w pamięci, na Twoim urządzeniu. Miniatury stron również są renderowane lokalnie, za pomocą pdf.js (tego samego silnika renderującego, który jest wbudowany w Firefoksa), dzięki czemu widzisz dokładnie, nad czym pracujesz, zanim cokolwiek zostanie połączone.",
+    "p3": "Dodaj swoje pliki PDF, klikając przycisk lub przeciągając je do strefy upuszczania — każda strona z każdego pliku pojawia się jako osobna miniatura, w jednej wspólnej siatce, a nie pogrupowana według pliku. Przeciągnij dowolną miniaturę, aby zmienić jej kolejność względem wszystkich pozostałych, nawet między różnymi plikami źródłowymi, albo użyj przycisków strzałek, jeśli przeciąganie nie jest wygodne. Kliknij przycisk obrotu przy stronie, aby obrócić ją o 90°, lub przycisk usuwania, aby pominąć ją w ostatecznym dokumencie — przydatne przy pomijaniu pustej zeskanowanej okładki lub zduplikowanej strony. Gdy wszystko wygląda dobrze, naciśnij Połącz PDF-y; scalony plik jest budowany w całości w pamięci i pobierany jako merged.pdf.",
+    "p4": "Narzędzie nie ma wbudowanego limitu liczby stron, choć bardzo duże partie zeskanowanych, obrazowych plików PDF w naturalny sposób będą dłużej renderować miniatury, ponieważ wszystko jest przetwarzane na Twoim urządzeniu, a nie na farmie serwerów. Jeśli jeden z plików nie wczyta się — na przykład dlatego, że jest zaszyfrowany hasłem albo uległ uszkodzeniu podczas pobierania — narzędzie od razu Cię o tym poinformuje, zamiast po cichu wygenerować uszkodzony wynik. Aby zrobić coś odwrotnego i podzielić połączony plik PDF z powrotem na mniejsze części, narzędzie Podziel PDF działa w ten sam sposób, stawiając na prywatność, i ma te same kontrolki obracania i usuwania stron."
+  }
+}

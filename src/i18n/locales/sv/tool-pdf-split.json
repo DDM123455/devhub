@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Dela PDF-filer online gratis — Web Tool Hub",
+    "description": "Dela en PDF i flera filer eller extrahera specifika sidor online gratis, helt i din webbläsare. Förhandsgranska varje sida som en miniatyrbild, rotera eller ta bort sidor, dela efter egna intervall eller var N:e sida. Ingen uppladdning, ingen vattenstämpel, ingen registrering."
+  },
+  "heading": "Dela PDF-filer",
+  "tagline": "Förhandsgranska varje sida som en miniatyrbild och dela en PDF i flera filer, direkt i webbläsaren.",
+  "ui": {
+    "selectFile": "Välj PDF-fil",
+    "dropHint": "eller dra och släpp en PDF-fil här",
+    "noFile": "Ingen PDF-fil vald än.",
+    "changeFile": "Välj en annan fil",
+    "loadingThumbnails": "Läser sidor…",
+    "pageCount": "{{count}} sidor",
+    "rotate": "Rotera sida",
+    "deletePage": "Ta bort sida",
+    "modeLabel": "Delningsläge",
+    "modeRanges": "Egna intervall",
+    "modeEveryN": "Var N:e sida",
+    "everyNLabel": "Sidor per fil",
+    "rangesLabel": "Sidintervall (valfritt)",
+    "rangesPlaceholder": "t.ex. 1-3, 4, 5-7",
+    "rangesHint": "Lämna tomt för att dela varje sida till en egen PDF-fil.",
+    "split": "Dela PDF",
+    "splitting": "Delar…",
+    "resultsHeading": "Resultatfiler",
+    "download": "Ladda ner",
+    "downloadAll": "Ladda ner alla (.zip)",
+    "errorGeneric": "Något gick fel när PDF-filen skulle läsas. Kontrollera att den inte är skadad eller lösenordsskyddad, och försök igen.",
+    "errorInvalidRange": "Ogiltigt sidintervall \"{{range}}\". Använd ett format som 1-3, 4, 5-7, med sidor mellan 1 och {{max}}.",
+    "errorInvalidEveryN": "Ange ett heltal på 1 eller mer."
+  },
+  "related": "Relaterade verktyg",
+  "article": {
+    "heading": "Varför dela en PDF lokalt istället för att ladda upp den?",
+    "p1": "En skannad bok, en bunt månadsutdrag, en rapport på 200 sidor där du bara behöver tre — förr eller senare växer en PDF sig för stor eller för blandad för det du faktiskt behöver just då. De flesta gratis \"dela PDF\"-webbplatser hanterar det på samma sätt som gratis \"slå ihop PDF\"-sajter: genom att i tysthet ladda upp filen till en server innan något görs med den. Det är ett märkligt stort förtroende att ge bort för ett dokument som kan innehålla en underskrift, ett kontoutdrag eller en sida du helst inte vill ska ligga på någon annans disk.",
+    "p2": "Det här verktyget laddar aldrig upp något. Det körs helt i din webbläsare med pdf-lib, ett JavaScript-bibliotek som läser den råa strukturen i din PDF och kopierar bara de sidor du bett om till helt nya dokument, sammansatta i minnet på din egen enhet. Sidminiatyrer renderas också lokalt, med pdf.js — samma motor som är inbyggd i Firefox — så att du kan se exakt vad som finns på varje sida innan du bestämmer hur den ska delas.",
+    "p3": "Välj en PDF-fil eller dra den till släppzonen; varje sida visas som en egen miniatyr så att du kan se hela dokumentet på en gång. Rotera en sida 90° i taget eller ta bort den helt om den inte ska vara med i någon av utdatafilerna — ett tomt skannat blad, till exempel. Välj sedan hur delningen ska ske: Egna intervall låter dig skriva grupper som \"1-3, 4, 5-7\" där varje kommaseparerad grupp blir en egen fil, medan Var N:e sida automatiskt delar upp dokumentet i lika stora delar — praktiskt för att bryta upp en lång skanning i, säg, 10-sidiga bitar utan att skriva ut varje intervall för hand. Klicka på Dela PDF så visas varje resultatfil med sin egen nedladdningsknapp.",
+    "p4": "Det finns ingen inbyggd sidgräns i verktyget, även om mycket stora skannade PDF-filer fulla av bilder naturligt tar lite längre tid att rendera miniatyrer för eftersom allt körs på din egen enhet istället för en serverpark. Om du skriver ett intervall som inte går att tolka — ett sidnummer utanför dokumentets längd, eller text som inte är ett giltigt intervall — talar verktyget om exakt vilken del som var ogiltig istället för att skapa en trasig fil. Om du senare behöver sätta ihop sidor från flera PDF-filer igen fungerar verktyget Slå ihop PDF på samma integritetsfokuserade sätt och delar samma kontroller för rotera och ta bort sida."
+  }
+}

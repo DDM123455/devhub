@@ -19,19 +19,18 @@
   bên dưới cho từng tool. 2 tool (Đếm từ & ký tự, JSON Formatter) và Text Case Converter đều
   SẠCH ngay từ đầu, không cần sửa gì. Báo cáo tổng kết dạng bảng đã gửi cho người dùng trong
   chính phiên chat này (không lưu file riêng, xem lại lịch sử chat nếu cần).
-- **ĐANG LÀM DỞ (2026-07-25, TẠM DỪNG theo yêu cầu người dùng — xem hướng dẫn tiếp tục chi
-  tiết bên dưới): Phase 2, task đầu tiên "Mở rộng i18n từ 8 lên 20 ngôn ngữ"**. Người dùng
-  đã chốt: thêm đúng 12 ngôn ngữ mới (zh, zh-tw, it, ru, nl, pl, tr, id, ar, hi, th, sv) để
-  đạt tổng 20, làm tuần tự không dừng hỏi. Phần HẠ TẦNG đã xong 100% (xem log chi tiết bên
-  dưới) — chỉ còn thiếu NỘI DUNG (file JSON dịch cho từng tool) cho 11.5/12 ngôn ngữ. Task
-  tiếp theo khi mở phiên mới: đọc kỹ log "2026-07-25 — Phase 2 (đang làm dở)" ngay bên dưới
-  để biết chính xác còn thiếu file nào, rồi tiếp tục viết nốt — **không viết lại phần đã
-  xong**, không lặp lại hạ tầng đã có.
-- Task sau khi xong toàn bộ Phase 2 mục i18n: tick checkbox "Mở rộng i18n..." trong
-  `ROADMAP.md`, rồi làm tiếp các mục còn lại của Phase 2 (viết meta/description tối ưu SEO
-  cho từng ngôn ngữ, soát schema JSON-LD, nội dung SEO 300–500 từ, internal linking, Core
-  Web Vitals). Có thể tranh thủ làm nốt mục nén PDF còn treo của Phase 1.5 nếu người dùng
-  muốn dứt điểm Phase 1.5 100% trước, nhưng không bắt buộc.
+- **Phase 2, task đầu tiên "Mở rộng i18n từ 8 lên 20 ngôn ngữ": HOÀN TẤT (2026-07-26)** ✅ —
+  xem log chi tiết bên dưới. Cả 12 ngôn ngữ mới (zh, zh-tw, it, ru, nl, pl, tr, id, ar, hi,
+  th, sv) đã có đủ 10/10 file `tool-*.json`, `npm run build` chạy sạch 221 trang. Trong lúc
+  verify đã phát hiện và sửa 1 bug hạ tầng THẬT (không phải do phiên này gây ra, có từ lúc
+  làm hạ tầng trước đó): thiếu `lowerCaseLng: true` trong cấu hình `i18next.init()` khiến
+  TOÀN BỘ trang `zh-tw` (Phồn thể) render nhầm sang nội dung `zh` (Giản thể) một cách âm
+  thầm (không lỗi, không fallback tiếng Anh dễ nhận ra) — xem chi tiết kỹ thuật trong log
+  bên dưới.
+- Task tiếp theo: các mục còn lại của Phase 2 (viết meta/description tối ưu SEO cho từng
+  ngôn ngữ, soát schema JSON-LD, nội dung SEO 300–500 từ, internal linking, Core Web
+  Vitals). Có thể tranh thủ làm nốt mục nén PDF còn treo của Phase 1.5 nếu người dùng muốn
+  dứt điểm Phase 1.5 100% trước, nhưng không bắt buộc.
 - Ghi chú thiết kế (2026-07-25): đã redesign toàn bộ giao diện site (không phải task trong
   `ROADMAP.md`, làm theo yêu cầu trực tiếp của người dùng) dựa trên file mockup
   `Web Tool Hub.dc.html` ở gốc repo (file KHÔNG được commit vào git — chỉ là tài liệu tham
@@ -103,6 +102,49 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-26 — Phase 2: Mở rộng i18n lên 20 ngôn ngữ — HOÀN TẤT (nội dung dịch nốt +
+  phát hiện/sửa 1 bug hạ tầng)
+- **Viết nốt toàn bộ nội dung dịch còn thiếu** từ phiên trước: 5 file còn lại của `it`, và
+  đủ 10/10 file `tool-*.json` cho 11 ngôn ngữ còn lại (`nl, pl, sv, tr, id, zh, zh-tw, ru,
+  ar, hi, th`) — tổng cộng 115 file JSON mới, viết tự nhiên riêng cho từng ngôn ngữ (không
+  dịch máy nguyên khối), đúng cấu trúc key của bản `en` gốc. `it` do tự viết trực tiếp (khối
+  lượng nhỏ, 5 file); 11 ngôn ngữ còn lại chia cho các agent con chạy song song theo 3 đợt
+  (5+3+3 ngôn ngữ), mỗi agent phụ trách trọn 1 ngôn ngữ để giữ nhất quán văn phong trong
+  cùng 1 ngôn ngữ.
+- **Verify độc lập** (không chỉ tin báo cáo của agent con): viết script Node so sánh key-set
+  + tập hợp placeholder `{{...}}` giữa từng file mới và bản `en` tương ứng cho toàn bộ 120
+  file (12 ngôn ngữ × 10 tool) — xác nhận khớp 100%, không thiếu/thừa key, không
+  thiếu/sai placeholder.
+- **Phát hiện 1 bug hạ tầng THẬT trong lúc verify build** (không phải lỗi do phiên này viết
+  ra, có sẵn từ lúc làm hạ tầng i18n trước đó, chỉ lộ ra khi có đủ nội dung `zh-tw` để so
+  sánh): `src/i18n/i18next.ts` gọi `i18next.init()` KHÔNG có `lowerCaseLng: true`. Theo mặc
+  định, `i18next.services.languageUtils.toResolveHierarchy('zh-tw')` trả về
+  `['zh-TW', 'zh', 'en']` — tức là thư viện tự viết hoa phần vùng miền (`zh-TW`) để tra cứu
+  trước, nhưng `resources` của dự án lưu theo đúng tên thư mục chữ thường `zh-tw` (khớp
+  với slug URL `/zh-tw/`) nên không tìm thấy khoá `zh-TW`, ÂM THẦM rơi xuống bước fallback
+  kế tiếp là `zh` (Giản thể) — không có lỗi, không phải fallback tiếng Anh dễ nhận ra, nên
+  rất khó phát hiện bằng mắt thường hoặc bằng `npm run build` (build vẫn "sạch" vì `zh` có
+  nội dung hợp lệ). Chỉ lộ ra khi so sánh trực tiếp nội dung trang `zh-tw` build ra với nội
+  dung file nguồn `zh-tw/*.json` tương ứng (phát hiện qua việc chữ trong `<h1>` là Giản thể
+  "图片压缩" thay vì Phồn thể "壓縮圖片" dù file JSON nguồn đã đúng). Xác nhận nguyên nhân
+  bằng cách gọi trực tiếp `i18next.services.languageUtils.toResolveHierarchy()` trong script
+  Node độc lập tái hiện chính xác hành vi. **Đã sửa** bằng cách thêm `lowerCaseLng: true`
+  vào config `i18next.init()` — xác nhận lại bằng cùng script: hierarchy đổi thành
+  `['zh-tw', 'zh', 'en']`, khớp đúng khoá resources chữ thường của dự án. Rebuild lại xác
+  nhận trang `zh-tw` giờ hiển thị đúng nội dung Phồn thể riêng, khác `zh` (Giản thể) — ví dụ
+  title trang chủ `zh-tw`: "Web Tool Hub — 免費線上工具集" vs `zh`: "Web Tool Hub — 免费在线
+  工具集". Bug này chỉ ảnh hưởng `zh-tw` vì đây là locale DUY NHẤT trong 20 locale có mã có
+  dấu gạch nối vùng miền (region subtag) — không ảnh hưởng 19 locale còn lại.
+- **Build cuối cùng xác nhận sạch**: `npm run build` (dùng Node 22.23.1 trong `.tools/`,
+  không phải Node hệ thống 20.19.0) ra đúng 221 trang tĩnh (20 ngôn ngữ × (10 tool + trang
+  chủ) + 1 root index), không lỗi.
+- Đã tick checkbox "Mở rộng i18n từ 8 lên 15–20 ngôn ngữ" trong `ROADMAP.md`.
+- **CHƯA commit** phần việc của phiên này (115 file JSON dịch mới + fix `i18next.ts` +
+  `ROADMAP.md` + mục log này) tại thời điểm ghi log — sẽ commit ngay sau khi ghi xong log
+  này, cùng 1 commit với message bắt đầu `feat(i18n):`. Commit trước đó của phiên hạ tầng
+  (message cũng bắt đầu `feat(i18n):`, chứa hạ tầng + `common.json` × 12 + 5 file `it`) vẫn
+  **CHƯA push lên `origin/main`** tính đến lúc này.
 
 ### 2026-07-25 — Phase 2 (ĐANG LÀM DỞ, TẠM DỪNG theo yêu cầu người dùng): Mở rộng i18n lên
   20 ngôn ngữ — hạ tầng XONG 100%, nội dung dịch còn dở

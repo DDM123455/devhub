@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "Ücretsiz Online Metin Büyük/Küçük Harf Dönüştürücü — Web Tool Hub",
+    "description": "Metni BÜYÜK HARF, küçük harf, Başlık Harfleri, camelCase, snake_case, Cümle harfleri ve daha fazlası arasında anında, ücretsiz ve tamamen tarayıcınızda dönüştürün. Yükleme yok, kayıt yok."
+  },
+  "heading": "Metin Büyük/Küçük Harf Dönüştürücü",
+  "tagline": "Metni BÜYÜK HARF, küçük harf, Başlık Harfleri, camelCase, snake_case ve daha fazlası arasında dönüştürün — ayrıca kullanışlı metin temizleme araçları.",
+  "ui": {
+    "placeholder": "Metni buraya yazın veya yapıştırın…",
+    "outputLabel": "Sonuç",
+    "caseUpper": "BÜYÜK HARF",
+    "caseLower": "küçük harf",
+    "caseTitle": "Başlık Harfleri",
+    "caseCamel": "camelCase",
+    "caseSnake": "snake_case",
+    "caseSentence": "Cümle harfleri",
+    "caseAlternating": "aLtErNaTiNg CaSe",
+    "caseInverse": "iNVERSE cASE",
+    "caseOptionsHeading": "Harf seçenekleri",
+    "utilRemoveSpaces": "Fazla boşlukları kaldır",
+    "utilRemoveLineBreaks": "Fazla satır sonlarını kaldır",
+    "utilSortLines": "Satırları A-Z sırala",
+    "utilitiesHeading": "Araçlar",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı!",
+    "clear": "Temizle"
+  },
+  "related": "İlgili araçlar",
+  "article": {
+    "heading": "Neden bir metin büyük/küçük harf dönüştürücü kullanmalısınız?",
+    "p1": "Büyük/küçük harf dönüştürme ihtiyaçları her zaman küçük ama can sıkıcı şekillerde karşımıza çıkar: Caps Lock açık kalmış bir şekilde yazılmış bir paragraf, camelCase bir değişken adına dönüşmesi gereken Başlık Harfleriyle yazılmış bir teknik özellik, snake_case bir veritabanı alanına dönüşmesi gereken bir CSV sütun başlığı, yayınlanmadan önce doğru başlık büyütmesine ihtiyaç duyan bir manşet. Bunların hiçbiri tek bir kelime için elle yapılması zor değildir; ancak bütün bir paragrafı ya da uzun bir alan adları listesini elle yeniden yazmak yavaştır ve yanlış yapmak kolaydır.",
+    "p2": "Bu araç, dönüştürmeyi doğrudan tarayıcınızda çalışan az miktarda saf JavaScript ile yapar — yüklenecek bir kütüphane ve bir sunucuya gönderilecek hiçbir şey yoktur. Metin yazdıkça veya yapıştırdıkça ve büyük/küçük harf seçenekleri arasında geçiş yaptıkça, sonuç her seferinde kendi cihazınızda bellekte yeniden hesaplanarak anında güncellenir.",
+    "p3": "Metninizi yapıştırın ya da yazın, ardından BÜYÜK HARF, küçük harf, Başlık Harfleri, camelCase ya da snake_case seçin ve sonucu almak için Kopyala'ya basın. Özellikle camelCase ve snake_case için, dönüştürücü boşlukları, tireleri, alt çizgileri ve noktalama işaretlerini kelime ayırıcı olarak ele alır — ayrıca mevcut camelCase ya da PascalCase sınırlarını da tespit eder, bu yüzden \"merhaba-dunya\", \"Merhaba Dunya\" ya da hatta zaten büyük/küçük harflendirilmiş \"merhabaDunya\" yapıştırmak, \"merhabadunya\" ya da \"merhaba-Dunya\" gibi bozuk bir şey üretmek yerine hepsi aynı temiz sonuca dönüşür.",
+    "p4": "Geliştiriciler bunu en çok farklı diller ve veritabanları tarafından kullanılan adlandırma kuralları arasında değişken ya da alan adlarını yeniden adlandırırken kullanır, yazarlar yanlışlıkla tamamen büyük harflerle yazılmış bir cümleyi düzeltmek için kullanır, editörler ise hangi küçük kelimelerin atlanacağını ezberlemeden tutarlı manşet büyütmesi elde etmek için Başlık Harfleri'ni kullanır. Ayrıca iki metin sürümünü karşılaştırmanız ya da yalnızca kelime ve karakter saymanız gerekiyorsa, Metin Karşılaştırma Aracı ve Kelime ve Karakter Sayacı araçları bunu aynı yerel, hiçbir şeyin yüklenmediği yaklaşımla halleder.",
+    "p5": "Klasik formatların ötesinde, Cümle harfleri, yalnızca her cümlenin ilk harfini büyüterek tamamen büyük harflerle yazılmış metni düzeltirken, aLtErNaTiNg CaSe ve iNVERSE cASE, bir yorumu öne çıkarmak ya da sosyal medyada alaycı görünmesini sağlamak için insanların başvurduğu iki eğlenceli stildir — biri her ikinci harfin büyük/küçük harfini çevirir, diğeri her tek harfin büyük/küçük harfini orijinaline göre tersine çevirir. Harf seçeneklerinin yanında, üç temizleme aracı yapıştırılan metinle sıkça birlikte gelen dağınık biçimlendirmeyi ele alır: Fazla boşlukları kaldır, satır sonlarınıza dokunmadan tekrarlanan boşlukları ve sekmeleri her boşlukta bire indirir; Fazla satır sonlarını kaldır, kopyala-yapıştırdan kalan başıboş boş satırları birleştirir; Satırları A-Z sırala ise bir listeyi alfabetik sıraya koyar — yapıştırılmış bir ad, etiket ya da CSV tarzı satır listesini başka bir yerde kullanmadan önce düzenlemek için kullanışlıdır."
+  }
+}

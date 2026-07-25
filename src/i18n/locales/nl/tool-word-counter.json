@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Woorden- en tekenteller online gratis — Web Tool Hub",
+    "description": "Tel woorden, tekens, zinnen en alinea's direct terwijl je typt of tekst plakt — gratis, live en volledig in je browser. Geen upload, geen registratie."
+  },
+  "heading": "Woorden- en tekenteller",
+  "tagline": "Tel woorden, tekens, zinnen en alinea's direct terwijl je typt.",
+  "ui": {
+    "placeholder": "Plak of typ hier tekst…",
+    "charsLabel": "Tekens",
+    "charsNoSpacesLabel": "Tekens (zonder spaties)",
+    "wordsLabel": "Woorden",
+    "sentencesLabel": "Zinnen",
+    "paragraphsLabel": "Alinea's",
+    "readingTimeLabel": "Leestijd",
+    "readingTimeValue": "{{minutes}} min leestijd",
+    "speakingTimeLabel": "Spreektijd",
+    "speakingTimeValue": "{{minutes}} min spreektijd",
+    "clear": "Wissen",
+    "keywordDensityHeading": "Trefwoorddichtheid",
+    "keywordDensityWordColumn": "Woord",
+    "keywordDensityCountColumn": "Aantal",
+    "keywordDensityPercentColumn": "% van tekst"
+  },
+  "related": "Gerelateerde tools",
+  "article": {
+    "heading": "Waarom woorden en tekens lokaal tellen?",
+    "p1": "Verrassend veel alledaagse schrijftaken hebben een harde limiet: een essay van maximaal 500 woorden, een tweet van 280 tekens, een meta-omschrijving die na ongeveer 160 tekens wordt afgekapt, een sollicitatiebrief die van een recruiter binnen één pagina moet blijven. Dit met de hand tellen is omslachtig en foutgevoelig, dus plakken de meeste mensen hun tekst liever in een online teller — wat meestal betekent dat een conceptsollicitatiebrief, een ongepubliceerd artikel of het vertrouwelijke briefingdocument van een klant naar een server gaat waar je niets van weet.",
+    "p2": "Deze tool doet dat nooit. Elk teken dat je typt wordt geteld door een klein stukje JavaScript dat rechtstreeks in je browser draait, en de cijfers worden live bijgewerkt terwijl je typt — er is geen verzendknop nodig, want er is geen serververbinding om op te wachten. Niets van wat je schrijft wordt ooit ergens naartoe verzonden, opgeslagen of gelogd; ververs de pagina en het is verdwenen, precies zoals je van een kladblok zou verwachten.",
+    "p3": "Begin gewoon met typen of plak je tekst in het vak. Het aantal woorden wordt bepaald op basis van witruimte, dus \"goedbekeken\" telt als één woord terwijl \"goed bekeken\" als twee telt. Het aantal zinnen zoekt naar tekst die eindigt op een punt, vraagteken of uitroepteken, wat goed werkt voor normale lopende tekst, maar tekst kan onderschatten die interpunctie overslaat, zoals een lijst met opsommingstekens. Het aantal alinea's beschouwt elk tekstblok dat gescheiden is door een lege regel als één alinea. De geschatte leestijd gaat uit van een gemiddelde leessnelheid van ongeveer 200 woorden per minuut, afgerond naar boven op de dichtstbijzijnde minuut, zodat zeer korte teksten toch \"1 min leestijd\" tonen in plaats van \"0\". Hetzelfde woordaantal bepaalt ook een geschatte spreektijd, gebaseerd op een gemiddeld presentatietempo van ongeveer 130 woorden per minuut — handig om een toespraak of video-voice-over te timen zonder hem eerst hardop voor te lezen.",
+    "p4": "Schrijvers gebruiken dit om een opdrachtwoordaantal te halen zonder te gokken, marketeers gebruiken het om een meta-omschrijving of advertentietekst binnen de weergavelimiet te houden, en studenten gebruiken het om een werkstuk te controleren tegen het minimum of maximum van een docent voordat ze het inleveren. Het aantal tekens zonder spaties is vooral handig voor platforms — sommige sociale netwerken en formulieren — die tekens op die manier tellen in plaats van elke spatie mee te rekenen. Onder de tellingen toont een trefwoorddichtheidstabel de woorden die het vaakst in je tekst voorkomen, samen met hoe vaak en welk percentage van het totaal ze uitmaken — dezelfde soort controle die SEO-schrijvers gebruiken om te zorgen dat een doeltrefwoord niet zo vaak wordt herhaald dat het als spam overkomt, of zo zelden dat het nauwelijks opvalt. Moet je twee concepten woord voor woord vergelijken in plaats van er maar één te tellen? De tool Tekst vergelijken doet dat op dezelfde lokale, niets-uploaden-manier."
+  }
+}

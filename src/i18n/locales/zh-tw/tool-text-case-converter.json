@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "線上免費英文大小寫轉換工具 — Web Tool Hub",
+    "description": "在 UPPERCASE、lowercase、Title Case、camelCase、snake_case、Sentence case 等格式之間即時轉換文字，完全免費、在瀏覽器裡運作。不用上傳、不用註冊。"
+  },
+  "heading": "英文大小寫轉換工具",
+  "tagline": "在 UPPERCASE、lowercase、Title Case、camelCase、snake_case 等格式間轉換文字，還附帶實用的文字清理工具。",
+  "ui": {
+    "placeholder": "在這裡輸入或貼上文字…",
+    "outputLabel": "結果",
+    "caseUpper": "UPPERCASE",
+    "caseLower": "lowercase",
+    "caseTitle": "Title Case",
+    "caseCamel": "camelCase",
+    "caseSnake": "snake_case",
+    "caseSentence": "Sentence case",
+    "caseAlternating": "aLtErNaTiNg CaSe",
+    "caseInverse": "iNVERSE cASE",
+    "caseOptionsHeading": "大小寫選項",
+    "utilRemoveSpaces": "移除多餘空格",
+    "utilRemoveLineBreaks": "移除多餘換行",
+    "utilSortLines": "依 A-Z 排序各行",
+    "utilitiesHeading": "實用工具",
+    "copy": "複製",
+    "copied": "已複製！",
+    "clear": "清除"
+  },
+  "related": "相關工具",
+  "article": {
+    "heading": "為什麼要用英文大小寫轉換工具？",
+    "p1": "大小寫轉換的需求常常以各種零碎但麻煩的方式冒出來：不小心開著 Caps Lock 打完的一整段文字、用 Title Case 寫的規格文件需要改成 camelCase 的變數名稱、CSV 欄位標題得轉成 snake_case 的資料庫欄位名稱、上線前標題需要正確的大小寫格式。單一個詞手動處理不難，但一整段文字或一長串欄位名稱要一個一個重打，既慢又容易出錯。",
+    "p2": "這個工具用一小段直接在瀏覽器裡執行的純 JavaScript 完成轉換——不需要載入任何函式庫，也不會傳送任何內容到伺服器。當你輸入、貼上文字，或切換不同的大小寫選項時，結果會立即更新，每一次都是在你自己裝置的記憶體裡即時算出來的。",
+    "p3": "貼上或輸入文字，選擇 UPPERCASE、lowercase、Title Case、camelCase 或 snake_case，再按下「複製」取得結果。特別針對 camelCase 和 snake_case，轉換器會把空格、連字號、底線和標點符號都當成單詞分隔點——同時也會辨識文字裡已經存在的 camelCase 或 PascalCase 邊界，所以不管貼上的是「hello-world」、「Hello World」，還是本來就寫成「helloWorld」，都會乾淨地轉成一致的結果，而不會出現「helloworld」或「hello-World」這種破碎的結果。",
+    "p4": "開發者最常用這個工具在不同語言、不同資料庫慣用的命名規則之間重新命名變數或欄位，寫作者用它修正不小心整段用大寫打出來的句子，編輯則用 Title Case 讓標題大小寫維持一致，不必自己背哪些小詞該省略大寫。如果你還需要比較兩個版本的文字，或單純想統計字數和字元數，文字差異比對工具和字數與字元統計工具用的是一樣本機、不上傳任何內容的方式。",
+    "p5": "除了幾種常見格式之外，Sentence case 能修正整段誤用大寫打出來的文字，只把每個句子的第一個字母改成大寫；aLtErNaTiNg CaSe 和 iNVERSE cASE 則是兩種常被用來讓留言看起來特別醒目或帶點諷刺意味的花式風格——一種是每隔一個字母就切換大小寫，另一種則是把每個字母的大小寫相對原文全部反轉。除了大小寫選項之外，還有三個清理工具能處理貼上文字時常見的排版亂象：「移除多餘空格」會把重複的空格和 Tab 縮成每個間隔一個，不會動到換行；「移除多餘換行」能收掉複製貼上留下的雜亂空白行；「依 A-Z 排序各行」則能把一份清單按字母順序排好——很適合用來整理貼上的名單、標籤，或 CSV 格式的資料列，方便之後拿去別處使用。"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Ord- och teckenräknare online gratis — Web Tool Hub",
+    "description": "Räkna ord, tecken, meningar och stycken direkt medan du skriver eller klistrar in text — gratis, i realtid och helt i din webbläsare. Ingen uppladdning, ingen registrering."
+  },
+  "heading": "Ord- och teckenräknare",
+  "tagline": "Räkna ord, tecken, meningar och stycken direkt medan du skriver.",
+  "ui": {
+    "placeholder": "Klistra in eller skriv text här…",
+    "charsLabel": "Tecken",
+    "charsNoSpacesLabel": "Tecken (utan mellanslag)",
+    "wordsLabel": "Ord",
+    "sentencesLabel": "Meningar",
+    "paragraphsLabel": "Stycken",
+    "readingTimeLabel": "Lästid",
+    "readingTimeValue": "{{minutes}} min läsning",
+    "speakingTimeLabel": "Taltid",
+    "speakingTimeValue": "{{minutes}} min tal",
+    "clear": "Rensa",
+    "keywordDensityHeading": "Sökordstäthet",
+    "keywordDensityWordColumn": "Ord",
+    "keywordDensityCountColumn": "Antal",
+    "keywordDensityPercentColumn": "% av texten"
+  },
+  "related": "Relaterade verktyg",
+  "article": {
+    "heading": "Varför räkna ord och tecken lokalt?",
+    "p1": "Ett förvånansvärt antal vardagliga skrivuppgifter har en exakt gräns kopplad till sig: en uppsats begränsad till 500 ord, en tweet på max 280 tecken, en metabeskrivning som klipps av efter ungefär 160 tecken, ett personligt brev en rekryterare bett dig hålla på en enda sida. Att räkna allt detta för hand är tröttsamt och felbenäget, så de flesta klistrar istället in sin text i en räknare online — vilket oftast innebär att skicka ett utkast till personligt brev, en opublicerad artikel eller en kunds konfidentiella underlag till en server du inte vet något om.",
+    "p2": "Det här verktyget gör aldrig så. Varje tecken du skriver räknas av en liten bit JavaScript som körs direkt i din webbläsare, och siffrorna uppdateras live medan du skriver — det finns ingen skicka-knapp eftersom det inte finns någon serverresa att vänta på. Inget du skriver skickas någonsin någonstans, sparas eller loggas; ladda om sidan så är det borta, precis som man förväntar sig av ett kladdblock.",
+    "p3": "Börja bara skriva eller klistra in din text i rutan. Ordräkningen delar upp på blanksteg, så \"väl-känt\" räknas som ett ord medan \"väl känt\" räknas som två. Meningsräkningen letar efter text som slutar med punkt, frågetecken eller utropstecken, vilket fungerar bra för vanlig löpande text men kan underräkna text som hoppar över skiljetecken, som en punktlista. Styckeräkningen räknar varje textblock som avgränsas av en tom rad som ett stycke. Den uppskattade lästiden utgår från en genomsnittlig läshastighet på cirka 200 ord per minut, avrundat uppåt till närmaste minut så att väldigt korta texter ändå visar \"1 min läsning\" istället för \"0\". Samma ordantal används också för att uppskatta en taltid, baserat på ett genomsnittligt presentationstempo på cirka 130 ord per minut — praktiskt för att tajma ett tal eller en videoberättarröst utan att behöva läsa det högt först.",
+    "p4": "Skribenter använder det för att träffa ett uppgivet ordantal utan att behöva gissa, marknadsförare använder det för att hålla en metabeskrivning eller annonstext under sin visningsgräns, och studenter använder det för att kontrollera en uppsats mot en lärares minimi- eller maxgräns innan den lämnas in. Teckenantalet utan mellanslag är särskilt användbart för plattformar — vissa sociala nätverk och formulär — som räknar tecken på det sättet istället för att inkludera varje mellanslag. Under räknarna listar en tabell för sökordstäthet de ord som förekommer oftast i din text tillsammans med antal förekomster och hur stor andel av totalen de utgör — samma sorts kontroll som SEO-skribenter använder för att säkerställa att ett målsökord varken upprepas så ofta att det uppfattas som spam, eller förekommer så sällan att det knappt märks. Om du behöver jämföra två utkast ord för ord istället för att bara räkna ett, hanterar verktyget Textjämförelse det på samma lokala sätt, utan att något laddas upp."
+  }
+}

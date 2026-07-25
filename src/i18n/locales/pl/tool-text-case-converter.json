@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "Konwerter wielkości liter online za darmo — Web Tool Hub",
+    "description": "Konwertuj tekst między WIELKIMI LITERAMI, małymi literami, Wielkimi Literami W Każdym Wyrazie, camelCase, snake_case, zdaniowym stylem zapisu i innymi, błyskawicznie, za darmo i w całości w przeglądarce. Bez wysyłania na serwer, bez rejestracji."
+  },
+  "heading": "Konwerter wielkości liter",
+  "tagline": "Konwertuj tekst między WIELKIMI LITERAMI, małymi literami, Wielkimi Literami W Każdym Wyrazie, camelCase, snake_case i innymi — plus przydatne narzędzia do porządkowania tekstu.",
+  "ui": {
+    "placeholder": "Wpisz lub wklej tekst tutaj…",
+    "outputLabel": "Wynik",
+    "caseUpper": "WIELKIE LITERY",
+    "caseLower": "małe litery",
+    "caseTitle": "Wielkie Litery W Każdym Wyrazie",
+    "caseCamel": "camelCase",
+    "caseSnake": "snake_case",
+    "caseSentence": "Zdanie z wielkiej litery",
+    "caseAlternating": "nApRzEmIeNnE wIeLkIe I mAłE",
+    "caseInverse": "oDWRÓCONA wIELKOŚĆ lITER",
+    "caseOptionsHeading": "Opcje wielkości liter",
+    "utilRemoveSpaces": "Usuń nadmiarowe spacje",
+    "utilRemoveLineBreaks": "Usuń nadmiarowe podziały wierszy",
+    "utilSortLines": "Sortuj wiersze A-Z",
+    "utilitiesHeading": "Narzędzia dodatkowe",
+    "copy": "Kopiuj",
+    "copied": "Skopiowano!",
+    "clear": "Wyczyść"
+  },
+  "related": "Powiązane narzędzia",
+  "article": {
+    "heading": "Po co używać konwertera wielkości liter?",
+    "p1": "Potrzeba zmiany wielkości liter pojawia się w drobnych, ale irytujących sytuacjach cały czas: akapit wpisany z zablokowanym Caps Lockiem, specyfikacja napisana Wielkimi Literami W Każdym Wyrazie, którą trzeba zamienić na nazwę zmiennej w camelCase, nagłówek kolumny w CSV, który musi zmienić się w pole bazy danych w formacie snake_case, tytuł, który przed publikacją potrzebuje poprawnej kapitalizacji. Żadna z tych rzeczy nie jest trudna do zrobienia ręcznie dla jednego słowa, ale ręczne przepisywanie całego akapitu albo długiej listy nazw pól jest powolne i łatwo o pomyłkę.",
+    "p2": "To narzędzie wykonuje konwersję za pomocą niewielkiej ilości czystego JavaScriptu działającego bezpośrednio w Twojej przeglądarce — nie ma żadnej biblioteki do wczytania i niczego do wysłania na serwer. W miarę jak piszesz lub wklejasz tekst i przełączasz się między opcjami wielkości liter, wynik aktualizuje się natychmiast, obliczany na nowo w pamięci na Twoim własnym urządzeniu za każdym razem.",
+    "p3": "Wklej lub wpisz swój tekst, a następnie wybierz WIELKIE LITERY, małe litery, Wielkie Litery W Każdym Wyrazie, camelCase lub snake_case i naciśnij Kopiuj, aby pobrać wynik. Konkretnie dla camelCase i snake_case konwerter traktuje spacje, myślniki, podkreślenia i znaki interpunkcyjne jako granice słów — a także wykrywa istniejące granice camelCase lub PascalCase, dzięki czemu wklejenie „hello-world”, „Hello World” czy nawet już sformatowanego „helloWorld” zawsze daje ten sam, poprawny wynik, zamiast czegoś zepsutego w rodzaju „helloworld” czy „hello-World”.",
+    "p4": "Programiści sięgają po to narzędzie najczęściej przy zmianie nazw zmiennych lub pól między konwencjami nazewnictwa stosowanymi w różnych językach i bazach danych, autorzy tekstów używają go, żeby naprawić zdanie przypadkowo napisane wielkimi literami, a redaktorzy korzystają z opcji Wielkie Litery W Każdym Wyrazie, aby uzyskać spójną kapitalizację nagłówków bez zapamiętywania, które krótkie słowa pominąć. Jeśli musisz też porównać dwie wersje tekstu albo po prostu policzyć słowa i znaki, narzędzia Porównywarka tekstów oraz Licznik słów i znaków działają w ten sam lokalny sposób, bez wysyłania czegokolwiek na serwer.",
+    "p5": "Oprócz klasycznych formatów, opcja Zdanie z wielkiej litery naprawia tekst wpisany w całości wielkimi literami, zostawiając wielką literę tylko na początku każdego zdania, a nApRzEmIeNnE wIeLkIe I mAłE oraz oDWRÓCONA wIELKOŚĆ lITER to dwa żartobliwe style, po które ludzie sięgają, żeby wyróżnić komentarz albo nadać mu sarkastyczny ton w mediach społecznościowych — jeden odwraca wielkość co drugiej litery, drugi odwraca wielkość każdej pojedynczej litery względem oryginału. Obok opcji wielkości liter znajdują się trzy narzędzia porządkujące, które radzą sobie z bałaganem formatowania często towarzyszącym wklejanemu tekstowi: Usuń nadmiarowe spacje redukuje powtarzające się spacje i tabulacje do jednej w każdym miejscu, nie ruszając podziałów wierszy, Usuń nadmiarowe podziały wierszy zwija zbędne puste linie pozostałe po kopiowaniu i wklejaniu, a Sortuj wiersze A-Z porządkuje listę alfabetycznie — przydatne przy porządkowaniu wklejonej listy nazwisk, tagów czy wierszy w stylu CSV przed dalszym ich wykorzystaniem."
+  }
+}

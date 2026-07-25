@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "PDF-bestanden splitsen online gratis — Web Tool Hub",
+    "description": "Splits een PDF in meerdere bestanden of haal specifieke pagina's eruit, online en gratis, volledig in je browser. Bekijk elke pagina als miniatuur, roteer of verwijder pagina's, splits op aangepaste bereiken of om de N pagina's. Geen upload, geen watermerk, geen registratie."
+  },
+  "heading": "PDF-bestanden splitsen",
+  "tagline": "Bekijk elke pagina als miniatuur en splits een PDF in meerdere bestanden, rechtstreeks in je browser.",
+  "ui": {
+    "selectFile": "PDF-bestand selecteren",
+    "dropHint": "of sleep een PDF-bestand hierheen",
+    "noFile": "Nog geen PDF-bestand geselecteerd.",
+    "changeFile": "Ander bestand kiezen",
+    "loadingThumbnails": "Pagina's worden gelezen…",
+    "pageCount": "{{count}} pagina's",
+    "rotate": "Pagina roteren",
+    "deletePage": "Pagina verwijderen",
+    "modeLabel": "Splitsmodus",
+    "modeRanges": "Aangepaste bereiken",
+    "modeEveryN": "Om de N pagina's",
+    "everyNLabel": "Pagina's per bestand",
+    "rangesLabel": "Paginabereiken (optioneel)",
+    "rangesPlaceholder": "bijv. 1-3, 4, 5-7",
+    "rangesHint": "Laat leeg om elke pagina als apart PDF-bestand te splitsen.",
+    "split": "PDF splitsen",
+    "splitting": "Bezig met splitsen…",
+    "resultsHeading": "Resultaatbestanden",
+    "download": "Downloaden",
+    "downloadAll": "Alles downloaden (.zip)",
+    "errorGeneric": "Er is iets misgegaan bij het lezen van deze PDF. Controleer of het bestand niet beschadigd of met een wachtwoord beveiligd is, en probeer het opnieuw.",
+    "errorInvalidRange": "Ongeldig paginabereik \"{{range}}\". Gebruik een notatie zoals 1-3, 4, 5-7, met pagina's tussen 1 en {{max}}.",
+    "errorInvalidEveryN": "Voer een geheel getal van 1 of hoger in."
+  },
+  "related": "Gerelateerde tools",
+  "article": {
+    "heading": "Waarom een PDF lokaal splitsen in plaats van uploaden?",
+    "p1": "Een gescand boek, een bundel maandelijkse afschriften, een rapport van 200 pagina's waar je maar drie pagina's van nodig hebt — vroeg of laat wordt een PDF te groot of te gemengd voor wat je er daadwerkelijk mee wilt. De meeste gratis \"PDF splitsen\"-websites pakken dit op dezelfde manier aan als de gratis \"PDF samenvoegen\"-sites: door je bestand stilletjes eerst naar een server te uploaden voordat er iets mee gebeurt. Dat is nogal wat vertrouwen om weg te geven voor een document dat mogelijk een handtekening, een bankafschrift of een pagina bevat die je liever niet op iemand anders' schijf ziet staan.",
+    "p2": "Deze tool uploadt nooit iets. Hij draait volledig in je browser met pdf-lib, een JavaScript-bibliotheek die de ruwe structuur van je PDF leest en alleen de pagina's die je hebt aangevraagd kopieert naar gloednieuwe documenten, opgebouwd in het geheugen op je eigen apparaat. Ook de paginaminiaturen worden lokaal weergegeven, met pdf.js — dezelfde engine die in Firefox is ingebouwd — zodat je precies ziet wat er op elke pagina staat voordat je beslist hoe je gaat splitsen.",
+    "p3": "Selecteer een PDF-bestand of sleep het in het invoervak; elke pagina verschijnt als eigen miniatuur zodat je het document in één oogopslag overziet. Roteer een pagina telkens 90° of verwijder er een helemaal als hij in geen enkel uitvoerbestand thuishoort — bijvoorbeeld een blanco gescand vel. Kies daarna hoe je wilt splitsen: Aangepaste bereiken laat je groepen typen zoals \"1-3, 4, 5-7\", waarbij elke door komma's gescheiden groep een eigen bestand wordt, terwijl Om de N pagina's het document automatisch in gelijke stukken hakt — handig om een lange scan bijvoorbeeld in stukken van 10 pagina's te knippen zonder elk bereik met de hand te typen. Druk op PDF splitsen en elk resultaat verschijnt met een eigen downloadknop.",
+    "p4": "Er zit geen paginalimiet in de tool, al zullen zeer grote gescande PDF's vol afbeeldingen uiteraard wat meer tijd kosten om miniaturen voor te renderen, omdat alles op je eigen apparaat draait in plaats van op een serverpark. Als je een bereik typt dat niet klopt — een paginanummer voorbij het einde van het document, of tekst die geen geldig bereik is — laat de tool precies weten welk deel ongeldig was, in plaats van een kapot bestand te produceren. Als je later pagina's uit meerdere PDF's weer wilt samenvoegen, werkt de tool PDF samenvoegen op dezelfde privacy-vriendelijke manier en deelt hij dezelfde bedieningselementen voor roteren en verwijderen van pagina's."
+  }
+}

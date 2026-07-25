@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "title": "Formatowanie i walidacja JSON online za darmo — Web Tool Hub",
+    "description": "Formatuj, waliduj i przeglądaj JSON online za darmo, w całości w przeglądarce. Wklej zminifikowany JSON, przełącz się na interaktywny widok drzewa i błyskawicznie wyłap błędy składni — bez wysyłania na serwer, bez rejestracji."
+  },
+  "heading": "Formatowanie i walidacja JSON",
+  "tagline": "Formatuj, waliduj i przeglądaj dane JSON, prosto w przeglądarce.",
+  "ui": {
+    "themeNotice": "Ten widżet edytora zachowuje własny jasny motyw niezależnie od trybu ciemnego strony — tak samo jak zwykle działa edytor kodu osadzony na dowolnej stronie.",
+    "errorWithLine": "Błąd składni w linii {{line}}: {{message}}",
+    "errorNoLine": "Błąd składni: {{message}}",
+    "goToErrorLine": "Przejdź do linii z błędem",
+    "exportHeading": "Konwertuj na inny format",
+    "exportXml": "Eksportuj jako XML",
+    "exportYaml": "Eksportuj jako YAML",
+    "exportCsv": "Eksportuj jako CSV",
+    "exportInvalidJson": "Popraw powyższy błąd składni JSON przed konwersją.",
+    "copy": "Kopiuj",
+    "copied": "Skopiowano!",
+    "download": "Pobierz"
+  },
+  "related": "Powiązane narzędzia",
+  "article": {
+    "heading": "Dlaczego formatować i walidować JSON lokalnie?",
+    "p1": "JSON pojawia się w pracy programisty nieustannie: zminifikowana odpowiedź API bez podziału na linie, plik konfiguracyjny, który ktoś ręcznie upchnął w jedną nieczytelną linię, ładunek danych, który debugujesz o 23:00, szukając jednego brakującego przecinka. Większość internetowych „formaterów JSON” rozwiązuje problem czytelności, wysyłając najpierw wklejony tekst na serwer — co jest niewygodnym kompromisem, gdy ten JSON może zawierać klucz API, token dostępu albo dane osobowe klienta.",
+    "p2": "To narzędzie nigdy niczego nigdzie nie wysyła. Zostało zbudowane na jsoneditor, bibliotece JavaScript, która parsuje i ponownie renderuje Twój JSON w całości w pamięci przeglądarki. Parsowanie, formatowanie oraz walidacja składni odbywają się w całości lokalnie, przy użyciu silnika JavaScript samej przeglądarki — w tym procesie nie ma żadnego serwera, więc nic, co tu wkleisz, nigdy nie opuszcza Twojego urządzenia.",
+    "p3": "Wklej swój JSON do edytora w trybie tekstowym i użyj przycisku Formatuj na pasku narzędzi, aby ładnie go sformatować, albo Kompaktuj, aby ścisnąć go z powrotem do jednej linii. Jeśli JSON zawiera błąd składni — końcowy przecinek, brakujący cudzysłów, niedopasowany nawias — edytor od razu go podświetla, pokazując jasny komunikat błędu wraz z dokładnym numerem linii, zamiast zostawiać Cię z koniecznością przeglądania całego dokumentu wzrokiem; przycisk „Przejdź do linii z błędem” przenosi bezpośrednio do tej linii i ją zaznacza, więc nie trzeba przewijać i szukać jej w długim pliku. Przełącz się na tryb drzewa z listy rozwijanej u góry, aby przeglądać te same dane jako zwijalne, interaktywne drzewo: rozwijaj i zwijaj zagnieżdżone obiekty i tablice, edytuj poszczególne wartości w miejscu, a także zmieniaj kolejność lub usuwaj pola bezpośrednio — zmiana natychmiast odzwierciedla się w tekście, gdy tylko ponownie przełączysz tryb.",
+    "p4": "To połączenie funkcji obejmuje większość codziennej pracy z JSON-em: uporządkowanie odpowiedzi API przed wklejeniem jej do dokumentacji, walidację pliku konfiguracyjnego przed jego zatwierdzeniem albo eksplorację głęboko zagnieżdżonego ładunku danych bez gubienia się w tym, w której tablicy się znajdujesz. Potrzebujesz danych w innym formacie? Przyciski pod edytorem konwertują aktualny JSON bezpośrednio na XML, YAML lub CSV — przydatne, gdy skrypt kolegi z zespołu oczekuje pliku konfiguracyjnego YAML albo arkusz kalkulacyjny potrzebuje zwykłych wierszy i kolumn zamiast zagnieżdżonego JSON-a — a przekonwertowany wynik jest pokazywany od razu, gotowy do szybkiego skopiowania lub pełnego pobrania. Ponieważ wszystko istnieje wyłącznie w karcie przeglądarki, zamknięcie jej całkowicie czyści edytor — nie ma zapisanej historii ani szkicu, o który trzeba by się martwić, co jest dokładnie takim zachowaniem, jakiego oczekujesz, gdy JSON, nad którym pracujesz, może być poufny."
+  }
+}

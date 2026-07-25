@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "title": "Ücretsiz Resim Arka Planı Kaldırma (Yapay Zeka, Yükleme Yok) — Web Tool Hub",
+    "description": "Tamamen tarayıcınızda çalışan yerel bir yapay zeka modeliyle bir fotoğrafın arka planını ücretsiz olarak kaldırın. Bir renk veya başka bir resimle değiştirin, kaydırıcıyla öncesini/sonrasını karşılaştırın. Yükleme yok, kayıt yok."
+  },
+  "heading": "Arka Planı Kaldır",
+  "tagline": "Bir fotoğrafın arka planını otomatik olarak kesin, bir renk veya resimle değiştirin — hepsi doğrudan tarayıcınızda.",
+  "ui": {
+    "selectFiles": "Resim seç",
+    "dropHint": "veya resimleri buraya sürükleyip bırakın",
+    "remove": "Arka Planı Kaldır",
+    "removing": "Arka plan kaldırılıyor… %{{percent}}",
+    "download": "İndir",
+    "original": "Orijinal",
+    "result": "Sonuç",
+    "noFiles": "Henüz resim seçilmedi.",
+    "errorGeneric": "Bu resmin arka planını kaldırırken bir sorun oluştu. Lütfen tekrar deneyin.",
+    "modelNotice": "İlk tıklama, tarayıcınıza küçük bir yapay zeka modeli (birkaç MB) indirir — bundan sonra tamamen çevrimdışı çalışır. Fotoğraflarınızın kendisi hiçbir yere yüklenmez.",
+    "backgroundLabel": "Arka plan",
+    "backgroundTransparent": "Saydam",
+    "backgroundColor": "Düz renk",
+    "backgroundImage": "Özel resim",
+    "backgroundImageSelect": "Arka plan resmi seç",
+    "backgroundImageClear": "Kaldır",
+    "edgeSoftnessLabel": "Kenar yumuşaklığı",
+    "removeItem": "Kaldır",
+    "clearAll": "Tümünü temizle",
+    "skippedFiles": "{{count}} dosya desteklenen bir resim formatında olmadığı için atlandı."
+  },
+  "related": "İlgili araçlar",
+  "article": {
+    "heading": "Yerel, tarayıcı içi arka plan kaldırma nasıl çalışır?",
+    "p1": "Bir fotoğrafın arka planını kaldırmak eskiden ya resminizi bir sunucuya yükleyen abonelikli bir araç ya da bir görsel düzenleyicide konunun etrafını elle çizmek anlamına gelirdi. Bu araç ikisini de yapmaz: hangi piksellerin konuya, hangilerinin arka plana ait olduğunu anlamak için doğrudan tarayıcı sekmenizde küçük bir yapay zeka segmentasyon modeli çalıştırır, ardından arka planı fotoğrafınız hiçbir yere gönderilmeden saydam hale getirir. Bu, genellikle ürün fotoğrafları, profil resimleri ve çıkartmalar için kullanılan türden bir düzenlemedir — eskiden bir görsel düzenleyicide dakikalar alan iş artık saniyeler sürüyor.",
+    "p2": "İlk kullanımınızda, tarayıcınız yapay zeka modelinin kendisini — birkaç megabaytlık veriyi — bir web sitesinden herhangi bir resim veya betik indirir gibi indirir. Bu indirme yalnızca bir kez gerçekleşir ve bir sonraki sefer için önbelleğe alınır. Fotoğraflarınız tamamen ayrı bir şeydir: her biri doğrudan tarayıcının belleğine yüklenir ve orada işlenir; hiçbir aşamada, geçici olarak bile bir sunucuya yüklenmez.",
+    "p3": "Bir veya birden fazla fotoğraf seçin ve Arka Planı Kaldır'a basın — her biri sırayla, bir ilerleme göstergesiyle birlikte ve sayfanın geri kalanının duyarlı kalması için bir Web Worker içinde işlenir. Bir sonuç hazır olduğunda, orijinali kesilmiş haliyle yan yana karşılaştırmak için küçük resmin üzerindeki kaydırıcıyı sürükleyin. Varsayılan olarak arka plan saydam hale gelir (dama deseni olarak gösterilir), ancak listenin üzerindeki kontrolleri kullanarak onu düz bir renkle veya kendi arka plan resminizle değiştirebilirsiniz — arka planı yeniden birleştirmek yapay zeka modelini yeniden çalıştırmaktan çok daha ucuz olduğundan, tamamlanan her fotoğraf anında güncellenir. Kenar yumuşaklığı kaydırıcısı, kesimin yalnızca alfa kenarını hafifçe bulanıklaştırır; bu, ince saç tellerini veya kürkü daha az \"kesilmiş\" ve daha doğal gösterebilir; çoğu konu, modelin zaten ürettiği keskin kenarla en iyi göründüğü için varsayılan olarak kapalıdır.",
+    "p4": "Sonuçlar genellikle, konuyla aynı renkte olmayan bir arka plana karşı net ve belirgin bir konusu olan fotoğraflarda — insanlar, hayvanlar, ürünler, araçlar — en iyi şekilde çıkar. Dağınık saç telleri veya kürk gibi çok ince ayrıntılar, kenar yumuşaklığı artırılsa bile mükemmel çıkmayabilir; karmaşık veya dolu arka planlar da modeli bazen yanıltabilir. Sonuç tam olarak doğru gelmiyorsa, fotoğrafı yüklemeden önce konunun etrafından daha sıkı kırpmak çoğu zaman yardımcı olur. Konuyu baştan itibaren düzgün aydınlatılmış, sade bir arka plana karşı fotoğraflamak da — ister insan ister yapay zeka olsun — herhangi bir aracın belirgin şekilde daha temiz bir kesim üretmesini kolaylaştırır."
+  }
+}

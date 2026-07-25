@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "title": "Porównywarka tekstów online za darmo — porównaj dwa teksty — Web Tool Hub",
+    "description": "Porównaj dwa bloki tekstu online za darmo — różnice na poziomie znaków, słów lub linii, obok siebie z numerami linii, plus narzędzie do scalania każdej zmiany. Działa w całości w przeglądarce — nic nigdy nie jest wysyłane na serwer."
+  },
+  "heading": "Porównywarka tekstów — porównaj dwa teksty",
+  "tagline": "Wklej dwie wersje tekstu i zobacz dokładnie, co się zmieniło, słowo po słowie lub linia po linii.",
+  "ui": {
+    "originalLabel": "Tekst oryginalny",
+    "changedLabel": "Tekst zmieniony",
+    "modeWord": "Słowo",
+    "modeLine": "Linia",
+    "modeChar": "Znak",
+    "noChanges": "Nie znaleziono różnic — oba teksty są identyczne.",
+    "placeholder": "Wklej lub wpisz tekst tutaj…",
+    "ignoreWhitespace": "Ignoruj białe znaki",
+    "ignoreCase": "Ignoruj wielkość liter",
+    "statsAdded": "dodano: {{count}}",
+    "statsRemoved": "usunięto: {{count}}",
+    "statsModified": "zmieniono: {{count}}",
+    "clear": "Wyczyść",
+    "swap": "Zamień",
+    "uploadFile": "Wgraj .txt",
+    "prevChange": "Poprzednia zmiana",
+    "nextChange": "Następna zmiana",
+    "changeCounter": "zmiana {{current}} / {{total}}",
+    "fullscreen": "Pełny ekran",
+    "exitFullscreen": "Zamknij pełny ekran",
+    "mergeToolHeading": "Narzędzie do scalania",
+    "mergeLeftHeading": "Wersja lewa",
+    "mergeRightHeading": "Wersja prawa",
+    "acceptRightAria": "Użyj prawej wersji dla tej zmiany",
+    "acceptLeftAria": "Użyj lewej wersji dla tej zmiany",
+    "copy": "Kopiuj",
+    "copied": "Skopiowano!",
+    "save": "Zapisz jako .txt"
+  },
+  "related": "Powiązane narzędzia",
+  "article": {
+    "heading": "Po co używać porównywarki tekstów?",
+    "p1": "Zawsze gdy istnieją dwie wersje tego samego dokumentu — umowa przed i po poprawkach prawnika, esej przed i po rundzie uwag, plik konfiguracyjny przed i po commicie kolegi z zespołu — najważniejsze pytanie rzadko brzmi „czy to te same pliki”, a raczej „co dokładnie się zmieniło”. Czytanie obu wersji obok siebie i próba wychwycenia każdego dodanego przecinka, usuniętej klauzuli czy przeredagowanego zdania jest powolne i podatne na błędy, zwłaszcza gdy dokument przekracza stronę czy dwie. Porównywarka tekstów automatyzuje to porównanie i podświetla dokładnie te słowa lub linie, które się różnią, dzięki czemu przegląd zmiany zajmuje sekundy zamiast minut.",
+    "p2": "To narzędzie działa w całości w Twojej przeglądarce. Oba pola tekstowe pozostają w pamięci na Twoim urządzeniu, a samo porównanie jest obliczane przez lokalnie działającą bibliotekę JavaScript do wyznaczania różnic — nic, co wpiszesz lub wklejasz, nigdy nie jest wysyłane na serwer, rejestrowane ani nigdzie przechowywane. Ma to znaczenie, jeśli porównujesz umowę z klientem, plik z hasłami albo dowolny tekst, którego wolałbyś nie przepuszczać przez usługę zewnętrzną. Zamknij kartę i wszystko znika — nie ma żadnej historii, o którą trzeba by się martwić.",
+    "p3": "Wklej oryginalny tekst po lewej stronie, a zaktualizowaną wersję po prawej — oba pola pokazują numery linii i przewijają się synchronicznie, a każde ma własne przyciski Wyczyść, Zamień i Wgraj .txt, dzięki czemu możesz wczytać dwa pliki bezpośrednio z dysku zamiast kopiować i wklejać. Porównanie aktualizuje się na żywo w trakcie pisania — nie trzeba niczego naciskać. Wybierz Znak, Słowo lub Linię, aby określić, jak dokładnie mają być rozbijane różnice: tryb Znak wychwytuje pojedynczą literówkę, tryb Słowo jest najlepszy do prozy, ponieważ podświetla dokładnie te słowa, które zmieniły się w zdaniu, a tryb Linia porównuje całe linie naraz, co sprawdza się w przypadku kodu, JSON-a czy treści w formie list, gdzie liczy się, które całe linie się przesunęły, a nie pojedyncze słowa w ich obrębie. Linia, która istnieje tylko w jednej wersji, jest pokazana w całości na zielono (dodana) lub na czerwono (usunięta); linia, która istnieje w obu, ale została zmieniona, jest pokazana na pomarańczowo, z dokładnym zmienionym słowem lub znakami podświetlonymi mocniej w jej wnętrzu — dzięki temu od razu widać różnicę między edytowaną linią a niepowiązaną parą usunięcie-a-potem-wstawienie.",
+    "p4": "Liczniki dodanych/usuniętych/zmienionych elementów nad porównaniem dają szybki obraz skali zmiany, a przyciski ↑/↓ przenoszą od razu do następnej lub poprzedniej zmiany bez przewijania niezmienionych linii — przydatne przy długim dokumencie. Przycisk Pełny ekran rozszerza porównanie na cały ekran, ułatwiając dokładniejszy przegląd. Pod porównaniem narzędzie do scalania zamienia to z zwykłego, tylko-do-odczytu porównania w coś, co faktycznie można rozstrzygnąć: każda zmiana ma własne przyciski ← / → między dwiema kolumnami, pozwalające przenieść edycję z prawej kolumny do lewej lub odwrotnie, po jednej zmianie na raz, aż każda z kolumn będzie brzmiała dokładnie tak, jak chcesz. Każda kolumna ma własne przyciski Kopiuj i Zapisz, dzięki czemu możesz wydobyć czysty, scalony wynik bez ponownego przepisywania czegokolwiek. Jeśli oba teksty okażą się identyczne, narzędzie wprost o tym informuje, zamiast pokazywać pusty, niejednoznaczny wynik — jedna rzecz mniej do domyślania się."
+  }
+}

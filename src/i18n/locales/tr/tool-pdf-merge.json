@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "title": "Ücretsiz Online PDF Birleştirme — Web Tool Hub",
+    "description": "Birden fazla PDF dosyasını tamamen tarayıcınızda, ücretsiz olarak tek bir belgede birleştirin. Her sayfayı küçük resim olarak görün, sürükleyerek yeniden sıralayın, birleştirmeden önce sayfaları döndürün veya silin. Yükleme yok, filigran yok, kayıt yok."
+  },
+  "heading": "PDF Dosyalarını Birleştir",
+  "tagline": "Sayfa sayfa küçük resim görünümüyle birden fazla PDF'yi tek bir dosyada birleştirin — hepsi doğrudan tarayıcınızda.",
+  "ui": {
+    "selectFiles": "PDF dosyaları seç",
+    "dropHint": "veya PDF dosyalarını buraya sürükleyip bırakın",
+    "merge": "PDF'leri Birleştir",
+    "merging": "Birleştiriliyor…",
+    "download": "merged.pdf indir",
+    "moveUp": "Öne taşı",
+    "moveDown": "Sona taşı",
+    "remove": "Sayfayı sil",
+    "rotate": "Sayfayı döndür",
+    "loadingThumbnails": "Sayfalar okunuyor…",
+    "dragHint": "Sıralamak için herhangi bir sayfayı sürükleyin ya da ok düğmelerini kullanın.",
+    "noFiles": "Henüz PDF dosyası seçilmedi.",
+    "errorGeneric": "Bu PDF'yi okurken bir sorun oluştu. Bozuk veya parola korumalı olmadığından emin olup tekrar deneyin.",
+    "skippedFiles": "{{count}} dosya PDF olmadığı için atlandı."
+  },
+  "related": "İlgili araçlar",
+  "article": {
+    "heading": "PDF dosyalarını sunucuya yüklemek yerine yerel olarak neden birleştirmelisiniz?",
+    "p1": "Taranmış sözleşmeler, imzalı formlar, fatura grupları, bir raporun bölümleri — er ya da geç neredeyse herkes aslında tek bir belge olması gereken birkaç PDF dosyasıyla karşılaşır. Beş ayrı ek göndermek ya da bir müşteriden tek bir bağlantı yerine beş bağlantı açmasını istemek beceriksizcedir; çoğu ücretsiz \"PDF birleştirici\" sitesi bunu, dosyalarınızı önce sessizce bir sunucuya yükleyerek çözer — bu da bir imza, bir kimlik numarası ya da finansal bilgiler içerebilecek bir belgeye pek kimsenin göstermek istemeyeceği türden bir güven anlamına gelir.",
+    "p2": "Bu araç bunu asla yapmaz. Her şey, her bir PDF'nin ham yapısını okuyan, sayfalarını yeni bir belgeye kopyalayan ve sonucu yeniden bir araya getiren bir JavaScript kütüphanesi olan pdf-lib kullanılarak tarayıcınızın içinde — tamamen bellekte, cihazınızda — çalışır. Sayfa küçük resimleri de yerel olarak, Firefox'a gömülü aynı çizim motoru olan pdf.js ile oluşturulur; böylece herhangi bir şey birleştirilmeden önce üzerinde çalıştığınız şeyi tam olarak görebilirsiniz.",
+    "p3": "PDF dosyalarınızı düğmeye tıklayarak veya bırakma alanına sürükleyerek ekleyin — her dosyanın her sayfası, dosyalara göre gruplanmadan, tek bir birleşik ızgarada kendi küçük resmi olarak görünür. Herhangi bir küçük resmi, farklı kaynak dosyalardan gelenler de dahil olmak üzere diğerlerine göre yeniden sıralamak için sürükleyin, sürüklemek uygun değilse ok düğmelerini kullanın. Bir sayfayı 90° döndürmek için döndürme düğmesine, son belgeden tamamen çıkarmak için silme düğmesine tıklayın — bu, boş bir tarama kapak sayfasını ya da yinelenen bir sayfayı çıkarmak için kullanışlıdır. Her şey doğru göründüğünde PDF'leri Birleştir'e basın; birleştirilmiş dosya tamamen bellekte oluşturulur ve merged.pdf olarak indirilir.",
+    "p4": "Araca gömülü bir sayfa sınırı yoktur; ancak her şey bir sunucu çiftliği yerine kendi cihazınız tarafından işlendiğinden, taranmış, resim ağırlıklı çok büyük gruplarda küçük resimlerin oluşturulması doğal olarak daha uzun sürer. Bir dosya yüklenemezse — örneğin bir parolayla şifrelenmiş ya da indirme sırasında bozulmuşsa — bu araç sessizce bozuk bir sonuç üretmek yerine size bunu bildirir. Ters yönde, birleştirilmiş bir PDF'yi tekrar daha küçük parçalara ayırmak için PDF Bölme aracı aynı gizlilik öncelikli yaklaşımla çalışır ve aynı döndür-ve-sil sayfa kontrollerini paylaşır."
+  }
+}

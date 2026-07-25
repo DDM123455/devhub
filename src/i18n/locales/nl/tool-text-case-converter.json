@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "Tekst hoofdlettergebruik omzetten online gratis — Web Tool Hub",
+    "description": "Zet tekst direct om tussen HOOFDLETTERS, kleine letters, Titelvorm, camelCase, snake_case, Zinsvorm en meer, gratis en volledig in je browser. Geen upload, geen registratie."
+  },
+  "heading": "Tekst hoofdlettergebruik omzetten",
+  "tagline": "Zet tekst om tussen HOOFDLETTERS, kleine letters, Titelvorm, camelCase, snake_case en meer — plus handige tools voor tekstopschoning.",
+  "ui": {
+    "placeholder": "Typ of plak hier tekst…",
+    "outputLabel": "Resultaat",
+    "caseUpper": "HOOFDLETTERS",
+    "caseLower": "kleine letters",
+    "caseTitle": "Titelvorm",
+    "caseCamel": "camelCase",
+    "caseSnake": "snake_case",
+    "caseSentence": "Zinsvorm",
+    "caseAlternating": "aFwIsSeLeNd HoOfDlEtTeRgEbRuIk",
+    "caseInverse": "oMgEKeeRd HooFDletTErGebrUIK",
+    "caseOptionsHeading": "Hoofdletteropties",
+    "utilRemoveSpaces": "Overtollige spaties verwijderen",
+    "utilRemoveLineBreaks": "Overtollige regelafbrekingen verwijderen",
+    "utilSortLines": "Regels sorteren A-Z",
+    "utilitiesHeading": "Hulpmiddelen",
+    "copy": "Kopiëren",
+    "copied": "Gekopieerd!",
+    "clear": "Wissen"
+  },
+  "related": "Gerelateerde tools",
+  "article": {
+    "heading": "Waarom een tool voor hoofdlettergebruik gebruiken?",
+    "p1": "De behoefte om hoofdlettergebruik om te zetten duikt voortdurend op kleine maar irritante manieren op: een alinea getypt met per ongeluk vastzittende Caps Lock, een specificatie geschreven in Titelvorm die een camelCase-variabelenaam moet worden, een CSV-kolomkop die een snake_case-databaseveld moet worden, een kop die de juiste titelhoofdlettering nodig heeft voordat hij online gaat. Voor één woord is dit met de hand niet moeilijk, maar een hele alinea of een lange lijst veldnamen met de hand overtypen is traag en foutgevoelig.",
+    "p2": "Deze tool voert de omzetting uit met een klein beetje pure JavaScript die rechtstreeks in je browser draait — er hoeft geen bibliotheek geladen te worden en er wordt niets naar een server gestuurd. Terwijl je tekst typt of plakt en tussen de hoofdletteropties wisselt, wordt het resultaat direct bijgewerkt, elke keer opnieuw berekend in het geheugen op je eigen apparaat.",
+    "p3": "Plak of typ je tekst, kies dan HOOFDLETTERS, kleine letters, Titelvorm, camelCase of snake_case, en druk op Kopiëren om het resultaat over te nemen. Specifiek voor camelCase en snake_case behandelt de converter spaties, koppeltekens, underscores en leestekens als woordgrenzen — en hij herkent ook al bestaande camelCase- of PascalCase-grenzen, zodat het plakken van \"hallo-wereld\", \"Hallo Wereld\" of zelfs een al omgezette \"halloWereld\" allemaal netjes naar hetzelfde resultaat wordt omgezet, in plaats van iets kapots op te leveren zoals \"hallowereld\" of \"hallo-Wereld\".",
+    "p4": "Developers grijpen hier het vaakst naar bij het hernoemen van variabelen of velden tussen de naamgevingsconventies van verschillende talen en databases, schrijvers gebruiken het om een zin te herstellen die per ongeluk volledig in hoofdletters is getypt, en redacteuren gebruiken Titelvorm om consistente hoofdlettering in koppen te krijgen zonder te hoeven onthouden welke kleine woorden ze moeten overslaan. Moet je ook twee versies van tekst vergelijken of gewoon woorden en tekens tellen? De tools Tekst vergelijken en Woorden- en tekenteller dekken dat op dezelfde lokale, niets-uploaden-manier.",
+    "p5": "Naast de klassieke formaten herstelt Zinsvorm tekst die volledig in hoofdletters is getypt door alleen de eerste letter van elke zin een hoofdletter te geven, terwijl aFwIsSeLeNd HoOfDlEtTeRgEbRuIk en oMgEKeeRd HooFDletTErGebrUIK de twee grappige stijlen zijn waar mensen naar grijpen om een opmerking te laten opvallen of sarcastisch te laten overkomen op social media — de ene wisselt de hoofdlettering van elke andere letter om, de andere keert de hoofdlettering van elke letter afzonderlijk om ten opzichte van het origineel. Naast de hoofdletteropties pakken drie opschoonhulpmiddelen de rommelige opmaak aan die vaak met geplakte tekst meekomt: Overtollige spaties verwijderen comprimeert herhaalde spaties en tabs tot één per tussenruimte zonder je regelafbrekingen aan te raken, Overtollige regelafbrekingen verwijderen comprimeert losse lege regels die zijn overgebleven van kopiëren en plakken, en Regels sorteren A-Z alfabetiseert een lijst — handig om een geplakte lijst met namen, tags of CSV-achtige rijen op te schonen voordat je ze elders gebruikt."
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "title": "Usuwanie tła ze zdjęcia za darmo (AI, bez wysyłania) — Web Tool Hub",
+    "description": "Usuń tło ze zdjęcia za darmo dzięki lokalnemu modelowi AI działającemu w całości w przeglądarce. Zastąp je kolorem lub innym obrazem, porównaj efekt przed/po suwakiem. Bez wysyłania na serwer, bez rejestracji."
+  },
+  "heading": "Usuń tło",
+  "tagline": "Automatycznie wytnij tło ze zdjęcia, zastąp je kolorem lub obrazem, prosto w przeglądarce.",
+  "ui": {
+    "selectFiles": "Wybierz zdjęcia",
+    "dropHint": "lub przeciągnij i upuść zdjęcia tutaj",
+    "remove": "Usuń tło",
+    "removing": "Usuwanie tła… {{percent}}%",
+    "download": "Pobierz",
+    "original": "Oryginał",
+    "result": "Wynik",
+    "noFiles": "Nie wybrano jeszcze żadnego zdjęcia.",
+    "errorGeneric": "Coś poszło nie tak podczas usuwania tła z tego zdjęcia. Spróbuj ponownie.",
+    "modelNotice": "Pierwsze kliknięcie pobiera do przeglądarki niewielki model AI (kilka MB) — potem narzędzie działa całkowicie offline. Same zdjęcia nigdy nie są nigdzie wysyłane.",
+    "backgroundLabel": "Tło",
+    "backgroundTransparent": "Przezroczyste",
+    "backgroundColor": "Jednolity kolor",
+    "backgroundImage": "Własny obraz",
+    "backgroundImageSelect": "Wybierz obraz tła",
+    "backgroundImageClear": "Usuń",
+    "edgeSoftnessLabel": "Miękkość krawędzi",
+    "removeItem": "Usuń",
+    "clearAll": "Wyczyść wszystko",
+    "skippedFiles": "Pominięto {{count}} plik(ów), ponieważ nie są obsługiwanym formatem obrazu."
+  },
+  "related": "Powiązane narzędzia",
+  "article": {
+    "heading": "Jak działa lokalne usuwanie tła w przeglądarce?",
+    "p1": "Usuwanie tła ze zdjęcia zwykle oznaczało albo płatne narzędzie subskrypcyjne, które wysyła obraz na serwer, albo ręczne obrysowywanie obiektu w edytorze grafiki. To narzędzie nie robi ani jednego, ani drugiego: uruchamia niewielki model AI do segmentacji bezpośrednio w karcie przeglądarki, aby ustalić, które piksele należą do obiektu, a które do tła, a następnie usuwa tło, czyniąc je przezroczystym — a wszystko to bez wysyłania zdjęcia gdziekolwiek. To ten sam rodzaj edycji, który często stosuje się do zdjęć produktowych, zdjęć profilowych i naklejek — coś, co dawniej zajmowało minuty w edytorze grafiki, teraz trwa sekundy.",
+    "p2": "Za pierwszym razem, gdy korzystasz z narzędzia, przeglądarka pobiera sam model AI — kilka megabajtów danych — tak samo jak pobrałaby dowolny obraz czy skrypt ze strony. To pobranie następuje tylko raz i jest zapisywane w pamięci podręcznej na później. Twoje zdjęcia to zupełnie osobna sprawa: każde z nich jest wczytywane bezpośrednio do pamięci przeglądarki i tam przetwarzane, a w żadnym momencie nie trafia na serwer, nawet tymczasowo.",
+    "p3": "Wybierz jedno lub więcej zdjęć i naciśnij Usuń tło — każde jest przetwarzane pojedynczo, ze wskaźnikiem postępu, w Web Workerze, dzięki czemu reszta strony pozostaje responsywna. Gdy wynik jest gotowy, przeciągnij suwak na jego miniaturce, aby porównać oryginał z wycięciem obok siebie. Domyślnie tło staje się przezroczyste (pokazane jako wzór w kratkę), ale możesz zamienić je na jednolity kolor lub własny obraz tła za pomocą kontrolek nad listą — każde ukończone zdjęcie aktualizuje się natychmiast, ponieważ ponowne złożenie tła jest tanie obliczeniowo, w przeciwieństwie do ponownego uruchamiania modelu AI. Suwak miękkości krawędzi lekko rozmywa kanał alfa samego wycięcia, co może sprawić, że cienkie kosmyki włosów czy futro wyglądają mniej „wycięte” i bardziej naturalnie; domyślnie jest wyłączony, ponieważ większość obiektów wygląda najlepiej z ostrą krawędzią, którą model już generuje.",
+    "p4": "Najlepsze wyniki zwykle uzyskuje się na zdjęciach z wyraźnym, odrębnym obiektem — osobami, zwierzętami, produktami, pojazdami — na tle, które nie ma tego samego koloru co obiekt. Bardzo drobne detale, jak pojedyncze kosmyki włosów czy futro, mogą nie wyjść idealnie nawet przy zwiększonej miękkości krawędzi, a ruchliwe lub zagracone tła czasem mylą model. Jeśli wynik nie jest do końca zadowalający, często pomaga ściślejsze przycięcie zdjęcia wokół obiektu przed wgraniem. Fotografowanie obiektu na równomiernie oświetlonym, jednolitym tle również ułatwia uzyskanie wyraźnie czystszego wycięcia — dla dowolnego narzędzia, ludzkiego czy opartego na AI."
+  }
+}

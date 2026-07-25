@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "title": "Achtergrond verwijderen uit afbeelding gratis (AI, geen upload) — Web Tool Hub",
+    "description": "Verwijder gratis de achtergrond uit een foto met een lokaal AI-model dat volledig in je browser draait. Vervang door een kleur of andere afbeelding, vergelijk voor/na met een schuifbalk. Geen upload, geen registratie."
+  },
+  "heading": "Achtergrond verwijderen",
+  "tagline": "Knip automatisch de achtergrond uit een foto, vervang deze door een kleur of afbeelding, rechtstreeks in je browser.",
+  "ui": {
+    "selectFiles": "Afbeeldingen selecteren",
+    "dropHint": "of sleep afbeeldingen hierheen",
+    "remove": "Achtergrond verwijderen",
+    "removing": "Achtergrond wordt verwijderd… {{percent}}%",
+    "download": "Downloaden",
+    "original": "Origineel",
+    "result": "Resultaat",
+    "noFiles": "Nog geen afbeelding geselecteerd.",
+    "errorGeneric": "Er is iets misgegaan bij het verwijderen van de achtergrond uit deze afbeelding. Probeer het opnieuw.",
+    "modelNotice": "Bij de eerste klik wordt een klein AI-model (enkele MB's) naar je browser gedownload — daarna werkt het volledig offline. Je foto's zelf worden nooit ergens geüpload.",
+    "backgroundLabel": "Achtergrond",
+    "backgroundTransparent": "Transparant",
+    "backgroundColor": "Effen kleur",
+    "backgroundImage": "Eigen afbeelding",
+    "backgroundImageSelect": "Achtergrondafbeelding kiezen",
+    "backgroundImageClear": "Verwijderen",
+    "edgeSoftnessLabel": "Randverzachting",
+    "removeItem": "Verwijderen",
+    "clearAll": "Alles wissen",
+    "skippedFiles": "{{count}} bestand(en) overgeslagen omdat ze geen ondersteund afbeeldingsformaat hebben."
+  },
+  "related": "Gerelateerde tools",
+  "article": {
+    "heading": "Hoe werkt lokale achtergrondverwijdering in de browser?",
+    "p1": "De achtergrond uit een foto verwijderen betekende vroeger óf een abonnementstool die je afbeelding naar een server uploadt, óf handmatig het onderwerp uittekenen in een beeldbewerkingsprogramma. Deze tool doet geen van beide: hij draait een klein AI-segmentatiemodel rechtstreeks in je browsertabblad om te bepalen welke pixels bij het onderwerp horen en welke bij de achtergrond, en maakt vervolgens de achtergrond transparant — allemaal zonder dat je foto ooit ergens naartoe wordt verzonden. Het is dezelfde bewerking die vaak wordt gebruikt voor productfoto's, profielfoto's en stickers — iets wat vroeger minuten kostte in een beeldbewerker, duurt nu seconden.",
+    "p2": "De eerste keer dat je de tool gebruikt, downloadt je browser het AI-model zelf — een paar megabyte aan data — op dezelfde manier als het elke afbeelding of elk script van een website zou downloaden. Die download gebeurt maar één keer en wordt daarna in de cache bewaard. Je foto's zijn een volledig apart verhaal: elke foto wordt rechtstreeks in het geheugen van de browser geladen en daar verwerkt, en op geen enkel moment wordt hij naar een server geüpload, ook niet tijdelijk.",
+    "p3": "Selecteer een of meer foto's en druk op Achtergrond verwijderen — elke foto wordt één voor één verwerkt, met een voortgangsindicator, in een Web Worker zodat de rest van de pagina soepel blijft reageren. Zodra een resultaat klaar is, sleep je de schuifbalk over de miniatuur om het origineel naast de uitgeknipte versie te vergelijken. Standaard wordt de achtergrond transparant (weergegeven als geblokt patroon), maar je kunt deze vervangen door een effen kleur of je eigen achtergrondafbeelding via de bedieningselementen boven de lijst — elke afgeronde foto wordt direct bijgewerkt, want het opnieuw samenstellen van een achtergrond is goedkoop, in tegenstelling tot het opnieuw uitvoeren van het AI-model. De schuifregelaar voor randverzachting vervaagt alleen de alfarand van de uitknip iets, wat losse haren of vacht minder \"uitgeknipt\" en natuurlijker kan laten ogen; standaard staat dit uit, omdat de meeste onderwerpen er het best uitzien met de scherpe rand die het model al produceert.",
+    "p4": "De resultaten zijn meestal het best bij foto's met een duidelijk, herkenbaar onderwerp — mensen, dieren, producten, voertuigen — tegen een achtergrond die niet dezelfde kleur heeft als het onderwerp. Zeer fijne details zoals losse haarstrengen of vacht komen mogelijk niet perfect uit, zelfs niet met randverzachting hoger gezet, en drukke of rommelige achtergronden kunnen het model soms in de war brengen. Als het resultaat niet helemaal goed is, helpt het vaak om de foto strakker rond het onderwerp bij te snijden voordat je hem uploadt. Het onderwerp fotograferen tegen een egaal verlichte, effen achtergrond maakt het bovendien voor elke tool — mens of AI — merkbaar makkelijker om een schone uitknip te produceren."
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "title": "Konverter Format Gambar Online Gratis (JPEG, PNG, WebP, AVIF, HEIC & Lainnya) — Web Tool Hub",
+    "description": "Konversi gambar antar format JPEG, PNG, WebP, AVIF, GIF, BMP dan ICO online secara gratis, sepenuhnya di browser Anda. Juga bisa membaca foto HEIC dari iPhone. Tanpa upload, tanpa perlu daftar."
+  },
+  "heading": "Konverter Format Gambar",
+  "tagline": "Konversi antara JPEG, PNG, WebP, AVIF, GIF, BMP dan ICO — serta membaca foto HEIC dari iPhone — langsung di browser Anda.",
+  "ui": {
+    "selectFiles": "Pilih gambar",
+    "dropHint": "atau seret dan lepas gambar di sini",
+    "targetFormat": "Konversi ke",
+    "quality": "Kualitas",
+    "convert": "Konversi",
+    "converting": "Mengonversi…",
+    "download": "Unduh",
+    "original": "Asli",
+    "converted": "Hasil konversi",
+    "noFiles": "Belum ada gambar yang dipilih.",
+    "errorGeneric": "Terjadi kesalahan saat mengonversi gambar ini. Silakan coba lagi.",
+    "errorAvifUnsupported": "Browser ini tidak dapat mengekspor AVIF. Coba gunakan versi terbaru Chrome atau Firefox, atau pilih format lain.",
+    "formatsNote": "Output ICO diubah ukurannya menjadi maksimal 256×256 (ukuran ikon standar). Ekspor AVIF membutuhkan Chrome atau Firefox versi terbaru. Foto HEIC/HEIF dari iPhone dibaca secara otomatis — tidak perlu langkah konversi terpisah.",
+    "remove": "Hapus",
+    "clearAll": "Hapus semua",
+    "skippedFiles": "{{count}} file dilewati karena bukan format gambar yang didukung."
+  },
+  "related": "Alat terkait",
+  "article": {
+    "heading": "JPEG, PNG, WebP, AVIF — format mana yang sebaiknya digunakan?",
+    "p1": "JPEG, PNG, WebP, dan yang semakin populer AVIF, semuanya menyimpan gambar, tetapi masing-masing memiliki kompromi berbeda dalam hal kualitas, transparansi, dan ukuran file, dan memilih format yang salah adalah alasan umum sebuah foto terlihat lebih buruk dari seharusnya atau memakan ruang jauh lebih besar dari yang diperlukan. Beberapa format lain — GIF, BMP, ICO — melayani kebutuhan yang lebih sempit dan spesifik, bukan fotografi sehari-hari. Mengonversi antar semua format ini memungkinkan Anda menyesuaikan format dengan kebutuhan gambar yang sebenarnya, bukan hanya memakai format apa pun yang kebetulan disimpan oleh kamera, alat tangkapan layar, atau iPhone Anda.",
+    "p2": "JPEG adalah pilihan tepat untuk foto biasa: format ini mengompres detail fotografis dengan sangat efisien tetapi tidak mendukung transparansi dan sedikit kehilangan kualitas setiap kali disimpan ulang. PNG bersifat lossless dan mendukung transparansi, lebih cocok untuk tangkapan layar, logo, dan grafik berwarna datar. WebP umumnya mengungguli keduanya, mendukung transparansi seperti PNG sekaligus mengompres foto hampir sebaik JPEG. AVIF lebih baru lagi dan sering kali mengompres lebih ketat dibanding WebP pada kualitas visual yang sama, meski dukungan browser untuk mengekspornya (bukan sekadar menampilkannya) masih terus berkembang — alat ini akan memberi tahu Anda dengan jelas jika browser Anda tidak bisa menghasilkan file AVIF, alih-alih diam-diam memberikan file yang rusak. GIF, BMP, dan ICO ada untuk kebutuhan lama atau khusus tertentu: GIF untuk gambar berwarna datar sederhana yang butuh kompatibilitas luas dengan perangkat lunak lama, BMP untuk data piksel mentah tanpa kompresi, dan ICO khusus untuk favicon situs web dan ikon aplikasi Windows.",
+    "p3": "Semua proses berjalan secara lokal menggunakan Canvas API bawaan browser Anda — gambar didekode, digambar ke kanvas tak terlihat, lalu diencode ulang ke format target tanpa pernah dikirim ke mana pun. Karena tidak ada browser yang secara native bisa mengekspor BMP, ICO, atau GIF dari kanvas, alat ini menyertakan beberapa potongan kecil JavaScript murni yang menyusun format file tersebut secara manual dari data piksel mentah — tetap 100% lokal, hanya tanpa mengandalkan API browser yang memang tidak tersedia. Pilih satu atau beberapa gambar (foto HEIC dan HEIF langsung dari iPhone otomatis didekode terlebih dahulu), pilih format tujuan, sesuaikan penggeser kualitas untuk JPEG, WebP, atau AVIF, lalu tekan Konversi.",
+    "p4": "Sebagai patokan: konversi foto biasa ke WebP atau AVIF untuk ukuran file terkecil, atau ke JPEG jika Anda butuh kompatibilitas maksimal dengan perangkat lunak lama. Simpan tangkapan layar, ikon, dan apa pun yang membutuhkan transparansi sebagai PNG atau WebP, bukan JPEG. Gunakan ICO khusus saat Anda memerlukan favicon atau ikon aplikasi — outputnya otomatis diubah ukurannya menjadi maksimal standar 256×256. Dukungan input HEIC ada murni untuk kemudahan: jika galeri foto Anda penuh dengan file HEIC iPhone yang ditolak oleh suatu aplikasi atau situs web, alat ini mendekodenya sama seperti gambar lain, sehingga Anda bisa langsung mengonversi ke format apa pun yang benar-benar Anda butuhkan."
+  }
+}
