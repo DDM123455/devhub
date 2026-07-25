@@ -1,26 +1,60 @@
 {
   "meta": {
     "title": "Gerador de código QR grátis online — Web Tool Hub",
-    "description": "Crie um código QR personalizado com suas próprias cores e um logo no centro, de graça e direto no seu navegador. Baixe como PNG na hora — sem upload, sem cadastro, sem rastreamento."
+    "description": "Crie um código QR para uma URL, rede Wi-Fi, cartão de contato, email ou SMS — com suas próprias cores e um logo no centro, de graça e direto no seu navegador. Baixe como PNG ou SVG — sem upload, sem cadastro, sem rastreamento."
   },
   "heading": "Gerador de código QR",
   "tagline": "Crie um código QR personalizado com suas próprias cores e logo, direto no seu navegador.",
   "ui": {
-    "textLabel": "Texto ou URL",
-    "textPlaceholder": "https://exemplo.com",
+    "contentTypeLabel": "Tipo de conteúdo",
+    "typeUrl": "URL",
+    "typeText": "Texto simples",
+    "typeWifi": "Rede Wi-Fi",
+    "typeVcard": "Contato (vCard)",
+    "typeEmail": "Email",
+    "typeSms": "SMS",
+    "urlLabel": "URL",
+    "urlPlaceholder": "https://exemplo.com",
+    "textLabel": "Texto",
+    "textPlaceholder": "Digite qualquer texto…",
+    "wifiSsidLabel": "Nome da rede (SSID)",
+    "wifiPasswordLabel": "Senha",
+    "wifiEncryptionLabel": "Segurança",
+    "wifiEncryptionWpa": "WPA/WPA2",
+    "wifiEncryptionWep": "WEP",
+    "wifiEncryptionNone": "Nenhuma (rede aberta)",
+    "wifiHiddenLabel": "Rede oculta",
+    "vcardFirstNameLabel": "Nome",
+    "vcardLastNameLabel": "Sobrenome",
+    "vcardPhoneLabel": "Telefone",
+    "vcardEmailLabel": "Email",
+    "vcardOrgLabel": "Organização",
+    "vcardUrlLabel": "Site",
+    "emailToLabel": "Para",
+    "emailSubjectLabel": "Assunto",
+    "emailBodyLabel": "Mensagem",
+    "smsPhoneLabel": "Número de telefone",
+    "smsMessageLabel": "Mensagem",
     "fgColorLabel": "Cor principal",
     "bgColorLabel": "Cor de fundo",
     "sizeLabel": "Tamanho: {{size}}px",
+    "levelLabel": "Correção de erros",
+    "levelL": "L — recupera ~7%",
+    "levelM": "M — recupera ~15%",
+    "levelQ": "Q — recupera ~25%",
+    "levelH": "H — recupera ~30%",
     "logoLabel": "Logo (opcional)",
     "removeLogo": "Remover logo",
-    "download": "Baixar PNG"
+    "pngResolutionLabel": "Resolução do PNG",
+    "downloadPng": "Baixar PNG",
+    "downloadSvg": "Baixar SVG"
   },
   "related": "Ferramentas relacionadas",
   "article": {
     "heading": "Por que gerar códigos QR localmente em vez de usar um serviço \"grátis\" que rastreia?",
     "p1": "Códigos QR aparecem em toda parte — em um cartão de visita, no cardápio de um restaurante, na senha do Wi-Fi colada no roteador, em um cartaz de evento. Muitos sites gratuitos de \"gerador de código QR\" na verdade não codificam seu link diretamente; em vez disso, geram um link curto para o próprio servidor deles e codificam esse link, então cada leitura passa discretamente por — e é registrada por — uma empresa que você nunca ouviu falar. Se essa empresa encerrar o serviço de redirecionamento, todo código QR que você já imprimiu para de funcionar silenciosamente, mesmo anos depois.",
     "p2": "Esta ferramenta não faz isso. Ela usa o qrcode.react para codificar seu texto ou URL exatos diretamente no próprio padrão do código QR, renderizado em um canvas HTML totalmente dentro do seu navegador. Não há servidor intermediário, nem redirecionamento, nem rastreamento de leituras, porque não há nada para um servidor se intrometer: o código que você baixar vai continuar funcionando enquanto existirem leitores de QR, totalmente independente deste site.",
-    "p3": "Digite o texto ou a URL que você quer codificar e escolha uma cor principal e de fundo de acordo com sua marca. Envie uma imagem para colocar um logo no centro — a ferramenta aumenta automaticamente o nível de correção de erros do código QR para o mais alto (nível H, com cerca de 30% de redundância) sempre que há um logo, o que mantém o código lido de forma confiável mesmo com parte do padrão coberta. Ajuste o controle deslizante de tamanho conforme seu uso, de um pequeno adesivo a um cartaz grande, e clique em Baixar PNG.",
-    "p4": "Algumas coisas afetam se um código QR realmente é lido bem na prática: mantenha contraste suficiente entre a cor principal e a de fundo — um cinza claro sobre fundo branco fica bonito, mas costuma falhar na leitura — e evite deixar o logo grande demais em relação ao código, já que mesmo o nível mais alto de correção de erros tem limites. Se você está codificando uma URL longa, considere encurtá-la antes; códigos QR para textos curtos ficam com uma grade mais simples e menos densa, mais fácil para a câmera do celular focar do que uma muito longa e complexa. Se você também trabalha com dados estruturados no lado de desenvolvimento, a ferramenta Formatador e validador JSON funciona com a mesma abordagem local focada em privacidade."
+    "p3": "Escolha o que você quer codificar no menu de tipo de conteúdo — uma URL ou texto simples, os dados de uma rede Wi-Fi para o celular entrar na rede assim que ler o código, um cartão de contato (vCard) que se salva direto na agenda de quem escaneia, ou um email ou SMS já preenchido — e complete apenas os campos que aquele tipo precisa; trocar de tipo mantém as cores e o logo escolhidos. Escolha uma cor principal e de fundo de acordo com sua marca, e um nível de correção de erros: níveis mais altos (Q, H) deixam o código mais resistente a manchas, reflexos ou um logo cobrindo parte do padrão, ao custo de uma grade um pouco mais densa. Envie uma imagem para colocar um logo no centro — isso eleva automaticamente o nível de correção de erros para H se ainda não estiver nesse nível, já que cobrir parte do padrão exige essa redundância extra para continuar legível, mas você ainda pode baixar o nível manualmente depois.",
+    "p4": "Algumas coisas afetam se um código QR realmente é lido bem na prática: mantenha contraste suficiente entre a cor principal e a de fundo — um cinza claro sobre fundo branco fica bonito, mas costuma falhar na leitura — e evite deixar o logo grande demais em relação ao código, já que mesmo o nível mais alto de correção de erros tem limites. Quando estiver satisfeito, clique em Baixar PNG ou Baixar SVG. O PNG gera uma imagem raster de tamanho fixo — escolha uma resolução entre 256×256 e 2048×2048 dependendo se o código vai para um adesivo pequeno ou um cartaz grande — enquanto o SVG é um arquivo vetorial que fica nítido em qualquer tamanho de impressão, o formato que a maioria das gráficas e ferramentas de design prefere. Se você está codificando uma URL longa, considere encurtá-la antes; códigos QR para textos curtos ficam com uma grade mais simples e menos densa, mais fácil para a câmera do celular focar do que uma muito longa e complexa. Se você também trabalha com dados estruturados no lado de desenvolvimento, a ferramenta Formatador e validador JSON funciona com a mesma abordagem local focada em privacidade."
   }
 }

@@ -10,12 +10,13 @@
   Phase 2) + mục "Checklist Feature Parity" vào `CLAUDE.md` — mục tiêu đưa từng tool từ
   "MVP chạy được" lên "ngang tầm đối thủ đầu ngành" (benchmark, so sánh feature-by-feature,
   nâng cấp).
-- Task tiếp theo cần làm: **Phase 1.5**, tool #1, #2, #3, #6, #7, #8 đã xong (đủ điều kiện
-  tick). Tool #4 & #5 "Gộp/Tách PDF" đã build+test xong 3/4 mục con (còn thiếu nén PDF, để
-  sau) — xem log 2026-07-25 bên dưới. Task kế tiếp khi mở phiên mới: tool **#9 "QR Code
-  Generator"** trong Phase 1.5 (benchmark qr-code-generator.com — nhiều loại nội dung
-  URL/text/WiFi/vCard/email/SMS, tùy chỉnh màu/logo/error correction, export PNG nhiều độ
-  phân giải + SVG).
+- Task tiếp theo cần làm: **Phase 1.5**, tool #1, #2, #3, #6, #7, #8, #9 đã xong (đủ điều
+  kiện tick). Tool #4 & #5 "Gộp/Tách PDF" đã build+test xong 3/4 mục con (còn thiếu nén
+  PDF, để sau) — xem log 2026-07-25 bên dưới. Task kế tiếp khi mở phiên mới: tool **#10
+  "Chuyển đổi Case văn bản"** trong Phase 1.5 (benchmark ConvertCase.net — thêm Sentence
+  case/aLtErNaTiNg/iNVERSE, xóa khoảng trắng thừa/xuống dòng thừa, sắp xếp dòng theo
+  alphabet). Đây là tool CUỐI CÙNG của Phase 1.5 — sau khi xong tool #10 (trừ mục nén PDF
+  còn treo của #4/#5), toàn bộ Phase 1.5 coi như hoàn tất, chuyển sang Phase 2.
 - Ghi chú thiết kế (2026-07-25): đã redesign toàn bộ giao diện site (không phải task trong
   `ROADMAP.md`, làm theo yêu cầu trực tiếp của người dùng) dựa trên file mockup
   `Web Tool Hub.dc.html` ở gốc repo (file KHÔNG được commit vào git — chỉ là tài liệu tham
@@ -87,6 +88,69 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 1.5, tool #9: Nâng cấp "QR Code Generator" lên Feature Parity — XONG
+- Benchmark: qr-code-generator.com.
+- Trạng thái trước khi nâng cấp: chỉ có 1 ô nhập văn bản/URL đơn, màu sắc + logo đã có sẵn
+  từ Phase 1, mức sửa lỗi (error correction) bị hard-code cứng ở `level="H"` luôn luôn
+  (không cho chọn), chỉ export được PNG (qua `canvas.toDataURL`), không có SVG.
+- Đã làm (viết lại gần như toàn bộ `QrCodeGenerator.tsx`):
+  - Thêm dropdown chọn **loại nội dung**: URL, văn bản thường, Wi-Fi, danh thiếp (vCard),
+    email, SMS — mỗi loại có bộ field riêng, đổi loại nội dung KHÔNG làm mất màu sắc/logo
+    đã chọn (state riêng biệt cho từng loại, không dùng chung 1 ô input).
+  - Tự viết 4 hàm tạo payload theo đúng định dạng chuẩn mà hầu hết máy quét QR hỗ trợ
+    (không có thư viện nào trong `qrcode.react` làm việc này, phải tự implement theo spec
+    de-facto):
+    - Wi-Fi: `WIFI:T:<WPA|WEP|nopass>;S:<ssid>;P:<password>;H:<true>;;` — có escape các ký
+      tự đặc biệt `\;,":` bằng backslash theo đúng quy ước mọi máy quét đều hiểu ngầm (Wi-Fi
+      QR không có spec chính thức, nhưng quy ước escape này thống nhất giữa Android/iOS).
+    - vCard: chuẩn `BEGIN:VCARD...VERSION:3.0...N:/FN:/TEL:/EMAIL:/ORG:/URL:...END:VCARD`,
+      chỉ thêm dòng nào có dữ liệu.
+    - Email: `mailto:<to>?subject=...&body=...` dùng `URLSearchParams` để tự động encode
+      đúng chuẩn URI.
+    - SMS: `SMSTO:<phone>:<message>` — định dạng được hầu hết máy quét nhận diện rộng rãi
+      hơn `sms:` URI scheme hiện đại.
+  - Thêm dropdown chọn **mức sửa lỗi L/M/Q/H** (trước đó hard-code H). Giữ lại hành vi tiện
+    lợi cũ (tự nâng lên H khi có logo) nhưng CHỈ khi mức hiện tại đang thấp hơn H — không
+    ghi đè lựa chọn thủ công của người dùng nếu họ đã tự chọn Q/H từ trước, và vẫn cho phép
+    hạ mức lại bằng tay sau khi tự động nâng.
+  - Thêm **export SVG**: dùng component `QRCodeSVG` có sẵn trong `qrcode.react` (trước đó
+    chỉ dùng `QRCodeCanvas`), render ẩn (`aria-hidden`, `h-0 w-0 overflow-hidden`) song
+    song với canvas hiển thị, lấy `outerHTML` qua `XMLSerializer`, thêm khai báo XML rồi
+    tải xuống dạng `.svg`.
+  - Thêm **chọn độ phân giải PNG khi tải xuống** (256/512/1024/2048px), TÁCH RIÊNG khỏi
+    thanh trượt kích thước xem trước (preview vẫn 128–512px để không làm chậm re-render khi
+    kéo trượt) — render thêm 1 `QRCodeCanvas` ẩn ở đúng độ phân giải đã chọn, tải xuống từ
+    canvas ẩn đó thay vì canvas hiển thị.
+- Test tương tác qua Puppeteer (`test-qr.mjs`, `test-qr-export.mjs` trong scratchpad, không
+  commit) — **quan trọng: không chỉ kiểm tra chuỗi payload bằng mắt, mà GIẢI MÃ THẬT lại
+  ảnh QR đã render** bằng thư viện `jsqr` (cài tạm trong scratchpad, không phải dependency
+  dự án) đọc `canvas.getImageData()` rồi decode ngược — cách duy nhất xác nhận chắc chắn
+  rằng ảnh QR sinh ra thực sự quét được đúng nội dung, không chỉ "state React đúng":
+  - URL mặc định giải mã đúng y hệt.
+  - Wi-Fi: giải mã lại đúng `WIFI:T:WPA;S:MyHome Network;P:sup3r\;secret\"pass;;` — xác
+    nhận việc escape `;` và `"` trong mật khẩu hoạt động thật qua 1 vòng encode→quét ảnh→
+    decode thật, không chỉ so sánh chuỗi JS. Test thêm chế độ "nopass" xác nhận field `P:`
+    biến mất hoàn toàn.
+  - vCard: giải mã đúng đủ 6 dòng `BEGIN/VERSION/N/FN/TEL/EMAIL/END`.
+  - Email: giải mã đúng `mailto:...?subject=Hi+there&body=This+is+a+test+%26+more` — xác
+    nhận ký tự `&` trong nội dung body được `URLSearchParams` tự encode đúng thành `%26`
+    (không làm hỏng cấu trúc query string).
+  - SMS: giải mã đúng `SMSTO:+15550100:Hello from QR`.
+  - Đổi loại nội dung qua lại xác nhận màu FG đã chọn (`#ff0000`) không bị mất.
+  - Test xuất file thật: chọn độ phân giải PNG 2048px, tải xuống, **đọc trực tiếp 4 byte
+    IHDR chunk của file PNG thật** (offset 16-23, big-endian) để xác nhận kích thước ảnh
+    đúng 2048×2048 — không tin vào việc UI "trông đúng", đọc thẳng byte nhị phân của file
+    kết quả. Tải SVG, xác nhận có khai báo `<?xml...?>` và thẻ `<svg>` hợp lệ.
+  - Test hành vi tự nâng mức sửa lỗi: đặt mức về L, giả lập upload logo thật bằng
+    `DataTransfer` + `File` API thật trong context trang (không gọi thẳng hàm xử lý bằng
+    tay) để đảm bảo đúng luồng sự kiện `input[type=file].onchange` thật của React, xác nhận
+    mức tự nhảy lên H.
+- `npm run build` sạch. Đã tick đủ 3/3 checkbox con + dòng cha "9. QR Code Generator" trong
+  `ROADMAP.md` Phase 1.5.
+- Cập nhật đoạn nội dung SEO (bài viết p3/p4 + meta description) ở cả 8 ngôn ngữ để mô tả
+  đủ các loại nội dung mới, mức sửa lỗi chọn được, và export SVG/độ phân giải PNG — viết
+  thêm/sửa câu bằng tay cho từng ngôn ngữ, không dịch máy nguyên khối.
 
 ### 2026-07-25 — Phase 1.5, tool #8: Nâng cấp "JSON Formatter & Validator" lên Feature
   Parity — XONG

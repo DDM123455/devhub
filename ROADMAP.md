@@ -91,10 +91,10 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
   - [x] Báo lỗi cú pháp kèm số dòng chính xác, highlight dòng lỗi
   - [x] Convert JSON → XML/YAML/CSV
 
-- [ ] **9. QR Code Generator** — benchmark: qr-code-generator.com
-  - [ ] Hỗ trợ nhiều loại nội dung: URL, plain text, WiFi, vCard, email, SMS
-  - [ ] Tùy chỉnh màu sắc, chèn logo giữa, chọn mức error correction (L/M/Q/H)
-  - [ ] Export ở nhiều định dạng: PNG (chọn độ phân giải), SVG
+- [x] **9. QR Code Generator** — benchmark: qr-code-generator.com
+  - [x] Hỗ trợ nhiều loại nội dung: URL, plain text, WiFi, vCard, email, SMS
+  - [x] Tùy chỉnh màu sắc, chèn logo giữa, chọn mức error correction (L/M/Q/H)
+  - [x] Export ở nhiều định dạng: PNG (chọn độ phân giải), SVG
 
 - [ ] **10. Chuyển đổi Case văn bản** — benchmark: ConvertCase.net
   - [ ] Thêm các kiểu: Sentence case, aLtErNaTiNg CaSe, iNVERSE cASE
