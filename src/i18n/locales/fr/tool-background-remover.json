@@ -1,13 +1,13 @@
 {
   "meta": {
     "title": "Supprimer l'arrière-plan d'une image gratuitement (IA, sans envoi) — Web Tool Hub",
-    "description": "Supprimez l'arrière-plan d'une photo gratuitement grâce à un modèle d'IA local qui s'exécute entièrement dans votre navigateur. Sans envoi, sans inscription — votre photo ne quitte jamais votre appareil."
+    "description": "Supprimez l'arrière-plan d'une photo gratuitement grâce à un modèle d'IA local qui s'exécute entièrement dans votre navigateur. Remplacez-le par une couleur ou une autre image, comparez avant/après avec un curseur. Sans envoi, sans inscription."
   },
   "heading": "Supprimer l'arrière-plan",
-  "tagline": "Détourez automatiquement une photo, directement dans votre navigateur.",
+  "tagline": "Détourez automatiquement une photo et remplacez l'arrière-plan par une couleur ou une image, directement dans votre navigateur.",
   "ui": {
-    "selectFiles": "Sélectionner une image",
-    "dropHint": "ou glissez-déposez une image ici",
+    "selectFiles": "Sélectionner des images",
+    "dropHint": "ou glissez-déposez vos images ici",
     "remove": "Supprimer l'arrière-plan",
     "removing": "Suppression de l'arrière-plan… {{percent}} %",
     "download": "Télécharger",
@@ -15,14 +15,21 @@
     "result": "Résultat",
     "noFiles": "Aucune image sélectionnée pour le moment.",
     "errorGeneric": "Une erreur est survenue lors de la suppression de l'arrière-plan de cette image. Réessayez.",
-    "modelNotice": "Le premier clic télécharge un petit modèle d'IA (quelques Mo) dans votre navigateur — ensuite, tout fonctionne hors ligne. Votre photo n'est quant à elle jamais envoyée où que ce soit."
+    "modelNotice": "Le premier clic télécharge un petit modèle d'IA (quelques Mo) dans votre navigateur — ensuite, tout fonctionne hors ligne. Vos photos, elles, ne sont quant à elles jamais envoyées où que ce soit.",
+    "backgroundLabel": "Arrière-plan",
+    "backgroundTransparent": "Transparent",
+    "backgroundColor": "Couleur unie",
+    "backgroundImage": "Image personnalisée",
+    "backgroundImageSelect": "Choisir une image de fond",
+    "backgroundImageClear": "Retirer",
+    "edgeSoftnessLabel": "Adoucissement des bords"
   },
   "related": "Outils associés",
   "article": {
     "heading": "Comment fonctionne la suppression d'arrière-plan par IA locale dans le navigateur ?",
     "p1": "Auparavant, supprimer l'arrière-plan d'une photo signifiait soit utiliser un outil par abonnement qui envoie votre image vers un serveur, soit détourer le sujet à la main dans un éditeur d'images. Cet outil ne fait ni l'un ni l'autre : il exécute un petit modèle d'IA de segmentation directement dans votre onglet de navigateur pour déterminer quels pixels appartiennent au sujet et lesquels appartiennent à l'arrière-plan, puis rend l'arrière-plan transparent — le tout sans que votre photo ne soit jamais envoyée où que ce soit. C'est le même type de retouche souvent utilisé pour les photos de produits, les photos de profil ou les stickers — ce qui prenait autrefois des minutes dans un éditeur d'images ne prend désormais que quelques secondes.",
-    "p2": "La première fois que vous l'utilisez, votre navigateur télécharge le modèle d'IA lui-même — quelques mégaoctets — de la même façon qu'il téléchargerait n'importe quelle image ou script d'un site web. Ce téléchargement n'a lieu qu'une seule fois et reste en cache pour la prochaine fois. Votre photo, elle, est totalement distincte : elle est chargée directement dans la mémoire du navigateur et traitée là, sans jamais être envoyée vers un serveur, pas même temporairement.",
-    "p3": "L'utilisation est simple : sélectionnez une photo, patientez quelques secondes pendant que le modèle l'analyse (un indicateur de progression affiche l'avancement), puis téléchargez le résultat sous forme de PNG transparent. Le traitement s'exécutant dans un Web Worker, le reste de la page reste réactif pendant l'analyse, même sur une photo volumineuse.",
-    "p4": "Les meilleurs résultats s'obtiennent généralement sur des photos avec un sujet net et distinct — personnes, animaux, produits, véhicules — sur un fond d'une couleur différente de celle du sujet. Les détails très fins, comme des mèches de cheveux ou du pelage, peuvent ne pas ressortir parfaitement, et un arrière-plan chargé peut parfois perturber le modèle. Si le résultat n'est pas tout à fait satisfaisant, recadrer la photo plus près du sujet avant de l'envoyer aide souvent beaucoup. Photographier le sujet sur un fond uni et bien éclairé dès le départ facilite aussi, pour n'importe quel outil — humain ou IA —, un détourage plus propre."
+    "p2": "La première fois que vous l'utilisez, votre navigateur télécharge le modèle d'IA lui-même — quelques mégaoctets — de la même façon qu'il téléchargerait n'importe quelle image ou script d'un site web. Ce téléchargement n'a lieu qu'une seule fois et reste en cache pour la prochaine fois. Vos photos, elles, sont totalement distinctes : chacune est chargée directement dans la mémoire du navigateur et traitée là, sans jamais être envoyée vers un serveur, pas même temporairement.",
+    "p3": "Sélectionnez une ou plusieurs photos et cliquez sur Supprimer l'arrière-plan — chacune est traitée l'une après l'autre, avec un indicateur de progression, dans un Web Worker afin que le reste de la page reste réactif. Une fois un résultat prêt, faites glisser le curseur sur sa vignette pour comparer l'original et le détourage côte à côte. Par défaut l'arrière-plan devient transparent (affiché sous forme de damier), mais vous pouvez le remplacer par une couleur unie ou votre propre image de fond grâce aux contrôles au-dessus de la liste — chaque photo terminée se met à jour instantanément, recomposer un arrière-plan étant une opération légère, contrairement à relancer le modèle d'IA. Le curseur d'adoucissement des bords floute légèrement le bord alpha du détourage, ce qui peut rendre des cheveux fins ou une fourrure moins « découpés » et plus naturels ; il est désactivé par défaut, la plupart des sujets étant plus nets avec le bord net déjà produit par le modèle.",
+    "p4": "Les meilleurs résultats s'obtiennent généralement sur des photos avec un sujet net et distinct — personnes, animaux, produits, véhicules — sur un fond d'une couleur différente de celle du sujet. Les détails très fins, comme des mèches de cheveux ou du pelage, peuvent ne pas ressortir parfaitement même avec l'adoucissement activé, et un arrière-plan chargé peut parfois perturber le modèle. Si le résultat n'est pas tout à fait satisfaisant, recadrer la photo plus près du sujet avant de l'envoyer aide souvent beaucoup."
   }
 }

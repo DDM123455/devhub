@@ -1,13 +1,13 @@
 {
   "meta": {
     "title": "Remover fundo de imagem grátis com IA (sem upload) — Web Tool Hub",
-    "description": "Remova o fundo de uma foto grátis com um modelo de IA local que roda totalmente no seu navegador. Sem upload, sem cadastro — sua foto nunca sai do seu dispositivo."
+    "description": "Remova o fundo de uma foto grátis com um modelo de IA local que roda totalmente no seu navegador. Substitua por uma cor ou outra imagem, compare antes/depois com um controle deslizante. Sem upload, sem cadastro."
   },
   "heading": "Remover fundo",
-  "tagline": "Remova o fundo de uma foto automaticamente, direto no navegador.",
+  "tagline": "Remova o fundo de uma foto automaticamente e substitua por uma cor ou imagem, direto no navegador.",
   "ui": {
-    "selectFiles": "Selecionar imagem",
-    "dropHint": "ou arraste e solte uma imagem aqui",
+    "selectFiles": "Selecionar imagens",
+    "dropHint": "ou arraste e solte as imagens aqui",
     "remove": "Remover fundo",
     "removing": "Removendo o fundo… {{percent}}%",
     "download": "Baixar",
@@ -15,14 +15,21 @@
     "result": "Resultado",
     "noFiles": "Nenhuma imagem selecionada ainda.",
     "errorGeneric": "Ocorreu um erro ao remover o fundo desta imagem. Tente novamente.",
-    "modelNotice": "O primeiro clique baixa um pequeno modelo de IA (alguns MB) para o seu navegador — depois disso funciona totalmente offline. Sua foto nunca é enviada a lugar nenhum."
+    "modelNotice": "O primeiro clique baixa um pequeno modelo de IA (alguns MB) para o seu navegador — depois disso funciona totalmente offline. Suas fotos nunca são enviadas a lugar nenhum.",
+    "backgroundLabel": "Fundo",
+    "backgroundTransparent": "Transparente",
+    "backgroundColor": "Cor sólida",
+    "backgroundImage": "Imagem personalizada",
+    "backgroundImageSelect": "Escolher imagem de fundo",
+    "backgroundImageClear": "Remover",
+    "edgeSoftnessLabel": "Suavização de borda"
   },
   "related": "Ferramentas relacionadas",
   "article": {
     "heading": "Como funciona a remoção de fundo com IA local no navegador?",
     "p1": "Antes, remover o fundo de uma foto geralmente exigia uma ferramenta paga que enviava sua imagem para um servidor, ou recortar manualmente o contorno do assunto em um editor de imagens. Esta ferramenta não faz nenhuma das duas coisas: ela roda um pequeno modelo de IA de segmentação direto na aba do seu navegador para identificar quais pixels pertencem ao assunto e quais pertencem ao fundo, e então torna o fundo transparente — tudo sem que sua foto seja enviada a lugar nenhum. É o mesmo tipo de edição usada para fotos de produtos, fotos de perfil ou stickers — algo que antes levava minutos em um editor de imagens agora leva segundos.",
-    "p2": "Na primeira vez que você usar, seu navegador vai baixar o próprio modelo de IA — apenas alguns megabytes — da mesma forma que baixaria qualquer imagem ou script de um site. Esse download acontece só uma vez e fica em cache para a próxima. Sua foto é algo completamente separado: ela é carregada direto na memória do navegador e processada ali, sem nunca ser enviada a um servidor, nem mesmo temporariamente.",
-    "p3": "É simples de usar: selecione uma foto, espere alguns segundos enquanto o modelo analisa (um indicador de progresso mostra o andamento), e baixe o resultado como um PNG transparente. Como o processo roda em um Web Worker, o resto da página continua respondendo enquanto a análise acontece, mesmo em uma foto grande.",
-    "p4": "Os melhores resultados costumam vir de fotos com um assunto claro e bem definido — pessoas, animais, produtos, veículos — sobre um fundo de cor diferente do assunto. Detalhes bem finos, como fios soltos de cabelo ou pelos, podem não sair perfeitos, e fundos muito carregados às vezes confundem o modelo. Se o resultado não ficar bom, recortar a foto mais próxima do assunto antes de enviar costuma ajudar bastante. Fotografar o assunto sobre um fundo liso e com iluminação uniforme desde o início também ajuda qualquer ferramenta — humana ou de IA — a produzir um recorte mais limpo."
+    "p2": "Na primeira vez que você usar, seu navegador vai baixar o próprio modelo de IA — apenas alguns megabytes — da mesma forma que baixaria qualquer imagem ou script de um site. Esse download acontece só uma vez e fica em cache para a próxima. Suas fotos são algo completamente separado: cada uma é carregada direto na memória do navegador e processada ali, sem nunca ser enviada a um servidor, nem mesmo temporariamente.",
+    "p3": "Selecione uma ou mais fotos e clique em Remover fundo — cada uma é processada por vez, com um indicador de progresso, dentro de um Web Worker para que o resto da página continue respondendo. Assim que um resultado fica pronto, arraste o controle deslizante sobre a miniatura para comparar o original com o recorte lado a lado. Por padrão o fundo fica transparente (mostrado como um padrão quadriculado), mas você pode trocar por uma cor sólida ou por uma imagem de fundo própria usando os controles acima da lista — cada foto concluída atualiza na hora, já que recompor um fundo é uma operação leve, diferente de rodar o modelo de IA de novo. O controle de suavização de borda desfoca levemente a borda alfa do recorte, o que pode fazer cabelo fino ou pelo parecer menos recortado e mais natural; vem desativado por padrão porque a maioria dos assuntos fica melhor com a borda nítida que o modelo já produz.",
+    "p4": "Os melhores resultados costumam vir de fotos com um assunto claro e bem definido — pessoas, animais, produtos, veículos — sobre um fundo de cor diferente do assunto. Detalhes bem finos, como fios soltos de cabelo ou pelos, podem não sair perfeitos mesmo com a suavização ativada, e fundos muito carregados às vezes confundem o modelo. Se o resultado não ficar bom, recortar a foto mais próxima do assunto antes de enviar costuma ajudar bastante."
   }
 }

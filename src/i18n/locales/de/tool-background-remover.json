@@ -1,13 +1,13 @@
 {
   "meta": {
     "title": "Bildhintergrund kostenlos entfernen (KI, kein Upload) — Web Tool Hub",
-    "description": "Entferne den Hintergrund eines Fotos kostenlos mit einem lokalen KI-Modell, das vollständig in deinem Browser läuft. Kein Upload, keine Anmeldung — dein Foto verlässt nie dein Gerät."
+    "description": "Entferne den Hintergrund eines Fotos kostenlos mit einem lokalen KI-Modell, das vollständig in deinem Browser läuft. Ersetze ihn durch eine Farbe oder ein anderes Bild, vergleiche Vorher/Nachher mit einem Schieberegler. Kein Upload, keine Anmeldung."
   },
   "heading": "Hintergrund entfernen",
-  "tagline": "Entferne den Hintergrund eines Fotos automatisch, direkt im Browser.",
+  "tagline": "Entferne den Hintergrund eines Fotos automatisch und ersetze ihn durch eine Farbe oder ein Bild, direkt im Browser.",
   "ui": {
-    "selectFiles": "Bild auswählen",
-    "dropHint": "oder ein Bild hierher ziehen",
+    "selectFiles": "Bilder auswählen",
+    "dropHint": "oder Bilder hierher ziehen",
     "remove": "Hintergrund entfernen",
     "removing": "Hintergrund wird entfernt… {{percent}} %",
     "download": "Herunterladen",
@@ -15,14 +15,21 @@
     "result": "Ergebnis",
     "noFiles": "Noch kein Bild ausgewählt.",
     "errorGeneric": "Beim Entfernen des Hintergrunds ist ein Fehler aufgetreten. Bitte versuche es erneut.",
-    "modelNotice": "Beim ersten Klick wird ein kleines KI-Modell (wenige MB) in deinen Browser geladen — danach funktioniert alles vollständig offline. Dein Foto selbst wird dabei nie irgendwohin hochgeladen."
+    "modelNotice": "Beim ersten Klick wird ein kleines KI-Modell (wenige MB) in deinen Browser geladen — danach funktioniert alles vollständig offline. Deine Fotos selbst werden dabei nie irgendwohin hochgeladen.",
+    "backgroundLabel": "Hintergrund",
+    "backgroundTransparent": "Transparent",
+    "backgroundColor": "Einfarbig",
+    "backgroundImage": "Eigenes Bild",
+    "backgroundImageSelect": "Hintergrundbild wählen",
+    "backgroundImageClear": "Entfernen",
+    "edgeSoftnessLabel": "Kantenweichheit"
   },
   "related": "Ähnliche Tools",
   "article": {
     "heading": "Wie funktioniert lokale Hintergrundentfernung per KI im Browser?",
     "p1": "Früher bedeutete das Entfernen des Hintergrunds entweder ein Abo-Tool, das dein Bild auf einen Server hochlädt, oder das manuelle Freistellen des Motivs in einem Bildbearbeitungsprogramm. Dieses Tool macht keines von beidem: Es führt ein kleines KI-Segmentierungsmodell direkt in deinem Browser-Tab aus, um herauszufinden, welche Pixel zum Motiv und welche zum Hintergrund gehören, und macht den Hintergrund dann transparent — alles, ohne dass dein Foto jemals irgendwohin gesendet wird. Es ist die gleiche Art von Bearbeitung, die oft für Produktfotos, Profilbilder oder Sticker verwendet wird — was früher Minuten in einem Bildbearbeitungsprogramm dauerte, dauert jetzt Sekunden.",
-    "p2": "Beim ersten Gebrauch lädt dein Browser das KI-Modell selbst herunter — wenige Megabyte —, genauso wie er jedes andere Bild oder Skript von einer Website laden würde. Dieser Download passiert nur einmal und wird für das nächste Mal zwischengespeichert. Dein Foto ist etwas völlig anderes: Es wird direkt in den Speicher des Browsers geladen und dort verarbeitet, ohne jemals auf einen Server hochgeladen zu werden, nicht einmal vorübergehend.",
-    "p3": "Die Bedienung ist einfach: Wähle ein Foto aus, warte ein paar Sekunden, während das Modell es analysiert (eine Fortschrittsanzeige zeigt den Stand), und lade das Ergebnis als transparentes PNG herunter. Da der Vorgang in einem Web Worker läuft, bleibt der Rest der Seite während der Analyse reaktionsfähig, selbst bei einem großen Foto.",
-    "p4": "Die besten Ergebnisse gibt es meist bei Fotos mit einem klaren, deutlich abgegrenzten Motiv — Personen, Tiere, Produkte, Fahrzeuge — vor einem Hintergrund, der nicht dieselbe Farbe wie das Motiv hat. Sehr feine Details wie einzelne Haarsträhnen oder Fell kommen möglicherweise nicht perfekt heraus, und ein unruhiger Hintergrund kann das Modell manchmal verwirren. Wenn das Ergebnis nicht ganz stimmt, hilft es oft, das Foto vor dem Hochladen enger um das Motiv zuzuschneiden. Das Motiv von Anfang an vor einem einfarbigen, gleichmäßig ausgeleuchteten Hintergrund zu fotografieren, erleichtert zudem jedem Werkzeug — ob Mensch oder KI — einen saubereren Freistellungsschnitt."
+    "p2": "Beim ersten Gebrauch lädt dein Browser das KI-Modell selbst herunter — wenige Megabyte —, genauso wie er jedes andere Bild oder Skript von einer Website laden würde. Dieser Download passiert nur einmal und wird für das nächste Mal zwischengespeichert. Deine Fotos sind etwas völlig anderes: Jedes wird direkt in den Speicher des Browsers geladen und dort verarbeitet, ohne jemals auf einen Server hochgeladen zu werden, nicht einmal vorübergehend.",
+    "p3": "Wähle ein oder mehrere Fotos aus und klicke auf Hintergrund entfernen — jedes wird nacheinander verarbeitet, mit Fortschrittsanzeige, in einem Web Worker, sodass der Rest der Seite reaktionsfähig bleibt. Sobald ein Ergebnis fertig ist, ziehe den Schieberegler über sein Vorschaubild, um Original und Freistellung nebeneinander zu vergleichen. Standardmäßig wird der Hintergrund transparent (als Schachbrettmuster dargestellt), du kannst ihn aber über die Steuerelemente oberhalb der Liste durch eine einfarbige Fläche oder ein eigenes Hintergrundbild ersetzen — jedes fertige Foto aktualisiert sich sofort, da das Neuzusammensetzen eines Hintergrunds eine leichte Operation ist, anders als das erneute Ausführen des KI-Modells. Der Regler für Kantenweichheit weicht die Alpha-Kante der Freistellung leicht auf, wodurch feines Haar oder Fell weniger „ausgeschnitten“ und natürlicher wirken kann; er ist standardmäßig deaktiviert, da die meisten Motive mit der scharfen Kante, die das Modell bereits liefert, am besten aussehen.",
+    "p4": "Die besten Ergebnisse gibt es meist bei Fotos mit einem klaren, deutlich abgegrenzten Motiv — Personen, Tiere, Produkte, Fahrzeuge — vor einem Hintergrund, der nicht dieselbe Farbe wie das Motiv hat. Sehr feine Details wie einzelne Haarsträhnen oder Fell kommen möglicherweise auch mit erhöhter Kantenweichheit nicht perfekt heraus, und ein unruhiger Hintergrund kann das Modell manchmal verwirren. Wenn das Ergebnis nicht ganz stimmt, hilft es oft, das Foto vor dem Hochladen enger um das Motiv zuzuschneiden."
   }
 }

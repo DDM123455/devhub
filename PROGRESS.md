@@ -10,10 +10,10 @@
   Phase 2) + mục "Checklist Feature Parity" vào `CLAUDE.md` — mục tiêu đưa từng tool từ
   "MVP chạy được" lên "ngang tầm đối thủ đầu ngành" (benchmark, so sánh feature-by-feature,
   nâng cấp).
-- Task tiếp theo cần làm: **Phase 1.5**, tool #1 và #2 đã xong (xem log bên dưới) — tiếp
-  tục với tool **#3 "Xóa nền ảnh"** (benchmark remove.bg, Adobe Express Background
-  Remover): preview dạng slider kéo trước/sau, thay nền bằng màu solid/ảnh khác, xử lý
-  hàng loạt, tinh chỉnh viền nếu thư viện `@imgly/background-removal` hỗ trợ.
+- Task tiếp theo cần làm: **Phase 1.5**, tool #1, #2, #3 đã xong (xem log bên dưới) — tiếp
+  tục với tool **#4 & #5 "Gộp/Tách PDF"** (benchmark iLovePDF, Smallpdf, PDF2GO): hiển thị
+  thumbnail từng trang PDF + kéo-thả sắp xếp thứ tự, tách theo range/mỗi N trang/trang chỉ
+  định, xoay/xóa trang riêng lẻ, nén PDF nếu khả thi client-side.
 - Ghi chú thiết kế (2026-07-25): đã redesign toàn bộ giao diện site (không phải task trong
   `ROADMAP.md`, làm theo yêu cầu trực tiếp của người dùng) dựa trên file mockup
   `Web Tool Hub.dc.html` ở gốc repo (file KHÔNG được commit vào git — chỉ là tài liệu tham
@@ -85,6 +85,70 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 1.5, tool #3: Nâng cấp "Xóa nền ảnh" lên Feature Parity
+- Benchmark: remove.bg, Adobe Express Background Remover.
+- Trạng thái trước khi nâng cấp: batch nhiều ảnh + kéo-thả đã có sẵn từ Phase 1; preview
+  chỉ là 2 thumbnail tĩnh cạnh nhau (không kéo so sánh được), chưa có thay nền, chưa có
+  tinh chỉnh viền.
+- Kiểm tra `Config` schema của `@imgly/background-removal` — thư viện KHÔNG có option
+  edge refinement/feathering nào (chỉ có `model` isnet/isnet_fp16/isnet_quint8 và
+  `output.format`/`quality`), đúng như `ROADMAP.md` dự liệu trước ("nếu thư viện hỗ trợ").
+  Quyết định tự làm mềm viền bằng hậu xử lý JS thuần thay vì bỏ qua mục này.
+- Đã làm:
+  - Viết `softenAlphaEdges()`: box blur 2 lượt (ngang rồi dọc) áp dụng CHỈ lên kênh alpha
+    của ảnh đã xóa nền — không đụng RGB — tạo hiệu ứng viền mềm tự nhiên hơn cho tóc/lông
+    thú. Luôn tính lại từ `resultBlob` GỐC (không lặp làm mờ lên kết quả đã mờ trước đó)
+    nên non-destructive, đổi slider qua lại không bị cộng dồn.
+  - Viết `buildDisplayBlob()`: pipeline hợp nhất "làm mềm viền (nếu có) → ghép nền (màu
+    solid / ảnh tùy chọn / giữ trong suốt)" thành 1 blob hiển thị (`displayUrl`), tách
+    biệt hoàn toàn khỏi `resultBlob` gốc (không sửa/ghi đè kết quả AI thật) — cho phép đổi
+    nền/độ mềm viền qua lại nhiều lần mà không cần chạy lại mô hình AI (chỉ chạy lại thao
+    tác canvas nhẹ).
+  - Thêm `useEffect` tính lại `displayUrl` cho MỌI ảnh đã xong mỗi khi nền hoặc độ mềm
+    viền thay đổi — dependency dùng số lượng ảnh `status === 'done'` (không dùng
+    `items` trực tiếp để tránh vòng lặp effect vô hạn do bản thân effect cũng gọi
+    `setItems`).
+  - Thêm UI slider so sánh trước/sau: 2 ảnh xếp chồng, ảnh kết quả bọc trong 1 lớp có nền
+    caro (hiện qua vùng trong suốt) và bị cắt bằng CSS `clip-path` theo % vị trí; điều
+    khiển bằng 1 `<input type="range">` trong suốt phủ toàn bộ khung (kéo bằng chuột/chạm/
+    phím mũi tên đều dùng được, tận dụng accessibility có sẵn của range input thay vì tự
+    viết logic kéo-thả bằng pointer events).
+  - Thêm control chọn nền: 3 nút Trong suốt/Màu solid (kèm color picker)/Ảnh tùy chọn
+    (kèm input file + nút xóa), áp dụng CHUNG cho toàn bộ danh sách ảnh (không phải từng
+    ảnh riêng) — khớp UX phổ biến của remove.bg/Adobe (chọn 1 nền, áp cho cả batch).
+  - Track mọi object URL (preview gốc, ảnh nền tùy chọn, display đã ghép) trong 1
+    `useRef<Set>`, revoke hết khi unmount — giống pattern đã dùng ở tool Nén ảnh.
+  - Thêm 7 key i18n UI mới (`backgroundLabel`, `backgroundTransparent`, `backgroundColor`,
+    `backgroundImage`, `backgroundImageSelect`, `backgroundImageClear`,
+    `edgeSoftnessLabel`) cho cả 8 ngôn ngữ, viết lại `meta`/`heading`/`tagline`/`p3`/`p4`
+    của bài viết để phản ánh tính năng mới.
+  - `npm run build` sạch, 89 trang.
+  - **Test tương tác thật với model AI thật** (không mock) qua CDP: upload ảnh test thật
+    200×150px, bấm Xóa nền — xác nhận model tải về + chạy suy luận thật (~15-27 giây tuỳ
+    lần chạy, log tiến trình 0%→100% đúng), tải xuống PNG hợp lệ ở TRẠNG THÁI TRONG SUỐT
+    MẶC ĐỊNH. Sau đó test lần lượt: chuyển sang nền màu solid (PNG mới, dung lượng khác —
+    xác nhận ghép nền thật), tăng độ mềm viền lên 5px (PNG khác nữa), quay lại trong suốt
+    (PNG khác nữa) — cả 4 bước đều cho ra PNG hợp lệ với dung lượng khác nhau ở mỗi bước,
+    xác nhận pipeline ghép nền/làm mềm viền hoạt động đúng, không bị cache nhầm hay đứng
+    yên. Gặp 1 lỗi giả trong chính script test (Chrome tự động tải xuống ghi đè file trùng
+    tên thay vì thêm hậu tố "(1)" như tải tương tác thường — khiến bước so sánh
+    before/after của script tưởng nhầm là "không có file mới"); sửa bằng cách xóa sạch thư
+    mục tải trước mỗi lần kiểm tra thay vì so sánh diff — không phải lỗi sản phẩm.
+- Quyết định kỹ thuật quan trọng:
+  - Chọn nền áp dụng CHUNG cho cả danh sách thay vì từng ảnh riêng — đơn giản hóa UI đáng
+    kể và khớp đúng cách các đối thủ benchmark làm (remove.bg cũng chọn 1 nền áp cho ảnh
+    đang xử lý, không phải nền riêng biệt phức tạp cho từng ảnh trong batch).
+  - Test bằng ảnh tổng hợp 200×150px (hình chữ nhật màu, không phải ảnh người/vật thật) —
+    đủ để xác nhận toàn bộ PIPELINE kỹ thuật hoạt động đúng (model chạy, alpha blur đúng,
+    ghép nền đúng), nhưng KHÔNG xác nhận được chất lượng cắt nền trên ảnh thật có chủ thể
+    phức tạp (tóc, lông thú...) — việc đó cần thử bằng ảnh thật.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Chưa tự thử bằng ảnh người/thú cưng thật để đánh giá chất lượng cắt nền và hiệu quả
+    thực tế của slider làm mềm viền trên tóc/lông — nên thử tay khi có dịp.
+  - Model AI tải từ CDN công khai của thư viện mất khoảng 15-27 giây trong lần test (mạng
+    + máy chủ CI/test), thời gian thực tế cho người dùng cuối có thể khác tùy tốc độ mạng.
+- Task tiếp theo: Phase 1.5, tool #4 & #5 "Gộp/Tách PDF".
 
 ### 2026-07-25 — Phase 1.5, tool #2: Nâng cấp "Chuyển đổi định dạng ảnh" lên Feature Parity
 - Benchmark: Convertio, CloudConvert, iLoveIMG.

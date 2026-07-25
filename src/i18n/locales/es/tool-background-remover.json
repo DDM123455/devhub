@@ -1,13 +1,13 @@
 {
   "meta": {
     "title": "Quitar fondo de imagen gratis con IA (sin subir archivos) — Web Tool Hub",
-    "description": "Quita el fondo de una foto gratis con un modelo de IA local que se ejecuta por completo en tu navegador. Sin subidas, sin registro — tu foto nunca sale de tu dispositivo."
+    "description": "Quita el fondo de una foto gratis con un modelo de IA local que se ejecuta por completo en tu navegador. Sustitúyelo por un color o por otra imagen, compara antes/después con un control deslizante. Sin subidas, sin registro."
   },
   "heading": "Quitar fondo",
-  "tagline": "Elimina el fondo de una foto automáticamente, directamente en tu navegador.",
+  "tagline": "Elimina el fondo de una foto automáticamente y sustitúyelo por un color o una imagen, directamente en tu navegador.",
   "ui": {
-    "selectFiles": "Seleccionar imagen",
-    "dropHint": "o arrastra y suelta una imagen aquí",
+    "selectFiles": "Seleccionar imágenes",
+    "dropHint": "o arrastra y suelta las imágenes aquí",
     "remove": "Quitar fondo",
     "removing": "Quitando el fondo… {{percent}}%",
     "download": "Descargar",
@@ -15,14 +15,21 @@
     "result": "Resultado",
     "noFiles": "Aún no has seleccionado ninguna imagen.",
     "errorGeneric": "Ocurrió un error al quitar el fondo de esta imagen. Inténtalo de nuevo.",
-    "modelNotice": "El primer clic descarga un pequeño modelo de IA (unos MB) a tu navegador — después funciona totalmente sin conexión. Tu foto nunca se sube a ningún sitio."
+    "modelNotice": "El primer clic descarga un pequeño modelo de IA (unos MB) a tu navegador — después funciona totalmente sin conexión. Tus fotos nunca se suben a ningún sitio.",
+    "backgroundLabel": "Fondo",
+    "backgroundTransparent": "Transparente",
+    "backgroundColor": "Color sólido",
+    "backgroundImage": "Imagen personalizada",
+    "backgroundImageSelect": "Elegir imagen de fondo",
+    "backgroundImageClear": "Quitar",
+    "edgeSoftnessLabel": "Suavizado de bordes"
   },
   "related": "Herramientas relacionadas",
   "article": {
     "heading": "¿Cómo funciona quitar el fondo con IA local en el navegador?",
     "p1": "Antes, quitar el fondo de una foto solía significar usar una herramienta de suscripción que sube tu imagen a un servidor, o recortar a mano el contorno del sujeto en un editor de imágenes. Esta herramienta no hace ninguna de las dos cosas: ejecuta un pequeño modelo de IA de segmentación directamente en tu pestaña del navegador para averiguar qué píxeles pertenecen al sujeto y cuáles al fondo, y luego hace transparente el fondo — todo sin que tu foto se envíe a ningún sitio. Es el mismo tipo de edición que se suele usar para fotos de productos, fotos de perfil o stickers — algo que antes llevaba minutos en un editor de imágenes ahora toma segundos.",
-    "p2": "La primera vez que la uses, tu navegador descargará el propio modelo de IA — unos pocos megabytes — de la misma forma en que descargaría cualquier imagen o script de un sitio web. Esa descarga ocurre una sola vez y queda guardada en caché para la próxima. Tu foto es algo completamente aparte: se carga directamente en la memoria del navegador y se procesa ahí, sin subirse nunca a un servidor, ni siquiera de forma temporal.",
-    "p3": "Usarlo es sencillo: selecciona una foto, espera unos segundos mientras el modelo la analiza (un indicador de progreso muestra el avance), y descarga el resultado como un PNG transparente. Como el proceso se ejecuta en un Web Worker, el resto de la página sigue respondiendo mientras se realiza el análisis, incluso con una foto grande.",
-    "p4": "Los mejores resultados suelen darse con fotos de un sujeto claro y distinguible —personas, animales, productos, vehículos— sobre un fondo de un color distinto al del sujeto. Detalles muy finos, como mechones de pelo sueltos o pelaje, pueden no salir perfectos, y los fondos recargados a veces confunden al modelo. Si el resultado no queda del todo bien, recortar la foto más cerca del sujeto antes de subirla suele ayudar bastante. Fotografiar el sujeto sobre un fondo plano y con iluminación uniforme desde el principio también facilita que cualquier herramienta —humana o de IA— logre un recorte más limpio."
+    "p2": "La primera vez que la uses, tu navegador descargará el propio modelo de IA — unos pocos megabytes — de la misma forma en que descargaría cualquier imagen o script de un sitio web. Esa descarga ocurre una sola vez y queda guardada en caché para la próxima. Tus fotos son algo completamente aparte: cada una se carga directamente en la memoria del navegador y se procesa ahí, sin subirse nunca a un servidor, ni siquiera de forma temporal.",
+    "p3": "Selecciona una o varias fotos y pulsa Quitar fondo — cada una se procesa por turnos, con un indicador de progreso, dentro de un Web Worker para que el resto de la página siga respondiendo. En cuanto un resultado esté listo, arrastra el control deslizante sobre su miniatura para comparar el original con el recorte lado a lado. Por defecto el fondo se vuelve transparente (se muestra como un patrón de cuadros), pero puedes cambiarlo por un color sólido o por tu propia imagen de fondo con los controles de arriba de la lista — cada foto terminada se actualiza al instante, ya que recomponer un fondo es una operación ligera, a diferencia de volver a ejecutar el modelo de IA. El control de suavizado de bordes difumina ligeramente el borde alfa del recorte, lo que puede hacer que el pelo fino o el pelaje se vean menos recortados y más naturales; está desactivado por defecto porque la mayoría de los sujetos se ven mejor con el borde nítido que ya produce el modelo.",
+    "p4": "Los mejores resultados suelen darse con fotos de un sujeto claro y distinguible —personas, animales, productos, vehículos— sobre un fondo de un color distinto al del sujeto. Detalles muy finos, como mechones de pelo sueltos o pelaje, pueden no salir perfectos incluso con el suavizado activado, y los fondos recargados a veces confunden al modelo. Si el resultado no queda del todo bien, recortar la foto más cerca del sujeto antes de subirla suele ayudar bastante."
   }
 }

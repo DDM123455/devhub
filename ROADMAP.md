@@ -57,11 +57,12 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
   - [x] Xử lý hàng loạt + chọn định dạng đích chung cho tất cả file
   - [x] Cho chọn chất lượng output khi convert sang định dạng có nén (JPG/WebP)
 
-- [ ] **3. Xóa nền ảnh** — benchmark: remove.bg, Adobe Express Background Remover
-  - [ ] Preview dạng slider kéo qua lại trước/sau khi xóa nền
-  - [ ] Cho phép thay nền bằng màu solid hoặc ảnh khác sau khi xóa
-  - [ ] Xử lý hàng loạt nhiều ảnh
-  - [ ] Nút tinh chỉnh viền (edge refinement) nếu thư viện hỗ trợ
+- [x] **3. Xóa nền ảnh** — benchmark: remove.bg, Adobe Express Background Remover
+  - [x] Preview dạng slider kéo qua lại trước/sau khi xóa nền
+  - [x] Cho phép thay nền bằng màu solid hoặc ảnh khác sau khi xóa
+  - [x] Xử lý hàng loạt nhiều ảnh
+  - [x] Nút tinh chỉnh viền (edge refinement) — thư viện không hỗ trợ trực tiếp, tự làm
+        mềm alpha edge bằng box blur JS thuần thay thế
 
 - [ ] **4 & 5. Gộp/Tách PDF** — benchmark: iLovePDF, Smallpdf, PDF2GO
   - [ ] Hiển thị thumbnail từng trang, cho kéo-thả sắp xếp lại thứ tự trước khi gộp
