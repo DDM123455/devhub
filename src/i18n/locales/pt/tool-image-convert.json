@@ -1,10 +1,10 @@
 {
   "meta": {
-    "title": "Converter formato de imagem JPEG, PNG, WebP grátis — Web Tool Hub",
-    "description": "Converta imagens entre JPEG, PNG e WebP grátis, direto no seu navegador usando a API Canvas. Sem upload, sem cadastro — suas fotos nunca saem do seu dispositivo."
+    "title": "Conversor de formato de imagem grátis (JPEG, PNG, WebP, AVIF, HEIC...) — Web Tool Hub",
+    "description": "Converta imagens entre JPEG, PNG, WebP, AVIF, GIF, BMP e ICO grátis, direto no seu navegador. Também lê fotos HEIC do iPhone. Sem upload, sem cadastro."
   },
-  "heading": "Converter formato de imagem",
-  "tagline": "Alterne entre JPEG, PNG e WebP direto no navegador.",
+  "heading": "Conversor de formato de imagem",
+  "tagline": "Converta entre JPEG, PNG, WebP, AVIF, GIF, BMP e ICO — e leia fotos HEIC do iPhone — direto no seu navegador.",
   "ui": {
     "selectFiles": "Selecionar imagens",
     "dropHint": "ou arraste e solte as imagens aqui",
@@ -16,14 +16,16 @@
     "original": "Original",
     "converted": "Convertido",
     "noFiles": "Nenhuma imagem selecionada ainda.",
-    "errorGeneric": "Ocorreu um erro ao converter esta imagem. Tente novamente."
+    "errorGeneric": "Ocorreu um erro ao converter esta imagem. Tente novamente.",
+    "errorAvifUnsupported": "Este navegador não consegue exportar AVIF. Tente uma versão recente do Chrome ou Firefox, ou escolha outro formato.",
+    "formatsNote": "A saída ICO é redimensionada para no máximo 256×256 (o tamanho padrão de ícone). A exportação AVIF exige uma versão recente do Chrome ou Firefox. Fotos HEIC/HEIF do iPhone são lidas automaticamente — sem etapa de conversão separada."
   },
   "related": "Ferramentas relacionadas",
   "article": {
-    "heading": "JPEG, PNG ou WebP — qual formato usar?",
-    "p1": "JPEG, PNG e WebP servem para guardar imagens, mas cada um equilibra qualidade, transparência e tamanho de arquivo de um jeito diferente, e escolher o formato errado é um motivo comum para uma foto ficar pior do que deveria ou pesar muito mais do que precisa. Converter entre formatos permite adaptar o formato ao que a imagem realmente precisa, em vez de manter o que a câmera ou a ferramenta de captura salvou por padrão.",
-    "p2": "JPEG é a escolha certa para fotos comuns: comprime muito bem o detalhe fotográfico, mas não suporta transparência e perde um pouco de qualidade a cada vez que é salvo novamente. PNG é sem perdas e suporta transparência, o que o torna melhor para capturas de tela, logotipos e gráficos com cores chapadas ou bordas nítidas — ao custo de arquivos bem maiores em conteúdo fotográfico. WebP é mais recente e geralmente supera os dois: suporta transparência como o PNG e comprime fotos quase tão bem quanto o JPEG, muitas vezes resultando em um arquivo menor na mesma qualidade visual, embora algumas ferramentas e clientes de e-mail antigos ainda não o suportem.",
-    "p3": "Esta ferramenta converte tudo localmente usando a API Canvas nativa do seu navegador — a imagem é decodificada, desenhada em um canvas invisível e recodificada no formato de destino sem nunca ser enviada a lugar nenhum. Selecione uma ou mais imagens JPEG, PNG ou WebP, escolha o formato de destino, ajuste a qualidade se estiver convertendo para JPEG ou WebP, e clique em Converter. Ao converter para JPEG, áreas transparentes são automaticamente preenchidas de branco, já que o JPEG não tem canal de transparência.",
-    "p4": "Como regra geral: converta fotos para WebP (ou JPEG se precisar de compatibilidade máxima) para arquivos menores, e mantenha capturas de tela, ícones e tudo que precise de transparência em PNG ou WebP em vez de JPEG. Na dúvida, converter para WebP com qualidade de 80% é uma escolha segura que costuma parecer idêntica ao original ocupando bem menos espaço."
+    "heading": "JPEG, PNG, WebP, AVIF — qual formato usar?",
+    "p1": "JPEG, PNG, WebP e, cada vez mais, AVIF servem para guardar imagens, mas cada um equilibra qualidade, transparência e tamanho de arquivo de um jeito diferente, e escolher o formato errado é um motivo comum para uma foto ficar pior do que deveria ou pesar muito mais do que precisa. Alguns outros formatos — GIF, BMP, ICO — atendem necessidades mais específicas do que fotografia comum. Converter entre todos eles permite adaptar o formato ao que a imagem realmente precisa, em vez de manter o que a câmera, a ferramenta de captura ou o iPhone salvaram por padrão.",
+    "p2": "JPEG é a escolha certa para fotos comuns: comprime muito bem o detalhe fotográfico, mas não suporta transparência e perde um pouco de qualidade a cada vez que é salvo novamente. PNG é sem perdas e suporta transparência, melhor para capturas de tela, logotipos e gráficos de cores chapadas. WebP geralmente supera os dois, com transparência como o PNG e compressão de fotos quase tão boa quanto o JPEG. AVIF é ainda mais recente e costuma comprimir mais que o WebP na mesma qualidade visual, embora o suporte dos navegadores para exportá-lo (não só visualizá-lo) ainda seja desigual — esta ferramenta avisa claramente se o seu navegador não consegue gerar um arquivo AVIF, em vez de entregar um arquivo quebrado silenciosamente. GIF, BMP e ICO existem para necessidades específicas: GIF para imagens simples de cores chapadas que precisam de ampla compatibilidade com softwares antigos, BMP para dados de pixel brutos sem compressão, e ICO especificamente para favicons de sites e ícones de aplicativos do Windows.",
+    "p3": "Tudo roda localmente usando a API Canvas nativa do seu navegador — a imagem é decodificada, desenhada em um canvas invisível e recodificada no formato de destino sem nunca ser enviada a lugar nenhum. Como nenhum navegador exporta nativamente BMP, ICO ou GIF a partir de um canvas, esta ferramenta inclui alguns pequenos trechos de JavaScript puro que constroem esses formatos de arquivo à mão a partir dos dados brutos de pixel — ainda 100% local, só que sem depender de uma API do navegador que não existe. Selecione uma ou mais imagens (fotos HEIC e HEIF direto de um iPhone são decodificadas automaticamente primeiro), escolha o formato de destino, ajuste a qualidade para JPEG, WebP ou AVIF, e clique em Converter.",
+    "p4": "Como regra geral: converta fotos comuns para WebP ou AVIF para os arquivos menores, ou JPEG se precisar de compatibilidade máxima com softwares antigos. Mantenha capturas de tela, ícones e tudo que precise de transparência em PNG ou WebP em vez de JPEG. Recorra ao ICO especificamente quando precisar de um favicon ou ícone de aplicativo — a saída é redimensionada automaticamente para o máximo padrão de 256×256. O suporte de entrada HEIC existe puramente por conveniência: se sua galeria de fotos está cheia de arquivos HEIC do iPhone que algum app ou site se recusa a aceitar, esta ferramenta os decodifica do mesmo jeito que qualquer outra imagem, para você converter direto para o formato que realmente precisa."
   }
 }

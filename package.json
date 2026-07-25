@@ -26,6 +26,8 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "diff": "^9.0.0",
+    "gifenc": "^1.0.3",
+    "heic2any": "^0.0.4",
     "i18next": "^26.3.6",
     "jsoneditor": "^10.4.3",
     "jszip": "^3.10.1",

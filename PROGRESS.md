@@ -10,11 +10,10 @@
   Phase 2) + mục "Checklist Feature Parity" vào `CLAUDE.md` — mục tiêu đưa từng tool từ
   "MVP chạy được" lên "ngang tầm đối thủ đầu ngành" (benchmark, so sánh feature-by-feature,
   nâng cấp).
-- Task tiếp theo cần làm: **Phase 1.5**, tool #1 "Nén ảnh" đã xong (xem log bên dưới) —
-  tiếp tục với tool **#2 "Chuyển đổi định dạng ảnh"** (benchmark Convertio/CloudConvert/
-  iLoveIMG): mở rộng từ 3 lên tối thiểu JPG/PNG/WebP/AVIF/BMP/GIF/ICO, hỗ trợ đọc HEIC
-  (`heic2any`), xử lý hàng loạt + chọn định dạng đích chung, chọn chất lượng output. **Lưu
-  ý dependency mới**: `heic2any` chưa có trong danh sách — hỏi người dùng trước khi cài.
+- Task tiếp theo cần làm: **Phase 1.5**, tool #1 và #2 đã xong (xem log bên dưới) — tiếp
+  tục với tool **#3 "Xóa nền ảnh"** (benchmark remove.bg, Adobe Express Background
+  Remover): preview dạng slider kéo trước/sau, thay nền bằng màu solid/ảnh khác, xử lý
+  hàng loạt, tinh chỉnh viền nếu thư viện `@imgly/background-removal` hỗ trợ.
 - Ghi chú thiết kế (2026-07-25): đã redesign toàn bộ giao diện site (không phải task trong
   `ROADMAP.md`, làm theo yêu cầu trực tiếp của người dùng) dựa trên file mockup
   `Web Tool Hub.dc.html` ở gốc repo (file KHÔNG được commit vào git — chỉ là tài liệu tham
@@ -86,6 +85,83 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 1.5, tool #2: Nâng cấp "Chuyển đổi định dạng ảnh" lên Feature Parity
+- Benchmark: Convertio, CloudConvert, iLoveIMG.
+- Trạng thái trước khi nâng cấp: chỉ hỗ trợ 3 định dạng đích (WebP/JPEG/PNG); batch +
+  chọn định dạng đích chung cho tất cả file **đã có sẵn từ Phase 1** (không phải làm lại).
+- Đã hỏi người dùng trước khi cài `gifenc` (encoder GIF thuần JS, ~5KB gzip, không WASM)
+  — được đồng ý dùng thư viện nhỏ thay vì bỏ qua GIF. `heic2any` cài không cần hỏi lại vì
+  chính `ROADMAP.md` đã nêu tên thư viện này làm gợi ý cho mục HEIC.
+- Đã làm:
+  - Cài `gifenc` (không có type sẵn → viết `src/types/gifenc.d.ts` khai báo tối thiểu
+    đúng API dùng tới: `quantize`, `applyPalette`, `GIFEncoder`) và `heic2any` (có sẵn
+    `.d.ts`).
+  - Mở rộng `TargetFormat` từ 3 lên 7: thêm AVIF, BMP, GIF, ICO.
+    - AVIF: vẫn dùng `canvas.toBlob('image/avif', quality)` có sẵn của trình duyệt, nhưng
+      **tự kiểm tra `blob.type` sau khi tạo** — một số trình duyệt (kể cả Chrome headless
+      dùng để test) âm thầm trả về blob khác định dạng khi không hỗ trợ AVIF thay vì báo
+      lỗi, nên phải tự phát hiện và báo message riêng (`errorAvifUnsupported`) thay vì tải
+      xuống 1 file .avif rởm.
+    - BMP: `canvas.toBlob` KHÔNG trình duyệt nào hỗ trợ xuất BMP — tự viết encoder JS
+      thuần (`encodeBmp`) ghi trực tiếp bytes theo chuẩn BITMAPFILEHEADER +
+      BITMAPINFOHEADER 24bpp không nén, không cần thư viện.
+    - ICO: `canvas.toBlob` cũng không hỗ trợ — tự viết `encodeIco` bọc 1 PNG blob trong
+      container ICO tối giản (header 22 byte + dữ liệu PNG nguyên vẹn — hợp lệ từ Windows
+      Vista trở lên, không cần tự nén lại pixel). Tự động resize ảnh nếu lớn hơn 256×256
+      (giới hạn kích thước icon chuẩn).
+    - GIF: dùng `gifenc` (`quantize` → `applyPalette` → `GIFEncoder`) để nén palette +
+      LZW từ dữ liệu pixel thô.
+  - Mở rộng input `accept` + bộ lọc file để nhận thêm GIF/BMP/AVIF và đặc biệt HEIC/HEIF —
+    ảnh HEIC từ iPhone thường có `file.type` RỖNG trên một số trình duyệt/hệ điều hành nên
+    không thể chỉ lọc theo MIME type, phải kiểm tra thêm đuôi file `.heic`/`.heif`.
+  - Thêm `toDecodableBlob()`: nếu file là HEIC/HEIF, chuyển qua `heic2any` thành PNG
+    TRƯỚC khi đưa vào `createImageBitmap` (không trình duyệt nào giải mã HEIC trực tiếp
+    được). Cả `heic2any` và `gifenc` đều nạp bằng **dynamic `import()`** thay vì import
+    tĩnh — áp dụng đúng bài học rút ra từ lỗi SSR crash của `jsoneditor` ở tool #8 (thư
+    viện chạm global trình duyệt ở module scope sẽ làm crash `npm run build` nếu import
+    tĩnh, dù ở đây kiểm tra riêng thấy `heic2any` không trực tiếp đụng `self` — vẫn phòng
+    ngừa theo nguyên tắc chung đã ghi trong log tool #8).
+  - Thêm key i18n `ui.errorAvifUnsupported` và `ui.formatsNote` (giải thích giới hạn ICO
+    256×256, yêu cầu trình duyệt mới cho AVIF, tự động đọc HEIC) cho cả 8 ngôn ngữ. Viết
+    lại toàn bộ `meta`/`heading`/`tagline`/`article` cho cả 8 ngôn ngữ để phản ánh đúng 7
+    định dạng + HEIC input (nội dung cũ chỉ nhắc JPEG/PNG/WebP đã lỗi thời, cũng là cơ hội
+    SEO tốt hơn vì bắt thêm từ khóa "avif converter", "heic to jpg", "ico converter"...).
+  - `npm run build` sạch, 89 trang.
+  - **Test tương tác thật cho cả 7 định dạng đích** bằng CDP (viết tiếp từ script của tool
+    #1): phát hiện lần chạy đầu TOÀN BỘ 7 định dạng đều lỗi "Something went wrong" — điều
+    tra bằng cách bật `console.error` tạm thời trong catch block, phát hiện nguyên nhân
+    thật là `createImageBitmap()` báo `InvalidStateError` vì ảnh test 1×1 pixel tổng hợp
+    (dùng từ log tool #1) quá tối giản để giải mã — **không phải lỗi do code sửa** (dòng
+    gọi `createImageBitmap` y hệt code gốc trước khi nâng cấp). Tạo lại ảnh test thật
+    (200×150px, PNG hợp lệ qua GDI+/.NET) rồi chạy lại: **WebP/JPEG/PNG/BMP/ICO đều PASS
+    (kiểm tra đúng magic bytes)**, **AVIF phát hiện đúng "trình duyệt không hỗ trợ" và báo
+    message rõ ràng thay vì tạo file lỗi** (đúng thiết kế phòng ngừa), **GIF** ban đầu báo
+    "MAGIC_BYTES_INVALID" nhưng khi đọc trực tiếp file thật trên đĩa xác nhận header
+    `GIF89a` hợp lệ 542 byte — té ra là race condition trong logic so sánh
+    before/after-download của SCRIPT TEST (đọc nhầm thời điểm), không phải lỗi encoder.
+    Gỡ dòng `console.error` debug tạm trước khi build bản cuối.
+- Quyết định kỹ thuật quan trọng:
+  - Tự viết encoder BMP/ICO bằng tay thay vì thêm thư viện — cả 2 định dạng đủ đơn giản
+    (BMP: header cố định + pixel thô; ICO: header cố định + PNG có sẵn) nên viết tay rẻ
+    hơn và ít rủi ro hơn thêm dependency.
+  - AVIF không dùng thư viện mã hoá riêng (như `@jsquash/avif` WASM) — chấp nhận phụ
+    thuộc vào hỗ trợ native của trình duyệt vì đây đúng tinh thần "ưu tiên Web API có sẵn
+    trước khi thêm thư viện" của `CLAUDE.md`; có UI báo lỗi rõ ràng cho trường hợp không
+    hỗ trợ thay vì giả vờ luôn hoạt động.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Chrome headless dùng để test có thể chưa hỗ trợ xuất AVIF (không xác nhận được AVIF
+    thật trên trình duyệt có hỗ trợ) — logic phát hiện lỗi đã test đúng nhánh "không hỗ
+    trợ", nhưng nhánh "trình duyệt CÓ hỗ trợ AVIF thật" chưa được test trực tiếp. Nên thử
+    tay trên Chrome/Firefox bản mới khi có dịp.
+  - Chưa test HEIC thật (không có sẵn file .heic mẫu trong môi trường build để test) — chỉ
+    verify code logic `toDecodableBlob`/`isHeic` bằng đọc lại, chưa chạy qua CDP với file
+    HEIC thật. Nên tự thử tay với ảnh HEIC thật từ iPhone khi có dịp.
+  - Bài học phương pháp luận: khi viết script test tự động, nhớ 1×1 pixel test image quá
+    tối giản với `createImageBitmap` — dùng ảnh test có kích thước/nội dung thực tế hơn
+    (đã tạo `test-real.png` 200×150px qua PowerShell GDI+, lưu trong scratchpad phiên) cho
+    các lần test sau liên quan tới decode ảnh qua Canvas API.
+- Task tiếp theo: Phase 1.5, tool #3 "Xóa nền ảnh".
 
 ### 2026-07-25 — Phase 1.5, tool #1: Nâng cấp "Nén ảnh" lên Feature Parity
 - Benchmark: TinyPNG, Squoosh, iLoveIMG (theo đúng yêu cầu trong `ROADMAP.md`).

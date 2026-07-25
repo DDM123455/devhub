@@ -49,13 +49,13 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
   - [x] Nút "Download All" dưới dạng .zip khi xử lý nhiều ảnh
   - [x] Kéo-thả (drag & drop) file vào khung upload
 
-- [ ] **2. Chuyển đổi định dạng ảnh** — benchmark: Convertio, CloudConvert, iLoveIMG
-  - [ ] Hiện tại chỉ hỗ trợ 3 định dạng → mở rộng tối thiểu: JPG, PNG, WebP, AVIF, BMP,
+- [x] **2. Chuyển đổi định dạng ảnh** — benchmark: Convertio, CloudConvert, iLoveIMG
+  - [x] Hiện tại chỉ hỗ trợ 3 định dạng → mở rộng tối thiểu: JPG, PNG, WebP, AVIF, BMP,
         GIF (tĩnh), ICO
-  - [ ] Thêm hỗ trợ đọc file HEIC (dùng `heic2any` hoặc tương đương chạy client-side)
+  - [x] Thêm hỗ trợ đọc file HEIC (dùng `heic2any` hoặc tương đương chạy client-side)
         vì ảnh từ iPhone rất phổ biến
-  - [ ] Xử lý hàng loạt + chọn định dạng đích chung cho tất cả file
-  - [ ] Cho chọn chất lượng output khi convert sang định dạng có nén (JPG/WebP)
+  - [x] Xử lý hàng loạt + chọn định dạng đích chung cho tất cả file
+  - [x] Cho chọn chất lượng output khi convert sang định dạng có nén (JPG/WebP)
 
 - [ ] **3. Xóa nền ảnh** — benchmark: remove.bg, Adobe Express Background Remover
   - [ ] Preview dạng slider kéo qua lại trước/sau khi xóa nền

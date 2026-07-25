@@ -1,10 +1,10 @@
 {
   "meta": {
-    "title": "Chuyển đổi định dạng ảnh JPEG, PNG, WebP miễn phí — Web Tool Hub",
-    "description": "Chuyển đổi ảnh giữa JPEG, PNG và WebP miễn phí, xử lý hoàn toàn trên trình duyệt bằng Canvas API. Không upload, không cần đăng ký — ảnh không rời khỏi thiết bị."
+    "title": "Chuyển đổi định dạng ảnh miễn phí (JPEG, PNG, WebP, AVIF, HEIC...) — Web Tool Hub",
+    "description": "Chuyển đổi ảnh giữa JPEG, PNG, WebP, AVIF, GIF, BMP và ICO miễn phí, xử lý hoàn toàn trên trình duyệt. Đọc được cả ảnh HEIC từ iPhone. Không upload, không cần đăng ký."
   },
   "heading": "Chuyển đổi định dạng ảnh",
-  "tagline": "Chuyển đổi qua lại giữa JPEG, PNG và WebP ngay trên trình duyệt.",
+  "tagline": "Chuyển đổi qua lại giữa JPEG, PNG, WebP, AVIF, GIF, BMP, ICO — và đọc được ảnh HEIC từ iPhone — ngay trên trình duyệt.",
   "ui": {
     "selectFiles": "Chọn ảnh",
     "dropHint": "hoặc kéo thả ảnh vào đây",
@@ -16,14 +16,16 @@
     "original": "Gốc",
     "converted": "Đã chuyển đổi",
     "noFiles": "Chưa chọn ảnh nào.",
-    "errorGeneric": "Có lỗi khi chuyển đổi ảnh này. Vui lòng thử lại."
+    "errorGeneric": "Có lỗi khi chuyển đổi ảnh này. Vui lòng thử lại.",
+    "errorAvifUnsupported": "Trình duyệt này chưa hỗ trợ xuất AVIF. Hãy thử bản Chrome hoặc Firefox mới, hoặc chọn định dạng khác.",
+    "formatsNote": "Ảnh ICO được tự động thu nhỏ về tối đa 256×256 (kích thước icon chuẩn). Xuất AVIF cần trình duyệt Chrome hoặc Firefox bản mới. Ảnh HEIC/HEIF từ iPhone được tự động đọc — không cần bước chuyển đổi riêng."
   },
   "related": "Công cụ liên quan",
   "article": {
-    "heading": "JPEG, PNG hay WebP — nên dùng định dạng nào?",
-    "p1": "JPEG, PNG và WebP đều dùng để lưu ảnh, nhưng mỗi định dạng đánh đổi giữa chất lượng, khả năng trong suốt và dung lượng theo cách khác nhau — chọn sai định dạng là lý do phổ biến khiến ảnh trông tệ hơn cần thiết hoặc nặng hơn mức cần có. Chuyển đổi định dạng giúp bạn chọn đúng định dạng phù hợp với nhu cầu thực tế, thay vì giữ nguyên định dạng mà máy ảnh hay công cụ chụp màn hình mặc định lưu.",
-    "p2": "JPEG phù hợp với ảnh chụp thông thường: nén chi tiết ảnh rất hiệu quả nhưng không hỗ trợ trong suốt và mất một chút chất lượng mỗi lần lưu lại. PNG nén không mất dữ liệu và hỗ trợ trong suốt, phù hợp hơn cho ảnh chụp màn hình, logo, hình có mảng màu phẳng hoặc viền sắc nét — đổi lại dung lượng thường lớn hơn nhiều với ảnh chụp thực tế. WebP mới hơn và thường tốt hơn cả hai: vừa hỗ trợ trong suốt như PNG, vừa nén ảnh gần bằng JPEG, thường cho dung lượng nhỏ hơn ở cùng chất lượng hình ảnh, dù một số công cụ hoặc email client cũ vẫn chưa hỗ trợ.",
-    "p3": "Công cụ này chuyển đổi hoàn toàn trên trình duyệt bằng Canvas API có sẵn của trình duyệt — ảnh được giải mã, vẽ lên một canvas ẩn, rồi mã hóa lại theo định dạng mới mà không gửi đi đâu cả. Chọn một hoặc nhiều ảnh JPEG, PNG hoặc WebP, chọn định dạng muốn chuyển sang, chỉnh thanh trượt chất lượng nếu chuyển sang JPEG hoặc WebP, rồi bấm Chuyển đổi. Khi chuyển sang JPEG, phần trong suốt sẽ tự động được tô trắng vì JPEG không có kênh alpha.",
-    "p4": "Quy tắc đơn giản: chuyển ảnh chụp sang WebP (hoặc JPEG nếu cần tương thích rộng nhất) để có dung lượng nhỏ hơn, còn ảnh chụp màn hình, icon hay bất cứ gì cần trong suốt thì nên giữ ở PNG hoặc WebP thay vì JPEG. Nếu chưa chắc chắn, chuyển sang WebP ở mức chất lượng 80% là lựa chọn an toàn, thường trông gần như bản gốc mà nhẹ hơn đáng kể."
+    "heading": "JPEG, PNG, WebP, AVIF — nên dùng định dạng nào?",
+    "p1": "JPEG, PNG, WebP và ngày càng phổ biến hơn là AVIF đều dùng để lưu ảnh, nhưng mỗi định dạng đánh đổi giữa chất lượng, khả năng trong suốt và dung lượng theo cách khác nhau — chọn sai định dạng là lý do phổ biến khiến ảnh trông tệ hơn cần thiết hoặc nặng hơn mức cần có. Một vài định dạng khác — GIF, BMP, ICO — phục vụ nhu cầu hẹp và đặc thù hơn là chụp ảnh thông thường. Chuyển đổi qua lại giữa tất cả các định dạng này giúp bạn chọn đúng cái phù hợp với nhu cầu thực tế, thay vì giữ nguyên định dạng mà máy ảnh, công cụ chụp màn hình, hay iPhone mặc định lưu.",
+    "p2": "JPEG phù hợp với ảnh chụp thông thường: nén chi tiết ảnh rất hiệu quả nhưng không hỗ trợ trong suốt và mất một chút chất lượng mỗi lần lưu lại. PNG nén không mất dữ liệu và hỗ trợ trong suốt, phù hợp hơn cho ảnh chụp màn hình, logo, hình có mảng màu phẳng. WebP thường tốt hơn cả hai, vừa hỗ trợ trong suốt như PNG vừa nén ảnh gần bằng JPEG. AVIF còn mới hơn nữa và thường nén chặt hơn cả WebP ở cùng chất lượng hình ảnh, dù việc trình duyệt hỗ trợ XUẤT (không chỉ xem) AVIF vẫn chưa đồng đều — công cụ này sẽ báo rõ nếu trình duyệt của bạn không xuất được AVIF thay vì âm thầm đưa ra một file lỗi. GIF, BMP và ICO tồn tại cho nhu cầu đặc thù: GIF cho ảnh mảng màu đơn giản cần tương thích rộng với phần mềm cũ, BMP cho dữ liệu pixel thô không nén, còn ICO dành riêng cho favicon website và icon ứng dụng Windows.",
+    "p3": "Mọi thứ chạy hoàn toàn tại chỗ bằng Canvas API có sẵn của trình duyệt — ảnh được giải mã, vẽ lên một canvas ẩn, rồi mã hóa lại theo định dạng mới mà không gửi đi đâu cả. Vì không trình duyệt nào có sẵn khả năng xuất BMP, ICO hay GIF từ canvas, công cụ này có thêm vài đoạn JavaScript thuần nhỏ tự xây dựng các định dạng file đó từ dữ liệu pixel thô — vẫn 100% xử lý tại chỗ, chỉ là không dựa vào một API trình duyệt vốn không tồn tại. Chọn một hoặc nhiều ảnh (ảnh HEIC/HEIF chụp thẳng từ iPhone sẽ tự động được giải mã trước), chọn định dạng muốn chuyển sang, chỉnh thanh trượt chất lượng nếu chuyển sang JPEG, WebP hoặc AVIF, rồi bấm Chuyển đổi.",
+    "p4": "Quy tắc đơn giản: chuyển ảnh chụp thông thường sang WebP hoặc AVIF để có dung lượng nhỏ nhất, hoặc JPEG nếu cần tương thích rộng nhất với phần mềm cũ. Ảnh chụp màn hình, icon hay bất cứ gì cần trong suốt thì nên giữ ở PNG hoặc WebP thay vì JPEG. Chọn ICO khi cần favicon hay icon ứng dụng — ảnh sẽ tự động thu nhỏ về mức tối đa chuẩn 256×256. Hỗ trợ đọc HEIC chỉ nhằm mục đích tiện lợi: nếu thư viện ảnh của bạn toàn file HEIC từ iPhone mà một ứng dụng hay website nào đó không nhận, công cụ này đọc chúng y như đọc bất kỳ ảnh nào khác, để bạn chuyển thẳng sang định dạng thực sự cần."
   }
 }
