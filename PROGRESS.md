@@ -10,10 +10,9 @@
   Phase 2) + mục "Checklist Feature Parity" vào `CLAUDE.md` — mục tiêu đưa từng tool từ
   "MVP chạy được" lên "ngang tầm đối thủ đầu ngành" (benchmark, so sánh feature-by-feature,
   nâng cấp).
-- Task tiếp theo cần làm: **Phase 1.5**, tool #1, #2, #3 đã xong (xem log bên dưới) — tiếp
-  tục với tool **#4 & #5 "Gộp/Tách PDF"** (benchmark iLovePDF, Smallpdf, PDF2GO): hiển thị
-  thumbnail từng trang PDF + kéo-thả sắp xếp thứ tự, tách theo range/mỗi N trang/trang chỉ
-  định, xoay/xóa trang riêng lẻ, nén PDF nếu khả thi client-side.
+- Task tiếp theo cần làm: **Phase 1.5**, tool #1, #2, #3 đã xong. Tool **#4 & #5
+  "Gộp/Tách PDF"** đang làm dở — xem mục log mới nhất bên dưới để biết chính xác đã làm gì
+  và còn thiếu gì trước khi tick ROADMAP.md.
 - Ghi chú thiết kế (2026-07-25): đã redesign toàn bộ giao diện site (không phải task trong
   `ROADMAP.md`, làm theo yêu cầu trực tiếp của người dùng) dựa trên file mockup
   `Web Tool Hub.dc.html` ở gốc repo (file KHÔNG được commit vào git — chỉ là tài liệu tham
@@ -85,6 +84,37 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 1.5, tool #4 & #5: Nâng cấp "Gộp/Tách PDF" — ĐANG LÀM DỞ
+- Đang làm: benchmark iLovePDF/Smallpdf/PDF2GO cho tool #4 "Gộp PDF" và #5 "Tách PDF".
+- Đã làm (commit `f1dbe2b`, chỉ ở local, CHƯA push lên `origin/main`):
+  - Thêm `src/lib/pdf-thumbnails.ts` dùng chung cho cả 2 tool: gọi `pdfjs-dist` (đã hỏi và
+    được đồng ý cài trước đó) để render thumbnail từng trang PDF, nạp qua dynamic import.
+  - `PdfMerger.tsx`: đổi từ danh sách file sang lưới thumbnail theo TỪNG TRANG (mọi trang
+    của mọi file gộp chung 1 lưới, không nhóm theo file) — kéo-thả sắp xếp lại (kèm nút
+    mũi tên dự phòng cho bàn phím/không kéo được), xoay 90°/lần, xóa từng trang trước khi
+    gộp.
+  - `PdfSplitter.tsx`: thêm hiển thị thumbnail từng trang, xoay/xóa trang, thêm chế độ tách
+    "Mỗi N trang" bên cạnh "Khoảng tùy chỉnh" đã có.
+  - Cập nhật 16 file i18n (`tool-pdf-merge.json` + `tool-pdf-split.json` × 8 ngôn ngữ) —
+    key UI mới + viết lại nội dung bài viết.
+  - `npm run build` đã chạy **thành công** (exit code 0, xác nhận qua task notification)
+    trước khi phiên bị gián đoạn.
+- **CHƯA xong / còn thiếu trước khi tick ROADMAP.md**:
+  - Test tương tác thật qua CDP (đúng quy trình đã áp dụng cho tool #1-#3) — đang test dở
+    `PdfMerger.tsx` (upload 2 file PDF thật, xoay/xóa/sắp xếp trang, gộp, kiểm tra file kết
+    quả bằng `pdf-lib` trong Node) thì bị gián đoạn giữa chừng, CHƯA có kết quả pass/fail.
+  - Chưa test `PdfSplitter.tsx` (chế độ "Mỗi N trang" mới, xoay/xóa trang trước khi tách)
+    hoàn toàn chưa chạy thử.
+  - Chưa tick checkbox nào của tool #4/#5 trong `ROADMAP.md` Phase 1.5 — ĐÚNG, vì theo quy
+    trình `CLAUDE.md` chỉ tick sau khi build + test xác nhận ổn, chưa được làm xong ở đây.
+  - Chưa push commit `f1dbe2b` lên GitHub.
+- Task tiếp theo khi mở phiên mới (làm đúng theo thứ tự): (1) chạy lại `npm run build` để
+  xác nhận vẫn sạch, (2) chạy/hoàn tất test tương tác cho cả `PdfMerger.tsx` và
+  `PdfSplitter.tsx` (script test CDP tham khảo nằm trong thư mục scratchpad của phiên
+  trước, cần viết lại nếu không còn), (3) nếu mọi thứ ổn mới tick các checkbox tương ứng
+  trong `ROADMAP.md` Phase 1.5 và ghi log hoàn tất, (4) hỏi người dùng trước khi push,
+  (5) sau đó mới chuyển sang tool #6 "So sánh văn bản".
 
 ### 2026-07-25 — Phase 1.5, tool #3: Nâng cấp "Xóa nền ảnh" lên Feature Parity
 - Benchmark: remove.bg, Adobe Express Background Remover.
