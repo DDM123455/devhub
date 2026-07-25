@@ -12,6 +12,7 @@
     "compress": "Compresser",
     "compressing": "Compression…",
     "download": "Télécharger",
+    "downloadAll": "Tout télécharger (.zip)",
     "original": "Original",
     "compressed": "Compressé",
     "reduced": "{{percent}} % de moins",

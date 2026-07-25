@@ -10,13 +10,11 @@
   Phase 2) + mục "Checklist Feature Parity" vào `CLAUDE.md` — mục tiêu đưa từng tool từ
   "MVP chạy được" lên "ngang tầm đối thủ đầu ngành" (benchmark, so sánh feature-by-feature,
   nâng cấp).
-- Task tiếp theo cần làm: Bắt đầu **Phase 1.5**, task đầu tiên trong danh sách — công cụ
-  #1 "Nén ảnh" (benchmark TinyPNG/Squoosh/iLoveIMG): batch upload nhiều ảnh, quality
-  slider + preview trước/sau, hiển thị % giảm dung lượng, nút "Download All" dạng .zip,
-  kéo-thả file. **Lưu ý dependency mới**: mục "Download All .zip" cần thêm thư viện zip
-  (chưa có trong danh sách hiện tại của `ROADMAP.md`/`package.json` — ví dụ `jszip`) — hỏi
-  người dùng trước khi cài theo đúng quy tắc "không thêm dependency ngoài danh sách" trong
-  `CLAUDE.md`.
+- Task tiếp theo cần làm: **Phase 1.5**, tool #1 "Nén ảnh" đã xong (xem log bên dưới) —
+  tiếp tục với tool **#2 "Chuyển đổi định dạng ảnh"** (benchmark Convertio/CloudConvert/
+  iLoveIMG): mở rộng từ 3 lên tối thiểu JPG/PNG/WebP/AVIF/BMP/GIF/ICO, hỗ trợ đọc HEIC
+  (`heic2any`), xử lý hàng loạt + chọn định dạng đích chung, chọn chất lượng output. **Lưu
+  ý dependency mới**: `heic2any` chưa có trong danh sách — hỏi người dùng trước khi cài.
 - Ghi chú thiết kế (2026-07-25): đã redesign toàn bộ giao diện site (không phải task trong
   `ROADMAP.md`, làm theo yêu cầu trực tiếp của người dùng) dựa trên file mockup
   `Web Tool Hub.dc.html` ở gốc repo (file KHÔNG được commit vào git — chỉ là tài liệu tham
@@ -88,6 +86,54 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 1.5, tool #1: Nâng cấp "Nén ảnh" lên Feature Parity
+- Benchmark: TinyPNG, Squoosh, iLoveIMG (theo đúng yêu cầu trong `ROADMAP.md`).
+- Trạng thái trước khi nâng cấp: batch upload nhiều ảnh, quality slider, kéo-thả đã có sẵn
+  từ Phase 1 (không phải làm lại) — chỉ thiếu 2 mục: preview ảnh trực quan trước/sau (trước
+  đó chỉ có số liệu dung lượng dạng text) và nút "Download All" dạng .zip.
+- Đã hỏi người dùng trước khi cài `jszip` (thư viện zip, chưa có trong danh sách
+  `ROADMAP.md`) — được đồng ý.
+- Đã làm:
+  - Cài `jszip` (bundle sẵn type TypeScript, không cần `@types` riêng).
+  - Sửa `src/components/tools/ImageCompressor.tsx`:
+    - Thêm `previewUrl` (tạo bằng `URL.createObjectURL(file)` ngay khi thêm ảnh) và
+      `compressedPreviewUrl` (tạo sau khi nén xong) vào state từng item — hiển thị 2
+      thumbnail 64×64 cạnh nhau (ảnh gốc → mũi tên → ảnh đã nén) kèm alt text mô tả đầy đủ
+      (đáp ứng checklist SEO alt text).
+    - Track mọi object URL đã tạo trong 1 `useRef<Set>`, revoke tất cả trong cleanup của
+      `useEffect` khi component unmount — tránh leak memory vì object URL không tự giải
+      phóng, và component này (khác các tool trước) tạo khá nhiều URL nếu người dùng
+      upload nhiều ảnh.
+    - Thêm `handleDownloadAll`: dùng `JSZip` gộp toàn bộ `compressedBlob` đã nén xong
+      thành 1 file `compressed-images.zip`, chỉ hiện nút khi có > 1 ảnh đã nén xong
+      (`doneCount > 1`) — nén 1 ảnh thì nút tải riêng lẻ đã đủ, không cần zip 1 file.
+  - Thêm key i18n `ui.downloadAll` cho cả 8 ngôn ngữ trong `tool-image-compress.json`
+    (dạng "Download All (.zip)" dịch tự nhiên từng ngôn ngữ), cập nhật
+    `ImageCompressPage.astro` truyền message mới.
+  - `npm run build` sạch, 89 trang.
+  - **Test tương tác thật** (không chỉ tin build sạch/HTML tĩnh như phần lớn task trước) —
+    viết 1 script Node dùng Chrome DevTools Protocol thuần (không cài puppeteer/playwright,
+    dùng `WebSocket`/`fetch` built-in của Node 22) để: mở trang thật qua `npm run preview`,
+    dùng `DOM.setFileInputFiles` set 2 file ảnh test vào đúng input, bấm nút Nén qua
+    `Runtime.evaluate`, chờ và xác nhận cả 2 ảnh nén xong + 4 thẻ `<img>` preview hiện đúng
+    (2 gốc + 2 đã nén), bấm "Download All", xác nhận 1 file `.zip` thật được tải xuống
+    (231 bytes cho 2 ảnh test 68 bytes). Toàn bộ pass. Có chụp ảnh màn hình cuối cùng xác
+    nhận UI đúng như thiết kế.
+- Quyết định kỹ thuật quan trọng:
+  - Không thêm nút xóa từng ảnh khỏi danh sách (không có trong checklist Phase 1.5, không
+    tự ý mở rộng phạm vi) — giữ đúng scope 2 mục còn thiếu.
+  - Nút "Download All" chỉ hiện khi `doneCount > 1` thay vì luôn hiện — tránh UI thừa khi
+    chỉ có 1 ảnh (nút tải riêng lẻ đã đủ dùng).
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Ảnh test dùng để verify là PNG 1×1 pixel tổng hợp (không phải ảnh thật) nên % giảm dung
+    lượng ra số ÂM (-40%, vì overhead định dạng lớn hơn nội dung cho ảnh siêu nhỏ) — đây là
+    đặc thù của ảnh test, KHÔNG phải lỗi công thức tính (`1 - compressedSize/originalSize`
+    vẫn đúng, ảnh thật vài trăm KB-vài MB sẽ luôn ra số dương như mong đợi).
+  - Script test CDP (`cdp-test.js`) lưu trong thư mục scratchpad của phiên, không phải file
+    dự án — nếu muốn tái sử dụng cho các tool khác ở Phase 1.5 cần viết lại/tham số hóa
+    (chọn selector input, tên nút Compress khác nhau theo từng tool).
+- Task tiếp theo: Phase 1.5, tool #2 "Chuyển đổi định dạng ảnh".
 
 ### 2026-07-25 — Redesign toàn site theo mockup `Web Tool Hub.dc.html` (ngoài ROADMAP.md)
 - Bối cảnh: sau khi hoàn tất Phase 1, người dùng để lại 1 file mockup thiết kế

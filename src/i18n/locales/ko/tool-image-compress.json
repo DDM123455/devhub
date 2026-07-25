@@ -12,6 +12,7 @@
     "compress": "압축",
     "compressing": "압축 중…",
     "download": "다운로드",
+    "downloadAll": "전체 다운로드 (.zip)",
     "original": "원본",
     "compressed": "압축됨",
     "reduced": "{{percent}}% 감소",

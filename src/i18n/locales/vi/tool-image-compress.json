@@ -12,6 +12,7 @@
     "compress": "Nén ảnh",
     "compressing": "Đang nén…",
     "download": "Tải xuống",
+    "downloadAll": "Tải tất cả (.zip)",
     "original": "Gốc",
     "compressed": "Đã nén",
     "reduced": "Giảm {{percent}}%",

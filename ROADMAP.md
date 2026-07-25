@@ -42,12 +42,12 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 > Với mỗi công cụ: liệt kê đối thủ → so sánh gap → nâng cấp → build thử → tick → log.
 > Áp dụng đúng "Checklist Feature Parity" trong `CLAUDE.md`.
 
-- [ ] **1. Nén ảnh** — benchmark: TinyPNG, Squoosh, iLoveIMG
-  - [ ] Upload/xử lý hàng loạt (nhiều ảnh cùng lúc), không chỉ 1 ảnh
-  - [ ] Thanh trượt điều chỉnh mức nén (quality slider), xem preview trước/sau
-  - [ ] Hiển thị % giảm dung lượng, so sánh before/after side-by-side
-  - [ ] Nút "Download All" dưới dạng .zip khi xử lý nhiều ảnh
-  - [ ] Kéo-thả (drag & drop) file vào khung upload
+- [x] **1. Nén ảnh** — benchmark: TinyPNG, Squoosh, iLoveIMG
+  - [x] Upload/xử lý hàng loạt (nhiều ảnh cùng lúc), không chỉ 1 ảnh
+  - [x] Thanh trượt điều chỉnh mức nén (quality slider), xem preview trước/sau
+  - [x] Hiển thị % giảm dung lượng, so sánh before/after side-by-side
+  - [x] Nút "Download All" dưới dạng .zip khi xử lý nhiều ảnh
+  - [x] Kéo-thả (drag & drop) file vào khung upload
 
 - [ ] **2. Chuyển đổi định dạng ảnh** — benchmark: Convertio, CloudConvert, iLoveIMG
   - [ ] Hiện tại chỉ hỗ trợ 3 định dạng → mở rộng tối thiểu: JPG, PNG, WebP, AVIF, BMP,

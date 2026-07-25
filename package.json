@@ -28,6 +28,7 @@
     "diff": "^9.0.0",
     "i18next": "^26.3.6",
     "jsoneditor": "^10.4.3",
+    "jszip": "^3.10.1",
     "lucide-react": "^1.26.0",
     "onnxruntime-web": "^1.21.0",
     "pdf-lib": "^1.17.1",
