@@ -28,9 +28,9 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] 1. Nén ảnh (JPEG/PNG/WebP) — `browser-image-compression`
 - [x] 2. Chuyển đổi định dạng ảnh — HTML5 Canvas API
 - [x] 3. Xóa nền ảnh (AI, chạy local) — `@imgly/background-removal`
-- [ ] 4. Gộp PDF (Merge) — `pdf-lib`
+- [x] 4. Gộp PDF (Merge) — `pdf-lib`
 - [ ] 5. Tách PDF (Split) — `pdf-lib`
-- [ ] 6. So sánh văn bản (Diff Checker) — `diff` (jsdiff)
+- [x] 6. So sánh văn bản (Diff Checker) — `diff` (jsdiff)
 - [ ] 7. Đếm từ & ký tự — JS thuần
 - [ ] 8. JSON Formatter & Validator — Monaco editor hoặc jsoneditor
 - [ ] 9. QR Code Generator (tùy chỉnh màu, logo giữa) — `qrcode.react` + Canvas

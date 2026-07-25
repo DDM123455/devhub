@@ -3,6 +3,8 @@ import Layout from '../../../layouts/Layout.astro';
 import ImageCompressPage from '@/components/tools/ImageCompressPage.astro';
 import ImageConvertPage from '@/components/tools/ImageConvertPage.astro';
 import BackgroundRemoverPage from '@/components/tools/BackgroundRemoverPage.astro';
+import PdfMergePage from '@/components/tools/PdfMergePage.astro';
+import TextDiffPage from '@/components/tools/TextDiffPage.astro';
 import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { tools } from '@/data/tools';
@@ -30,6 +32,10 @@ const name = tool.names[locale];
 		<ImageConvertPage lang={locale} />
 	) : toolId === 'background-remover' ? (
 		<BackgroundRemoverPage lang={locale} />
+	) : toolId === 'pdf-merge' ? (
+		<PdfMergePage lang={locale} />
+	) : toolId === 'text-diff' ? (
+		<TextDiffPage lang={locale} />
 	) : (
 		<Layout title={`${name} — Web Tool Hub`} description={name} lang={locale}>
 			<section class="px-4 py-10">

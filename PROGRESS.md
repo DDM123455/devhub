@@ -5,9 +5,10 @@
 
 ## 🔵 Trạng thái hiện tại
 
-- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (3/10 xong)
-- Task tiếp theo cần làm: Công cụ #4 "Gộp PDF (Merge)" dùng `pdf-lib` (xem `ROADMAP.md`
-  Phase 1)
+- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (5/10 xong)
+- Task tiếp theo cần làm: Công cụ #5 "Tách PDF (Split)" dùng `pdf-lib` (xem `ROADMAP.md`
+  Phase 1) — công cụ #4 và #6 đã xong (xem log bên dưới), #5 là task duy nhất bị bỏ qua
+  giữa 2 tool đó nên vẫn còn `[ ]`.
 - Ghi chú kiến trúc tool page: `src/pages/[locale]/tools/[slug].astro` giờ rẽ nhánh theo
   `toolId` — nếu là tool đã có UI thật thì render component riêng
   (`src/components/tools/<Ten>Page.astro`), còn lại vẫn rơi vào nhánh "coming soon" mặc
@@ -52,6 +53,56 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Sửa `.git/index` hỏng + gộp (merge) công cụ #4 và #6 từ worktree agent
+- Bối cảnh: người dùng yêu cầu kiểm tra xem các chức năng đã code có được gộp vào `main`
+  và đã push lên GitHub chưa. Khi chạy `git status`, phát hiện `.git/index` của repo
+  chính bị hỏng (`fatal: index file corrupt`, file toàn byte `0x00`) — chặn mọi lệnh cần
+  đọc index. Đào sâu bằng các lệnh git không cần index (`cat-file`, `log`,
+  `worktree list`) phát hiện `.claude/worktrees/` còn 3 worktree phụ (dấu vết background
+  agent chạy song song ở phiên trước):
+  - `agent-a3473eb7a9c0f0cfc` → branch riêng, commit `198efe5` = code đầy đủ **công cụ #4
+    Gộp PDF (Merge)** dùng `pdf-lib` (component + trang SEO + 8 file i18n).
+  - `agent-a28729a2e6a090b60` → branch riêng, commit `aa89f80` = code đầy đủ **công cụ #6
+    So sánh văn bản (Diff Checker)** dùng `diff` (jsdiff).
+  - Cả hai agent CỐ Ý không sửa `[slug].astro`/`ROADMAP.md`/`PROGRESS.md` (ghi rõ trong
+    commit message, để tránh xung đột khi chạy song song) — bước tích hợp cuối cùng chưa
+    từng xảy ra, nhiều khả năng đúng lúc đó `.git/index` bị hỏng (tiến trình bị ngắt giữa
+    chừng).
+  - `agent-a494ece694ff1143f` — worktree thứ 3 hỏng hẳn, ref branch là 41 byte NUL thuần
+    (không phải SHA hợp lệ), thư mục chưa từng `npm install`/có commit nào — agent bị
+    crash/kill ngay từ bước khởi tạo, không có gì để cứu.
+- Đã làm:
+  - Xóa `.git/index` rồi `git reset` (mixed reset, đọc lại index từ `HEAD` tree) — không
+    đụng working tree, không mất commit nào (toàn bộ lịch sử `main` vẫn nguyên vẹn).
+  - `git merge worktree-agent-a3473eb7a9c0f0cfc` (công cụ #4) — fast-forward sạch.
+  - `git merge worktree-agent-a28729a2e6a090b60` (công cụ #6) — auto-merge sạch
+    (`package.json`/`package-lock.json` chỉ conflict do thêm dependency ở vị trí khác
+    nhau, git tự resolve đúng).
+  - Hoàn tất phần tích hợp mà 2 agent cố ý bỏ qua: thêm 2 nhánh `toolId === 'pdf-merge'`
+    và `toolId === 'text-diff'` vào `src/pages/[locale]/tools/[slug].astro`; tick `[x]`
+    task #4 và #6 trong `ROADMAP.md`.
+  - Dọn worktree: `git worktree remove` 2 worktree đã merge xong + xóa 2 branch
+    `worktree-agent-*` tương ứng (an toàn vì đã nằm trong lịch sử `main`); force-remove
+    worktree hỏng `agent-a494ece694ff1143f` + xóa ref hỏng của nó.
+  - `npm run build` sạch, đọc `dist/en/tools/merge-pdf/index.html` và
+    `dist/en/tools/text-diff-checker/index.html` xác nhận route mới sinh trang đúng.
+  - `git push origin main` — đồng bộ lại với remote sau khi merge.
+- Quyết định kỹ thuật quan trọng:
+  - Không squash 2 commit gốc của agent — giữ nguyên lịch sử/tác giả (`Co-Authored-By`),
+    chỉ thêm 1 commit riêng cho phần wiring + ROADMAP/PROGRESS.
+  - Không thử "cứu" worktree hỏng thứ 3 — ref bị hỏng ở mức byte (NUL thuần), không phải
+    lỗi git logic có thể phục hồi bằng lệnh git thông thường, và thư mục không có commit
+    nào để mất.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Nguyên nhân gốc khiến `.git/index` và ref của worktree thứ 3 bị hỏng cùng lúc nhiều
+    khả năng là tiến trình agent bị kill/crash đột ngột (mất điện, force-kill...) giữa
+    lúc đang ghi file — nếu hiện tượng này lặp lại, cần điều tra tại sao tiến trình bị
+    ngắt đột ngột thay vì chỉ sửa hậu quả như lần này.
+  - Code của công cụ #4 và #6 do agent khác viết, phiên này CHƯA tự test tương tác thật
+    trên trình duyệt (chọn PDF/gộp, dán văn bản/so sánh) — chỉ verify qua `npm run build`
+    + đọc HTML tĩnh, giống tình trạng các tool trước.
+- Task tiếp theo: Phase 1, công cụ #5 "Tách PDF (Split)" dùng `pdf-lib`.
 
 ### 2026-07-24 — Phase 1, công cụ #3: Xóa nền ảnh (AI, chạy local)
 - Đã làm:
