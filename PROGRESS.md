@@ -9,20 +9,17 @@
   soát & Nâng cấp Feature Parity: HOÀN TẤT 10/10 tool** ✅ (tool #10 "Chuyển đổi Case văn
   bản" vừa xong — xem log bên dưới), CHỈ CÒN treo lại đúng 1 mục con nhỏ: nén PDF cho
   tool #4/#5 (chưa làm, không phải lỗi chặn, xem log 2026-07-25 "Gộp/Tách PDF" bên dưới).
-- **ĐANG LÀM (2026-07-25, phiên hiện tại): QA audit toàn site theo yêu cầu trực tiếp của
-  người dùng** (không phải task trong ROADMAP — đóng vai Senior QA/Frontend/UI-UX kiểm tra
-  lại toàn bộ chức năng + UI/UX của cả 10 tool trước khi coi dự án "hoàn thành"). Đã xong:
-  layout dùng chung + 9/10 tool (Nén ảnh, Chuyển đổi định dạng ảnh, Xóa nền ảnh, Gộp PDF,
-  Tách PDF, So sánh văn bản, Đếm từ & ký tự, JSON Formatter, QR Generator) — xem log chi
-  tiết ngay bên dưới, mỗi tool đã build + test tương tác Puppeteer + commit riêng. Đếm từ &
-  ký tự và JSON Formatter đều SẠCH, không cần sửa gì. QR Generator có 1 bug **Critical** đã
-  sửa (xem log). CÒN LẠI cần audit: Text Case Converter (tool vừa build xong ở phiên trước,
-  rủi ro thấp nhưng vẫn cần audit đầy đủ theo đúng quy trình), trang chủ (đã audit sơ bộ cùng
-  layout dùng chung ở lượt đầu — chỉ còn phần responsive/dark mode toàn site sâu hơn), rồi
-  tổng hợp báo cáo cuối cùng dạng bảng theo đúng yêu cầu gốc của người dùng. Task tiếp theo
-  khi mở phiên mới (nếu bị ngắt giữa chừng): tiếp tục audit từ "Text Case Converter" theo
-  đúng thứ tự trên.
-- Task tiếp theo sau khi audit xong: bắt đầu **Phase 2 — SEO chuyên sâu & nhân bản đa ngôn
+- **QA audit toàn site: HOÀN TẤT (2026-07-25)**, theo yêu cầu trực tiếp của người dùng
+  (không phải task trong ROADMAP — đóng vai Senior QA/Frontend/UI-UX kiểm tra lại toàn bộ
+  chức năng + UI/UX của cả 10 tool + layout dùng chung + responsive/dark mode trước khi coi
+  dự án "hoàn thành"). Đã audit đủ: layout dùng chung, cả 10/10 tool, và responsive/dark mode
+  sweep toàn site (mobile 375px + tablet 768px cho cả 10 trang tool, dark mode spot-check).
+  Tổng cộng tìm và sửa **9 bug/gap thật** (1 Critical, phần còn lại High/Medium), tất cả đã
+  build + test tương tác Puppeteer xác nhận + commit riêng theo từng phần — xem log chi tiết
+  bên dưới cho từng tool. 2 tool (Đếm từ & ký tự, JSON Formatter) và Text Case Converter đều
+  SẠCH ngay từ đầu, không cần sửa gì. Báo cáo tổng kết dạng bảng đã gửi cho người dùng trong
+  chính phiên chat này (không lưu file riêng, xem lại lịch sử chat nếu cần).
+- Task tiếp theo khi mở phiên mới: bắt đầu **Phase 2 — SEO chuyên sâu & nhân bản đa ngôn
   ngữ** (xem `ROADMAP.md` từ dòng "## Phase 2"), việc đầu tiên là mở rộng i18n từ 8 lên
   15–20 ngôn ngữ. Có thể tranh thủ làm nốt mục nén PDF còn treo của Phase 1.5 trước nếu
   người dùng muốn dứt điểm Phase 1.5 100% trước khi sang Phase 2, nhưng đây không phải yêu
@@ -98,6 +95,29 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — QA Audit toàn site (hoàn tất): Text Case Converter + responsive/dark mode
+  sweep + báo cáo tổng kết — XONG
+- **Tool #10 Text Case Converter**: audit đầy đủ lại (dù vừa build ở phiên trước cùng ngày)
+  — chạy lại toàn bộ bộ test cũ (`test-textcase.mjs`, vẫn pass 100%) + thêm test hiệu năng
+  với input ~900.000 ký tự (UPPERCASE: 340ms) và 20.000 dòng (Sort lines: 281ms) — **SẠCH,
+  không tìm thấy bug, không cần sửa gì**.
+- **Responsive + dark mode sweep toàn site**: chụp + kiểm tra `scrollWidth` thật (không chỉ
+  nhìn ảnh) ở mobile (375px) và tablet (768px) cho cả 10 trang tool, cộng dark mode spot-check
+  3 tool phức tạp (QR Generator, Text Diff, Merge PDF).
+  - Phát hiện 1 bug thật: **So sánh văn bản** tràn lề ~4px ở đúng breakpoint tablet (768px) —
+    hàng tiêu đề mỗi khung nhập (nhãn + nút Clear/Swap/Upload .txt) không tự xuống dòng, chen
+    nhau vượt quá chiều rộng cột trong grid 2 cột tại `md:`. Sửa bằng cách thêm `flex-wrap`
+    cho cả 4 hàng toolbar liên quan (2 khung nhập chính + 2 cột Merge Tool) — verify lại
+    bằng `getBoundingClientRect()` xác nhận hết tràn lề, chạy lại toàn bộ
+    `test-textdiff.mjs` xác nhận không có hồi quy.
+  - 9 tool còn lại: không phát hiện tràn lề nào ở cả 2 mốc kích thước.
+- **Tổng kết toàn bộ đợt audit** (từ đầu phiên tới giờ): tìm và sửa tổng cộng **9 bug/gap
+  thật** trên layout dùng chung + 6/10 tool, đã build + test tương tác Puppeteer xác nhận +
+  commit riêng từng phần trong suốt quá trình (không dồn tới cuối), đúng yêu cầu của người
+  dùng. Danh sách đầy đủ + phân loại mức độ đã gửi trực tiếp cho người dùng dưới dạng bảng
+  trong chat (không tạo file báo cáo riêng vì đây là nội dung nhất thời của 1 lần audit, theo
+  đúng nguyên tắc không lưu tài liệu trung gian khi không được yêu cầu).
 
 ### 2026-07-25 — QA Audit toàn site (tiếp tục): tool #6-#9 — XONG, đã build + test + commit
   riêng từng phần
