@@ -16,6 +16,9 @@ interface Messages {
 	reduced: string;
 	noFiles: string;
 	errorGeneric: string;
+	remove: string;
+	clearAll: string;
+	skippedFiles: string;
 }
 
 interface ImageItem {
@@ -39,6 +42,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 	const [quality, setQuality] = useState(0.8);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isZipping, setIsZipping] = useState(false);
+	const [skippedCount, setSkippedCount] = useState(0);
 	const objectUrls = useRef<Set<string>>(new Set());
 
 	// Every object URL created for a preview (original or compressed) is tracked
@@ -57,25 +61,38 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList) return;
-		const newItems: ImageItem[] = Array.from(fileList)
-			.filter((file) => file.type.startsWith('image/'))
-			.map((file) => ({
-				id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
-				file,
-				previewUrl: trackUrl(URL.createObjectURL(file)),
-				status: 'pending' as const,
-			}));
+		const allFiles = Array.from(fileList);
+		const imageFiles = allFiles.filter((file) => file.type.startsWith('image/'));
+		setSkippedCount(allFiles.length - imageFiles.length);
+		const newItems: ImageItem[] = imageFiles.map((file) => ({
+			id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
+			file,
+			previewUrl: trackUrl(URL.createObjectURL(file)),
+			status: 'pending' as const,
+		}));
 		setItems((prev) => [...prev, ...newItems]);
+	}, []);
+
+	const handleRemove = useCallback((id: string) => {
+		setItems((prev) => prev.filter((item) => item.id !== id));
+	}, []);
+
+	const handleClearAll = useCallback(() => {
+		setItems([]);
+		setSkippedCount(0);
 	}, []);
 
 	const handleCompress = useCallback(async () => {
 		setIsProcessing(true);
 		for (const item of items) {
-			if (item.status === 'done') continue;
 			setItems((prev) =>
 				prev.map((it) => (it.id === item.id ? { ...it, status: 'processing' } : it)),
 			);
 			try {
+				if (item.compressedPreviewUrl) {
+					URL.revokeObjectURL(item.compressedPreviewUrl);
+					objectUrls.current.delete(item.compressedPreviewUrl);
+				}
 				const compressedBlob = await imageCompression(item.file, {
 					maxSizeMB: 10,
 					useWebWorker: true,
@@ -132,8 +149,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 		}
 	}, [items]);
 
-	const canCompress =
-		!isProcessing && items.length > 0 && items.some((item) => item.status !== 'done');
+	const canCompress = !isProcessing && items.length > 0;
 	const doneCount = items.filter((item) => item.status === 'done').length;
 
 	const [isDragOver, setIsDragOver] = useState(false);
@@ -171,6 +187,12 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 				/>
 				<p className="text-xs text-muted-foreground">{messages.dropHint}</p>
 			</div>
+
+			{skippedCount > 0 && (
+				<p className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
+					{messages.skippedFiles.replace('{{count}}', String(skippedCount))}
+				</p>
+			)}
 
 			<div className="flex items-center gap-3">
 				<label htmlFor="image-compressor-quality" className="shrink-0 text-sm text-foreground">
@@ -239,6 +261,16 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 										{messages.download}
 									</Button>
 								)}
+								<Button
+									type="button"
+									size="sm"
+									variant="ghost"
+									onClick={() => handleRemove(item.id)}
+									disabled={item.status === 'processing'}
+									aria-label={messages.remove}
+								>
+									✕
+								</Button>
 							</div>
 						</li>
 					))}
@@ -252,6 +284,16 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 				{doneCount > 1 && (
 					<Button type="button" variant="secondary" onClick={handleDownloadAll} disabled={isZipping}>
 						{messages.downloadAll}
+					</Button>
+				)}
+				{items.length > 0 && (
+					<Button
+						type="button"
+						variant="outline"
+						onClick={handleClearAll}
+						disabled={isProcessing}
+					>
+						{messages.clearAll}
 					</Button>
 				)}
 			</div>

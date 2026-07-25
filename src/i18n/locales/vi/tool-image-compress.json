@@ -17,7 +17,10 @@
     "compressed": "Đã nén",
     "reduced": "Giảm {{percent}}%",
     "noFiles": "Chưa chọn ảnh nào.",
-    "errorGeneric": "Có lỗi khi nén ảnh này. Vui lòng thử lại."
+    "errorGeneric": "Có lỗi khi nén ảnh này. Vui lòng thử lại.",
+    "remove": "Xóa",
+    "clearAll": "Xóa tất cả",
+    "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ."
   },
   "related": "Công cụ liên quan",
   "article": {

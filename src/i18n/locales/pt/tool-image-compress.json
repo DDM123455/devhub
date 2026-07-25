@@ -17,7 +17,10 @@
     "compressed": "Comprimido",
     "reduced": "{{percent}}% a menos",
     "noFiles": "Nenhuma imagem selecionada ainda.",
-    "errorGeneric": "Ocorreu um erro ao comprimir esta imagem. Tente novamente."
+    "errorGeneric": "Ocorreu um erro ao comprimir esta imagem. Tente novamente.",
+    "remove": "Remover",
+    "clearAll": "Remover tudo",
+    "skippedFiles": "{{count}} arquivo(s) foram ignorados por não serem um formato de imagem compatível."
   },
   "related": "Ferramentas relacionadas",
   "article": {

@@ -17,7 +17,10 @@
     "compressed": "圧縮後",
     "reduced": "{{percent}}%削減",
     "noFiles": "まだ画像が選択されていません。",
-    "errorGeneric": "この画像の圧縮中にエラーが発生しました。もう一度お試しください。"
+    "errorGeneric": "この画像の圧縮中にエラーが発生しました。もう一度お試しください。",
+    "remove": "削除",
+    "clearAll": "すべて削除",
+    "skippedFiles": "対応していない画像形式のため、{{count}}件のファイルをスキップしました。"
   },
   "related": "関連ツール",
   "article": {

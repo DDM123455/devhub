@@ -17,7 +17,10 @@
     "compressed": "압축됨",
     "reduced": "{{percent}}% 감소",
     "noFiles": "아직 선택된 이미지가 없습니다.",
-    "errorGeneric": "이 이미지를 압축하는 중 오류가 발생했습니다. 다시 시도해 주세요."
+    "errorGeneric": "이 이미지를 압축하는 중 오류가 발생했습니다. 다시 시도해 주세요.",
+    "remove": "삭제",
+    "clearAll": "전체 삭제",
+    "skippedFiles": "지원되지 않는 이미지 형식이라 {{count}}개 파일을 건너뛰었습니다."
   },
   "related": "관련 도구",
   "article": {

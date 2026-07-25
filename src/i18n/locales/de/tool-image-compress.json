@@ -17,7 +17,10 @@
     "compressed": "Komprimiert",
     "reduced": "{{percent}} % kleiner",
     "noFiles": "Noch keine Bilder ausgewählt.",
-    "errorGeneric": "Beim Komprimieren dieses Bildes ist ein Fehler aufgetreten. Bitte versuche es erneut."
+    "errorGeneric": "Beim Komprimieren dieses Bildes ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+    "remove": "Entfernen",
+    "clearAll": "Alle entfernen",
+    "skippedFiles": "{{count}} Datei(en) wurden übersprungen, da es sich nicht um ein unterstütztes Bildformat handelt."
   },
   "related": "Ähnliche Tools",
   "article": {
