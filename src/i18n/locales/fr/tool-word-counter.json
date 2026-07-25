@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "title": "Compteur de mots et de caractères gratuit en ligne — Web Tool Hub",
+    "description": "Comptez les mots, caractères, phrases et paragraphes instantanément pendant que vous tapez ou collez du texte — gratuit, en temps réel, directement dans votre navigateur. Sans envoi sur un serveur, sans inscription."
+  },
+  "heading": "Compteur de mots et de caractères",
+  "tagline": "Comptez les mots, caractères, phrases et paragraphes instantanément pendant que vous tapez.",
+  "ui": {
+    "placeholder": "Collez ou tapez du texte ici…",
+    "charsLabel": "Caractères",
+    "charsNoSpacesLabel": "Caractères (sans espaces)",
+    "wordsLabel": "Mots",
+    "sentencesLabel": "Phrases",
+    "paragraphsLabel": "Paragraphes",
+    "readingTimeLabel": "Temps de lecture",
+    "readingTimeValue": "{{minutes}} min de lecture",
+    "clear": "Effacer"
+  },
+  "related": "Outils associés",
+  "article": {
+    "heading": "Pourquoi compter les mots et les caractères en local ?",
+    "p1": "Un nombre surprenant de tâches d'écriture quotidiennes s'accompagne d'une limite précise : une dissertation plafonnée à 500 mots, un tweet limité à 280 caractères, une meta description tronquée au-delà d'environ 160 caractères, une lettre de motivation qu'un recruteur a demandé de tenir sur une seule page. Compter tout cela à la main est fastidieux et source d'erreurs, si bien que la plupart des gens collent leur texte dans un compteur en ligne — ce qui revient généralement à envoyer un brouillon de lettre de motivation, un article non publié ou le brief confidentiel d'un client vers un serveur dont vous ne savez rien.",
+    "p2": "Cet outil ne fait jamais cela. Chaque caractère que vous tapez est compté par un petit script JavaScript qui s'exécute directement dans votre navigateur, et les chiffres se mettent à jour en temps réel pendant que vous tapez — il n'y a pas de bouton d'envoi car il n'y a aucun aller-retour vers un serveur à attendre. Rien de ce que vous écrivez n'est jamais envoyé où que ce soit, ni enregistré, ni journalisé ; rechargez la page et tout disparaît, exactement comme on l'attend d'un brouillon de travail.",
+    "p3": "Il suffit de commencer à taper ou de coller votre texte dans la zone prévue. Le compte de mots se fait en séparant selon les espaces, donc « bien-connu » compte pour un mot tandis que « bien connu » en compte deux. Le compte de phrases repère le texte se terminant par un point, un point d'interrogation ou d'exclamation, ce qui fonctionne bien pour de la prose classique mais peut sous-compter un texte qui se passe de ponctuation, comme une liste à puces. Le compte de paragraphes considère chaque bloc de texte séparé par une ligne vide comme un paragraphe. Le temps de lecture estimé suppose une vitesse de lecture moyenne d'environ 200 mots par minute, arrondie à la minute supérieure, afin qu'un texte très court affiche quand même « 1 min de lecture » plutôt que « 0 ».",
+    "p4": "Les rédacteurs s'en servent pour atteindre le nombre de mots requis pour un devoir sans avoir à deviner, les marketeurs pour garder une meta description ou un texte publicitaire sous sa limite d'affichage, et les étudiants pour vérifier qu'un travail respecte le minimum ou le maximum demandé par un enseignant avant de le rendre. Le nombre de caractères sans espaces est particulièrement utile pour les plateformes — certains réseaux sociaux et formulaires — qui comptent les caractères de cette façon plutôt qu'en incluant chaque espace. Si vous devez comparer deux brouillons mot à mot plutôt que d'en compter un seul, l'outil Comparateur de texte fonctionne selon la même approche locale, sans rien envoyer."
+  }
+}

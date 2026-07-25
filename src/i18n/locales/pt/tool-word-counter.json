@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "title": "Contador de palavras e caracteres grátis online — Web Tool Hub",
+    "description": "Conte palavras, caracteres, frases e parágrafos instantaneamente enquanto você digita ou cola um texto — grátis, em tempo real e direto no seu navegador. Sem upload, sem cadastro."
+  },
+  "heading": "Contador de palavras e caracteres",
+  "tagline": "Conte palavras, caracteres, frases e parágrafos instantaneamente enquanto você digita.",
+  "ui": {
+    "placeholder": "Cole ou digite o texto aqui…",
+    "charsLabel": "Caracteres",
+    "charsNoSpacesLabel": "Caracteres (sem espaços)",
+    "wordsLabel": "Palavras",
+    "sentencesLabel": "Frases",
+    "paragraphsLabel": "Parágrafos",
+    "readingTimeLabel": "Tempo de leitura",
+    "readingTimeValue": "{{minutes}} min de leitura",
+    "clear": "Limpar"
+  },
+  "related": "Ferramentas relacionadas",
+  "article": {
+    "heading": "Por que contar palavras e caracteres localmente?",
+    "p1": "Um número surpreendente de tarefas de escrita do dia a dia vem com um limite fixo: uma redação de no máximo 500 palavras, um tuíte limitado a 280 caracteres, uma meta description que é cortada depois de cerca de 160 caracteres, uma carta de apresentação que o recrutador pediu para caber em uma página. Contar tudo isso manualmente é cansativo e sujeito a erros, então a maioria das pessoas cola o texto em um contador online — o que geralmente significa enviar um rascunho de carta de apresentação, um artigo ainda não publicado ou o briefing confidencial de um cliente para um servidor sobre o qual você não sabe nada.",
+    "p2": "Esta ferramenta nunca faz isso. Cada caractere que você digita é contado por um pequeno trecho de JavaScript rodando direto no seu navegador, e os números são atualizados em tempo real enquanto você digita — não há botão de enviar porque não há nenhuma viagem de ida e volta a um servidor para esperar. Nada do que você escreve é enviado para lugar nenhum, salvo ou registrado; atualize a página e tudo desaparece, exatamente como você esperaria de um rascunho de trabalho.",
+    "p3": "Basta começar a digitar ou colar seu texto na caixa. A contagem de palavras é feita separando por espaços em branco, então \"bem-conhecido\" conta como uma palavra enquanto \"bem conhecido\" conta como duas. A contagem de frases procura texto que termina em ponto final, interrogação ou exclamação, o que funciona bem para prosa comum mas pode subcontar textos que dispensam pontuação, como uma lista de tópicos. A contagem de parágrafos trata cada bloco de texto separado por uma linha em branco como um parágrafo. O tempo de leitura estimado assume uma velocidade média de leitura de cerca de 200 palavras por minuto, arredondada para cima até o minuto mais próximo, para que textos muito curtos ainda mostrem \"1 min de leitura\" em vez de \"0\".",
+    "p4": "Escritores usam isso para acertar a contagem de palavras de um trabalho sem precisar adivinhar, profissionais de marketing usam para manter uma meta description ou um texto de anúncio dentro do limite de exibição, e estudantes usam para conferir se um trabalho atende ao mínimo ou máximo pedido pelo professor antes de entregar. O número de caracteres sem espaços é especialmente útil para plataformas — algumas redes sociais e formulários — que contam caracteres dessa forma em vez de incluir cada espaço. Se você precisa comparar dois rascunhos palavra por palavra em vez de apenas contar um deles, a ferramenta Comparador de textos funciona com a mesma abordagem local, sem enviar nada."
+  }
+}

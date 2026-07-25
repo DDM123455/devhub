@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "title": "Contador de palabras y caracteres gratis online — Web Tool Hub",
+    "description": "Cuenta palabras, caracteres, frases y párrafos al instante mientras escribes o pegas texto — gratis, en vivo y directamente en tu navegador. Sin subidas, sin registro."
+  },
+  "heading": "Contador de palabras y caracteres",
+  "tagline": "Cuenta palabras, caracteres, frases y párrafos al instante mientras escribes.",
+  "ui": {
+    "placeholder": "Pega o escribe texto aquí…",
+    "charsLabel": "Caracteres",
+    "charsNoSpacesLabel": "Caracteres (sin espacios)",
+    "wordsLabel": "Palabras",
+    "sentencesLabel": "Frases",
+    "paragraphsLabel": "Párrafos",
+    "readingTimeLabel": "Tiempo de lectura",
+    "readingTimeValue": "{{minutes}} min de lectura",
+    "clear": "Borrar"
+  },
+  "related": "Herramientas relacionadas",
+  "article": {
+    "heading": "¿Por qué contar palabras y caracteres en local?",
+    "p1": "Un número sorprendente de tareas de escritura cotidianas viene con un límite fijo: una redacción tope de 500 palabras, un tuit limitado a 280 caracteres, una meta descripción que se corta pasados unos 160 caracteres, una carta de presentación que un reclutador pidió mantener en una sola página. Contar todo eso a mano es tedioso y propenso a errores, así que la mayoría de la gente pega su texto en un contador online — lo que normalmente significa enviar un borrador de carta de presentación, un artículo sin publicar o el brief confidencial de un cliente a un servidor del que no sabes nada.",
+    "p2": "Esta herramienta nunca hace eso. Cada carácter que escribes lo cuenta un pequeño fragmento de JavaScript que se ejecuta directamente en tu navegador, y las cifras se actualizan en vivo mientras escribes — no hay botón de enviar porque no hay ningún viaje de ida y vuelta a un servidor que esperar. Nada de lo que escribes se envía a ningún sitio, ni se guarda ni se registra; recarga la página y todo desaparece, tal como esperarías de un borrador de trabajo.",
+    "p3": "Simplemente empieza a escribir o pega tu texto en el cuadro. El conteo de palabras se hace separando por espacios en blanco, así que \"bien-conocido\" cuenta como una palabra mientras que \"bien conocido\" cuenta como dos. El conteo de frases busca texto que termine en punto, signo de interrogación o de exclamación, lo cual funciona bien con prosa normal pero puede contar de menos en textos que prescinden de la puntuación, como una lista de viñetas. El conteo de párrafos trata cada bloque de texto separado por una línea en blanco como un párrafo. El tiempo de lectura estimado asume una velocidad media de lectura de unas 200 palabras por minuto, redondeada al minuto más cercano hacia arriba, para que un texto muy corto siga mostrando \"1 min de lectura\" en vez de \"0\".",
+    "p4": "Los escritores usan esto para ajustarse al número de palabras de un trabajo sin tener que adivinar, los profesionales de marketing lo usan para mantener una meta descripción o un anuncio dentro de su límite de visualización, y los estudiantes lo usan para comprobar que un trabajo cumple el mínimo o máximo que pidió el profesor antes de entregarlo. La cifra de caracteres sin espacios es especialmente útil para plataformas —algunas redes sociales y formularios— que cuentan los caracteres de esa forma en lugar de incluir cada espacio. Si necesitas comparar dos borradores palabra por palabra en vez de solo contar uno, la herramienta Comparador de textos funciona con el mismo enfoque local, sin subir nada."
+  }
+}

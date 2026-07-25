@@ -31,7 +31,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] 4. Gộp PDF (Merge) — `pdf-lib`
 - [x] 5. Tách PDF (Split) — `pdf-lib`
 - [x] 6. So sánh văn bản (Diff Checker) — `diff` (jsdiff)
-- [ ] 7. Đếm từ & ký tự — JS thuần
+- [x] 7. Đếm từ & ký tự — JS thuần
 - [ ] 8. JSON Formatter & Validator — Monaco editor hoặc jsoneditor
 - [ ] 9. QR Code Generator (tùy chỉnh màu, logo giữa) — `qrcode.react` + Canvas
 - [ ] 10. Chuyển đổi Case văn bản (upper/lower/Title/camelCase/snake_case) — JS thuần

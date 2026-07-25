@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "title": "Word Counter & Character Counter Online Free — Web Tool Hub",
+    "description": "Count words, characters, sentences and paragraphs instantly as you type or paste text — free, live, and entirely in your browser. No upload, no signup."
+  },
+  "heading": "Word & Character Counter",
+  "tagline": "Count words, characters, sentences and paragraphs instantly as you type.",
+  "ui": {
+    "placeholder": "Paste or type text here…",
+    "charsLabel": "Characters",
+    "charsNoSpacesLabel": "Characters (no spaces)",
+    "wordsLabel": "Words",
+    "sentencesLabel": "Sentences",
+    "paragraphsLabel": "Paragraphs",
+    "readingTimeLabel": "Reading time",
+    "readingTimeValue": "{{minutes}} min read",
+    "clear": "Clear"
+  },
+  "related": "Related tools",
+  "article": {
+    "heading": "Why count words and characters locally?",
+    "p1": "A surprising number of everyday writing tasks come with a hard number attached: an essay capped at 500 words, a tweet limited to 280 characters, a meta description that gets truncated past roughly 160 characters, a cover letter a recruiter asked to keep under one page. Manually counting any of that is tedious and error-prone, so most people paste their text into an online counter instead — which usually means sending a draft cover letter, an unpublished article, or a client's confidential brief to a server you know nothing about.",
+    "p2": "This tool never does that. Every character you type is counted by a small piece of JavaScript running directly in your browser, and the numbers update live as you type — there's no submit button because there's no server round-trip to wait for. Nothing you write is ever sent anywhere, stored, or logged; refresh the page and it's gone, exactly as you'd expect from a scratchpad.",
+    "p3": "Just start typing or paste your text into the box. Word count splits on whitespace, so \"well-known\" counts as one word while \"well known\" counts as two. Sentence count looks for text ending in a period, question mark, or exclamation point, which works well for normal prose but can undercount text that skips punctuation, like a list of bullet points. Paragraph count treats any block of text separated by a blank line as one paragraph. The estimated reading time assumes an average adult reading speed of about 200 words per minute, rounded up to the nearest minute so very short texts still show \"1 min read\" instead of \"0\".",
+    "p4": "Writers use this to hit an assignment's word count without guessing, marketers use it to keep a meta description or ad copy under its display limit, and students use it to check a paper against a professor's minimum or maximum before submitting. The character-count-without-spaces figure is particularly useful for platforms — some social networks and forms — that count characters that way rather than including every space. If you need to compare two drafts word by word instead of just counting one, the Text Diff Checker tool handles that with the same local, nothing-uploaded approach."
+  }
+}

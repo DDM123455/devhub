@@ -6,6 +6,7 @@ import BackgroundRemoverPage from '@/components/tools/BackgroundRemoverPage.astr
 import PdfMergePage from '@/components/tools/PdfMergePage.astro';
 import PdfSplitPage from '@/components/tools/PdfSplitPage.astro';
 import TextDiffPage from '@/components/tools/TextDiffPage.astro';
+import WordCounterPage from '@/components/tools/WordCounterPage.astro';
 import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { tools } from '@/data/tools';
@@ -39,6 +40,8 @@ const name = tool.names[locale];
 		<PdfSplitPage lang={locale} />
 	) : toolId === 'text-diff' ? (
 		<TextDiffPage lang={locale} />
+	) : toolId === 'word-counter' ? (
+		<WordCounterPage lang={locale} />
 	) : (
 		<Layout title={`${name} — Web Tool Hub`} description={name} lang={locale}>
 			<section class="px-4 py-10">

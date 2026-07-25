@@ -5,9 +5,9 @@
 
 ## 🔵 Trạng thái hiện tại
 
-- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (6/10 xong)
-- Task tiếp theo cần làm: Công cụ #7 "Đếm từ & ký tự" dùng JS thuần (xem `ROADMAP.md`
-  Phase 1).
+- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi** (7/10 xong)
+- Task tiếp theo cần làm: Công cụ #8 "JSON Formatter & Validator" dùng Monaco editor hoặc
+  jsoneditor (xem `ROADMAP.md` Phase 1).
 - Ghi chú kiến trúc tool page: `src/pages/[locale]/tools/[slug].astro` giờ rẽ nhánh theo
   `toolId` — nếu là tool đã có UI thật thì render component riêng
   (`src/components/tools/<Ten>Page.astro`), còn lại vẫn rơi vào nhánh "coming soon" mặc
@@ -52,6 +52,44 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-25 — Phase 1, công cụ #7: Đếm từ & ký tự
+- Đã làm:
+  - Tạo `src/components/tools/WordCounter.tsx` (React, `client:load`): 1 ô textarea, các
+    chỉ số (số từ, số ký tự, số ký tự không tính khoảng trắng, số câu, số đoạn văn, thời
+    gian đọc ước tính) tính bằng `useMemo` và **cập nhật trực tiếp khi gõ** — không có nút
+    "tính toán" vì đây là phép đếm JS thuần cực nhẹ, không cần bước xử lý riêng biệt như
+    các tool trước (khác với Diff Checker cần bấm "So sánh" vì thuật toán diff tốn hơn).
+    Số câu đếm theo dấu kết thúc câu (`.`, `?`, `!`); số đoạn văn tính theo khối văn bản
+    cách nhau bởi dòng trống; thời gian đọc ước tính theo tốc độ trung bình 200 từ/phút,
+    làm tròn lên tối thiểu 1 phút. Có nút "Xóa hết".
+  - Tạo `src/components/tools/WordCounterPage.astro`: theo đúng khuôn các trang tool
+    trước — title/description riêng theo từ khóa "word counter"/"character counter",
+    JSON-LD `WebApplication` giá 0 USD, nội dung hướng dẫn 4 đoạn/ngôn ngữ, link tới 2 tool
+    cùng category `text` (So sánh văn bản, và tool #10 Chuyển đổi Case khi được làm).
+  - Tạo 8 file dictionary i18n `tool-word-counter.json` — dịch tay riêng cho từng ngôn
+    ngữ; với `ja`/`ko`, chú thích rõ trong bài viết rằng số liệu "số từ" chỉ mang tính
+    tham khảo vì 2 ngôn ngữ này không tách từ bằng khoảng trắng như các ngôn ngữ Latin.
+  - Sửa `src/pages/[locale]/tools/[slug].astro` thêm nhánh `toolId === 'word-counter'` →
+    `<WordCounterPage lang={locale} />`.
+  - `npm run build` sinh đủ 89 trang không lỗi; đọc thử
+    `dist/en/tools/word-counter/index.html` và `dist/vi/tools/dem-tu-va-ky-tu/index.html`
+    xác nhận title/heading/link liên quan đúng.
+- Quyết định kỹ thuật quan trọng:
+  - Không dùng thư viện đếm từ nào — đúng chỉ định "JS thuần" trong `ROADMAP.md`, phép
+    đếm dựa trên `split`/`match`/regex cơ bản là đủ chính xác cho mục đích công cụ này.
+  - Cập nhật số liệu live theo từng ký tự gõ (không cần nút bấm) — khác pattern
+    "chọn file rồi bấm nút xử lý" của các tool trước, vì đây là phép tính tức thời trên
+    text đã có sẵn trong bộ nhớ, không có bước I/O hay xử lý nặng nào cần chờ.
+- Vấn đề còn tồn đọng / cần lưu ý cho phiên sau:
+  - Số câu/đoạn văn dùng heuristic đơn giản (regex dấu câu, dòng trống) nên có thể đếm
+    sai với văn bản không theo chuẩn (danh sách gạch đầu dòng không có dấu chấm, văn bản
+    dùng dấu câu Á Đông như `。`) — đã ghi rõ giới hạn này trong nội dung SEO thay vì giả
+    vờ chính xác tuyệt đối; có thể cải thiện regex cho dấu câu CJK ở Phase 2/3 nếu cần.
+  - Chưa test tương tác thật trên trình duyệt (gõ trực tiếp, xem số liệu cập nhật live) —
+    chỉ verify qua `npm run build` + đọc HTML tĩnh, giống tình trạng các tool trước.
+- Task tiếp theo: Phase 1, công cụ #8 "JSON Formatter & Validator" (Monaco editor hoặc
+  jsoneditor).
 
 ### 2026-07-25 — Phase 1, công cụ #5: Tách PDF (Split)
 - Đã làm:

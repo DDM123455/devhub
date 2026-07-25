@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "title": "Wörter- und Zeichenzähler kostenlos online — Web Tool Hub",
+    "description": "Zähle Wörter, Zeichen, Sätze und Absätze sofort, während du tippst oder Text einfügst — kostenlos, live, direkt in deinem Browser. Kein Upload, keine Anmeldung."
+  },
+  "heading": "Wörter- und Zeichenzähler",
+  "tagline": "Zähle Wörter, Zeichen, Sätze und Absätze sofort, während du tippst.",
+  "ui": {
+    "placeholder": "Text hier einfügen oder eintippen…",
+    "charsLabel": "Zeichen",
+    "charsNoSpacesLabel": "Zeichen (ohne Leerzeichen)",
+    "wordsLabel": "Wörter",
+    "sentencesLabel": "Sätze",
+    "paragraphsLabel": "Absätze",
+    "readingTimeLabel": "Lesezeit",
+    "readingTimeValue": "{{minutes}} Min. Lesezeit",
+    "clear": "Leeren"
+  },
+  "related": "Ähnliche Tools",
+  "article": {
+    "heading": "Warum Wörter und Zeichen lokal zählen?",
+    "p1": "Erstaunlich viele alltägliche Schreibaufgaben kommen mit einer festen Grenze daher: ein Aufsatz mit maximal 500 Wörtern, ein Tweet mit 280 Zeichen, eine Meta-Description, die nach etwa 160 Zeichen abgeschnitten wird, ein Anschreiben, das laut Personaler auf eine Seite passen soll. Das alles von Hand zu zählen ist mühsam und fehleranfällig, weshalb die meisten Leute ihren Text stattdessen in einen Online-Zähler einfügen — was meist bedeutet, einen Entwurf für ein Anschreiben, einen unveröffentlichten Artikel oder ein vertrauliches Kunden-Briefing an einen Server zu schicken, über den man nichts weiß.",
+    "p2": "Dieses Tool tut das nie. Jedes Zeichen, das du tippst, wird von einem kleinen JavaScript-Schnipsel gezählt, der direkt in deinem Browser läuft, und die Zahlen aktualisieren sich live beim Tippen — es gibt keinen Absenden-Button, weil es keinen Server-Roundtrip gibt, auf den man warten müsste. Nichts, was du schreibst, wird jemals irgendwohin gesendet, gespeichert oder protokolliert; die Seite neu laden und alles ist weg, genau wie man es von einem Schmierzettel erwarten würde.",
+    "p3": "Fang einfach an zu tippen oder füge deinen Text in das Feld ein. Die Wortzahl wird anhand von Leerzeichen ermittelt, sodass \"gut-bekannt\" als ein Wort zählt, während \"gut bekannt\" als zwei Wörter zählt. Die Satzzahl sucht nach Text, der mit Punkt, Fragezeichen oder Ausrufezeichen endet — das funktioniert gut bei normalem Fließtext, kann aber bei Text ohne Satzzeichen, etwa einer Liste mit Aufzählungspunkten, zu niedrig ausfallen. Die Absatzzahl behandelt jeden durch eine Leerzeile getrennten Textblock als einen Absatz. Die geschätzte Lesezeit geht von einer durchschnittlichen Lesegeschwindigkeit von etwa 200 Wörtern pro Minute aus, aufgerundet auf die nächste Minute, damit auch sehr kurze Texte \"1 Min. Lesezeit\" statt \"0\" anzeigen.",
+    "p4": "Autorinnen und Autoren nutzen das Tool, um die geforderte Wortzahl einer Arbeit zu treffen, ohne raten zu müssen, Marketing-Teams, um eine Meta-Description oder einen Anzeigentext innerhalb der Anzeigegrenze zu halten, und Studierende, um vor der Abgabe zu prüfen, ob eine Arbeit das vom Dozenten geforderte Minimum oder Maximum einhält. Die Zeichenzahl ohne Leerzeichen ist besonders nützlich für Plattformen — manche sozialen Netzwerke und Formulare — die Zeichen auf diese Weise zählen, statt jedes Leerzeichen mitzurechnen. Musst du zwei Entwürfe Wort für Wort statt nur einen zu zählen vergleichen, erledigt das der Textvergleich-Tool nach demselben lokalen Prinzip, ganz ohne Upload."
+  }
+}

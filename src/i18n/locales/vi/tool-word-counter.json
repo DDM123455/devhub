@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "title": "Đếm từ & ký tự miễn phí trực tuyến — Web Tool Hub",
+    "description": "Đếm số từ, ký tự, câu và đoạn văn ngay khi bạn gõ hoặc dán văn bản — miễn phí, cập nhật trực tiếp, xử lý hoàn toàn trên trình duyệt. Không upload, không cần đăng ký."
+  },
+  "heading": "Đếm từ & ký tự",
+  "tagline": "Đếm số từ, ký tự, câu và đoạn văn ngay khi bạn gõ chữ.",
+  "ui": {
+    "placeholder": "Dán hoặc gõ văn bản vào đây…",
+    "charsLabel": "Ký tự",
+    "charsNoSpacesLabel": "Ký tự (không tính khoảng trắng)",
+    "wordsLabel": "Số từ",
+    "sentencesLabel": "Số câu",
+    "paragraphsLabel": "Số đoạn văn",
+    "readingTimeLabel": "Thời gian đọc",
+    "readingTimeValue": "{{minutes}} phút đọc",
+    "clear": "Xóa hết"
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Vì sao nên đếm từ và ký tự ngay trên máy?",
+    "p1": "Rất nhiều việc viết lách hàng ngày lại đi kèm một con số cứng: bài luận giới hạn 500 từ, một dòng tweet tối đa 280 ký tự, phần mô tả meta bị cắt sau khoảng 160 ký tự, một lá thư xin việc mà nhà tuyển dụng yêu cầu gói gọn trong một trang. Tự đếm tay những thứ này rất mất công và dễ sai, nên phần lớn mọi người dán văn bản vào một công cụ đếm online — nghĩa là gửi một bản nháp thư xin việc, một bài viết chưa xuất bản, hay một bản brief bảo mật của khách hàng lên một máy chủ mà bạn chẳng biết gì về nó.",
+    "p2": "Công cụ này không bao giờ làm vậy. Mỗi ký tự bạn gõ được đếm bởi một đoạn JavaScript nhỏ chạy ngay trong trình duyệt của bạn, và các con số cập nhật trực tiếp khi bạn gõ — không có nút submit vì không có bước gửi lên máy chủ nào để chờ. Không có gì bạn viết bị gửi đi đâu, lưu trữ hay ghi log lại; tải lại trang là mọi thứ biến mất, đúng như bạn mong đợi từ một tờ giấy nháp.",
+    "p3": "Chỉ cần bắt đầu gõ hoặc dán văn bản vào khung. Số từ được tính bằng cách tách theo khoảng trắng, nên \"đã-hoàn-thành\" tính là một từ trong khi \"đã hoàn thành\" tính là ba từ. Số câu được đếm dựa trên các dấu chấm câu kết thúc (., ?, !), cách này hoạt động tốt với văn xuôi thông thường nhưng có thể đếm thiếu với văn bản không dùng dấu câu, ví dụ danh sách gạch đầu dòng. Số đoạn văn tính mỗi khối văn bản cách nhau bởi một dòng trống là một đoạn. Thời gian đọc ước tính dựa trên tốc độ đọc trung bình khoảng 200 từ/phút, làm tròn lên phút gần nhất để văn bản rất ngắn vẫn hiện \"1 phút đọc\" thay vì \"0\".",
+    "p4": "Người viết dùng công cụ này để đạt đúng số từ yêu cầu của một bài tập mà không cần đoán mò, người làm marketing dùng nó để giữ mô tả meta hoặc nội dung quảng cáo trong giới hạn hiển thị, còn sinh viên dùng để kiểm tra bài luận có đạt số từ tối thiểu/tối đa giảng viên yêu cầu trước khi nộp. Con số ký tự không tính khoảng trắng đặc biệt hữu ích với các nền tảng — một số mạng xã hội và biểu mẫu — đếm ký tự theo cách đó thay vì tính cả mọi khoảng trắng. Nếu cần so sánh hai bản nháp từng từ một thay vì chỉ đếm một bản, công cụ So sánh văn bản cũng xử lý theo đúng nguyên tắc tại chỗ, không upload gì tương tự."
+  }
+}
