@@ -5,6 +5,16 @@
 
 ## 🔵 Trạng thái hiện tại
 
+- **[CẢNH BÁO - SỬA DỞ] (2026-07-26, kiểm tra theo yêu cầu người dùng)**: đang làm dở
+  **Phase 3, tool #3/10 "Regex Tester"** thì bị ngắt quãng giữa chừng — xem chi tiết đầy
+  đủ trong log tương ứng bên dưới ("2026-07-26 — [CẢNH BÁO - SỬA DỞ] Regex Tester").
+  Tóm tắt nhanh: code + i18n 20 ngôn ngữ đã viết xong và tự verify (key/placeholder/JSON
+  hợp lệ) bằng script độc lập, nhưng **CHƯA chạy `npm run build`**, **CHƯA test chức năng
+  regex thật**, và **CHƯA tick ROADMAP.md** — vì vậy KHÔNG được coi tool này là "xong".
+  Đã commit toàn bộ code hiện có (commit riêng, message bắt đầu `wip(regex-tester):`) để
+  không mất việc, KHÔNG merge/push branch nào. Nhánh hiện tại: `main` (không có nhánh phụ
+  nào khác đang dùng cho phiên này), đang lead trước `origin/main` (chưa push). Phiên sau
+  đọc mục log chi tiết bên dưới TRƯỚC khi tiếp tục.
 - Phase đang làm: **Phase 3 — Mở rộng công cụ ngách: 2/10 tool xong (JWT Decoder,
   Base64 Encode/Decode — cả hai 2026-07-26)** ✅ — xem log chi tiết bên dưới. Theo yêu
   cầu trực tiếp của người dùng, Phase 3 được làm TRƯỚC khi hoàn tất nốt các mục còn lại
@@ -108,6 +118,55 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-26 — [CẢNH BÁO - SỬA DỞ] Regex Tester (Phase 3, tool #3/10) — BỊ NGẮT QUÃNG,
+  chưa hoàn tất, ghi lại theo yêu cầu trực tiếp của người dùng (kiểm tra `git status`/
+  `git log` trước khi làm gì khác)
+- **Bối cảnh**: đang làm tiếp Phase 3 sau JWT Decoder + Base64 Encode/Decode (2 tool đã
+  HOÀN TẤT, xem log bên dưới), task thứ 3 là **Regex Tester** (benchmark: regex101.com,
+  regexr.com). Giữa lúc đang chạy 18 agent con dịch song song ra 18 ngôn ngữ còn lại thì
+  8 agent (ja, ru, nl, tr, ar, hi, th, sv) báo lỗi `API session limit` (giới hạn phiên
+  API, reset lúc 3:50pm giờ Việt Nam) và dừng giữa chừng. Người dùng yêu cầu dừng lại,
+  kiểm tra `git status`/`git log`, ghi tóm tắt vào đây, và commit ngay để không mất code
+  — KHÔNG được tự ý merge branch nào.
+- **Kết quả kiểm tra `git status`/`git log` tại thời điểm này**:
+  - Đang ở nhánh `main` (không tạo/dùng nhánh phụ nào cho phiên này), lead 16 commit so
+    với `origin/main` (JWT Decoder + Base64 Encode/Decode đã commit xong nhưng CHƯA
+    push — việc push do người dùng quyết định, không tự ý push).
+  - Không có branch nào khác đang "orphaned" ngoài `main` — 2 remote branch liệt kê được
+    (`origin/main`, `origin/cloudflare/workers-autoconfig`) không liên quan tới phiên
+    làm việc này.
+  - Trước khi commit: `src/data/tools.ts` và `src/pages/[locale]/tools/[slug].astro` ở
+    trạng thái "modified" (đã đăng ký tool `regex-tester` + nhánh routing), cùng với các
+    file MỚI hoàn toàn chưa track: `src/components/tools/RegexTester.tsx`,
+    `RegexTesterPage.astro`, và 20 file `src/i18n/locales/*/tool-regex-tester.json`.
+- **Đã tự verify lại bằng script Node ĐỘC LẬP** (không tin báo cáo "failed" của 8 agent
+  con) trước khi quyết định commit: viết script so sánh key-set + tập placeholder
+  `{{count}}/{{index}}/{{message}}/{{name}}` giữa cả 20 file locale với bản `en` gốc —
+  **kết quả: cả 20/20 file đều là JSON hợp lệ, đủ 51/51 key, đủ placeholder, không có
+  HTML entity bị escape nhầm**. Tức là dù 8 agent con báo lỗi API giữa chừng, file đích
+  của chúng đã được ghi xong TRƯỚC khi lỗi xảy ra (lỗi rơi vào bước tự báo cáo cuối cùng
+  của agent, sau khi thao tác Write đã thành công) — không có file nào bị cắt cụt/hỏng.
+- **CHƯA làm** (để lại nguyên cho phiên sau, KHÔNG được coi tool này là "Done"):
+  - **Chưa chạy `npm run build`** — chưa xác nhận site build sạch với tool mới.
+  - **Chưa test chức năng thật** của `RegexTester.tsx` (match/highlight/capture group/
+    replace) bằng script Node độc lập như đã làm cho JWT Decoder và Base64 Encode/Decode.
+  - **Chưa tick checkbox "Regex Tester" trong `ROADMAP.md`**.
+  - Chưa có commit riêng mang tính "hoàn tất" cho tool này — commit của phiên này (xem
+    ngay bên dưới) chỉ nhằm mục đích KHÔNG MẤT CODE, không phải commit "feat hoàn chỉnh".
+- **Hành động đã thực hiện ngay trong phiên này**: commit toàn bộ thay đổi liệt kê ở trên
+  (kể cả mục log này) vào MỘT commit riêng, message bắt đầu bằng `wip(regex-tester):` để
+  phân biệt rõ với các commit `feat(...)` đã hoàn tất đầy đủ quy trình của 2 tool trước.
+  Không build, không test, không tick ROADMAP, không push, không merge — đúng theo yêu
+  cầu người dùng.
+- **Việc cần làm ở phiên tiếp theo, theo đúng thứ tự** (đọc log này trước khi bắt đầu):
+  1. Chạy `npm run build` (nhớ trỏ `PATH` vào `.tools/node-v22.23.1-win-x64`), xác nhận
+     tăng đúng 20 trang so với lần build gần nhất (261 → dự kiến 281).
+  2. Viết script Node test độc lập cho logic regex (match/highlight/group/replace),
+     theo đúng pattern đã dùng ở JWT Decoder và Base64 Encode/Decode.
+  3. Tick "Regex Tester" trong `ROADMAP.md`, ghi MỘT log mới đúng mẫu (không sửa log
+     này) xác nhận hoàn tất, rồi mới commit `feat(regex-tester): ...` chính thức.
+  4. Báo người dùng đã xong, hỏi có tiếp tục tool #4 Phase 3 (SVG Optimizer) không.
 
 ### 2026-07-26 — Phase 3, tool #2: Base64 Encode/Decode — HOÀN TẤT
 - Task kế tiếp trong Phase 3 sau JWT Decoder. Benchmark đối thủ: **base64.guru**,

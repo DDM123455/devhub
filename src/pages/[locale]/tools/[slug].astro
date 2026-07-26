@@ -12,6 +12,7 @@ import QrCodeGeneratorPage from '@/components/tools/QrCodeGeneratorPage.astro';
 import TextCaseConverterPage from '@/components/tools/TextCaseConverterPage.astro';
 import JwtDecoderPage from '@/components/tools/JwtDecoderPage.astro';
 import Base64ToolPage from '@/components/tools/Base64ToolPage.astro';
+import RegexTesterPage from '@/components/tools/RegexTesterPage.astro';
 import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { tools } from '@/data/tools';
@@ -57,6 +58,8 @@ const name = tool.names[locale];
 		<JwtDecoderPage lang={locale} />
 	) : toolId === 'base64-tool' ? (
 		<Base64ToolPage lang={locale} />
+	) : toolId === 'regex-tester' ? (
+		<RegexTesterPage lang={locale} />
 	) : (
 		<Layout title={`${name} — Web Tool Hub`} description={name} lang={locale}>
 			<section class="px-4 py-10">

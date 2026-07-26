@@ -1,0 +1,114 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import RegexTester from './RegexTester';
+import { getFixedT } from '@/i18n/i18next';
+import { tools } from '@/data/tools';
+import type { Locale } from '@/i18n/config';
+
+interface Props {
+	lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getFixedT(lang, 'tool-regex-tester');
+
+const tool = tools.find((item) => item.id === 'regex-tester')!;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const relatedTools = tools.filter((item) => item.category === tool.category && item.id !== tool.id);
+
+const messages = {
+	patternLabel: t('ui.patternLabel'),
+	patternPlaceholder: t('ui.patternPlaceholder'),
+	flagsLabel: t('ui.flagsLabel'),
+	flagGlobal: t('ui.flagGlobal'),
+	flagIgnoreCase: t('ui.flagIgnoreCase'),
+	flagMultiline: t('ui.flagMultiline'),
+	flagDotAll: t('ui.flagDotAll'),
+	flagUnicode: t('ui.flagUnicode'),
+	flagSticky: t('ui.flagSticky'),
+	testStringLabel: t('ui.testStringLabel'),
+	testStringPlaceholder: t('ui.testStringPlaceholder'),
+	invalidPatternError: t('ui.invalidPatternError'),
+	highlightedHeading: t('ui.highlightedHeading'),
+	matchesHeading: t('ui.matchesHeading'),
+	matchCount: t('ui.matchCount'),
+	noMatches: t('ui.noMatches'),
+	matchLabel: t('ui.matchLabel'),
+	fullMatchLabel: t('ui.fullMatchLabel'),
+	groupLabel: t('ui.groupLabel'),
+	namedGroupLabel: t('ui.namedGroupLabel'),
+	indexLabel: t('ui.indexLabel'),
+	replaceHeading: t('ui.replaceHeading'),
+	replacementLabel: t('ui.replacementLabel'),
+	replacementPlaceholder: t('ui.replacementPlaceholder'),
+	resultLabel: t('ui.resultLabel'),
+	copy: t('ui.copy'),
+	copied: t('ui.copied'),
+	clear: t('ui.clear'),
+	cheatSheetHeading: t('ui.cheatSheetHeading'),
+	cheat1: t('ui.cheat1'),
+	cheat2: t('ui.cheat2'),
+	cheat3: t('ui.cheat3'),
+	cheat4: t('ui.cheat4'),
+	cheat5: t('ui.cheat5'),
+	cheat6: t('ui.cheat6'),
+	cheat7: t('ui.cheat7'),
+	cheat8: t('ui.cheat8'),
+	cheat9: t('ui.cheat9'),
+	cheat10: t('ui.cheat10'),
+	cheat11: t('ui.cheat11'),
+	cheat12: t('ui.cheat12'),
+};
+
+const schema = {
+	'@context': 'https://schema.org',
+	'@type': 'WebApplication',
+	name: t('heading'),
+	description: t('meta.description'),
+	url: canonicalUrl,
+	applicationCategory: 'DeveloperApplication',
+	operatingSystem: 'Any',
+	offers: {
+		'@type': 'Offer',
+		price: '0',
+		priceCurrency: 'USD',
+	},
+};
+---
+
+<Layout title={t('meta.title')} description={t('meta.description')} lang={lang}>
+	<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+	<section class="px-4 py-10">
+		<h1 class="text-3xl font-bold text-foreground">{t('heading')}</h1>
+		<p class="mt-2 text-muted-foreground">{t('tagline')}</p>
+		<div class="mt-6 max-w-4xl">
+			<RegexTester client:load messages={messages} />
+		</div>
+	</section>
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-xl font-semibold text-foreground">{t('article.heading')}</h2>
+		<div class="mt-4 flex max-w-3xl flex-col gap-4 text-muted-foreground">
+			<p>{t('article.p1')}</p>
+			<p>{t('article.p2')}</p>
+			<p>{t('article.p3')}</p>
+			<p>{t('article.p4')}</p>
+		</div>
+	</section>
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-xl font-semibold text-foreground">{t('related')}</h2>
+		<ul class="mt-4 flex flex-col gap-1">
+			{
+				relatedTools.map((related) => (
+					<li>
+						<a
+							href={`/${lang}/tools/${related.slugs[lang]}/`}
+							class="text-sm text-primary hover:underline"
+						>
+							{related.names[lang]}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+</Layout>
