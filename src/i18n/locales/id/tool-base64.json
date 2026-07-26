@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Base64 Encode/Decode Online Gratis — Web Tool Hub",
+    "description": "Encode teks dan file ke Base64 atau decode Base64 kembali ke teks, gambar, dan file — dengan dukungan data URI dan URL-safe. Instan, langsung di browser Anda, tanpa upload."
+  },
+  "heading": "Base64 Encode/Decode",
+  "tagline": "Encode teks atau file ke Base64, atau decode Base64 kembali — sepenuhnya di dalam browser Anda.",
+  "ui": {
+    "textTabLabel": "Teks",
+    "fileTabLabel": "File",
+    "encodeOption": "Encode",
+    "decodeOption": "Decode",
+    "textInputLabel": "Input",
+    "textInputPlaceholderEncode": "Ketik atau tempel teks yang ingin di-encode…",
+    "textInputPlaceholderDecode": "Tempel Base64 yang ingin di-decode…",
+    "textOutputLabel": "Output",
+    "urlSafeLabel": "Alfabet URL-safe (- dan _)",
+    "lineWrapLabel": "Wrap setiap 76 karakter (MIME)",
+    "swap": "Tukar input/output & ganti mode",
+    "copy": "Salin",
+    "copied": "Tersalin!",
+    "clear": "Hapus",
+    "decodeError": "Tidak bisa di-decode — ini bukan Base64 yang valid.",
+    "sizeInfo": "Input: {{input}} karakter → Output: {{output}} karakter",
+    "fileEncodeHeading": "Encode sebuah file",
+    "fileDropLabel": "Tarik & lepas file di sini, atau",
+    "fileChoose": "Pilih file",
+    "fileBase64Label": "Base64",
+    "fileDataUriLabel": "Data URI",
+    "fileDecodeHeading": "Decode menjadi file",
+    "fileDecodeInputLabel": "Base64 atau data URI",
+    "fileDecodeInputPlaceholder": "Tempel string Base64 atau URI lengkap data:...;base64,...",
+    "fileMimeLabel": "Tipe MIME",
+    "fileNameLabel": "Nama file",
+    "fileNamePlaceholder": "file.bin",
+    "downloadFile": "Unduh file",
+    "fileDecodeError": "Tidak bisa di-decode — ini bukan Base64 yang valid.",
+    "imagePreviewLabel": "Pratinjau"
+  },
+  "related": "Alat terkait",
+  "article": {
+    "heading": "Apa itu Base64, dan kenapa data perlu di-encode?",
+    "p1": "Base64 mengubah data biner apa pun — gambar, PDF, atau sekumpulan byte terenkripsi — menjadi string yang hanya terdiri dari 64 karakter A–Z, a–z, 0–9, +, dan / (ditambah = untuk padding). Ini bukan enkripsi maupun kompresi; string Base64 berukuran sekitar 33% lebih besar dari data aslinya, dan siapa pun bisa langsung men-decode-nya kembali tanpa memerlukan kunci apa pun. Alasan keberadaannya justru sangat praktis: banyak format transport dan sistem penyimpanan — email (lampiran MIME), field JSON, parameter query URL, `data:` URI di CSS/HTML, file konfigurasi — dirancang untuk membawa teks biasa dengan aman, dan bermasalah saat menghadapi byte biner mentah seperti karakter line-feed atau null yang tertanam di tengah data. Meng-encode payload biner ke Base64 mengubahnya menjadi teks biasa yang bisa dibawa oleh sistem-sistem tersebut tanpa risiko rusak.",
+    "p2": "Alat ini menjalankan proses encoding dan decoding dengan JavaScript murni langsung di browser Anda — tidak ada yang Anda ketik atau unggah yang dikirim ke server mana pun. Teks di-encode menggunakan `TextEncoder`/`btoa` di balik layar sehingga karakter UTF-8 multi-byte (emoji, huruf beraksen, teks CJK) tetap utuh bolak-balik, bukan cuma karakter ASCII biasa. File dibaca secara lokal lewat API `FileReader` bawaan browser, artinya gambar berukuran beberapa megabyte pun tidak pernah meninggalkan perangkat Anda hanya untuk mengetahui bentuk Base64-nya.",
+    "p3": "Tab Teks menangani kasus sehari-hari: ketik atau tempel sesuatu, pindah antara Encode dan Decode, dan hasilnya langsung diperbarui secara real-time. Opsi URL-safe mengganti karakter `+`/`/` menjadi `-`/`_` dan menghilangkan padding `=` di akhir — inilah yang Anda butuhkan saat nilai Base64 harus diselipkan ke dalam URL atau nama file, bukan ke field JSON. Tab File melangkah lebih jauh: masukkan gambar, PDF, atau file apa pun untuk mendapatkan hasil Base64 mentah sekaligus `data:` URI siap pakai yang bisa langsung ditempel ke `<img src>` atau `background-image` di CSS — berguna untuk menyisipkan ikon kecil tanpa perlu request HTTP terpisah. Tempelkan data URI tersebut (atau sekadar string Base64 polos ditambah tipe MIME) kembali ke kotak decode, dan alat ini akan menyusun ulang byte aslinya, lengkap dengan pratinjau gambar otomatis dan tombol unduh sekali klik.",
+    "p4": "Ada satu kesalahpahaman umum yang perlu diluruskan: Base64 adalah metode encoding, bukan langkah keamanan. String Base64 dirancang agar mudah dibalik kembali, jadi jangan pernah menggunakannya sebagai pengganti enkripsi sungguhan — jika tujuan Anda melindungi token atau data rahasia, silakan gunakan alat ini untuk keperluan transport-nya saja, tapi jangan mengira itu sama dengan menyembunyikannya. Untuk memeriksa struktur payload JSON yang sudah di-decode, alat JSON Formatter & Validator adalah langkah lanjutan yang tepat."
+  }
+}

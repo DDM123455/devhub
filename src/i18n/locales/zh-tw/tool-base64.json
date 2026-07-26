@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "免費線上 Base64 編碼／解碼工具 — Web Tool Hub",
+    "description": "將文字或檔案編碼為 Base64，或將 Base64 解碼回文字、圖片與檔案 — 支援 data URI 與 URL-safe 格式。即時處理，完全在瀏覽器中執行，無需上傳。"
+  },
+  "heading": "Base64 編碼／解碼",
+  "tagline": "將文字或檔案編碼為 Base64，或將 Base64 解碼還原 — 全程在您的瀏覽器中完成。",
+  "ui": {
+    "textTabLabel": "文字",
+    "fileTabLabel": "檔案",
+    "encodeOption": "編碼",
+    "decodeOption": "解碼",
+    "textInputLabel": "輸入",
+    "textInputPlaceholderEncode": "輸入或貼上要編碼的文字…",
+    "textInputPlaceholderDecode": "貼上要解碼的 Base64…",
+    "textOutputLabel": "輸出",
+    "urlSafeLabel": "URL-safe 字元集（- 與 _）",
+    "lineWrapLabel": "每 76 字元換行（MIME）",
+    "swap": "交換輸入／輸出並切換模式",
+    "copy": "複製",
+    "copied": "已複製！",
+    "clear": "清除",
+    "decodeError": "無法解碼 — 這不是有效的 Base64 格式。",
+    "sizeInfo": "輸入：{{input}} 字元 → 輸出：{{output}} 字元",
+    "fileEncodeHeading": "編碼檔案",
+    "fileDropLabel": "將檔案拖放到這裡，或",
+    "fileChoose": "選擇檔案",
+    "fileBase64Label": "Base64",
+    "fileDataUriLabel": "Data URI",
+    "fileDecodeHeading": "解碼為檔案",
+    "fileDecodeInputLabel": "Base64 或 data URI",
+    "fileDecodeInputPlaceholder": "貼上 Base64 字串，或完整的 data:...;base64,... URI",
+    "fileMimeLabel": "MIME 類型",
+    "fileNameLabel": "檔案名稱",
+    "fileNamePlaceholder": "file.bin",
+    "downloadFile": "下載檔案",
+    "fileDecodeError": "無法解碼 — 這不是有效的 Base64 格式。",
+    "imagePreviewLabel": "預覽"
+  },
+  "related": "相關工具",
+  "article": {
+    "heading": "什麼是 Base64？為什麼一開始需要編碼？",
+    "p1": "Base64 能將任意二進位資料 — 一張圖片、一份 PDF、一段加密過的位元組 — 轉換成只由 64 個字元組成的字串：A–Z、a–z、0–9、+ 與 /（外加用於補位的 =）。它既不是加密，也不是壓縮；Base64 字串通常會比原始資料大上約 33%，而且任何人都能立即將它還原，完全不需要金鑰。它存在的理由其實相當單純：許多傳輸格式與儲存系統 — 電子郵件（MIME 附件）、JSON 欄位、URL 查詢參數、CSS／HTML 的 `data:` URI、設定檔 — 生來就是為了安全地承載純文字，一遇到換行字元或內嵌的空字元（null）這類原始二進位位元組就會出問題。將二進位資料以 Base64 編碼後，就變成一段任何系統都能安全承載、不會被破壞的純文字。",
+    "p2": "這個工具完全使用純 JavaScript，在您的瀏覽器中直接執行編碼與解碼 — 您輸入或上傳的任何內容都不會傳送到伺服器。文字編碼的底層是透過 `TextEncoder`／`btoa` 完成，確保多位元組的 UTF-8 字元（表情符號、帶重音符號的字母、中日韓文字）都能正確地來回轉換，而不只是單純的 ASCII 字元。檔案則是透過瀏覽器的 `FileReader` API 在本機讀取，這代表即使是好幾 MB 大的圖片，也不需要離開您的電腦，就能得知它的 Base64 型態長什麼樣子。",
+    "p3": "「文字」分頁處理的是日常最常見的情境：輸入或貼上內容，在「編碼」與「解碼」之間切換，輸出結果會即時更新。「URL-safe」選項會把 `+`／`/` 字元換成 `-`／`_`，並移除結尾補位用的 `=`，這在 Base64 值需要放進 URL 或檔案名稱、而不是 JSON 欄位時特別有用。「檔案」分頁則更進一步：拖放一張圖片、一份 PDF 或任何其他檔案進去，就能同時取得原始 Base64 內容，以及一段可直接使用的 `data:` URI，能直接貼進 `<img src>` 或 CSS 的 `background-image` 中 — 很適合用來內嵌小圖示，省去額外的 HTTP 請求。將這段 data URI（或單純的 Base64 字串加上 MIME 類型）貼回解碼欄位，工具就會還原出原始位元組，自動顯示圖片預覽，並提供一鍵下載。",
+    "p4": "有個常見的誤解值得在此特別說明清楚：Base64 只是一種編碼方式，並非安全防護機制。Base64 字串在設計上就能被輕易還原，因此絕對不能拿來取代真正的加密 — 如果您想保護權杖（token）或機密資料，用這個工具將它編碼以便傳輸當然沒問題，但請不要誤以為這樣就等於把它隱藏起來了。若您想進一步檢視已解碼出來的 JSON 內容結構，「JSON Formatter & Validator」工具會是很自然的下一步。"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Base64 Encode/Decode ऑनलाइन मुफ़्त — Web Tool Hub",
+    "description": "Text और files को Base64 में encode करें या Base64 को वापस text, images और files में decode करें — data URI और URL-safe support के साथ। तुरंत, आपके browser में ही, कोई upload नहीं।"
+  },
+  "heading": "Base64 Encode/Decode",
+  "tagline": "Text या files को Base64 में encode करें, या Base64 को वापस decode करें — पूरी तरह आपके browser में ही।",
+  "ui": {
+    "textTabLabel": "Text",
+    "fileTabLabel": "File",
+    "encodeOption": "Encode",
+    "decodeOption": "Decode",
+    "textInputLabel": "Input",
+    "textInputPlaceholderEncode": "Encode करने के लिए टेक्स्ट टाइप करें या पेस्ट करें…",
+    "textInputPlaceholderDecode": "Decode करने के लिए Base64 पेस्ट करें…",
+    "textOutputLabel": "Output",
+    "urlSafeLabel": "URL-safe अल्फ़ाबेट (- और _)",
+    "lineWrapLabel": "76 अक्षरों पर wrap करें (MIME)",
+    "swap": "Input/output बदलें और mode स्विच करें",
+    "copy": "Copy करें",
+    "copied": "Copy हो गया!",
+    "clear": "Clear करें",
+    "decodeError": "इसे decode नहीं किया जा सका — यह वैध Base64 नहीं है।",
+    "sizeInfo": "Input: {{input}} अक्षर → Output: {{output}} अक्षर",
+    "fileEncodeHeading": "किसी file को encode करें",
+    "fileDropLabel": "यहाँ file को drag & drop करें, या",
+    "fileChoose": "File चुनें",
+    "fileBase64Label": "Base64",
+    "fileDataUriLabel": "Data URI",
+    "fileDecodeHeading": "File में decode करें",
+    "fileDecodeInputLabel": "Base64 या data URI",
+    "fileDecodeInputPlaceholder": "एक Base64 स्ट्रिंग या पूरा data:...;base64,... URI पेस्ट करें",
+    "fileMimeLabel": "MIME type",
+    "fileNameLabel": "File का नाम",
+    "fileNamePlaceholder": "file.bin",
+    "downloadFile": "File डाउनलोड करें",
+    "fileDecodeError": "इसे decode नहीं किया जा सका — यह वैध Base64 नहीं है।",
+    "imagePreviewLabel": "Preview"
+  },
+  "related": "संबंधित टूल्स",
+  "article": {
+    "heading": "Base64 क्या है, और किसी चीज़ को encode करने की ज़रूरत ही क्यों पड़ती है?",
+    "p1": "Base64 किसी भी तरह के binary data — जैसे कि एक image, एक PDF, या encrypted bytes का कोई हिस्सा — को एक ऐसी string में बदल देता है जो सिर्फ़ 64 characters A–Z, a–z, 0–9, +, और / (और padding के लिए =) से बनी होती है। यह न तो encryption है, न ही compression; एक Base64 string उस डेटा से लगभग 33% बड़ी होती है जिसे वह represent करती है, और इसे कोई भी बिना किसी key के तुरंत वापस decode कर सकता है। इसके होने की वजह काफ़ी सीधी-सादी है: कई transport formats और storage systems — जैसे email (MIME attachments), JSON fields, URL query parameters, CSS/HTML `data:` URIs, config files — plain text को सुरक्षित तरीक़े से ले जाने के लिए बनाए गए थे, और raw binary bytes जैसे line-feed characters या embedded nulls पर अटक जाते हैं। किसी binary payload को Base64-encode करने से वह plain text के एक ऐसे टुकड़े में बदल जाता है जिसे इनमें से कोई भी सिस्टम बिना corrupt किए ले जा सकता है।",
+    "p2": "यह टूल encoding और decoding का पूरा काम plain JavaScript के ज़रिए सीधे आपके browser में करता है — आप जो कुछ भी टाइप या अपलोड करते हैं, वह कभी किसी server पर नहीं भेजा जाता। Text को अंदर ही अंदर `TextEncoder`/`btoa` का इस्तेमाल करके encode किया जाता है, ताकि multi-byte UTF-8 characters (emoji, accent वाले अक्षर, CJK text) भी सही तरीक़े से round-trip हो सकें, न कि सिर्फ़ plain ASCII। Files को browser के `FileReader` API के ज़रिए locally पढ़ा जाता है, यानी कई megabyte की एक image अपने Base64 रूप को देखने भर के लिए भी आपकी मशीन से बाहर नहीं जाती।",
+    "p3": "Text tab रोज़मर्रा के इस्तेमाल को संभालता है: कुछ टाइप या पेस्ट करें, Encode और Decode के बीच स्विच करें, और output लाइव अपडेट होता रहेगा। URL-safe विकल्प `+`/`/` characters की जगह `-`/`_` लगा देता है और आख़िर में लगने वाला `=` padding हटा देता है, जिसकी ज़रूरत तब पड़ती है जब किसी Base64 value को JSON field की बजाय किसी URL या filename के अंदर फ़िट होना हो। File tab इससे भी आगे जाता है: कोई image, PDF, या कोई भी अन्य file डालें और बदले में raw Base64 के साथ-साथ एक इस्तेमाल के लिए तैयार `data:` URI भी मिलेगा, जिसे आप सीधे किसी `<img src>` या CSS `background-image` में पेस्ट कर सकते हैं — यह किसी छोटे icon को अलग HTTP request के बिना embed करने के लिए काम आता है। उस data URI को (या सिर्फ़ एक Base64 string और MIME type को) वापस decode box में पेस्ट करें, और टूल मूल bytes को फिर से बना देगा, साथ ही अपने आप image preview भी दिखा देगा और एक क्लिक में download का विकल्प भी देगा।",
+    "p4": "एक आम confusion को यहाँ साफ़ कर देना ज़रूरी है: Base64 एक encoding है, कोई security measure नहीं। एक Base64 string को डिज़ाइन के हिसाब से बेहद आसानी से वापस पलटा जा सकता है, इसलिए इसे कभी भी असली encryption के विकल्प के तौर पर इस्तेमाल नहीं करना चाहिए — अगर आप किसी token या secret को protect करना चाहते हैं, तो बेशक transport के लिए इसे इस टूल से encode कर सकते हैं, लेकिन इसे छुपाने का ज़रिया न समझें। पहले से decode हो चुके किसी JSON payload के structure को देखने के लिए, JSON Formatter & Validator टूल अगला स्वाभाविक पड़ाव है।"
+  }
+}

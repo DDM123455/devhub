@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Base64 Kodlama/Çözme — Ücretsiz Çevrimiçi Araç — Web Tool Hub",
+    "description": "Metni ve dosyaları Base64'e kodlayın veya Base64'ü tekrar metne, görsellere ve dosyalara çözün — data URI ve URL güvenli (URL-safe) desteğiyle. Anında, tarayıcınızda, yükleme yok."
+  },
+  "heading": "Base64 Kodlama/Çözme",
+  "tagline": "Metni veya dosyaları Base64'e kodlayın, ya da Base64'ü tekrar çözün — tamamen tarayıcınızda.",
+  "ui": {
+    "textTabLabel": "Metin",
+    "fileTabLabel": "Dosya",
+    "encodeOption": "Kodla",
+    "decodeOption": "Çöz",
+    "textInputLabel": "Girdi",
+    "textInputPlaceholderEncode": "Kodlamak için metin yazın veya yapıştırın…",
+    "textInputPlaceholderDecode": "Çözmek için Base64 yapıştırın…",
+    "textOutputLabel": "Çıktı",
+    "urlSafeLabel": "URL güvenli alfabe (- ve _)",
+    "lineWrapLabel": "76 karakterde satır kaydır (MIME)",
+    "swap": "Girdi/çıktıyı değiştir ve modu değiştir",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı!",
+    "clear": "Temizle",
+    "decodeError": "Bu çözülemedi — geçerli bir Base64 değil.",
+    "sizeInfo": "Girdi: {{input}} karakter → Çıktı: {{output}} karakter",
+    "fileEncodeHeading": "Bir dosyayı kodla",
+    "fileDropLabel": "Bir dosyayı buraya sürükleyip bırakın veya",
+    "fileChoose": "Dosya seç",
+    "fileBase64Label": "Base64",
+    "fileDataUriLabel": "Data URI",
+    "fileDecodeHeading": "Bir dosyaya çöz",
+    "fileDecodeInputLabel": "Base64 veya data URI",
+    "fileDecodeInputPlaceholder": "Bir Base64 dizesi veya tam bir data:...;base64,... URI'si yapıştırın",
+    "fileMimeLabel": "MIME türü",
+    "fileNameLabel": "Dosya adı",
+    "fileNamePlaceholder": "file.bin",
+    "downloadFile": "Dosyayı indir",
+    "fileDecodeError": "Bu çözülemedi — geçerli bir Base64 değil.",
+    "imagePreviewLabel": "Önizleme"
+  },
+  "related": "İlgili araçlar",
+  "article": {
+    "heading": "Base64 nedir ve bir şeyi neden kodlamaya ihtiyaç duyarız?",
+    "p1": "Base64, herhangi bir ikili (binary) veriyi — bir görsel, bir PDF, şifrelenmiş bir bayt yığını — yalnızca A–Z, a–z, 0–9, + ve / olmak üzere 64 karakterden oluşan bir dizeye dönüştürür (dolgu için ayrıca = kullanılır). Bu bir şifreleme veya sıkıştırma yöntemi değildir; bir Base64 dizesi, temsil ettiği veriden yaklaşık %33 daha büyüktür ve herkes onu hiçbir anahtara ihtiyaç duymadan anında geri çözebilir. Var olma sebebi çok daha sıradan: e-posta (MIME ekleri), JSON alanları, URL sorgu parametreleri, CSS/HTML `data:` URI'leri, yapılandırma dosyaları gibi pek çok taşıma formatı ve depolama sistemi düz metni güvenle taşımak üzere tasarlanmıştır ve satır sonu karakterleri veya gömülü null baytlar gibi ham ikili verilerle karşılaştığında sorun çıkarır. İkili bir veriyi Base64 ile kodlamak, onu bu sistemlerin hiçbirinin bozmadan taşıyabileceği düz metin parçasına dönüştürür.",
+    "p2": "Bu araç, kodlama ve çözme işlemlerini doğrudan tarayıcınızda saf JavaScript ile yapar — yazdığınız veya yüklediğiniz hiçbir şey bir sunucuya gönderilmez. Metinler arka planda `TextEncoder`/`btoa` kullanılarak kodlanır, böylece yalnızca düz ASCII değil, çok baytlı UTF-8 karakterleri de (emoji, aksanlı harfler, Çince/Japonca/Korece metinler) sorunsuz şekilde geri çözülebilir. Dosyalar, tarayıcının `FileReader` API'si üzerinden yerel olarak okunur; yani birkaç megabaytlık bir görsel, sadece Base64 hâlinin neye benzediğini görmek için bile bilgisayarınızdan asla ayrılmaz.",
+    "p3": "Metin sekmesi günlük kullanım senaryosunu karşılar: bir şeyler yazın veya yapıştırın, Kodla ile Çöz arasında geçiş yapın, çıktı anında güncellenir. URL güvenli seçeneği, `+`/`/` karakterlerini `-`/`_` ile değiştirir ve sondaki `=` dolgusunu kaldırır; bu, Base64 değerinin bir JSON alanı yerine bir URL'nin veya dosya adının içine yerleştirilmesi gerektiğinde işinize yarar. Dosya sekmesi ise daha ileri gider: bir görsel, PDF veya başka herhangi bir dosyayı bırakın, hem ham Base64'ü hem de doğrudan bir `<img src>` özniteliğine veya CSS `background-image` özelliğine yapıştırabileceğiniz kullanıma hazır bir `data:` URI'sini elde edin — ayrı bir HTTP isteği yapmadan küçük bir simgeyi gömmek için pratiktir. Bu data URI'sini (ya da sadece çıplak bir Base64 dizesiyle bir MIME türünü) çözme kutusuna geri yapıştırdığınızda araç orijinal baytları yeniden oluşturur, otomatik olarak bir görsel önizlemesi sunar ve tek tıkla indirme sağlar.",
+    "p4": "Doğrudan belirtmekte fayda var, sık karşılaşılan bir yanılgı şu: Base64 bir kodlama yöntemidir, bir güvenlik önlemi değildir. Bir Base64 dizesi tasarımı gereği çok kolay geri çevrilebilir, bu yüzden gerçek şifrelemenin yerine asla kullanılmamalıdır — bir jetonu (token) veya bir sırrı taşımak için kodlamak istiyorsanız bu aracı elbette kullanabilirsiniz, ama bunu onu gizlemekle karıştırmayın. Zaten çözülmüş bir JSON verisinin yapısını incelemek isterseniz, JSON Biçimlendirici ve Doğrulayıcı aracı doğal bir sonraki durak olur."
+  }
+}

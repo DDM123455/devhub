@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Codificar/Decodificar Base64 Online Grátis — Web Tool Hub",
+    "description": "Codifique texto e arquivos para Base64 ou decodifique Base64 de volta para texto, imagens e arquivos — com suporte a data URI e URL-safe. Instantâneo, no seu navegador, sem upload."
+  },
+  "heading": "Codificar/Decodificar Base64",
+  "tagline": "Codifique texto ou arquivos para Base64, ou decodifique Base64 de volta — tudo direto no seu navegador.",
+  "ui": {
+    "textTabLabel": "Texto",
+    "fileTabLabel": "Arquivo",
+    "encodeOption": "Codificar",
+    "decodeOption": "Decodificar",
+    "textInputLabel": "Entrada",
+    "textInputPlaceholderEncode": "Digite ou cole o texto a codificar…",
+    "textInputPlaceholderDecode": "Cole o Base64 a decodificar…",
+    "textOutputLabel": "Saída",
+    "urlSafeLabel": "Alfabeto seguro para URL (- e _)",
+    "lineWrapLabel": "Quebrar a cada 76 caracteres (MIME)",
+    "swap": "Trocar entrada/saída e alternar modo",
+    "copy": "Copiar",
+    "copied": "Copiado!",
+    "clear": "Limpar",
+    "decodeError": "Não foi possível decodificar isso — não é um Base64 válido.",
+    "sizeInfo": "Entrada: {{input}} caracteres → Saída: {{output}} caracteres",
+    "fileEncodeHeading": "Codificar um arquivo",
+    "fileDropLabel": "Arraste e solte um arquivo aqui, ou",
+    "fileChoose": "Escolher arquivo",
+    "fileBase64Label": "Base64",
+    "fileDataUriLabel": "Data URI",
+    "fileDecodeHeading": "Decodificar para um arquivo",
+    "fileDecodeInputLabel": "Base64 ou data URI",
+    "fileDecodeInputPlaceholder": "Cole uma string Base64 ou uma URI completa data:...;base64,...",
+    "fileMimeLabel": "Tipo MIME",
+    "fileNameLabel": "Nome do arquivo",
+    "fileNamePlaceholder": "file.bin",
+    "downloadFile": "Baixar arquivo",
+    "fileDecodeError": "Não foi possível decodificar isso — não é um Base64 válido.",
+    "imagePreviewLabel": "Pré-visualização"
+  },
+  "related": "Ferramentas relacionadas",
+  "article": {
+    "heading": "O que é Base64 e por que codificar algo, afinal?",
+    "p1": "O Base64 transforma dados binários arbitrários — uma imagem, um PDF, um trecho de bytes criptografados — em uma string composta apenas pelos 64 caracteres A–Z, a–z, 0–9, + e / (mais = para o preenchimento). Não é criptografia nem compressão; uma string Base64 é cerca de 33% maior do que os dados que representa, e qualquer pessoa pode decodificá-la de volta instantaneamente, sem precisar de nenhuma chave. O motivo de sua existência é bem mais prosaico: muitos formatos de transporte e sistemas de armazenamento — e-mail (anexos MIME), campos JSON, parâmetros de URL, URIs `data:` em CSS/HTML, arquivos de configuração — foram criados para transportar texto puro com segurança, e travam diante de bytes binários crus, como caracteres de quebra de linha ou nulos embutidos. Codificar um payload binário em Base64 o transforma em um bloco de texto puro que qualquer um desses sistemas consegue carregar sem corrompê-lo.",
+    "p2": "Esta ferramenta executa a codificação e a decodificação com JavaScript puro, diretamente no seu navegador — nada do que você digita ou envia é transmitido a um servidor. O texto é codificado usando `TextEncoder`/`btoa` por baixo dos panos, de modo que caracteres UTF-8 multibyte (emojis, letras acentuadas, texto em CJK) são convertidos corretamente de ida e volta, não apenas ASCII simples. Os arquivos são lidos localmente pela API `FileReader` do navegador, o que significa que uma imagem de vários megabytes nunca sai da sua máquina só para você descobrir qual é a sua forma em Base64.",
+    "p3": "A aba Texto cuida do caso do dia a dia: digite ou cole algo, alterne entre Codificar e Decodificar, e a saída se atualiza ao vivo. A opção URL-safe troca os caracteres `+`/`/` por `-`/`_` e remove o preenchimento `=` no final, o que é necessário quando um valor Base64 precisa ficar dentro de uma URL ou de um nome de arquivo em vez de um campo JSON. A aba Arquivo vai além: solte uma imagem, um PDF ou qualquer outro arquivo para obter tanto o Base64 bruto quanto uma data URI pronta para uso, que você pode colar direto em um `<img src>` ou em um `background-image` do CSS — útil para incorporar um ícone pequeno sem precisar de uma requisição HTTP separada. Cole essa data URI (ou apenas uma string Base64 simples junto com um tipo MIME) de volta na caixa de decodificação, e a ferramenta reconstrói os bytes originais, oferecendo automaticamente uma pré-visualização de imagem e um download com um clique.",
+    "p4": "Vale destacar diretamente um ponto comum de confusão: Base64 é uma codificação, não uma medida de segurança. Uma string Base64 é reversível de forma trivial, por design, então nunca deve ser usada como substituto de uma criptografia de verdade — se o objetivo é proteger um token ou um segredo, codificá-lo para transporte com esta ferramenta é perfeitamente válido, mas não confunda isso com escondê-lo de fato. Para inspecionar a estrutura de um payload JSON já decodificado, a ferramenta JSON Formatter & Validator é o próximo passo natural."
+  }
+}

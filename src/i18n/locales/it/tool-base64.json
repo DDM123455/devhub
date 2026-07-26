@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Base64 Encode/Decode Online Gratis — Web Tool Hub",
+    "description": "Codifica testo e file in Base64 o decodifica Base64 in testo, immagini e file — con supporto per data URI e alfabeto URL-safe. Istantaneo, nel tuo browser, senza upload."
+  },
+  "heading": "Codifica/Decodifica Base64",
+  "tagline": "Codifica testo o file in Base64, oppure decodifica Base64 — interamente nel tuo browser.",
+  "ui": {
+    "textTabLabel": "Testo",
+    "fileTabLabel": "File",
+    "encodeOption": "Codifica",
+    "decodeOption": "Decodifica",
+    "textInputLabel": "Input",
+    "textInputPlaceholderEncode": "Digita o incolla il testo da codificare…",
+    "textInputPlaceholderDecode": "Incolla il Base64 da decodificare…",
+    "textOutputLabel": "Output",
+    "urlSafeLabel": "Alfabeto URL-safe (- e _)",
+    "lineWrapLabel": "A capo ogni 76 caratteri (MIME)",
+    "swap": "Scambia input/output e cambia modalità",
+    "copy": "Copia",
+    "copied": "Copiato!",
+    "clear": "Cancella",
+    "decodeError": "Impossibile decodificare: non è un Base64 valido.",
+    "sizeInfo": "Input: {{input}} caratteri → Output: {{output}} caratteri",
+    "fileEncodeHeading": "Codifica un file",
+    "fileDropLabel": "Trascina qui un file, oppure",
+    "fileChoose": "Scegli file",
+    "fileBase64Label": "Base64",
+    "fileDataUriLabel": "Data URI",
+    "fileDecodeHeading": "Decodifica in un file",
+    "fileDecodeInputLabel": "Base64 o data URI",
+    "fileDecodeInputPlaceholder": "Incolla una stringa Base64 o un URI completo data:...;base64,...",
+    "fileMimeLabel": "Tipo MIME",
+    "fileNameLabel": "Nome file",
+    "fileNamePlaceholder": "file.bin",
+    "downloadFile": "Scarica file",
+    "fileDecodeError": "Impossibile decodificare: non è un Base64 valido.",
+    "imagePreviewLabel": "Anteprima"
+  },
+  "related": "Strumenti correlati",
+  "article": {
+    "heading": "Cos'è il Base64 e perché codificare qualcosa, prima di tutto?",
+    "p1": "Il Base64 trasforma dati binari arbitrari — un'immagine, un PDF, un blocco di byte cifrati — in una stringa composta solo dai 64 caratteri A-Z, a-z, 0-9, + e / (più = per il padding finale). Non è né crittografia né compressione: una stringa Base64 è circa il 33% più grande dei dati che rappresenta, e chiunque può decodificarla all'istante senza bisogno di alcuna chiave. Il motivo per cui esiste è molto più pratico: tanti formati di trasporto e sistemi di archiviazione — email (allegati MIME), campi JSON, parametri di query negli URL, data URI in CSS/HTML, file di configurazione — sono stati progettati per trasportare testo semplice in sicurezza, e vanno in crisi davanti a byte binari grezzi come caratteri di a-capo o valori nulli incorporati. Codificando un payload binario in Base64 lo si trasforma in un blocco di puro testo che uno qualsiasi di questi sistemi può trasportare senza corromperlo.",
+    "p2": "Questo strumento esegue la codifica e la decodifica con JavaScript puro, direttamente nel tuo browser: nulla di ciò che digiti o carichi viene inviato a un server. Il testo viene codificato usando `TextEncoder`/`btoa` sotto il cofano, così i caratteri UTF-8 multi-byte (emoji, lettere accentate, testo CJK) vengono gestiti correttamente andata e ritorno, non solo il semplice ASCII. I file vengono letti localmente tramite l'API `FileReader` del browser, il che significa che un'immagine di diversi megabyte non lascia mai il tuo computer solo per scoprire com'è fatta la sua forma Base64.",
+    "p3": "La scheda Testo copre il caso quotidiano: digita o incolla qualcosa, passa da Codifica a Decodifica, e l'output si aggiorna in tempo reale. L'opzione URL-safe sostituisce i caratteri `+`/`/` con `-`/`_` ed elimina il padding finale `=`, esattamente ciò che serve quando un valore Base64 deve stare dentro un URL o un nome file invece che in un campo JSON. La scheda File va oltre: trascina un'immagine, un PDF o qualsiasi altro file per ottenere sia il Base64 grezzo sia un data URI pronto all'uso, da incollare direttamente in un `<img src>` o in un `background-image` CSS — comodo per incorporare una piccola icona senza una richiesta HTTP separata. Incolla quel data URI (oppure una semplice stringa Base64 più un tipo MIME) nel campo di decodifica e lo strumento ricostruisce i byte originali, mostrando automaticamente un'anteprima dell'immagine e offrendo il download con un solo click.",
+    "p4": "Un punto di confusione comune che vale la pena chiarire subito: il Base64 è una codifica, non una misura di sicurezza. Una stringa Base64 è reversibile in modo banale per progettazione, quindi non va mai usata come sostituto di una vera crittografia — se vuoi proteggere un token o un segreto, codificalo pure con questo strumento per il trasporto, ma non scambiare questo per nasconderlo. Per esaminare la struttura di un payload JSON già decodificato, lo strumento JSON Formatter & Validator è la tappa successiva naturale."
+  }
+}

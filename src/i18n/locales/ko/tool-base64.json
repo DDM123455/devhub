@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Base64 인코딩/디코딩 무료 온라인 — Web Tool Hub",
+    "description": "텍스트와 파일을 Base64로 인코딩하거나 Base64를 텍스트, 이미지, 파일로 다시 디코딩하세요 — data URI 및 URL-safe 방식 지원. 업로드 없이 브라우저에서 즉시 처리됩니다."
+  },
+  "heading": "Base64 인코딩/디코딩",
+  "tagline": "텍스트나 파일을 Base64로 인코딩하거나, Base64를 원본으로 디코딩하세요 — 모든 처리는 브라우저 안에서 이루어집니다.",
+  "ui": {
+    "textTabLabel": "텍스트",
+    "fileTabLabel": "파일",
+    "encodeOption": "인코딩",
+    "decodeOption": "디코딩",
+    "textInputLabel": "입력",
+    "textInputPlaceholderEncode": "인코딩할 텍스트를 입력하거나 붙여넣으세요…",
+    "textInputPlaceholderDecode": "디코딩할 Base64를 붙여넣으세요…",
+    "textOutputLabel": "출력",
+    "urlSafeLabel": "URL-safe 문자셋 사용 (- 및 _)",
+    "lineWrapLabel": "76자마다 줄바꿈 (MIME)",
+    "swap": "입력/출력 위치 바꾸기 및 모드 전환",
+    "copy": "복사",
+    "copied": "복사됨!",
+    "clear": "지우기",
+    "decodeError": "디코딩할 수 없습니다 — 올바른 Base64 형식이 아닙니다.",
+    "sizeInfo": "입력: {{input}}자 → 출력: {{output}}자",
+    "fileEncodeHeading": "파일 인코딩",
+    "fileDropLabel": "파일을 이곳에 드래그 앤 드롭하거나,",
+    "fileChoose": "파일 선택",
+    "fileBase64Label": "Base64",
+    "fileDataUriLabel": "Data URI",
+    "fileDecodeHeading": "파일로 디코딩",
+    "fileDecodeInputLabel": "Base64 또는 data URI",
+    "fileDecodeInputPlaceholder": "Base64 문자열 또는 data:...;base64,... 형식의 전체 URI를 붙여넣으세요",
+    "fileMimeLabel": "MIME 타입",
+    "fileNameLabel": "파일 이름",
+    "fileNamePlaceholder": "file.bin",
+    "downloadFile": "파일 다운로드",
+    "fileDecodeError": "디코딩할 수 없습니다 — 올바른 Base64 형식이 아닙니다.",
+    "imagePreviewLabel": "미리보기"
+  },
+  "related": "관련 도구",
+  "article": {
+    "heading": "Base64란 무엇이며, 왜 데이터를 인코딩해야 할까요?",
+    "p1": "Base64는 이미지, PDF, 암호화된 바이트 조각 등 임의의 바이너리 데이터를 A-Z, a-z, 0-9, +, / 이렇게 64개의 문자(그리고 패딩용 =)만으로 이루어진 문자열로 변환하는 방식입니다. 암호화나 압축이 아니며, Base64 문자열은 원본 데이터보다 약 33% 더 커지고, 별도의 키 없이 누구나 즉시 원래대로 디코딩할 수 있습니다. Base64가 존재하는 이유는 훨씬 실용적입니다. 이메일(MIME 첨부파일), JSON 필드, URL 쿼리 파라미터, CSS/HTML의 `data:` URI, 설정 파일 등 수많은 전송 형식과 저장 시스템은 원래 순수한 텍스트만 안전하게 전달하도록 설계되어 있어서, 줄바꿈 문자나 널(null) 바이트 같은 원시 바이너리 데이터가 섞이면 오류가 발생합니다. 바이너리 데이터를 Base64로 인코딩하면 이런 시스템들이 손상 없이 다룰 수 있는 순수 텍스트 조각으로 바뀝니다.",
+    "p2": "이 도구는 순수 JavaScript로 인코딩과 디코딩을 브라우저 안에서 직접 수행합니다 — 입력하거나 업로드한 어떤 내용도 서버로 전송되지 않습니다. 텍스트는 내부적으로 `TextEncoder`/`btoa`를 사용해 인코딩되므로, 단순 ASCII뿐 아니라 이모지, 악센트 문자, 한중일(CJK) 텍스트 같은 멀티바이트 UTF-8 문자도 손실 없이 왕복 변환됩니다. 파일은 브라우저의 `FileReader` API를 통해 로컬에서 읽히기 때문에, 수 메가바이트 크기의 이미지라도 Base64 형태를 확인하기 위해 사용자의 기기를 벗어나는 일이 없습니다.",
+    "p3": "텍스트 탭은 가장 흔한 사용 사례를 다룹니다. 텍스트를 입력하거나 붙여넣고 인코딩과 디코딩 사이를 전환하면 결과가 실시간으로 업데이트됩니다. URL-safe 옵션을 켜면 `+`/`/` 문자가 `-`/`_`로 바뀌고 끝의 `=` 패딩이 제거되는데, Base64 값을 JSON 필드가 아니라 URL이나 파일 이름 안에 넣어야 할 때 필요한 방식입니다. 파일 탭은 한 걸음 더 나아가, 이미지·PDF 등 어떤 파일이든 넣으면 원본 Base64 값과 함께 `<img src>`나 CSS `background-image`에 바로 붙여넣을 수 있는 `data:` URI를 함께 제공합니다. 별도의 HTTP 요청 없이 작은 아이콘 등을 페이지에 직접 내장하고 싶을 때 유용합니다. 이 data URI(또는 단순 Base64 문자열과 MIME 타입)를 디코딩 입력란에 다시 붙여넣으면 도구가 원본 바이트를 복원하고, 이미지의 경우 자동으로 미리보기를 보여주며 한 번의 클릭으로 다운로드할 수 있습니다.",
+    "p4": "자주 오해하는 부분을 짚고 넘어가자면, Base64는 인코딩 방식일 뿐 보안 수단이 아닙니다. Base64 문자열은 설계상 누구나 손쉽게 원래대로 되돌릴 수 있으므로, 실제 암호화를 대체하는 용도로 사용해서는 안 됩니다. 토큰이나 비밀 값을 전송하기 위해 이 도구로 인코딩하는 것은 괜찮지만, 그것이 값을 숨기는 것과 같다고 착각해서는 안 됩니다. 이미 디코딩한 JSON 데이터의 구조를 살펴보고 싶다면, JSON Formatter & Validator 도구를 이어서 사용해 보시기 바랍니다."
+  }
+}

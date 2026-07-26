@@ -115,7 +115,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 ## Phase 3 — Mở rộng công cụ ngách (Long-tail)
 
 - [x] JWT Decoder
-- [ ] Base64 Encode/Decode
+- [x] Base64 Encode/Decode
 - [ ] Regex Tester
 - [ ] SVG Optimizer — `svgo`
 - [ ] Color Picker & Palette Generator

@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Mã hóa/Giải mã Base64 Online Miễn phí — Web Tool Hub",
+    "description": "Mã hóa văn bản và file sang Base64 hoặc giải mã Base64 về văn bản, ảnh, file gốc — hỗ trợ data URI và bảng chữ cái an toàn cho URL. Xử lý ngay trên trình duyệt, không tải lên server."
+  },
+  "heading": "Mã hóa/Giải mã Base64",
+  "tagline": "Mã hóa văn bản hoặc file sang Base64, hoặc giải mã Base64 về dạng gốc — hoàn toàn trên trình duyệt của bạn.",
+  "ui": {
+    "textTabLabel": "Văn bản",
+    "fileTabLabel": "File",
+    "encodeOption": "Mã hóa",
+    "decodeOption": "Giải mã",
+    "textInputLabel": "Đầu vào",
+    "textInputPlaceholderEncode": "Gõ hoặc dán văn bản cần mã hóa…",
+    "textInputPlaceholderDecode": "Dán chuỗi Base64 cần giải mã…",
+    "textOutputLabel": "Kết quả",
+    "urlSafeLabel": "Bảng chữ cái an toàn cho URL (- và _)",
+    "lineWrapLabel": "Xuống dòng mỗi 76 ký tự (chuẩn MIME)",
+    "swap": "Hoán đổi đầu vào/kết quả & đổi chế độ",
+    "copy": "Sao chép",
+    "copied": "Đã sao chép!",
+    "clear": "Xóa",
+    "decodeError": "Không giải mã được — đây không phải chuỗi Base64 hợp lệ.",
+    "sizeInfo": "Đầu vào: {{input}} ký tự → Kết quả: {{output}} ký tự",
+    "fileEncodeHeading": "Mã hóa file",
+    "fileDropLabel": "Kéo thả file vào đây, hoặc",
+    "fileChoose": "Chọn file",
+    "fileBase64Label": "Base64",
+    "fileDataUriLabel": "Data URI",
+    "fileDecodeHeading": "Giải mã về file",
+    "fileDecodeInputLabel": "Base64 hoặc data URI",
+    "fileDecodeInputPlaceholder": "Dán chuỗi Base64 hoặc data URI đầy đủ dạng data:...;base64,...",
+    "fileMimeLabel": "Loại MIME",
+    "fileNameLabel": "Tên file",
+    "fileNamePlaceholder": "file.bin",
+    "downloadFile": "Tải file xuống",
+    "fileDecodeError": "Không giải mã được — đây không phải chuỗi Base64 hợp lệ.",
+    "imagePreviewLabel": "Xem trước"
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Base64 là gì, và vì sao phải mã hóa dữ liệu?",
+    "p1": "Base64 chuyển dữ liệu nhị phân bất kỳ — một tấm ảnh, một file PDF, một đoạn byte đã mã hóa — thành một chuỗi chỉ gồm 64 ký tự A–Z, a–z, 0–9, dấu `+` và `/` (thêm dấu `=` để đệm cho đủ độ dài). Đây không phải là mã hóa bảo mật hay nén dữ liệu; một chuỗi Base64 thường lớn hơn khoảng 33% so với dữ liệu gốc, và ai cũng có thể giải mã ngược lại ngay lập tức mà không cần bất kỳ khóa nào. Lý do Base64 tồn tại thực ra rất đơn giản: rất nhiều định dạng truyền tải và lưu trữ — email (tệp đính kèm MIME), trường dữ liệu JSON, tham số trên URL, `data:` URI trong CSS/HTML, file cấu hình — vốn chỉ được thiết kế để mang văn bản thuần an toàn, và dễ bị lỗi khi gặp byte nhị phân thô như ký tự xuống dòng hay byte null nằm giữa dữ liệu. Mã hóa một khối dữ liệu nhị phân sang Base64 biến nó thành văn bản thuần mà bất kỳ hệ thống nào trong số đó cũng mang đi được mà không làm hỏng dữ liệu.",
+    "p2": "Công cụ này thực hiện việc mã hóa và giải mã bằng JavaScript thuần ngay trên trình duyệt của bạn — không có gì bạn gõ vào hay tải lên bị gửi tới server nào cả. Văn bản được mã hóa thông qua `TextEncoder`/`btoa` phía dưới, nên các ký tự UTF-8 nhiều byte (emoji, chữ có dấu, chữ Hán/Nhật/Hàn) đều được xử lý đúng, không chỉ riêng ký tự ASCII thuần. File được đọc cục bộ qua API `FileReader` có sẵn của trình duyệt, nghĩa là một tấm ảnh dung lượng vài megabyte sẽ không bao giờ rời khỏi máy của bạn chỉ để xem dạng Base64 của nó trông thế nào.",
+    "p3": "Tab Văn bản xử lý trường hợp thường gặp nhất: gõ hoặc dán nội dung, chuyển qua lại giữa Mã hóa và Giải mã, kết quả cập nhật ngay lập tức. Tùy chọn \"an toàn cho URL\" thay các ký tự `+`/`/` bằng `-`/`_` và bỏ dấu `=` đệm ở cuối — đúng thứ bạn cần khi giá trị Base64 phải nằm trong một URL hoặc tên file thay vì một trường JSON. Tab File đi xa hơn: thả vào một tấm ảnh, file PDF, hay bất kỳ file nào khác để nhận về cả chuỗi Base64 thô lẫn một `data:` URI dùng được ngay, dán thẳng vào `<img src>` hoặc `background-image` trong CSS — rất tiện khi cần nhúng một icon nhỏ mà không muốn tạo thêm một request HTTP riêng. Dán data URI đó (hoặc chỉ một chuỗi Base64 trần kèm loại MIME) vào ô giải mã, công cụ sẽ khôi phục lại đúng dữ liệu byte gốc, tự động hiện ảnh xem trước nếu là ảnh, và cho tải xuống chỉ với một cú nhấp.",
+    "p4": "Một điểm dễ nhầm lẫn cần nói rõ: Base64 là một kiểu mã hóa để truyền tải, không phải một biện pháp bảo mật. Một chuỗi Base64 vốn được thiết kế để có thể giải mã ngược cực kỳ dễ dàng, nên đừng bao giờ dùng nó thay cho mã hóa bảo mật thật sự — nếu bạn cần bảo vệ một token hay một bí mật, mã hóa Base64 để truyền tải thì được, nhưng đừng nhầm điều đó với việc giấu nó đi. Nếu cần soi kỹ cấu trúc một payload JSON sau khi đã giải mã, công cụ Định dạng & kiểm tra JSON là điểm dừng tiếp theo hợp lý."
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Encodeur/Décodeur Base64 en ligne gratuit — Web Tool Hub",
+    "description": "Encodez du texte et des fichiers en Base64 ou décodez du Base64 en texte, images et fichiers — avec prise en charge des data URI et du format URL-safe. Instantané, dans votre navigateur, sans upload."
+  },
+  "heading": "Encodeur/Décodeur Base64",
+  "tagline": "Encodez du texte ou des fichiers en Base64, ou décodez du Base64 — entièrement dans votre navigateur.",
+  "ui": {
+    "textTabLabel": "Texte",
+    "fileTabLabel": "Fichier",
+    "encodeOption": "Encoder",
+    "decodeOption": "Décoder",
+    "textInputLabel": "Entrée",
+    "textInputPlaceholderEncode": "Tapez ou collez le texte à encoder…",
+    "textInputPlaceholderDecode": "Collez le Base64 à décoder…",
+    "textOutputLabel": "Résultat",
+    "urlSafeLabel": "Alphabet compatible URL (- et _)",
+    "lineWrapLabel": "Retour à la ligne tous les 76 caractères (MIME)",
+    "swap": "Inverser entrée/sortie et changer de mode",
+    "copy": "Copier",
+    "copied": "Copié !",
+    "clear": "Effacer",
+    "decodeError": "Impossible de décoder ceci — ce n'est pas du Base64 valide.",
+    "sizeInfo": "Entrée : {{input}} caractères → Sortie : {{output}} caractères",
+    "fileEncodeHeading": "Encoder un fichier",
+    "fileDropLabel": "Glissez-déposez un fichier ici, ou",
+    "fileChoose": "Choisir un fichier",
+    "fileBase64Label": "Base64",
+    "fileDataUriLabel": "Data URI",
+    "fileDecodeHeading": "Décoder vers un fichier",
+    "fileDecodeInputLabel": "Base64 ou data URI",
+    "fileDecodeInputPlaceholder": "Collez une chaîne Base64 ou une URI complète data:...;base64,...",
+    "fileMimeLabel": "Type MIME",
+    "fileNameLabel": "Nom du fichier",
+    "fileNamePlaceholder": "file.bin",
+    "downloadFile": "Télécharger le fichier",
+    "fileDecodeError": "Impossible de décoder ceci — ce n'est pas du Base64 valide.",
+    "imagePreviewLabel": "Aperçu"
+  },
+  "related": "Outils associés",
+  "article": {
+    "heading": "Qu'est-ce que le Base64, et pourquoi encoder quelque chose au juste ?",
+    "p1": "Le Base64 transforme des données binaires quelconques — une image, un PDF, un bloc d'octets chiffrés — en une chaîne de caractères composée uniquement des 64 symboles A–Z, a–z, 0–9, + et / (auxquels s'ajoute = pour le remplissage). Ce n'est ni du chiffrement ni de la compression : une chaîne Base64 est environ 33 % plus volumineuse que les données qu'elle représente, et n'importe qui peut la redécoder instantanément, sans aucune clé. La vraie raison d'être du Base64 est bien plus terre-à-terre : de nombreux formats de transport et systèmes de stockage — l'e-mail (pièces jointes MIME), les champs JSON, les paramètres d'URL, les URI `data:` en CSS/HTML, les fichiers de configuration — ont été conçus pour véhiculer du texte brut en toute sécurité, et s'étouffent sur des octets binaires bruts comme les sauts de ligne ou les caractères nuls intégrés. Encoder une charge binaire en Base64 la transforme en un bloc de texte brut que tous ces systèmes peuvent transporter sans le corrompre.",
+    "p2": "Cet outil effectue l'encodage et le décodage en JavaScript pur, directement dans votre navigateur — rien de ce que vous saisissez ou déposez n'est envoyé à un serveur. Le texte est encodé via `TextEncoder`/`btoa` en coulisses, de sorte que les caractères UTF-8 multi-octets (émojis, lettres accentuées, texte CJK) sont restitués correctement, et pas seulement l'ASCII pur. Les fichiers sont lus localement grâce à l'API `FileReader` du navigateur, ce qui signifie qu'une image de plusieurs mégaoctets ne quitte jamais votre machine juste pour connaître sa forme Base64.",
+    "p3": "L'onglet Texte gère le cas courant : tapez ou collez quelque chose, basculez entre Encoder et Décoder, et le résultat se met à jour en direct. L'option compatible URL remplace les caractères `+`/`/` par `-`/`_` et retire le remplissage `=` final — exactement ce qu'il faut lorsqu'une valeur Base64 doit se glisser dans une URL ou un nom de fichier plutôt que dans un champ JSON. L'onglet Fichier va plus loin : déposez une image, un PDF ou tout autre fichier pour récupérer à la fois le Base64 brut et une data URI `data:` prête à l'emploi, que vous pouvez coller directement dans un `<img src>` ou un `background-image` CSS — pratique pour intégrer une petite icône sans requête HTTP supplémentaire. Recollez cette data URI (ou simplement une chaîne Base64 accompagnée d'un type MIME) dans la zone de décodage, et l'outil reconstitue les octets d'origine, avec un aperçu image automatique et un téléchargement en un clic.",
+    "p4": "Une confusion fréquente mérite d'être signalée clairement : le Base64 est un encodage, pas une mesure de sécurité. Une chaîne Base64 est réversible de façon triviale, par construction, et ne doit donc jamais servir de substitut à un vrai chiffrement — si vous cherchez à protéger un jeton ou un secret, encodez-le pour le transport avec cet outil si besoin, mais ne confondez pas cela avec le fait de le dissimuler. Pour examiner la structure d'une charge JSON déjà décodée, l'outil Formateur & Validateur JSON constitue la suite logique."
+  }
+}

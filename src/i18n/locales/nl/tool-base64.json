@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Base64 Coderen/Decoderen Online Gratis — Web Tool Hub",
+    "description": "Codeer tekst en bestanden naar Base64 of decodeer Base64 terug naar tekst, afbeeldingen en bestanden — met ondersteuning voor data-URI en URL-veilige tekens. Direct, in je browser, zonder upload."
+  },
+  "heading": "Base64 Coderen/Decoderen",
+  "tagline": "Codeer tekst of bestanden naar Base64, of decodeer Base64 terug — volledig in je browser.",
+  "ui": {
+    "textTabLabel": "Tekst",
+    "fileTabLabel": "Bestand",
+    "encodeOption": "Coderen",
+    "decodeOption": "Decoderen",
+    "textInputLabel": "Invoer",
+    "textInputPlaceholderEncode": "Typ of plak tekst om te coderen…",
+    "textInputPlaceholderDecode": "Plak Base64 om te decoderen…",
+    "textOutputLabel": "Uitvoer",
+    "urlSafeLabel": "URL-veilig alfabet (- en _)",
+    "lineWrapLabel": "Afbreken na 76 tekens (MIME)",
+    "swap": "Wissel invoer/uitvoer & modus",
+    "copy": "Kopiëren",
+    "copied": "Gekopieerd!",
+    "clear": "Wissen",
+    "decodeError": "Kan dit niet decoderen — het is geen geldige Base64.",
+    "sizeInfo": "Invoer: {{input}} tekens → Uitvoer: {{output}} tekens",
+    "fileEncodeHeading": "Een bestand coderen",
+    "fileDropLabel": "Sleep een bestand hierheen, of",
+    "fileChoose": "Bestand kiezen",
+    "fileBase64Label": "Base64",
+    "fileDataUriLabel": "Data-URI",
+    "fileDecodeHeading": "Decoderen naar een bestand",
+    "fileDecodeInputLabel": "Base64 of data-URI",
+    "fileDecodeInputPlaceholder": "Plak een Base64-string of een volledige data:...;base64,... URI",
+    "fileMimeLabel": "MIME-type",
+    "fileNameLabel": "Bestandsnaam",
+    "fileNamePlaceholder": "file.bin",
+    "downloadFile": "Bestand downloaden",
+    "fileDecodeError": "Kan dit niet decoderen — het is geen geldige Base64.",
+    "imagePreviewLabel": "Voorbeeld"
+  },
+  "related": "Gerelateerde tools",
+  "article": {
+    "heading": "Wat is Base64, en waarom zou je iets coderen?",
+    "p1": "Base64 zet willekeurige binaire data — een afbeelding, een PDF, een stuk versleutelde bytes — om in een tekenreeks die alleen bestaat uit de 64 tekens A–Z, a–z, 0–9, + en / (plus = als opvulling). Het is geen versleuteling en geen compressie; een Base64-string is ongeveer 33% groter dan de data die hij vertegenwoordigt, en iedereen kan hem direct terugdecoderen zonder sleutel. De reden dat Base64 bestaat is veel praktischer: veel transportformaten en opslagsystemen — e-mail (MIME-bijlagen), JSON-velden, URL-queryparameters, `data:`-URI's in CSS/HTML, configuratiebestanden — zijn gebouwd om platte tekst veilig te vervoeren, maar struikelen over ruwe binaire bytes zoals regeleindetekens of ingebedde null-bytes. Door binaire data naar Base64 te coderen, wordt het een stuk platte tekst dat al die systemen probleemloos kunnen doorgeven.",
+    "p2": "Deze tool voert het coderen en decoderen uit met puur JavaScript, rechtstreeks in je browser — niets van wat je typt of uploadt wordt naar een server gestuurd. Tekst wordt onder de motorkap gecodeerd met `TextEncoder`/`btoa`, zodat meerbyte UTF-8-tekens (emoji, letters met accenten, CJK-tekst) correct heen en weer worden omgezet, niet alleen platte ASCII. Bestanden worden lokaal gelezen via de `FileReader`-API van de browser, wat betekent dat een afbeelding van meerdere megabytes je apparaat nooit verlaat, alleen om te ontdekken hoe de Base64-vorm ervan eruitziet.",
+    "p3": "Het tabblad Tekst dekt het dagelijkse gebruik: typ of plak iets, wissel tussen Coderen en Decoderen, en de uitvoer wordt live bijgewerkt. De optie URL-veilig vervangt de tekens `+`/`/` door `-`/`_` en laat de afsluitende `=`-opvulling weg — precies wat je nodig hebt wanneer een Base64-waarde in een URL of bestandsnaam moet staan in plaats van in een JSON-veld. Het tabblad Bestand gaat een stap verder: sleep een afbeelding, PDF of ander bestand naartoe om zowel de ruwe Base64 als een kant-en-klare `data:`-URI terug te krijgen, die je direct in een `<img src>` of een CSS `background-image` kunt plakken — handig om een klein icoon in te sluiten zonder een aparte HTTP-aanvraag. Plak die data-URI (of gewoon een kale Base64-string plus een MIME-type) terug in het decodeervak, en de tool reconstrueert de oorspronkelijke bytes, met automatisch een afbeeldingsvoorbeeld en een download met één klik.",
+    "p4": "Een veelvoorkomend misverstand dat het vermelden waard is: Base64 is een codering, geen beveiligingsmaatregel. Een Base64-string is bij ontwerp triviaal omkeerbaar, dus mag hij nooit dienen als vervanging voor echte versleuteling — wil je een token of geheim beveiligen, codeer het dan gerust met deze tool voor transport, maar verwar dat niet met het verbergen ervan. Wil je vervolgens de structuur van een reeds gedecodeerde JSON-payload inspecteren, dan is de JSON Formatter & Validator-tool een logische volgende stap."
+  }
+}

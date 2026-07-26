@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Base64-kodning/avkodning online gratis — Web Tool Hub",
+    "description": "Koda text och filer till Base64 eller avkoda Base64 tillbaka till text, bilder och filer — med stöd för data-URI och URL-säkert format. Direkt i webbläsaren, ingen uppladdning."
+  },
+  "heading": "Base64-kodning/avkodning",
+  "tagline": "Koda text eller filer till Base64, eller avkoda Base64 tillbaka — helt i din webbläsare.",
+  "ui": {
+    "textTabLabel": "Text",
+    "fileTabLabel": "Fil",
+    "encodeOption": "Koda",
+    "decodeOption": "Avkoda",
+    "textInputLabel": "Indata",
+    "textInputPlaceholderEncode": "Skriv eller klistra in text som ska kodas…",
+    "textInputPlaceholderDecode": "Klistra in Base64 som ska avkodas…",
+    "textOutputLabel": "Utdata",
+    "urlSafeLabel": "URL-säkert alfabet (- och _)",
+    "lineWrapLabel": "Radbryt vid 76 tecken (MIME)",
+    "swap": "Byt indata/utdata och läge",
+    "copy": "Kopiera",
+    "copied": "Kopierat!",
+    "clear": "Rensa",
+    "decodeError": "Kunde inte avkoda detta — det är inte giltig Base64.",
+    "sizeInfo": "Indata: {{input}} tecken → Utdata: {{output}} tecken",
+    "fileEncodeHeading": "Koda en fil",
+    "fileDropLabel": "Dra och släpp en fil här, eller",
+    "fileChoose": "Välj fil",
+    "fileBase64Label": "Base64",
+    "fileDataUriLabel": "Data-URI",
+    "fileDecodeHeading": "Avkoda till en fil",
+    "fileDecodeInputLabel": "Base64 eller data-URI",
+    "fileDecodeInputPlaceholder": "Klistra in en Base64-sträng eller en fullständig data:...;base64,...-URI",
+    "fileMimeLabel": "MIME-typ",
+    "fileNameLabel": "Filnamn",
+    "fileNamePlaceholder": "file.bin",
+    "downloadFile": "Ladda ner fil",
+    "fileDecodeError": "Kunde inte avkoda detta — det är inte giltig Base64.",
+    "imagePreviewLabel": "Förhandsvisning"
+  },
+  "related": "Relaterade verktyg",
+  "article": {
+    "heading": "Vad är Base64, och varför koda något överhuvudtaget?",
+    "p1": "Base64 omvandlar godtycklig binär data — en bild, en PDF, en klump krypterade byte — till en sträng som enbart består av de 64 tecknen A–Z, a–z, 0–9, + och / (samt = som utfyllnad). Det är varken kryptering eller komprimering; en Base64-sträng är ungefär 33 % större än den data den representerar, och vem som helst kan avkoda den tillbaka omedelbart utan någon nyckel. Anledningen till att formatet finns är betydligt mer vardaglig: många transportformat och lagringssystem — e-post (MIME-bilagor), JSON-fält, URL-parametrar, `data:`-URI:er i CSS/HTML, konfigurationsfiler — är byggda för att hantera vanlig text på ett säkert sätt, men trasslar till sig av rå binärdata som radbrytningstecken eller inbäddade nolltecken. Genom att Base64-koda en binär nyttolast omvandlas den till ett textblock som alla dessa system kan transportera utan att data blir korrupt.",
+    "p2": "Det här verktyget sköter kodningen och avkodningen med vanlig JavaScript direkt i din webbläsare — ingenting du skriver eller laddar upp skickas till någon server. Text kodas under huven med `TextEncoder`/`btoa` så att flerbyte-UTF-8-tecken (emoji, bokstäver med diakritiska tecken, CJK-text) hanteras korrekt fram och tillbaka, inte bara vanlig ASCII. Filer läses lokalt via webbläsarens `FileReader`-API, vilket innebär att en bild på flera megabyte aldrig lämnar din dator bara för att du vill se hur dess Base64-form ser ut.",
+    "p3": "Fliken Text hanterar vardagsfallet: skriv eller klistra in något, växla mellan Koda och Avkoda, och utdata uppdateras direkt. Alternativet URL-säkert byter ut tecknen `+`/`/` mot `-`/`_` och tar bort den avslutande `=`-utfyllnaden, vilket är precis vad du behöver när ett Base64-värde ska in i en URL eller ett filnamn snarare än ett JSON-fält. Fliken Fil går ett steg längre: släpp in en bild, PDF eller vilken annan fil som helst för att få tillbaka både den rena Base64-strängen och en färdig `data:`-URI som du kan klistra direkt in i en `<img src>` eller en CSS-`background-image` — praktiskt när du vill bädda in en liten ikon utan en separat HTTP-förfrågan. Klistra in samma data-URI (eller bara en Base64-sträng plus en MIME-typ) i avkodningsrutan så återskapar verktyget de ursprungliga byten, med automatisk bildförhandsvisning och nedladdning med ett klick.",
+    "p4": "En vanlig missuppfattning som är värd att lyfta fram: Base64 är en kodning, inte en säkerhetsåtgärd. En Base64-sträng är per design trivial att vända tillbaka till originalet, så den ska aldrig användas som ersättning för riktig kryptering — vill du skydda en token eller en hemlighet kan du gärna koda den för transport med det här verktyget, men förväxla inte det med att dölja den. Vill du sedan inspektera strukturen på en redan avkodad JSON-nyttolast är verktyget JSON Formatter & Validator ett naturligt nästa steg."
+  }
+}

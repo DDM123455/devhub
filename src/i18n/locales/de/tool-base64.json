@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Base64 Encoder/Decoder Online Kostenlos — Web Tool Hub",
+    "description": "Text und Dateien in Base64 kodieren oder Base64 zurück in Text, Bilder und Dateien dekodieren — mit Data-URI- und URL-sicherer Unterstützung. Sofort, im Browser, kein Upload."
+  },
+  "heading": "Base64 Encoder/Decoder",
+  "tagline": "Text oder Dateien in Base64 kodieren oder Base64 zurück dekodieren — vollständig in Ihrem Browser.",
+  "ui": {
+    "textTabLabel": "Text",
+    "fileTabLabel": "Datei",
+    "encodeOption": "Kodieren",
+    "decodeOption": "Dekodieren",
+    "textInputLabel": "Eingabe",
+    "textInputPlaceholderEncode": "Text zum Kodieren eingeben oder einfügen…",
+    "textInputPlaceholderDecode": "Base64 zum Dekodieren einfügen…",
+    "textOutputLabel": "Ausgabe",
+    "urlSafeLabel": "URL-sicheres Alphabet (- und _)",
+    "lineWrapLabel": "Nach 76 Zeichen umbrechen (MIME)",
+    "swap": "Eingabe/Ausgabe tauschen & Modus wechseln",
+    "copy": "Kopieren",
+    "copied": "Kopiert!",
+    "clear": "Leeren",
+    "decodeError": "Konnte nicht dekodiert werden — das ist kein gültiges Base64.",
+    "sizeInfo": "Eingabe: {{input}} Zeichen → Ausgabe: {{output}} Zeichen",
+    "fileEncodeHeading": "Eine Datei kodieren",
+    "fileDropLabel": "Datei hierher ziehen und ablegen, oder",
+    "fileChoose": "Datei auswählen",
+    "fileBase64Label": "Base64",
+    "fileDataUriLabel": "Data-URI",
+    "fileDecodeHeading": "Zu einer Datei dekodieren",
+    "fileDecodeInputLabel": "Base64 oder Data-URI",
+    "fileDecodeInputPlaceholder": "Einen Base64-String oder eine vollständige data:...;base64,...-URI einfügen",
+    "fileMimeLabel": "MIME-Typ",
+    "fileNameLabel": "Dateiname",
+    "fileNamePlaceholder": "file.bin",
+    "downloadFile": "Datei herunterladen",
+    "fileDecodeError": "Konnte nicht dekodiert werden — das ist kein gültiges Base64.",
+    "imagePreviewLabel": "Vorschau"
+  },
+  "related": "Verwandte Tools",
+  "article": {
+    "heading": "Was ist Base64, und wozu kodiert man überhaupt etwas?",
+    "p1": "Base64 verwandelt beliebige Binärdaten — ein Bild, ein PDF, einen Block verschlüsselter Bytes — in eine Zeichenkette, die ausschließlich aus den 64 Zeichen A–Z, a–z, 0–9, + und / besteht (plus = als Padding). Es handelt sich weder um Verschlüsselung noch um Kompression; ein Base64-String ist etwa 33 % größer als die Daten, die er repräsentiert, und jeder kann ihn ohne Schlüssel sofort wieder zurückwandeln. Der Grund für seine Existenz ist viel banaler: Zahlreiche Transportformate und Speichersysteme — E-Mail (MIME-Anhänge), JSON-Felder, URL-Query-Parameter, CSS/HTML-`data:`-URIs, Konfigurationsdateien — wurden dafür gebaut, reinen Text sicher zu transportieren, und geraten bei rohen Binärbytes wie Zeilenumbrüchen oder eingebetteten Nullzeichen ins Straucheln. Kodiert man eine Binärdatei in Base64, wird daraus ein Textblock, den jedes dieser Systeme unbeschadet transportieren kann.",
+    "p2": "Dieses Tool führt das Kodieren und Dekodieren mit reinem JavaScript direkt in Ihrem Browser aus — nichts von dem, was Sie eingeben oder hochladen, wird an einen Server gesendet. Text wird intern über `TextEncoder`/`btoa` kodiert, sodass mehrbytige UTF-8-Zeichen (Emoji, Umlaute, CJK-Text) korrekt hin- und zurückkonvertiert werden, nicht nur reines ASCII. Dateien werden lokal über die `FileReader`-API des Browsers eingelesen, sodass ein mehrere Megabyte großes Bild Ihren Rechner niemals verlässt, nur um herauszufinden, wie seine Base64-Form aussieht.",
+    "p3": "Der Tab „Text“ deckt den Alltagsfall ab: Etwas eingeben oder einfügen, zwischen Kodieren und Dekodieren umschalten, und die Ausgabe aktualisiert sich live. Die Option „URL-sicher“ ersetzt die Zeichen `+`/`/` durch `-`/`_` und lässt das abschließende `=`-Padding weg — genau das, was Sie brauchen, wenn ein Base64-Wert in einer URL oder einem Dateinamen stehen muss statt in einem JSON-Feld. Der Tab „Datei“ geht noch weiter: Ziehen Sie ein Bild, ein PDF oder eine beliebige andere Datei hinein, und Sie erhalten sowohl das rohe Base64 als auch eine fertige `data:`-URI, die Sie direkt in ein `<img src>` oder ein CSS-`background-image` einfügen können — praktisch, um ein kleines Icon einzubetten, ohne eine separate HTTP-Anfrage auszulösen. Fügen Sie diese Data-URI (oder einfach einen nackten Base64-String samt MIME-Typ) wieder in das Dekodierfeld ein, und das Tool rekonstruiert die ursprünglichen Bytes, zeigt bei Bildern automatisch eine Vorschau an und bietet einen Download per Klick.",
+    "p4": "Ein Missverständnis, das man direkt ansprechen sollte: Base64 ist eine Kodierung, keine Sicherheitsmaßnahme. Ein Base64-String lässt sich absichtlich mühelos zurückwandeln und sollte deshalb niemals als Ersatz für echte Verschlüsselung dienen — wenn Sie ein Token oder ein Geheimnis für den Transport kodieren möchten, ist dieses Tool dafür genau richtig, aber verwechseln Sie das nicht mit dem Verbergen der Daten. Um die Struktur eines bereits dekodierten JSON-Payloads zu untersuchen, ist das Tool JSON Formatter & Validator der naheliegende nächste Schritt."
+  }
+}

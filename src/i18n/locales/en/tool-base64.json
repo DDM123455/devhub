@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "title": "Base64 Encode/Decode Online Free — Web Tool Hub",
+    "description": "Encode text and files to Base64 or decode Base64 back to text, images, and files — with data URI and URL-safe support. Instant, in your browser, no upload."
+  },
+  "heading": "Base64 Encode/Decode",
+  "tagline": "Encode text or files to Base64, or decode Base64 back — entirely in your browser.",
+  "ui": {
+    "textTabLabel": "Text",
+    "fileTabLabel": "File",
+    "encodeOption": "Encode",
+    "decodeOption": "Decode",
+    "textInputLabel": "Input",
+    "textInputPlaceholderEncode": "Type or paste text to encode…",
+    "textInputPlaceholderDecode": "Paste Base64 to decode…",
+    "textOutputLabel": "Output",
+    "urlSafeLabel": "URL-safe alphabet (- and _)",
+    "lineWrapLabel": "Wrap at 76 characters (MIME)",
+    "swap": "Swap input/output & switch mode",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "clear": "Clear",
+    "decodeError": "Couldn't decode this — it isn't valid Base64.",
+    "sizeInfo": "Input: {{input}} characters → Output: {{output}} characters",
+    "fileEncodeHeading": "Encode a file",
+    "fileDropLabel": "Drag & drop a file here, or",
+    "fileChoose": "Choose file",
+    "fileBase64Label": "Base64",
+    "fileDataUriLabel": "Data URI",
+    "fileDecodeHeading": "Decode to a file",
+    "fileDecodeInputLabel": "Base64 or data URI",
+    "fileDecodeInputPlaceholder": "Paste a Base64 string or a full data:...;base64,... URI",
+    "fileMimeLabel": "MIME type",
+    "fileNameLabel": "File name",
+    "fileNamePlaceholder": "file.bin",
+    "downloadFile": "Download file",
+    "fileDecodeError": "Couldn't decode this — it isn't valid Base64.",
+    "imagePreviewLabel": "Preview"
+  },
+  "related": "Related tools",
+  "article": {
+    "heading": "What is Base64, and why encode something in the first place?",
+    "p1": "Base64 turns arbitrary binary data — an image, a PDF, a chunk of encrypted bytes — into a string made up only of the 64 characters A–Z, a–z, 0–9, +, and / (plus = for padding). It isn't encryption or compression; a Base64 string is roughly 33% larger than the data it represents, and anyone can decode it back instantly with no key required. The reason it exists is much more mundane: a lot of transport formats and storage systems — email (MIME attachments), JSON fields, URL query parameters, CSS/HTML `data:` URIs, config files — were built to carry plain text safely, and choke on raw binary bytes like line-feed characters or embedded nulls. Base64-encoding a binary payload turns it into a chunk of plain text that any of those systems can carry without corrupting it.",
+    "p2": "This tool runs the encoding and decoding with plain JavaScript directly in your browser — nothing you type or upload is sent to a server. Text is encoded using `TextEncoder`/`btoa` under the hood so multi-byte UTF-8 characters (emoji, accented letters, CJK text) round-trip correctly, not just plain ASCII. Files are read locally via the browser's `FileReader` API, which means a multi-megabyte image never leaves your machine just to find out what its Base64 form looks like.",
+    "p3": "The Text tab handles the everyday case: type or paste something, flip between Encode and Decode, and the output updates live. The URL-safe option swaps the `+`/`/` characters for `-`/`_` and drops the trailing `=` padding, which is what you need when a Base64 value has to sit inside a URL or a filename rather than a JSON field. The File tab goes further: drop in an image, PDF, or any other file to get back both the raw Base64 and a ready-to-use `data:` URI you can paste straight into an `<img src>` or a CSS `background-image` — handy for embedding a small icon without a separate HTTP request. Paste that data URI (or just a bare Base64 string plus a MIME type) back into the decode box and the tool reconstructs the original bytes, offering an image preview automatically and a one-click download.",
+    "p4": "A common point of confusion worth flagging directly: Base64 is an encoding, not a security measure. A Base64 string is trivially reversible by design, so it should never be used as a substitute for real encryption — if you're looking to protect a token or a secret, encode it for transport with this tool by all means, but don't mistake that for hiding it. For inspecting the structure of an already-decoded JSON payload, the JSON Formatter & Validator tool is a natural next stop."
+  }
+}

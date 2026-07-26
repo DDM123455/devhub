@@ -5,12 +5,12 @@
 
 ## 🔵 Trạng thái hiện tại
 
-- Phase đang làm: **Phase 3 — Mở rộng công cụ ngách: 1/10 tool xong (JWT Decoder,
-  2026-07-26)** ✅ — xem log chi tiết bên dưới. Theo yêu cầu trực tiếp của người dùng,
-  Phase 3 được làm TRƯỚC khi hoàn tất nốt các mục còn lại của Phase 2 (meta/description
-  tối ưu SEO, nội dung SEO 300–500 từ cho 10 tool cũ, internal linking map, Core Web
-  Vitals — vẫn còn treo, xem `ROADMAP.md`). Task tiếp theo trong Phase 3: Base64
-  Encode/Decode.
+- Phase đang làm: **Phase 3 — Mở rộng công cụ ngách: 2/10 tool xong (JWT Decoder,
+  Base64 Encode/Decode — cả hai 2026-07-26)** ✅ — xem log chi tiết bên dưới. Theo yêu
+  cầu trực tiếp của người dùng, Phase 3 được làm TRƯỚC khi hoàn tất nốt các mục còn lại
+  của Phase 2 (meta/description tối ưu SEO, nội dung SEO 300–500 từ cho 10 tool cũ,
+  internal linking map, Core Web Vitals — vẫn còn treo, xem `ROADMAP.md`). Task tiếp
+  theo trong Phase 3: Regex Tester.
 - **Phase 1 — 10 công cụ cốt lõi: HOÀN TẤT 10/10** ✅. **Phase 1.5 — Rà soát & Nâng cấp
   Feature Parity: HOÀN TẤT 10/10 tool** ✅ (tool #10 "Chuyển đổi Case văn bản" vừa xong —
   xem log bên dưới), CHỈ CÒN treo lại đúng 1 mục con nhỏ: nén PDF cho tool #4/#5 (chưa
@@ -108,6 +108,48 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-26 — Phase 3, tool #2: Base64 Encode/Decode — HOÀN TẤT
+- Task kế tiếp trong Phase 3 sau JWT Decoder. Benchmark đối thủ: **base64.guru**,
+  **freeformatter.com/base64-encoder.html** — cả hai đều hỗ trợ mã hóa/giải mã văn bản
+  VÀ file, xem trước ảnh, biến thể URL-safe.
+- **100% client-side, không thêm dependency mới**: chỉ dùng API có sẵn của trình duyệt
+  — `btoa`/`atob`, `TextEncoder`/`TextDecoder` (đảm bảo UTF-8 đa byte round-trip đúng,
+  không chỉ ASCII thuần), và `FileReader.readAsDataURL` cho việc đọc file cục bộ (file
+  vài MB không rời khỏi máy chỉ để xem dạng Base64).
+- **Tính năng đã làm** (`src/components/tools/Base64Tool.tsx`), theo đúng nguyên tắc
+  Feature Parity — không dừng ở bản MVP tối giản:
+  - Tab "Văn bản": mã hóa/giải mã trực tiếp khi gõ, tùy chọn bảng chữ cái an toàn cho
+    URL (`-`/`_` thay `+`/`/`, bỏ đệm `=`), tùy chọn xuống dòng mỗi 76 ký tự (chuẩn
+    MIME), nút hoán đổi đầu vào/kết quả kèm đổi chế độ, hiển thị số ký tự đầu
+    vào/đầu ra.
+  - Tab "File": kéo-thả hoặc chọn file để mã hóa — trả về cả chuỗi Base64 thô lẫn
+    `data:` URI dùng ngay được trong `<img src>`/CSS, tự động xem trước nếu là ảnh.
+    Chiều ngược lại: dán Base64 hoặc data URI đầy đủ, tự nhận diện MIME type từ data
+    URI (hoặc cho nhập tay), xem trước ảnh, tải file xuống với tên tự đặt.
+  - Báo lỗi rõ ràng khi chuỗi Base64 không hợp lệ, thay vì crash hoặc trả về rác.
+- Đăng ký tool (`id: 'base64-tool'`, `category: 'dev'`) vào `src/data/tools.ts` với đủ
+  slug/tên 20 ngôn ngữ, thêm nhánh routing, tạo `Base64ToolPage.astro` theo đúng pattern
+  đã dùng cho JWT Decoder.
+- **Nội dung i18n cho 20 ngôn ngữ** (`tool-base64.json`, 40 key/file gồm `meta`, `ui.*`
+  có 2 placeholder `{{input}}`/`{{output}}` trong `sizeInfo`, `related`,
+  `article.heading`+`p1`-`p4`): tự viết `en`/`vi`, 18 ngôn ngữ còn lại giao song song
+  cho 18 agent con (đúng tiền lệ JWT Decoder), có nhắc rõ giữ nguyên placeholder
+  `{{input}}`/`{{output}}` và tên file ví dụ `file.bin`.
+- **Verify độc lập**: script Node so sánh key-set (100% khớp cho cả 20 file), xác nhận
+  2 placeholder `{{input}}`/`{{output}}` còn nguyên trong `sizeInfo` của MỌI ngôn ngữ,
+  quét toàn bộ tìm HTML entity bị escape nhầm (không có — một agent con nhắc tới
+  `&lt;img src&gt;` trong báo cáo text nhưng chỉ là cách mô tả, không phải nội dung JSON
+  thật, đã xác nhận bằng script).
+- **Test logic độc lập bằng Node** (mô phỏng lại đúng hàm trong component): round-trip
+  UTF-8 (emoji + tiếng Việt có dấu + tiếng Nhật) mã hóa rồi giải mã khớp 100% văn bản
+  gốc, biến thể URL-safe không còn ký tự `+`/`/`, chuỗi Base64 sai bị từ chối đúng cách,
+  vector đã biết (`"Hello"` → `SGVsbG8=`) khớp chuẩn.
+- **Build cuối cùng xác nhận sạch**: `npm run build` ra đúng 261 trang tĩnh (tăng từ 241
+  lên 261 = thêm đúng 1 tool × 20 ngôn ngữ), không lỗi. Kiểm tra thủ công HTML build ra
+  cho en/vi: `<h1>` đúng, schema JSON-LD có mặt, link tới JWT Decoder trong related
+  tools hiển thị đúng (cùng category `dev`).
+- Đã tick checkbox "Base64 Encode/Decode" trong `ROADMAP.md` (Phase 3).
 
 ### 2026-07-26 — Phase 3, tool #1: JWT Decoder — HOÀN TẤT
 - Theo yêu cầu người dùng, bắt đầu Phase 3 trước khi làm nốt các mục còn lại của Phase 2.

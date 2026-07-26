@@ -1,0 +1,103 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Base64Tool from './Base64Tool';
+import { getFixedT } from '@/i18n/i18next';
+import { tools } from '@/data/tools';
+import type { Locale } from '@/i18n/config';
+
+interface Props {
+	lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getFixedT(lang, 'tool-base64');
+
+const tool = tools.find((item) => item.id === 'base64-tool')!;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const relatedTools = tools.filter((item) => item.category === tool.category && item.id !== tool.id);
+
+const messages = {
+	textTabLabel: t('ui.textTabLabel'),
+	fileTabLabel: t('ui.fileTabLabel'),
+	encodeOption: t('ui.encodeOption'),
+	decodeOption: t('ui.decodeOption'),
+	textInputLabel: t('ui.textInputLabel'),
+	textInputPlaceholderEncode: t('ui.textInputPlaceholderEncode'),
+	textInputPlaceholderDecode: t('ui.textInputPlaceholderDecode'),
+	textOutputLabel: t('ui.textOutputLabel'),
+	urlSafeLabel: t('ui.urlSafeLabel'),
+	lineWrapLabel: t('ui.lineWrapLabel'),
+	swap: t('ui.swap'),
+	copy: t('ui.copy'),
+	copied: t('ui.copied'),
+	clear: t('ui.clear'),
+	decodeError: t('ui.decodeError'),
+	sizeInfo: t('ui.sizeInfo'),
+	fileEncodeHeading: t('ui.fileEncodeHeading'),
+	fileDropLabel: t('ui.fileDropLabel'),
+	fileChoose: t('ui.fileChoose'),
+	fileBase64Label: t('ui.fileBase64Label'),
+	fileDataUriLabel: t('ui.fileDataUriLabel'),
+	fileDecodeHeading: t('ui.fileDecodeHeading'),
+	fileDecodeInputLabel: t('ui.fileDecodeInputLabel'),
+	fileDecodeInputPlaceholder: t('ui.fileDecodeInputPlaceholder'),
+	fileMimeLabel: t('ui.fileMimeLabel'),
+	fileNameLabel: t('ui.fileNameLabel'),
+	fileNamePlaceholder: t('ui.fileNamePlaceholder'),
+	downloadFile: t('ui.downloadFile'),
+	fileDecodeError: t('ui.fileDecodeError'),
+	imagePreviewLabel: t('ui.imagePreviewLabel'),
+};
+
+const schema = {
+	'@context': 'https://schema.org',
+	'@type': 'WebApplication',
+	name: t('heading'),
+	description: t('meta.description'),
+	url: canonicalUrl,
+	applicationCategory: 'DeveloperApplication',
+	operatingSystem: 'Any',
+	offers: {
+		'@type': 'Offer',
+		price: '0',
+		priceCurrency: 'USD',
+	},
+};
+---
+
+<Layout title={t('meta.title')} description={t('meta.description')} lang={lang}>
+	<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+	<section class="px-4 py-10">
+		<h1 class="text-3xl font-bold text-foreground">{t('heading')}</h1>
+		<p class="mt-2 text-muted-foreground">{t('tagline')}</p>
+		<div class="mt-6 max-w-4xl">
+			<Base64Tool client:load messages={messages} />
+		</div>
+	</section>
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-xl font-semibold text-foreground">{t('article.heading')}</h2>
+		<div class="mt-4 flex max-w-3xl flex-col gap-4 text-muted-foreground">
+			<p>{t('article.p1')}</p>
+			<p>{t('article.p2')}</p>
+			<p>{t('article.p3')}</p>
+			<p>{t('article.p4')}</p>
+		</div>
+	</section>
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-xl font-semibold text-foreground">{t('related')}</h2>
+		<ul class="mt-4 flex flex-col gap-1">
+			{
+				relatedTools.map((related) => (
+					<li>
+						<a
+							href={`/${lang}/tools/${related.slugs[lang]}/`}
+							class="text-sm text-primary hover:underline"
+						>
+							{related.names[lang]}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+</Layout>
