@@ -120,6 +120,34 @@
 
 ## Nhật ký (mới nhất ở trên cùng)
 
+### 2026-07-26 — Phase 2, task: Internal linking map giữa các công cụ cùng nhóm — HOÀN
+  TẤT (SẠCH, đã có sẵn từ trước qua cơ chế `relatedTools`, audit xác nhận đạt chuẩn)
+- **Phát hiện cơ chế đã có sẵn**: mọi file `*Page.astro` (cả 13 tool) đều tự tính
+  `relatedTools = tools.filter(item => item.category === tool.category && item.id !==
+  tool.id)` rồi render thành danh sách link trong section "Related tools"/"Công cụ liên
+  quan" — đây CHÍNH LÀ internal linking map theo nhóm mà task yêu cầu (`ảnh↔ảnh` = category
+  `image` gồm 3 tool: Nén ảnh/Chuyển đổi định dạng/Xóa nền; `PDF↔PDF` = category `pdf` gồm
+  2 tool: Gộp/Tách; ngoài ra còn `text` gồm 3 tool và `dev` gồm 5 tool — 2 nhóm này không
+  được nêu tên trong ROADMAP nhưng cùng chung cơ chế). Chỉ chưa có audit + tick chính thức.
+- **Audit độc lập trên build output thật** (260 trang tool): viết script Node trích xuất
+  toàn bộ `href` trong section related-tools của mỗi trang, đối chiếu với danh sách trang
+  thật đã build ra — xác nhận **0 link hỏng, 0 trang không có link liên quan nào**, và số
+  lượng link mỗi trang khớp đúng kỳ vọng theo quy mô từng nhóm: PDF (2 tool) → 1 link/trang
+  × 40 trang (2×20 ngôn ngữ), Ảnh (3 tool) và Văn bản (3 tool) → 2 link/trang × 120 trang,
+  Dev (5 tool: JSON Formatter, QR Generator, JWT Decoder, Base64, Regex Tester) → 4
+  link/trang × 100 trang. Tổng 40+120+100 = 260, khớp đúng.
+  - Lượt chạy script ĐẦU TIÊN báo nhầm **680 link hỏng** — hóa ra do chính bug trong script
+    audit (thêm dư 1 dấu `/` ở đầu path khi nối chuỗi trên Windows, vì `path.sep` sau khi
+    convert đã có sẵn dấu `/` ở đầu). Trước khi kết luận "hỏng", đã tự đào sâu xác minh:
+    so sánh trực tiếp code point Unicode của slug tiếng Ả Rập giữa href/tên thư mục thật/
+    nguồn `tools.ts` — xác nhận HOÀN TOÀN GIỐNG NHAU ở mức code point, chứng tỏ lỗi nằm ở
+    logic so sánh path của script chứ không phải dữ liệu. Sửa lại script, chạy lại ra 0 lỗi
+    thật. Bài học: khi audit tự động ra kết quả "hỏng hàng loạt", nên nghi ngờ chính công cụ
+    audit trước khi kết luận sản phẩm có bug — đặc biệt với thao tác path/Unicode trên
+    Windows dễ có off-by-one hoặc lẫn lộn separator.
+- Không cần sửa code — cơ chế `relatedTools` theo category đã đúng và đủ. Đã tick checkbox
+  "Xây internal linking map giữa các công cụ cùng nhóm" trong `ROADMAP.md` (Phase 2).
+
 ### 2026-07-26 — Phase 2, task: Nội dung SEO 300–500 từ cho từng công cụ × từng ngôn ngữ
   — HOÀN TẤT (SẠCH, đã có sẵn từ trước, audit xác nhận đạt chuẩn, không cần viết thêm)
 - **Cách làm**: viết script Node đo độ dài phần `article.p1`...`p4`/`p5` của cả
