@@ -120,6 +120,42 @@
 
 ## Nhật ký (mới nhất ở trên cùng)
 
+### 2026-07-26 — Phase 2, task: Soát schema JSON-LD toàn bộ trang công cụ — HOÀN TẤT
+  (SẠCH, không có bug nào cần sửa)
+- **Cách làm**: thay vì chỉ đọc code nguồn 13 file `*Page.astro` (10 tool cốt lõi + 3
+  tool Phase 3 đã có UI thật: JWT Decoder, Base64, Regex Tester — tất cả đều đã gắn JSON-LD
+  theo cùng 1 pattern từ lúc tạo), viết script Node đọc trực tiếp **toàn bộ 260 trang HTML
+  đã build** (13 tool × 20 ngôn ngữ, không phải chỉ code nguồn) — trích xuất nội dung
+  `<script type="application/ld+json">`, `JSON.parse` từng cái, rồi kiểm tra: JSON hợp lệ,
+  đủ field bắt buộc (`@context`, `@type`, `name`, `description`, `url`,
+  `applicationCategory`, `operatingSystem`, `offers`) không rỗng, `@context` đúng
+  `https://schema.org`, `@type` đúng `WebApplication`, `offers.price` đúng `'0'` +
+  `priceCurrency` đúng `'USD'` (theo đúng yêu cầu checklist SEO trong `CLAUDE.md`).
+- **Kết quả: cả 260/260 trang PASS mọi tiêu chí**, không có trang nào thiếu schema, JSON
+  lỗi, hay sai field.
+- Kiểm tra thêm 2 điểm dễ bị bỏ sót: (1) trường `url` trong schema có khớp đúng URL thật
+  của từng trang không — viết script so sánh `url` (sau khi `decodeURIComponent` vì URL có
+  ký tự Ả Rập/Thái/Hindi được percent-encode) với đường dẫn file build ra — khớp 100%
+  cho cả 260 trang; (2) `name`/`description` trong schema có đúng nội dung bản địa hóa của
+  từng ngôn ngữ không (đối chiếu với `<h1>` cùng trang) — khớp 100% về nội dung, có 10
+  trang chứa ký tự `&`/`'` trong tên tool (JSON Formatter & Validator, Word & Character
+  Counter, Đếm từ & ký tự, Supprimer l'arrière-plan...) ban đầu tưởng là mismatch vì
+  `<h1>` hiện `&amp;`/`&#39;` còn schema hiện `&`/`'` thô — xác nhận đây KHÔNG phải bug:
+  nội dung trong thẻ `<script type="application/ld+json">` là raw text/JSON, không nằm
+  trong ngữ cảnh HTML nên không cần (và không nên) escape entity, trong khi `<h1>` là text
+  node HTML nên Astro tự escape đúng chuẩn — hai cách hiển thị khác nhau của CÙNG một nội
+  dung, đúng theo từng ngữ cảnh.
+- Không tìm thấy bug nào cần sửa trong lượt soát này — 13 file `*Page.astro` đã dùng đúng
+  1 pattern JSON-LD nhất quán từ lúc viết (`WebApplication`, `applicationCategory` phân
+  theo nhóm tool hợp lý: `MultimediaApplication` cho ảnh, `DeveloperApplication` cho dev
+  tools, `UtilitiesApplication` cho text/PDF), không cần thêm `aggregateRating`/`review`
+  vì Google chỉ yêu cầu CÓ ÍT NHẤT MỘT trong `aggregateRating`/`offers`/`review` để đủ
+  điều kiện rich result Software App — `offers` (giá 0) đã đáp ứng, và dự án chủ động
+  không tự bịa rating giả (đúng tinh thần tránh nội dung gây hiểu lầm).
+- Đã tick checkbox "Soát lại toàn bộ 10 trang công cụ để đảm bảo schema JSON-LD đúng
+  chuẩn" trong `ROADMAP.md` (Phase 2). Không có thay đổi code nào ở task này (chỉ là audit
+  xác nhận sạch) — không cần `npm run build` lại vì không sửa gì.
+
 ### 2026-07-26 — Phase 2, task: Viết lại meta title/description tối ưu SEO cho từng ngôn
   ngữ — HOÀN TẤT
 - **Bối cảnh**: đây là task đầu tiên chưa tick trong Phase 2 sau khi mở rộng i18n lên 20

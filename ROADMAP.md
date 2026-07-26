@@ -105,7 +105,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 
 - [x] Mở rộng i18n từ 8 lên 15–20 ngôn ngữ
 - [x] Viết lại meta title/description tối ưu từ khóa cho từng ngôn ngữ (không dịch máy thô)
-- [ ] Soát lại toàn bộ 10 trang công cụ để đảm bảo schema JSON-LD đúng chuẩn
+- [x] Soát lại toàn bộ 10 trang công cụ để đảm bảo schema JSON-LD đúng chuẩn
 - [ ] Viết nội dung SEO 300–500 từ riêng biệt cho từng công cụ × từng ngôn ngữ chính
 - [ ] Xây internal linking map giữa các công cụ cùng nhóm (ảnh↔ảnh, PDF↔PDF...)
 - [ ] Submit sitemap lên Google Search Console (Chưa có public domain tạm thời chưa làm)
