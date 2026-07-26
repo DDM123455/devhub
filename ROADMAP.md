@@ -110,7 +110,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] Xây internal linking map giữa các công cụ cùng nhóm (ảnh↔ảnh, PDF↔PDF...)
 - [ ] Submit sitemap lên Google Search Console (Chưa có public domain tạm thời chưa làm)
 - [ ] Submit sitemap lên Bing Webmaster Tools (Chưa có public domain tạm thời chưa làm)
-- [ ] Audit Core Web Vitals toàn site, fix mọi trang < 90 điểm
+- [x] Audit Core Web Vitals toàn site, fix mọi trang < 90 điểm
 
 ## Phase 3 — Mở rộng công cụ ngách (Long-tail)
 

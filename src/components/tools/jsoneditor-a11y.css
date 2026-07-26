@@ -1,0 +1,12 @@
+/* jsoneditor's own default theme fails WCAG AA contrast (4.5:1) on two elements
+   flagged by Lighthouse: the mode-picker button (translucent white-on-blue) and
+   the status bar's cursor-info label (mid-gray-on-light-gray). Values below were
+   picked to clear 4.5:1 against jsoneditor's own fixed background colors. */
+.jsoneditor-menu button.jsoneditor-modes {
+	color: #0f172a !important;
+	opacity: 1 !important;
+}
+
+.jsoneditor-statusbar .jsoneditor-curserinfo-label {
+	color: #4b5563 !important;
+}

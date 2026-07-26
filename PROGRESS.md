@@ -15,13 +15,14 @@
   cần xử lý thật sự chính là cảnh báo SỬA DỞ "Regex Tester" bên dưới. **Đã xử lý dứt điểm
   mục đó** — xem log "2026-07-26 — Phase 3, tool #3: Regex Tester — HOÀN TẤT" ngay bên
   dưới. Không có branch nào bị merge/xoá/tạo mới trong phiên này.
-- Phase đang làm: **Phase 3 — Mở rộng công cụ ngách: 3/10 tool xong** (JWT Decoder,
-  Base64 Encode/Decode, Regex Tester — cả ba 2026-07-26) ✅, và **Phase 2, task 2/8**
-  "Viết lại meta title/description tối ưu SEO cho từng ngôn ngữ" **HOÀN TẤT
-  (2026-07-26)** ✅ — xem log chi tiết bên dưới cho cả hai. Các mục Phase 2 còn lại vẫn
-  treo: soát schema JSON-LD, nội dung SEO 300–500 từ (đã có sẵn từ trước, cần soát lại
-  chất lượng), internal linking map, submit sitemap (chờ domain thật), Core Web Vitals —
-  xem `ROADMAP.md`. Task tiếp theo (ưu tiên theo yêu cầu người dùng): tiếp tục Phase 2.
+- **Phase 2 — SEO chuyên sâu & nhân bản đa ngôn ngữ: HOÀN TẤT 6/8 mục** ✅ (2026-07-26) —
+  chỉ còn đúng 2 mục treo là "Submit sitemap lên Google Search Console" và "Submit sitemap
+  lên Bing Webmaster Tools", CẢ HAI đều bị chặn vì chưa có public domain thật + cần đăng
+  nhập thủ công (không phải việc agent tự làm được) — xem chi tiết từng mục trong log bên
+  dưới (meta title/description, schema JSON-LD, nội dung SEO 300–500 từ, internal linking
+  map, Core Web Vitals đều đã audit/sửa xong).
+- **Phase 3 — Mở rộng công cụ ngách: 3/10 tool xong** (JWT Decoder, Base64 Encode/Decode,
+  Regex Tester — cả ba 2026-07-26) ✅. Task tiếp theo trong Phase 3: SVG Optimizer.
 - **Phase 1 — 10 công cụ cốt lõi: HOÀN TẤT 10/10** ✅. **Phase 1.5 — Rà soát & Nâng cấp
   Feature Parity: HOÀN TẤT 10/10 tool** ✅ (tool #10 "Chuyển đổi Case văn bản" vừa xong —
   xem log bên dưới), CHỈ CÒN treo lại đúng 1 mục con nhỏ: nén PDF cho tool #4/#5 (chưa
@@ -119,6 +120,66 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-26 — Phase 2, task: Audit Core Web Vitals toàn site — HOÀN TẤT (tìm và sửa 1
+  bug Accessibility thật ở JSON Formatter)
+- **Công cụ**: `npx lighthouse` (không cài vào `package.json`, chỉ chạy tạm qua npx —
+  không vi phạm quy tắc "không thêm dependency mới" vì không phải runtime dependency của
+  site). Serve bản build production thật qua `npm run preview` (không audit dev server, vì
+  dev server không tối ưu giống production).
+- **Phạm vi audit**: KHÔNG chạy Lighthouse cho cả 281 trang (không khả thi về thời gian
+  trong 1 phiên — mỗi lần chạy mất 15-30s). Thay vào đó chọn mẫu đại diện có chủ đích: 3
+  trang chủ (`en` - Latin, `ar` - RTL, `zh` - chữ Hán không dấu cách, đại diện 3 kiểu
+  script/layout khác nhau) + 7 trang tool phủ đủ mọi category và mọi mức độ nặng: nặng nhất
+  (`remove-background` - tải mô hình AI qua `onnxruntime-web`), `compress-image`,
+  `merge-pdf`, `json-formatter` (dùng thư viện `jsoneditor`), `qr-code-generator`,
+  `regex-tester` (tool Phase 3 mới nhất, chưa từng được audit hiệu năng), `text-case-
+  converter` (nhẹ nhất, JS thuần, dùng làm baseline).
+- **Kết quả lần audit đầu**: 9/10 trang đạt ≥90 điểm cả 4 hạng mục (Performance,
+  Accessibility, Best Practices, SEO) — điểm thấp nhất trong nhóm 9 trang này là
+  `pdf-merge` Performance=94 (LCP 3.0s, do `pdf-lib`/`pdfjs-dist` tải nặng hơn) và
+  `text-case-converter` Accessibility=98. Riêng **`json-formatter` Accessibility đúng
+  bằng 90** (biên giới) — đào sâu vào chi tiết audit thì phát hiện **2 lỗi Accessibility
+  THẬT**, không phải false positive:
+  1. `color-contrast`: nút chuyển mode (Text/Tree) của thư viện `jsoneditor` dùng chữ
+     trắng độ mờ 0.8 trên nền xanh `#3883fa` → tỉ lệ tương phản chỉ 2.87:1 (cần ≥4.5:1);
+     nhãn con trỏ dòng/cột ở status bar dùng chữ xám `#808080` trên nền xám nhạt `#ebebeb`
+     → tỉ lệ 3.31:1.
+  2. `label`: `<textarea class="jsoneditor-text">` (chế độ Text) không có `aria-label`
+     hay `<label>` nào — screen reader không đọc được đây là ô nhập gì.
+  - Cả 2 lỗi đều từ CSS/HTML mặc định của thư viện bên thứ ba `jsoneditor`, không phải do
+    code tự viết — nhưng vẫn ảnh hưởng người dùng thật (khiếm thị, dùng screen reader) nên
+    quyết định sửa thay vì bỏ qua dù về mặt kỹ thuật trang vẫn đạt ngưỡng ≥90.
+- **Cách sửa** (`src/components/tools/JsonFormatter.tsx` +
+  `src/components/tools/jsoneditor-a11y.css` mới):
+  - CSS override (tính toán tỉ lệ tương phản thủ công theo công thức WCAG trước khi chọn
+    màu, không đoán): nút mode đổi màu chữ sang `#0f172a` (đạt 4.93:1 trên nền xanh gốc),
+    nhãn cursor đổi sang `#4b5563` (đạt 6.34:1 trên nền xám gốc) — giữ nguyên màu nền, chỉ
+    đổi màu chữ, không phá vỡ giao diện tổng thể của thư viện.
+  - `aria-label` cho textarea: dùng `MutationObserver` theo dõi container, mỗi khi
+    textarea `.jsoneditor-text` xuất hiện (kể cả sau khi user bấm đổi mode Tree→Text nhiều
+    lần, làm DOM node bị hủy/tạo lại) thì tự gắn `aria-label={heading của tool}` — chọn
+    `MutationObserver` thay vì gắn 1 lần sau mount vì textarea bị destroy/recreate mỗi lần
+    đổi mode, gắn 1 lần duy nhất sẽ mất tác dụng sau lần đổi mode đầu tiên. Cần thêm
+    `heading` vào `Messages` interface và truyền từ `JsonFormatterPage.astro` (vốn đã có
+    sẵn `t('heading')` để render `<h1>`, chỉ cần truyền thêm vào prop `messages`, không
+    cần thêm key i18n mới nào — tránh phải sửa cả 20 file locale).
+- **Verify độc lập**: viết test Puppeteer tương tác thật (cài tạm `puppeteer` qua
+  `npm install` trong thư mục scratchpad, không phải `E:\WEB\common`, không đụng
+  `package.json` của dự án) — xác nhận `aria-label` có mặt ngay khi mount VÀ vẫn còn đúng
+  sau khi bấm đổi mode Tree → Text (textarea bị tạo lại nhưng observer tự gắn lại), màu
+  chữ tính toán (`getComputedStyle`) đúng khớp giá trị đã override, 0 lỗi console/page
+  trong suốt quá trình tương tác. Sau đó chạy lại chính `npm run build` (281 trang, sạch)
+  rồi chạy lại Lighthouse cho `json-formatter`: **Accessibility 90 → 100**, 3 hạng mục còn
+  lại không đổi (Performance 96, Best Practices 100, SEO 100).
+- **Giới hạn đã ghi nhận rõ** (để phiên sau biết): đây là audit theo MẪU đại diện, không
+  phải quét toàn bộ 281 trang — nếu sau này cần độ tin cậy cao hơn (ví dụ trước khi submit
+  Search Console), nên cân nhắc chạy Lighthouse CI đầy đủ hoặc mở rộng mẫu sang nhiều ngôn
+  ngữ/tool hơn.
+- Đã tick checkbox "Audit Core Web Vitals toàn site, fix mọi trang < 90 điểm" trong
+  `ROADMAP.md` (Phase 2) — **hoàn tất mục cuối cùng khả thi của Phase 2**; 2 mục còn lại
+  (submit sitemap Google Search Console/Bing Webmaster Tools) vẫn treo vì cần domain thật +
+  đăng nhập thủ công, đã ghi rõ lý do ngay trong `ROADMAP.md` từ trước.
 
 ### 2026-07-26 — Phase 2, task: Internal linking map giữa các công cụ cùng nhóm — HOÀN
   TẤT (SẠCH, đã có sẵn từ trước qua cơ chế `relatedTools`, audit xác nhận đạt chuẩn)

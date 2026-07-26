@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import type JSONEditor from 'jsoneditor/dist/jsoneditor-minimalist.js';
 import type { JSONEditorMode, ParseError, SchemaValidationError } from 'jsoneditor';
 import 'jsoneditor/dist/jsoneditor.min.css';
+import './jsoneditor-a11y.css';
 import { Button } from '@/components/ui/button';
 
 interface Messages {
+	heading: string;
 	themeNotice: string;
 	errorWithLine: string;
 	errorNoLine: string;
@@ -221,6 +223,18 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 		if (!containerRef.current) return;
 		let cancelled = false;
 
+		// jsoneditor's "text" mode textarea has no accessible name of its own, and it
+		// gets torn down/recreated whenever the mode toggles back to "text" — a
+		// MutationObserver re-labels it every time it (re)appears instead of relying
+		// on fragile timing around onModeChange.
+		const observer = new MutationObserver(() => {
+			const textarea = containerRef.current?.querySelector<HTMLTextAreaElement>('textarea.jsoneditor-text');
+			if (textarea && !textarea.getAttribute('aria-label')) {
+				textarea.setAttribute('aria-label', messages.heading);
+			}
+		});
+		observer.observe(containerRef.current, { childList: true, subtree: true });
+
 		void import('jsoneditor/dist/jsoneditor-minimalist.js').then(({ default: JSONEditorCtor }) => {
 			if (cancelled || !containerRef.current) return;
 			const editor = new JSONEditorCtor(containerRef.current, {
@@ -249,10 +263,11 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 
 		return () => {
 			cancelled = true;
+			observer.disconnect();
 			editorRef.current?.destroy();
 			editorRef.current = null;
 		};
-	}, []);
+	}, [messages.heading]);
 
 	const handleGoToErrorLine = () => {
 		if (!parseError?.line || !editorRef.current || !containerRef.current) return;

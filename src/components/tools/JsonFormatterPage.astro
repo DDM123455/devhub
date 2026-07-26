@@ -17,6 +17,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
 const relatedTools = tools.filter((item) => item.category === tool.category && item.id !== tool.id);
 
 const messages = {
+	heading: t('heading'),
 	themeNotice: t('ui.themeNotice'),
 	errorWithLine: t('ui.errorWithLine'),
 	errorNoLine: t('ui.errorNoLine'),
