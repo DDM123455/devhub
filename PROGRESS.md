@@ -15,12 +15,13 @@
   cần xử lý thật sự chính là cảnh báo SỬA DỞ "Regex Tester" bên dưới. **Đã xử lý dứt điểm
   mục đó** — xem log "2026-07-26 — Phase 3, tool #3: Regex Tester — HOÀN TẤT" ngay bên
   dưới. Không có branch nào bị merge/xoá/tạo mới trong phiên này.
-- Phase đang làm: **Phase 3 — Mở rộng công cụ ngách: 3/10 tool xong (JWT Decoder,
-  Base64 Encode/Decode, Regex Tester — cả ba 2026-07-26)** ✅ — xem log chi tiết bên
-  dưới. Theo yêu cầu trực tiếp của người dùng, Phase 3 được làm TRƯỚC khi hoàn tất nốt
-  các mục còn lại của Phase 2 (meta/description tối ưu SEO, nội dung SEO 300–500 từ cho
-  10 tool cũ, internal linking map, Core Web Vitals — vẫn còn treo, xem `ROADMAP.md`).
-  Task tiếp theo trong Phase 3: SVG Optimizer.
+- Phase đang làm: **Phase 3 — Mở rộng công cụ ngách: 3/10 tool xong** (JWT Decoder,
+  Base64 Encode/Decode, Regex Tester — cả ba 2026-07-26) ✅, và **Phase 2, task 2/8**
+  "Viết lại meta title/description tối ưu SEO cho từng ngôn ngữ" **HOÀN TẤT
+  (2026-07-26)** ✅ — xem log chi tiết bên dưới cho cả hai. Các mục Phase 2 còn lại vẫn
+  treo: soát schema JSON-LD, nội dung SEO 300–500 từ (đã có sẵn từ trước, cần soát lại
+  chất lượng), internal linking map, submit sitemap (chờ domain thật), Core Web Vitals —
+  xem `ROADMAP.md`. Task tiếp theo (ưu tiên theo yêu cầu người dùng): tiếp tục Phase 2.
 - **Phase 1 — 10 công cụ cốt lõi: HOÀN TẤT 10/10** ✅. **Phase 1.5 — Rà soát & Nâng cấp
   Feature Parity: HOÀN TẤT 10/10 tool** ✅ (tool #10 "Chuyển đổi Case văn bản" vừa xong —
   xem log bên dưới), CHỈ CÒN treo lại đúng 1 mục con nhỏ: nén PDF cho tool #4/#5 (chưa
@@ -118,6 +119,59 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-26 — Phase 2, task: Viết lại meta title/description tối ưu SEO cho từng ngôn
+  ngữ — HOÀN TẤT
+- **Bối cảnh**: đây là task đầu tiên chưa tick trong Phase 2 sau khi mở rộng i18n lên 20
+  ngôn ngữ. Trước khi viết lại, đã audit bằng script Node độc lập đo `.length` của
+  `meta.title`/`meta.description` cho cả **10 tool cốt lõi × 20 ngôn ngữ = 200 file**
+  (không tính 3 tool Phase 3 vì các tool đó đã được viết meta ngắn gọn ngay từ đầu lúc
+  tạo). Phát hiện: **65 title vượt quá 60 ký tự** (giới hạn Google thường cắt trên SERP,
+  có title dài tới 101 ký tự) và **145 description vượt quá 160 ký tự** (có description
+  dài tới 273 ký tự) — tức là phần lớn nội dung SEO viết ở các phiên trước, dù văn phong
+  tự nhiên và giàu từ khóa, sẽ bị Google cắt cụt giữa câu trên kết quả tìm kiếm.
+  - Riêng 4 ngôn ngữ dùng chữ tượng hình/kanji dày đặc (`zh`, `zh-tw`, `ja`, `ko`) hoàn
+    toàn SẠCH — 0 title/description vượt giới hạn — vì số ký tự cần để diễn đạt cùng nội
+    dung ít hơn hẳn ngôn ngữ dùng chữ Latin, nên KHÔNG cần sửa 4 ngôn ngữ này.
+  - **16 ngôn ngữ còn lại cần sửa**: `en, vi, es, pt, fr, de, it, ru, nl, pl, tr, id, ar,
+    hi, th, sv`.
+- **Cách làm**: tự viết trực tiếp `en` và `vi` (rút gọn còn title ≤ 49 ký tự, description
+  ≤ 153 ký tự, giữ nguyên từ khóa + hậu tố thương hiệu "— Web Tool Hub"), áp dụng bằng
+  script Node đọc/sửa/ghi JSON (không dùng Edit tool, đúng bài học kỹ thuật đã ghi ở log
+  JWT Decoder về việc Edit tool hay báo "not found" với nội dung nhiều ký tự Unicode).
+  14 ngôn ngữ còn lại (`es, pt, fr, de, it, ru, nl, pl, tr, id, ar, hi, th, sv`) giao song
+  song cho 14 agent con chạy nền, mỗi agent phụ trách trọn 1 ngôn ngữ, có chỉ rõ: giới
+  hạn `title.length <= 60`/`description.length <= 160` (đo bằng `.length` thật của JS,
+  không áng chừng bằng mắt), giữ văn phong tự nhiên bản ngữ đã có sẵn trong file (không
+  dịch lại từ tiếng Anh), CHỈ được sửa `meta.title`/`meta.description`, không đụng tới
+  `heading`/`tagline`/`ui.*`/`related`/`article.*`, và phải áp dụng bằng script Node
+  read-modify-write thay vì Edit tool.
+- **Verify độc lập SAU KHI cả 14 agent xong** (không chỉ tin báo cáo của agent con, đúng
+  quy tắc đã áp dụng xuyên suốt dự án): viết lại script Node riêng, tự đo lại
+  `.length` của toàn bộ 200 file (10 tool × 20 ngôn ngữ) — xác nhận **0 title > 60 ký
+  tự, 0 description > 160 ký tự, 0 file JSON không hợp lệ**. Đồng thời diff từng file với
+  bản gốc trên `git show HEAD:<path>` sau khi loại bỏ khối `meta` — xác nhận **0 file có
+  thay đổi ngoài `meta`** (tức các agent con không vô tình đụng vào `heading`/`ui.*`/
+  `article.*`...). Kiểm tra thêm không có title/description trùng lặp giữa các tool trong
+  cùng 1 ngôn ngữ (tránh duplicate content nội bộ) — sạch cho cả 20 ngôn ngữ.
+  - Một chi tiết đáng chú ý lúc verify: vài agent con báo lại text chứa `&amp;` (ví dụ
+    title tool JSON Formatter của `de`/`id`) — nghi ngờ đây có thể là bug HTML-entity bị
+    escape nhầm (đúng loại lỗi đã từng xảy ra thật ở Phase 2 trước, xem log
+    "Mở rộng i18n lên 20 ngôn ngữ"). Đã tự kiểm tra trực tiếp nội dung file JSON gốc bằng
+    Node — xác nhận file JSON chỉ chứa ký tự `&` bình thường, KHÔNG có gì sai; `&amp;`
+    chỉ xuất hiện trong PHẦN VĂN BẢN BÁO CÁO của agent (do báo cáo đi qua tầng render
+    markdown/HTML nào đó), không phải trong dữ liệu thật — đây là báo động giả, không
+    phải bug, nhưng việc luôn tự kiểm tra trực tiếp thay vì tin báo cáo là đúng đắn.
+- **Build cuối cùng xác nhận sạch**: `npm run build` vẫn ra đúng 281 trang tĩnh, không lỗi
+  (không đổi số trang vì chỉ sửa nội dung, không thêm/bớt trang). Đối chiếu HTML build ra
+  cho 3 mẫu đại diện (`de` Latin có dấu, `ar` RTL, `th` chữ Thái không dấu cách giữa từ)
+  — thẻ `<title>` và `<meta name="description">` hiển thị đúng nội dung mới, ký tự `&`
+  được HTML-escape đúng chuẩn thành `&amp;` trong HTML thô (đúng, không phải lỗi — đây là
+  yêu cầu bắt buộc của chuẩn HTML khi in ký tự `&` trong text content).
+- Đã tick checkbox "Viết lại meta title/description tối ưu từ khóa cho từng ngôn ngữ"
+  trong `ROADMAP.md` (Phase 2).
+- **CHƯA commit** tại thời điểm ghi log này — sẽ commit ngay sau (đợt commit riêng, không
+  gộp với commit Regex Tester ở log dưới).
 
 ### 2026-07-26 — Phase 3, tool #3: Regex Tester — HOÀN TẤT (tiếp nối từ mục [CẢNH BÁO -
   SỬA DỞ] ngay bên dưới)

@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Comparador de textos online grátis — Web Tool Hub",
-    "description": "Compare dois textos gratuitamente — por caractere, palavra ou linha, lado a lado com números de linha e uma ferramenta de mesclagem para resolver cada mudança. Tudo roda no seu navegador, sem enviar nada para nenhum servidor."
+    "description": "Compare dois textos por caractere, palavra ou linha, com mesclagem para resolver mudanças. Tudo no navegador, sem enviar nada a servidores."
   },
   "heading": "Comparador de textos (Diff Checker)",
   "tagline": "Cole duas versões de um texto e veja exatamente o que mudou, palavra por palavra ou linha por linha.",

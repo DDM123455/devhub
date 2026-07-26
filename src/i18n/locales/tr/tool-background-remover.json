@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Ücretsiz Resim Arka Planı Kaldırma (Yapay Zeka, Yükleme Yok) — Web Tool Hub",
-    "description": "Tamamen tarayıcınızda çalışan yerel bir yapay zeka modeliyle bir fotoğrafın arka planını ücretsiz olarak kaldırın. Bir renk veya başka bir resimle değiştirin, kaydırıcıyla öncesini/sonrasını karşılaştırın. Yükleme yok, kayıt yok."
+    "title": "Ücretsiz Arka Plan Kaldırma (Yapay Zeka) — Web Tool Hub",
+    "description": "Tarayıcınızda çalışan yerel yapay zekayla fotoğrafın arka planını ücretsiz kaldırın. Renk veya resimle değiştirin. Yükleme yok, kayıt yok."
   },
   "heading": "Arka Planı Kaldır",
   "tagline": "Bir fotoğrafın arka planını otomatik olarak kesin, bir renk veya resimle değiştirin — hepsi doğrudan tarayıcınızda.",
