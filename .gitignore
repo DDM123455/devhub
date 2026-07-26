@@ -25,3 +25,9 @@ pnpm-debug.log*
 
 # local toolchain (Node runtime downloaded outside system PATH)
 .tools/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
