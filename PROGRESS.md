@@ -5,10 +5,16 @@
 
 ## 🔵 Trạng thái hiện tại
 
-- Phase đang làm: **Phase 1 — 10 công cụ cốt lõi: HOÀN TẤT 10/10** ✅. **Phase 1.5 — Rà
-  soát & Nâng cấp Feature Parity: HOÀN TẤT 10/10 tool** ✅ (tool #10 "Chuyển đổi Case văn
-  bản" vừa xong — xem log bên dưới), CHỈ CÒN treo lại đúng 1 mục con nhỏ: nén PDF cho
-  tool #4/#5 (chưa làm, không phải lỗi chặn, xem log 2026-07-25 "Gộp/Tách PDF" bên dưới).
+- Phase đang làm: **Phase 3 — Mở rộng công cụ ngách: 1/10 tool xong (JWT Decoder,
+  2026-07-26)** ✅ — xem log chi tiết bên dưới. Theo yêu cầu trực tiếp của người dùng,
+  Phase 3 được làm TRƯỚC khi hoàn tất nốt các mục còn lại của Phase 2 (meta/description
+  tối ưu SEO, nội dung SEO 300–500 từ cho 10 tool cũ, internal linking map, Core Web
+  Vitals — vẫn còn treo, xem `ROADMAP.md`). Task tiếp theo trong Phase 3: Base64
+  Encode/Decode.
+- **Phase 1 — 10 công cụ cốt lõi: HOÀN TẤT 10/10** ✅. **Phase 1.5 — Rà soát & Nâng cấp
+  Feature Parity: HOÀN TẤT 10/10 tool** ✅ (tool #10 "Chuyển đổi Case văn bản" vừa xong —
+  xem log bên dưới), CHỈ CÒN treo lại đúng 1 mục con nhỏ: nén PDF cho tool #4/#5 (chưa
+  làm, không phải lỗi chặn, xem log 2026-07-25 "Gộp/Tách PDF" bên dưới).
 - **QA audit toàn site: HOÀN TẤT (2026-07-25)**, theo yêu cầu trực tiếp của người dùng
   (không phải task trong ROADMAP — đóng vai Senior QA/Frontend/UI-UX kiểm tra lại toàn bộ
   chức năng + UI/UX của cả 10 tool + layout dùng chung + responsive/dark mode trước khi coi
@@ -102,6 +108,67 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-26 — Phase 3, tool #1: JWT Decoder — HOÀN TẤT
+- Theo yêu cầu người dùng, bắt đầu Phase 3 trước khi làm nốt các mục còn lại của Phase 2.
+  Task đầu tiên chưa tick trong Phase 3 là **JWT Decoder** (benchmark đối thủ: **jwt.io**,
+  **jwt.ms**) — đúng quy trình Feature Parity trong `CLAUDE.md`.
+- **100% client-side, không thêm dependency mới**: decode/verify/ký lại JWT chỉ dùng
+  Web Crypto API (`crypto.subtle`) có sẵn trong mọi trình duyệt hiện đại — xác nhận từ
+  đầu bằng cách đọc `package.json`, không có thư viện JWT nào trong danh sách dependency
+  nên không cần xin thêm.
+- **Tính năng đã làm** (`src/components/tools/JwtDecoder.tsx`):
+  - Decode header/payload từ token dán vào, báo lỗi rõ ràng cho 3 trường hợp: sai định
+    dạng (không đủ 3 phần cách nhau bởi dấu chấm), Base64URL không hợp lệ, JSON không
+    hợp lệ sau khi giải mã.
+  - Đọc các claim chuẩn `exp`/`iat`/`nbf`, hiển thị dạng ngày giờ dễ đọc, có badge "Đã
+    hết hạn" nếu `exp` đã qua.
+  - Kiểm tra chữ ký: HS256/384/512 (nhập secret) và RS256/384/512 (dán public key PEM
+    SPKI) — dùng `crypto.subtle.importKey`/`verify`. Các thuật toán khác (ES256, `none`)
+    vẫn giải mã bình thường nhưng báo rõ "chưa hỗ trợ kiểm tra chữ ký" thay vì giả vờ hỗ
+    trợ (đúng nguyên tắc trong `CLAUDE.md` về việc nêu rõ giới hạn kỹ thuật).
+  - Chỉnh sửa header/payload rồi ký lại token bằng secret HS* — tính năng tương đương
+    "Edit & re-sign" của jwt.io, hữu ích khi dev cần test logic phân quyền cục bộ.
+  - Nút copy cho từng khối, nút "Load sample token" dùng token mẫu công khai của jwt.io.
+- **Đăng ký tool mới**: thêm entry `id: 'jwt-decoder'`, `category: 'dev'` vào
+  `src/data/tools.ts` với đủ slug/tên bản địa hóa cho 20 ngôn ngữ; thêm nhánh routing
+  trong `src/pages/[locale]/tools/[slug].astro`; tạo `JwtDecoderPage.astro` theo đúng
+  pattern của `JsonFormatterPage.astro` (schema JSON-LD `WebApplication` giá 0 USD,
+  section article, related tools cùng category `dev`).
+- **Lưu ý kỹ thuật khi sửa `tools.ts` bằng Edit tool**: công cụ Edit liên tục báo "String
+  to replace not found" dù `old_string` nhìn giống hệt nội dung file (kể cả copy trực
+  tiếp từ kết quả Read) — nghi do lệch khoảng trắng/tab hoặc chuẩn hoá Unicode khi gõ lại
+  các dòng chứa ký tự đa ngôn ngữ (ả Rập, Thái, có dấu). Cách né: chèn bằng script Node
+  (`fs.readFileSync`/`lastIndexOf('];\n')`/`writeFileSync`) thay vì Edit tool khi cần
+  chèn khối text dài có nhiều ký tự Unicode ở gần đó.
+- **Nội dung i18n cho 20 ngôn ngữ** (`src/i18n/locales/{lang}/tool-jwt-decoder.json`,
+  51 key mỗi file gồm `meta`, `ui.*`, `related`, `article.heading`+`p1`-`p4` ~300-500
+  từ): tự viết trực tiếp `en` và `vi`; 18 ngôn ngữ còn lại (es, pt, fr, de, ja, ko, zh,
+  zh-tw, it, ru, nl, pl, tr, id, ar, hi, th, sv) giao cho 18 agent con chạy song song
+  (mỗi agent phụ trách đúng 1 ngôn ngữ để giữ nhất quán văn phong, theo đúng tiền lệ đã
+  dùng ở Phase 2), có nhắc rõ giữ nguyên các thuật ngữ kỹ thuật không dịch (JWT, HS256,
+  RS256, PEM, SPKI, Base64URL, SubtleCrypto, tên claim `exp`/`iat`/`nbf`...).
+- **Verify độc lập** (không chỉ tin báo cáo của agent con): viết script Node so sánh
+  key-set giữa từng file locale với bản `en` gốc cho cả 20 file — khớp 100%, không thiếu/
+  thừa key; đồng thời quét toàn bộ nội dung tìm HTML entity bị escape nhầm (`&amp;` v.v.)
+  vì một agent con có nhắc tới ký tự này trong báo cáo — xác nhận không có, chỉ là cách
+  agent đó mô tả trong text báo cáo chứ không phải trong JSON thật.
+- **Test logic mã hoá độc lập với JS thuần** (không chỉ dựa vào build sạch): viết script
+  Node dùng `crypto.subtle` (Node 22 hỗ trợ Web Crypto API y hệt trình duyệt) mô phỏng lại
+  chính xác các hàm trong `JwtDecoder.tsx` — xác nhận: decode đúng header/payload token
+  mẫu jwt.io, verify HS256 đúng secret → `true`, verify sai secret → `false`, phát hiện
+  đúng token hết hạn (`exp` quá khứ), sửa payload rồi ký lại verify lại vẫn đúng, token
+  sai định dạng bị từ chối đúng cách thay vì crash.
+- **Build cuối cùng xác nhận sạch**: `npm run build` (Node 22.23.1 trong `.tools/`) ra
+  đúng 241 trang tĩnh (tăng từ 221 lên 241 = thêm đúng 1 tool × 20 ngôn ngữ + 20 trang
+  chủ không đổi), không lỗi. Kiểm tra thủ công output HTML của 4 locale (en, vi, zh-tw,
+  de) xác nhận `<h1>` đúng ngôn ngữ, schema JSON-LD có mặt, section article + related
+  tools render đúng.
+- Đã tick checkbox "JWT Decoder" trong `ROADMAP.md` (Phase 3).
+- **Giới hạn kỹ thuật đã ghi rõ cho người dùng trong UI** (không phải lỗi, là quyết định
+  có chủ đích): không hỗ trợ verify cho ES256/ES384/ES512 (ECDSA) hay `none` — chỉ
+  HS256/384/512 và RS256/384/512. Có thể bổ sung ECDSA sau nếu có yêu cầu (Web Crypto
+  API cũng hỗ trợ `ECDSA` nên khả thi kỹ thuật, chỉ là chưa làm trong lượt này).
 
 ### 2026-07-26 — Phase 2: Mở rộng i18n lên 20 ngôn ngữ — HOÀN TẤT (nội dung dịch nốt +
   phát hiện/sửa 1 bug hạ tầng)
