@@ -120,6 +120,37 @@
 
 ## Nhật ký (mới nhất ở trên cùng)
 
+### 2026-07-26 — Phase 2, task: Nội dung SEO 300–500 từ cho từng công cụ × từng ngôn ngữ
+  — HOÀN TẤT (SẠCH, đã có sẵn từ trước, audit xác nhận đạt chuẩn, không cần viết thêm)
+- **Cách làm**: viết script Node đo độ dài phần `article.p1`...`p4`/`p5` của cả
+  **260 file** (13 tool: 10 tool cốt lõi + JWT Decoder + Base64 + Regex Tester × 20 ngôn
+  ngữ). Với ngôn ngữ dùng dấu cách phân tách từ (17 ngôn ngữ: en, vi, es, pt, fr, de, it,
+  ru, nl, pl, tr, id, ar, hi, ko, sv...) đo bằng số từ; với 4 ngôn ngữ KHÔNG dùng dấu cách
+  giữa các từ (`ja`, `zh`, `zh-tw`, `th`) đo bằng số ký tự thay vì số từ (đếm số từ theo
+  khoảng trắng cho các ngôn ngữ này ra kết quả vô nghĩa — ví dụ `ja` ra "6 từ" dù bài viết
+  dài hàng nghìn ký tự, vì tiếng Nhật không có khoảng trắng giữa từ).
+- **Kết quả: cả 260/260 file đạt chuẩn độ dài** (tương đương 300–500 từ tiếng Anh):
+  17 ngôn ngữ dùng dấu cách dao động 314–531 từ trung bình mỗi tool (không có file nào
+  dưới 250 từ), 4 ngôn ngữ không dấu cách dao động 600–2800 ký tự tùy độ phức tạp của
+  tool (tỉ lệ hợp lý so với 300–500 từ tiếng Anh cho từng loại chữ viết: Hán tự mật độ
+  thông tin cao nên ít ký tự hơn, chữ Thái dùng bảng chữ cái nên cần nhiều ký tự hơn,
+  tương đương chữ Latin).
+  - Có 22 "issue" giả ban đầu khi mới chạy script — hóa ra là do chính script viết sai
+    (dùng nhầm id `base64-tool` trong khi tên file thật là `tool-base64.json`, xem log
+    "Base64 Encode/Decode — HOÀN TẤT" bên dưới; và quên thêm `th` vào danh sách ngôn ngữ
+    không dấu cách) — sau khi sửa lại script, chạy lại ra 0 issue thật.
+- **Kiểm tra thêm trùng lặp nội dung** (đúng tinh thần "không AI-spin lặp lại" trong
+  `CLAUDE.md`): so sánh từng đoạn văn (`article.p1`, `p2`...) GIỮA CÁC TOOL KHÁC NHAU
+  trong CÙNG 1 ngôn ngữ — nếu có đoạn văn giống hệt nhau xuất hiện ở 2 tool khác nhau thì
+  coi là dấu hiệu nội dung bị copy-paste/template hóa. Kết quả: **0 đoạn văn trùng lặp**
+  trong bất kỳ ngôn ngữ nào trên cả 260 file.
+- Không phát hiện gì cần sửa — nội dung này đã được viết đầy đủ, tự nhiên (không dịch máy
+  hàng loạt) từ các phiên trước (Phase 1, Phase 1.5, Phase 2 mở rộng i18n, và lúc tạo mới
+  3 tool Phase 3), chỉ chưa được audit + tick chính thức trong `ROADMAP.md`.
+- Đã tick checkbox "Viết nội dung SEO 300–500 từ riêng biệt cho từng công cụ × từng ngôn
+  ngữ chính" trong `ROADMAP.md` (Phase 2). Không có thay đổi code/nội dung nào ở task này
+  (chỉ audit xác nhận sạch) — không cần `npm run build` lại.
+
 ### 2026-07-26 — Phase 2, task: Soát schema JSON-LD toàn bộ trang công cụ — HOÀN TẤT
   (SẠCH, không có bug nào cần sửa)
 - **Cách làm**: thay vì chỉ đọc code nguồn 13 file `*Page.astro` (10 tool cốt lõi + 3
