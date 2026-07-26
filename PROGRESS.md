@@ -5,22 +5,22 @@
 
 ## 🔵 Trạng thái hiện tại
 
-- **[CẢNH BÁO - SỬA DỞ] (2026-07-26, kiểm tra theo yêu cầu người dùng)**: đang làm dở
-  **Phase 3, tool #3/10 "Regex Tester"** thì bị ngắt quãng giữa chừng — xem chi tiết đầy
-  đủ trong log tương ứng bên dưới ("2026-07-26 — [CẢNH BÁO - SỬA DỞ] Regex Tester").
-  Tóm tắt nhanh: code + i18n 20 ngôn ngữ đã viết xong và tự verify (key/placeholder/JSON
-  hợp lệ) bằng script độc lập, nhưng **CHƯA chạy `npm run build`**, **CHƯA test chức năng
-  regex thật**, và **CHƯA tick ROADMAP.md** — vì vậy KHÔNG được coi tool này là "xong".
-  Đã commit toàn bộ code hiện có (commit riêng, message bắt đầu `wip(regex-tester):`) để
-  không mất việc, KHÔNG merge/push branch nào. Nhánh hiện tại: `main` (không có nhánh phụ
-  nào khác đang dùng cho phiên này), đang lead trước `origin/main` (chưa push). Phiên sau
-  đọc mục log chi tiết bên dưới TRƯỚC khi tiếp tục.
-- Phase đang làm: **Phase 3 — Mở rộng công cụ ngách: 2/10 tool xong (JWT Decoder,
-  Base64 Encode/Decode — cả hai 2026-07-26)** ✅ — xem log chi tiết bên dưới. Theo yêu
-  cầu trực tiếp của người dùng, Phase 3 được làm TRƯỚC khi hoàn tất nốt các mục còn lại
-  của Phase 2 (meta/description tối ưu SEO, nội dung SEO 300–500 từ cho 10 tool cũ,
-  internal linking map, Core Web Vitals — vẫn còn treo, xem `ROADMAP.md`). Task tiếp
-  theo trong Phase 3: Regex Tester.
+- **(2026-07-26)** Đầu phiên, người dùng yêu cầu kiểm tra và merge nhánh
+  `fix-corrupted-git-repo-merge-orphaned-tools` trước khi làm gì khác. Đã kiểm tra kỹ:
+  **nhánh này KHÔNG tồn tại** — không có trong `git branch -a` (local lẫn remote sau khi
+  `git fetch --all --prune`), không có trong `git fsck` (dangling commits), không có
+  trong reflog, không được nhắc tới ở bất kỳ đâu trong `PROGRESS.md`/`ROADMAP.md`. Repo
+  chỉ có 2 remote branch (`origin/main`, `origin/cloudflare/workers-autoconfig`), không
+  liên quan. Đã hỏi lại người dùng qua `AskUserQuestion` — xác nhận đây là nhầm lẫn, mục
+  cần xử lý thật sự chính là cảnh báo SỬA DỞ "Regex Tester" bên dưới. **Đã xử lý dứt điểm
+  mục đó** — xem log "2026-07-26 — Phase 3, tool #3: Regex Tester — HOÀN TẤT" ngay bên
+  dưới. Không có branch nào bị merge/xoá/tạo mới trong phiên này.
+- Phase đang làm: **Phase 3 — Mở rộng công cụ ngách: 3/10 tool xong (JWT Decoder,
+  Base64 Encode/Decode, Regex Tester — cả ba 2026-07-26)** ✅ — xem log chi tiết bên
+  dưới. Theo yêu cầu trực tiếp của người dùng, Phase 3 được làm TRƯỚC khi hoàn tất nốt
+  các mục còn lại của Phase 2 (meta/description tối ưu SEO, nội dung SEO 300–500 từ cho
+  10 tool cũ, internal linking map, Core Web Vitals — vẫn còn treo, xem `ROADMAP.md`).
+  Task tiếp theo trong Phase 3: SVG Optimizer.
 - **Phase 1 — 10 công cụ cốt lõi: HOÀN TẤT 10/10** ✅. **Phase 1.5 — Rà soát & Nâng cấp
   Feature Parity: HOÀN TẤT 10/10 tool** ✅ (tool #10 "Chuyển đổi Case văn bản" vừa xong —
   xem log bên dưới), CHỈ CÒN treo lại đúng 1 mục con nhỏ: nén PDF cho tool #4/#5 (chưa
@@ -118,6 +118,59 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-26 — Phase 3, tool #3: Regex Tester — HOÀN TẤT (tiếp nối từ mục [CẢNH BÁO -
+  SỬA DỞ] ngay bên dưới)
+- **Bối cảnh đầu phiên**: người dùng yêu cầu xử lý merge nhánh
+  `fix-corrupted-git-repo-merge-orphaned-tools` trước tiên. Sau khi kiểm tra kỹ (`git
+  branch -a`, `git fetch --all --prune`, `git fsck`, reflog, grep toàn repo) xác nhận
+  nhánh này không tồn tại ở đâu cả — hỏi lại người dùng qua `AskUserQuestion`, được xác
+  nhận đây là nhầm lẫn/tên cũ, và việc thật sự cần xử lý là mục SỬA DỞ Regex Tester. Toàn
+  bộ code dở của Regex Tester nằm thẳng trên `main` (không có branch phụ nào), đúng như
+  log trước đã ghi.
+- **Làm đúng 3 việc còn treo lại theo thứ tự đã ghi trong log SỬA DỞ trước**:
+  1. `npm run build` (Node 22.23.1 trong `.tools/`): sạch, ra đúng **281 trang tĩnh**
+     (tăng từ 261 → 281 = +20 trang, đúng 1 tool × 20 ngôn ngữ).
+  2. Viết script Node test độc lập
+     (`test-regextester.mjs`, mô phỏng lại chính xác 2 khối `useMemo` trong
+     `RegexTester.tsx`: dựng match/segments highlight, và replace) — 26 test case: đếm
+     match cơ bản, capture group thường + named group, từng flag riêng lẻ
+     (`i`/`m`/`s`/`u`/`y`), pattern lỗi không crash mà trả về thông báo lỗi, replace có
+     backreference `$1`/`$2` và named backreference `$<name>`, replace không có flag `g`
+     chỉ thay thế 1 lần, pattern rỗng, và đặc biệt **match độ dài 0** (`x*` trên chuỗi
+     không có `x`, và `\b` — 2 pattern rất phổ biến khi test regex).
+  - **Phát hiện 1 bug THẬT qua chính bộ test này** (không phải lỗi báo cáo giả từ agent
+    con, mà là lỗi logic có sẵn trong code đã viết ở phiên trước): phần dựng đoạn
+    highlight (`segments`) trong `RegexTester.tsx` xử lý sai cho MỌI match độ dài 0 —
+    dòng `if (m[0].length === 0) lastIndex++;` cộng thêm 1 vào `lastIndex` một cách máy
+    móc để né vòng lặp vô hạn (thói quen hay dùng khi tự viết `regex.exec` thủ công),
+    nhưng vì đang lặp qua kết quả có sẵn của `matchAll` (JS đã tự xử lý việc né lặp vô
+    hạn rồi, không cần làm lại), phép cộng dư này làm lệch mốc `lastIndex` so với vị trí
+    match tiếp theo, khiến **ký tự thật ngay sau mỗi match độ dài 0 bị nuốt mất hoàn
+    toàn khỏi khung highlight** — không lỗi, không crash, chỉ ÂM THẦM thiếu chữ. Ví dụ cụ
+    thể phát hiện qua test: pattern `x*` (không có `x` trong chuỗi) trên chuỗi `"abc"` →
+    khung highlight dựng ra chuỗi RỖNG thay vì `"abc"`. Vì `\b` (word boundary) và các
+    pattern optional (`a?`, lookahead) là những thứ RẤT hay được test trong 1 công cụ
+    "Regex Tester", đây là bug ảnh hưởng thật tới trải nghiệm chính của tool, không phải
+    edge case hiếm gặp.
+  - **Đã sửa tận gốc**: bỏ hẳn dòng `lastIndex++` thủ công, thay bằng nhánh rẽ rõ ràng —
+    match có độ dài > 0 thì đẩy `lastIndex` tới hết match như cũ; match độ dài 0 thì giữ
+    nguyên `lastIndex = m.index` (không cộng dư), để lần lặp kế tiếp tự so sánh
+    `m.index > lastIndex` đúng và không bỏ sót ký tự nào ở giữa. Xác nhận lại bằng đúng
+    bộ test cũ (thêm test case `\b` trên `"ab cd"`): **26/26 pass**, chuỗi dựng lại từ
+    `segments` khớp 100% với chuỗi gốc trong mọi trường hợp test.
+  - Rebuild lại sau khi sửa: vẫn sạch, đúng 281 trang, không phát sinh lỗi mới.
+  - Đối chiếu lại HTML build ra cho `en`: `<h1>Regex Tester</h1>` đúng, có JSON-LD
+    `WebApplication` với `price: 0` đúng chuẩn.
+- **Verify i18n độc lập lại lần nữa** (không chỉ tin kết quả tự-verify của phiên trước):
+  viết lại script Node so sánh key-set + placeholder giữa cả 20 file
+  `tool-regex-tester.json` với bản `en` — xác nhận lại **20/20 khớp 100%**, không có gì
+  thay đổi so với báo cáo của phiên trước.
+- Đã tick checkbox "Regex Tester" trong `ROADMAP.md` (Phase 3, tool #3/10).
+- **CHƯA commit** tại thời điểm ghi log này — sẽ commit ngay sau (1 commit
+  `fix(regex-tester):` cho phần sửa bug segment + `feat(regex-tester):`-style hoàn tất,
+  gộp chung theo đúng tinh thần "1 task = xong mới commit"). Repo vẫn đang lead trước
+  `origin/main`, chưa push (việc push do người dùng quyết định).
 
 ### 2026-07-26 — [CẢNH BÁO - SỬA DỞ] Regex Tester (Phase 3, tool #3/10) — BỊ NGẮT QUÃNG,
   chưa hoàn tất, ghi lại theo yêu cầu trực tiếp của người dùng (kiểm tra `git status`/

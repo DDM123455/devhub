@@ -99,9 +99,12 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 			for (const m of found) {
 				if (m.index === undefined) continue;
 				if (m.index > lastIndex) parts.push({ text: testString.slice(lastIndex, m.index), isMatch: false });
-				parts.push({ text: m[0], isMatch: true });
-				lastIndex = m.index + m[0].length;
-				if (m[0].length === 0) lastIndex++;
+				if (m[0].length > 0) {
+					parts.push({ text: m[0], isMatch: true });
+					lastIndex = m.index + m[0].length;
+				} else {
+					lastIndex = m.index;
+				}
 			}
 			if (lastIndex < testString.length) parts.push({ text: testString.slice(lastIndex), isMatch: false });
 			return { matches: found, error: null as string | null, segments: parts };
