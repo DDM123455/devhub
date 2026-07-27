@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Ücretsiz Çevrimiçi SVG Optimize Aracı — Web Tool Hub",
+    "description": "SVG dosyalarını tamamen tarayıcınızda, ücretsiz olarak optimize edin ve küçültün. svgo ile simgeleri ve logoları küçültün — yükleme yok, kayıt yok."
+  },
+  "heading": "SVG Optimize Aracı",
+  "tagline": "SVG dosyalarını bozmadan küçültün, doğrudan tarayıcınızda.",
+  "ui": {
+    "inputLabel": "SVG kodu",
+    "inputPlaceholder": "SVG kodunuzu buraya yapıştırın…",
+    "dropHint": "veya bir .svg dosyasını buraya sürükleyip bırakın",
+    "chooseFile": "Dosya seç",
+    "loadSample": "Örnek yükle",
+    "clear": "Temizle",
+    "optionsHeading": "Optimizasyon seçenekleri",
+    "optMultipass": "Çoklu geçiş (daha küçük bir sonuç için tekrar tekrar optimize et)",
+    "optPrecisionLabel": "Hassasiyet: {{value}}",
+    "optRemoveDimensions": "width/height kaldır (yalnızca viewBox'ı koru)",
+    "optPrettify": "Çıktıyı düzenli göster (okunabilir, küçültülmemiş)",
+    "originalHeading": "Orijinal",
+    "optimizedHeading": "Optimize edilmiş",
+    "previewTab": "Önizleme",
+    "codeTab": "Kod",
+    "sizeLabel": "{{size}}",
+    "reduced": "%{{percent}} daha küçük",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı!",
+    "download": "İndir",
+    "invalidSvgError": "Bu SVG ayrıştırılamadı: {{message}}",
+    "notSvgError": "Bu bir SVG dosyasına benzemiyor (<svg> kök öğesi eksik).",
+    "noInput": "Başlamak için SVG kodu yapıştırın veya bir dosya yükleyin."
+  },
+  "related": "İlgili araçlar",
+  "article": {
+    "heading": "SVG optimizasyonu nasıl çalışır?",
+    "p1": "Illustrator, Figma veya Sketch gibi tasarım araçlarından dışa aktarılan simgeler ve logolar, görüntünün görünümüyle hiçbir ilgisi olmayan bir sürü fazlalık taşır: düzenleyici meta verileri, XML yorumları, gereksiz grup sarmalayıcıları, on beş ondalık basamağa kadar yazılmış koordinatlar ve kimsenin referans vermediği kimlikler. Bunların hiçbiri görüntülemeyi etkilemez, ama her indirmeyi şişirir — ve siteniz onlarca SVG simgesi kullanıyorsa, bu fazladan yük hızla birikir.",
+    "p2": "Bu araç, SVGOMG'nin arkasındaki aynı optimizasyon motoru olan svgo'yu tamamen tarayıcınızın içinde çalıştırır. SVG kodunu yapıştırın veya bir dosya bırakın; yorumları ve düzenleyici çöplerini temizler, mümkün olduğunda yolları birleştirir, gereksiz grupları daraltır ve koordinatları sizin belirlediğiniz hassasiyete yuvarlar — tüm bunlar cihazınızdan hiç ayrılmadan olur. Yükleme adımı ve sunucu dahliyeti yoktur, bu yüzden herkese açık bir simgede olduğu kadar özel bir müşteri logosunda da aynı derecede iyi çalışır.",
+    "p3": "Varsayılan ayarlar kasıtlı olarak muhafazakârdır: viewBox'ı korurlar (böylece simge nereye yerleştirilirse yerleştirilsin doğru ölçeklenmeye devam eder) ve width/height'i olduğu gibi bırakırlar. SVG'yi satır içi (inline) olarak gömüp boyutlandırmayı CSS ile yapıyorsanız \"width/height kaldır\" seçeneğini açmak faydalıdır, çünkü kök öğedeki sabit boyutlar aksi halde stil sayfanızla çakışabilir. Çoklu geçiş, optimizasyon aracını birden fazla kez çalıştırarak yalnızca ilk geçiş kodu basitleştirdikten sonra ortaya çıkan ek tasarrufları yakalar — açık bırakmak neredeyse hiç zarar vermez.",
+    "p4": "Hassasiyet, yol koordinatlarında kaç ondalık basamağın korunacağını belirler; düşürmek dosyayı daha da küçültür ama çok ayrıntılı çizimlerde ufak görsel kaymalara yol açabilir, bu yüzden ayarı değiştirdikten sonra canlı önizlemeyi kontrol etmekte fayda var. Çoğu simge ve logo için yalnızca varsayılan ayarlar bile genellikle gözle görülür bir farklılık olmadan dosya boyutunu %40–60 azaltır — indirmeden önce bunu doğrulamak için önizlemeyi ve öncesi/sonrası boyut sayacını kullanın."
+  }
+}

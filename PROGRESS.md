@@ -21,8 +21,9 @@
   nhập thủ công (không phải việc agent tự làm được) — xem chi tiết từng mục trong log bên
   dưới (meta title/description, schema JSON-LD, nội dung SEO 300–500 từ, internal linking
   map, Core Web Vitals đều đã audit/sửa xong).
-- **Phase 3 — Mở rộng công cụ ngách: 3/10 tool xong** (JWT Decoder, Base64 Encode/Decode,
-  Regex Tester — cả ba 2026-07-26) ✅. Task tiếp theo trong Phase 3: SVG Optimizer.
+- **Phase 3 — Mở rộng công cụ ngách: 4/10 tool xong** (JWT Decoder, Base64 Encode/Decode,
+  Regex Tester — cả ba 2026-07-26; SVG Optimizer — 2026-07-27) ✅. Task tiếp theo trong
+  Phase 3: Color Picker & Palette Generator.
 - **Phase 1 — 10 công cụ cốt lõi: HOÀN TẤT 10/10** ✅. **Phase 1.5 — Rà soát & Nâng cấp
   Feature Parity: HOÀN TẤT 10/10 tool** ✅ (tool #10 "Chuyển đổi Case văn bản" vừa xong —
   xem log bên dưới), CHỈ CÒN treo lại đúng 1 mục con nhỏ: nén PDF cho tool #4/#5 (chưa
@@ -120,6 +121,54 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-27 — Phase 3, tool #4: SVG Optimizer — HOÀN TẤT
+- **Bối cảnh đầu phiên**: `git status` cho thấy phần lớn công việc của SVG Optimizer đã được
+  làm từ phiên trước nhưng **chưa commit**: component `SvgOptimizer.tsx` (dùng `svgo/browser`),
+  `SvgOptimizerPage.astro`, entry trong `tools.ts` (slug + tên cho cả 20 ngôn ngữ),
+  nhánh routing trong `[slug].astro`, dependency `svgo@^4.0.2` trong `package.json`, và
+  13/20 file dịch `tool-svg-optimizer.json`. Đã dùng `AskUserQuestion` xác nhận với người
+  dùng phạm vi cần hoàn tất: giữ nguyên bộ tính năng hiện tại (không mở rộng thêm toggle
+  từng plugin svgo riêng lẻ, ước tính gzip, hay xử lý nhiều file — theo đúng tiền lệ scope
+  của JWT Decoder/Base64/Regex Tester ở Phase 3, không đào sâu như Phase 1.5).
+- **Benchmark đối thủ**: SVGOMG (jakearchibald.github.io/svgomg — giao diện web chính thức
+  của chính thư viện svgo), so sánh phụ với svgminify.com. Tính năng đã có: paste/kéo-thả/
+  upload file `.svg`, nút "Load sample", toggle multipass/remove width-height/prettify,
+  thanh trượt precision, tab Preview/Code, so sánh dung lượng gốc/tối ưu kèm % giảm, copy,
+  download — tương đương mức "lõi" của SVGOMG. Gap còn lại so với SVGOMG (toggle từng
+  plugin svgo riêng lẻ, ước tính gzip, xử lý hàng loạt nhiều file) — người dùng đã xác nhận
+  không cần làm ở lượt này.
+- **Phát hiện 1 bug thật khi kiểm tra kỹ**: 7/20 ngôn ngữ (`nl`, `tr`, `id`, `ar`, `hi`,
+  `th`, `sv`) chưa có file `tool-svg-optimizer.json` — build vẫn chạy sạch (không lỗi) vì
+  i18next tự fallback sang tiếng Anh một cách âm thầm, y hệt bug `zh-tw` đã gặp ở Phase 2 —
+  xác nhận qua đối chiếu HTML build ra (`<h1>` của `nl`/`tr`/`ar` đều ra "SVG Optimizer"
+  thay vì bản dịch). Đã viết dịch thật cho cả 7 ngôn ngữ (không AI-spin lặp câu chữ), giữ
+  đúng toàn bộ placeholder `{{value}}`/`{{percent}}`/`{{size}}`/`{{message}}`. Nhân tiện sửa
+  luôn 1 điểm không nhất quán nhỏ phát hiện được: heading tiếng Hà Lan (`nl`) ban đầu để
+  nguyên "SVG Optimizer" thay vì khớp tên đã định nghĩa trong `tools.ts`
+  ("SVG-optimalisatie") — đã sửa cho khớp.
+- **Verify độc lập**: viết script Node tạm (`verify-i18n.mjs`, không commit vào repo) so
+  sánh key-set + placeholder giữa cả 20 file `tool-svg-optimizer.json` với bản `en` —
+  **20/20 khớp 100%** (33 key mỗi file), không thiếu/thừa key nào.
+- **Build**: `npm run build` (Node 22.23.1 trong `.tools/`) sạch, đúng **301 trang tĩnh**.
+  Đối chiếu lại HTML build ra cho `nl`/`tr`/`ar`/`hi`/`th`/`sv`/`id`: `<h1>` đã ra đúng bản
+  dịch bản địa cho tất cả, không còn fallback tiếng Anh.
+- **Test tương tác thật bằng Puppeteer** (chạy `npm run preview`, dùng bản Puppeteer đã có
+  sẵn trong npx cache từ phiên trước, không cài thêm dependency mới vào repo): xác nhận
+  golden path hoạt động đúng — nút "Load sample" nạp SVG mẫu, khung Original/Optimized hiện
+  đúng dung lượng và % giảm (511 B → 254 B, giảm 50%), preview trước/sau render đúng hình
+  SVG thật bên trong iframe sandbox (đã xác nhận bằng screenshot riêng của iframe, ảnh chụp
+  toàn trang lúc đầu bị chụp sớm hơn 1 nhịp render nên trông như trống — không phải bug),
+  toggle "Remove width/height" giảm thêm dung lượng (254 B → 231 B), toggle "Prettify" ra
+  code định dạng dễ đọc đúng như kỳ vọng, thanh trượt precision cập nhật nhãn đúng, nút Copy
+  chuyển sang "Copied!". Edge case: xóa hết input hiện đúng gợi ý trạng thái rỗng; dán văn
+  bản không phải SVG hiện đúng lỗi "doesn't look like an SVG file"; dán SVG lỗi cú pháp
+  (`</svg-broken>`) hiện đúng thông báo lỗi kèm chi tiết parser, không crash. Không có lỗi
+  console/page nào trong suốt quá trình test.
+- Đã tick checkbox "SVG Optimizer" trong `ROADMAP.md` (Phase 3, tool #4/10).
+- Đã commit 1 commit duy nhất gồm toàn bộ phần việc trên (component, page, `tools.ts`,
+  `[slug].astro`, `package.json`/`package-lock.json`, 20 file JSON i18n, `ROADMAP.md`,
+  `PROGRESS.md`). **Chưa push** — để người dùng quyết định.
 
 ### 2026-07-26 — Phase 2, task: Audit Core Web Vitals toàn site — HOÀN TẤT (tìm và sửa 1
   bug Accessibility thật ở JSON Formatter)

@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "SVG Optimizer Online Gratis — Web Tool Hub",
+    "description": "Optimalkan dan perkecil file SVG secara online gratis, sepenuhnya di browser Anda. Perkecil ikon dan logo dengan svgo — tanpa unggah, tanpa pendaftaran."
+  },
+  "heading": "Pengoptimal SVG",
+  "tagline": "Perkecil file SVG tanpa merusaknya, langsung di browser Anda.",
+  "ui": {
+    "inputLabel": "Kode SVG",
+    "inputPlaceholder": "Tempelkan kode SVG Anda di sini…",
+    "dropHint": "atau seret dan lepas file .svg di sini",
+    "chooseFile": "Pilih file",
+    "loadSample": "Muat contoh",
+    "clear": "Bersihkan",
+    "optionsHeading": "Opsi optimasi",
+    "optMultipass": "Multipass (optimalkan berulang kali untuk hasil yang lebih kecil)",
+    "optPrecisionLabel": "Presisi: {{value}}",
+    "optRemoveDimensions": "Hapus width/height (hanya simpan viewBox)",
+    "optPrettify": "Rapikan output (mudah dibaca, tidak diminifikasi)",
+    "originalHeading": "Asli",
+    "optimizedHeading": "Dioptimalkan",
+    "previewTab": "Pratinjau",
+    "codeTab": "Kode",
+    "sizeLabel": "{{size}}",
+    "reduced": "{{percent}}% lebih kecil",
+    "copy": "Salin",
+    "copied": "Tersalin!",
+    "download": "Unduh",
+    "invalidSvgError": "Tidak dapat mem-parsing SVG ini: {{message}}",
+    "notSvgError": "Ini sepertinya bukan file SVG (elemen root <svg> tidak ada).",
+    "noInput": "Tempelkan kode SVG atau unggah file untuk memulai."
+  },
+  "related": "Alat terkait",
+  "article": {
+    "heading": "Bagaimana cara kerja optimasi SVG?",
+    "p1": "Ikon dan logo yang diekspor dari alat desain seperti Illustrator, Figma, atau Sketch membawa banyak beban yang tidak ada hubungannya dengan tampilan gambar: metadata editor, komentar XML, wrapper grup yang berlebihan, koordinat yang ditulis hingga lima belas angka desimal, dan ID yang tidak dirujuk oleh siapa pun. Tidak satu pun dari itu memengaruhi tampilan, tetapi semuanya memperbesar setiap unduhan — dan jika situs Anda menggunakan puluhan ikon SVG, beban tambahan ini cepat bertambah.",
+    "p2": "Alat ini menjalankan svgo, mesin optimasi yang sama yang menjadi dasar SVGOMG, sepenuhnya di dalam browser Anda. Tempelkan markup SVG atau jatuhkan file, dan alat ini akan menghapus komentar dan sampah editor, menggabungkan path jika memungkinkan, meruntuhkan grup yang berlebihan, dan membulatkan koordinat ke presisi yang Anda tentukan — semua tanpa pernah meninggalkan perangkat Anda. Tidak ada tahap unggah dan tidak ada server yang terlibat, jadi alat ini bekerja sama baiknya untuk logo klien pribadi maupun ikon publik.",
+    "p3": "Pengaturan default sengaja dibuat konservatif: pengaturan ini mempertahankan viewBox (agar ikon tetap terskala dengan benar di mana pun ditempatkan) dan menjaga width/height tetap utuh. Mengaktifkan \"Hapus width/height\" berguna saat Anda menyematkan SVG secara inline dan mengatur ukurannya dengan CSS, karena dimensi tetap pada elemen root bisa bertentangan dengan stylesheet Anda. Multipass menjalankan pengoptimal lebih dari sekali, menangkap penghematan yang baru muncul setelah proses pertama menyederhanakan markup — hampir tidak pernah merugikan untuk membiarkannya aktif.",
+    "p4": "Presisi menentukan berapa banyak angka desimal yang dipertahankan pada koordinat path; menurunkannya membuat file lebih kecil lagi tetapi dapat menyebabkan sedikit pergeseran visual pada gambar yang sangat detail, jadi ada baiknya memeriksa pratinjau langsung setelah menyesuaikannya. Untuk sebagian besar ikon dan logo, pengaturan default saja biasanya memangkas ukuran file 40–60% tanpa perbedaan yang terlihat — gunakan pratinjau dan penghitung ukuran sebelum/sesudah untuk memastikannya sebelum mengunduh."
+  }
+}

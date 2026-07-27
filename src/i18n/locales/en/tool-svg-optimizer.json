@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "SVG Optimizer Online Free — Web Tool Hub",
+    "description": "Optimize and minify SVG files online for free, entirely in your browser. Shrink icons and logos with svgo — no upload, no signup."
+  },
+  "heading": "SVG Optimizer",
+  "tagline": "Shrink SVG files without breaking them, right in your browser.",
+  "ui": {
+    "inputLabel": "SVG code",
+    "inputPlaceholder": "Paste your SVG code here…",
+    "dropHint": "or drag and drop an .svg file here",
+    "chooseFile": "Choose file",
+    "loadSample": "Load sample",
+    "clear": "Clear",
+    "optionsHeading": "Optimization options",
+    "optMultipass": "Multipass (optimize repeatedly for a smaller result)",
+    "optPrecisionLabel": "Precision: {{value}}",
+    "optRemoveDimensions": "Remove width/height (keep only viewBox)",
+    "optPrettify": "Prettify output (readable, not minified)",
+    "originalHeading": "Original",
+    "optimizedHeading": "Optimized",
+    "previewTab": "Preview",
+    "codeTab": "Code",
+    "sizeLabel": "{{size}}",
+    "reduced": "{{percent}}% smaller",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "download": "Download",
+    "invalidSvgError": "Couldn't parse this SVG: {{message}}",
+    "notSvgError": "This doesn't look like an SVG file (missing <svg> root element).",
+    "noInput": "Paste SVG code or upload a file to get started."
+  },
+  "related": "Related tools",
+  "article": {
+    "heading": "How does SVG optimization work?",
+    "p1": "Icons and logos exported from design tools like Illustrator, Figma, or Sketch carry a lot of baggage that has nothing to do with how the image looks: editor metadata, XML comments, redundant group wrappers, coordinates written out to fifteen decimal places, and IDs nobody references. None of that affects rendering, but it does inflate every download — and if your site uses dozens of SVG icons, that overhead adds up fast.",
+    "p2": "This tool runs svgo, the same optimization engine behind SVGOMG, entirely inside your browser. Paste SVG markup or drop a file, and it strips comments and editor cruft, merges paths where it can, collapses redundant groups, and rounds coordinates to a precision you control — all without ever leaving your device. There's no upload step and no server involved, so it works just as well on a private client logo as a public one.",
+    "p3": "The default settings are deliberately conservative: they preserve the viewBox (so the icon still scales correctly wherever it's placed) and keep width/height intact. Turning on \"Remove width/height\" is useful when you're embedding the SVG inline and sizing it with CSS instead, since fixed dimensions on the root element can otherwise fight with your stylesheet. Multipass runs the optimizer more than once, catching savings that only appear after the first pass simplifies the markup — it rarely hurts to leave it on.",
+    "p4": "Precision controls how many decimal places survive in path coordinates; lowering it shrinks the file further but can introduce tiny visual drift on very detailed artwork, so it's worth checking the live preview after adjusting it. For most icons and logos, the default settings alone typically cut file size by 40–60% with no visible difference — use the preview and the before/after size counter to confirm before you download."
+  }
+}

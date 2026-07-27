@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "免费在线 SVG 优化工具 — Web Tool Hub",
+    "description": "将 SVG 图标与 logo 在线压缩优化，基于 svgo 在浏览器本地运行——无需上传，无需注册，全部免费。"
+  },
+  "heading": "SVG 优化工具",
+  "tagline": "在你的浏览器里安全压缩 SVG 文件，不破坏图形效果。",
+  "ui": {
+    "inputLabel": "SVG 代码",
+    "inputPlaceholder": "在此粘贴 SVG 代码……",
+    "dropHint": "或将 .svg 文件拖放到此处",
+    "chooseFile": "选择文件",
+    "loadSample": "加载示例",
+    "clear": "清空",
+    "optionsHeading": "优化选项",
+    "optMultipass": "多轮优化（Multipass，反复优化以获得更小的结果）",
+    "optPrecisionLabel": "精度：{{value}}",
+    "optRemoveDimensions": "移除 width/height（仅保留 viewBox）",
+    "optPrettify": "美化输出（保持可读格式，不压缩）",
+    "originalHeading": "原始文件",
+    "optimizedHeading": "优化后",
+    "previewTab": "预览",
+    "codeTab": "代码",
+    "sizeLabel": "{{size}}",
+    "reduced": "缩小 {{percent}}%",
+    "copy": "复制",
+    "copied": "已复制！",
+    "download": "下载",
+    "invalidSvgError": "无法解析此 SVG：{{message}}",
+    "notSvgError": "这似乎不是一个 SVG 文件（缺少 <svg> 根元素）。",
+    "noInput": "粘贴 SVG 代码或上传文件即可开始。"
+  },
+  "related": "相关工具",
+  "article": {
+    "heading": "SVG 优化到底是怎么运作的？",
+    "p1": "从 Illustrator、Figma 或 Sketch 导出的图标和 logo，往往带着一大堆和最终显示效果毫无关系的“行李”：编辑器留下的元数据、XML 注释、多余的分组包裹、精确到小数点后十几位的坐标，还有一堆从来没被引用过的 ID。这些内容不会影响图形本身的渲染效果，却会实实在在地拉大文件体积——如果你的网站用了几十个 SVG 图标，这些冗余累积起来的体积可不是小数目。",
+    "p2": "这个工具在你的浏览器里直接运行 svgo——没错，就是 SVGOMG 背后那套同样的优化引擎。粘贴 SVG 代码，或者拖入一个文件，它就会自动清除注释和编辑器留下的杂物，能合并的路径就合并，能折叠的多余分组就折叠，并按你设定的精度对坐标做四舍五入——这一切都在你的设备本地完成，不会经过任何上传或服务器环节。所以不管是要优化一个对外公开的图标，还是客户还没发布的私密 logo，都可以放心处理。",
+    "p3": "默认参数刻意保持保守：会保留 viewBox（这样图标不管放在哪里缩放都不会走样），也会保留 width/height。如果你打算把 SVG 内联嵌入页面、改用 CSS 来控制尺寸，可以开启“移除 width/height”选项——因为根元素上写死的宽高有时会和你的样式表打架。Multipass 会让优化器反复跑上好几轮，抓住那些只有在第一轮简化过代码之后才会暴露出来的进一步压缩空间——大多数情况下开着它不会有什么坏处。",
+    "p4": "精度（Precision）决定路径坐标里保留几位小数：调低它能进一步压缩文件体积，但对于线条特别精细的图形，可能会带来肉眼可见的细微偏差，所以调整之后最好在预览里确认一下效果。对于大多数图标和 logo 来说，光是默认参数通常就能把文件体积压缩 40%–60%，而且看不出任何差别——下载之前，别忘了用预览和前后体积对比来把关。"
+  }
+}

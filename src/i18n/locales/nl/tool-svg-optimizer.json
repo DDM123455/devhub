@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "SVG Optimizer Online Gratis — Web Tool Hub",
+    "description": "Optimaliseer en verklein SVG-bestanden online, gratis en volledig in je browser. Verklein iconen en logo's met svgo — geen upload, geen registratie."
+  },
+  "heading": "SVG-optimalisatie",
+  "tagline": "Verklein SVG-bestanden zonder ze te breken, rechtstreeks in je browser.",
+  "ui": {
+    "inputLabel": "SVG-code",
+    "inputPlaceholder": "Plak hier je SVG-code…",
+    "dropHint": "of sleep een .svg-bestand hierheen",
+    "chooseFile": "Bestand kiezen",
+    "loadSample": "Voorbeeld laden",
+    "clear": "Wissen",
+    "optionsHeading": "Optimalisatie-opties",
+    "optMultipass": "Multipass (herhaaldelijk optimaliseren voor een kleiner resultaat)",
+    "optPrecisionLabel": "Precisie: {{value}}",
+    "optRemoveDimensions": "Width/height verwijderen (alleen viewBox behouden)",
+    "optPrettify": "Uitvoer opmaken (leesbaar, niet geminificeerd)",
+    "originalHeading": "Origineel",
+    "optimizedHeading": "Geoptimaliseerd",
+    "previewTab": "Voorbeeld",
+    "codeTab": "Code",
+    "sizeLabel": "{{size}}",
+    "reduced": "{{percent}}% kleiner",
+    "copy": "Kopiëren",
+    "copied": "Gekopieerd!",
+    "download": "Downloaden",
+    "invalidSvgError": "Kon deze SVG niet verwerken: {{message}}",
+    "notSvgError": "Dit lijkt geen SVG-bestand te zijn (ontbrekend <svg>-hoofdelement).",
+    "noInput": "Plak SVG-code of upload een bestand om te beginnen."
+  },
+  "related": "Gerelateerde tools",
+  "article": {
+    "heading": "Hoe werkt SVG-optimalisatie?",
+    "p1": "Iconen en logo's die worden geëxporteerd uit ontwerptools zoals Illustrator, Figma of Sketch, slepen veel ballast mee dat niets te maken heeft met hoe de afbeelding eruitziet: editormetadata, XML-commentaar, overbodige groep-wrappers, coördinaten met vijftien decimalen, en id's waar niemand naar verwijst. Niets daarvan beïnvloedt de weergave, maar het maakt elke download wel groter — en als je site tientallen SVG-iconen gebruikt, telt die overhead snel op.",
+    "p2": "Deze tool draait svgo, dezelfde optimalisatie-engine achter SVGOMG, volledig in je browser. Plak SVG-markup of sleep een bestand erin, en het verwijdert commentaar en editorrommel, voegt paden samen waar mogelijk, comprimeert overbodige groepen en rondt coördinaten af op de precisie die jij kiest — allemaal zonder je apparaat te verlaten. Er is geen uploadstap en geen server bij betrokken, dus het werkt net zo goed voor een privélogo van een klant als voor een publiek icoon.",
+    "p3": "De standaardinstellingen zijn bewust conservatief: ze behouden de viewBox (zodat het icoon overal correct blijft schalen) en laten width/height intact. \"Width/height verwijderen\" inschakelen is handig wanneer je de SVG inline insluit en de grootte met CSS regelt, aangezien vaste afmetingen op het hoofdelement anders kunnen botsen met je stylesheet. Multipass laat de optimalisator meer dan één keer draaien, waardoor besparingen worden gevonden die pas zichtbaar worden nadat de eerste ronde de markup al heeft vereenvoudigd — het laten aanstaan is zelden nadelig.",
+    "p4": "Precisie bepaalt hoeveel decimalen behouden blijven in padcoördinaten; een lagere waarde maakt het bestand kleiner, maar kan bij zeer gedetailleerde afbeeldingen voor lichte visuele afwijkingen zorgen, dus controleer na aanpassing de live preview. Voor de meeste iconen en logo's verkleinen de standaardinstellingen alleen al het bestand doorgaans met 40–60% zonder zichtbaar verschil — gebruik de preview en de voor/na-teller om dit te bevestigen voordat je downloadt."
+  }
+}

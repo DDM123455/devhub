@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "免費線上 SVG 優化壓縮工具 — Web Tool Hub",
+    "description": "線上免費優化並壓縮 SVG 檔案，完全在瀏覽器中執行。使用 svgo 縮小圖示與 Logo 檔案——不用上傳，免註冊。"
+  },
+  "heading": "SVG 優化工具",
+  "tagline": "在瀏覽器裡就能縮小 SVG 檔案，不破壞畫面呈現。",
+  "ui": {
+    "inputLabel": "SVG 程式碼",
+    "inputPlaceholder": "貼上你的 SVG 程式碼……",
+    "dropHint": "或將 .svg 檔案拖放到這裡",
+    "chooseFile": "選擇檔案",
+    "loadSample": "載入範例",
+    "clear": "清除",
+    "optionsHeading": "優化選項",
+    "optMultipass": "Multipass（重複優化以取得更小的結果）",
+    "optPrecisionLabel": "精確度：{{value}}",
+    "optRemoveDimensions": "移除 width／height（只保留 viewBox）",
+    "optPrettify": "美化輸出（保留可讀性，不壓成一行）",
+    "originalHeading": "原始版本",
+    "optimizedHeading": "優化後",
+    "previewTab": "預覽",
+    "codeTab": "程式碼",
+    "sizeLabel": "{{size}}",
+    "reduced": "縮小 {{percent}}%",
+    "copy": "複製",
+    "copied": "已複製！",
+    "download": "下載",
+    "invalidSvgError": "無法解析這份 SVG：{{message}}",
+    "notSvgError": "這似乎不是 SVG 檔案（缺少 <svg> 根元素）。",
+    "noInput": "貼上 SVG 程式碼，或上傳檔案來開始使用。"
+  },
+  "related": "相關工具",
+  "article": {
+    "heading": "SVG 優化背後是怎麼運作的？",
+    "p1": "從 Illustrator、Figma 或 Sketch 匯出的圖示與 Logo，檔案裡往往夾帶著一堆跟畫面呈現本身完全無關的東西：編輯器留下的中繼資料、XML 註解、多層疊在一起卻沒有實際作用的群組（group）、座標值硬是寫到小數點後十幾位、還有一堆沒有任何地方引用的 ID。這些內容全部拿掉，畫面看起來完全不會變，卻會白白拉大每一次下載的檔案大小——如果網站上用了幾十個 SVG 圖示，這些多出來的位元組累積起來相當可觀。",
+    "p2": "這個工具在你的瀏覽器裡直接執行 svgo——也就是 SVGOMG 背後所使用的同一套優化引擎。貼上 SVG 原始碼，或直接拖放檔案進來，它就會清掉註解與編輯器留下的雜訊、能合併的路徑就合併、把多餘的群組收攏起來，並依照你設定的精確度四捨五入座標——整個過程完全不會離開你的裝置，沒有上傳、也沒有任何伺服器參與。就算是還沒公開、屬於客戶專案的 Logo，也一樣能放心拿來處理。",
+    "p3": "預設設定刻意保守：viewBox 會保留下來（讓圖示不管放大縮小、擺在哪裡都還能正確顯示），width／height 也不會被動到。如果你打算把 SVG 直接內嵌進頁面、改用 CSS 來控制大小，這時候開啟「移除 width／height」就很有幫助，因為根元素上寫死的尺寸有時候反而會跟你的樣式表打架。Multipass 會讓優化器重複跑好幾輪，抓出那些要等第一輪把結構簡化之後、才會浮現出來的優化空間——開著它通常不會有什麼壞處。",
+    "p4": "精確度（Precision）決定路徑座標保留幾位小數；數字調得越低，檔案就能再瘦身一些，但如果圖案本身線條很細緻，畫面可能會出現肉眼幾乎察覺不到、卻確實存在的偏移，調整之後最好透過即時預覽確認一下。對絕大多數圖示與 Logo 來說，光是預設設定通常就能把檔案縮小 40–60%，畫面幾乎看不出差異——下載前，記得用預覽畫面跟前後檔案大小的數字互相對照確認。"
+  }
+}

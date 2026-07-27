@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "SVG-optimerare Online Gratis — Web Tool Hub",
+    "description": "Optimera och minifiera SVG-filer online gratis, helt i din webbläsare. Krymp ikoner och logotyper med svgo — ingen uppladdning, ingen registrering."
+  },
+  "heading": "SVG-optimerare",
+  "tagline": "Krymp SVG-filer utan att förstöra dem, direkt i din webbläsare.",
+  "ui": {
+    "inputLabel": "SVG-kod",
+    "inputPlaceholder": "Klistra in din SVG-kod här…",
+    "dropHint": "eller dra och släpp en .svg-fil här",
+    "chooseFile": "Välj fil",
+    "loadSample": "Ladda exempel",
+    "clear": "Rensa",
+    "optionsHeading": "Optimeringsalternativ",
+    "optMultipass": "Multipass (optimera upprepade gånger för ett mindre resultat)",
+    "optPrecisionLabel": "Precision: {{value}}",
+    "optRemoveDimensions": "Ta bort width/height (behåll endast viewBox)",
+    "optPrettify": "Snygg formatering av utdata (läsbar, inte minifierad)",
+    "originalHeading": "Original",
+    "optimizedHeading": "Optimerad",
+    "previewTab": "Förhandsvisning",
+    "codeTab": "Kod",
+    "sizeLabel": "{{size}}",
+    "reduced": "{{percent}}% mindre",
+    "copy": "Kopiera",
+    "copied": "Kopierad!",
+    "download": "Ladda ner",
+    "invalidSvgError": "Kunde inte tolka denna SVG: {{message}}",
+    "notSvgError": "Detta verkar inte vara en SVG-fil (roten <svg> saknas).",
+    "noInput": "Klistra in SVG-kod eller ladda upp en fil för att komma igång."
+  },
+  "related": "Relaterade verktyg",
+  "article": {
+    "heading": "Hur fungerar SVG-optimering?",
+    "p1": "Ikoner och logotyper som exporteras från designverktyg som Illustrator, Figma eller Sketch släpar med sig en hel del barlast som inte har något med bildens utseende att göra: redigerarmetadata, XML-kommentarer, onödiga gruppomslag, koordinater skrivna med femton decimaler och id:n som ingen refererar till. Inget av detta påverkar renderingen, men det gör varje nedladdning större — och om din webbplats använder dussintals SVG-ikoner adderar den overheaden snabbt upp sig.",
+    "p2": "Det här verktyget kör svgo, samma optimeringsmotor som ligger bakom SVGOMG, helt inuti din webbläsare. Klistra in SVG-kod eller släpp en fil, så tar den bort kommentarer och redigerarskräp, slår ihop paths där det går, komprimerar onödiga grupper och avrundar koordinater till den precision du väljer — allt utan att någonsin lämna din enhet. Det finns inget uppladdningssteg och ingen server inblandad, så det fungerar lika bra för en privat kundlogotyp som för en offentlig ikon.",
+    "p3": "Standardinställningarna är medvetet konservativa: de bevarar viewBox (så att ikonen fortsätter skalas korrekt oavsett var den placeras) och lämnar width/height orört. Att slå på \"Ta bort width/height\" är användbart när du bäddar in SVG:n inline och styr storleken med CSS istället, eftersom fasta dimensioner på rotelementet annars kan krocka med ditt stilmall. Multipass kör optimeraren mer än en gång och fångar besparingar som bara dyker upp efter att den första omgången redan förenklat koden — det skadar sällan att låta den vara på.",
+    "p4": "Precision styr hur många decimaler som bevaras i path-koordinater; att sänka den krymper filen ytterligare men kan ge upphov till små visuella avvikelser i mycket detaljerad grafik, så det är värt att kontrollera förhandsvisningen live efter att ha justerat den. För de flesta ikoner och logotyper minskar standardinställningarna ensamma vanligtvis filstorleken med 40–60% utan någon synlig skillnad — använd förhandsvisningen och räknaren för storlek före/efter för att bekräfta det innan du laddar ner."
+  }
+}

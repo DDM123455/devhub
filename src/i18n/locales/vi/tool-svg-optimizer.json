@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Tối ưu file SVG miễn phí trực tuyến — Web Tool Hub",
+    "description": "Tối ưu và nén file SVG miễn phí, xử lý hoàn toàn trên trình duyệt bằng svgo. Giảm dung lượng icon/logo — không upload, không cần đăng ký."
+  },
+  "heading": "Tối ưu SVG",
+  "tagline": "Giảm dung lượng file SVG mà không làm hỏng hình ảnh, ngay trên trình duyệt.",
+  "ui": {
+    "inputLabel": "Mã SVG",
+    "inputPlaceholder": "Dán mã SVG vào đây…",
+    "dropHint": "hoặc kéo thả file .svg vào đây",
+    "chooseFile": "Chọn file",
+    "loadSample": "Dùng mẫu có sẵn",
+    "clear": "Xóa",
+    "optionsHeading": "Tùy chọn tối ưu",
+    "optMultipass": "Multipass (tối ưu nhiều lượt để giảm dung lượng hơn)",
+    "optPrecisionLabel": "Độ chính xác: {{value}}",
+    "optRemoveDimensions": "Xóa width/height (chỉ giữ viewBox)",
+    "optPrettify": "Định dạng dễ đọc (không nén gọn)",
+    "originalHeading": "Bản gốc",
+    "optimizedHeading": "Đã tối ưu",
+    "previewTab": "Xem trước",
+    "codeTab": "Mã nguồn",
+    "sizeLabel": "{{size}}",
+    "reduced": "Giảm {{percent}}%",
+    "copy": "Sao chép",
+    "copied": "Đã sao chép!",
+    "download": "Tải xuống",
+    "invalidSvgError": "Không đọc được file SVG này: {{message}}",
+    "notSvgError": "Nội dung này không giống file SVG (thiếu thẻ gốc <svg>).",
+    "noInput": "Dán mã SVG hoặc tải file lên để bắt đầu."
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Tối ưu SVG hoạt động như thế nào?",
+    "p1": "Icon và logo xuất ra từ các phần mềm thiết kế như Illustrator, Figma hay Sketch thường mang theo rất nhiều dữ liệu thừa không ảnh hưởng gì tới hình ảnh hiển thị: metadata của phần mềm biên tập, comment XML, các thẻ group lồng nhau không cần thiết, tọa độ viết dài tới 15 chữ số thập phân, và những ID không ai dùng tới. Những thứ này không làm thay đổi cách hình vẽ hiển thị, nhưng lại làm dung lượng tải về nặng hơn hẳn — nếu website dùng vài chục icon SVG, phần dư thừa này cộng dồn lại rất đáng kể.",
+    "p2": "Công cụ này chạy svgo — chính engine tối ưu đứng sau công cụ nổi tiếng SVGOMG — hoàn toàn ngay trên trình duyệt của bạn. Dán mã SVG hoặc kéo thả file vào, công cụ sẽ tự động xóa comment và dữ liệu thừa từ phần mềm biên tập, gộp các đường path có thể gộp, thu gọn group thừa, và làm tròn tọa độ theo độ chính xác bạn tự chọn — tất cả không rời khỏi thiết bị. Không có bước upload, không có server nào tham gia, nên dùng thoải mái kể cả với logo khách hàng riêng tư.",
+    "p3": "Cấu hình mặc định được chọn thận trọng: vẫn giữ nguyên `viewBox` (để icon co giãn đúng ở mọi kích thước hiển thị) và giữ nguyên width/height. Bật tùy chọn \"Xóa width/height\" hữu ích khi bạn nhúng SVG trực tiếp vào HTML và chỉnh kích thước bằng CSS, vì width/height cố định trên thẻ gốc đôi khi xung đột với CSS. Multipass chạy lại thuật toán tối ưu nhiều lần, bắt được thêm phần dung lượng chỉ lộ ra sau khi lượt đầu đã đơn giản hóa mã nguồn — hầu như không có hại gì khi bật sẵn.",
+    "p4": "Độ chính xác quyết định số chữ số thập phân giữ lại trong tọa độ đường path; hạ thấp giá trị này giúp giảm dung lượng hơn nữa nhưng có thể làm lệch hình ảnh rất nhỏ với hình vẽ chi tiết cao, nên kiểm tra lại khung xem trước sau khi chỉnh. Với phần lớn icon và logo, chỉ riêng cấu hình mặc định thường đã giảm được 40-60% dung lượng mà không thấy khác biệt gì bằng mắt thường — dùng khung xem trước và bộ đếm dung lượng trước/sau để xác nhận trước khi tải xuống."
+  }
+}

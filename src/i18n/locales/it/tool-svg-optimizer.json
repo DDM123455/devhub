@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "title": "Ottimizzatore SVG Online Gratis — Web Tool Hub",
+    "description": "Ottimizza e comprimi file SVG online gratis, interamente nel browser. Riduci icone e loghi con svgo — nessun upload, nessuna registrazione."
+  },
+  "heading": "Ottimizzatore SVG",
+  "tagline": "Riduci il peso dei file SVG senza romperli, direttamente nel tuo browser.",
+  "ui": {
+    "inputLabel": "Codice SVG",
+    "inputPlaceholder": "Incolla qui il tuo codice SVG…",
+    "dropHint": "oppure trascina qui un file .svg",
+    "chooseFile": "Scegli file",
+    "loadSample": "Carica esempio",
+    "clear": "Cancella",
+    "optionsHeading": "Opzioni di ottimizzazione",
+    "optMultipass": "Multipass (ottimizza più volte per un risultato più piccolo)",
+    "optPrecisionLabel": "Precisione: {{value}}",
+    "optRemoveDimensions": "Rimuovi width/height (mantieni solo viewBox)",
+    "optPrettify": "Formatta output (leggibile, non minificato)",
+    "originalHeading": "Originale",
+    "optimizedHeading": "Ottimizzato",
+    "previewTab": "Anteprima",
+    "codeTab": "Codice",
+    "sizeLabel": "{{size}}",
+    "reduced": "{{percent}}% più piccolo",
+    "copy": "Copia",
+    "copied": "Copiato!",
+    "download": "Scarica",
+    "invalidSvgError": "Impossibile analizzare questo SVG: {{message}}",
+    "notSvgError": "Questo non sembra un file SVG (manca l'elemento radice <svg>).",
+    "noInput": "Incolla il codice SVG o carica un file per iniziare."
+  },
+  "related": "Strumenti correlati",
+  "article": {
+    "heading": "Come funziona l'ottimizzazione di un SVG?",
+    "p1": "Le icone e i loghi esportati da programmi come Illustrator, Figma o Sketch si portano dietro un bel po' di zavorra che non ha nulla a che vedere con l'aspetto dell'immagine: metadati dell'editor, commenti XML, gruppi ridondanti che avvolgono altri gruppi, coordinate scritte con quindici cifre decimali e ID che nessuno richiama mai. Niente di tutto questo influisce sul rendering, ma ogni singolo elemento gonfia il file — e se il tuo sito usa decine di icone SVG, quel sovrappeso si accumula in fretta.",
+    "p2": "Questo strumento esegue svgo, lo stesso motore di ottimizzazione dietro SVGOMG, interamente dentro il tuo browser. Incolla il markup SVG o trascina un file, e lo strumento elimina commenti e residui dell'editor, unisce i path dove possibile, collassa i gruppi superflui e arrotonda le coordinate alla precisione che scegli tu — tutto senza che nulla lasci mai il tuo dispositivo. Non c'è alcun passaggio di upload né un server coinvolto, quindi funziona altrettanto bene sul logo riservato di un cliente quanto su un'icona pubblica.",
+    "p3": "Le impostazioni predefinite sono volutamente prudenti: mantengono il viewBox (così l'icona continua a scalare correttamente ovunque venga usata) e lasciano intatti width e height. Attivare \"Rimuovi width/height\" torna utile quando incorpori l'SVG inline e ne gestisci le dimensioni via CSS, perché le dimensioni fisse sull'elemento radice possono altrimenti entrare in conflitto con il tuo foglio di stile. Il multipass esegue l'ottimizzatore più di una volta, cogliendo risparmi che emergono solo dopo che il primo passaggio ha già semplificato il markup — lasciarlo attivo raramente crea problemi.",
+    "p4": "La precisione stabilisce quante cifre decimali sopravvivono nelle coordinate dei path: abbassarla riduce ulteriormente il file, ma su illustrazioni molto dettagliate può introdurre piccole imperfezioni visive, quindi conviene controllare l'anteprima dal vivo dopo averla modificata. Per la maggior parte di icone e loghi, le impostazioni predefinite da sole riducono tipicamente il peso del file del 40–60% senza differenze visibili — usa l'anteprima e il contatore delle dimensioni prima/dopo per verificarlo prima di scaricare il risultato."
+  }
+}
