@@ -1,0 +1,104 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ColorPicker from './ColorPicker';
+import { getFixedT } from '@/i18n/i18next';
+import { tools } from '@/data/tools';
+import type { Locale } from '@/i18n/config';
+
+interface Props {
+	lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getFixedT(lang, 'tool-color-picker');
+
+const tool = tools.find((item) => item.id === 'color-picker')!;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const relatedTools = tools.filter((item) => item.category === tool.category && item.id !== tool.id);
+
+const messages = {
+	pickerHeading: t('ui.pickerHeading'),
+	hexLabel: t('ui.hexLabel'),
+	rLabel: t('ui.rLabel'),
+	gLabel: t('ui.gLabel'),
+	bLabel: t('ui.bLabel'),
+	hLabel: t('ui.hLabel'),
+	sLabel: t('ui.sLabel'),
+	lLabel: t('ui.lLabel'),
+	copy: t('ui.copy'),
+	copied: t('ui.copied'),
+	harmonyHeading: t('ui.harmonyHeading'),
+	harmonyComplementary: t('ui.harmonyComplementary'),
+	harmonyAnalogous: t('ui.harmonyAnalogous'),
+	harmonyTriadic: t('ui.harmonyTriadic'),
+	harmonyTetradic: t('ui.harmonyTetradic'),
+	harmonySplit: t('ui.harmonySplit'),
+	harmonyMonochromatic: t('ui.harmonyMonochromatic'),
+	randomHeading: t('ui.randomHeading'),
+	generate: t('ui.generate'),
+	generateHint: t('ui.generateHint'),
+	lockAria: t('ui.lockAria'),
+	unlockAria: t('ui.unlockAria'),
+	copyPaletteCss: t('ui.copyPaletteCss'),
+	copyPaletteJson: t('ui.copyPaletteJson'),
+	contrastHeading: t('ui.contrastHeading'),
+	contrastVsWhite: t('ui.contrastVsWhite'),
+	contrastVsBlack: t('ui.contrastVsBlack'),
+	contrastPassAAA: t('ui.contrastPassAAA'),
+	contrastPassAA: t('ui.contrastPassAA'),
+	contrastFail: t('ui.contrastFail'),
+	invalidHexError: t('ui.invalidHexError'),
+};
+
+const schema = {
+	'@context': 'https://schema.org',
+	'@type': 'WebApplication',
+	name: t('heading'),
+	description: t('meta.description'),
+	url: canonicalUrl,
+	applicationCategory: 'DesignApplication',
+	operatingSystem: 'Any',
+	offers: {
+		'@type': 'Offer',
+		price: '0',
+		priceCurrency: 'USD',
+	},
+};
+---
+
+<Layout title={t('meta.title')} description={t('meta.description')} lang={lang}>
+	<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+	<section class="px-4 py-10">
+		<h1 class="text-3xl font-bold text-foreground">{t('heading')}</h1>
+		<p class="mt-2 text-muted-foreground">{t('tagline')}</p>
+		<div class="mt-6 max-w-4xl">
+			<ColorPicker client:load messages={messages} />
+		</div>
+	</section>
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-xl font-semibold text-foreground">{t('article.heading')}</h2>
+		<div class="mt-4 flex max-w-3xl flex-col gap-4 text-muted-foreground">
+			<p>{t('article.p1')}</p>
+			<p>{t('article.p2')}</p>
+			<p>{t('article.p3')}</p>
+			<p>{t('article.p4')}</p>
+		</div>
+	</section>
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-xl font-semibold text-foreground">{t('related')}</h2>
+		<ul class="mt-4 flex flex-col gap-1">
+			{
+				relatedTools.map((related) => (
+					<li>
+						<a
+							href={`/${lang}/tools/${related.slugs[lang]}/`}
+							class="text-sm text-primary hover:underline"
+						>
+							{related.names[lang]}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+</Layout>

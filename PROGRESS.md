@@ -21,9 +21,15 @@
   nhập thủ công (không phải việc agent tự làm được) — xem chi tiết từng mục trong log bên
   dưới (meta title/description, schema JSON-LD, nội dung SEO 300–500 từ, internal linking
   map, Core Web Vitals đều đã audit/sửa xong).
-- **Phase 3 — Mở rộng công cụ ngách: 4/10 tool xong** (JWT Decoder, Base64 Encode/Decode,
-  Regex Tester — cả ba 2026-07-26; SVG Optimizer — 2026-07-27) ✅. Task tiếp theo trong
-  Phase 3: Color Picker & Palette Generator.
+- **Phase 3 — Mở rộng công cụ ngách: 5/10 tool xong** (JWT Decoder, Base64 Encode/Decode,
+  Regex Tester — cả ba 2026-07-26; SVG Optimizer, Color Picker & Palette Generator — cả hai
+  2026-07-27) ✅. Task tiếp theo trong Phase 3: CSV ↔ JSON Converter.
+- **Lưu ý i18n quan trọng cho các tool tiếp theo**: theo yêu cầu trực tiếp của người dùng
+  (2026-07-27, ngay sau SVG Optimizer), từ Color Picker trở đi, mỗi tool mới **chỉ tạo file
+  dịch cho `en` và `vi`** — 18 ngôn ngữ còn lại người dùng sẽ tự bổ sung sau. Vẫn khai báo
+  đủ slug + tên cho cả 20 ngôn ngữ trong `tools.ts` như thường lệ (để routing/slug sẵn
+  sàng), chỉ không viết `tool-<id>.json` cho 18 locale kia. Đây là quyết định chủ động, KHÔNG
+  phải bug fallback âm thầm như từng gặp ở `zh-tw`/SVG Optimizer.
 - **Phase 1 — 10 công cụ cốt lõi: HOÀN TẤT 10/10** ✅. **Phase 1.5 — Rà soát & Nâng cấp
   Feature Parity: HOÀN TẤT 10/10 tool** ✅ (tool #10 "Chuyển đổi Case văn bản" vừa xong —
   xem log bên dưới), CHỈ CÒN treo lại đúng 1 mục con nhỏ: nén PDF cho tool #4/#5 (chưa
@@ -121,6 +127,53 @@
 ---
 
 ## Nhật ký (mới nhất ở trên cùng)
+
+### 2026-07-27 — Phase 3, tool #5: Color Picker & Palette Generator — HOÀN TẤT
+- **Benchmark đối thủ**: Coolors.co (random palette generator có khóa/lock từng màu, phím
+  tắt spacebar để tạo lại), Adobe Color (bánh xe màu + các quy tắc phối màu). Theo yêu cầu
+  trực tiếp của người dùng (xem ghi chú i18n ở mục "Trạng thái hiện tại" phía trên), phiên
+  này **chỉ tạo file dịch `en`/`vi`**, không làm đủ 20 ngôn ngữ như các tool trước.
+- **Tính năng đã làm** (`src/components/tools/ColorPicker.tsx`, JS thuần không thêm
+  dependency màu sắc nào — chỉ dùng lại `lucide-react` đã có sẵn cho icon khóa):
+  - Bộ chọn màu đồng bộ hai chiều đầy đủ: input màu gốc của trình duyệt, ô nhập HEX, và 6
+    ô số R/G/B + H/S/L — sửa bất kỳ ô nào, các ô còn lại tự cập nhật theo.
+  - Sinh bảng phối màu tự động theo 6 quy tắc lý thuyết màu từ màu gốc: Complementary,
+    Analogous, Triadic, Tetradic, Split-complementary, Monochromatic.
+  - Bảng màu ngẫu nhiên kiểu Coolors: nút "Generate" + phím tắt phím cách, khóa
+    (lock/unlock) từng ô màu riêng lẻ để giữ lại khi tạo lại — đã test xác nhận đúng: khóa 1
+    ô rồi generate lại, ô đó giữ nguyên, 4 ô còn lại đổi màu.
+  - Copy nhanh mã HEX của từng ô màu (bấm vào ô), copy cả bảng màu dưới dạng CSS custom
+    properties hoặc mảng JSON.
+  - Kiểm tra độ tương phản WCAG: tính tỷ lệ tương phản chính xác giữa màu đã chọn với chữ
+    trắng/đen (công thức relative luminance đúng chuẩn WCAG), gắn nhãn AA/AAA/Fail.
+  - Gap so với Coolors/Adobe Color không làm ở lượt này (theo đúng tinh thần scope gọn của
+    Phase 3): trích xuất bảng màu từ ảnh upload, xuất file PNG/PDF/SVG, thư viện cộng đồng
+    (browse palette) — tính năng cuối cần backend nên loại hẳn theo triết lý zero-server của
+    dự án.
+- **Phát hiện và sửa 1 bug thật khi test tương tác**: state ban đầu của bảng màu ngẫu nhiên
+  được khởi tạo bằng `Math.random()` ngay trong `useState(() => ...)` — vì Astro
+  pre-render component `client:load` một lần lúc build để sinh HTML tĩnh (giống ghi chú kỹ
+  thuật cũ về `jsoneditor`), giá trị ngẫu nhiên sinh ra lúc build (server) và lúc hydrate
+  (client) khác nhau, gây lỗi **React hydration mismatch (Minified React error #418)** — bắt
+  được qua `page.on('pageerror', ...)` trong lúc test bằng Puppeteer, không phải qua đọc code
+  tĩnh. Đã sửa bằng cách khởi tạo `palette` với giá trị cố định (không ngẫu nhiên) để khớp
+  giữa server/client, rồi random hóa thật sự trong `useEffect` chạy sau khi mount (chỉ chạy
+  ở client, không ảnh hưởng hydration). Rebuild + test lại: hết lỗi console.
+- **Test tương tác bằng Puppeteer** (dùng lại bản Puppeteer sẵn có trong npx cache, không
+  cài thêm dependency): xác nhận đúng toàn bộ — đồng bộ HEX↔RGB↔HSL hai chiều (kể cả khi
+  sửa 1 ô RGB thì HEX cập nhật đúng), báo lỗi đúng khi nhập hex không hợp lệ và giữ nguyên
+  giá trị hợp lệ trước đó (không bị hỏng state), chuyển đổi đúng giữa 6 kiểu phối màu, tạo
+  bảng ngẫu nhiên + khóa/mở khóa từng ô đúng, phím tắt Space hoạt động, copy CSS/JSON/HEX
+  từng ô đều đúng, chỉ số tương phản WCAG hợp lý. Trong lúc test cũng gặp vài lần "bug giả"
+  do chính script test dùng sai selector (nhầm vào input màu native thay vì ô HEX text, nhầm
+  vào nút "Toggle theme" ở header vì cũng có `aria-label`) — đã tự phát hiện qua đối chiếu
+  DOM trực tiếp và loại trừ trước khi kết luận, không báo nhầm thành lỗi ứng dụng.
+- **Build**: `npm run build` (Node 22.23.1) sạch, đúng **321 trang tĩnh** (301 + 20 = thêm 1
+  tool × 20 ngôn ngữ, dù chỉ 2/20 ngôn ngữ có bản dịch thật — 18 ngôn ngữ còn lại fallback
+  tiếng Anh có chủ đích, đã ghi rõ ở mục "Trạng thái hiện tại").
+- Đã tick checkbox "Color Picker & Palette Generator" trong `ROADMAP.md` (Phase 3, tool
+  #5/10).
+- Đã commit 1 commit duy nhất. **Chưa push** — để người dùng quyết định.
 
 ### 2026-07-27 — Phase 3, tool #4: SVG Optimizer — HOÀN TẤT
 - **Bối cảnh đầu phiên**: `git status` cho thấy phần lớn công việc của SVG Optimizer đã được

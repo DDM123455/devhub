@@ -14,6 +14,7 @@ import JwtDecoderPage from '@/components/tools/JwtDecoderPage.astro';
 import Base64ToolPage from '@/components/tools/Base64ToolPage.astro';
 import RegexTesterPage from '@/components/tools/RegexTesterPage.astro';
 import SvgOptimizerPage from '@/components/tools/SvgOptimizerPage.astro';
+import ColorPickerPage from '@/components/tools/ColorPickerPage.astro';
 import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { tools } from '@/data/tools';
@@ -63,6 +64,8 @@ const name = tool.names[locale];
 		<RegexTesterPage lang={locale} />
 	) : toolId === 'svg-optimizer' ? (
 		<SvgOptimizerPage lang={locale} />
+	) : toolId === 'color-picker' ? (
+		<ColorPickerPage lang={locale} />
 	) : (
 		<Layout title={`${name} — Web Tool Hub`} description={name} lang={locale}>
 			<section class="px-4 py-10">

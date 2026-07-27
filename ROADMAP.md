@@ -118,7 +118,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] Base64 Encode/Decode
 - [x] Regex Tester
 - [x] SVG Optimizer — `svgo`
-- [ ] Color Picker & Palette Generator
+- [x] Color Picker & Palette Generator
 - [ ] CSV ↔ JSON Converter
 - [ ] JSON → Excel Converter
 - [ ] Markdown Viewer/Editor

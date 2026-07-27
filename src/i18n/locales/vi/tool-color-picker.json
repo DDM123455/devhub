@@ -1,0 +1,49 @@
+{
+  "meta": {
+    "title": "Công cụ Chọn Màu & Tạo Bảng Phối Màu Miễn Phí — Web Tool Hub",
+    "description": "Chọn màu, chuyển đổi HEX/RGB/HSL và tạo bảng phối màu hài hòa ngay trong trình duyệt, hoàn toàn miễn phí. Không tải lên, không cần đăng ký."
+  },
+  "heading": "Chọn Màu & Tạo Bảng Phối Màu",
+  "tagline": "Chọn một màu, tạo bảng phối màu, và kiểm tra độ tương phản — tất cả ngay trong trình duyệt.",
+  "ui": {
+    "pickerHeading": "Bộ chọn màu",
+    "hexLabel": "HEX",
+    "rLabel": "R",
+    "gLabel": "G",
+    "bLabel": "B",
+    "hLabel": "H",
+    "sLabel": "S",
+    "lLabel": "L",
+    "copy": "Sao chép",
+    "copied": "Đã sao chép!",
+    "harmonyHeading": "Phối màu theo lý thuyết",
+    "harmonyComplementary": "Bổ túc",
+    "harmonyAnalogous": "Tương đồng",
+    "harmonyTriadic": "Bộ ba",
+    "harmonyTetradic": "Bộ bốn",
+    "harmonySplit": "Bổ túc phân chia",
+    "harmonyMonochromatic": "Đơn sắc",
+    "randomHeading": "Bảng màu ngẫu nhiên",
+    "generate": "Tạo mới",
+    "generateHint": "Nhấn phím cách để tạo bảng màu mới. Bấm biểu tượng khóa để giữ lại một màu.",
+    "lockAria": "Mở khóa màu này",
+    "unlockAria": "Khóa màu này",
+    "copyPaletteCss": "Sao chép dạng CSS",
+    "copyPaletteJson": "Sao chép dạng JSON",
+    "contrastHeading": "Kiểm tra độ tương phản",
+    "contrastVsWhite": "Chữ trắng",
+    "contrastVsBlack": "Chữ đen",
+    "contrastPassAAA": "Đạt AAA",
+    "contrastPassAA": "Đạt AA",
+    "contrastFail": "Không đạt",
+    "invalidHexError": "Vui lòng nhập mã màu hex hợp lệ, ví dụ #3b82f6."
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Phối màu hài hòa và độ tương phản hoạt động thế nào?",
+    "p1": "Mỗi màu sắc trên màn hình đều có thể mô tả theo ba cách khác nhau, và công cụ này luôn đồng bộ cả ba: HEX là ký hiệu rút gọn dùng trong CSS và các phần mềm thiết kế, RGB mô tả lượng ánh sáng đỏ, xanh lá, xanh dương pha trộn để tạo ra màu đó, còn HSL — sắc độ (hue), độ bão hòa (saturation), độ sáng (lightness) — mô tả màu theo cách con người thực sự cảm nhận: đó là màu gì, rực rỡ ra sao, và sáng hay tối đến mức nào. Kéo ô màu gốc, gõ mã HEX, hoặc chỉnh trực tiếp từng ô R/G/B hay H/S/L, mọi ô còn lại sẽ tự cập nhật ngay lập tức, giúp bạn chuyển đổi giữa các cách hình dung màu sắc khác nhau mà không cần tự tính toán.",
+    "p2": "Bánh xe màu sắc là nền tảng cho sáu quy tắc phối màu kinh điển, tất cả đều được tạo tự động từ màu gốc bạn chọn. Bổ túc (complementary) ghép một màu với màu đối diện để đạt độ tương phản cao nhất; tương đồng (analogous) chọn các màu liền kề trên bánh xe để tạo cảm giác nhẹ nhàng, gắn kết; bộ ba và bộ bốn (triadic/tetradic) chia đều ba hoặc bốn màu quanh bánh xe cho bảng màu sống động nhưng vẫn cân bằng; bổ túc phân chia (split-complementary) làm dịu bớt một cặp bổ túc bằng cách dùng hai màu cạnh màu đối diện thay vì chính màu đối diện; còn đơn sắc (monochromatic) chỉ giữ nguyên một sắc độ và thay đổi độ sáng, thường là lựa chọn an toàn nhất khi giao diện cần một màu thương hiệu nhất quán ở nhiều cấp độ sáng khác nhau.",
+    "p3": "Không phải bảng màu đẹp nào cũng phải bắt đầu từ lý thuyết màu sắc — đôi khi bạn chỉ muốn xem thử điều gì xuất hiện. Bộ tạo bảng màu ngẫu nhiên (nhấn phím cách, hoặc bấm nút Tạo mới) cho ra năm màu cùng lúc, với sắc độ và độ sáng được cân chỉnh để tránh những màu xỉn hoặc quá nhạt. Bấm biểu tượng khóa trên bất kỳ ô màu nào bạn muốn giữ lại, rồi tạo lại lần nữa: chỉ những màu chưa khóa mới thay đổi, nhờ vậy bạn có thể xây dựng bảng màu dần dần, giống cách các công cụ như Coolors hoạt động. Bấm vào bất kỳ ô màu nào để sao chép mã HEX của nó, hoặc dùng các nút bên dưới bảng màu để sao chép toàn bộ dưới dạng biến CSS hoặc mảng JSON, sẵn sàng dán vào file stylesheet hay design token.",
+    "p4": "Chọn được một màu đẹp mắt không đồng nghĩa với việc nó dùng được — chữ đặt trên nền có độ sáng quá gần nhau sẽ khó đọc, và tiêu chuẩn Web Content Accessibility Guidelines (WCAG) đặt ra ngưỡng cụ thể cho việc này: tỷ lệ tương phản tối thiểu 4.5:1 với chữ thường để đạt mức AA, và 7:1 để đạt mức AAA nghiêm ngặt hơn. Công cụ kiểm tra độ tương phản tính chính xác tỷ lệ giữa màu bạn chọn với cả chữ trắng lẫn chữ đen, dùng đúng công thức độ chói tương đối (relative luminance) mà chuẩn WCAG quy định, và báo rõ từng cặp có đạt chuẩn hay không — giúp bạn phát hiện một nút bấm hay tiêu đề có độ tương phản thấp trước khi đưa lên sản phẩm, thay vì sau đó."
+  }
+}
