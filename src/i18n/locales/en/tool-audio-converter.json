@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "title": "MP3 to WAV Converter Online Free — Web Tool Hub",
+    "description": "Convert MP3 to WAV and WAV to MP3 right in your browser — pick a bitrate, preview before and after, download the result. No upload, no server."
+  },
+  "heading": "MP3 ↔ WAV Converter",
+  "tagline": "Convert between MP3 and WAV — pick a bitrate, preview the result, download it — entirely in your browser.",
+  "ui": {
+    "dropLabel": "Drag and drop an audio file here",
+    "chooseFile": "Choose audio",
+    "previewLabel": "Original",
+    "outputFormatLabel": "Convert to",
+    "formatMp3": "MP3",
+    "formatWav": "WAV",
+    "bitrateLabel": "Bitrate",
+    "convertButton": "Convert",
+    "decodingLabel": "Decoding audio…",
+    "encodingLabel": "Encoding… {{percent}}%",
+    "resultLabel": "Result",
+    "download": "Download",
+    "originalLabel": "Original",
+    "convertedLabel": "Converted",
+    "sizeAndDuration": "{{size}} · {{duration}}",
+    "clear": "Choose a different file",
+    "decodeError": "Couldn't read this audio file — it may be corrupted or in a format this browser can't decode.",
+    "encodeError": "Conversion failed. Try a different bitrate, or choose a different file."
+  },
+  "related": "Related tools",
+  "article": {
+    "heading": "Converting between MP3 and WAV without a server",
+    "p1": "WAV and MP3 exist for opposite reasons. WAV stores audio as raw, uncompressed samples — every bit of the original waveform, at the cost of a large file — which is why it's the format professional audio and video editing software expects. MP3 throws away the parts of the signal human hearing barely notices to shrink that same audio down to a fraction of the size, which is why it's the format for sharing, streaming, and everyday listening. The moment you need to hand a WAV recording to something that only accepts MP3, or pull a WAV out of an MP3 for an editor that needs uncompressed audio, you're stuck converting — and most online converters solve that by asking you to upload the file to their server first.",
+    "p2": "This tool converts locally instead, using two things every modern browser already has built in and one small, purpose-built library. The browser's own Web Audio API decodes your file — MP3 or WAV — into raw audio samples without needing a plugin or a server. From there, converting to WAV is a matter of packaging those samples with a standard WAV header; converting to MP3 runs those samples through a compact, well-established JavaScript MP3 encoder. The actual encoding work happens on a separate background thread (a Web Worker), so the tab doesn't lock up while a longer file processes. Your audio file is never uploaded anywhere at any point.",
+    "p3": "When converting to MP3, pick a bitrate: 128 kbps is fine for spoken word or casual listening and keeps the file small, 320 kbps is closer to the original quality for music at the cost of a larger file, and 192–256 kbps sits in between. Converting to WAV has no such choice to make — WAV doesn't compress, so the result simply contains the same audio as uncompressed PCM samples, larger than the MP3 source but with nothing further lost.",
+    "p4": "Preview both the original and the converted result directly on the page before downloading, and compare the file size difference between the two. If you're trimming a video's audio track or extracting a clip before converting it, the Video Trimmer handles that side of things; for anything text-based that needs a similar local, no-upload workflow, the tools in the Dev and Text categories on this site follow the same principle."
+  }
+}

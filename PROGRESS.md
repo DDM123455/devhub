@@ -15,15 +15,12 @@
 - **Phase 2 — SEO & đa ngôn ngữ**: HOÀN TẤT 6/8 mục. 2 mục còn treo (submit sitemap lên
   Google Search Console / Bing Webmaster Tools) bị chặn vì chưa có public domain thật + cần
   đăng nhập thủ công, không phải việc agent tự làm được.
-- **Phase 3 — Mở rộng công cụ ngách: 9/10 tool xong** (JWT Decoder, Base64 Encode/Decode,
-  Regex Tester, SVG Optimizer, Color Picker & Palette Generator, CSV ↔ JSON Converter,
-  JSON → Excel Converter, Markdown Viewer/Editor, Trim video ngắn). Task tiếp theo: Chuyển
-  đổi Audio MP3 ↔ WAV — sẽ tự động lấp khoảng trống "related tools" rỗng của Trim video ngắn
-  (category `media` mới hiện chỉ có 1 tool, xem ghi chú bên dưới).
-- **Category mới `media`** (thêm ở `src/data/categories.ts`, Trim video ngắn là tool đầu
-  tiên): related-tools tự động lọc theo cùng category, nên hiện tại trang Trim video ngắn có
-  0 related tool hiển thị (chưa đủ 2-3 theo checklist SEO) — sẽ tự hết khi thêm tool Audio
-  MP3 ↔ WAV (cùng category `media`) ở task kế tiếp, không phải bug.
+- **Phase 3 — HOÀN TẤT 10/10 tool** (JWT Decoder, Base64 Encode/Decode, Regex Tester, SVG
+  Optimizer, Color Picker & Palette Generator, CSV ↔ JSON Converter, JSON → Excel Converter,
+  Markdown Viewer/Editor, Trim video ngắn, Chuyển đổi Audio MP3 ↔ WAV). Category `media`
+  (thêm ở Phase 3 #9) nay có đủ 2 tool nên related-tools của cả Trim video ngắn và MP3 ↔ WAV
+  Converter đã hiển thị lẫn nhau, không còn khoảng trống. Task tiếp theo: chọn 1 hạng mục ở
+  Phase 4 (Kiếm tiền & PWA) hoặc Phase 5 (Launch & Growth) trong `ROADMAP.md`.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -88,6 +85,18 @@
   khiến thư viện cố đọc lại một `Response` đã đọc hết và crash "body stream already read";
   dùng `toBlobURL(url, mimeType)` không kèm progress để tránh nhánh code lỗi này (mất progress
   % khi tải engine, chỉ còn hiển thị trạng thái "đang tải" chung chung).
+- **Chuyển đổi Audio MP3 ↔ WAV không dùng ffmpeg.wasm** (Phase 3 #10, khác với Trim video ngắn):
+  giải mã MP3/WAV bằng `AudioContext.decodeAudioData` có sẵn của trình duyệt (native, không
+  cần thư viện), mã hóa WAV bằng cách tự viết RIFF header (44 byte) + PCM 16-bit, mã hóa MP3
+  bằng `@breezystack/lamejs` (fork `lamejs` gốc còn được cập nhật, có kèm type Typescript).
+  Không cần tải engine ngoài qua CDN như Trim video ngắn — toàn bộ tự host trong bundle, nhẹ
+  hơn nhiều (không có giới hạn 25MiB của Cloudflare). Phần mã hóa nặng (vòng lặp encode MP3)
+  chạy trong Web Worker riêng (`audioEncodeWorker.ts`, dùng `new Worker(new URL(...), {type:
+  'module'})` — cùng pattern Vite đã dùng cho worker của `@ffmpeg/ffmpeg`) để không đứng UI
+  khi xử lý file dài, đúng yêu cầu Web Worker cho xử lý nặng trong `CLAUDE.md`. Lưu ý:
+  `AudioContext`/`decodeAudioData` chỉ chạy được ở main thread (không có trong Worker), nên
+  bước giải mã luôn ở component chính, chỉ phần đóng gói byte (WAV) và mã hóa (MP3) chuyển
+  cho worker qua `postMessage` với `Float32Array` transferable.
 - **URL routing**: `/{lang}/...` cho MỌI ngôn ngữ kể cả `en` (`prefixDefaultLocale: true`).
   `src/pages/index.astro` phải luôn tồn tại (dù rỗng) để Astro sinh redirect `/` → `/en/`,
   xoá file này sẽ lỗi `MissingIndexForInternationalizationError`.
@@ -100,6 +109,18 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-28** — Chuyển đổi Audio MP3 ↔ WAV (Phase 3 #10) hoàn tất — **Phase 3 HOÀN TẤT
+  10/10 tool**. Giải mã MP3/WAV bằng Web Audio API có sẵn của trình duyệt (không cần thư
+  viện), mã hóa MP3 bằng `@breezystack/lamejs`, mã hóa WAV tự viết RIFF header + PCM 16-bit;
+  phần mã hóa chạy trong Web Worker riêng để không đứng UI. Tự động gợi ý định dạng đích
+  (upload .mp3 → gợi ý WAV, upload .wav → gợi ý MP3), chọn bitrate khi xuất MP3
+  (128/192/256/320 kbps), nghe thử gốc/kết quả, so sánh dung lượng. Vì cùng category `media`
+  với Trim video ngắn (task trước), 2 tool này nay hiện related-tools của nhau, lấp khoảng
+  trống đã ghi nhận ở log trước. Build sạch + test Puppeteer tương tác thật (tạo file WAV mẫu
+  bằng OfflineAudioContext ngay trong Puppeteer, chuyển WAV→MP3 thật, dùng chính MP3 vừa tạo
+  ra để test chiều MP3→WAV — round-trip đầy đủ qua engine thật, không mock, kiểm tra
+  related-tools, ẩn/hiện bitrate theo định dạng, dark mode) + commit riêng, chỉ làm i18n
+  en/vi theo quy ước hiện hành.
 - **2026-07-28** — Trim video ngắn (Phase 3 #9) hoàn tất: cắt một đoạn video ngay trên trình
   duyệt bằng FFmpeg biên dịch WebAssembly (`@ffmpeg/ffmpeg` + `@ffmpeg/util`), chọn điểm bắt
   đầu/kết thúc bằng slider hoặc nút "lấy thời điểm hiện tại" từ video đang phát, 2 chế độ cắt

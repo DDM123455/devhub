@@ -123,7 +123,8 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] JSON → Excel Converter — `exceljs`
 - [x] Markdown Viewer/Editor — `marked` + `dompurify`
 - [x] Trim video ngắn — `ffmpeg.wasm` (`@ffmpeg/ffmpeg` + `@ffmpeg/util`, core engine tải qua jsDelivr CDN)
-- [ ] Chuyển đổi Audio MP3 ↔ WAV
+- [x] Chuyển đổi Audio MP3 ↔ WAV — Web Audio API (decode) + `@breezystack/lamejs` (encode MP3) +
+      WAV header viết tay, mã hóa trong Web Worker
 
 ## Phase 4 — Kiếm tiền & PWA
 

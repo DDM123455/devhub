@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "title": "Chuyển đổi MP3 sang WAV Online Miễn phí — Web Tool Hub",
+    "description": "Chuyển đổi MP3 sang WAV và WAV sang MP3 ngay trên trình duyệt — chọn bitrate, nghe thử trước/sau, tải kết quả về. Không tải lên server."
+  },
+  "heading": "Chuyển đổi MP3 ↔ WAV",
+  "tagline": "Chuyển đổi qua lại giữa MP3 và WAV — chọn bitrate, nghe thử kết quả, tải về — hoàn toàn trên trình duyệt của bạn.",
+  "ui": {
+    "dropLabel": "Kéo thả file âm thanh vào đây",
+    "chooseFile": "Chọn file âm thanh",
+    "previewLabel": "File gốc",
+    "outputFormatLabel": "Chuyển sang",
+    "formatMp3": "MP3",
+    "formatWav": "WAV",
+    "bitrateLabel": "Bitrate",
+    "convertButton": "Chuyển đổi",
+    "decodingLabel": "Đang giải mã âm thanh…",
+    "encodingLabel": "Đang mã hóa… {{percent}}%",
+    "resultLabel": "Kết quả",
+    "download": "Tải xuống",
+    "originalLabel": "Gốc",
+    "convertedLabel": "Đã chuyển đổi",
+    "sizeAndDuration": "{{size}} · {{duration}}",
+    "clear": "Chọn file khác",
+    "decodeError": "Không đọc được file âm thanh này — có thể file bị hỏng hoặc định dạng mà trình duyệt này không giải mã được.",
+    "encodeError": "Chuyển đổi thất bại. Thử bitrate khác, hoặc chọn file khác."
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Chuyển đổi MP3 và WAV mà không cần server",
+    "p1": "WAV và MP3 tồn tại vì hai lý do trái ngược nhau. WAV lưu âm thanh dưới dạng mẫu thô, không nén — giữ nguyên từng bit của waveform gốc, đổi lại là dung lượng file lớn — đó là lý do các phần mềm dựng âm thanh và video chuyên nghiệp đều yêu cầu định dạng này. MP3 loại bỏ những phần tín hiệu mà tai người gần như không nhận ra để thu nhỏ cùng một đoạn âm thanh xuống chỉ còn một phần nhỏ dung lượng, đó là lý do nó là định dạng dùng để chia sẻ, streaming, nghe nhạc hàng ngày. Ngay khi bạn cần đưa một bản ghi WAV cho thứ gì đó chỉ nhận MP3, hay cần lấy ra một bản WAV từ file MP3 để đưa vào phần mềm dựng cần âm thanh không nén, bạn sẽ phải chuyển đổi — và hầu hết các công cụ online giải quyết việc đó bằng cách bắt bạn tải file lên server của họ trước.",
+    "p2": "Công cụ này chuyển đổi ngay tại chỗ, dùng hai thứ mà mọi trình duyệt hiện đại đã có sẵn cùng một thư viện nhỏ chuyên dụng. Web Audio API có sẵn của trình duyệt giải mã file của bạn — MP3 hay WAV — thành mẫu âm thanh thô mà không cần plugin hay server nào. Từ đó, chuyển sang WAV chỉ đơn giản là đóng gói các mẫu đó cùng một header WAV chuẩn; chuyển sang MP3 thì đưa các mẫu đó qua một bộ mã hóa MP3 viết bằng JavaScript, gọn nhẹ và đã được kiểm chứng rộng rãi. Phần mã hóa thực sự chạy trên một luồng nền riêng (Web Worker), nên tab trình duyệt không bị đứng khi xử lý file dài. File âm thanh của bạn không bao giờ bị tải lên bất cứ đâu trong suốt quá trình.",
+    "p3": "Khi chuyển sang MP3, hãy chọn bitrate: 128 kbps đủ tốt cho giọng nói hoặc nghe thông thường và giữ dung lượng file nhỏ, 320 kbps gần với chất lượng gốc hơn cho nhạc nhưng đổi lại dung lượng lớn hơn, còn 192–256 kbps nằm ở giữa. Chuyển sang WAV thì không có lựa chọn nào như vậy — WAV không nén, nên kết quả đơn giản là chứa cùng đoạn âm thanh dưới dạng mẫu PCM không nén, dung lượng lớn hơn file MP3 gốc nhưng không mất thêm gì.",
+    "p4": "Nghe thử cả file gốc lẫn kết quả đã chuyển đổi ngay trên trang trước khi tải về, và so sánh chênh lệch dung lượng giữa hai file. Nếu bạn cần cắt phần âm thanh của một video hoặc lấy ra một đoạn clip trước khi chuyển đổi, công cụ Cắt video ngắn sẽ đảm nhiệm phần đó; còn với bất cứ tác vụ nào liên quan đến văn bản cần quy trình xử lý cục bộ, không tải lên tương tự, các công cụ trong nhóm Dev Tools và Text trên trang này đều tuân theo cùng nguyên tắc đó."
+  }
+}

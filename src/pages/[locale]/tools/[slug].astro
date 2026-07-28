@@ -19,6 +19,7 @@ import CsvJsonConverterPage from '@/components/tools/CsvJsonConverterPage.astro'
 import JsonExcelConverterPage from '@/components/tools/JsonExcelConverterPage.astro';
 import MarkdownEditorPage from '@/components/tools/MarkdownEditorPage.astro';
 import VideoTrimPage from '@/components/tools/VideoTrimPage.astro';
+import AudioConverterPage from '@/components/tools/AudioConverterPage.astro';
 import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { tools } from '@/data/tools';
@@ -78,6 +79,8 @@ const name = tool.names[locale];
 		<MarkdownEditorPage lang={locale} />
 	) : toolId === 'video-trim' ? (
 		<VideoTrimPage lang={locale} />
+	) : toolId === 'audio-converter' ? (
+		<AudioConverterPage lang={locale} />
 	) : (
 		<Layout title={`${name} — Web Tool Hub`} description={name} lang={locale}>
 			<section class="px-4 py-10">
