@@ -121,7 +121,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] Color Picker & Palette Generator
 - [x] CSV ↔ JSON Converter — `papaparse`
 - [x] JSON → Excel Converter — `exceljs`
-- [ ] Markdown Viewer/Editor
+- [x] Markdown Viewer/Editor — `marked` + `dompurify`
 - [ ] Trim video ngắn — `ffmpeg.wasm`
 - [ ] Chuyển đổi Audio MP3 ↔ WAV
 

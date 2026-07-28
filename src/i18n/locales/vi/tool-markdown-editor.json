@@ -1,0 +1,45 @@
+{
+  "meta": {
+    "title": "Trình soạn thảo Markdown & Xem trước Trực tiếp Miễn phí — Web Tool Hub",
+    "description": "Soạn thảo Markdown với xem trước trực tiếp chuẩn GFM — thanh công cụ định dạng, bảng, danh sách công việc, xuất file .md hoặc .html. Chạy hoàn toàn trên trình duyệt, không tải lên server."
+  },
+  "heading": "Trình soạn thảo Markdown",
+  "tagline": "Soạn Markdown một bên, xem kết quả hiển thị chính xác ở bên còn lại — thanh công cụ định dạng, bảng GFM, xuất file .md hoặc .html, hoàn toàn trên trình duyệt của bạn.",
+  "ui": {
+    "viewSplit": "Chia đôi",
+    "viewEditor": "Soạn thảo",
+    "viewPreview": "Xem trước",
+    "boldTitle": "In đậm",
+    "italicTitle": "In nghiêng",
+    "headingTitle": "Tiêu đề",
+    "linkTitle": "Liên kết",
+    "imageTitle": "Hình ảnh",
+    "ulTitle": "Danh sách gạch đầu dòng",
+    "olTitle": "Danh sách đánh số",
+    "quoteTitle": "Trích dẫn",
+    "codeTitle": "Mã code",
+    "tableTitle": "Bảng",
+    "hrTitle": "Đường kẻ ngang",
+    "editorLabel": "Markdown",
+    "previewLabel": "Xem trước",
+    "inputPlaceholder": "Gõ hoặc dán nội dung Markdown vào đây…",
+    "dropLabel": "Kéo thả file .md, .markdown hoặc .txt vào đây",
+    "chooseFile": "Chọn file",
+    "loadSample": "Tải mẫu",
+    "clear": "Xóa",
+    "copyMarkdown": "Sao chép Markdown",
+    "copyHtml": "Sao chép HTML",
+    "copied": "Đã sao chép!",
+    "downloadMd": "Tải file .md",
+    "downloadHtml": "Tải file .html",
+    "wordCount": "{{words}} từ · {{chars}} ký tự"
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Soạn thảo Markdown với xem trước trực tiếp mà không cần server",
+    "p1": "Markdown trở thành định dạng mặc định cho file README, tài liệu kỹ thuật, mô tả pull request, và bài viết trên các trang blog tĩnh vì nó vẫn đọc được như văn bản thuần, nhưng vẫn hiển thị đúng định dạng — tiêu đề, chữ đậm/nghiêng, danh sách, liên kết, khối code — mà không cần dùng đến trình soạn thảo rich-text. Vấn đề là chỉ một lỗi cú pháp nhỏ (thiếu dòng trống trước một danh sách, một bảng có số cột không khớp giữa các dòng, một khối code dùng dấu ``` mà không đóng lại) có thể khiến kết quả hiển thị khác hẳn so với ý định của bạn, và thường bạn không thể nhận ra chỉ bằng cách nhìn vào văn bản gốc.",
+    "p2": "Công cụ này phân tích Markdown của bạn theo đúng quy tắc GitHub-Flavored Markdown (GFM) — quy tắc dùng để hiển thị README và pull request trên GitHub — và hiển thị kết quả render thực tế song song với văn bản gốc, cập nhật ngay khi bạn gõ. Vì việc phân tích và hiển thị diễn ra hoàn toàn trên trình duyệt của bạn, bất cứ thứ gì bạn đang viết — tài liệu nháp, ghi chú riêng tư, một bài blog chưa xuất bản — sẽ không bao giờ rời khỏi máy của bạn. Phần HTML hiển thị cũng được lọc sạch trước khi đưa ra màn hình, nên nếu bạn dán Markdown có chứa HTML thô hay một thẻ script lạc vào, nó sẽ không thể thực thi bất cứ điều gì trên trình duyệt — được xử lý như nội dung tĩnh, không phải mã chạy được.",
+    "p3": "Thanh công cụ định dạng sẽ chèn đúng cú pháp giúp bạn — in đậm, in nghiêng, tiêu đề, liên kết, hình ảnh, danh sách có thứ tự và không thứ tự, trích dẫn, code dạng inline hoặc dạng khối, bảng, và đường kẻ ngang — để bạn không cần nhớ chính xác ký hiệu Markdown cho những phần tử ít dùng như tiêu đề bảng hay liên kết kiểu tham chiếu. Chuyển đổi giữa chế độ chia đôi, chỉ soạn thảo, hoặc chỉ xem trước tùy theo không gian màn hình bạn cần, và ở chế độ chia đôi, hai khung sẽ cuộn đồng bộ với nhau nên bạn không bao giờ mất dấu phần văn bản gốc tương ứng với phần nào trong kết quả hiển thị.",
+    "p4": "Khi xong, hãy sao chép Markdown gốc hoặc HTML đã render thẳng vào clipboard, hoặc tải về dưới dạng file `.md` hay `.html` sẵn sàng sử dụng. Nếu cần so sánh hai phiên bản của một tài liệu thay vì chỉ xem trước một bản, công cụ So sánh văn bản sẽ highlight chính xác phần nào đã thay đổi; còn để đếm số từ và ước tính thời gian đọc cho bài viết hoàn chỉnh, Đếm từ & ký tự là điểm dừng tiếp theo hợp lý."
+  }
+}

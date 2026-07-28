@@ -1,0 +1,97 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import MarkdownEditor from './MarkdownEditor';
+import { getFixedT } from '@/i18n/i18next';
+import { tools } from '@/data/tools';
+import type { Locale } from '@/i18n/config';
+
+interface Props {
+	lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getFixedT(lang, 'tool-markdown-editor');
+
+const tool = tools.find((item) => item.id === 'markdown-editor')!;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const relatedTools = tools.filter((item) => item.category === tool.category && item.id !== tool.id);
+
+const messages = {
+	viewSplit: t('ui.viewSplit'),
+	viewEditor: t('ui.viewEditor'),
+	viewPreview: t('ui.viewPreview'),
+	boldTitle: t('ui.boldTitle'),
+	italicTitle: t('ui.italicTitle'),
+	headingTitle: t('ui.headingTitle'),
+	linkTitle: t('ui.linkTitle'),
+	imageTitle: t('ui.imageTitle'),
+	ulTitle: t('ui.ulTitle'),
+	olTitle: t('ui.olTitle'),
+	quoteTitle: t('ui.quoteTitle'),
+	codeTitle: t('ui.codeTitle'),
+	tableTitle: t('ui.tableTitle'),
+	hrTitle: t('ui.hrTitle'),
+	editorLabel: t('ui.editorLabel'),
+	previewLabel: t('ui.previewLabel'),
+	inputPlaceholder: t('ui.inputPlaceholder'),
+	dropLabel: t('ui.dropLabel'),
+	chooseFile: t('ui.chooseFile'),
+	loadSample: t('ui.loadSample'),
+	clear: t('ui.clear'),
+	copyMarkdown: t('ui.copyMarkdown'),
+	copyHtml: t('ui.copyHtml'),
+	copied: t('ui.copied'),
+	downloadMd: t('ui.downloadMd'),
+	downloadHtml: t('ui.downloadHtml'),
+	wordCount: t('ui.wordCount'),
+};
+
+const schema = {
+	'@context': 'https://schema.org',
+	'@type': 'WebApplication',
+	name: t('heading'),
+	description: t('meta.description'),
+	url: canonicalUrl,
+	applicationCategory: 'UtilitiesApplication',
+	operatingSystem: 'Any',
+	offers: {
+		'@type': 'Offer',
+		price: '0',
+		priceCurrency: 'USD',
+	},
+};
+---
+
+<Layout title={t('meta.title')} description={t('meta.description')} lang={lang}>
+	<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+	<section class="px-4 py-10">
+		<h1 class="text-3xl font-bold text-foreground">{t('heading')}</h1>
+		<p class="mt-2 text-muted-foreground">{t('tagline')}</p>
+		<div class="mt-6 max-w-5xl">
+			<MarkdownEditor client:load messages={messages} />
+		</div>
+	</section>
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-xl font-semibold text-foreground">{t('article.heading')}</h2>
+		<div class="mt-4 flex max-w-3xl flex-col gap-4 text-muted-foreground">
+			<p>{t('article.p1')}</p>
+			<p>{t('article.p2')}</p>
+			<p>{t('article.p3')}</p>
+			<p>{t('article.p4')}</p>
+		</div>
+	</section>
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-xl font-semibold text-foreground">{t('related')}</h2>
+		<ul class="mt-4 flex flex-col gap-1">
+			{
+				relatedTools.map((related) => (
+					<li>
+						<a href={`/${lang}/tools/${related.slugs[lang]}/`} class="text-sm text-primary hover:underline">
+							{related.names[lang]}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+</Layout>

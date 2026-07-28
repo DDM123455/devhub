@@ -1,0 +1,45 @@
+{
+  "meta": {
+    "title": "Markdown Editor & Live Preview Online Free — Web Tool Hub",
+    "description": "Write Markdown with a live, GFM-accurate preview — formatting toolbar, tables, task lists, export as .md or .html. Runs entirely in your browser, no upload."
+  },
+  "heading": "Markdown Viewer/Editor",
+  "tagline": "Write Markdown on one side, see an accurate live preview on the other — formatting toolbar, GFM tables, export as .md or .html, entirely in your browser.",
+  "ui": {
+    "viewSplit": "Split",
+    "viewEditor": "Editor",
+    "viewPreview": "Preview",
+    "boldTitle": "Bold",
+    "italicTitle": "Italic",
+    "headingTitle": "Heading",
+    "linkTitle": "Link",
+    "imageTitle": "Image",
+    "ulTitle": "Bulleted list",
+    "olTitle": "Numbered list",
+    "quoteTitle": "Quote",
+    "codeTitle": "Code",
+    "tableTitle": "Table",
+    "hrTitle": "Horizontal rule",
+    "editorLabel": "Markdown",
+    "previewLabel": "Preview",
+    "inputPlaceholder": "Type or paste Markdown here…",
+    "dropLabel": "Drag and drop a .md, .markdown, or .txt file here",
+    "chooseFile": "Choose file",
+    "loadSample": "Load sample",
+    "clear": "Clear",
+    "copyMarkdown": "Copy Markdown",
+    "copyHtml": "Copy HTML",
+    "copied": "Copied!",
+    "downloadMd": "Download .md",
+    "downloadHtml": "Download .html",
+    "wordCount": "{{words}} words · {{chars}} characters"
+  },
+  "related": "Related tools",
+  "article": {
+    "heading": "Writing Markdown with a live preview, without a server",
+    "p1": "Markdown became the default format for README files, documentation, pull request descriptions, and static-site blog posts because it's readable as plain text and still renders into properly formatted output — headings, bold and italic text, lists, links, and code blocks — without ever touching a rich-text editor. The catch is that even a small syntax slip (a missing blank line before a list, a table with mismatched column counts, a fenced code block that never closes) can render very differently from what you intended, and you usually can't tell just by looking at the raw text.",
+    "p2": "This tool parses your Markdown using the same GitHub-Flavored Markdown rules that render your READMEs and pull requests, and shows you the actual rendered output side by side with the source, updating as you type. Because the parsing and rendering happen entirely in your browser, whatever you're writing — draft documentation, private notes, a blog post that isn't published yet — never leaves your machine. The rendered HTML is also sanitized before being displayed, so pasting Markdown that contains raw HTML or a stray script tag can't execute anything in your browser; it's treated as inert content, not code.",
+    "p3": "The formatting toolbar inserts the right syntax for you — bold, italic, headings, links, images, ordered and unordered lists, blockquotes, inline or fenced code, tables, and horizontal rules — so you don't need to remember exact Markdown punctuation for less common elements like table headers or reference-style links. Switch between split view, editor-only, and preview-only depending on how much screen space you need, and the two panes scroll together in split view so you never lose track of which part of the source corresponds to which part of the rendered result.",
+    "p4": "When you're done, copy the raw Markdown or the rendered HTML straight to your clipboard, or download either one as a ready-to-use `.md` or `.html` file. If you need to compare two versions of a document instead of just previewing one, the Text Diff Checker highlights exactly what changed; for counting words and estimating reading time on the finished piece, the Word & Character Counter is a natural next stop."
+  }
+}

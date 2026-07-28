@@ -15,9 +15,10 @@
 - **Phase 2 — SEO & đa ngôn ngữ**: HOÀN TẤT 6/8 mục. 2 mục còn treo (submit sitemap lên
   Google Search Console / Bing Webmaster Tools) bị chặn vì chưa có public domain thật + cần
   đăng nhập thủ công, không phải việc agent tự làm được.
-- **Phase 3 — Mở rộng công cụ ngách: 7/10 tool xong** (JWT Decoder, Base64 Encode/Decode,
+- **Phase 3 — Mở rộng công cụ ngách: 8/10 tool xong** (JWT Decoder, Base64 Encode/Decode,
   Regex Tester, SVG Optimizer, Color Picker & Palette Generator, CSV ↔ JSON Converter,
-  JSON → Excel Converter). Task tiếp theo: Markdown Viewer/Editor.
+  JSON → Excel Converter, Markdown Viewer/Editor). Task tiếp theo: Trim video ngắn
+  (`ffmpeg.wasm`), Chuyển đổi Audio MP3 ↔ WAV.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -80,6 +81,20 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-28** — Markdown Viewer/Editor (Phase 3 #8) hoàn tất: soạn thảo Markdown với xem
+  trước GFM trực tiếp (bảng, gạch ngang, task list), 3 chế độ xem (chia đôi/chỉ soạn
+  thảo/chỉ xem trước) có cuộn đồng bộ ở chế độ chia đôi, thanh công cụ định dạng (đậm/nghiêng/
+  tiêu đề/liên kết/hình/danh sách/trích dẫn/code/bảng/đường kẻ), kéo-thả file, đếm từ/ký tự,
+  copy Markdown hoặc HTML, tải file `.md`/`.html`. Thêm dependency `marked` (parser GFM) +
+  `dompurify` (lọc sạch HTML render ra trước khi hiển thị — bắt buộc vì tool này render HTML
+  do người dùng nhập vào cùng trang, nếu không lọc sẽ là lỗ hổng XSS thật; đã test trực tiếp
+  bằng payload `<script>`/`onerror` qua Puppeteer, xác nhận bị vô hiệu hóa hoàn toàn). Xếp
+  vào category `text` (giống Text Diff/Word Counter/Text Case Converter) thay vì `dev`, vì
+  đây là công cụ xử lý nội dung văn bản chứ không phải định dạng dữ liệu cho developer — dùng
+  `applicationCategory: UtilitiesApplication` cho JSON-LD, khớp quy ước 3 tool `text` kia
+  (không phải `DeveloperApplication` như các tool `dev`). Build sạch + test Puppeteer tương
+  tác (render GFM, XSS payload, toolbar bold, toggle chế độ xem, copy, tải file, dark mode) +
+  commit riêng, chỉ làm i18n en/vi theo quy ước hiện hành.
 - **2026-07-28** — JSON → Excel Converter (Phase 3 #7) hoàn tất: chuyển JSON thành file
   `.xlsx` thật (không phải CSV đổi tên) — dòng tiêu đề in đậm, cột auto-size, giữ đúng kiểu
   số/boolean trong ô. Tự nhận diện nhiều sheet khi JSON gốc là object mà mọi giá trị cấp cao
