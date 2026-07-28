@@ -3,6 +3,7 @@ export const categories = [
   { slug: 'pdf', letter: 'PDF', hue: 45 },
   { slug: 'text', letter: 'TXT', hue: 100 },
   { slug: 'dev', letter: 'DEV', hue: 160 },
+  { slug: 'media', letter: 'MED', hue: 220 },
 ] as const;
 
 export type CategorySlug = (typeof categories)[number]['slug'];

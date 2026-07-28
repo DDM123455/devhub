@@ -1,0 +1,94 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import VideoTrim from './VideoTrim';
+import { getFixedT } from '@/i18n/i18next';
+import { tools } from '@/data/tools';
+import type { Locale } from '@/i18n/config';
+
+interface Props {
+	lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getFixedT(lang, 'tool-video-trim');
+
+const tool = tools.find((item) => item.id === 'video-trim')!;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const relatedTools = tools.filter((item) => item.category === tool.category && item.id !== tool.id);
+
+const messages = {
+	dropLabel: t('ui.dropLabel'),
+	chooseFile: t('ui.chooseFile'),
+	previewLabel: t('ui.previewLabel'),
+	startLabel: t('ui.startLabel'),
+	endLabel: t('ui.endLabel'),
+	markCurrent: t('ui.markCurrent'),
+	selectionLabel: t('ui.selectionLabel'),
+	fastModeLabel: t('ui.fastModeLabel'),
+	preciseModeLabel: t('ui.preciseModeLabel'),
+	modeHint: t('ui.modeHint'),
+	trimButton: t('ui.trimButton'),
+	loadingEngineLabel: t('ui.loadingEngineLabel'),
+	processingLabel: t('ui.processingLabel'),
+	resultLabel: t('ui.resultLabel'),
+	download: t('ui.download'),
+	originalLabel: t('ui.originalLabel'),
+	trimmedLabel: t('ui.trimmedLabel'),
+	sizeAndDuration: t('ui.sizeAndDuration'),
+	clear: t('ui.clear'),
+	invalidRangeError: t('ui.invalidRangeError'),
+	engineLoadError: t('ui.engineLoadError'),
+	trimError: t('ui.trimError'),
+	metadataError: t('ui.metadataError'),
+	manualDurationLabel: t('ui.manualDurationLabel'),
+};
+
+const schema = {
+	'@context': 'https://schema.org',
+	'@type': 'WebApplication',
+	name: t('heading'),
+	description: t('meta.description'),
+	url: canonicalUrl,
+	applicationCategory: 'MultimediaApplication',
+	operatingSystem: 'Any',
+	offers: {
+		'@type': 'Offer',
+		price: '0',
+		priceCurrency: 'USD',
+	},
+};
+---
+
+<Layout title={t('meta.title')} description={t('meta.description')} lang={lang}>
+	<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+	<section class="px-4 py-10">
+		<h1 class="text-3xl font-bold text-foreground">{t('heading')}</h1>
+		<p class="mt-2 text-muted-foreground">{t('tagline')}</p>
+		<div class="mt-6 max-w-4xl">
+			<VideoTrim client:load messages={messages} />
+		</div>
+	</section>
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-xl font-semibold text-foreground">{t('article.heading')}</h2>
+		<div class="mt-4 flex max-w-3xl flex-col gap-4 text-muted-foreground">
+			<p>{t('article.p1')}</p>
+			<p>{t('article.p2')}</p>
+			<p>{t('article.p3')}</p>
+			<p>{t('article.p4')}</p>
+		</div>
+	</section>
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-xl font-semibold text-foreground">{t('related')}</h2>
+		<ul class="mt-4 flex flex-col gap-1">
+			{
+				relatedTools.map((related) => (
+					<li>
+						<a href={`/${lang}/tools/${related.slugs[lang]}/`} class="text-sm text-primary hover:underline">
+							{related.names[lang]}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+</Layout>

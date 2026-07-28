@@ -122,7 +122,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] CSV ↔ JSON Converter — `papaparse`
 - [x] JSON → Excel Converter — `exceljs`
 - [x] Markdown Viewer/Editor — `marked` + `dompurify`
-- [ ] Trim video ngắn — `ffmpeg.wasm`
+- [x] Trim video ngắn — `ffmpeg.wasm` (`@ffmpeg/ffmpeg` + `@ffmpeg/util`, core engine tải qua jsDelivr CDN)
 - [ ] Chuyển đổi Audio MP3 ↔ WAV
 
 ## Phase 4 — Kiếm tiền & PWA

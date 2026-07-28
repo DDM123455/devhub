@@ -28,7 +28,8 @@
       "image": "Bilder",
       "pdf": "PDF",
       "text": "Text",
-      "dev": "Dev-Tools"
+      "dev": "Dev-Tools",
+      "media": "Medien"
     }
   },
   "footer": {

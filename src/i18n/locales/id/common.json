@@ -28,7 +28,8 @@
       "image": "Gambar",
       "pdf": "PDF",
       "text": "Teks",
-      "dev": "Alat Developer"
+      "dev": "Alat Developer",
+      "media": "Media"
     }
   },
   "footer": {

@@ -28,7 +28,8 @@
       "image": "圖片",
       "pdf": "PDF",
       "text": "文字",
-      "dev": "開發工具"
+      "dev": "開發工具",
+      "media": "媒體"
     }
   },
   "footer": {

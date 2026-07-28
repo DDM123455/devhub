@@ -15,10 +15,15 @@
 - **Phase 2 — SEO & đa ngôn ngữ**: HOÀN TẤT 6/8 mục. 2 mục còn treo (submit sitemap lên
   Google Search Console / Bing Webmaster Tools) bị chặn vì chưa có public domain thật + cần
   đăng nhập thủ công, không phải việc agent tự làm được.
-- **Phase 3 — Mở rộng công cụ ngách: 8/10 tool xong** (JWT Decoder, Base64 Encode/Decode,
+- **Phase 3 — Mở rộng công cụ ngách: 9/10 tool xong** (JWT Decoder, Base64 Encode/Decode,
   Regex Tester, SVG Optimizer, Color Picker & Palette Generator, CSV ↔ JSON Converter,
-  JSON → Excel Converter, Markdown Viewer/Editor). Task tiếp theo: Trim video ngắn
-  (`ffmpeg.wasm`), Chuyển đổi Audio MP3 ↔ WAV.
+  JSON → Excel Converter, Markdown Viewer/Editor, Trim video ngắn). Task tiếp theo: Chuyển
+  đổi Audio MP3 ↔ WAV — sẽ tự động lấp khoảng trống "related tools" rỗng của Trim video ngắn
+  (category `media` mới hiện chỉ có 1 tool, xem ghi chú bên dưới).
+- **Category mới `media`** (thêm ở `src/data/categories.ts`, Trim video ngắn là tool đầu
+  tiên): related-tools tự động lọc theo cùng category, nên hiện tại trang Trim video ngắn có
+  0 related tool hiển thị (chưa đủ 2-3 theo checklist SEO) — sẽ tự hết khi thêm tool Audio
+  MP3 ↔ WAV (cùng category `media`) ở task kế tiếp, không phải bug.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -69,6 +74,20 @@
 - **Deploy**: repo tại GitHub `DDM123455/devhub`, nhánh `main`. Deploy qua Cloudflare Git
   integration (Workers static assets) tại `https://devhub.duongdangmanh01.workers.dev`, tự
   deploy mỗi lần push `main`, không cần GitHub Actions/wrangler riêng trong repo.
+- **`@ffmpeg/core` (ffmpeg.wasm) phải load bản `dist/esm/`, KHÔNG phải `dist/umd/`, khi dùng
+  qua CDN** (Trim video ngắn, Phase 3 #9): file wasm engine ~30.7MB vượt giới hạn 25MiB/file
+  của Cloudflare Pages cổ điển, nên KHÔNG tự host trong `public/` — tải qua jsDelivr CDN lúc
+  runtime (`toBlobURL`, xem code `VideoTrim.tsx`). Bug thật đã gặp và sửa: `@ffmpeg/ffmpeg`
+  tạo Web Worker kiểu `type: "module"`; khi worker không gọi được `importScripts()` (API chỉ
+  tồn tại ở classic worker), nó fallback sang `import()` động trên chính URL core — nếu URL
+  đó trỏ vào bản UMD (`dist/umd/ffmpeg-core.js`, không có `export default`), `import()` thất
+  bại âm thầm và ném lỗi chung "failed to import ffmpeg-core.js" không có stack trace rõ
+  ràng. Phải trỏ `coreURL`/`wasmURL` vào `dist/esm/` mới đúng. Ngoài ra: KHÔNG dùng tham số
+  `progress` của `toBlobURL()` (gọi `downloadWithProgress` nội bộ) — nếu CDN nén gzip/br file
+  `.js`, header `Content-Length` (kích thước nén) sẽ lệch với số byte thực nhận sau giải nén,
+  khiến thư viện cố đọc lại một `Response` đã đọc hết và crash "body stream already read";
+  dùng `toBlobURL(url, mimeType)` không kèm progress để tránh nhánh code lỗi này (mất progress
+  % khi tải engine, chỉ còn hiển thị trạng thái "đang tải" chung chung).
 - **URL routing**: `/{lang}/...` cho MỌI ngôn ngữ kể cả `en` (`prefixDefaultLocale: true`).
   `src/pages/index.astro` phải luôn tồn tại (dù rỗng) để Astro sinh redirect `/` → `/en/`,
   xoá file này sẽ lỗi `MissingIndexForInternationalizationError`.
@@ -81,6 +100,25 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-28** — Trim video ngắn (Phase 3 #9) hoàn tất: cắt một đoạn video ngay trên trình
+  duyệt bằng FFmpeg biên dịch WebAssembly (`@ffmpeg/ffmpeg` + `@ffmpeg/util`), chọn điểm bắt
+  đầu/kết thúc bằng slider hoặc nút "lấy thời điểm hiện tại" từ video đang phát, 2 chế độ cắt
+  (Nhanh — stream copy theo keyframe, tức thì; Chính xác — mã hóa lại, đúng từng khung hình
+  nhưng chậm hơn), xem trước/tải kết quả, so sánh dung lượng và thời lượng gốc/đã cắt. Tạo
+  category mới `media` trong `categories.ts` (dịch nhãn "Media" cho cả 20 ngôn ngữ trong
+  `common.json`, vì đây là chuỗi điều hướng dùng chung toàn site chứ không phải file dịch
+  riêng của 1 tool — không áp dụng quy ước "chỉ en/vi" cho phần này). Engine FFmpeg (~30.7MB)
+  KHÔNG tự host trong repo (vượt giới hạn 25MiB/file của Cloudflare Pages cổ điển) — tải qua
+  jsDelivr CDN lúc runtime, theo đúng lựa chọn người dùng đã chốt. Trong lúc build, phát hiện
+  và sửa 2 bug thật khi tích hợp CDN (xem ghi chú kỹ thuật ở trên): (1) phải trỏ vào bản
+  `dist/esm/` của `@ffmpeg/core` thay vì `dist/umd/` vì worker kiểu module không có
+  `importScripts`; (2) không dùng tham số `progress` của `toBlobURL` vì gzip CDN làm lệch
+  `Content-Length` gây crash "body stream already read". Build sạch + test Puppeteer tương
+  tác thật (tạo video mẫu bằng canvas + MediaRecorder ngay trong Puppeteer, upload, cắt thật
+  bằng ffmpeg.wasm qua CDN thật ở cả 2 chế độ, kiểm tra thời lượng kết quả, dark mode) + commit
+  riêng, chỉ làm i18n en/vi cho namespace riêng của tool theo quy ước hiện hành. Ghi chú: trang
+  tool này hiện có 0 "related tools" hiển thị vì category `media` mới chỉ có 1 tool — sẽ tự
+  hết khi thêm Audio MP3 ↔ WAV ở task kế tiếp.
 - **2026-07-28** — Markdown Viewer/Editor (Phase 3 #8) hoàn tất: soạn thảo Markdown với xem
   trước GFM trực tiếp (bảng, gạch ngang, task list), 3 chế độ xem (chia đôi/chỉ soạn
   thảo/chỉ xem trước) có cuộn đồng bộ ở chế độ chia đôi, thanh công cụ định dạng (đậm/nghiêng/

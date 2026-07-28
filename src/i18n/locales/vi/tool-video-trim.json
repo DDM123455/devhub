@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "title": "Cắt Video Ngắn Online Miễn phí — Web Tool Hub",
+    "description": "Cắt một đoạn ngắn từ video ngay trên trình duyệt — chọn điểm bắt đầu/kết thúc, chọn chế độ cắt nhanh hoặc chính xác, rồi tải kết quả về. Không tải lên server."
+  },
+  "heading": "Cắt video ngắn",
+  "tagline": "Cắt một đoạn ngắn từ video — chọn điểm bắt đầu và kết thúc, chọn chế độ cắt nhanh hoặc chính xác, rồi tải kết quả về, hoàn toàn trên trình duyệt của bạn.",
+  "ui": {
+    "dropLabel": "Kéo thả file video vào đây",
+    "chooseFile": "Chọn video",
+    "previewLabel": "Xem trước",
+    "startLabel": "Bắt đầu",
+    "endLabel": "Kết thúc",
+    "markCurrent": "Lấy thời điểm hiện tại",
+    "selectionLabel": "Độ dài đoạn đã chọn: {{duration}}",
+    "fastModeLabel": "Nhanh (cắt theo keyframe)",
+    "preciseModeLabel": "Chính xác (mã hóa lại)",
+    "modeHint": "Chế độ Nhanh sao chép video mà không mã hóa lại — tức thì, nhưng điểm cắt có thể rơi vào keyframe gần nhất thay vì đúng khung hình bạn chọn. Chế độ Chính xác mã hóa lại đoạn video để cắt đúng từng khung hình, nhưng mất nhiều thời gian hơn.",
+    "trimButton": "Cắt video",
+    "loadingEngineLabel": "Đang tải engine xử lý video (khoảng 30 MB, chỉ tải lần đầu — có thể mất một chút thời gian)…",
+    "processingLabel": "Đang xử lý… {{percent}}%",
+    "resultLabel": "Kết quả",
+    "download": "Tải xuống",
+    "originalLabel": "Gốc",
+    "trimmedLabel": "Đã cắt",
+    "sizeAndDuration": "{{size}} · {{duration}}",
+    "clear": "Chọn video khác",
+    "invalidRangeError": "Điểm kết thúc phải nằm sau điểm bắt đầu.",
+    "engineLoadError": "Không tải được engine xử lý video — kiểm tra kết nối mạng rồi thử lại.",
+    "trimError": "Cắt video thất bại. Thử điểm bắt đầu/kết thúc khác, hoặc đổi sang chế độ còn lại.",
+    "metadataError": "Trình duyệt này không xem trước trực tiếp được định dạng video này, nhưng vẫn có thể cắt được — nhập tổng thời lượng thủ công bên dưới.",
+    "manualDurationLabel": "Tổng thời lượng (giây)"
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Cắt video mà không cần tải lên bất cứ đâu",
+    "p1": "Cắt một đoạn ngắn từ một video dài hơn — lấy ra khoảnh khắc hay từ một bản ghi màn hình, cắt bỏ đoạn thừa ở đầu một video quay bằng điện thoại, lấy đúng 10 giây để chia sẻ — là một trong những việc tưởng chừng chỉ mất mười giây, nhưng hầu hết công cụ video online lại bắt bạn tải nguyên file lên server của họ trước, chờ xử lý, rồi mới tải kết quả về. Với file có dung lượng kha khá, hoặc bất cứ nội dung nào bạn không muốn đưa cho server của người lạ, việc đi vòng đó vừa chậm, vừa quan trọng hơn là buộc bạn phải đánh đổi quyền riêng tư của file chỉ để thực hiện một chỉnh sửa nhỏ.",
+    "p2": "Công cụ này chạy một bản FFmpeg thật — chính là engine đứng sau hầu hết phần mềm xử lý video — được biên dịch sang WebAssembly, nên nó thực thi hoàn toàn ngay trong tab trình duyệt của bạn. File video của bạn không bao giờ rời khỏi thiết bị; nó được giải mã, cắt, và đóng gói lại ngay tại chỗ. Ngoại lệ duy nhất là chính engine FFmpeg: đây là một file chương trình khoảng 30 MB được tải một lần từ một CDN công khai vào lần đầu bạn dùng công cụ (giống như cách một web font hay một thư viện icon được tải về), sau đó trình duyệt sẽ lưu cache lại. File tải về đó không chứa bất kỳ thông tin nào về bạn hay file của bạn — nó chỉ là phần mềm thực hiện việc cắt video, chạy trên máy bạn kể từ thời điểm đó.",
+    "p3": "Phát video và dùng nút \"Lấy thời điểm hiện tại\" để đánh dấu chính xác điểm vào/ra, hoặc kéo trực tiếp hai thanh trượt. Chế độ Nhanh cắt đoạn video bằng cách sao chép nguyên luồng hình và tiếng gốc mà không mã hóa lại — gần như tức thì, nhưng vì video được lưu dưới dạng chuỗi các keyframe cùng các khung hình dự đoán xen giữa, điểm cắt thực tế có thể rơi vào keyframe gần nhất thay vì đúng mili-giây bạn chọn. Chế độ Chính xác mã hóa lại toàn bộ đoạn đã chọn từ đầu, mất nhiều thời gian hơn (mã hóa video bằng WebAssembly không nhanh bằng phần mềm gốc) nhưng cho kết quả cắt đúng từng khung hình tại điểm bạn chọn.",
+    "p4": "Khi cắt xong, xem trước kết quả trực tiếp, so sánh dung lượng và thời lượng với file gốc, rồi tải về. Nếu đoạn gốc là một bản ghi màn hình hoặc cần chỉnh sửa thêm — ví dụ tách riêng phần âm thanh — kết hợp công cụ này với một công cụ xử lý âm thanh chuyên dụng khi có sẽ hoàn thiện quy trình làm việc; còn hiện tại, Nén ảnh và Xóa nền ảnh đáp ứng những nhu cầu chỉnh sửa hình ảnh đi kèm phổ biến nhất trên trang này."
+  }
+}

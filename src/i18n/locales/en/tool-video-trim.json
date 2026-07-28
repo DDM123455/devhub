@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "title": "Trim Video Online Free — Video Trimmer — Web Tool Hub",
+    "description": "Cut a short clip out of a video right in your browser — pick a start and end point, choose fast or precise trimming, and download the result. No upload, no server."
+  },
+  "heading": "Video Trimmer",
+  "tagline": "Cut a short clip from a video — pick start and end points, choose fast or precise trimming, and download the result, entirely in your browser.",
+  "ui": {
+    "dropLabel": "Drag and drop a video file here",
+    "chooseFile": "Choose video",
+    "previewLabel": "Preview",
+    "startLabel": "Start",
+    "endLabel": "End",
+    "markCurrent": "Set to current time",
+    "selectionLabel": "Selection length: {{duration}}",
+    "fastModeLabel": "Fast (keyframe cut)",
+    "preciseModeLabel": "Precise (re-encode)",
+    "modeHint": "Fast mode copies the video without re-encoding — instant, but the cut may land on the nearest keyframe rather than the exact frame. Precise mode re-encodes the clip for a frame-accurate cut, which takes longer.",
+    "trimButton": "Trim video",
+    "loadingEngineLabel": "Loading video engine (~30 MB, first time only — this may take a moment)…",
+    "processingLabel": "Processing… {{percent}}%",
+    "resultLabel": "Result",
+    "download": "Download",
+    "originalLabel": "Original",
+    "trimmedLabel": "Trimmed",
+    "sizeAndDuration": "{{size}} · {{duration}}",
+    "clear": "Choose a different video",
+    "invalidRangeError": "The end point must be after the start point.",
+    "engineLoadError": "Couldn't load the video engine — check your connection and try again.",
+    "trimError": "Trimming failed. Try a different start/end point, or switch to the other mode.",
+    "metadataError": "This browser can't preview this video format directly, but it may still be trimmable — enter its total duration manually below.",
+    "manualDurationLabel": "Total duration (seconds)"
+  },
+  "related": "Related tools",
+  "article": {
+    "heading": "Trimming a video without uploading it anywhere",
+    "p1": "Cutting a short clip out of a longer recording — pulling a highlight from a screen recording, trimming dead air from the start of a phone video, grabbing a 10-second segment to share — is one of those tasks that feels like it should take ten seconds, but most online video tools want you to upload the entire file to their server first, wait for it to process, then download the result. For anything even moderately large, or anything you'd rather not hand to a stranger's server, that round trip is slow and, more importantly, forces you to give up your file's privacy for a trivial edit.",
+    "p2": "This tool runs a real build of FFmpeg — the same engine that powers most video software — compiled to WebAssembly, so it executes entirely inside your browser tab. Your video file never leaves your device; it's decoded, cut, and re-packaged locally. The one exception is the FFmpeg engine itself: it's a roughly 30 MB program file loaded once from a public CDN the first time you use the tool (the same way a web font or an icon library gets loaded), cached by your browser afterward. That download contains no information about you or your files — it's just the software doing the trimming, running on your machine from that point on.",
+    "p3": "Play the video and use \"Set to current time\" to mark your in and out points precisely, or drag the two sliders directly. Fast mode cuts the clip by copying the original video and audio streams without re-encoding them — it finishes almost instantly, but because video is stored as a sequence of keyframes with predicted frames in between, the actual cut point may land on the nearest keyframe rather than the exact millisecond you selected. Precise mode re-encodes the selected range from scratch, which takes longer (WebAssembly video encoding isn't as fast as native software) but gives you a frame-accurate cut at the point you chose.",
+    "p4": "Once trimming finishes, preview the result directly, compare its file size and duration against the original, and download it. If the source clip is itself a screen recording or needs further cleanup — extracting just the audio, for instance — pairing this with a dedicated audio tool once one is available will round out the workflow; for now, the Image Compressor and Background Remover cover the most common companion editing needs for visual content on this site."
+  }
+}
