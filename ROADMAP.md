@@ -120,7 +120,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] SVG Optimizer — `svgo`
 - [x] Color Picker & Palette Generator
 - [x] CSV ↔ JSON Converter — `papaparse`
-- [ ] JSON → Excel Converter
+- [x] JSON → Excel Converter — `exceljs`
 - [ ] Markdown Viewer/Editor
 - [ ] Trim video ngắn — `ffmpeg.wasm`
 - [ ] Chuyển đổi Audio MP3 ↔ WAV

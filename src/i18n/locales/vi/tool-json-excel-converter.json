@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "title": "Chuyển đổi JSON sang Excel Online Miễn phí — Web Tool Hub",
+    "description": "Chuyển đổi JSON thành file Excel .xlsx thật ngay trên trình duyệt — tự động nhận diện nhiều sheet, gộp các trường lồng nhau, giữ nguyên kiểu số và boolean. Không tải lên server."
+  },
+  "heading": "Chuyển đổi JSON → Excel",
+  "tagline": "Chuyển đổi JSON thành file Excel .xlsx thật, có thể tải về — nhiều sheet, gộp trường lồng nhau, giữ đúng kiểu dữ liệu số/boolean — hoàn toàn trên trình duyệt của bạn.",
+  "ui": {
+    "sheetNameLabel": "Tên sheet",
+    "sheetNamePlaceholder": "Sheet1",
+    "fileNameLabel": "Tên file",
+    "fileNamePlaceholder": "output",
+    "flattenLabel": "Gộp object lồng nhau (dot notation)",
+    "flattenHint": "Khi bật, một trường lồng nhau như address.city sẽ trở thành một cột riêng. Khi tắt, object và mảng lồng nhau được giữ nguyên trong một ô dạng văn bản JSON.",
+    "inputLabel": "Dữ liệu JSON đầu vào",
+    "inputPlaceholder": "Dán một mảng hoặc object JSON vào đây…",
+    "dropLabel": "Kéo thả file .json hoặc .txt vào đây",
+    "chooseFile": "Chọn file",
+    "loadSample": "Tải dữ liệu mẫu",
+    "clear": "Xóa",
+    "jsonParseError": "JSON không hợp lệ: {{message}}",
+    "jsonRootError": "JSON này không có object hay mảng nào để chuyển thành các dòng — một giá trị đơn lẻ như null hay một con số thì không có gì để đưa vào bảng tính.",
+    "previewHeading": "Xem trước",
+    "previewInfo": "{{rows}} dòng × {{cols}} cột",
+    "sheetsInfo": "sẽ xuất ra {{count}} sheet",
+    "moreRows": "còn +{{count}} dòng nữa trong file tải về",
+    "download": "Tải file .xlsx",
+    "generating": "Đang tạo file…"
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Biến JSON thành bảng tính thật mà không cần server",
+    "p1": "Một phản hồi từ API hay một file cấu hình thường ở dạng JSON; còn người cần xem, lọc hay vẽ biểu đồ từ dữ liệu đó gần như luôn muốn có nó trong Excel. Để đi từ JSON sang Excel, thông thường bạn phải nhờ ai đó viết một script dùng một lần, hoặc dán dữ liệu vào một trang chuyển đổi online mà âm thầm lưu lại một bản sao của bất cứ thứ gì bạn tải lên — một sự đánh đổi tệ khi dữ liệu JSON đó là hồ sơ khách hàng, số liệu tài chính, hay bất cứ thứ gì bạn không muốn đưa cho server của bên thứ ba.",
+    "p2": "Công cụ này tạo ra một file .xlsx thật — không phải file CSV đổi tên, mà là một file Excel thật sự với ô có kiểu dữ liệu, dòng tiêu đề in đậm, và độ rộng cột được tính sẵn — ngay trên trình duyệt của bạn bằng một thư viện xử lý bảng tính JavaScript. JSON của bạn được phân tích, chuyển đổi và đóng gói thành file tải về hoàn toàn trên máy bạn; không có gì được gửi đi bất cứ đâu. Số vẫn là số và boolean vẫn là boolean trong bảng tính kết quả, nên một cột giá tiền có thể dùng ngay trong công thức SUM mà không cần tìm-và-thay trước.",
+    "p3": "Nếu JSON của bạn là một mảng object duy nhất, bạn sẽ có một sheet. Nếu đó là một object mà mỗi khóa cấp cao nhất đều chứa một mảng — ví dụ `{ \"employees\": [...], \"departments\": [...] }` — công cụ sẽ tự động tạo một sheet cho mỗi khóa, đặt tên theo khóa đó, để một bản xuất JSON chứa nhiều bảng liên quan gộp lại thành một file Excel với nhiều tab, thay vì bạn phải tự tách ra bằng tay. Các trường lồng nhau như `address.city` có thể được gộp thành một cột riêng dạng dot-notation, hoặc giữ nguyên trong một ô dạng văn bản JSON nếu bạn muốn nhìn thấy cấu trúc gốc.",
+    "p4": "Bảng xem trước hiển thị chính xác nội dung của từng sheet — số dòng, số cột, và những dòng dữ liệu đầu tiên — trước khi bạn quyết định tải về, để bạn có thể chỉnh tùy chọn gộp trường hoặc sửa lại JSON gốc nếu cấu trúc chưa đúng ý. Khi mọi thứ đã ổn, đặt tên sheet và tên file rồi bấm tải về. Nếu cần dữ liệu dạng bảng ở định dạng văn bản thuần thay vì file bảng tính nhị phân, công cụ Chuyển đổi CSV ↔ JSON sẽ đáp ứng việc đó; còn nếu bạn cần kiểm tra hoặc định dạng lại chính JSON trước, Định dạng & kiểm tra JSON là điểm dừng đầu tiên hợp lý."
+  }
+}

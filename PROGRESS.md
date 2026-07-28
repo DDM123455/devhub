@@ -15,9 +15,9 @@
 - **Phase 2 — SEO & đa ngôn ngữ**: HOÀN TẤT 6/8 mục. 2 mục còn treo (submit sitemap lên
   Google Search Console / Bing Webmaster Tools) bị chặn vì chưa có public domain thật + cần
   đăng nhập thủ công, không phải việc agent tự làm được.
-- **Phase 3 — Mở rộng công cụ ngách: 6/10 tool xong** (JWT Decoder, Base64 Encode/Decode,
-  Regex Tester, SVG Optimizer, Color Picker & Palette Generator, CSV ↔ JSON Converter). Task
-  tiếp theo: JSON → Excel Converter, Markdown Viewer/Editor.
+- **Phase 3 — Mở rộng công cụ ngách: 7/10 tool xong** (JWT Decoder, Base64 Encode/Decode,
+  Regex Tester, SVG Optimizer, Color Picker & Palette Generator, CSV ↔ JSON Converter,
+  JSON → Excel Converter). Task tiếp theo: Markdown Viewer/Editor.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -56,6 +56,15 @@
 - **`@imgly/background-removal`** cần cài thêm `onnxruntime-web` thủ công (peerDependency,
   npm không tự cài) — nếu thiếu, build lỗi "Rolldown failed to resolve import
   onnxruntime-web/webgpu".
+- **`xlsx` (SheetJS) trên npm bị bỏ qua, dùng `exceljs` thay thế** (JSON → Excel Converter,
+  Phase 3 #7): bản `xlsx@0.18.5` duy nhất có trên npm registry mang 2 lỗ hổng chưa vá
+  (Prototype Pollution + ReDoS, "no fix available" — SheetJS chỉ phát hành bản vá qua CDN
+  riêng của họ, không qua npm). Đã hỏi người dùng, chọn `exceljs` — dù `npm audit` báo nhiều
+  lỗ hổng hơn (12, qua chuỗi phụ thuộc `archiver`/`zip-stream` phía Node), đã xác minh trực
+  tiếp bundle client (`dist/exceljs.min.js`, ~930KB minified) KHÔNG chứa `archiver`/`fs` —
+  các gói lỗ hổng đó chỉ tồn tại trong `node_modules` lúc build, không lọt vào bundle gửi cho
+  trình duyệt người dùng. Dùng `await import('exceljs')` động bên trong hàm xử lý (không
+  import tĩnh) theo đúng pattern đã có với `jsoneditor`.
 - **Deploy**: repo tại GitHub `DDM123455/devhub`, nhánh `main`. Deploy qua Cloudflare Git
   integration (Workers static assets) tại `https://devhub.duongdangmanh01.workers.dev`, tự
   deploy mỗi lần push `main`, không cần GitHub Actions/wrangler riêng trong repo.
@@ -71,6 +80,16 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-28** — JSON → Excel Converter (Phase 3 #7) hoàn tất: chuyển JSON thành file
+  `.xlsx` thật (không phải CSV đổi tên) — dòng tiêu đề in đậm, cột auto-size, giữ đúng kiểu
+  số/boolean trong ô. Tự nhận diện nhiều sheet khi JSON gốc là object mà mọi giá trị cấp cao
+  đều là mảng (mỗi khóa → 1 sheet); toggle gộp trường lồng nhau (dot notation); bảng xem
+  trước số dòng/cột trước khi tải; tùy chỉnh tên sheet/tên file; kéo-thả file; báo lỗi JSON
+  sai hoặc JSON không có gì để lập bảng. Thêm dependency `exceljs` thay vì `xlsx` (xem ghi
+  chú kỹ thuật ở trên về lý do — `xlsx` trên npm có 2 lỗ hổng chưa vá, đã hỏi và được người
+  dùng chọn `exceljs`). Build sạch + test Puppeteer tương tác (flatten on/off, multi-sheet,
+  JSON lỗi, root primitive, tải file .xlsx thật kiểm tra kích thước, dark mode) + commit
+  riêng, chỉ làm i18n en/vi theo quy ước hiện hành.
 - **2026-07-28** — CSV ↔ JSON Converter (Phase 3 #6) hoàn tất: chuyển đổi hai chiều
   CSV↔JSON, chọn dấu phân cách (phẩy/chấm phẩy/tab/tùy chỉnh), toggle dòng tiêu đề/khóa
   lồng nhau (dot notation)/pretty-print, kéo-thả file, copy/download, báo lỗi inline kèm

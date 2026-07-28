@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "title": "JSON to Excel Converter Online Free — Web Tool Hub",
+    "description": "Convert JSON to a real .xlsx Excel file instantly in your browser — auto-detects multiple sheets, flattens nested fields, preserves numbers and booleans. No upload, no server."
+  },
+  "heading": "JSON → Excel Converter",
+  "tagline": "Convert JSON into a real, downloadable .xlsx workbook — multiple sheets, flattened fields, real number/boolean cell types — entirely in your browser.",
+  "ui": {
+    "sheetNameLabel": "Sheet name",
+    "sheetNamePlaceholder": "Sheet1",
+    "fileNameLabel": "File name",
+    "fileNamePlaceholder": "output",
+    "flattenLabel": "Flatten nested objects (dot notation)",
+    "flattenHint": "When on, a nested field like address.city becomes its own column. When off, nested objects and arrays are kept as a single JSON-text cell.",
+    "inputLabel": "JSON input",
+    "inputPlaceholder": "Paste a JSON array or object here…",
+    "dropLabel": "Drag and drop a .json or .txt file here",
+    "chooseFile": "Choose file",
+    "loadSample": "Load sample data",
+    "clear": "Clear",
+    "jsonParseError": "Invalid JSON: {{message}}",
+    "jsonRootError": "This JSON has no object or array to convert into rows — a bare value like null or a number has nothing to put in a spreadsheet.",
+    "previewHeading": "Preview",
+    "previewInfo": "{{rows}} rows × {{cols}} columns",
+    "sheetsInfo": "{{count}} sheets will be exported",
+    "moreRows": "+{{count}} more rows in the downloaded file",
+    "download": "Download .xlsx",
+    "generating": "Generating…"
+  },
+  "related": "Related tools",
+  "article": {
+    "heading": "Turning JSON into a real spreadsheet without a server",
+    "p1": "An API response or a config file speaks JSON; the person who needs to review, filter, or chart that data almost always wants it in Excel. Getting there usually means either asking someone to write a throwaway script, or pasting the data into an online converter that quietly stores a copy of whatever you upload — which is a bad trade when the JSON in question is customer records, financial figures, or anything else you'd rather not hand to a third-party server.",
+    "p2": "This tool builds an actual .xlsx workbook — not a renamed CSV, but a real Excel file with typed cells, a bold header row, and sized columns — directly in your browser using a JavaScript spreadsheet library. Your JSON is parsed, converted, and packaged into the download entirely on your machine; nothing is ever transmitted anywhere. Numbers stay numbers and booleans stay booleans in the resulting spreadsheet, so a column of prices is immediately usable in a SUM formula instead of needing a find-and-replace pass first.",
+    "p3": "If your JSON is a single array of objects, you get one sheet. If it's an object whose top-level keys each hold an array — for example `{ \"employees\": [...], \"departments\": [...] }` — the tool automatically creates one sheet per key, named after that key, so a single JSON export with several related tables lands in one workbook with several tabs instead of forcing you to split it apart by hand. Nested fields like `address.city` can be flattened into their own dot-notation column, or left as a single JSON-text cell if you'd rather keep the raw structure visible.",
+    "p4": "The preview table shows exactly what each sheet will contain — row count, column count, and the first rows of data — before you commit to downloading anything, so you can adjust the flatten option or fix the source JSON first if the shape isn't quite right. Once it looks correct, name the sheet and the output file and click download. If you need the tabular data as plain text instead of a binary spreadsheet, the CSV ↔ JSON Converter covers that; if you're validating or reformatting the JSON itself first, the JSON Formatter & Validator is the natural first stop."
+  }
+}
