@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "title": "Chuyển đổi CSV sang JSON Online Miễn phí — Web Tool Hub",
+    "description": "Chuyển đổi CSV sang JSON và JSON sang CSV ngay trên trình duyệt — chọn dấu phân cách, bật/tắt dòng tiêu đề, gộp hoặc tách trường lồng nhau, tải về hoặc sao chép kết quả. Không tải lên server."
+  },
+  "heading": "Chuyển đổi CSV ↔ JSON",
+  "tagline": "Chuyển đổi qua lại giữa CSV và JSON ngay lập tức — chọn dấu phân cách, bật/tắt dòng tiêu đề, gộp hoặc tách trường lồng nhau — hoàn toàn trên trình duyệt của bạn.",
+  "ui": {
+    "modeCsvToJson": "CSV → JSON",
+    "modeJsonToCsv": "JSON → CSV",
+    "delimiterLabel": "Dấu phân cách",
+    "delimiterComma": "Dấu phẩy (,)",
+    "delimiterSemicolon": "Dấu chấm phẩy (;)",
+    "delimiterTab": "Tab",
+    "delimiterCustom": "Tùy chỉnh",
+    "customDelimiterPlaceholder": "ví dụ: |",
+    "headerLabel": "Dòng đầu là tiêu đề",
+    "nestedLabel": "Khóa lồng nhau (dot notation)",
+    "nestedHint": "Khi chuyển từ JSON sang CSV, các object lồng nhau luôn được gộp thành cột dạng dot-notation — vì CSV không có cách nào khác để biểu diễn cấu trúc lồng nhau. Ô chọn này chỉ thay đổi hành vi ở chế độ CSV → JSON.",
+    "prettyPrintLabel": "Định dạng đẹp (pretty print)",
+    "inputLabelCsv": "Dữ liệu CSV đầu vào",
+    "inputLabelJson": "Dữ liệu JSON đầu vào",
+    "inputPlaceholderCsv": "Dán dữ liệu CSV vào đây…",
+    "inputPlaceholderJson": "Dán một mảng hoặc object JSON vào đây…",
+    "dropLabel": "Kéo thả file .csv, .json hoặc .txt vào đây",
+    "chooseFile": "Chọn file",
+    "loadSample": "Tải dữ liệu mẫu",
+    "clear": "Xóa",
+    "swap": "Hoán đổi đầu vào/đầu ra",
+    "outputLabel": "Kết quả",
+    "copy": "Sao chép",
+    "copied": "Đã sao chép!",
+    "download": "Tải xuống",
+    "csvParseError": "Dòng {{row}}: {{message}}",
+    "jsonParseError": "JSON không hợp lệ: {{message}}",
+    "jsonRootError": "JSON này không có object hay mảng nào để chuyển thành các dòng — một giá trị đơn lẻ như null hay một con số thì không có gì để lập bảng."
+  },
+  "related": "Công cụ liên quan",
+  "article": {
+    "heading": "Chuyển đổi CSV và JSON mà không cần server",
+    "p1": "CSV và JSON cùng giải quyết một bài toán — di chuyển dữ liệu có cấu trúc giữa các hệ thống — nhưng theo hai hình dạng rất khác nhau. CSV là một bảng phẳng: chỉ có hàng và cột, không hơn không kém, đó là lý do mọi phần mềm bảng tính, mọi bản xuất dữ liệu từ database, mọi hệ thống cũ đều \"nói\" được CSV. JSON là một cây: object có thể lồng trong object, mảng có thể chứa bất cứ thứ gì, đó là lý do mọi API hiện đại và mọi codebase JavaScript đều dùng JSON thay vì CSV. Ngay khi bạn cần nạp một file bảng tính vào API, hoặc biến kết quả trả về từ API thành thứ mở được bằng Excel, bạn sẽ phải chuyển đổi qua lại giữa hai định dạng này — và làm đúng việc đó bằng tay (trường có dấu ngoặc kép chứa dấu phẩy bên trong, dấu ngoặc kép cần escape, object lồng nhau không map được vào một cột duy nhất) rất dễ sai một cách tinh vi.",
+    "p2": "Công cụ này thực hiện toàn bộ việc chuyển đổi ngay trên trình duyệt của bạn bằng một bộ phân tích CSV đã được kiểm chứng kỹ, nên dữ liệu bạn dán vào — có thể là dữ liệu khách hàng xuất ra, một báo cáo nội bộ, hay phản hồi từ API mà bạn không muốn đưa cho một trang web bên thứ ba — sẽ không bao giờ rời khỏi máy của bạn. Không có bước tải lên, không có yêu cầu gửi tới server, và không bị giới hạn dung lượng do request mạng gây ra; cùng một engine xử lý cả hai chiều, nên khi bấm nút Hoán đổi để đi vòng qua lại, bạn sẽ nhận lại đúng dữ liệu ban đầu.",
+    "p3": "Chọn dấu phân cách (dấu phẩy, dấu chấm phẩy, tab, hoặc bất kỳ ký tự tùy chỉnh nào — hữu ích với các file CSV xuất theo chuẩn châu Âu dùng dấu chấm phẩy, hay các file cũ dùng dấu gạch đứng), bật/tắt việc coi dòng đầu tiên là tên cột, và quyết định xem các khóa JSON lồng nhau như `address.city` nên trở thành một cột CSV dạng gộp, hay được dựng lại thành object lồng nhau khi chuyển ngược về JSON. Bạn có thể định dạng đẹp phần JSON đầu ra để dễ đọc, hoặc để dạng thu gọn (minify) để dán thẳng vào code. Nếu file CSV có dấu ngoặc kép sai chỗ hoặc một dòng không nhất quán, công cụ sẽ báo chính xác dòng nào bị lỗi thay vì âm thầm tạo ra kết quả sai.",
+    "p4": "Bạn có thể kéo thả file thẳng vào khung upload hoặc dán văn bản trực tiếp — cả hai cách đều hoạt động như nhau. Khi đã hài lòng với kết quả, hãy sao chép vào clipboard hoặc tải về dưới dạng file `.json` hay `.csv` sẵn sàng sử dụng. Nếu cần định dạng lại JSON đầu ra hoặc kiểm tra theo schema, công cụ Định dạng & kiểm tra JSON là điểm dừng tiếp theo hợp lý; còn nếu bạn đang làm việc với token xác thực thay vì dữ liệu dạng bảng, JWT Decoder và Mã hóa/Giải mã Base64 sẽ đảm nhiệm phần đó trong bộ công cụ dành cho developer."
+  }
+}

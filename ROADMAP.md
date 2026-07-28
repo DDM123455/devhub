@@ -119,7 +119,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] Regex Tester
 - [x] SVG Optimizer — `svgo`
 - [x] Color Picker & Palette Generator
-- [ ] CSV ↔ JSON Converter
+- [x] CSV ↔ JSON Converter — `papaparse`
 - [ ] JSON → Excel Converter
 - [ ] Markdown Viewer/Editor
 - [ ] Trim video ngắn — `ffmpeg.wasm`

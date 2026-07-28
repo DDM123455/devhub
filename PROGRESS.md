@@ -15,10 +15,9 @@
 - **Phase 2 — SEO & đa ngôn ngữ**: HOÀN TẤT 6/8 mục. 2 mục còn treo (submit sitemap lên
   Google Search Console / Bing Webmaster Tools) bị chặn vì chưa có public domain thật + cần
   đăng nhập thủ công, không phải việc agent tự làm được.
-- **Phase 3 — Mở rộng công cụ ngách: 5/10 tool xong** (JWT Decoder, Base64 Encode/Decode,
-  Regex Tester, SVG Optimizer, Color Picker & Palette Generator). Task tiếp theo: CSV ↔ JSON
-  Converter, JSON → Excel Converter, Markdown Viewer/Editor (đang giao song song cho 3 agent
-  — xem log 2026-07-27 bên dưới).
+- **Phase 3 — Mở rộng công cụ ngách: 6/10 tool xong** (JWT Decoder, Base64 Encode/Decode,
+  Regex Tester, SVG Optimizer, Color Picker & Palette Generator, CSV ↔ JSON Converter). Task
+  tiếp theo: JSON → Excel Converter, Markdown Viewer/Editor.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -72,6 +71,15 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-28** — CSV ↔ JSON Converter (Phase 3 #6) hoàn tất: chuyển đổi hai chiều
+  CSV↔JSON, chọn dấu phân cách (phẩy/chấm phẩy/tab/tùy chỉnh), toggle dòng tiêu đề/khóa
+  lồng nhau (dot notation)/pretty-print, kéo-thả file, copy/download, báo lỗi inline kèm
+  số dòng khi CSV sai định dạng. Thêm dependency `papaparse` (bộ phân tích CSV chuẩn RFC
+  4180, thay vì tự viết parser hai chiều — code CSV cũ trong JsonFormatter chỉ một chiều
+  JSON→CSV nên không tái dùng được cho chiều ngược lại). Build sạch + test Puppeteer tương
+  tác (quote/comma/newline lồng nhau, CSV lỗi, JSON lồng nhau, đổi delimiter, toggle header,
+  copy, download, kéo-thả, dark mode) + commit riêng, chỉ làm i18n en/vi theo quy ước hiện
+  hành.
 - **2026-07-27** — SVG Optimizer (Phase 3 #4) và Color Picker & Palette Generator
   (Phase 3 #5) hoàn tất, mỗi tool đã build sạch + test Puppeteer tương tác + commit riêng.
   Color Picker phát hiện & sửa bug hydration mismatch (xem ghi chú kỹ thuật ở trên). Từ tool
