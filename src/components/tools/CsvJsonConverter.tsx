@@ -24,6 +24,9 @@ interface Messages {
 	loadSample: string;
 	clear: string;
 	swap: string;
+	previewHeading: string;
+	previewInfo: string;
+	moreRows: string;
 	outputLabel: string;
 	copy: string;
 	copied: string;
@@ -52,6 +55,9 @@ const SAMPLE_JSON = JSON.stringify(
 );
 
 const SAMPLE_CSV = 'name,age,address.city,address.country\n"Ada Lovelace",36,London,UK\n"Alan Turing",41,"Maida Vale",UK';
+
+const PREVIEW_ROW_LIMIT = 20;
+const EMPTY_PREVIEW = { previewHeaders: [] as string[], previewRows: [] as string[][] };
 
 function flattenObject(obj: Record<string, unknown>, prefix = ''): Record<string, unknown> {
 	const result: Record<string, unknown> = {};
@@ -95,10 +101,10 @@ function jsonToCsv(
 	json: unknown,
 	delimiter: string,
 	header: boolean,
-): { output: string; rootError: boolean } {
+): { output: string; rootError: boolean; previewHeaders: string[]; previewRows: string[][] } {
 	let rows: Record<string, unknown>[];
 	if (Array.isArray(json)) {
-		if (json.length === 0) return { output: '', rootError: false };
+		if (json.length === 0) return { output: '', rootError: false, previewHeaders: [], previewRows: [] };
 		rows = json.map((item) =>
 			item !== null && typeof item === 'object' && !Array.isArray(item)
 				? flattenObject(item as Record<string, unknown>)
@@ -107,7 +113,7 @@ function jsonToCsv(
 	} else if (json !== null && typeof json === 'object') {
 		rows = [flattenObject(json as Record<string, unknown>)];
 	} else {
-		return { output: '', rootError: true };
+		return { output: '', rootError: true, previewHeaders: [], previewRows: [] };
 	}
 
 	const fields: string[] = [];
@@ -117,7 +123,12 @@ function jsonToCsv(
 		}
 	}
 	const data = rows.map((row) => fields.map((field) => csvCellValue(row[field])));
-	return { output: Papa.unparse({ fields, data }, { delimiter, header }), rootError: false };
+	return {
+		output: Papa.unparse({ fields, data }, { delimiter, header }),
+		rootError: false,
+		previewHeaders: fields,
+		previewRows: data,
+	};
 }
 
 function csvToJson(
@@ -126,7 +137,13 @@ function csvToJson(
 	header: boolean,
 	nested: boolean,
 	pretty: boolean,
-): { output: string; errorRow: number | null; errorMessage: string | null } {
+): {
+	output: string;
+	errorRow: number | null;
+	errorMessage: string | null;
+	previewHeaders: string[];
+	previewRows: string[][];
+} {
 	const result = Papa.parse<Record<string, string> | string[]>(csv, {
 		delimiter,
 		header,
@@ -136,7 +153,20 @@ function csvToJson(
 
 	if (result.errors.length > 0) {
 		const first = result.errors[0];
-		return { output: '', errorRow: first.row ?? 0, errorMessage: first.message };
+		return { output: '', errorRow: first.row ?? 0, errorMessage: first.message, previewHeaders: [], previewRows: [] };
+	}
+
+	// Preview always reflects the flat, tabular shape actually parsed from the CSV — the
+	// same regardless of the "nested" toggle, since nesting only reshapes the final JSON.
+	let previewHeaders: string[];
+	let previewRows: string[][];
+	if (header) {
+		previewHeaders = result.meta.fields ?? [];
+		previewRows = (result.data as Record<string, string>[]).map((row) => previewHeaders.map((h) => row[h] ?? ''));
+	} else {
+		const rawRows = result.data as string[][];
+		previewHeaders = Array.from({ length: rawRows[0]?.length ?? 0 }, (_, i) => `column${i + 1}`);
+		previewRows = rawRows;
 	}
 
 	let data: unknown[];
@@ -154,7 +184,13 @@ function csvToJson(
 		});
 	}
 
-	return { output: JSON.stringify(data, null, pretty ? 2 : undefined), errorRow: null, errorMessage: null };
+	return {
+		output: JSON.stringify(data, null, pretty ? 2 : undefined),
+		errorRow: null,
+		errorMessage: null,
+		previewHeaders,
+		previewRows,
+	};
 }
 
 function CopyButton({ value, label, copiedLabel }: { value: string; label: string; copiedLabel: string }) {
@@ -190,8 +226,8 @@ export default function CsvJsonConverter({ messages }: { messages: Messages }) {
 
 	const delimiter = delimiterOption === 'custom' ? customDelimiter || ',' : DELIMITER_VALUES[delimiterOption];
 
-	const { output, error } = useMemo(() => {
-		if (input.trim() === '') return { output: '', error: null as string | null };
+	const { output, error, previewHeaders, previewRows } = useMemo(() => {
+		if (input.trim() === '') return { output: '', error: null as string | null, ...EMPTY_PREVIEW };
 
 		if (mode === 'csv-to-json') {
 			const result = csvToJson(input, delimiter, header, nested, prettyPrint);
@@ -201,20 +237,32 @@ export default function CsvJsonConverter({ messages }: { messages: Messages }) {
 					error: messages.csvParseError
 						.replace('{{row}}', String(result.errorRow))
 						.replace('{{message}}', result.errorMessage),
+					...EMPTY_PREVIEW,
 				};
 			}
-			return { output: result.output, error: null as string | null };
+			return {
+				output: result.output,
+				error: null as string | null,
+				previewHeaders: result.previewHeaders,
+				previewRows: result.previewRows,
+			};
 		}
 
 		try {
 			const parsed = JSON.parse(input);
 			const result = jsonToCsv(parsed, delimiter, header);
-			if (result.rootError) return { output: '', error: messages.jsonRootError };
-			return { output: result.output, error: null as string | null };
+			if (result.rootError) return { output: '', error: messages.jsonRootError, ...EMPTY_PREVIEW };
+			return {
+				output: result.output,
+				error: null as string | null,
+				previewHeaders: result.previewHeaders,
+				previewRows: result.previewRows,
+			};
 		} catch (e) {
 			return {
 				output: '',
 				error: messages.jsonParseError.replace('{{message}}', e instanceof Error ? e.message : ''),
+				...EMPTY_PREVIEW,
 			};
 		}
 	}, [input, mode, delimiter, header, nested, prettyPrint, messages]);
@@ -383,6 +431,48 @@ export default function CsvJsonConverter({ messages }: { messages: Messages }) {
 			</div>
 
 			{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+
+			{!error && previewHeaders.length > 0 && (
+				<div className="flex flex-col gap-2 rounded-lg border border-border p-4">
+					<div className="flex flex-wrap items-center justify-between gap-2">
+						<h3 className="text-sm font-medium text-foreground">{messages.previewHeading}</h3>
+						<span className="text-xs text-muted-foreground">
+							{messages.previewInfo
+								.replace('{{rows}}', String(previewRows.length))
+								.replace('{{cols}}', String(previewHeaders.length))}
+						</span>
+					</div>
+					<div className="overflow-x-auto rounded-md border border-border">
+						<table className="w-full border-collapse text-left text-xs">
+							<thead>
+								<tr className="bg-muted">
+									{previewHeaders.map((h) => (
+										<th key={h} className="border-b border-border px-2 py-1.5 font-medium text-foreground">
+											{h}
+										</th>
+									))}
+								</tr>
+							</thead>
+							<tbody>
+								{previewRows.slice(0, PREVIEW_ROW_LIMIT).map((row, i) => (
+									<tr key={i} className="border-b border-border last:border-0">
+										{row.map((cell, j) => (
+											<td key={j} className="px-2 py-1.5 text-muted-foreground">
+												{cell}
+											</td>
+										))}
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+					{previewRows.length > PREVIEW_ROW_LIMIT && (
+						<p className="text-xs text-muted-foreground">
+							{messages.moreRows.replace('{{count}}', String(previewRows.length - PREVIEW_ROW_LIMIT))}
+						</p>
+					)}
+				</div>
+			)}
 
 			<div className="flex justify-center">
 				<Button type="button" size="sm" variant="outline" onClick={handleSwap} disabled={output === ''}>

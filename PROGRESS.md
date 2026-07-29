@@ -129,6 +129,19 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-29** — Phase 3.5c (hoàn tất): CSV ↔ JSON Converter — thêm bảng xem trước
+  (số dòng/cột phát hiện được + preview 20 dòng đầu), đồng bộ với JSON → Excel Converter đã
+  có sẵn. Preview phản ánh cấu trúc bảng phẳng thực sự parse được từ CSV (không đổi theo
+  toggle "nested keys", vì nested chỉ ảnh hưởng hình dạng JSON cuối cùng, không ảnh hưởng
+  bảng CSV gốc) — hoạt động cho cả 2 chiều: CSV→JSON dùng `result.meta.fields`/`result.data`
+  từ PapaParse, JSON→CSV tái dùng trực tiếp `fields`/`data` đã tính sẵn trong `jsonToCsv` (
+  không tính lại). Ẩn hoàn toàn khi có lỗi parse. Đã rút kinh nghiệm từ bug H1 vừa gặp — thêm
+  key i18n mới (`previewHeading`/`previewInfo`/`moreRows`) vào **cả file JSON locale lẫn**
+  `CsvJsonConverterPage.astro` cùng lúc, tránh lặp lại lỗi render rỗng. Build sạch (421
+  trang) + test Puppeteer thật: load sample CSV → xác nhận preview hiện đúng "2 rows × 4
+  columns" và đúng dữ liệu thật (Ada Lovelace/London); swap sang chiều JSON→CSV → preview
+  vẫn đúng; CSV lỗi cú pháp (quote chưa đóng) → báo lỗi `role="alert"` đúng và **ẩn bảng
+  preview** thay vì hiện dữ liệu rác. Đã tick mục tương ứng, hoàn tất toàn bộ Phase 3.5c.
 - **2026-07-29** — Phase 3.5c: Image Format Converter — thêm "Download All (.zip)" đồng bộ
   với Image Compressor/PDF Splitter đã có sẵn (dùng `jszip` qua `await import()` động, không
   static import, theo đúng pattern lazy-load mới hơn của PdfSplitter thay vì static import

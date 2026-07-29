@@ -143,7 +143,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 ### 3.5c — Nhất quán trải nghiệm giữa các tool cùng nhóm (High)
 - [x] Image Format Converter: thêm "Download All .zip"
 - [x] Color Picker: thêm phản hồi "Copied" cho nút export CSS/JSON
-- [ ] CSV↔JSON Converter: thêm bảng preview trước convert
+- [x] CSV↔JSON Converter: thêm bảng preview trước convert
 
 ### 3.5d — Feature parity trọng điểm (High)
 - [ ] SVG Optimizer: mở rộng danh sách plugin SVGO có thể bật/tắt riêng lẻ
