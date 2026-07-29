@@ -129,6 +129,25 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-29** — Phase 3.5d: Word Counter — tool duy nhất trên site trước đây không có
+  bất kỳ nút copy/export nào, nay thêm đủ 3 tính năng đối thủ (WordCounter.net) có mà tool
+  này thiếu: (1) nút Copy (đồng bộ pattern "Copied!" toàn site) và Download `.txt`; (2) chọn
+  preset giới hạn ký tự (X/Twitter 280, Meta description 160, Instagram caption 2200,
+  YouTube title 100, SMS 160) — hiện số ký tự còn lại, đổi màu cảnh báo (amber khi còn
+  ≤10% giới hạn) và destructive khi vượt quá, dùng `role="status"` để báo động; (3) điểm đọc
+  hiểu Flesch Reading Ease — tự viết syllable counter xấp xỉ cho tiếng Anh (heuristic đếm
+  nhóm nguyên âm, có điều chỉnh hậu tố phổ biến kiểu "-ed"/"-es"/silent-e, không dùng thư
+  viện ngoài vì bài toán đơn giản), phân loại theo đúng 7 mức chuẩn Flesch (Very Easy → Very
+  Confusing). Ghi chú kỹ thuật: điểm Flesch vốn được hiệu chỉnh cho tiếng Anh — nhãn UI đã
+  dịch cho từng ngôn ngữ nhưng bản thân công thức chỉ tính đúng ý nghĩa với văn bản tiếng
+  Anh (giống cách WordCounter.net vận hành), không xây riêng công thức cho từng ngôn ngữ vì
+  ngoài phạm vi yêu cầu audit. Đã thêm đủ key i18n mới vào **cả JSON locale lẫn
+  `WordCounterPage.astro`** cùng lúc (áp dụng bài học từ bug H1). Build sạch (421 trang) +
+  test Puppeteer thật: gõ văn bản mẫu → điểm Flesch tính đúng ("97, Very easy to read");
+  bấm Copy → hiện "Copied!" (dùng clipboard stub theo ghi chú kỹ thuật đã có); bấm Download
+  → file `.txt` tải về đúng nội dung textarea (so khớp byte-for-byte); chọn preset Twitter →
+  hiện đúng số ký tự còn lại; gõ vượt 280 ký tự → chuyển đúng sang trạng thái "vượt quá" màu
+  destructive. Đã tick mục tương ứng trong `ROADMAP.md` Phase 3.5d.
 - **2026-07-29** — Phase 3.5d bắt đầu: Markdown Editor — autosave `localStorage`, tránh mất
   bài khi refresh nhầm (rủi ro UX thật với một text editor không có tính năng này). Restore
   chạy trong `useEffect` riêng sau mount (localStorage không tồn tại lúc SSR build-time của
