@@ -149,7 +149,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [ ] SVG Optimizer: mở rộng danh sách plugin SVGO có thể bật/tắt riêng lẻ
 - [ ] Word Counter: thêm copy/export, char-limit preset, readability score
 - [ ] Video Trim: timeline kéo-2-tay-cầm thay 2 slider; offload FFmpeg sang Web Worker
-- [ ] Markdown Editor: autosave localStorage
+- [x] Markdown Editor: autosave localStorage
 
 ### 3.5e — SEO nâng cao (High)
 - [ ] Thêm `FAQPage` JSON-LD cho 20 trang tool (tận dụng nội dung article có sẵn)

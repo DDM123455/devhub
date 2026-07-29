@@ -149,6 +149,9 @@ const PREVIEW_CLASSES =
 	'[&_table]:my-2 [&_table]:w-full [&_table]:border-collapse [&_th]:border [&_th]:border-border [&_th]:bg-muted ' +
 	'[&_th]:px-2 [&_th]:py-1 [&_td]:border [&_td]:border-border [&_td]:px-2 [&_td]:py-1 [&_strong]:font-semibold [&_em]:italic';
 
+const DRAFT_STORAGE_KEY = 'markdown-editor-draft';
+const AUTOSAVE_DEBOUNCE_MS = 500;
+
 function CopyButton({ value, label, copiedLabel }: { value: string; label: string; copiedLabel: string }) {
 	const [copied, setCopied] = useState(false);
 	return (
@@ -179,6 +182,33 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const modulesRef = useRef<{ parse: (md: string) => string; sanitize: (html: string) => string } | null>(null);
 	const syncingRef = useRef<'editor' | 'preview' | null>(null);
+
+	// Restore an autosaved draft after mount — localStorage isn't available during Astro's
+	// build-time SSR pass, so this must run client-side only, same pattern as the
+	// hydration-safe randomization used elsewhere on the site (see ColorPicker).
+	useEffect(() => {
+		try {
+			const saved = localStorage.getItem(DRAFT_STORAGE_KEY);
+			if (saved) setContent(saved);
+		} catch {
+			// localStorage unavailable (private browsing, quota, etc.) — autosave is a
+			// convenience, not a requirement, so fail silently.
+		}
+	}, []);
+
+	// Debounced autosave: an empty editor clears the saved draft instead of persisting an
+	// empty string, so clicking "Clear" doesn't leave a stale draft to resurrect later.
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			try {
+				if (content) localStorage.setItem(DRAFT_STORAGE_KEY, content);
+				else localStorage.removeItem(DRAFT_STORAGE_KEY);
+			} catch {
+				// See note above — autosave failures are non-fatal.
+			}
+		}, AUTOSAVE_DEBOUNCE_MS);
+		return () => clearTimeout(timer);
+	}, [content]);
 
 	useEffect(() => {
 		let cancelled = false;

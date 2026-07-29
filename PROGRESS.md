@@ -129,6 +129,17 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-29** — Phase 3.5d bắt đầu: Markdown Editor — autosave `localStorage`, tránh mất
+  bài khi refresh nhầm (rủi ro UX thật với một text editor không có tính năng này). Restore
+  chạy trong `useEffect` riêng sau mount (localStorage không tồn tại lúc SSR build-time của
+  Astro, cùng nguyên tắc hydration-safe đã áp dụng ở Color Picker); lưu debounce 500ms theo
+  nội dung, và **xóa key khi nội dung rỗng** thay vì lưu chuỗi rỗng — để bấm "Clear" không
+  để lại draft cũ hồi sinh ở lần load sau. Cả 2 effect dùng try/catch nuốt lỗi im lặng (không
+  chặn tool nếu localStorage bị chặn — private browsing, quota đầy...). Build sạch (421
+  trang) + test Puppeteer thật (không phải chỉ giả lập DOM): gõ nội dung → đợi qua debounce →
+  **reload trang thật** → xác nhận nội dung khôi phục đúng; bấm Clear → đợi → reload → xác
+  nhận KHÔNG hồi sinh; bấm Load Sample → reload → xác nhận sample cũng được autosave đúng.
+  Đã tick mục tương ứng trong `ROADMAP.md` Phase 3.5d.
 - **2026-07-29** — Phase 3.5c (hoàn tất): CSV ↔ JSON Converter — thêm bảng xem trước
   (số dòng/cột phát hiện được + preview 20 dòng đầu), đồng bộ với JSON → Excel Converter đã
   có sẵn. Preview phản ánh cấu trúc bảng phẳng thực sự parse được từ CSV (không đổi theo
