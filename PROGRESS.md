@@ -129,6 +129,25 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-29** — Phase 3.5d: SVG Optimizer — gap tính năng lớn nhất site theo audit (58/100,
+  chỉ 3 checkbox so với ~30+ toggle riêng lẻ của SVGOMG) nay đã đóng. Đọc trực tiếp source
+  `node_modules/svgo/plugins/preset-default.js` (bản cài thật, svgo 4.0.2) thay vì suy đoán
+  từ trí nhớ để lấy đúng danh sách 34 plugin thành viên thật của `preset-default` — quan
+  trọng vì SVGO **ném lỗi runtime nếu `overrides` chứa tên plugin không thuộc preset**, nên
+  đoán sai tên sẽ crash tool. Mỗi plugin giờ có checkbox riêng (mặc định bật, khớp hành vi
+  gốc của SVGO), tắt một plugin sẽ set `overrides: { [tên]: false }` khi gọi `optimize()`
+  — không đụng tới các plugin còn lại. Phát hiện: `removeViewBox` **không còn nằm trong
+  `preset-default` ở SVGO v4** (khác các bản v2/v3 cũ) nên phải thêm như 1 plugin độc lập
+  riêng (giống cách `removeDimensions` đã có sẵn), mặc định **tắt** (giữ viewBox) — chủ đích
+  khác với hành vi gốc SVGO, vì xóa viewBox phá khả năng co giãn responsive trong đa số
+  trường hợp thực tế, đúng quy ước SVGOMG. Toàn bộ 34 checkbox nằm trong `<details>` gập lại
+  ("nâng cao") để không phá vỡ trải nghiệm 3-tùy-chọn đơn giản mặc định cho người dùng thường.
+  Build sạch (421 trang) + test Puppeteer thật: xác nhận đủ 34 checkbox render; tối ưu SVG
+  mẫu có comment với cấu hình mặc định → comment bị xóa đúng; bỏ tick "Remove comments" →
+  comment được giữ lại đúng (override hoạt động thật, không phải chỉ đổi UI); xác nhận
+  **không có lỗi runtime nào từ svgo** (tức mọi tên override đều hợp lệ); bật "Remove
+  viewBox" → viewBox bị xóa đúng khỏi output. Đã tick mục tương ứng trong `ROADMAP.md`
+  Phase 3.5d.
 - **2026-07-29** — Phase 3.5d: Word Counter — tool duy nhất trên site trước đây không có
   bất kỳ nút copy/export nào, nay thêm đủ 3 tính năng đối thủ (WordCounter.net) có mà tool
   này thiếu: (1) nút Copy (đồng bộ pattern "Copied!" toàn site) và Download `.txt`; (2) chọn

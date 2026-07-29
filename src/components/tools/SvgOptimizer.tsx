@@ -26,9 +26,101 @@ interface Messages {
 	invalidSvgError: string;
 	notSvgError: string;
 	noInput: string;
+	pluginsToggle: string;
+	pluginRemoveDoctype: string;
+	pluginRemoveXMLProcInst: string;
+	pluginRemoveComments: string;
+	pluginRemoveDeprecatedAttrs: string;
+	pluginRemoveMetadata: string;
+	pluginRemoveEditorsNSData: string;
+	pluginCleanupAttrs: string;
+	pluginMergeStyles: string;
+	pluginInlineStyles: string;
+	pluginMinifyStyles: string;
+	pluginCleanupIds: string;
+	pluginRemoveUselessDefs: string;
+	pluginCleanupNumericValues: string;
+	pluginConvertColors: string;
+	pluginRemoveUnknownsAndDefaults: string;
+	pluginRemoveNonInheritableGroupAttrs: string;
+	pluginRemoveUselessStrokeAndFill: string;
+	pluginCleanupEnableBackground: string;
+	pluginRemoveHiddenElems: string;
+	pluginRemoveEmptyText: string;
+	pluginConvertShapeToPath: string;
+	pluginConvertEllipseToCircle: string;
+	pluginMoveElemsAttrsToGroup: string;
+	pluginMoveGroupAttrsToElems: string;
+	pluginCollapseGroups: string;
+	pluginConvertPathData: string;
+	pluginConvertTransform: string;
+	pluginRemoveEmptyAttrs: string;
+	pluginRemoveEmptyContainers: string;
+	pluginMergePaths: string;
+	pluginRemoveUnusedNS: string;
+	pluginSortAttrs: string;
+	pluginSortDefsChildren: string;
+	pluginRemoveDesc: string;
+	pluginRemoveViewBox: string;
 }
 
 type View = 'preview' | 'code';
+
+// Every plugin bundled in SVGO's preset-default (v4), in the order SVGO itself declares
+// them. Each is individually toggleable via preset-default's `overrides` option — passing
+// `{ [id]: false }` disables just that one plugin while leaving the rest of the preset
+// (and its own internal defaults) untouched. `removeViewBox` is NOT part of preset-default
+// in this SVGO version, so it's handled separately as a standalone plugin entry, and its
+// checkbox defaults to OFF (keep viewBox) rather than mirroring an "enabled" default, since
+// stripping viewBox breaks responsive/scalable use of the SVG in most real-world cases.
+const PRESET_PLUGIN_IDS = [
+	'removeDoctype',
+	'removeXMLProcInst',
+	'removeComments',
+	'removeDeprecatedAttrs',
+	'removeMetadata',
+	'removeEditorsNSData',
+	'cleanupAttrs',
+	'mergeStyles',
+	'inlineStyles',
+	'minifyStyles',
+	'cleanupIds',
+	'removeUselessDefs',
+	'cleanupNumericValues',
+	'convertColors',
+	'removeUnknownsAndDefaults',
+	'removeNonInheritableGroupAttrs',
+	'removeUselessStrokeAndFill',
+	'cleanupEnableBackground',
+	'removeHiddenElems',
+	'removeEmptyText',
+	'convertShapeToPath',
+	'convertEllipseToCircle',
+	'moveElemsAttrsToGroup',
+	'moveGroupAttrsToElems',
+	'collapseGroups',
+	'convertPathData',
+	'convertTransform',
+	'removeEmptyAttrs',
+	'removeEmptyContainers',
+	'mergePaths',
+	'removeUnusedNS',
+	'sortAttrs',
+	'sortDefsChildren',
+	'removeDesc',
+] as const;
+
+type PresetPluginId = (typeof PRESET_PLUGIN_IDS)[number];
+
+function messageKeyForPlugin(id: PresetPluginId | 'removeViewBox'): keyof Messages {
+	return (`plugin${id[0].toUpperCase()}${id.slice(1)}`) as keyof Messages;
+}
+
+function defaultPluginState(): Record<PresetPluginId, boolean> {
+	const state = {} as Record<PresetPluginId, boolean>;
+	for (const id of PRESET_PLUGIN_IDS) state[id] = true;
+	return state;
+}
 
 const SAMPLE_SVG = `<?xml version="1.0" encoding="UTF-8"?>
 <!-- Sample icon -->
@@ -84,29 +176,50 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 	const [multipass, setMultipass] = useState(true);
 	const [precision, setPrecision] = useState(3);
 	const [removeDimensions, setRemoveDimensions] = useState(false);
+	const [removeViewBox, setRemoveViewBox] = useState(false);
 	const [prettify, setPrettify] = useState(false);
+	const [pluginEnabled, setPluginEnabled] = useState<Record<PresetPluginId, boolean>>(defaultPluginState);
 	const [view, setView] = useState<View>('preview');
 	const [isDragOver, setIsDragOver] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+
+	const togglePlugin = (id: PresetPluginId) => {
+		setPluginEnabled((prev) => ({ ...prev, [id]: !prev[id] }));
+	};
 
 	const { output, error } = useMemo(() => {
 		const trimmed = input.trim();
 		if (trimmed === '') return { output: '', error: null as string | null };
 		if (!looksLikeSvg(trimmed)) return { output: '', error: messages.notSvgError };
 		try {
+			const overrides: Record<string, false> = {};
+			for (const id of PRESET_PLUGIN_IDS) {
+				if (!pluginEnabled[id]) overrides[id] = false;
+			}
 			const result = optimize(trimmed, {
 				multipass,
 				js2svg: prettify ? { indent: 2, pretty: true } : undefined,
 				plugins: [
-					{ name: 'preset-default', params: { floatPrecision: precision } },
+					{ name: 'preset-default', params: { floatPrecision: precision, overrides } },
 					...(removeDimensions ? [{ name: 'removeDimensions' }] : []),
+					...(removeViewBox ? [{ name: 'removeViewBox' }] : []),
 				],
 			});
 			return { output: result.data, error: null as string | null };
 		} catch (err) {
 			return { output: '', error: messages.invalidSvgError.replace('{{message}}', (err as Error).message) };
 		}
-	}, [input, multipass, precision, removeDimensions, prettify, messages.invalidSvgError, messages.notSvgError]);
+	}, [
+		input,
+		multipass,
+		precision,
+		removeDimensions,
+		removeViewBox,
+		prettify,
+		pluginEnabled,
+		messages.invalidSvgError,
+		messages.notSvgError,
+	]);
 
 	const originalSize = new TextEncoder().encode(input).length;
 	const optimizedSize = new TextEncoder().encode(output).length;
@@ -205,6 +318,10 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 						{messages.optRemoveDimensions}
 					</label>
 					<label className="flex items-center gap-1.5 text-sm text-muted-foreground">
+						<input type="checkbox" checked={removeViewBox} onChange={(e) => setRemoveViewBox(e.target.checked)} />
+						{messages.pluginRemoveViewBox}
+					</label>
+					<label className="flex items-center gap-1.5 text-sm text-muted-foreground">
 						<input type="checkbox" checked={prettify} onChange={(e) => setPrettify(e.target.checked)} />
 						{messages.optPrettify}
 					</label>
@@ -222,6 +339,18 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 					</label>
 				</div>
 			</div>
+
+			<details className="rounded-lg border border-border p-4">
+				<summary className="cursor-pointer text-sm font-medium text-foreground">{messages.pluginsToggle}</summary>
+				<div className="mt-3 grid grid-cols-1 gap-x-4 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+					{PRESET_PLUGIN_IDS.map((id) => (
+						<label key={id} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+							<input type="checkbox" checked={pluginEnabled[id]} onChange={() => togglePlugin(id)} />
+							{messages[messageKeyForPlugin(id)]}
+						</label>
+					))}
+				</div>
+			</details>
 
 			{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
 
