@@ -109,6 +109,27 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-29** — Phase 3.5: xử lý rủi ro kỹ thuật thật ở Regex Tester (Phase 3 #3) —
+  trước đây tính match bằng `useMemo` đồng bộ ngay trên main thread, không debounce, không
+  timeout/guard, nên một pattern catastrophic-backtracking (vd. `(a+)+\1` với chuỗi dài) có
+  thể treo cứng tab. Đã tách việc match/replace sang Web Worker riêng
+  (`regexMatchWorker.ts`, cùng pattern với `audioEncodeWorker.ts`), debounce input 300ms,
+  và đặt hard timeout 1500ms ở main thread: nếu worker không phản hồi kịp, `worker.terminate()`
+  được gọi để giết luồng đang treo, hiện thông báo lỗi kèm gợi ý đơn giản hóa pattern (key
+  i18n mới `timeoutError`), có label "Đang tính…" (`computingLabel`) trong lúc chờ. Dùng
+  `requestId` tăng dần để bỏ qua response trễ khi người dùng gõ nhanh (tránh race condition).
+  Test bằng script Puppeteer riêng ở scratchpad: (1) pattern bình thường vẫn khớp đúng, named
+  group + replace preview vẫn hoạt động đúng, lỗi pattern sai vẫn hiện đúng; (2) xác minh trực
+  tiếp cơ chế Worker + hard-timeout + terminate() bằng 1 trang HTML độc lập có worker chạy vòng
+  lặp vô hạn thật sự — xác nhận main thread (đo bằng `requestAnimationFrame` tick) không bao
+  giờ bị đứng dù worker đang treo, và bị terminate đúng ~1501ms như cấu hình 1500ms. Ghi chú:
+  thử nhiều pattern ReDoS kinh điển (`^(a+)+$`, pattern có backreference dài) trực tiếp trên
+  Chromium của Puppeteer nhưng đều không treo — V8 trong Chromium hiện đại có vẻ đã tối ưu/giảm
+  thiểu một phần các trường hợp catastrophic backtracking phổ biến (khác biệt với Node.js độc
+  lập, nơi cùng pattern vẫn đo được thời gian tăng theo cấp số nhân khi calibrate); guard vẫn
+  giữ lại vì đây là phòng vệ đúng đắn, không phụ thuộc vào hành vi tối ưu hoá cụ thể của 1 phiên
+  bản trình duyệt. Build sạch (421 trang). Đã tick mục tương ứng trong `ROADMAP.md` Phase 3.5a
+  — hoàn tất toàn bộ 3.5a.
 - **2026-07-29** — Phase 3.5: fix bug thật thứ 2 ở Audio Converter (Phase 3 #10) —
   `audioEncodeWorker.ts` dùng `Math.min(channels.length, 2)` ở cả `encodeMp3` và
   `encodeWav` để giới hạn về stereo, nhưng không có cảnh báo nào cho người dùng khi file

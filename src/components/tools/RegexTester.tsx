@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import type { RegexMatchGroup, RegexMatchRequest, RegexMatchResponse } from './regexMatchWorker';
 
 interface Messages {
 	patternLabel: string;
@@ -14,6 +15,8 @@ interface Messages {
 	testStringLabel: string;
 	testStringPlaceholder: string;
 	invalidPatternError: string;
+	timeoutError: string;
+	computingLabel: string;
 	highlightedHeading: string;
 	matchesHeading: string;
 	matchCount: string;
@@ -55,9 +58,20 @@ interface FlagState {
 }
 
 const DEFAULT_FLAGS: FlagState = { g: true, i: false, m: false, s: false, u: false, y: false };
+const DEBOUNCE_MS = 300;
+const WORKER_TIMEOUT_MS = 1500;
 
 function flagsToString(flags: FlagState): string {
 	return (['g', 'i', 'm', 's', 'u', 'y'] as const).filter((f) => flags[f]).join('');
+}
+
+function useDebouncedValue<T>(value: T, delayMs: number): T {
+	const [debounced, setDebounced] = useState(value);
+	useEffect(() => {
+		const timer = setTimeout(() => setDebounced(value), delayMs);
+		return () => clearTimeout(timer);
+	}, [value, delayMs]);
+	return debounced;
 }
 
 function CopyButton({ value, label, copiedLabel }: { value: string; label: string; copiedLabel: string }) {
@@ -88,44 +102,112 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 
 	const selectedFlags = flagsToString(flags);
 
-	const { matches, error, segments } = useMemo(() => {
-		if (pattern === '') return { matches: [] as RegExpMatchArray[], error: null as string | null, segments: null };
-		const displayFlags = selectedFlags.includes('g') ? selectedFlags : selectedFlags + 'g';
-		try {
-			const displayRegex = new RegExp(pattern, displayFlags);
-			const found = [...testString.matchAll(displayRegex)];
-			const parts: { text: string; isMatch: boolean }[] = [];
-			let lastIndex = 0;
-			for (const m of found) {
-				if (m.index === undefined) continue;
-				if (m.index > lastIndex) parts.push({ text: testString.slice(lastIndex, m.index), isMatch: false });
-				if (m[0].length > 0) {
-					parts.push({ text: m[0], isMatch: true });
-					lastIndex = m.index + m[0].length;
-				} else {
-					lastIndex = m.index;
-				}
-			}
-			if (lastIndex < testString.length) parts.push({ text: testString.slice(lastIndex), isMatch: false });
-			return { matches: found, error: null as string | null, segments: parts };
-		} catch (err) {
-			return {
-				matches: [] as RegExpMatchArray[],
-				error: messages.invalidPatternError.replace('{{message}}', (err as Error).message),
-				segments: null,
-			};
-		}
-	}, [pattern, selectedFlags, testString, messages.invalidPatternError]);
+	const debouncedPattern = useDebouncedValue(pattern, DEBOUNCE_MS);
+	const debouncedFlags = useDebouncedValue(selectedFlags, DEBOUNCE_MS);
+	const debouncedTestString = useDebouncedValue(testString, DEBOUNCE_MS);
+	const debouncedReplacement = useDebouncedValue(replacement, DEBOUNCE_MS);
 
-	const replaceResult = useMemo(() => {
-		if (pattern === '' || error) return null;
-		try {
-			const regex = new RegExp(pattern, selectedFlags);
-			return testString.replace(regex, replacement);
-		} catch {
-			return null;
+	const [matches, setMatches] = useState<RegexMatchGroup[]>([]);
+	const [error, setError] = useState<string | null>(null);
+	const [replaceResult, setReplaceResult] = useState<string | null>(null);
+	const [isRunning, setIsRunning] = useState(false);
+
+	const workerRef = useRef<Worker | null>(null);
+	const requestIdRef = useRef(0);
+	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	const stopWorker = () => {
+		workerRef.current?.terminate();
+		workerRef.current = null;
+		if (timeoutRef.current) {
+			clearTimeout(timeoutRef.current);
+			timeoutRef.current = null;
 		}
-	}, [pattern, selectedFlags, testString, replacement, error]);
+	};
+
+	useEffect(() => stopWorker, []);
+
+	// Runs matching in a dedicated Web Worker with a hard timeout: a pattern with
+	// catastrophic backtracking runs synchronously forever, and only terminating the
+	// worker thread can actually stop it — a main-thread try/catch cannot.
+	useEffect(() => {
+		stopWorker();
+
+		if (debouncedPattern === '') {
+			setMatches([]);
+			setError(null);
+			setReplaceResult(null);
+			setIsRunning(false);
+			return;
+		}
+
+		const requestId = ++requestIdRef.current;
+		setIsRunning(true);
+
+		const worker = new Worker(new URL('./regexMatchWorker.ts', import.meta.url), { type: 'module' });
+		workerRef.current = worker;
+
+		worker.onmessage = (event: MessageEvent<RegexMatchResponse>) => {
+			if (event.data.requestId !== requestIdRef.current) return;
+			stopWorker();
+			setIsRunning(false);
+			if (event.data.error) {
+				setError(messages.invalidPatternError.replace('{{message}}', event.data.error));
+				setMatches([]);
+				setReplaceResult(null);
+			} else {
+				setError(null);
+				setMatches(event.data.matches);
+				setReplaceResult(event.data.replaceResult);
+			}
+		};
+		worker.onerror = () => {
+			if (requestId !== requestIdRef.current) return;
+			stopWorker();
+			setIsRunning(false);
+			setError(messages.invalidPatternError.replace('{{message}}', 'worker error'));
+			setMatches([]);
+			setReplaceResult(null);
+		};
+
+		const request: RegexMatchRequest = {
+			requestId,
+			pattern: debouncedPattern,
+			flags: debouncedFlags,
+			testString: debouncedTestString,
+			replacement: debouncedReplacement,
+		};
+		worker.postMessage(request);
+
+		timeoutRef.current = setTimeout(() => {
+			if (requestId !== requestIdRef.current) return;
+			stopWorker();
+			setIsRunning(false);
+			setError(messages.timeoutError);
+			setMatches([]);
+			setReplaceResult(null);
+		}, WORKER_TIMEOUT_MS);
+
+		return stopWorker;
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [debouncedPattern, debouncedFlags, debouncedTestString, debouncedReplacement]);
+
+	const segments = useMemo(() => {
+		if (debouncedPattern === '' || error) return null;
+		const parts: { text: string; isMatch: boolean }[] = [];
+		let lastIndex = 0;
+		for (const m of matches) {
+			if (m.index > lastIndex) parts.push({ text: debouncedTestString.slice(lastIndex, m.index), isMatch: false });
+			if (m.fullMatch.length > 0) {
+				parts.push({ text: m.fullMatch, isMatch: true });
+				lastIndex = m.index + m.fullMatch.length;
+			} else {
+				lastIndex = m.index;
+			}
+		}
+		if (lastIndex < debouncedTestString.length) parts.push({ text: debouncedTestString.slice(lastIndex), isMatch: false });
+		return parts;
+	}, [matches, debouncedTestString, debouncedPattern, error]);
 
 	const flagCheckbox = (key: keyof FlagState, label: string) => (
 		<label className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -203,6 +285,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 				</div>
 
 				{error && <p className="text-sm text-destructive">{error}</p>}
+				{isRunning && <p className="text-xs text-muted-foreground">{messages.computingLabel}</p>}
 
 				<div>
 					<Button
@@ -220,7 +303,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 				</div>
 			</div>
 
-			{segments && testString !== '' && (
+			{segments && debouncedTestString !== '' && (
 				<div className="flex flex-col gap-2 rounded-lg border border-border p-4">
 					<span className="text-sm font-medium text-foreground">{messages.highlightedHeading}</span>
 					<pre className="max-h-64 overflow-auto rounded-md bg-muted p-3 font-mono text-xs whitespace-pre-wrap text-foreground">
@@ -237,7 +320,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 				</div>
 			)}
 
-			{pattern !== '' && !error && (
+			{debouncedPattern !== '' && !error && (
 				<div className="flex flex-col gap-3 rounded-lg border border-border p-4">
 					<span className="text-sm font-medium text-foreground">
 						{messages.matchesHeading} —{' '}
@@ -253,10 +336,10 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 										{messages.matchLabel.replace('{{index}}', String(i + 1))}
 									</div>
 									<div className="mt-1 font-mono text-muted-foreground">
-										{messages.fullMatchLabel}: <span className="text-foreground">{m[0]}</span>{' '}
+										{messages.fullMatchLabel}: <span className="text-foreground">{m.fullMatch}</span>{' '}
 										({messages.indexLabel}: {m.index})
 									</div>
-									{m.slice(1).map((group, gi) =>
+									{m.groups.map((group, gi) =>
 										group === undefined ? null : (
 											<div key={gi} className="mt-0.5 font-mono text-muted-foreground">
 												{messages.groupLabel.replace('{{index}}', String(gi + 1))}:{' '}
@@ -264,8 +347,8 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 											</div>
 										),
 									)}
-									{m.groups &&
-										Object.entries(m.groups).map(([name, value]) =>
+									{m.namedGroups &&
+										Object.entries(m.namedGroups).map(([name, value]) =>
 											value === undefined ? null : (
 												<div key={name} className="mt-0.5 font-mono text-muted-foreground">
 													{messages.namedGroupLabel.replace('{{name}}', name)}:{' '}
@@ -280,7 +363,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 				</div>
 			)}
 
-			{pattern !== '' && !error && (
+			{debouncedPattern !== '' && !error && (
 				<div className="flex flex-col gap-2 rounded-lg border border-border p-4">
 					<span className="text-sm font-medium text-foreground">{messages.replaceHeading}</span>
 					<div className="flex flex-col gap-1">

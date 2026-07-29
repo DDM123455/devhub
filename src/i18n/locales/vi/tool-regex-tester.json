@@ -18,6 +18,8 @@
     "testStringLabel": "Chuỗi kiểm tra",
     "testStringPlaceholder": "Dán hoặc gõ văn bản để kiểm tra mẫu regex của bạn…",
     "invalidPatternError": "Mẫu không hợp lệ: {{message}}",
+    "timeoutError": "Mẫu regex này chạy quá lâu trên chuỗi kiểm tra (có thể do catastrophic backtracking) nên đã bị dừng tự động. Hãy thử đơn giản hóa mẫu hoặc rút ngắn chuỗi kiểm tra.",
+    "computingLabel": "Đang tính kết quả khớp…",
     "highlightedHeading": "Kết quả khớp được highlight",
     "matchesHeading": "Kết quả khớp",
     "matchCount": "{{count}} kết quả khớp",

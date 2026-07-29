@@ -18,6 +18,8 @@
     "testStringLabel": "Test string",
     "testStringPlaceholder": "Paste or type text to test your pattern against…",
     "invalidPatternError": "Invalid pattern: {{message}}",
+    "timeoutError": "This pattern is taking too long to run against your test string (possible catastrophic backtracking) and was stopped automatically. Try simplifying the pattern or shortening the test string.",
+    "computingLabel": "Computing matches…",
     "highlightedHeading": "Highlighted matches",
     "matchesHeading": "Matches",
     "matchCount": "{{count}} match(es)",
