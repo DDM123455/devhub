@@ -374,7 +374,7 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 						)}
 					</div>
 
-					{error && <p className="text-sm text-destructive">{error}</p>}
+					{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
 
 					{resultUrl && (
 						<div className="flex flex-col gap-3 rounded-lg border border-border p-4">

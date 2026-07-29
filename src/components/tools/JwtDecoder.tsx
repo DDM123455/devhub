@@ -347,7 +347,7 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 			</div>
 
 			{decodeError && (
-				<div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+				<div role="alert" className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
 					{decodeError}
 				</div>
 			)}
@@ -475,13 +475,13 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 									</Button>
 								</div>
 								{verifyResult === 'valid' && (
-									<p className="text-sm font-medium text-primary">{messages.signatureValid}</p>
+									<p role="status" className="text-sm font-medium text-primary">{messages.signatureValid}</p>
 								)}
 								{verifyResult === 'invalid' && (
-									<p className="text-sm font-medium text-destructive">{messages.signatureInvalid}</p>
+									<p role="alert" className="text-sm font-medium text-destructive">{messages.signatureInvalid}</p>
 								)}
 								{verifyResult === 'error' && (
-									<p className="text-sm font-medium text-destructive">
+									<p role="alert" className="text-sm font-medium text-destructive">
 										{kind === 'rsa' ? messages.verifyInvalidPublicKey : messages.signatureInvalid}
 									</p>
 								)}
@@ -524,7 +524,7 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 								{messages.resignButton}
 							</Button>
 						</div>
-						{resignError && <p className="text-sm text-destructive">{resignError}</p>}
+						{resignError && <p role="alert" className="text-sm text-destructive">{resignError}</p>}
 						{resignedToken && (
 							<div className="flex flex-col gap-1">
 								<div className="flex items-center justify-between">

@@ -304,7 +304,7 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 						/>
 					</div>
 
-					{textError && <p className="text-sm text-destructive">{textError}</p>}
+					{textError && <p role="alert" className="text-sm text-destructive">{textError}</p>}
 					{textInput !== '' && !textError && (
 						<p className="text-xs text-muted-foreground">
 							{messages.sizeInfo.replace('{{input}}', String(textInput.length)).replace('{{output}}', String(textOutput.length))}
@@ -444,7 +444,7 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 								{messages.downloadFile}
 							</Button>
 						</div>
-						{fileDecodeError && <p className="text-sm text-destructive">{fileDecodeError}</p>}
+						{fileDecodeError && <p role="alert" className="text-sm text-destructive">{fileDecodeError}</p>}
 					</div>
 				</div>
 			)}

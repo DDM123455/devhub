@@ -379,7 +379,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 				</div>
 			)}
 
-			{error && <p className="text-sm text-destructive">{error}</p>}
+			{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
 
 			<div>
 				<Button type="button" onClick={handleSplit} disabled={!canSplit}>

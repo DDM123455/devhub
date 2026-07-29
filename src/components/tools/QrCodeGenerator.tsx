@@ -610,7 +610,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 
 			<div className="flex flex-1 items-center justify-center rounded-md border border-border p-6">
 				{tooLong ? (
-					<p className="max-w-xs text-center text-sm text-destructive">{messages.errorTooLong}</p>
+					<p role="alert" className="max-w-xs text-center text-sm text-destructive">{messages.errorTooLong}</p>
 				) : (
 					<QrErrorBoundary key={renderKey} onError={() => setErroredRenderKey(renderKey)}>
 						<QRCodeCanvas

@@ -211,7 +211,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 			</div>
 
 			{skippedCount > 0 && (
-				<p className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
+				<p role="status" className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
 					{messages.skippedFiles.replace('{{count}}', String(skippedCount))}
 				</p>
 			)}
@@ -297,7 +297,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 				</>
 			)}
 
-			{mergeError && <p className="text-sm text-destructive">{mergeError}</p>}
+			{mergeError && <p role="alert" className="text-sm text-destructive">{mergeError}</p>}
 
 			<div className="flex items-center gap-3">
 				<Button type="button" onClick={handleMerge} disabled={!canMerge}>

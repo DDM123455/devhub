@@ -382,7 +382,7 @@ export default function CsvJsonConverter({ messages }: { messages: Messages }) {
 				</Button>
 			</div>
 
-			{error && <p className="text-sm text-destructive">{error}</p>}
+			{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
 
 			<div className="flex justify-center">
 				<Button type="button" size="sm" variant="outline" onClick={handleSwap} disabled={output === ''}>

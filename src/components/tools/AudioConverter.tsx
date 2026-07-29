@@ -266,9 +266,9 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 						)}
 					</div>
 
-					{error && <p className="text-sm text-destructive">{error}</p>}
+					{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
 					{channelCount !== null && (
-						<p className="rounded-md border border-amber-500/40 bg-amber-500/10 p-2 text-sm text-amber-700 dark:text-amber-300">
+						<p role="status" className="rounded-md border border-amber-500/40 bg-amber-500/10 p-2 text-sm text-amber-700 dark:text-amber-300">
 							{messages.channelDownmixWarning.replace('{{count}}', String(channelCount))}
 						</p>
 					)}

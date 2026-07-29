@@ -136,7 +136,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 ### 3.5b — Accessibility pass toàn site (Critical)
 - [x] Thêm skip-to-content link trong Layout.astro
 - [x] Thêm focus-trap + trả focus cho sidebar mobile khi đóng
-- [ ] Rà soát 20 tool: thêm `aria-live="polite"` cho mọi vùng thông báo lỗi/kết quả động
+- [x] Rà soát 20 tool: thêm `aria-live="polite"` cho mọi vùng thông báo lỗi/kết quả động
 - [ ] Rà soát 20 tool: thêm `role=`/`sr-only` có hệ thống cho input/button/status quan trọng
 - [ ] Đo lại bằng Lighthouse + axe DevTools sau khi sửa, xác nhận điểm Accessibility ≥ 90
 

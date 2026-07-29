@@ -277,7 +277,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 			</div>
 
 			{skippedCount > 0 && (
-				<p className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
+				<p role="status" className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
 					{messages.skippedFiles.replace('{{count}}', String(skippedCount))}
 				</p>
 			)}
@@ -408,7 +408,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 									</span>
 								)}
 								{item.status === 'error' && (
-									<span className="text-destructive">{messages.errorGeneric}</span>
+									<span role="alert" className="text-destructive">{messages.errorGeneric}</span>
 								)}
 							</div>
 							<div className="flex shrink-0 items-center gap-2">

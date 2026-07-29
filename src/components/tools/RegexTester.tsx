@@ -284,8 +284,8 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 					/>
 				</div>
 
-				{error && <p className="text-sm text-destructive">{error}</p>}
-				{isRunning && <p className="text-xs text-muted-foreground">{messages.computingLabel}</p>}
+				{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+				{isRunning && <p role="status" className="text-xs text-muted-foreground">{messages.computingLabel}</p>}
 
 				<div>
 					<Button

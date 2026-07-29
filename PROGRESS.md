@@ -109,6 +109,22 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-29** — Phase 3.5b: thêm `role="alert"`/`role="status"` (tương đương
+  `aria-live="assertive"`/`"polite"` ngầm định theo ARIA spec) cho toàn bộ thông báo lỗi/
+  trạng thái xuất hiện động ở **16/20 tool** (4 tool còn lại — Word Counter, Text Case
+  Converter, Text Diff Checker, Markdown Editor — không có trạng thái lỗi nào trong code,
+  xác nhận bằng grep, không phải bỏ sót). Rà soát toàn bộ vị trí `text-destructive` bằng
+  grep trước khi sửa để không bỏ sót (24 vị trí qua 16 file). Quy tắc áp dụng: `role="alert"`
+  cho lỗi thật cần người dùng biết ngay (parse error, decode error, verify thất bại, lỗi
+  export...); `role="status"` cho thông báo không chặn (file bị bỏ qua vì sai định dạng,
+  "đang tính…", cảnh báo downmix audio, kết quả verify JWT hợp lệ). Cố tình giữ nguyên 2 vị
+  trí tĩnh không thêm role (badge "Expired" của JWT Decoder, badge "Fail" contrast của Color
+  Picker) vì đây là chỉ báo trạng thái thường trực hiển thị cùng lúc với dữ liệu, không phải
+  thông báo động cần công bố riêng — đúng tinh thần ARIA (`alert`/`status` dành cho nội dung
+  *xuất hiện/thay đổi* để báo tin mới). Build sạch (421 trang) + test Puppeteer thật xác
+  nhận `role="alert"` xuất hiện đúng lúc chạy (không chỉ trong code) ở JWT Decoder (token
+  sai), Base64 Tool (base64 sai), và `role="status"` ở Image Compressor (upload file không
+  phải ảnh bị bỏ qua). Đã tick mục tương ứng trong `ROADMAP.md` Phase 3.5b.
 - **2026-07-29** — Phase 3.5b (accessibility) — 2 mục đầu tiên: skip-to-content link +
   focus-trap sidebar mobile, cả hai đều sửa trong `Layout.astro` (layout dùng chung, áp
   dụng cho toàn bộ 20+ trang tool). (1) Thêm `<a href="#main-content">` ẩn bằng `sr-only`,

@@ -223,7 +223,7 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 				</div>
 			</div>
 
-			{error && <p className="text-sm text-destructive">{error}</p>}
+			{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
 
 			{input !== '' && !error && (
 				<>

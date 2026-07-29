@@ -343,7 +343,7 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 						</div>
 					</div>
 				</div>
-				{hexError && <p className="mt-2 text-sm text-destructive">{messages.invalidHexError}</p>}
+				{hexError && <p role="alert" className="mt-2 text-sm text-destructive">{messages.invalidHexError}</p>}
 			</div>
 
 			<div className="rounded-lg border border-border p-4">

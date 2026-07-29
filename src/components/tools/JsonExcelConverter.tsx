@@ -306,8 +306,8 @@ export default function JsonExcelConverter({ messages }: { messages: Messages })
 				</Button>
 			</div>
 
-			{error && <p className="text-sm text-destructive">{error}</p>}
-			{downloadError && <p className="text-sm text-destructive">{downloadError}</p>}
+			{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+			{downloadError && <p role="alert" className="text-sm text-destructive">{downloadError}</p>}
 
 			{sheets && currentSheet && (
 				<div className="flex flex-col gap-3 rounded-lg border border-border p-4">

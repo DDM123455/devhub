@@ -321,7 +321,7 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 			<p className="text-xs text-muted-foreground">{messages.themeNotice}</p>
 
 			{parseError && mode === 'text' && (
-				<div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+				<div role="alert" className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
 					<span>
 						{parseError.line
 							? messages.errorWithLine
@@ -351,7 +351,7 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 					</Button>
 				</div>
 
-				{exportError && <p className="text-sm text-destructive">{exportError}</p>}
+				{exportError && <p role="alert" className="text-sm text-destructive">{exportError}</p>}
 
 				{exportResult !== null && exportFormat && (
 					<div className="flex flex-col gap-2">
