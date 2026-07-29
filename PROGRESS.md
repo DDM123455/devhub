@@ -106,9 +106,31 @@
 - **Test tương tác**: dùng Puppeteer (không phải dependency chính thức của repo, chạy qua
   bản cài sẵn trong npx cache của máy). Luôn `npm run build` + `npm run preview` rồi test
   trên bundle production thật, không test trên dev server.
+- **Test Puppeteer cho tính năng copy-to-clipboard (từ 2026-07-29)**: môi trường headless
+  Chrome ở máy này từ chối `navigator.clipboard.writeText` thật với lỗi "Write permission
+  denied", `navigator.permissions.query({name:'clipboard-write'})` báo `denied` dù đã gọi
+  `browserContext.overridePermissions(origin, ['clipboard-read','clipboard-write'])` — giới
+  hạn sandbox của môi trường, không phải bug ở code. Muốn test phần logic "hiện chữ Copied
+  rồi tự ẩn sau timeout" của bất kỳ nút copy nào, phải stub API trước khi trang load:
+  `page.evaluateOnNewDocument(() => Object.defineProperty(navigator, 'clipboard', { value: {
+  writeText: () => Promise.resolve() }, configurable: true }))`, rồi mới `page.goto(...)`.
+  Ngoài ra bấm nút phải dùng `elementHandle.click()` thật của Puppeteer (trusted mouse event
+  qua CDP), không phải `btn.click()` gọi trong `page.evaluate()` (synthetic, không có user
+  activation) — nếu không dù có stub clipboard cũng không chắc phản ánh đúng hành vi thật.
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-29** — Phase 3.5c: Color Picker — 2 nút "Copy as CSS"/"Copy as JSON" trước đây
+  không có phản hồi "Copied!" như mọi nút copy khác trên site (bất nhất UX đã ghi trong
+  audit). Thêm 2 state `cssCopied`/`jsonCopied` riêng, hiện `messages.copied` 1200ms sau khi
+  bấm rồi tự trở lại nhãn gốc — cùng pattern với `Swatch` component đã có sẵn trong cùng
+  file. Build sạch (421 trang) + test Puppeteer: phát hiện môi trường headless Chrome ở đây
+  luôn từ chối `navigator.clipboard.writeText` thật (permission "denied" dù đã
+  `overridePermissions`, xác minh bằng probe riêng — giới hạn sandbox, không phải bug code),
+  nên test phải stub `navigator.clipboard` qua `page.evaluateOnNewDocument` để cô lập kiểm
+  tra đúng phần logic state của tool (hiện đúng "Copied!" rồi tự revert sau timeout) — ghi
+  chú kỹ thuật này áp dụng cho mọi test Puppeteer liên quan tới clipboard ở các phiên sau.
+  Đã tick mục tương ứng trong `ROADMAP.md` Phase 3.5c.
 - **2026-07-29** — Phase 3.5b (hoàn tất 4/5 mục, trừ đo Lighthouse/axe thật): rà soát
   `role=`/`sr-only` có hệ thống. Dùng 1 Explore agent đọc toàn bộ 20 file tool +
   layout component để tìm nút chỉ có icon (không text/aria-label/title) — kết quả: **không

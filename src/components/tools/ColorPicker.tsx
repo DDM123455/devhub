@@ -216,6 +216,8 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 	// Deterministic placeholder so server-rendered and hydrated markup match; randomized on mount below.
 	const [palette, setPalette] = useState<Hsl[]>(() => Array(5).fill({ h: 217, s: 91, l: 60 }));
 	const [locked, setLocked] = useState<boolean[]>(() => Array(5).fill(false));
+	const [cssCopied, setCssCopied] = useState(false);
+	const [jsonCopied, setJsonCopied] = useState(false);
 
 	useEffect(() => {
 		setPalette(Array.from({ length: 5 }, randomHsl));
@@ -406,10 +408,13 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 								...palette.map((c, i) => `  --color-${i + 1}: ${rgbToHex(hslToRgb(c))};`),
 								'}',
 							].join('\n');
-							void navigator.clipboard.writeText(css);
+							void navigator.clipboard.writeText(css).then(() => {
+								setCssCopied(true);
+								setTimeout(() => setCssCopied(false), 1200);
+							});
 						}}
 					>
-						{messages.copyPaletteCss}
+						{cssCopied ? messages.copied : messages.copyPaletteCss}
 					</Button>
 					<Button
 						type="button"
@@ -417,10 +422,13 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 						variant="ghost"
 						onClick={() => {
 							const json = JSON.stringify(palette.map((c) => rgbToHex(hslToRgb(c))), null, 2);
-							void navigator.clipboard.writeText(json);
+							void navigator.clipboard.writeText(json).then(() => {
+								setJsonCopied(true);
+								setTimeout(() => setJsonCopied(false), 1200);
+							});
 						}}
 					>
-						{messages.copyPaletteJson}
+						{jsonCopied ? messages.copied : messages.copyPaletteJson}
 					</Button>
 				</div>
 			</div>
