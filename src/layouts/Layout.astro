@@ -17,6 +17,32 @@ interface Props {
 const { title, lang, description, showSearch = false } = Astro.props;
 const dir = rtlLocales.has(lang) ? 'rtl' : 'ltr';
 const t = getFixedT(lang);
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+
+// Open Graph's og:locale wants a language_TERRITORY tag, not the bare 2-letter code this
+// site otherwise uses everywhere for routing/i18n — mapped once here rather than per-page.
+const OG_LOCALE: Record<Locale, string> = {
+	en: 'en_US',
+	vi: 'vi_VN',
+	es: 'es_ES',
+	pt: 'pt_PT',
+	fr: 'fr_FR',
+	de: 'de_DE',
+	ja: 'ja_JP',
+	ko: 'ko_KR',
+	zh: 'zh_CN',
+	'zh-tw': 'zh_TW',
+	it: 'it_IT',
+	ru: 'ru_RU',
+	nl: 'nl_NL',
+	pl: 'pl_PL',
+	tr: 'tr_TR',
+	id: 'id_ID',
+	ar: 'ar_AR',
+	hi: 'hi_IN',
+	th: 'th_TH',
+	sv: 'sv_SE',
+};
 ---
 
 <html lang={lang} dir={dir}>
@@ -39,10 +65,21 @@ const t = getFixedT(lang);
 		</script>
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
+		<link rel="canonical" href={canonicalUrl} />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 		{description && <meta name="description" content={description} />}
+
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Web Tool Hub" />
+		<meta property="og:title" content={title} />
+		{description && <meta property="og:description" content={description} />}
+		<meta property="og:url" content={canonicalUrl} />
+		<meta property="og:locale" content={OG_LOCALE[lang]} />
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content={title} />
+		{description && <meta name="twitter:description" content={description} />}
 	</head>
 	<body class="flex min-h-screen flex-col">
 		<a

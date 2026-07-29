@@ -137,6 +137,23 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-29** — Phase 3.5e bắt đầu: xác minh và bổ sung Open Graph + Twitter Card +
+  canonical link trong `Layout.astro` (dùng chung toàn bộ 20+ trang). Audit ban đầu ghi "chưa
+  xác minh được" — đọc trực tiếp `Layout.astro` xác nhận **hoàn toàn chưa có** cả OG, Twitter
+  Card, lẫn `<link rel="canonical">` (canonical trước đó chỉ tồn tại bên trong JSON-LD
+  `url`, không có link tag thật — ảnh hưởng SEO thật vì Google ưu tiên link tag hơn). Đã thêm
+  `og:type/site_name/title/description/url/locale` + `twitter:card` (`summary`, không phải
+  `summary_large_image` vì chưa có ảnh)/`title`/`description` + `<link rel="canonical">`,
+  tính `canonicalUrl` một lần trong `Layout.astro` từ `Astro.url` + `Astro.site` (không cần
+  mỗi `*Page.astro` tự tính lại). Thêm bảng map `og:locale` cho cả 20 ngôn ngữ (vd. `vi` →
+  `vi_VN`, `zh-tw` → `zh_TW`) vì chuẩn Open Graph cần dạng `ngôn_ngữ_QUỐC-GIA`, khác mã 2 ký
+  tự routing thuần của site. **Cố tình chưa thêm `og:image`/`twitter:image`**: repo chưa có
+  ảnh OG chuẩn (1200×630) nào trong `public/`, chỉ có favicon (không phù hợp làm og:image) —
+  ghi nhận đây là việc cần làm riêng (thiết kế 1 ảnh banner thương hiệu), không tự chế ảnh
+  giả để "cho đủ tag". Build sạch (421 trang) + xác minh trực tiếp trong `dist/` HTML build
+  ra: tag `og:locale` đúng theo từng ngôn ngữ (`en_US` cho `/en/`, `vi_VN` cho `/vi/`),
+  `canonical` đúng URL tuyệt đối từng trang. Đã tick mục tương ứng trong `ROADMAP.md` Phase
+  3.5e.
 - **2026-07-29** — Phase 3.5d (hoàn tất, kết thúc luôn Phase 3.5d): Video Trim — 2 phần theo
   audit. (1) **Timeline kéo-2-tay-cầm**: thay 2 thanh `<input type=range>` tách rời bằng 1
   component `TrimTimeline` tự viết — track trực quan, 2 tay cầm kéo được đè lên vùng chọn tô
