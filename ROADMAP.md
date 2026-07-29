@@ -159,6 +159,17 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 ### 3.5f — PWA nền tảng (đẩy sớm hơn trong Phase 4)
 - [ ] manifest.json + service worker cơ bản (ưu tiên trước AdSense vì giá trị conversion/SEO cao hơn)
 
+### 3.5g — Text Diff Checker: nâng cấp theo yêu cầu trực tiếp người dùng (2026-07-29)
+- [x] Character-level diff cho từ bị thay thế trong Word mode (không còn highlight cả từ khi
+      chỉ khác vài ký tự — kiến trúc Line → Word → Character kiểu DiffChecker/GitHub)
+- [x] Sửa bug thật lộ ra khi test: 2 dòng giống hệt nhau bị `diffLines` gắn nhầm nhãn "modified"
+- [x] Thêm 3 tùy chọn ignore còn thiếu: ignore empty lines, normalize line endings (CRLF/LF),
+      Unicode normalization
+- [x] Chuyển việc tính diff sang Web Worker riêng (`textDiffWorker.ts`), không đứng UI
+- [ ] Virtualization (windowed rendering) cho khu vực so sánh chính, hỗ trợ file rất lớn
+      (100k+ dòng) — cần đổi `jumpToHunk` từ `scrollIntoView` sang tính `scrollTop` toán học;
+      cân nhắc có virtualize luôn phần Merge Tool hay không. Chưa làm, để phiên sau.
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav
