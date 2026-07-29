@@ -40,6 +40,110 @@ function formatTime(seconds: number): string {
 	return `${m}:${s.toFixed(1).padStart(4, '0')}`;
 }
 
+const MIN_SELECTION_GAP = 0.1;
+
+// A Clideo-style dual-handle scrubber: drag either handle to set the trim start/end
+// directly on a visual timeline instead of two separate, disconnected range inputs.
+// Pointer capture (not document-level listeners) keeps dragging reliable even when the
+// cursor moves outside the track, and works identically for mouse and touch input.
+function TrimTimeline({
+	duration,
+	start,
+	end,
+	onStartChange,
+	onEndChange,
+	startAriaLabel,
+	endAriaLabel,
+}: {
+	duration: number;
+	start: number;
+	end: number;
+	onStartChange: (value: number) => void;
+	onEndChange: (value: number) => void;
+	startAriaLabel: string;
+	endAriaLabel: string;
+}) {
+	const trackRef = useRef<HTMLDivElement>(null);
+
+	const timeFromClientX = (clientX: number): number => {
+		const track = trackRef.current;
+		if (!track || duration <= 0) return 0;
+		const rect = track.getBoundingClientRect();
+		const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+		return ratio * duration;
+	};
+
+	const beginDrag = (which: 'start' | 'end') => (event: React.PointerEvent<HTMLDivElement>) => {
+		event.preventDefault();
+		const handle = event.currentTarget;
+		handle.setPointerCapture(event.pointerId);
+
+		const onMove = (moveEvent: PointerEvent) => {
+			const time = timeFromClientX(moveEvent.clientX);
+			if (which === 'start') onStartChange(Math.min(time, end - MIN_SELECTION_GAP));
+			else onEndChange(Math.max(time, start + MIN_SELECTION_GAP));
+		};
+		const onUp = () => {
+			handle.removeEventListener('pointermove', onMove);
+			handle.removeEventListener('pointerup', onUp);
+		};
+		handle.addEventListener('pointermove', onMove);
+		handle.addEventListener('pointerup', onUp);
+	};
+
+	const handleKeyDown = (which: 'start' | 'end') => (event: React.KeyboardEvent) => {
+		const step = event.shiftKey ? 5 : 0.5;
+		if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+			event.preventDefault();
+			const delta = event.key === 'ArrowLeft' ? -step : step;
+			if (which === 'start') onStartChange(Math.min(Math.max(0, start + delta), end - MIN_SELECTION_GAP));
+			else onEndChange(Math.max(Math.min(duration, end + delta), start + MIN_SELECTION_GAP));
+		} else if (event.key === 'Home') {
+			event.preventDefault();
+			if (which === 'start') onStartChange(0);
+		} else if (event.key === 'End') {
+			event.preventDefault();
+			if (which === 'end') onEndChange(duration);
+		}
+	};
+
+	const startPct = duration > 0 ? (start / duration) * 100 : 0;
+	const endPct = duration > 0 ? (end / duration) * 100 : 100;
+
+	return (
+		<div ref={trackRef} className="relative h-10 w-full touch-none select-none rounded-md bg-muted">
+			<div
+				className="absolute inset-y-0 rounded-md bg-primary/30"
+				style={{ left: `${startPct}%`, right: `${100 - endPct}%` }}
+			/>
+			<div
+				role="slider"
+				aria-label={startAriaLabel}
+				aria-valuemin={0}
+				aria-valuemax={duration}
+				aria-valuenow={start}
+				tabIndex={0}
+				onPointerDown={beginDrag('start')}
+				onKeyDown={handleKeyDown('start')}
+				className="absolute top-0 h-full w-3 -translate-x-1/2 cursor-ew-resize rounded-sm bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+				style={{ left: `${startPct}%` }}
+			/>
+			<div
+				role="slider"
+				aria-label={endAriaLabel}
+				aria-valuemin={0}
+				aria-valuemax={duration}
+				aria-valuenow={end}
+				tabIndex={0}
+				onPointerDown={beginDrag('end')}
+				onKeyDown={handleKeyDown('end')}
+				className="absolute top-0 h-full w-3 -translate-x-1/2 cursor-ew-resize rounded-sm bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+				style={{ left: `${endPct}%` }}
+			/>
+		</div>
+	);
+}
+
 function formatBytes(bytes: number): string {
 	if (bytes < 1024) return `${bytes} B`;
 	const units = ['KB', 'MB', 'GB'];
@@ -295,53 +399,41 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 
 					{duration !== null && (
 						<div className="flex flex-col gap-3 rounded-lg border border-border p-4">
-							<div className="flex flex-col gap-1.5">
-								<div className="flex items-center justify-between text-xs text-muted-foreground">
-									<span>
-										{messages.startLabel}: {formatTime(start)}
-									</span>
+							<div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+								<span>
+									{messages.startLabel}: {formatTime(start)} · {messages.endLabel}: {formatTime(end)}
+								</span>
+								<div className="flex gap-2">
 									<Button
 										type="button"
 										size="sm"
 										variant="ghost"
-										onClick={() => videoRef.current && setStart(Math.min(videoRef.current.currentTime, end - 0.1))}
+										onClick={() => videoRef.current && setStart(Math.min(videoRef.current.currentTime, end - MIN_SELECTION_GAP))}
 									>
-										{messages.markCurrent}
+										{messages.startLabel}: {messages.markCurrent}
+									</Button>
+									<Button
+										type="button"
+										size="sm"
+										variant="ghost"
+										onClick={() => videoRef.current && setEnd(Math.max(videoRef.current.currentTime, start + MIN_SELECTION_GAP))}
+									>
+										{messages.endLabel}: {messages.markCurrent}
 									</Button>
 								</div>
-								<input
-									type="range"
-									min={0}
-									max={effectiveDuration}
-									step={0.1}
-									value={start}
-									onChange={(e) => setStart(Math.min(Number(e.target.value), end - 0.1))}
-									className="w-full"
-								/>
 							</div>
-							<div className="flex flex-col gap-1.5">
-								<div className="flex items-center justify-between text-xs text-muted-foreground">
-									<span>
-										{messages.endLabel}: {formatTime(end)}
-									</span>
-									<Button
-										type="button"
-										size="sm"
-										variant="ghost"
-										onClick={() => videoRef.current && setEnd(Math.max(videoRef.current.currentTime, start + 0.1))}
-									>
-										{messages.markCurrent}
-									</Button>
-								</div>
-								<input
-									type="range"
-									min={0}
-									max={effectiveDuration}
-									step={0.1}
-									value={end}
-									onChange={(e) => setEnd(Math.max(Number(e.target.value), start + 0.1))}
-									className="w-full"
-								/>
+							<TrimTimeline
+								duration={effectiveDuration}
+								start={start}
+								end={end}
+								onStartChange={setStart}
+								onEndChange={setEnd}
+								startAriaLabel={messages.startLabel}
+								endAriaLabel={messages.endLabel}
+							/>
+							<div className="flex items-center justify-between text-xs text-muted-foreground">
+								<span>0:00.0</span>
+								<span>{formatTime(effectiveDuration)}</span>
 							</div>
 							<p className="text-xs text-muted-foreground">
 								{messages.selectionLabel.replace('{{duration}}', formatTime(selectionDuration))}

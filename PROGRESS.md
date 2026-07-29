@@ -112,6 +112,14 @@
 - **Layout dùng chung**: `Header`/`Sidebar`/`Footer` ở `src/components/layout/`, tự nhận
   `lang` + tự gọi `getFixedT` — mọi trang bọc trong `Layout.astro` tự động có đủ 3 phần,
   không cần import lại thủ công.
+- **Test Puppeteer cho thao tác kéo-thả bằng `page.mouse`/`elementHandle.boundingBox()`
+  (từ 2026-07-29)**: viewport mặc định của Puppeteer chỉ 800×600. Nếu phần tử cần kéo nằm ở
+  vị trí y > 600px trên trang dài (rất dễ gặp với tool có nhiều control phía trên), `page.
+  mouse.move/down/up` gửi tọa độ hợp lệ về mặt API nhưng **không trúng gì trên màn hình
+  thật** — không báo lỗi, chỉ đơn giản là không có sự kiện `pointerdown`/`pointermove` nào
+  được kích hoạt, khiến test kết luận nhầm "tính năng kéo bị hỏng" dù code đúng. Luôn
+  `page.setViewport({ width: 1280, height: 1600 })` (hoặc đủ cao hơn chiều cao trang) trước
+  khi lấy `boundingBox()` để mô phỏng kéo-thả bằng `page.mouse`.
 - **Test tương tác**: dùng Puppeteer (không phải dependency chính thức của repo, chạy qua
   bản cài sẵn trong npx cache của máy). Luôn `npm run build` + `npm run preview` rồi test
   trên bundle production thật, không test trên dev server.
@@ -129,6 +137,34 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-29** — Phase 3.5d (hoàn tất, kết thúc luôn Phase 3.5d): Video Trim — 2 phần theo
+  audit. (1) **Timeline kéo-2-tay-cầm**: thay 2 thanh `<input type=range>` tách rời bằng 1
+  component `TrimTimeline` tự viết — track trực quan, 2 tay cầm kéo được đè lên vùng chọn tô
+  màu, dùng Pointer Events + `setPointerCapture` (không phải listener gắn ở `document`) nên
+  kéo mượt kể cả khi con trỏ ra khỏi track, hoạt động cả chuột lẫn cảm ứng qua cùng 1 API;
+  có `role="slider"` + `aria-valuenow/min/max` + hỗ trợ bàn phím (mũi tên trái/phải chỉnh
+  0.5s, Shift+mũi tên chỉnh 5s, Home/End nhảy về đầu/cuối) — đạt chuẩn custom widget WCAG,
+  không phải chỉ đẹp mắt. (2) **"Offload FFmpeg sang Web Worker"**: audit gốc ghi nhận đây là
+  gap ("Video Trim xử lý FFmpeg hoàn toàn trên main thread... rủi ro jank UI"), nhưng khi đọc
+  trực tiếp source thật của `@ffmpeg/ffmpeg` (`node_modules/@ffmpeg/ffmpeg/dist/esm/classes.js`)
+  phát hiện **class `FFmpeg` đã tự tạo `new Worker(...)` nội bộ và mọi lệnh (`exec`,
+  `writeFile`, `readFile`...) đều đi qua `worker.postMessage()`** — nghĩa là phần tính toán
+  nặng (chạy WASM) vốn đã chạy trong Worker riêng của chính thư viện, không phải trên main
+  thread như audit tĩnh (chỉ đọc code, không đọc `node_modules`) đã suy đoán. Đã xác minh
+  **thực nghiệm** bằng Puppeteer: đếm số lần `requestAnimationFrame` tick trên main thread
+  trong suốt lúc trim video thật (dùng ffmpeg.wasm CDN thật, không mock) — tick vẫn tăng đều
+  đặn (233 lần trong ~vài giây xử lý), chứng minh main thread không hề bị block. Kết luận:
+  không cần viết thêm 1 lớp Worker nữa bọc quanh thứ đã chạy trong Worker sẵn (sẽ là
+  over-engineering vô nghĩa theo đúng tinh thần CLAUDE.md) — mục này coi là đã đạt, chỉ khác
+  cách đạt được so với audit ban đầu hình dung. Build sạch (421 trang) + test Puppeteer thật
+  toàn trình: tạo video mẫu thật bằng canvas + MediaRecorder ngay trong Puppeteer, upload,
+  kéo tay cầm start bằng pointer event thật (không phải gọi hàm JS trực tiếp) xác nhận giá
+  trị đổi đúng, trim thật qua CDN ffmpeg.wasm thật, xác nhận có video kết quả + main thread
+  không đứng. Lưu ý kỹ thuật khi test: phải set viewport đủ lớn (`1280×1600`) trước khi lấy
+  `boundingBox()` để mô phỏng kéo chuột — mặc định 800×600 khiến control nằm ngoài viewport,
+  `page.mouse` gửi tọa độ không trúng gì, kéo "im lặng" không báo lỗi (bug test, không phải
+  bug code — dễ nhầm). Đã tick mục tương ứng trong `ROADMAP.md`, **hoàn tất toàn bộ Phase
+  3.5d**.
 - **2026-07-29** — Phase 3.5d: SVG Optimizer — gap tính năng lớn nhất site theo audit (58/100,
   chỉ 3 checkbox so với ~30+ toggle riêng lẻ của SVGOMG) nay đã đóng. Đọc trực tiếp source
   `node_modules/svgo/plugins/preset-default.js` (bản cài thật, svgo 4.0.2) thay vì suy đoán

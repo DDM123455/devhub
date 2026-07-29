@@ -148,7 +148,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 ### 3.5d — Feature parity trọng điểm (High)
 - [x] SVG Optimizer: mở rộng danh sách plugin SVGO có thể bật/tắt riêng lẻ
 - [x] Word Counter: thêm copy/export, char-limit preset, readability score
-- [ ] Video Trim: timeline kéo-2-tay-cầm thay 2 slider; offload FFmpeg sang Web Worker
+- [x] Video Trim: timeline kéo-2-tay-cầm thay 2 slider; offload FFmpeg sang Web Worker
 - [x] Markdown Editor: autosave localStorage
 
 ### 3.5e — SEO nâng cao (High)
