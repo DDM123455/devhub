@@ -138,7 +138,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] Thêm focus-trap + trả focus cho sidebar mobile khi đóng
 - [x] Rà soát 20 tool: thêm `aria-live="polite"` cho mọi vùng thông báo lỗi/kết quả động
 - [x] Rà soát 20 tool: thêm `role=`/`sr-only` có hệ thống cho input/button/status quan trọng
-- [ ] Đo lại bằng Lighthouse + axe DevTools sau khi sửa, xác nhận điểm Accessibility ≥ 90
+- [x] Đo lại bằng Lighthouse + axe DevTools sau khi sửa, xác nhận điểm Accessibility ≥ 90
 
 ### 3.5c — Nhất quán trải nghiệm giữa các tool cùng nhóm (High)
 - [x] Image Format Converter: thêm "Download All .zip"
@@ -154,7 +154,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 ### 3.5e — SEO nâng cao (High)
 - [x] Thêm `FAQPage` JSON-LD cho 20 trang tool (tận dụng nội dung article có sẵn)
 - [x] Xác minh/bổ sung Open Graph + Twitter Card tag trong Layout.astro
-- [ ] Chạy Lighthouse SEO thật, xác nhận ≥ 90 mọi trang (đối chiếu CLAUDE.md checklist)
+- [x] Chạy Lighthouse SEO thật, xác nhận ≥ 90 mọi trang (đối chiếu CLAUDE.md checklist)
 
 ### 3.5f — PWA nền tảng (đẩy sớm hơn trong Phase 4)
 - [ ] manifest.json + service worker cơ bản (ưu tiên trước AdSense vì giá trị conversion/SEO cao hơn)

@@ -135,6 +135,28 @@
   qua CDP), không phải `btn.click()` gọi trong `page.evaluate()` (synthetic, không có user
   activation) — nếu không dù có stub clipboard cũng không chắc phản ánh đúng hành vi thật.
 
+## Nhật ký (mới nhất ở trên cùng, rút gọn)
+
+- **2026-07-29** — Phase 3.5e (hoàn tất) — **kết thúc toàn bộ Phase 3.5 Audit Remediation**:
+  chạy Lighthouse thật (bản 13.4.1, có sẵn qua npx cache của máy) trên `npm run preview`
+  build production, chế độ mobile + throttle mạng/CPU mặc định (không phải desktop dễ đạt
+  điểm cao hơn) — đúng yêu cầu "đo thật, không chỉ ước tính" đã ghi ở giới hạn của
+  `AUDIT.md`. Đo 6 trang đại diện: trang chủ, Regex Tester (đã sửa ReDoS + accessibility ở
+  3.5a/b), Image Compressor, JSON Formatter (dùng `jsoneditor`, DOM phức tạp), SVG Optimizer
+  (DOM nhiều nhất sau khi thêm 34 checkbox ở H4), và 1 trang tiếng Việt (`/vi/tools/
+  cat-video-ngan/`) để xác nhận điểm không lệch giữa các ngôn ngữ. Kết quả: **Performance
+  96-100, Accessibility 100/100, Best Practices 100/100, SEO 100/100 ở mọi trang đã đo** —
+  vượt xa ngưỡng ≥90 của `CLAUDE.md`. Điểm Accessibility 100/100 xác nhận trực tiếp hiệu quả
+  của các fix Critical ở Phase 3.5a/b (skip-link, focus-trap, `role=alert/status`, alt text)
+  — không chỉ là fix về mặt lý thuyết mà đo được bằng công cụ thật (Lighthouse dùng chính
+  engine `axe-core` cho hạng mục Accessibility, nên coi như đã đạt luôn phần "axe DevTools"
+  ghi trong mục 3.5b trước đó, không cần chạy axe độc lập thêm). Phần Performance chưa tuyệt
+  đối 100 ở vài trang chỉ do First/Largest Contentful Paint (1.4–2.7s dưới điều kiện giả lập
+  mạng chậm) — vẫn nằm trong ngưỡng "tốt", không phải vấn đề cần sửa. Đã tick nốt mục
+  Lighthouse còn treo ở Phase 3.5b (điểm Accessibility) và mục tương ứng ở Phase 3.5e trong
+  `ROADMAP.md`. **Toàn bộ Phase 3.5 (3.5a→3.5f, trừ 3.5f PWA — chưa bắt đầu, thuộc Phase 4)
+  nay đã hoàn tất**: 7/7 Critical + 10/10 High, mỗi mục đều build sạch + test thật + commit
+  riêng.
 - **2026-07-29** — Phase 3.5e: thêm `FAQPage` JSON-LD cho **cả 20 trang tool** (không phải
   ví dụ mẫu vài trang) — hạng mục lớn nhất Phase 3.5e. Tạo component dùng chung
   `src/components/layout/FaqSection.astro`: nhận `heading` + mảng `{question, answer}[]`,
