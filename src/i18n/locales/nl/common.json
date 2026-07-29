@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "Menu openen/sluiten",
+    "skipToContent": "Naar inhoud springen",
     "toggleTheme": "Thema wisselen",
     "categories": {
       "image": "Afbeeldingen",

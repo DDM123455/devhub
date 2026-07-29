@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "मेनू खोलें/बंद करें",
+    "skipToContent": "सामग्री पर जाएँ",
     "toggleTheme": "थीम बदलें",
     "categories": {
       "image": "इमेज",

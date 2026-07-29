@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "メニュー切替",
+    "skipToContent": "コンテンツへスキップ",
     "toggleTheme": "テーマ切替",
     "categories": {
       "image": "画像",

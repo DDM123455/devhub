@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "Apri/chiudi menu",
+    "skipToContent": "Vai al contenuto",
     "toggleTheme": "Cambia tema",
     "categories": {
       "image": "Immagini",

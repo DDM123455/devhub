@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "메뉴 전환",
+    "skipToContent": "본문으로 건너뛰기",
     "toggleTheme": "테마 전환",
     "categories": {
       "image": "이미지",

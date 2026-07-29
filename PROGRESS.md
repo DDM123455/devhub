@@ -109,6 +109,25 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-29** — Phase 3.5b (accessibility) — 2 mục đầu tiên: skip-to-content link +
+  focus-trap sidebar mobile, cả hai đều sửa trong `Layout.astro` (layout dùng chung, áp
+  dụng cho toàn bộ 20+ trang tool). (1) Thêm `<a href="#main-content">` ẩn bằng `sr-only`,
+  hiện khi focus (`focus:not-sr-only` + style nổi bật), là phần tử đầu tiên trong `<body>`;
+  `<main>` được gán `id="main-content" tabindex="-1"` để có thể nhận focus khi nhảy tới.
+  Thêm key i18n dùng chung `nav.skipToContent` cho **cả 20 locale** trong `common.json`
+  (không chỉ en/vi — vì đây là chuỗi điều hướng toàn site, đúng quy ước đã ghi ở log
+  2026-07-28 khi thêm category `media`, không áp dụng ngoại lệ "chỉ en/vi" của tool mới).
+  (2) Sidebar mobile off-canvas trước đây không có focus-trap và không trả focus khi đóng —
+  đã thêm `getFocusable()` quét phần tử có thể focus trong `#sidebar`, khi mở tự focus vào
+  phần tử đầu tiên, khi đóng (qua Escape/backdrop/click link/toggle) trả focus về nút
+  `#sidebar-toggle` nếu sidebar đang thực sự mở (tránh cướp focus ngoài ý muốn ở desktop khi
+  sidebar toggle không hề chạy), và bẫy phím Tab/Shift+Tab bên trong sidebar khi đang mở (ở
+  desktop sidebar toggle bị ẩn `md:hidden` nên bẫy không kích hoạt, không ảnh hưởng hành vi
+  desktop). Build sạch (421 trang) + test Puppeteer thật: xác nhận skip-link là Tab-stop đầu
+  tiên và nhảy đúng tới `#main-content`; xác nhận mở sidebar mobile tự đưa focus vào bên
+  trong, Shift+Tab từ phần tử đầu quay vòng về phần tử cuối (bẫy hoạt động), Escape đóng
+  sidebar và trả focus đúng về nút hamburger. Đã tick 2 mục tương ứng trong `ROADMAP.md`
+  Phase 3.5b.
 - **2026-07-29** — Phase 3.5: xử lý rủi ro kỹ thuật thật ở Regex Tester (Phase 3 #3) —
   trước đây tính match bằng `useMemo` đồng bộ ngay trên main thread, không debounce, không
   timeout/guard, nên một pattern catastrophic-backtracking (vd. `(a+)+\1` với chuỗi dài) có

@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "切換選單",
+    "skipToContent": "跳至內容",
     "toggleTheme": "切換主題",
     "categories": {
       "image": "圖片",

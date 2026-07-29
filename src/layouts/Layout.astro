@@ -5,6 +5,7 @@ import PrivacyBanner from '@/components/layout/PrivacyBanner.astro';
 import Sidebar from '@/components/layout/Sidebar.astro';
 import Footer from '@/components/layout/Footer.astro';
 import { rtlLocales, type Locale } from '@/i18n/config';
+import { getFixedT } from '@/i18n/i18next';
 
 interface Props {
 	title: string;
@@ -15,6 +16,7 @@ interface Props {
 
 const { title, lang, description, showSearch = false } = Astro.props;
 const dir = rtlLocales.has(lang) ? 'rtl' : 'ltr';
+const t = getFixedT(lang);
 ---
 
 <html lang={lang} dir={dir}>
@@ -43,11 +45,17 @@ const dir = rtlLocales.has(lang) ? 'rtl' : 'ltr';
 		{description && <meta name="description" content={description} />}
 	</head>
 	<body class="flex min-h-screen flex-col">
+		<a
+			href="#main-content"
+			class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
+		>
+			{t('nav.skipToContent')}
+		</a>
 		<PrivacyBanner lang={lang} />
 		<Header lang={lang} showSearch={showSearch} />
 		<div class="flex flex-1">
 			<Sidebar lang={lang} />
-			<main class="flex-1">
+			<main id="main-content" tabindex="-1" class="flex-1 focus:outline-none">
 				<slot />
 			</main>
 		</div>
@@ -55,20 +63,34 @@ const dir = rtlLocales.has(lang) ? 'rtl' : 'ltr';
 		<script>
 			const sidebar = document.getElementById('sidebar');
 			const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+			const sidebarToggle = document.getElementById('sidebar-toggle');
+			let isSidebarOpen = false;
+
+			function getFocusable(container: HTMLElement): HTMLElement[] {
+				return Array.from(
+					container.querySelectorAll<HTMLElement>(
+						'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
+					),
+				).filter((el) => el.offsetParent !== null);
+			}
 
 			function openSidebar() {
 				sidebar?.classList.remove('-translate-x-full');
 				sidebarBackdrop?.classList.remove('hidden');
 				document.body.classList.add('overflow-hidden');
+				isSidebarOpen = true;
+				if (sidebar) getFocusable(sidebar)[0]?.focus();
 			}
 
 			function closeSidebar() {
 				sidebar?.classList.add('-translate-x-full');
 				sidebarBackdrop?.classList.add('hidden');
 				document.body.classList.remove('overflow-hidden');
+				if (isSidebarOpen) sidebarToggle?.focus();
+				isSidebarOpen = false;
 			}
 
-			document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
+			sidebarToggle?.addEventListener('click', () => {
 				const isOpen = sidebar && !sidebar.classList.contains('-translate-x-full');
 				if (isOpen) closeSidebar();
 				else openSidebar();
@@ -78,7 +100,24 @@ const dir = rtlLocales.has(lang) ? 'rtl' : 'ltr';
 				if ((event.target as HTMLElement)?.closest('a')) closeSidebar();
 			});
 			document.addEventListener('keydown', (event) => {
-				if (event.key === 'Escape') closeSidebar();
+				if (event.key === 'Escape') {
+					closeSidebar();
+					return;
+				}
+				// Trap Tab focus inside the mobile off-canvas sidebar while it's open, so
+				// keyboard users can't tab into content hidden behind the backdrop.
+				if (event.key !== 'Tab' || !isSidebarOpen || !sidebar) return;
+				const focusable = getFocusable(sidebar);
+				if (focusable.length === 0) return;
+				const first = focusable[0];
+				const last = focusable[focusable.length - 1];
+				if (event.shiftKey && document.activeElement === first) {
+					event.preventDefault();
+					last.focus();
+				} else if (!event.shiftKey && document.activeElement === last) {
+					event.preventDefault();
+					first.focus();
+				}
 			});
 
 			document.getElementById('theme-toggle')?.addEventListener('click', () => {

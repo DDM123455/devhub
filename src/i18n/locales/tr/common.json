@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "Menüyü aç/kapat",
+    "skipToContent": "İçeriğe geç",
     "toggleTheme": "Temayı değiştir",
     "categories": {
       "image": "Görseller",

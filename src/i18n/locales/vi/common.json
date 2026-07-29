@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "Bật/tắt menu",
+    "skipToContent": "Bỏ qua, đến nội dung chính",
     "toggleTheme": "Chuyển giao diện sáng/tối",
     "categories": {
       "image": "Ảnh",

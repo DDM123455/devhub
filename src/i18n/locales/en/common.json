@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "Toggle menu",
+    "skipToContent": "Skip to content",
     "toggleTheme": "Toggle theme",
     "categories": {
       "image": "Images",

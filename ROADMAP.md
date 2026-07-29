@@ -134,8 +134,8 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] Regex Tester: thêm debounce + guard/timeout chống ReDoS treo tab
 
 ### 3.5b — Accessibility pass toàn site (Critical)
-- [ ] Thêm skip-to-content link trong Layout.astro
-- [ ] Thêm focus-trap + trả focus cho sidebar mobile khi đóng
+- [x] Thêm skip-to-content link trong Layout.astro
+- [x] Thêm focus-trap + trả focus cho sidebar mobile khi đóng
 - [ ] Rà soát 20 tool: thêm `aria-live="polite"` cho mọi vùng thông báo lỗi/kết quả động
 - [ ] Rà soát 20 tool: thêm `role=`/`sr-only` có hệ thống cho input/button/status quan trọng
 - [ ] Đo lại bằng Lighthouse + axe DevTools sau khi sửa, xác nhận điểm Accessibility ≥ 90

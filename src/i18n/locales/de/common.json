@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "Menü umschalten",
+    "skipToContent": "Zum Inhalt springen",
     "toggleTheme": "Design umschalten",
     "categories": {
       "image": "Bilder",

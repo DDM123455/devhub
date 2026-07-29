@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "Visa/dölj meny",
+    "skipToContent": "Hoppa till innehållet",
     "toggleTheme": "Växla tema",
     "categories": {
       "image": "Bilder",

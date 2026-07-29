@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "เปิด/ปิดเมนู",
+    "skipToContent": "ข้ามไปยังเนื้อหา",
     "toggleTheme": "สลับธีม",
     "categories": {
       "image": "รูปภาพ",

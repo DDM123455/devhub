@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "Открыть/закрыть меню",
+    "skipToContent": "Перейти к содержимому",
     "toggleTheme": "Сменить тему",
     "categories": {
       "image": "Изображения",

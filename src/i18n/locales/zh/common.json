@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "切换菜单",
+    "skipToContent": "跳转到内容",
     "toggleTheme": "切换主题",
     "categories": {
       "image": "图片",

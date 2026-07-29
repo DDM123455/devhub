@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "Buka/tutup menu",
+    "skipToContent": "Lewati ke konten",
     "toggleTheme": "Ganti tema",
     "categories": {
       "image": "Gambar",

@@ -23,6 +23,7 @@
   },
   "nav": {
     "toggleMenu": "فتح/إغلاق القائمة",
+    "skipToContent": "تخطَّ إلى المحتوى",
     "toggleTheme": "تبديل المظهر",
     "categories": {
       "image": "الصور",
