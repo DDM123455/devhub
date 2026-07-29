@@ -26,6 +26,15 @@
     "clear": "Clear"
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "What case styles are supported?",
+    "a1": "UPPERCASE, lowercase, Title Case, Sentence case, camelCase, snake_case, aLtErNaTiNg CaSe, and iNVERSE CASE.",
+    "q2": "Can it clean up extra spaces or line breaks too?",
+    "a2": "Yes — separate utilities remove extra spaces, remove extra line breaks, and sort lines alphabetically.",
+    "q3": "Does converting case require uploading my text anywhere?",
+    "a3": "No — the conversion runs instantly in your browser as you type."
+  },
   "article": {
     "heading": "Why use a text case converter?",
     "p1": "Case conversion needs come up in small but annoying ways all the time: a paragraph typed with Caps Lock stuck on, a spec written in Title Case that needs to become a camelCase variable name, a CSV column header that has to turn into a snake_case database field, a headline that needs proper title capitalization before it goes live. None of this is hard to do by hand for one word, but retyping an entire paragraph or a long list of field names by hand is slow and easy to get wrong.",

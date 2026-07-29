@@ -36,6 +36,15 @@
     "save": "Save as .txt"
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Can I compare text character by character instead of by line?",
+    "a1": "Yes — switch between character, word, and line-level comparison granularity.",
+    "q2": "Can I merge the two versions into one final text?",
+    "a2": "Yes — the built-in merge tool lets you accept the left or right version hunk by hunk.",
+    "q3": "Can I ignore whitespace or capitalization differences?",
+    "a3": "Yes — toggle \"ignore whitespace\" and \"ignore case\" independently."
+  },
   "article": {
     "heading": "Why use a text diff checker?",
     "p1": "Anytime two versions of the same document exist — a contract before and after a lawyer's edits, an essay before and after a round of feedback, a config file before and after a teammate's commit — the important question is rarely \"are these the same file\" but \"what exactly changed.\" Reading both versions side by side and trying to spot every added comma, deleted clause, or reworded sentence is slow and error-prone, especially once a document runs past a page or two. A diff checker automates that comparison and highlights precisely the words or lines that differ, so you can review a change in seconds instead of minutes.",

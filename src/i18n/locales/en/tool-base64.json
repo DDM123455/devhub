@@ -38,6 +38,15 @@
     "imagePreviewLabel": "Preview"
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Can I encode and decode files, not just text?",
+    "a1": "Yes — a separate File tab handles encoding any file to Base64/Data URI and decoding Base64 back into a downloadable file.",
+    "q2": "Is URL-safe Base64 supported?",
+    "a2": "Yes — toggle URL-safe encoding for use in URLs or filenames.",
+    "q3": "Can it preview image files after decoding?",
+    "a3": "Yes — if the decoded MIME type is an image, a live preview is shown before you download it."
+  },
   "article": {
     "heading": "What is Base64, and why encode something in the first place?",
     "p1": "Base64 turns arbitrary binary data — an image, a PDF, a chunk of encrypted bytes — into a string made up only of the 64 characters A–Z, a–z, 0–9, +, and / (plus = for padding). It isn't encryption or compression; a Base64 string is roughly 33% larger than the data it represents, and anyone can decode it back instantly with no key required. The reason it exists is much more mundane: a lot of transport formats and storage systems — email (MIME attachments), JSON fields, URL query parameters, CSS/HTML `data:` URIs, config files — were built to carry plain text safely, and choke on raw binary bytes like line-feed characters or embedded nulls. Base64-encoding a binary payload turns it into a chunk of plain text that any of those systems can carry without corrupting it.",

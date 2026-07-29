@@ -51,6 +51,15 @@
     "errorTooLong": "This content is too long to fit in a QR code at the current error correction level. Try shortening it, or lower the error correction level below."
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "What kinds of content can a QR code hold besides a URL?",
+    "a1": "Plain text, WiFi credentials, a vCard contact, an email, or an SMS message, in addition to URLs.",
+    "q2": "Can I add a logo to the middle of the QR code?",
+    "a2": "Yes — upload a logo image, and the error-correction level automatically increases to keep the code scannable.",
+    "q3": "What formats can I export the QR code in?",
+    "a3": "PNG at several resolutions, or SVG for crisp scaling at any size."
+  },
   "article": {
     "heading": "Why generate QR codes locally instead of through a \"free\" tracker?",
     "p1": "QR codes end up everywhere — a business card, a restaurant menu, a Wi-Fi password taped to a router, a poster for an event. Many free \"QR code generator\" sites don't actually encode your link directly; instead they generate a short link to their own server and encode that, so every scan is quietly routed through — and logged by — a company you've never heard of. If that company ever shuts the redirect service down, every QR code you ever printed silently stops working, even years later.",

@@ -135,8 +135,26 @@
   qua CDP), không phải `btn.click()` gọi trong `page.evaluate()` (synthetic, không có user
   activation) — nếu không dù có stub clipboard cũng không chắc phản ánh đúng hành vi thật.
 
-## Nhật ký (mới nhất ở trên cùng, rút gọn)
-
+- **2026-07-29** — Phase 3.5e: thêm `FAQPage` JSON-LD cho **cả 20 trang tool** (không phải
+  ví dụ mẫu vài trang) — hạng mục lớn nhất Phase 3.5e. Tạo component dùng chung
+  `src/components/layout/FaqSection.astro`: nhận `heading` + mảng `{question, answer}[]`,
+  render vừa UI accordion thật (`<details>/<summary>`, không cần JS riêng vì đây là phần tử
+  HTML gốc hỗ trợ mở/đóng sẵn) vừa tự phát `<script type="application/ld+json">` chứa schema
+  `FAQPage` — 1 component lo cả 2 việc, tránh lặp code ở 20 file `*Page.astro`. Viết mới 3
+  cặp câu hỏi/trả lời ngắn gọn, đúng thực tế từng tool (không phải sinh hàng loạt theo
+  template chung — mỗi câu tham chiếu tính năng thật đã xác minh qua audit trước đó, ví dụ
+  JWT Decoder nhắc đúng khả năng verify HMAC/RSA, SVG Optimizer nhắc đúng con số "34 plugin"
+  vừa thêm ở H4) cho **cả 20 tool × 2 ngôn ngữ (en/vi)** = 120 câu hỏi/trả lời, lưu trong
+  object `faq` mới ở từng file JSON locale (cùng cấp với `article` đã có), gọi qua
+  `t('faq.q1')`/`t('faq.a1')`... ngay trong frontmatter mỗi `*Page.astro` (không đi qua
+  React `messages` prop nên không gặp lại kiểu bug thiếu key như ở H1). Đặt `<FaqSection>`
+  giữa section "article" và section "related tools" ở cả 20 trang. Build sạch (421 trang) +
+  xác minh: `grep FAQPage` khớp đúng 20/20 trang ở cả `dist/en/` và `dist/vi/`; parse JSON
+  của script `ld+json` bằng Node xác nhận hợp lệ (không lỗi cú pháp, `mainEntity` đúng 3
+  phần tử); nội dung tiếng Việt hiển thị đúng (không fallback âm thầm sang tiếng Anh); test
+  Puppeteer thật trên 5 tool đại diện — xác nhận đủ 3 FAQ mỗi trang, đúng nội dung câu hỏi,
+  và bấm vào `<summary>` thực sự mở được `<details>` (accordion hoạt động thật, không chỉ có
+  HTML tĩnh). Đã tick mục tương ứng trong `ROADMAP.md` Phase 3.5e.
 - **2026-07-29** — Phase 3.5e bắt đầu: xác minh và bổ sung Open Graph + Twitter Card +
   canonical link trong `Layout.astro` (dùng chung toàn bộ 20+ trang). Audit ban đầu ghi "chưa
   xác minh được" — đọc trực tiếp `Layout.astro` xác nhận **hoàn toàn chưa có** cả OG, Twitter

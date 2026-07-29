@@ -152,7 +152,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] Markdown Editor: autosave localStorage
 
 ### 3.5e — SEO nâng cao (High)
-- [ ] Thêm `FAQPage` JSON-LD cho 20 trang tool (tận dụng nội dung article có sẵn)
+- [x] Thêm `FAQPage` JSON-LD cho 20 trang tool (tận dụng nội dung article có sẵn)
 - [x] Xác minh/bổ sung Open Graph + Twitter Card tag trong Layout.astro
 - [ ] Chạy Lighthouse SEO thật, xác nhận ≥ 90 mọi trang (đối chiếu CLAUDE.md checklist)
 

@@ -36,6 +36,15 @@
     "save": "Lưu file .txt"
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Có thể so sánh theo từng ký tự thay vì theo dòng không?",
+    "a1": "Có — chuyển đổi giữa mức so sánh theo ký tự, theo từ hoặc theo dòng.",
+    "q2": "Có thể gộp hai phiên bản thành một bản văn bản cuối cùng không?",
+    "a2": "Có — công cụ gộp cho phép chấp nhận phiên bản trái hoặc phải theo từng đoạn khác biệt.",
+    "q3": "Có thể bỏ qua khác biệt về khoảng trắng hoặc hoa/thường không?",
+    "a3": "Có — bật riêng từng tùy chọn \"bỏ qua khoảng trắng\" và \"bỏ qua hoa/thường\"."
+  },
   "article": {
     "heading": "Vì sao cần công cụ so sánh văn bản?",
     "p1": "Khi có hai phiên bản của cùng một tài liệu — hợp đồng trước và sau khi luật sư chỉnh sửa, bài viết trước và sau khi biên tập góp ý, file cấu hình trước và sau khi đồng nghiệp commit — câu hỏi quan trọng hiếm khi là \"hai file này có giống nhau không\" mà là \"chính xác điều gì đã thay đổi\". Đọc song song hai bản và cố gắng phát hiện từng dấu phẩy được thêm, từng câu bị xoá hay viết lại bằng mắt thường rất chậm và dễ bỏ sót, nhất là khi tài liệu dài hơn một trang. Công cụ so sánh văn bản tự động hoá việc này, làm nổi bật chính xác những từ hoặc dòng khác nhau, giúp bạn rà soát một thay đổi trong vài giây thay vì vài phút.",

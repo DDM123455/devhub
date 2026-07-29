@@ -51,6 +51,15 @@
     "errorTooLong": "Nội dung này quá dài để tạo mã QR ở mức sửa lỗi hiện tại. Hãy rút ngắn nội dung, hoặc hạ mức sửa lỗi bên dưới."
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "QR code chứa được những loại nội dung nào ngoài URL?",
+    "a1": "Văn bản thuần, thông tin WiFi, danh thiếp vCard, email hoặc tin nhắn SMS, bên cạnh URL.",
+    "q2": "Có thể chèn logo vào giữa mã QR không?",
+    "a2": "Có — tải lên ảnh logo, mức sửa lỗi (error correction) sẽ tự động tăng để mã vẫn quét được.",
+    "q3": "Có thể xuất mã QR ở những định dạng nào?",
+    "a3": "PNG ở nhiều độ phân giải, hoặc SVG để nét luôn sắc ở mọi kích thước."
+  },
   "article": {
     "heading": "Vì sao nên tạo mã QR ngay trên máy thay vì qua một công cụ \"miễn phí\" có theo dõi?",
     "p1": "Mã QR xuất hiện ở khắp mọi nơi — trên danh thiếp, thực đơn nhà hàng, mật khẩu Wi-Fi dán trên router, poster sự kiện. Nhiều trang \"tạo mã QR\" miễn phí thực ra không mã hóa trực tiếp đường link của bạn; thay vào đó chúng tạo một link rút gọn trỏ về máy chủ của chính họ rồi mã hóa link đó, nghĩa là mỗi lần quét sẽ âm thầm đi qua — và bị ghi lại — bởi một công ty bạn chưa từng nghe tên. Nếu công ty đó ngừng dịch vụ redirect, mọi mã QR bạn từng in ra sẽ lặng lẽ ngừng hoạt động, kể cả nhiều năm sau.",

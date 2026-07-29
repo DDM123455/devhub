@@ -32,6 +32,15 @@
     "manualDurationLabel": "Total duration (seconds)"
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Can I trim a video without re-encoding it?",
+    "a1": "Yes — \"Fast\" mode uses stream copy for an instant, lossless trim; \"Precise\" mode re-encodes for frame-exact cuts.",
+    "q2": "Does trimming a video upload it anywhere?",
+    "a2": "No — trimming runs with ffmpeg compiled to WebAssembly directly in your browser; the video file itself is never uploaded.",
+    "q3": "How do I pick the exact start and end points?",
+    "a3": "Drag either handle on the visual timeline, or play the video and click \"set to current time\" to mark a precise point."
+  },
   "article": {
     "heading": "Trimming a video without uploading it anywhere",
     "p1": "Cutting a short clip out of a longer recording — pulling a highlight from a screen recording, trimming dead air from the start of a phone video, grabbing a 10-second segment to share — is one of those tasks that feels like it should take ten seconds, but most online video tools want you to upload the entire file to their server first, wait for it to process, then download the result. For anything even moderately large, or anything you'd rather not hand to a stranger's server, that round trip is slow and, more importantly, forces you to give up your file's privacy for a trivial edit.",

@@ -25,6 +25,15 @@
     "skippedFiles": "{{count}} file(s) were skipped because they're not a supported image format."
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Which image formats can I convert between?",
+    "a1": "JPEG, PNG, WebP, AVIF, GIF, BMP, and ICO, plus reading HEIC/HEIF photos from iPhone.",
+    "q2": "Is my browser's AVIF support checked automatically?",
+    "a2": "Yes — if your browser can't export AVIF, the tool tells you clearly instead of producing a broken file.",
+    "q3": "Can I convert several images to the same format at once?",
+    "a3": "Yes — select multiple images, pick one target format, and download them individually or all together as a .zip."
+  },
   "article": {
     "heading": "JPEG, PNG, WebP, AVIF — which format should you use?",
     "p1": "JPEG, PNG, WebP, and increasingly AVIF all store an image, but they trade off quality, transparency, and file size differently, and picking the wrong one is a common reason a photo looks worse than it should or takes up far more space than necessary. A few other formats — GIF, BMP, ICO — serve narrower, more specific jobs rather than everyday photography. Converting between all of them lets you match the format to what the image actually needs, instead of just keeping whatever your camera, screenshot tool, or iPhone happened to save.",

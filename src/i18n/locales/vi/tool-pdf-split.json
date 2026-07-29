@@ -31,6 +31,15 @@
     "errorInvalidEveryN": "Nhập một số nguyên từ 1 trở lên."
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Làm sao để chọn trang nào vào file nào?",
+    "a1": "Nhập khoảng trang tùy chỉnh kiểu \"1-3,5,8-9\", hoặc tự động tách mỗi N trang.",
+    "q2": "Có thể tải tất cả file đã tách cùng lúc không?",
+    "a2": "Có — nút \"Tải tất cả\" đóng gói mọi PDF kết quả vào một file .zip duy nhất.",
+    "q3": "Có thể xoay hoặc xóa trang trước khi tách không?",
+    "a3": "Có — mỗi thumbnail trang có nút xoay và xóa riêng trước khi tách."
+  },
   "article": {
     "heading": "Vì sao nên tách PDF ngay trên máy thay vì upload lên mạng?",
     "p1": "Một cuốn sách scan, một chồng sao kê hàng tháng gộp chung, một báo cáo 200 trang mà bạn chỉ cần đúng ba trang — sớm muộn gì cũng có lúc file PDF trở nên quá lớn hoặc gộp quá nhiều thứ không liên quan tới nhu cầu thực tế. Phần lớn các trang \"tách PDF\" miễn phí trên mạng xử lý việc này giống hệt các trang \"gộp PDF\": âm thầm upload file của bạn lên máy chủ trước khi làm bất cứ điều gì. Đó là một mức độ tin tưởng khá kỳ lạ để trao cho một tài liệu có thể chứa chữ ký, sao kê ngân hàng, hay một trang bạn không muốn nằm trên ổ đĩa của người khác.",

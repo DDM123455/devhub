@@ -31,6 +31,15 @@
     "errorInvalidEveryN": "Enter a whole number of 1 or more."
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "How do I choose which pages go into which output file?",
+    "a1": "Enter a custom range like \"1-3,5,8-9\", or split automatically every N pages.",
+    "q2": "Can I download all the split files at once?",
+    "a2": "Yes — \"Download All\" packages every resulting PDF into a single .zip file.",
+    "q3": "Can I rotate or delete pages before splitting?",
+    "a3": "Yes — each page thumbnail has its own rotate and delete controls before you split."
+  },
   "article": {
     "heading": "Why split a PDF locally instead of uploading it?",
     "p1": "A scanned book, a bundle of monthly statements, a 200-page report you only need three pages from — sooner or later a PDF grows too large or too mixed-purpose for what you actually need. Most free \"split PDF\" websites handle this the same way the free \"merge PDF\" sites do: by quietly uploading your file to a server before doing anything with it. That's a strange amount of trust to hand over for a document that might contain a signature, a bank statement, or a page you'd rather not have sitting on someone else's disk.",

@@ -20,6 +20,15 @@
     "download": "Download"
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Can I view JSON as a collapsible tree instead of raw text?",
+    "a1": "Yes — switch between text mode and an interactive tree view you can expand and collapse.",
+    "q2": "Does it tell me exactly where a JSON syntax error is?",
+    "a2": "Yes — the error message includes the line number, and a button jumps your cursor straight to it.",
+    "q3": "Can I convert JSON to other formats?",
+    "a3": "Yes — export the same data as XML, YAML, or CSV."
+  },
   "article": {
     "heading": "Why format and validate JSON locally?",
     "p1": "JSON shows up constantly in a developer's day: a minified API response with no line breaks, a config file someone hand-edited into a single unreadable line, a payload you're debugging at 11pm trying to spot the one missing comma. Most online \"JSON formatter\" tools solve the readability problem by sending your pasted text to a server first — which is an uncomfortable trade-off when that JSON might contain an API key, an access token, or a customer's personal data.",

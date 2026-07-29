@@ -51,6 +51,15 @@
     "cheat12": "\\b — ranh giới từ (word boundary), | — phép OR (một trong hai)"
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Một pattern regex sai có làm treo trang không?",
+    "a1": "Không — việc khớp chạy trong một Web Worker riêng có giới hạn thời gian cứng, nên kể cả pattern gây catastrophic backtracking cũng không thể làm treo tab.",
+    "q2": "Công cụ có hiện capture group có tên và theo số không?",
+    "a2": "Có — mỗi kết quả khớp liệt kê đủ group theo số thứ tự và mọi named group kiểu (?<year>\\d{4}).",
+    "q3": "Có thể xem trước kết quả thay thế trước khi dùng trong code không?",
+    "a3": "Có — phần Thay thế hiện chính xác kết quả mà String.replace() sẽ trả về, kể cả backreference tới group."
+  },
   "article": {
     "heading": "Kiểm tra regex ngay trên trình duyệt hoạt động thế nào?",
     "p1": "Biểu thức chính quy (regular expression, hay regex) là một ngôn ngữ mẫu gọn nhẹ dùng để khớp văn bản — từ việc \"chuỗi này có giống địa chỉ email không\" đến \"tìm mọi số điện thoại trong tài liệu này\" hay \"bóc tách các thẻ HTML khỏi chuỗi này\". Vấn đề là cú pháp regex rất dễ viết sai một cách tinh vi: một dấu `.` lẽ ra phải escape, một dấu `*` tham lam nuốt nhiều hơn dự tính, một group tưởng bắt được thứ mình cần nhưng thực ra không phải. Viết regex mà không kiểm tra trước, rồi chỉ phát hiện nó sai khi đã chạy trên dữ liệu thật ngoài production, là một cách học bài học đó khá đắt giá.",

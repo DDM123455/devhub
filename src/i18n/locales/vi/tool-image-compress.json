@@ -23,6 +23,15 @@
     "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ."
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Nén ảnh có tải ảnh lên server không?",
+    "a1": "Không — mọi thứ chạy ngay trên trình duyệt của bạn bằng Web Worker, ảnh không bao giờ rời khỏi thiết bị.",
+    "q2": "Công cụ hỗ trợ những định dạng ảnh nào?",
+    "a2": "JPEG, PNG và WebP. Chọn mức chất lượng và nén một hoặc nhiều ảnh cùng lúc.",
+    "q3": "Có thể tải về tất cả ảnh đã nén cùng lúc không?",
+    "a3": "Có — sau khi nén nhiều ảnh, dùng nút \"Tải tất cả\" để nhận về một file .zip duy nhất."
+  },
   "article": {
     "heading": "Vì sao nên nén ảnh trước khi đăng lên web?",
     "p1": "Một tấm ảnh chụp thẳng từ điện thoại đời mới có thể nặng tới 4-8 MB, trong khi phần lớn website chỉ cần một phần nhỏ dung lượng đó là đủ để hiển thị sắc nét. Ảnh quá nặng là một trong những nguyên nhân phổ biến nhất khiến trang web tải chậm, và trang tải chậm thường mất khách truy cập lẫn thứ hạng trên Google (Core Web Vitals). Nén ảnh trước khi đăng lên giúp loại bỏ phần dữ liệu dư thừa mà mắt người gần như không nhận ra ở kích thước hiển thị thông thường.",

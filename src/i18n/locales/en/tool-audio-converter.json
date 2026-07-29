@@ -27,6 +27,15 @@
     "channelDownmixWarning": "This file has {{count}} audio channels. Only the first 2 (stereo) will be kept in the converted file — the extra channels will be discarded."
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "What audio formats does it convert between?",
+    "a1": "MP3 and WAV, with the target format automatically suggested based on the file you upload.",
+    "q2": "Can I choose the MP3 bitrate?",
+    "a2": "Yes — pick 128, 192, 256, or 320 kbps when converting to MP3.",
+    "q3": "Does converting a surround-sound file lose channels?",
+    "a3": "Files with more than 2 channels are downmixed to stereo, and the tool now warns you clearly before that happens."
+  },
   "article": {
     "heading": "Converting between MP3 and WAV without a server",
     "p1": "WAV and MP3 exist for opposite reasons. WAV stores audio as raw, uncompressed samples — every bit of the original waveform, at the cost of a large file — which is why it's the format professional audio and video editing software expects. MP3 throws away the parts of the signal human hearing barely notices to shrink that same audio down to a fraction of the size, which is why it's the format for sharing, streaming, and everyday listening. The moment you need to hand a WAV recording to something that only accepts MP3, or pull a WAV out of an MP3 for an editor that needs uncompressed audio, you're stuck converting — and most online converters solve that by asking you to upload the file to their server first.",

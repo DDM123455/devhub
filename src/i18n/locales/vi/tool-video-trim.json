@@ -32,6 +32,15 @@
     "manualDurationLabel": "Tổng thời lượng (giây)"
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Có thể cắt video mà không mã hóa lại không?",
+    "a1": "Có — chế độ \"Nhanh\" dùng stream copy để cắt tức thì không mất chất lượng; chế độ \"Chính xác\" mã hóa lại để cắt đúng từng khung hình.",
+    "q2": "Cắt video có tải video lên đâu không?",
+    "a2": "Không — việc cắt chạy bằng ffmpeg biên dịch WebAssembly ngay trên trình duyệt, file video không bao giờ được tải lên.",
+    "q3": "Làm sao để chọn chính xác điểm bắt đầu/kết thúc?",
+    "a3": "Kéo một trong hai tay cầm trên timeline trực quan, hoặc phát video rồi bấm \"lấy thời điểm hiện tại\" để đánh dấu chính xác."
+  },
   "article": {
     "heading": "Cắt video mà không cần tải lên bất cứ đâu",
     "p1": "Cắt một đoạn ngắn từ một video dài hơn — lấy ra khoảnh khắc hay từ một bản ghi màn hình, cắt bỏ đoạn thừa ở đầu một video quay bằng điện thoại, lấy đúng 10 giây để chia sẻ — là một trong những việc tưởng chừng chỉ mất mười giây, nhưng hầu hết công cụ video online lại bắt bạn tải nguyên file lên server của họ trước, chờ xử lý, rồi mới tải kết quả về. Với file có dung lượng kha khá, hoặc bất cứ nội dung nào bạn không muốn đưa cho server của người lạ, việc đi vòng đó vừa chậm, vừa quan trọng hơn là buộc bạn phải đánh đổi quyền riêng tư của file chỉ để thực hiện một chỉnh sửa nhỏ.",

@@ -39,6 +39,15 @@
     "invalidHexError": "Vui lòng nhập mã màu hex hợp lệ, ví dụ #3b82f6."
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Có thể tự động tạo bảng màu từ một màu gốc không?",
+    "a1": "Có — chọn một kiểu hòa sắc (bổ túc, tương đồng, tam giác đều...) là các màu phù hợp được tạo ra ngay.",
+    "q2": "Công cụ có kiểm tra độ tương phản màu cho khả năng tiếp cận không?",
+    "a2": "Có — bộ kiểm tra tương phản tích hợp hiện tỷ lệ đạt/không đạt WCAG AA/AAA so với nền trắng và đen.",
+    "q3": "Có thể xuất bảng màu để dùng trong code không?",
+    "a3": "Có — sao chép bất kỳ bảng màu nào dưới dạng biến CSS hoặc mảng JSON các mã hex."
+  },
   "article": {
     "heading": "Phối màu hài hòa và độ tương phản hoạt động thế nào?",
     "p1": "Mỗi màu sắc trên màn hình đều có thể mô tả theo ba cách khác nhau, và công cụ này luôn đồng bộ cả ba: HEX là ký hiệu rút gọn dùng trong CSS và các phần mềm thiết kế, RGB mô tả lượng ánh sáng đỏ, xanh lá, xanh dương pha trộn để tạo ra màu đó, còn HSL — sắc độ (hue), độ bão hòa (saturation), độ sáng (lightness) — mô tả màu theo cách con người thực sự cảm nhận: đó là màu gì, rực rỡ ra sao, và sáng hay tối đến mức nào. Kéo ô màu gốc, gõ mã HEX, hoặc chỉnh trực tiếp từng ô R/G/B hay H/S/L, mọi ô còn lại sẽ tự cập nhật ngay lập tức, giúp bạn chuyển đổi giữa các cách hình dung màu sắc khác nhau mà không cần tự tính toán.",

@@ -29,6 +29,15 @@
     "downloadError": "Không thể tạo file .xlsx: {{message}}"
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "File tạo ra có phải Excel thật, không phải CSV đổi tên không?",
+    "a1": "Đúng vậy — một file .xlsx thật với dòng tiêu đề in đậm, ô số/boolean đúng kiểu dữ liệu, và cột được tính độ rộng sẵn.",
+    "q2": "Một file JSON có thể tạo ra nhiều sheet không?",
+    "a2": "Có — nếu JSON gốc là object mà mỗi khóa cấp cao đều chứa một mảng, mỗi khóa sẽ tự động thành một sheet riêng.",
+    "q3": "Có thể xem trước bảng tính trước khi tải về không?",
+    "a3": "Có — bảng xem trước hiện các dòng đầu của mỗi sheet trước khi bạn tải file .xlsx."
+  },
   "article": {
     "heading": "Biến JSON thành bảng tính thật mà không cần server",
     "p1": "Một phản hồi từ API hay một file cấu hình thường ở dạng JSON; còn người cần xem, lọc hay vẽ biểu đồ từ dữ liệu đó gần như luôn muốn có nó trong Excel. Để đi từ JSON sang Excel, thông thường bạn phải nhờ ai đó viết một script dùng một lần, hoặc dán dữ liệu vào một trang chuyển đổi online mà âm thầm lưu lại một bản sao của bất cứ thứ gì bạn tải lên — một sự đánh đổi tệ khi dữ liệu JSON đó là hồ sơ khách hàng, số liệu tài chính, hay bất cứ thứ gì bạn không muốn đưa cho server của bên thứ ba.",

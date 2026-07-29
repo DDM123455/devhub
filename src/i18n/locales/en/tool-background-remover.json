@@ -28,6 +28,15 @@
     "skippedFiles": "{{count}} file(s) were skipped because they're not a supported image format."
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "How does background removal work without uploading my photo?",
+    "a1": "An AI model runs entirely inside your browser (WebAssembly), so your photo is processed and never sent to a server.",
+    "q2": "Can I replace the background instead of leaving it transparent?",
+    "a2": "Yes — after removing the background you can keep it transparent or swap in a solid color or another image.",
+    "q3": "Can I fine-tune the cutout edges?",
+    "a3": "Yes — an edge-softness slider feathers the cutout edge for a more natural blend."
+  },
   "article": {
     "heading": "How does local, in-browser background removal work?",
     "p1": "Removing the background from a photo used to mean either a subscription tool that uploads your image to a server, or manually tracing around the subject in an image editor. This tool does neither: it runs a small AI segmentation model directly in your browser tab to figure out which pixels belong to the subject and which belong to the background, then makes the background transparent — all without your photo ever being sent anywhere. It's the same kind of edit often used for product photos, profile pictures, and stickers — the sort of thing that used to take minutes in an image editor now takes seconds.",

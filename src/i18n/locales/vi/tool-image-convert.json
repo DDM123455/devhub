@@ -25,6 +25,15 @@
     "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ."
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Công cụ chuyển đổi được giữa những định dạng ảnh nào?",
+    "a1": "JPEG, PNG, WebP, AVIF, GIF, BMP và ICO, ngoài ra còn đọc được ảnh HEIC/HEIF từ iPhone.",
+    "q2": "Trình duyệt có tự động kiểm tra hỗ trợ AVIF không?",
+    "a2": "Có — nếu trình duyệt không xuất được AVIF, công cụ sẽ báo rõ thay vì tạo ra một file lỗi.",
+    "q3": "Có thể chuyển nhiều ảnh sang cùng một định dạng cùng lúc không?",
+    "a3": "Có — chọn nhiều ảnh, một định dạng đích, rồi tải về từng ảnh hoặc tải tất cả dưới dạng .zip."
+  },
   "article": {
     "heading": "JPEG, PNG, WebP, AVIF — nên dùng định dạng nào?",
     "p1": "JPEG, PNG, WebP và ngày càng phổ biến hơn là AVIF đều dùng để lưu ảnh, nhưng mỗi định dạng đánh đổi giữa chất lượng, khả năng trong suốt và dung lượng theo cách khác nhau — chọn sai định dạng là lý do phổ biến khiến ảnh trông tệ hơn cần thiết hoặc nặng hơn mức cần có. Một vài định dạng khác — GIF, BMP, ICO — phục vụ nhu cầu hẹp và đặc thù hơn là chụp ảnh thông thường. Chuyển đổi qua lại giữa tất cả các định dạng này giúp bạn chọn đúng cái phù hợp với nhu cầu thực tế, thay vì giữ nguyên định dạng mà máy ảnh, công cụ chụp màn hình, hay iPhone mặc định lưu.",

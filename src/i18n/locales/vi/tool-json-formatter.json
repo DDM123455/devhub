@@ -20,6 +20,15 @@
     "download": "Tải xuống"
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Có thể xem JSON dạng cây thu gọn được thay vì văn bản thô không?",
+    "a1": "Có — chuyển đổi giữa chế độ văn bản và chế độ cây tương tác có thể thu gọn/mở rộng.",
+    "q2": "Công cụ có báo chính xác vị trí lỗi cú pháp JSON không?",
+    "a2": "Có — thông báo lỗi kèm số dòng, và một nút sẽ đưa con trỏ thẳng tới đó.",
+    "q3": "Có thể chuyển JSON sang định dạng khác không?",
+    "a3": "Có — xuất cùng dữ liệu đó sang XML, YAML hoặc CSV."
+  },
   "article": {
     "heading": "Vì sao nên định dạng và kiểm tra JSON ngay trên máy?",
     "p1": "JSON xuất hiện liên tục trong công việc của lập trình viên: một phản hồi API bị nén không xuống dòng, một file config bị ai đó sửa tay thành một dòng dài không đọc nổi, một payload bạn đang debug lúc 11 giờ đêm cố tìm cho ra dấu phẩy thừa duy nhất. Phần lớn công cụ \"định dạng JSON\" online giải quyết vấn đề dễ đọc bằng cách gửi văn bản bạn dán lên máy chủ trước — một sự đánh đổi khó chịu khi JSON đó có thể chứa API key, access token, hay dữ liệu cá nhân của khách hàng.",

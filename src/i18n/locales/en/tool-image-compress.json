@@ -23,6 +23,15 @@
     "skippedFiles": "{{count}} file(s) were skipped because they're not a supported image format."
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Does compressing images upload them to a server?",
+    "a1": "No — everything runs locally in your browser using Web Workers; your images never leave your device.",
+    "q2": "What image formats can I compress?",
+    "a2": "JPEG, PNG, and WebP. Choose a quality level and compress one or many files at once.",
+    "q3": "Can I download all compressed images at once?",
+    "a3": "Yes — after compressing multiple images, use \"Download All\" to get a single .zip file."
+  },
   "article": {
     "heading": "Why compress images before publishing them?",
     "p1": "A photo straight out of a modern phone camera can easily be 4–8 MB, yet most websites only need a fraction of that to look sharp on screen. Oversized images are one of the most common reasons a web page loads slowly, and slow pages lose visitors and rank lower in Google's Core Web Vitals. Compressing an image before you publish it strips out the extra data your eyes never actually use, without changing how the picture looks at normal viewing sizes.",

@@ -67,6 +67,15 @@
     "pluginRemoveViewBox": "Xóa viewBox (chỉ khi đã có width/height)"
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Có thể kiểm soát từng tối ưu riêng lẻ, không chỉ vài preset không?",
+    "a1": "Có — bảng nâng cao hiện đủ mọi plugin SVGO (34 plugin) dưới dạng bật/tắt riêng lẻ.",
+    "q2": "Tối ưu có làm hỏng khả năng co giãn responsive của SVG không?",
+    "a2": "Mặc định thì không — viewBox được giữ nguyên trừ khi bạn chủ động bật \"Xóa viewBox\".",
+    "q3": "Tối ưu thường giảm được bao nhiêu dung lượng?",
+    "a3": "Phần lớn icon và logo giảm 40-60% dung lượng chỉ với cấu hình mặc định, không thấy khác biệt trong bản xem trước."
+  },
   "article": {
     "heading": "Tối ưu SVG hoạt động như thế nào?",
     "p1": "Icon và logo xuất ra từ các phần mềm thiết kế như Illustrator, Figma hay Sketch thường mang theo rất nhiều dữ liệu thừa không ảnh hưởng gì tới hình ảnh hiển thị: metadata của phần mềm biên tập, comment XML, các thẻ group lồng nhau không cần thiết, tọa độ viết dài tới 15 chữ số thập phân, và những ID không ai dùng tới. Những thứ này không làm thay đổi cách hình vẽ hiển thị, nhưng lại làm dung lượng tải về nặng hơn hẳn — nếu website dùng vài chục icon SVG, phần dư thừa này cộng dồn lại rất đáng kể.",

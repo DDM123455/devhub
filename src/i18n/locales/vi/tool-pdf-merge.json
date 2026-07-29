@@ -22,6 +22,15 @@
     "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải file PDF."
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Có thể sắp xếp lại thứ tự trang trước khi gộp không?",
+    "a1": "Có — kéo thả từng thumbnail trang, kể cả giữa các file khác nhau, để đặt đúng thứ tự cuối cùng.",
+    "q2": "Có thể xoay hoặc xóa trang trước khi gộp không?",
+    "a2": "Có — mỗi thumbnail trang có nút xoay và xóa riêng.",
+    "q3": "Có giới hạn số lượng PDF có thể gộp không?",
+    "a3": "Không có giới hạn cố định — việc gộp chạy hoàn toàn trên trình duyệt nên chỉ phụ thuộc vào bộ nhớ thiết bị."
+  },
   "article": {
     "heading": "Vì sao nên gộp PDF ngay trên máy thay vì upload lên mạng?",
     "p1": "Hợp đồng scan, biểu mẫu đã ký, hóa đơn từng đợt, các chương của một báo cáo — hầu như ai cũng có lúc cầm trong tay vài file PDF lẽ ra nên là một tài liệu duy nhất. Gửi năm file đính kèm riêng lẻ hoặc bắt khách hàng mở năm đường link thay vì một là rất bất tiện, và phần lớn các trang \"gộp PDF\" miễn phí trên mạng giải quyết việc này bằng cách âm thầm upload file của bạn lên máy chủ trước — điều mà không phải ai cũng muốn với một tài liệu có thể chứa chữ ký, số CMND/CCCD hay thông tin tài chính.",

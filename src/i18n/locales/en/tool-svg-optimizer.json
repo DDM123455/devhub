@@ -67,6 +67,15 @@
     "pluginRemoveViewBox": "Remove viewBox (only if width/height are present)"
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Can I control individual optimizations, not just a few presets?",
+    "a1": "Yes — an advanced panel exposes every SVGO plugin (34 in total) as an individual on/off toggle.",
+    "q2": "Will optimizing break my SVG's ability to scale responsively?",
+    "a2": "Not by default — the viewBox is kept unless you explicitly enable \"Remove viewBox\".",
+    "q3": "How much smaller does optimization typically make a file?",
+    "a3": "Most icons and logos shrink 40-60% with the default settings, with no visible difference in the preview."
+  },
   "article": {
     "heading": "How does SVG optimization work?",
     "p1": "Icons and logos exported from design tools like Illustrator, Figma, or Sketch carry a lot of baggage that has nothing to do with how the image looks: editor metadata, XML comments, redundant group wrappers, coordinates written out to fifteen decimal places, and IDs nobody references. None of that affects rendering, but it does inflate every download — and if your site uses dozens of SVG icons, that overhead adds up fast.",

@@ -28,6 +28,15 @@
     "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ."
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Xóa nền hoạt động thế nào mà không cần tải ảnh lên?",
+    "a1": "Một mô hình AI chạy hoàn toàn trong trình duyệt của bạn (WebAssembly), nên ảnh được xử lý tại chỗ và không bao giờ gửi lên server.",
+    "q2": "Có thể thay nền thay vì để trong suốt không?",
+    "a2": "Có — sau khi xóa nền, bạn có thể giữ trong suốt hoặc thay bằng màu solid hay một ảnh khác.",
+    "q3": "Có thể tinh chỉnh viền cắt không?",
+    "a3": "Có — thanh trượt làm mềm viền giúp phần cắt hòa vào nền mới tự nhiên hơn."
+  },
   "article": {
     "heading": "Xóa nền ảnh bằng AI ngay trên trình duyệt hoạt động thế nào?",
     "p1": "Trước đây, xóa nền ảnh thường phải dùng công cụ trả phí upload ảnh lên server, hoặc tự tay cắt viền chủ thể trong phần mềm chỉnh ảnh. Công cụ này không làm theo cả hai cách đó: nó chạy một mô hình AI phân vùng ảnh nhỏ gọn ngay trong tab trình duyệt để xác định pixel nào thuộc chủ thể, pixel nào thuộc nền, rồi làm phần nền trong suốt — tất cả mà không cần gửi ảnh của bạn đi bất cứ đâu.",

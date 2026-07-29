@@ -51,6 +51,15 @@
     "cheat12": "\\b — word boundary, | — alternation (OR)"
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Will a bad regex pattern freeze the page?",
+    "a1": "No — matching runs in a separate Web Worker with a hard timeout, so even a catastrophic-backtracking pattern can't lock up your tab.",
+    "q2": "Does it show named and numbered capture groups?",
+    "a2": "Yes — every match lists its numbered groups and any named groups like (?<year>\\d{4}).",
+    "q3": "Can I preview a replacement before using it in code?",
+    "a3": "Yes — the Replace panel shows exactly what String.replace() would output, including group backreferences."
+  },
   "article": {
     "heading": "How does testing a regex in the browser actually work?",
     "p1": "A regular expression is a compact pattern language for matching text — everything from \"does this look like an email address\" to \"find every phone number in this document\" to \"strip HTML tags from this string.\" The catch is that regex syntax is notoriously easy to get subtly wrong: a `.` that should be escaped, a greedy `*` that swallows more than intended, a group that isn't capturing what you expect. Writing one blind and only finding out it's wrong once it's already running against production data is a bad way to learn that lesson.",

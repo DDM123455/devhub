@@ -27,6 +27,15 @@
     "channelDownmixWarning": "File này có {{count}} kênh âm thanh. Chỉ 2 kênh đầu tiên (stereo) được giữ lại trong file chuyển đổi — các kênh còn lại sẽ bị loại bỏ."
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Công cụ chuyển đổi được giữa những định dạng âm thanh nào?",
+    "a1": "MP3 và WAV, định dạng đích được tự động gợi ý dựa trên file bạn tải lên.",
+    "q2": "Có thể chọn bitrate MP3 không?",
+    "a2": "Có — chọn 128, 192, 256 hoặc 320 kbps khi chuyển sang MP3.",
+    "q3": "Chuyển đổi file âm thanh surround có bị mất kênh không?",
+    "a3": "File có nhiều hơn 2 kênh sẽ bị giảm về stereo, và công cụ giờ đã cảnh báo rõ trước khi việc đó xảy ra."
+  },
   "article": {
     "heading": "Chuyển đổi MP3 và WAV mà không cần server",
     "p1": "WAV và MP3 tồn tại vì hai lý do trái ngược nhau. WAV lưu âm thanh dưới dạng mẫu thô, không nén — giữ nguyên từng bit của waveform gốc, đổi lại là dung lượng file lớn — đó là lý do các phần mềm dựng âm thanh và video chuyên nghiệp đều yêu cầu định dạng này. MP3 loại bỏ những phần tín hiệu mà tai người gần như không nhận ra để thu nhỏ cùng một đoạn âm thanh xuống chỉ còn một phần nhỏ dung lượng, đó là lý do nó là định dạng dùng để chia sẻ, streaming, nghe nhạc hàng ngày. Ngay khi bạn cần đưa một bản ghi WAV cho thứ gì đó chỉ nhận MP3, hay cần lấy ra một bản WAV từ file MP3 để đưa vào phần mềm dựng cần âm thanh không nén, bạn sẽ phải chuyển đổi — và hầu hết các công cụ online giải quyết việc đó bằng cách bắt bạn tải file lên server của họ trước.",

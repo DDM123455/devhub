@@ -39,6 +39,15 @@
     "invalidHexError": "Enter a valid hex color, e.g. #3b82f6."
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Can I generate a color palette from a base color automatically?",
+    "a1": "Yes — pick a harmony type (complementary, analogous, triadic, and more) and matching colors are generated instantly.",
+    "q2": "Does it check color contrast for accessibility?",
+    "a2": "Yes — a built-in contrast checker shows the WCAG AA/AAA pass/fail ratio against white and black.",
+    "q3": "Can I export a palette to use in code?",
+    "a3": "Yes — copy any palette as CSS custom properties or as a JSON array of hex codes."
+  },
   "article": {
     "heading": "How do color harmony and contrast work?",
     "p1": "Every color on screen can be described three different ways, and this tool keeps them all in sync: HEX is the shorthand used in CSS and design tools, RGB describes how much red, green, and blue light combine to produce the color, and HSL — hue, saturation, lightness — describes it the way a person actually thinks about color: what shade it is, how vivid, and how light or dark. Drag the native color swatch, type a HEX code, or adjust any R/G/B or H/S/L field directly, and every other field updates instantly, so you can move between however you're used to thinking about color without doing the math yourself.",

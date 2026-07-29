@@ -22,6 +22,15 @@
     "skippedFiles": "{{count}} file(s) were skipped because they're not a PDF."
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Can I reorder pages before merging?",
+    "a1": "Yes — drag and drop individual page thumbnails, even across different source files, to set the exact final order.",
+    "q2": "Can I rotate or remove pages before merging?",
+    "a2": "Yes — each page thumbnail has its own rotate and delete controls.",
+    "q3": "Is there a limit on how many PDFs I can merge?",
+    "a3": "No fixed limit — merging runs entirely in your browser, so it's limited only by your device's memory."
+  },
   "article": {
     "heading": "Why merge PDF files locally instead of uploading them?",
     "p1": "Scanned contracts, signed forms, invoice batches, chapters of a report — sooner or later almost everyone ends up with several PDF files that really belong together as one document. Mailing five separate attachments or asking a client to open five links instead of one is clumsy, and most free online \"PDF merger\" sites solve this by quietly uploading your files to a server first, which is exactly the kind of trust few people want to extend to a document that might contain a signature, an ID number, or financial details.",

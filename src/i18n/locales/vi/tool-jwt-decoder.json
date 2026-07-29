@@ -49,6 +49,15 @@
     "copied": "Đã sao chép!"
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Công cụ có xác minh được chữ ký JWT, không chỉ giải mã không?",
+    "a1": "Có — hỗ trợ xác minh chữ ký HMAC (HS256/384/512) và RSA (RS256/384/512).",
+    "q2": "Token hay secret của tôi có bị gửi đi đâu không?",
+    "a2": "Không — giải mã, xác minh và ký lại đều diễn ra tại chỗ trên trình duyệt bằng Web Crypto API.",
+    "q3": "Có thể sửa payload rồi tạo token đã ký mới không?",
+    "a3": "Có — sửa JSON của header/payload rồi ký lại bằng secret HMAC để nhận token mới."
+  },
   "article": {
     "heading": "Giải mã JWT ngay trên trình duyệt hoạt động thế nào — và vì sao điều đó quan trọng?",
     "p1": "Một JSON Web Token trông giống như một chuỗi ký tự vô nghĩa, nhưng thực chất chỉ là ba phần được mã hóa Base64URL nối với nhau bằng dấu chấm: header, payload và signature (chữ ký). Việc giải mã header và payload hoàn toàn không phải là mã hóa (encryption) — bất kỳ ai có token đều đọc được các claim bên trong, đó chính là lý do không bao giờ nên nhét dữ liệu nhạy cảm vào payload của JWT. Vấn đề là những token người ta cần kiểm tra hiếm khi là dữ liệu thử nghiệm bỏ đi. Chúng thường là token phiên đăng nhập thật từ một ứng dụng production, một access token gọi API, hay một cookie đăng nhập lấy trực tiếp từ tab dev tools của trình duyệt khi đang debug — tức là một thông tin xác thực thật, và nếu rơi vào tay kẻ xấu sẽ cấp quyền truy cập thật. Dán token đó vào một website lạ chẳng khác nào giao phiên đăng nhập của bạn cho một server bạn không hề biết gì về nó.",

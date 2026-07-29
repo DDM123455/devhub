@@ -39,6 +39,15 @@
     "jsonRootError": "JSON này không có object hay mảng nào để chuyển thành các dòng — một giá trị đơn lẻ như null hay một con số thì không có gì để lập bảng."
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Có thể chuyển JSON về lại CSV, không chỉ CSV sang JSON không?",
+    "a1": "Có — đổi chiều bất cứ lúc nào bằng nút Hoán đổi, dùng cùng cấu hình dấu phân cách và tiêu đề.",
+    "q2": "Có hỗ trợ file dùng dấu chấm phẩy hoặc tab không?",
+    "a2": "Có — chọn dấu phẩy, chấm phẩy, tab, hoặc bất kỳ ký tự tùy chỉnh nào.",
+    "q3": "Có thể xem trước dữ liệu trước khi chuyển đổi không?",
+    "a3": "Có — bảng xem trước hiện số dòng/cột phát hiện được trước khi bạn chuyển đổi toàn bộ."
+  },
   "article": {
     "heading": "Chuyển đổi CSV và JSON mà không cần server",
     "p1": "CSV và JSON cùng giải quyết một bài toán — di chuyển dữ liệu có cấu trúc giữa các hệ thống — nhưng theo hai hình dạng rất khác nhau. CSV là một bảng phẳng: chỉ có hàng và cột, không hơn không kém, đó là lý do mọi phần mềm bảng tính, mọi bản xuất dữ liệu từ database, mọi hệ thống cũ đều \"nói\" được CSV. JSON là một cây: object có thể lồng trong object, mảng có thể chứa bất cứ thứ gì, đó là lý do mọi API hiện đại và mọi codebase JavaScript đều dùng JSON thay vì CSV. Ngay khi bạn cần nạp một file bảng tính vào API, hoặc biến kết quả trả về từ API thành thứ mở được bằng Excel, bạn sẽ phải chuyển đổi qua lại giữa hai định dạng này — và làm đúng việc đó bằng tay (trường có dấu ngoặc kép chứa dấu phẩy bên trong, dấu ngoặc kép cần escape, object lồng nhau không map được vào một cột duy nhất) rất dễ sai một cách tinh vi.",

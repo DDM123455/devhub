@@ -39,6 +39,15 @@
     "jsonRootError": "This JSON has no object or array to convert into rows — a bare value like null or a number has nothing to tabulate."
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Can I convert JSON back to CSV as well as CSV to JSON?",
+    "a1": "Yes — switch direction anytime with the Swap button, using the same delimiter and header settings.",
+    "q2": "Does it support semicolons or tab-delimited files?",
+    "a2": "Yes — choose comma, semicolon, tab, or any custom single-character delimiter.",
+    "q3": "Can I preview the data before converting?",
+    "a3": "Yes — a table preview shows the detected rows and columns before you commit to the full conversion."
+  },
   "article": {
     "heading": "Converting between CSV and JSON without a server",
     "p1": "CSV and JSON solve the same problem — moving structured data between systems — in two very different shapes. CSV is a flat table: rows and columns, nothing more, which is why every spreadsheet app, database export, and legacy system speaks it fluently. JSON is a tree: objects can nest inside objects, arrays can hold anything, which is why every modern API and JavaScript codebase speaks it instead. The moment you need to load a spreadsheet into an API, or turn an API response into something you can open in Excel, you're stuck translating between the two — and getting that translation exactly right (quoted fields with embedded commas, escaped quotes, nested objects that don't map to a single column) is easy to get subtly wrong by hand.",

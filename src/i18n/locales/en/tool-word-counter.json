@@ -45,6 +45,15 @@
     "keywordDensityPercentColumn": "% of text"
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Does it calculate readability, not just word count?",
+    "a1": "Yes — a Flesch Reading Ease score and keyword density table are included alongside the basic counts.",
+    "q2": "Can I check my text against a social media character limit?",
+    "a2": "Yes — pick a preset like X/Twitter, Instagram, or SMS to see exactly how many characters remain.",
+    "q3": "Can I export the text I typed?",
+    "a3": "Yes — copy it to your clipboard or download it as a .txt file."
+  },
   "article": {
     "heading": "Why count words and characters locally?",
     "p1": "A surprising number of everyday writing tasks come with a hard number attached: an essay capped at 500 words, a tweet limited to 280 characters, a meta description that gets truncated past roughly 160 characters, a cover letter a recruiter asked to keep under one page. Manually counting any of that is tedious and error-prone, so most people paste their text into an online counter instead — which usually means sending a draft cover letter, an unpublished article, or a client's confidential brief to a server you know nothing about.",

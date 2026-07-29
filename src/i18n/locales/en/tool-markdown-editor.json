@@ -35,6 +35,15 @@
     "wordCount": "{{words}} words · {{chars}} characters"
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Does it show a live preview while I type?",
+    "a1": "Yes — a split view renders GitHub-flavored Markdown (tables, task lists, strikethrough) live as you type, with synced scrolling.",
+    "q2": "Will I lose my work if I accidentally close the tab?",
+    "a2": "No — your draft is automatically saved to your browser's local storage and restored the next time you open the tool.",
+    "q3": "Can I export the result as HTML, not just Markdown?",
+    "a3": "Yes — download either the raw .md file or a standalone .html file with the rendered content."
+  },
   "article": {
     "heading": "Writing Markdown with a live preview, without a server",
     "p1": "Markdown became the default format for README files, documentation, pull request descriptions, and static-site blog posts because it's readable as plain text and still renders into properly formatted output — headings, bold and italic text, lists, links, and code blocks — without ever touching a rich-text editor. The catch is that even a small syntax slip (a missing blank line before a list, a table with mismatched column counts, a fenced code block that never closes) can render very differently from what you intended, and you usually can't tell just by looking at the raw text.",

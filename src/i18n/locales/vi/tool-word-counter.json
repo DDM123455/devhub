@@ -45,6 +45,15 @@
     "keywordDensityPercentColumn": "% văn bản"
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Công cụ có tính điểm độ dễ đọc, không chỉ đếm từ không?",
+    "a1": "Có — điểm Flesch Reading Ease và bảng tần suất từ khóa đi kèm các số liệu đếm cơ bản.",
+    "q2": "Có thể kiểm tra văn bản theo giới hạn ký tự mạng xã hội không?",
+    "a2": "Có — chọn preset như X/Twitter, Instagram hay SMS để biết chính xác còn lại bao nhiêu ký tự.",
+    "q3": "Có thể xuất văn bản đã gõ không?",
+    "a3": "Có — sao chép vào clipboard hoặc tải về dưới dạng file .txt."
+  },
   "article": {
     "heading": "Vì sao nên đếm từ và ký tự ngay trên máy?",
     "p1": "Rất nhiều việc viết lách hàng ngày lại đi kèm một con số cứng: bài luận giới hạn 500 từ, một dòng tweet tối đa 280 ký tự, phần mô tả meta bị cắt sau khoảng 160 ký tự, một lá thư xin việc mà nhà tuyển dụng yêu cầu gói gọn trong một trang. Tự đếm tay những thứ này rất mất công và dễ sai, nên phần lớn mọi người dán văn bản vào một công cụ đếm online — nghĩa là gửi một bản nháp thư xin việc, một bài viết chưa xuất bản, hay một bản brief bảo mật của khách hàng lên một máy chủ mà bạn chẳng biết gì về nó.",

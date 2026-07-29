@@ -49,6 +49,15 @@
     "copied": "Copied!"
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Can this tool verify a JWT's signature, not just decode it?",
+    "a1": "Yes — HMAC (HS256/384/512) and RSA (RS256/384/512) signature verification are both supported.",
+    "q2": "Is my token or secret sent anywhere?",
+    "a2": "No — decoding, verification, and re-signing all happen locally in your browser using the Web Crypto API.",
+    "q3": "Can I edit the payload and generate a new signed token?",
+    "a3": "Yes — edit the header/payload JSON and re-sign with an HMAC secret to get a new token."
+  },
   "article": {
     "heading": "How does client-side JWT decoding work — and why does it matter?",
     "p1": "A JSON Web Token looks like an unreadable blob of characters, but it's really just three Base64URL-encoded parts joined by dots: a header, a payload, and a signature. Decoding the header and payload isn't encryption at all — anyone with the token can read the claims inside, which is exactly why sensitive data should never be stuffed into a JWT payload. The problem is that the tokens people need to inspect are rarely disposable test data. They're often a live session token from a production app, an API access token, or a login cookie pulled straight from the browser's dev tools while debugging — a real credential that, in the wrong hands, grants real access. Pasting that into a random website hands your session to a server you know nothing about.",

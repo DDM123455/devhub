@@ -29,6 +29,15 @@
     "downloadError": "Could not generate the .xlsx file: {{message}}"
   },
   "related": "Related tools",
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Does it produce a real Excel file, not just a renamed CSV?",
+    "a1": "Yes — a genuine .xlsx workbook with a bold header row, typed numeric/boolean cells, and sized columns.",
+    "q2": "Can one JSON file produce multiple sheets?",
+    "a2": "Yes — if your JSON is an object whose top-level keys each hold an array, each key automatically becomes its own sheet.",
+    "q3": "Can I preview the spreadsheet before downloading?",
+    "a3": "Yes — a preview table shows the first rows of each sheet before you download the .xlsx file."
+  },
   "article": {
     "heading": "Turning JSON into a real spreadsheet without a server",
     "p1": "An API response or a config file speaks JSON; the person who needs to review, filter, or chart that data almost always wants it in Excel. Getting there usually means either asking someone to write a throwaway script, or pasting the data into an online converter that quietly stores a copy of whatever you upload — which is a bad trade when the JSON in question is customer records, financial figures, or anything else you'd rather not hand to a third-party server.",

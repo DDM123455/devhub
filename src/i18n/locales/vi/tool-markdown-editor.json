@@ -35,6 +35,15 @@
     "wordCount": "{{words}} từ · {{chars}} ký tự"
   },
   "related": "Công cụ liên quan",
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Có xem trước trực tiếp khi gõ không?",
+    "a1": "Có — chế độ chia đôi màn hình render Markdown chuẩn GitHub (bảng, task list, gạch ngang) ngay khi bạn gõ, cuộn đồng bộ hai khung.",
+    "q2": "Đóng nhầm tab có mất nội dung đang soạn không?",
+    "a2": "Không — bản nháp được tự động lưu vào bộ nhớ cục bộ của trình duyệt và khôi phục lại lần sau mở công cụ.",
+    "q3": "Có thể xuất ra HTML, không chỉ Markdown không?",
+    "a3": "Có — tải về file .md gốc hoặc file .html độc lập chứa nội dung đã render."
+  },
   "article": {
     "heading": "Soạn thảo Markdown với xem trước trực tiếp mà không cần server",
     "p1": "Markdown trở thành định dạng mặc định cho file README, tài liệu kỹ thuật, mô tả pull request, và bài viết trên các trang blog tĩnh vì nó vẫn đọc được như văn bản thuần, nhưng vẫn hiển thị đúng định dạng — tiêu đề, chữ đậm/nghiêng, danh sách, liên kết, khối code — mà không cần dùng đến trình soạn thảo rich-text. Vấn đề là chỉ một lỗi cú pháp nhỏ (thiếu dòng trống trước một danh sách, một bảng có số cột không khớp giữa các dòng, một khối code dùng dấu ``` mà không đóng lại) có thể khiến kết quả hiển thị khác hẳn so với ý định của bạn, và thường bạn không thể nhận ra chỉ bằng cách nhìn vào văn bản gốc.",
