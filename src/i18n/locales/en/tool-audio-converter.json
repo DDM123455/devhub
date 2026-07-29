@@ -23,7 +23,8 @@
     "sizeAndDuration": "{{size}} · {{duration}}",
     "clear": "Choose a different file",
     "decodeError": "Couldn't read this audio file — it may be corrupted or in a format this browser can't decode.",
-    "encodeError": "Conversion failed. Try a different bitrate, or choose a different file."
+    "encodeError": "Conversion failed. Try a different bitrate, or choose a different file.",
+    "channelDownmixWarning": "This file has {{count}} audio channels. Only the first 2 (stereo) will be kept in the converted file — the extra channels will be discarded."
   },
   "related": "Related tools",
   "article": {

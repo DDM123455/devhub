@@ -130,7 +130,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 
 ### 3.5a — Sửa bug thật + rủi ro kỹ thuật (Critical)
 - [x] Fix JSON → Excel: bắt lỗi `handleDownload`, set `downloadError` đúng khi exceljs thất bại
-- [ ] Fix Audio Converter: cảnh báo người dùng khi audio >2 kênh bị downmix về stereo
+- [x] Fix Audio Converter: cảnh báo người dùng khi audio >2 kênh bị downmix về stereo
 - [ ] Regex Tester: thêm debounce + guard/timeout chống ReDoS treo tab
 
 ### 3.5b — Accessibility pass toàn site (Critical)

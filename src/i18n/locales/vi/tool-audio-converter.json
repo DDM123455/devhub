@@ -23,7 +23,8 @@
     "sizeAndDuration": "{{size}} · {{duration}}",
     "clear": "Chọn file khác",
     "decodeError": "Không đọc được file âm thanh này — có thể file bị hỏng hoặc định dạng mà trình duyệt này không giải mã được.",
-    "encodeError": "Chuyển đổi thất bại. Thử bitrate khác, hoặc chọn file khác."
+    "encodeError": "Chuyển đổi thất bại. Thử bitrate khác, hoặc chọn file khác.",
+    "channelDownmixWarning": "File này có {{count}} kênh âm thanh. Chỉ 2 kênh đầu tiên (stereo) được giữ lại trong file chuyển đổi — các kênh còn lại sẽ bị loại bỏ."
   },
   "related": "Công cụ liên quan",
   "article": {

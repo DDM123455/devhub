@@ -21,6 +21,7 @@ interface Messages {
 	clear: string;
 	decodeError: string;
 	encodeError: string;
+	channelDownmixWarning: string;
 }
 
 type OutputFormat = 'mp3' | 'wav';
@@ -59,6 +60,7 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 	const [resultSize, setResultSize] = useState<number | null>(null);
 	const [resultDuration, setResultDuration] = useState<number | null>(null);
 	const [error, setError] = useState<string | null>(null);
+	const [channelCount, setChannelCount] = useState<number | null>(null);
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const workerRef = useRef<Worker | null>(null);
@@ -79,6 +81,7 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 		setResultSize(null);
 		setResultDuration(null);
 		setError(null);
+		setChannelCount(null);
 		setAudioFile(file);
 		setAudioUrl(URL.createObjectURL(file));
 		const lower = file.name.toLowerCase();
@@ -116,6 +119,7 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 			const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
 			audioCtx = new AudioCtx();
 			const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+			setChannelCount(audioBuffer.numberOfChannels > 2 ? audioBuffer.numberOfChannels : null);
 			const channels: Float32Array[] = [];
 			for (let i = 0; i < audioBuffer.numberOfChannels; i++) channels.push(audioBuffer.getChannelData(i).slice());
 			const sampleRate = audioBuffer.sampleRate;
@@ -158,6 +162,7 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 		setResultSize(null);
 		setResultDuration(null);
 		setError(null);
+		setChannelCount(null);
 	};
 
 	const handleDownload = () => {
@@ -262,6 +267,11 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 					</div>
 
 					{error && <p className="text-sm text-destructive">{error}</p>}
+					{channelCount !== null && (
+						<p className="rounded-md border border-amber-500/40 bg-amber-500/10 p-2 text-sm text-amber-700 dark:text-amber-300">
+							{messages.channelDownmixWarning.replace('{{count}}', String(channelCount))}
+						</p>
+					)}
 
 					{resultUrl && (
 						<div className="flex flex-col gap-3 rounded-lg border border-border p-4">

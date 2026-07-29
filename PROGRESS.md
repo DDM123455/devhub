@@ -109,6 +109,14 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-29** — Phase 3.5: fix bug thật thứ 2 ở Audio Converter (Phase 3 #10) —
+  `audioEncodeWorker.ts` dùng `Math.min(channels.length, 2)` ở cả `encodeMp3` và
+  `encodeWav` để giới hạn về stereo, nhưng không có cảnh báo nào cho người dùng khi file
+  gốc có nhiều hơn 2 kênh (5.1/7.1 surround) — các kênh dư bị bỏ qua âm thầm. Đã thêm kiểm
+  tra `audioBuffer.numberOfChannels` ngay sau khi decode ở `AudioConverter.tsx`, hiển thị
+  banner cảnh báo (màu amber, không phải destructive vì đây là cảnh báo chứ không phải lỗi
+  chặn) nêu rõ số kênh gốc và việc chỉ giữ 2 kênh đầu. Thêm key i18n `channelDownmixWarning`
+  cho en + vi. Build sạch (421 trang). Đã tick mục tương ứng trong `ROADMAP.md` Phase 3.5a.
 - **2026-07-29** — Bắt đầu Phase 3.5 (Audit Remediation, xem `AUDIT.md`), task đầu tiên:
   fix bug thật ở JSON → Excel Converter (Phase 3 #7) — `handleDownload` khai báo state
   `downloadError` và render nó trong UI nhưng try/catch không có `catch` clause nào set
