@@ -25,7 +25,8 @@
     "sheetsInfo": "{{count}} sheets will be exported",
     "moreRows": "+{{count}} more rows in the downloaded file",
     "download": "Download .xlsx",
-    "generating": "Generating…"
+    "generating": "Generating…",
+    "downloadError": "Could not generate the .xlsx file: {{message}}"
   },
   "related": "Related tools",
   "article": {

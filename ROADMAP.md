@@ -126,6 +126,39 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] Chuyển đổi Audio MP3 ↔ WAV — Web Audio API (decode) + `@breezystack/lamejs` (encode MP3) +
       WAV header viết tay, mã hóa trong Web Worker
 
+## Phase 3.5 — Audit Remediation (từ audit 2026-07-29, xem `AUDIT.md`)
+
+### 3.5a — Sửa bug thật + rủi ro kỹ thuật (Critical)
+- [x] Fix JSON → Excel: bắt lỗi `handleDownload`, set `downloadError` đúng khi exceljs thất bại
+- [ ] Fix Audio Converter: cảnh báo người dùng khi audio >2 kênh bị downmix về stereo
+- [ ] Regex Tester: thêm debounce + guard/timeout chống ReDoS treo tab
+
+### 3.5b — Accessibility pass toàn site (Critical)
+- [ ] Thêm skip-to-content link trong Layout.astro
+- [ ] Thêm focus-trap + trả focus cho sidebar mobile khi đóng
+- [ ] Rà soát 20 tool: thêm `aria-live="polite"` cho mọi vùng thông báo lỗi/kết quả động
+- [ ] Rà soát 20 tool: thêm `role=`/`sr-only` có hệ thống cho input/button/status quan trọng
+- [ ] Đo lại bằng Lighthouse + axe DevTools sau khi sửa, xác nhận điểm Accessibility ≥ 90
+
+### 3.5c — Nhất quán trải nghiệm giữa các tool cùng nhóm (High)
+- [ ] Image Format Converter: thêm "Download All .zip"
+- [ ] Color Picker: thêm phản hồi "Copied" cho nút export CSS/JSON
+- [ ] CSV↔JSON Converter: thêm bảng preview trước convert
+
+### 3.5d — Feature parity trọng điểm (High)
+- [ ] SVG Optimizer: mở rộng danh sách plugin SVGO có thể bật/tắt riêng lẻ
+- [ ] Word Counter: thêm copy/export, char-limit preset, readability score
+- [ ] Video Trim: timeline kéo-2-tay-cầm thay 2 slider; offload FFmpeg sang Web Worker
+- [ ] Markdown Editor: autosave localStorage
+
+### 3.5e — SEO nâng cao (High)
+- [ ] Thêm `FAQPage` JSON-LD cho 20 trang tool (tận dụng nội dung article có sẵn)
+- [ ] Xác minh/bổ sung Open Graph + Twitter Card tag trong Layout.astro
+- [ ] Chạy Lighthouse SEO thật, xác nhận ≥ 90 mọi trang (đối chiếu CLAUDE.md checklist)
+
+### 3.5f — PWA nền tảng (đẩy sớm hơn trong Phase 4)
+- [ ] manifest.json + service worker cơ bản (ưu tiên trước AdSense vì giá trị conversion/SEO cao hơn)
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

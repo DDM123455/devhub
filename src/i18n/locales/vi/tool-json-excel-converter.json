@@ -25,7 +25,8 @@
     "sheetsInfo": "sẽ xuất ra {{count}} sheet",
     "moreRows": "còn +{{count}} dòng nữa trong file tải về",
     "download": "Tải file .xlsx",
-    "generating": "Đang tạo file…"
+    "generating": "Đang tạo file…",
+    "downloadError": "Không thể tạo file .xlsx: {{message}}"
   },
   "related": "Công cụ liên quan",
   "article": {

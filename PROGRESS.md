@@ -109,6 +109,14 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-29** — Bắt đầu Phase 3.5 (Audit Remediation, xem `AUDIT.md`), task đầu tiên:
+  fix bug thật ở JSON → Excel Converter (Phase 3 #7) — `handleDownload` khai báo state
+  `downloadError` và render nó trong UI nhưng try/catch không có `catch` clause nào set
+  giá trị, nên khi `exceljs` build workbook lỗi, người dùng chỉ thấy nút hết trạng thái
+  "Generating..." mà không có bất kỳ thông báo lỗi nào (thất bại trong im lặng). Đã thêm
+  `catch` set `downloadError` từ message lỗi thật, thêm key i18n `downloadError` cho
+  en + vi. Build sạch (`npm run build`, 421 trang). Đã tick mục tương ứng trong
+  `ROADMAP.md` Phase 3.5a.
 - **2026-07-28** — Chuyển đổi Audio MP3 ↔ WAV (Phase 3 #10) hoàn tất — **Phase 3 HOÀN TẤT
   10/10 tool**. Giải mã MP3/WAV bằng Web Audio API có sẵn của trình duyệt (không cần thư
   viện), mã hóa MP3 bằng `@breezystack/lamejs`, mã hóa WAV tự viết RIFF header + PCM 16-bit;

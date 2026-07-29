@@ -22,6 +22,7 @@ interface Messages {
 	moreRows: string;
 	download: string;
 	generating: string;
+	downloadError: string;
 }
 
 interface Sheet {
@@ -199,6 +200,8 @@ export default function JsonExcelConverter({ messages }: { messages: Messages })
 			link.download = name.toLowerCase().endsWith('.xlsx') ? name : `${name}.xlsx`;
 			link.click();
 			URL.revokeObjectURL(url);
+		} catch (e) {
+			setDownloadError(messages.downloadError.replace('{{message}}', e instanceof Error ? e.message : String(e)));
 		} finally {
 			setIsGenerating(false);
 		}
