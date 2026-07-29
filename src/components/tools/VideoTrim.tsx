@@ -368,9 +368,13 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 						<Button type="button" size="sm" variant="ghost" onClick={handleClear}>
 							{messages.clear}
 						</Button>
-						{engineState === 'loading' && <p className="text-xs text-muted-foreground">{messages.loadingEngineLabel}</p>}
+						{engineState === 'loading' && (
+							<p role="status" className="text-xs text-muted-foreground">{messages.loadingEngineLabel}</p>
+						)}
 						{processing && engineState === 'ready' && (
-							<p className="text-xs text-muted-foreground">{messages.processingLabel.replace('{{percent}}', String(progress))}</p>
+							<p role="status" className="text-xs text-muted-foreground">
+								{messages.processingLabel.replace('{{percent}}', String(progress))}
+							</p>
 						)}
 					</div>
 

@@ -109,6 +109,26 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-29** — Phase 3.5b (hoàn tất 4/5 mục, trừ đo Lighthouse/axe thật): rà soát
+  `role=`/`sr-only` có hệ thống. Dùng 1 Explore agent đọc toàn bộ 20 file tool +
+  layout component để tìm nút chỉ có icon (không text/aria-label/title) — kết quả: **không
+  tìm thấy lỗ hổng nào** ở nhóm này, toàn bộ nút icon-only (rotate/xóa/khóa/copy trong
+  PdfMerger, PdfSplitter, ColorPicker, TextDiffChecker, MarkdownEditor...) đã có
+  `aria-label`/`title` từ trước — nhận định "aria-* rải rác 16/47 file" trong audit ban đầu
+  hóa ra phần lớn do đếm theo số file (1 file có 1 hay 20 `aria-label` đều tính là 1), không
+  phản ánh đúng độ phủ thực tế trên các control quan trọng. Việc thật sự cần sửa: (1)
+  `Base64Tool.tsx` — ảnh xem trước sau khi giải mã có `alt=""` (ẩn hoàn toàn khỏi screen
+  reader dù là nội dung chính người dùng vừa tạo ra) → đổi thành `alt={tên file || nhãn xem
+  trước}`, luôn có giá trị khác rỗng; (2) bổ sung `role="status"` cho 7 vị trí text trạng
+  thái/tiến trình xử lý bị bỏ sót ở lượt trước (Audio Converter: nhãn "đang giải mã"/"đang mã
+  hóa N%"; Video Trim: nhãn "đang tải engine"/"đang xử lý N%"; Background Remover: nhãn %
+  từng ảnh khi xóa nền; PDF Merger + PDF Splitter: nhãn "đang tải thumbnail") — cùng chuẩn
+  `role="status"` đã dùng ở lượt Phase 3.5b trước cho Regex Tester/Audio Converter, chỉ là mở
+  rộng đầy đủ hơn sang các tool còn thiếu. Build sạch (421 trang) + test Puppeteer xác nhận
+  ảnh xem trước giải mã có alt text đúng ("Preview" khi chưa đặt tên file) thay vì rỗng. Còn
+  treo 1 mục con trong Phase 3.5b: "đo lại bằng Lighthouse + axe DevTools, xác nhận
+  Accessibility ≥ 90" — CHƯA làm (cần chạy công cụ đo thật, không phải việc đọc/sửa code,
+  để lại cho phiên sau hoặc khi có yêu cầu đo trực tiếp).
 - **2026-07-29** — Phase 3.5b: thêm `role="alert"`/`role="status"` (tương đương
   `aria-live="assertive"`/`"polite"` ngầm định theo ARIA spec) cho toàn bộ thông báo lỗi/
   trạng thái xuất hiện động ở **16/20 tool** (4 tool còn lại — Word Counter, Text Case

@@ -260,9 +260,13 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 						<Button type="button" size="sm" variant="ghost" onClick={handleClear}>
 							{messages.clear}
 						</Button>
-						{processing && stage === 'decoding' && <p className="text-xs text-muted-foreground">{messages.decodingLabel}</p>}
+						{processing && stage === 'decoding' && (
+							<p role="status" className="text-xs text-muted-foreground">{messages.decodingLabel}</p>
+						)}
 						{processing && stage === 'encoding' && (
-							<p className="text-xs text-muted-foreground">{messages.encodingLabel.replace('{{percent}}', String(progress))}</p>
+							<p role="status" className="text-xs text-muted-foreground">
+								{messages.encodingLabel.replace('{{percent}}', String(progress))}
+							</p>
 						)}
 					</div>
 

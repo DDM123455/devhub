@@ -436,7 +436,11 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 						{decodedPreviewUri && fileDecodeMime.startsWith('image/') && (
 							<div className="flex flex-col gap-1">
 								<span className="text-xs text-muted-foreground">{messages.imagePreviewLabel}</span>
-								<img src={decodedPreviewUri} alt="" className="max-h-48 max-w-full rounded-md border border-border object-contain" />
+								<img
+									src={decodedPreviewUri}
+									alt={fileDecodeName.trim() || messages.imagePreviewLabel}
+									className="max-h-48 max-w-full rounded-md border border-border object-contain"
+								/>
 							</div>
 						)}
 						<div>

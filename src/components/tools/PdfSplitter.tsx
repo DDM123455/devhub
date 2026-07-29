@@ -277,7 +277,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 				<p className="text-xs text-muted-foreground">{messages.dropHint}</p>
 			</div>
 
-			{isLoadingThumbnails && <p className="text-sm text-muted-foreground">{messages.loadingThumbnails}</p>}
+			{isLoadingThumbnails && <p role="status" className="text-sm text-muted-foreground">{messages.loadingThumbnails}</p>}
 
 			{!file || pages.length === 0 ? (
 				!isLoadingThumbnails && <p className="text-sm text-muted-foreground">{messages.noFile}</p>

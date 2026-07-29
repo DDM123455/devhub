@@ -403,7 +403,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 							<div className="flex min-w-0 flex-1 flex-col gap-1">
 								<span className="truncate text-foreground">{item.file.name}</span>
 								{item.status === 'processing' && (
-									<span className="text-muted-foreground">
+									<span role="status" className="text-muted-foreground">
 										{messages.removing.replace('{{percent}}', String(item.progress ?? 0))}
 									</span>
 								)}

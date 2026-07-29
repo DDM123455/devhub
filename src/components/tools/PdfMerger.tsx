@@ -217,7 +217,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 			)}
 
 			{files.some((f) => f.status === 'loading') && (
-				<p className="text-sm text-muted-foreground">{messages.loadingThumbnails}</p>
+				<p role="status" className="text-sm text-muted-foreground">{messages.loadingThumbnails}</p>
 			)}
 
 			{pages.length === 0 ? (
