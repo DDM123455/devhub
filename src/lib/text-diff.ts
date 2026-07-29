@@ -17,6 +17,30 @@ export interface DiffOptions {
 	ignoreWhitespace?: boolean;
 }
 
+export interface PreprocessOptions {
+	normalizeLineEndings?: boolean;
+	normalizeUnicode?: boolean;
+	ignoreEmptyLines?: boolean;
+}
+
+// Applied to both sides before diffing (not to the raw textarea value the user sees/
+// edits) — each option strips a specific kind of "noise" difference the diff should
+// never report as a change:
+// - normalizeLineEndings: CRLF/CR → LF, so a file saved on Windows vs. Unix doesn't
+//   show every single line as modified.
+// - normalizeUnicode: NFC-normalizes both sides, so visually-identical text encoded
+//   with different combining-character sequences (e.g. "é" as one codepoint vs. "e" +
+//   combining acute) doesn't register as a difference.
+// - ignoreEmptyLines: drops blank/whitespace-only lines from both sides entirely, so
+//   blank-line-count differences don't appear as added/removed rows.
+export function preprocessDiffInput(text: string, options: PreprocessOptions): string {
+	let result = text;
+	if (options.normalizeLineEndings) result = result.replace(/\r\n?/g, '\n');
+	if (options.normalizeUnicode) result = result.normalize('NFC');
+	if (options.ignoreEmptyLines) result = result.split('\n').filter((line) => line.trim() !== '').join('\n');
+	return result;
+}
+
 // diffLines' Change.value contains one or more complete lines, each (except
 // possibly the very last line in the whole document) ending with '\n'.
 function splitIntoLines(value: string): string[] {
@@ -24,12 +48,46 @@ function splitIntoLines(value: string): string[] {
 	return withoutTrailingNewline === '' ? [] : withoutTrailingNewline.split('\n');
 }
 
+// A modified word/token is never highlighted as a solid block. Wherever diffWords
+// produces a removed chunk immediately followed by an added chunk (i.e. one or more
+// words were replaced, not purely inserted or deleted), that pair is re-diffed at the
+// character level and the coarse word-level pair is replaced with the fine-grained
+// result — this is the "Line → Word → Character" layering DiffChecker/GitHub use, so
+// "hahah" → "hahahahah" highlights only the appended "ahah", not the whole word.
+// Above CHAR_REFINE_MAX_LEN, characters diffing degrades to O(n*d) on long modified
+// spans, so very long replaced chunks fall back to the coarse word-level pair instead
+// of risking a multi-second stall on pathological input.
+const CHAR_REFINE_MAX_LEN = 2000;
+
+function refineModifiedWordPairs(changes: Change[], ignoreCase: boolean | undefined): Change[] {
+	const result: Change[] = [];
+	let i = 0;
+	while (i < changes.length) {
+		const current = changes[i];
+		const next = changes[i + 1];
+		if (
+			current.removed &&
+			next?.added &&
+			current.value.length <= CHAR_REFINE_MAX_LEN &&
+			next.value.length <= CHAR_REFINE_MAX_LEN
+		) {
+			result.push(...diffChars(current.value, next.value, { ignoreCase }));
+			i += 2;
+			continue;
+		}
+		result.push(current);
+		i += 1;
+	}
+	return result;
+}
+
 function diffLinePair(leftLine: string, rightLine: string, granularity: DiffGranularity, options: DiffOptions) {
 	if (granularity === 'line') return undefined;
-	const segments =
+	const rawSegments =
 		granularity === 'char'
 			? diffChars(leftLine, rightLine, { ignoreCase: options.ignoreCase })
 			: diffWords(leftLine, rightLine, { ignoreCase: options.ignoreCase });
+	const segments = granularity === 'word' ? refineModifiedWordPairs(rawSegments, options.ignoreCase) : rawSegments;
 	return {
 		leftSegments: segments.filter((s) => !s.added),
 		rightSegments: segments.filter((s) => !s.removed),
@@ -68,6 +126,16 @@ export function buildLineDiff(left: string, right: string, granularity: DiffGran
 			const addedLines = splitIntoLines(lineParts[i + 1].value);
 			const pairCount = Math.min(removedLines.length, addedLines.length);
 			for (let j = 0; j < pairCount; j++) {
+				// jsdiff's diffLines picks *a* minimal alignment, not necessarily the one that
+				// maximizes recognized unchanged lines — when several equally-minimal alignments
+				// exist, it can end up grouping two byte-identical lines into a removed+added
+				// pair instead of recognizing them as unchanged. Re-check equality here so that
+				// case doesn't render as a spurious "modified" (orange) row for text that's
+				// actually identical.
+				if (removedLines[j] === addedLines[j]) {
+					entries.push({ type: 'unchanged', leftText: removedLines[j], rightText: addedLines[j], hunkIndex: null });
+					continue;
+				}
 				const sub = diffLinePair(removedLines[j], addedLines[j], granularity, options);
 				entries.push({
 					type: 'modified',

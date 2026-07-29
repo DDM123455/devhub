@@ -137,6 +137,58 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-29** — Nâng cấp Text Diff Checker theo yêu cầu trực tiếp người dùng (không phải
+  task ROADMAP): sửa bug thật "highlight cả từ khi chỉ khác vài ký tự" (vd. `hahah` vs
+  `hahahahah` trước đây tô vàng nguyên cả từ). Nguyên nhân: ở Word mode, `diffWords` coi
+  mỗi từ là 1 token, khi 2 token khác nhau thì toàn bộ token bị đánh dấu removed/added,
+  không có bước tinh chỉnh xuống mức ký tự. Đã thêm `refineModifiedWordPairs()` trong
+  `src/lib/text-diff.ts`: sau `diffWords`, mọi cặp (removed token liền kề added token) —
+  tức 1 từ bị THAY THẾ chứ không phải thêm/xóa thuần túy — được chạy lại qua `diffChars` để
+  chỉ tô đúng phần ký tự khác biệt, đúng kiến trúc phân lớp Line → Word → Character mà
+  DiffChecker/GitHub dùng (dùng `diff` (jsdiff) sẵn có, engine này đã cài Myers diff nội bộ
+  — không cần đổi thư viện). Test Puppeteer thật với đúng 3 ví dụ người dùng đưa ra:
+  `hahah`→`hahahahah` chỉ tô "ahah"; `color`→`colour` chỉ tô "u" (còn tối ưu hơn ví dụ người
+  dùng đưa, vì Myers diff tìm ra "colo" và "r" đều chung nên chỉ 1 ký tự khác biệt thật sự);
+  `Hello`→`Hallo` tô đúng "e"/"a". Giới hạn `CHAR_REFINE_MAX_LEN=2000` ký tự cho mỗi token
+  trước khi tinh chỉnh, tránh treo tab với những đoạn văn bản thay thế cực dài (an toàn về
+  hiệu năng, không phải giới hạn tính năng).
+
+  Tiện thể phát hiện & sửa 1 bug thật khác trong lúc test hồi quy (không nằm trong yêu cầu
+  gốc nhưng lộ ra khi kiểm tra navigation): `diffLines` của jsdiff đôi khi chọn một cách gộp
+  dòng hợp lệ nhưng không tối ưu — 2 dòng **giống hệt nhau** bị xếp chung vào 1 cặp
+  removed+added (do LCS có nhiều lời giải tối thiểu ngang nhau) — khiến `buildLineDiff` gắn
+  nhãn "modified" (tô cam) cho một dòng thực ra không đổi gì. Đã thêm kiểm tra so sánh chuỗi
+  trước khi gắn nhãn 'modified': nếu 2 dòng trong cặp giống hệt nhau thì xếp lại thành
+  'unchanged'. Sửa này còn khắc phục luôn 1 hệ quả liên đới: các hunk bị gộp sai (2 khác
+  biệt tách biệt bị tính chung thành 1 hunk) khiến bộ đếm Previous/Next Change sai số.
+
+  Thêm 3 tùy chọn ignore còn thiếu so với yêu cầu: **Ignore empty lines** (lọc dòng
+  trống/chỉ-khoảng-trắng khỏi cả 2 phía trước khi so sánh), **Normalize line endings**
+  (CRLF/CR → LF trước khi so sánh — lưu ý: chỉ có tác dụng thật với file tải lên qua
+  `FileReader`, vì `<textarea>` tự chuẩn hóa CRLF→LF theo đặc tả HTML value-sanitization
+  ngay khi gõ/dán, nên gõ tay không bao giờ tạo ra CRLF thật để so sánh — đã xác minh giới
+  hạn này khi viết test, không phải suy đoán), **Unicode normalization** (`String.normalize
+  ('NFC')` cho cả 2 phía). Cả 3 nằm trong hàm mới `preprocessDiffInput()` (file
+  `text-diff.ts`), áp dụng cho `debouncedOriginal`/`debouncedChanged` trước khi diff, không
+  đụng vào nội dung gốc hiển thị trong textarea.
+
+  Chuyển việc tính diff sang **Web Worker riêng** (`textDiffWorker.ts`, cùng pattern với
+  `regexMatchWorker.ts`/`audioEncodeWorker.ts` đã có) — `buildLineDiff` là thuật toán
+  Myers O(N·D), có thể mất thời gian đáng kể với văn bản dán vào rất lớn, chạy trong worker
+  để không đứng UI. Dùng `requestId` tăng dần để bỏ qua response trễ (không cần cơ chế
+  hard-timeout-kill như Regex Tester vì thuật toán jsdiff có giới hạn, không phải input tùy
+  ý của người dùng như regex pattern).
+
+  **Chưa làm**: virtualization cho hỗ trợ file 100k+ dòng (yêu cầu mục 8 trong spec người
+  dùng) — đây là thay đổi kiến trúc lớn, đụng tới cả cơ chế cuộn-tới-hunk (`jumpToHunk` hiện
+  dùng `document.getElementById` + `scrollIntoView`, không tương thích trực tiếp với
+  windowed rendering, cần đổi sang tính `scrollTop` toán học) và 3 khu vực render riêng biệt
+  (2 cột so sánh chính + phần Merge Tool), rủi ro cao hơn hẳn phần còn lại nếu làm vội trong
+  cùng 1 lượt — để lại hỏi người dùng riêng trước khi làm, thay vì tự ý làm ẩu.
+
+  Build sạch (421 trang) + bộ test Puppeteer hồi quy đầy đủ xác nhận KHÔNG có tính năng cũ
+  nào bị hỏng: upload file, swap, clear, fullscreen, Character/Word/Line mode, thống kê
+  added/removed/modified, copy, download (merge tool), Previous/Next Change navigation.
 - **2026-07-29** — Phase 3.5e (hoàn tất) — **kết thúc toàn bộ Phase 3.5 Audit Remediation**:
   chạy Lighthouse thật (bản 13.4.1, có sẵn qua npx cache của máy) trên `npm run preview`
   build production, chế độ mobile + throttle mạng/CPU mặc định (không phải desktop dễ đạt

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type RefObject, type UIEvent } from 'react';
 import {
-	buildLineDiff,
 	countLineStats,
 	getHunkStartRows,
 	renderMergedColumn,
@@ -8,6 +7,7 @@ import {
 	type DiffLineEntry,
 	type HunkOverride,
 } from '@/lib/text-diff';
+import type { TextDiffRequest, TextDiffResponse } from './textDiffWorker';
 import { Button } from '@/components/ui/button';
 
 interface Messages {
@@ -20,6 +20,10 @@ interface Messages {
 	placeholder: string;
 	ignoreWhitespace: string;
 	ignoreCase: string;
+	ignoreEmptyLines: string;
+	normalizeLineEndings: string;
+	normalizeUnicode: string;
+	computing: string;
 	statsAdded: string;
 	statsRemoved: string;
 	statsModified: string;
@@ -217,6 +221,9 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	const [granularity, setGranularity] = useState<DiffGranularity>('word');
 	const [ignoreWhitespace, setIgnoreWhitespace] = useState(false);
 	const [ignoreCase, setIgnoreCase] = useState(false);
+	const [ignoreEmptyLines, setIgnoreEmptyLines] = useState(false);
+	const [normalizeLineEndings, setNormalizeLineEndings] = useState(false);
+	const [normalizeUnicode, setNormalizeUnicode] = useState(false);
 	const [activeHunk, setActiveHunk] = useState(0);
 	const [copiedSide, setCopiedSide] = useState<'left' | 'right' | null>(null);
 	const [hunkOverrides, setHunkOverrides] = useState<Map<number, HunkOverride>>(new Map());
@@ -224,10 +231,57 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	const debouncedOriginal = useDebouncedValue(originalText, DEBOUNCE_MS);
 	const debouncedChanged = useDebouncedValue(changedText, DEBOUNCE_MS);
 
-	const entries = useMemo(
-		() => buildLineDiff(debouncedOriginal, debouncedChanged, granularity, { ignoreCase, ignoreWhitespace }),
-		[debouncedOriginal, debouncedChanged, granularity, ignoreCase, ignoreWhitespace],
-	);
+	const [entries, setEntries] = useState<DiffLineEntry[]>([]);
+	const [isComputing, setIsComputing] = useState(false);
+	const diffWorkerRef = useRef<Worker | null>(null);
+	const diffRequestIdRef = useRef(0);
+
+	// Diffing runs in a dedicated Web Worker, not on the main thread: jsdiff's Myers-based
+	// algorithms are O(N·D) and a large paste (or a very large uploaded file) can take long
+	// enough to freeze the tab if run synchronously. A single worker is reused across
+	// requests (unlike the hard-timeout pattern used for user-authored regexes elsewhere on
+	// this site) since jsdiff's own algorithm is bounded, not adversarial user input.
+	useEffect(() => {
+		const requestId = ++diffRequestIdRef.current;
+		if (!diffWorkerRef.current) {
+			diffWorkerRef.current = new Worker(new URL('./textDiffWorker.ts', import.meta.url), { type: 'module' });
+		}
+		const worker = diffWorkerRef.current;
+		setIsComputing(true);
+		worker.onmessage = (event: MessageEvent<TextDiffResponse>) => {
+			if (event.data.requestId !== diffRequestIdRef.current) return;
+			setEntries(event.data.entries);
+			setIsComputing(false);
+		};
+		const request: TextDiffRequest = {
+			requestId,
+			original: debouncedOriginal,
+			changed: debouncedChanged,
+			granularity,
+			ignoreCase,
+			ignoreWhitespace,
+			ignoreEmptyLines,
+			normalizeLineEndings,
+			normalizeUnicode,
+		};
+		worker.postMessage(request);
+	}, [
+		debouncedOriginal,
+		debouncedChanged,
+		granularity,
+		ignoreCase,
+		ignoreWhitespace,
+		ignoreEmptyLines,
+		normalizeLineEndings,
+		normalizeUnicode,
+	]);
+
+	useEffect(() => {
+		return () => {
+			diffWorkerRef.current?.terminate();
+		};
+	}, []);
+
 	const stats = useMemo(() => countLineStats(entries), [entries]);
 	const hunkStartRows = useMemo(() => getHunkStartRows(entries), [entries]);
 	const hasChanges = stats.added > 0 || stats.removed > 0 || stats.modified > 0;
@@ -413,8 +467,25 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							<input type="checkbox" checked={ignoreCase} onChange={(event) => setIgnoreCase(event.target.checked)} />
 							{messages.ignoreCase}
 						</label>
+						<label className="flex cursor-pointer items-center gap-1.5">
+							<input type="checkbox" checked={ignoreEmptyLines} onChange={(event) => setIgnoreEmptyLines(event.target.checked)} />
+							{messages.ignoreEmptyLines}
+						</label>
+						<label className="flex cursor-pointer items-center gap-1.5">
+							<input
+								type="checkbox"
+								checked={normalizeLineEndings}
+								onChange={(event) => setNormalizeLineEndings(event.target.checked)}
+							/>
+							{messages.normalizeLineEndings}
+						</label>
+						<label className="flex cursor-pointer items-center gap-1.5">
+							<input type="checkbox" checked={normalizeUnicode} onChange={(event) => setNormalizeUnicode(event.target.checked)} />
+							{messages.normalizeUnicode}
+						</label>
 					</div>
 				</div>
+				{isComputing && <p role="status" className="text-xs text-muted-foreground">{messages.computing}</p>}
 			</div>
 
 			{hasChanges ? (
