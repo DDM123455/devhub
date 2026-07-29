@@ -56,6 +56,15 @@
   thêm 1 nhánh mới, KHÔNG sửa nhánh tool đã xong.
 - **i18n namespace**: mỗi tool có file riêng `src/i18n/locales/{lang}/tool-<id>.json`, gọi
   bằng `getFixedT(lang, 'tool-<id>')`.
+- **Thêm key i18n mới cho 1 tool đã có sẵn (từ 2026-07-29)**: mỗi `*Page.astro` build object
+  `messages` bằng cách liệt kê **thủ công từng key** (`xxx: t('ui.xxx')`), không spread cả
+  namespace `ui`. Thêm key mới vào file JSON locale KHÔNG đủ — phải thêm cả dòng tương ứng
+  vào object `messages` trong `*Page.astro`, nếu không component React nhận `undefined` cho
+  key đó và **render ra chuỗi rỗng, không lỗi build, không lỗi console** (interface
+  `Messages` trong file `.tsx` chỉ khai kiểu, TypeScript không xác nhận `.astro` đã truyền đủ
+  field vì `.astro` không typecheck cross-file field-by-field kiểu đó). Chỉ phát hiện được
+  bằng test tương tác thật (Puppeteer đọc text nút/nhãn), không phải chỉ tin `npm run build`
+  sạch — gặp bug thật kiểu này ở `ImageConvertPage.astro` khi thêm nút "Download All".
 - **`@imgly/background-removal`** cần cài thêm `onnxruntime-web` thủ công (peerDependency,
   npm không tự cài) — nếu thiếu, build lỗi "Rolldown failed to resolve import
   onnxruntime-web/webgpu".
@@ -120,6 +129,24 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-29** — Phase 3.5c: Image Format Converter — thêm "Download All (.zip)" đồng bộ
+  với Image Compressor/PDF Splitter đã có sẵn (dùng `jszip` qua `await import()` động, không
+  static import, theo đúng pattern lazy-load mới hơn của PdfSplitter thay vì static import
+  cũ của Image Compressor). Nút chỉ hiện khi có >1 ảnh đã convert xong (`doneCount > 1`),
+  dùng lại tên file đã đổi đuôi đúng định dạng đích (`replaceExtension`) làm tên file trong
+  zip. **Bug thật phát hiện qua test Puppeteer end-to-end** (không phải chỉ build sạch): nút
+  "Download All" render ra nhưng **không có chữ gì cả** — vì `ImageConvertPage.astro` build
+  object `messages` bằng cách liệt kê từng key gọi `t('ui.xxx')` thủ công (không spread cả
+  namespace `ui`), nên thêm key `downloadAll` vào file JSON i18n thôi là chưa đủ, phải thêm
+  dòng `downloadAll: t('ui.downloadAll')` vào `messages` trong chính `*Page.astro` nữa — nếu
+  chỉ dừng ở "build sạch" (build không báo lỗi vì key thiếu chỉ khiến JSX render chuỗi rỗng,
+  TypeScript không bắt được vì `Messages` interface trong `.tsx` chỉ khai kiểu, không xác
+  nhận `.astro` đã truyền đủ field) sẽ không phát hiện ra — bài học áp dụng cho mọi lần thêm
+  key i18n mới cho tool đã có sẵn: phải sửa cả object `messages` trong `*Page.astro`, không
+  chỉ file JSON, và bắt buộc test tương tác thật (không chỉ tin build sạch) mới bắt được lỗi
+  kiểu này. Test Puppeteer thật: upload 2 ảnh PNG thật, convert, bấm Download All, xác nhận
+  file `.zip` thật xuất hiện trong thư mục tải về với magic bytes `PK` hợp lệ. Build sạch
+  (421 trang). Đã tick mục tương ứng trong `ROADMAP.md` Phase 3.5c.
 - **2026-07-29** — Phase 3.5c: Color Picker — 2 nút "Copy as CSS"/"Copy as JSON" trước đây
   không có phản hồi "Copied!" như mọi nút copy khác trên site (bất nhất UX đã ghi trong
   audit). Thêm 2 state `cssCopied`/`jsonCopied` riêng, hiện `messages.copied` 1200ms sau khi

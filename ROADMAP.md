@@ -141,7 +141,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [ ] Đo lại bằng Lighthouse + axe DevTools sau khi sửa, xác nhận điểm Accessibility ≥ 90
 
 ### 3.5c — Nhất quán trải nghiệm giữa các tool cùng nhóm (High)
-- [ ] Image Format Converter: thêm "Download All .zip"
+- [x] Image Format Converter: thêm "Download All .zip"
 - [x] Color Picker: thêm phản hồi "Copied" cho nút export CSS/JSON
 - [ ] CSV↔JSON Converter: thêm bảng preview trước convert
 

@@ -9,6 +9,7 @@ interface Messages {
 	convert: string;
 	converting: string;
 	download: string;
+	downloadAll: string;
 	original: string;
 	converted: string;
 	noFiles: string;
@@ -224,6 +225,7 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 	const [targetFormat, setTargetFormat] = useState<TargetFormat>('image/webp');
 	const [quality, setQuality] = useState(0.8);
 	const [isProcessing, setIsProcessing] = useState(false);
+	const [isZipping, setIsZipping] = useState(false);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [skippedCount, setSkippedCount] = useState(0);
 
@@ -284,7 +286,30 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 		[targetFormat],
 	);
 
+	const handleDownloadAll = useCallback(async () => {
+		const doneItems = items.filter((item) => item.status === 'done' && item.resultBlob);
+		if (doneItems.length === 0) return;
+		setIsZipping(true);
+		try {
+			const { default: JSZip } = await import('jszip');
+			const zip = new JSZip();
+			for (const item of doneItems) {
+				zip.file(replaceExtension(item.file.name, targetFormat), item.resultBlob!);
+			}
+			const zipBlob = await zip.generateAsync({ type: 'blob' });
+			const url = URL.createObjectURL(zipBlob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = 'converted-images.zip';
+			link.click();
+			URL.revokeObjectURL(url);
+		} finally {
+			setIsZipping(false);
+		}
+	}, [items, targetFormat]);
+
 	const canConvert = !isProcessing && items.length > 0;
+	const doneCount = items.filter((item) => item.status === 'done').length;
 
 	return (
 		<div className="flex flex-col gap-4 rounded-lg border border-border p-4">
@@ -416,6 +441,11 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 				<Button type="button" onClick={handleConvert} disabled={!canConvert}>
 					{isProcessing ? messages.converting : messages.convert}
 				</Button>
+				{doneCount > 1 && (
+					<Button type="button" variant="secondary" onClick={handleDownloadAll} disabled={isZipping}>
+						{messages.downloadAll}
+					</Button>
+				)}
 				{items.length > 0 && (
 					<Button type="button" variant="outline" onClick={handleClearAll} disabled={isProcessing}>
 						{messages.clearAll}
