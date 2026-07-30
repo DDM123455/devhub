@@ -370,7 +370,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 					</p>
 					<p className="text-xs text-muted-foreground">{messages.dragHint}</p>
 
-					<ul className="flex max-h-[48rem] flex-col gap-3 overflow-y-auto pr-1">
+					<ul className="flex flex-wrap gap-3">
 						{pages.map((page, index) => (
 							<li
 								key={page.id}
@@ -381,12 +381,12 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 									event.preventDefault();
 									handleDropPage(page.id);
 								}}
-								className={`flex w-full cursor-grab items-center gap-4 rounded-md border border-border bg-card p-2 ${
+								className={`flex w-28 cursor-grab flex-col gap-1 rounded-md border border-border bg-card p-1.5 ${
 									dragPageId === page.id ? 'opacity-50' : ''
 								}`}
 							>
 								<div
-									className="relative w-[26rem] shrink-0 overflow-hidden rounded bg-muted"
+									className="relative overflow-hidden rounded bg-muted"
 									onClick={splitMode === 'checkbox' ? () => handleTogglePageSelected(page.id) : undefined}
 									role={splitMode === 'checkbox' ? 'button' : undefined}
 									tabIndex={splitMode === 'checkbox' ? 0 : undefined}
@@ -397,7 +397,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 										className="w-full"
 										style={{ transform: `rotate(${page.rotation}deg)` }}
 									/>
-									<span className="absolute bottom-1 right-1 rounded bg-black/60 px-1.5 py-0.5 text-xs font-medium text-white">
+									<span className="absolute bottom-1 right-1 rounded bg-black/60 px-1 text-[10px] font-medium text-white">
 										{index + 1}
 									</span>
 									{splitMode === 'checkbox' && (
@@ -405,12 +405,12 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 											type="checkbox"
 											checked={selectedPageIds.has(page.id)}
 											onChange={() => handleTogglePageSelected(page.id)}
-											className="absolute left-1.5 top-1.5 size-5 cursor-pointer"
+											className="absolute left-1 top-1 size-4 cursor-pointer"
 											aria-label={messages.selectPageAria.replace('{{number}}', String(index + 1))}
 										/>
 									)}
 								</div>
-								<div className="flex flex-1 items-center justify-end gap-1">
+								<div className="flex items-center justify-between gap-1">
 									<Button
 										type="button"
 										size="icon-xs"
@@ -549,7 +549,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 											key={i}
 											src={dataUrl}
 											alt={`${result.label} — ${i + 1}`}
-											className="h-44 w-auto rounded border border-border object-cover"
+											className="h-12 w-auto rounded border border-border object-cover"
 										/>
 									))}
 								</div>

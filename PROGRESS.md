@@ -144,6 +144,15 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — (theo yêu cầu trực tiếp người dùng: "chuyển lại nó về dạng ban đầu cho tôi")
+  **revert toàn bộ 3 commit thử nghiệm layout/kích thước thumbnail PDF ở dưới** (`3cb94f3`,
+  `1c11fa4`, `48682cf`) — người dùng không ưng kết quả sau khi thử phóng to + đổi layout dọc.
+  Khôi phục nguyên trạng `src/lib/pdf-thumbnails.ts`, `PdfSplitter.tsx`, `PdfMerger.tsx` về
+  đúng nội dung tại commit `ba193b2` (trước khi bắt đầu chuỗi thay đổi này) bằng
+  `git checkout ba193b2 -- <3 file>`. Về lại: lưới ngang tự xuống dòng (`flex flex-wrap`,
+  thumbnail 112px `w-28`), scale render pdf.js = 0.25 (mặc định gốc). Build sạch (421 trang).
+  Giữ nguyên 3 commit cũ trong lịch sử git (không xoá/rebase) — chỉ tạo commit mới phục hồi
+  nội dung, đúng quy tắc "luôn tạo commit mới thay vì sửa lịch sử" của dự án.
 - **2026-07-30** — (theo yêu cầu trực tiếp người dùng: "cho phần PDF to lên được không", sau
   khi đã chuyển sang layout dọc ở log ngay bên dưới) phóng to thêm 1 lần nữa: thumbnail chính
   trong danh sách trang (Gộp PDF + Tách PDF) từ `w-72` (288px) → `w-[26rem]` (416px); khung
