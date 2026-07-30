@@ -238,8 +238,8 @@ ROADMAP)
 - [x] Base64 — vs base64decode.org: batch nhiều file
 - [x] Base64 — chọn encoding khác ngoài UTF-8
 - [ ] Regex Tester — vs regex101/RegExr: bộ chọn "flavor" (PCRE/Python/...)
-- [ ] Regex Tester — lưu lịch sử pattern
-- [ ] Regex Tester — URL chia sẻ state
+- [x] Regex Tester — lưu lịch sử pattern
+- [x] Regex Tester — URL chia sẻ state
 - [ ] Color Picker — vs Coolors/Adobe Color: export ASE/SCSS/Tailwind config
 - [ ] Color Picker — trích xuất palette từ ảnh ("Image to Palette" — tính năng chủ lực Coolors)
 - [ ] Color Picker — lưu palette yêu thích (localStorage)

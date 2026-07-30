@@ -144,6 +144,18 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "Regex Tester: lưu lịch sử pattern + URL chia sẻ state"
+  (vs regex101/RegExr): **Lịch sử** — mỗi lần worker trả kết quả match thành công (không
+  lỗi), lưu `{pattern, flags}` vào `localStorage` (key `regex-tester-history`, tối đa 10
+  entry, mới nhất lên đầu, dedup nếu trùng pattern+flags) — hiển thị dạng chip bấm để load
+  lại, kèm nút "Clear history". **URL share** — cùng pattern `?token=` đã dùng ở JWT Decoder:
+  đọc `?pattern=&flags=&test=&replacement=` một lần lúc mount, nút "Copy share link" build
+  URL từ state hiện tại qua `URLSearchParams`. Cả 2 tính năng đọc/ghi `localStorage`/`window`
+  đều bọc try/catch hoặc guard `typeof window !== 'undefined'` để không vỡ SSR build (đúng
+  pattern đã áp dụng ở JWT Decoder). Verify bằng script Node độc lập: `flagsFromString()`
+  parse đúng, logic dedup/move-to-front không tạo trùng lặp. Build sạch (421 trang), xác
+  nhận label mới trong `dist/en/tools/regex-tester/index.html`. Thêm 3 key i18n
+  (`historyHeading`/`historyClear`/`copyShareLink`) cho en+vi + `messages` object.
 - **2026-07-30** — Phase 3.6b — mục "Base64: batch nhiều file + chọn encoding khác UTF-8"
   (vs base64decode.org): **Batch encode** — đổi state file-encode từ 1 object đơn sang mảng
   `encodedFiles`, `handleFileEncode` lặp qua mọi file trong `FileList` (đã hỗ trợ `multiple`

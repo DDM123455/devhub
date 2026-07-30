@@ -46,6 +46,9 @@ interface Messages {
 	cheat10: string;
 	cheat11: string;
 	cheat12: string;
+	historyHeading: string;
+	historyClear: string;
+	copyShareLink: string;
 }
 
 interface FlagState {
@@ -60,9 +63,41 @@ interface FlagState {
 const DEFAULT_FLAGS: FlagState = { g: true, i: false, m: false, s: false, u: false, y: false };
 const DEBOUNCE_MS = 300;
 const WORKER_TIMEOUT_MS = 1500;
+const HISTORY_STORAGE_KEY = 'regex-tester-history';
+const HISTORY_LIMIT = 10;
+
+interface HistoryEntry {
+	pattern: string;
+	flags: string;
+}
 
 function flagsToString(flags: FlagState): string {
 	return (['g', 'i', 'm', 's', 'u', 'y'] as const).filter((f) => flags[f]).join('');
+}
+
+function flagsFromString(value: string): FlagState {
+	return {
+		g: value.includes('g'),
+		i: value.includes('i'),
+		m: value.includes('m'),
+		s: value.includes('s'),
+		u: value.includes('u'),
+		y: value.includes('y'),
+	};
+}
+
+function loadHistory(): HistoryEntry[] {
+	try {
+		const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+		if (!raw) return [];
+		const parsed = JSON.parse(raw);
+		if (!Array.isArray(parsed)) return [];
+		return parsed.filter(
+			(entry): entry is HistoryEntry => typeof entry?.pattern === 'string' && typeof entry?.flags === 'string',
+		);
+	} catch {
+		return [];
+	}
 }
 
 function useDebouncedValue<T>(value: T, delayMs: number): T {
@@ -102,6 +137,19 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 
 	const selectedFlags = flagsToString(flags);
 
+	// `window` doesn't exist during Astro's build-time SSR pass, so this stays
+	// empty on that first pre-render and fills in once hydrated in the browser
+	// (same guard used in JwtDecoder.tsx's share-link feature).
+	const shareLink =
+		typeof window !== 'undefined' && pattern.trim() !== ''
+			? `${window.location.origin}${window.location.pathname}?${new URLSearchParams({
+					pattern,
+					flags: selectedFlags,
+					test: testString,
+					replacement,
+				}).toString()}`
+			: '';
+
 	const debouncedPattern = useDebouncedValue(pattern, DEBOUNCE_MS);
 	const debouncedFlags = useDebouncedValue(selectedFlags, DEBOUNCE_MS);
 	const debouncedTestString = useDebouncedValue(testString, DEBOUNCE_MS);
@@ -112,9 +160,55 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 	const [replaceResult, setReplaceResult] = useState<string | null>(null);
 	const [isRunning, setIsRunning] = useState(false);
 
+	const [history, setHistory] = useState<HistoryEntry[]>(() => loadHistory());
+
 	const workerRef = useRef<Worker | null>(null);
 	const requestIdRef = useRef(0);
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	// Mirrors regex101/RegExr's URL-state sharing: read a link's pattern/flags/
+	// test string once on mount. One-way import, not a synced URL — typing
+	// doesn't rewrite the address bar (same reasoning as JWT Decoder's `?token=`).
+	useEffect(() => {
+		const params = new URLSearchParams(window.location.search);
+		const urlPattern = params.get('pattern');
+		if (urlPattern === null) return;
+		setPattern(urlPattern);
+		setFlags(flagsFromString(params.get('flags') ?? ''));
+		setTestString(params.get('test') ?? '');
+		setReplacement(params.get('replacement') ?? '');
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	const saveToHistory = (patternValue: string, flagsValue: string) => {
+		if (patternValue.trim() === '') return;
+		setHistory((prev) => {
+			const next = [
+				{ pattern: patternValue, flags: flagsValue },
+				...prev.filter((entry) => !(entry.pattern === patternValue && entry.flags === flagsValue)),
+			].slice(0, HISTORY_LIMIT);
+			try {
+				localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(next));
+			} catch {
+				// Ignore quota/private-mode errors — history is a convenience, not core functionality.
+			}
+			return next;
+		});
+	};
+
+	const handleLoadHistoryEntry = (entry: HistoryEntry) => {
+		setPattern(entry.pattern);
+		setFlags(flagsFromString(entry.flags));
+	};
+
+	const handleClearHistory = () => {
+		setHistory([]);
+		try {
+			localStorage.removeItem(HISTORY_STORAGE_KEY);
+		} catch {
+			// Ignore — same reasoning as above.
+		}
+	};
 
 	const stopWorker = () => {
 		workerRef.current?.terminate();
@@ -159,6 +253,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 				setError(null);
 				setMatches(event.data.matches);
 				setReplaceResult(event.data.replaceResult);
+				saveToHistory(debouncedPattern, debouncedFlags);
 			}
 		};
 		worker.onerror = () => {
@@ -287,7 +382,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 				{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
 				{isRunning && <p role="status" className="text-xs text-muted-foreground">{messages.computingLabel}</p>}
 
-				<div>
+				<div className="flex flex-wrap items-center gap-2">
 					<Button
 						type="button"
 						size="sm"
@@ -300,7 +395,34 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 					>
 						{messages.clear}
 					</Button>
+					{pattern.trim() !== '' && (
+						<CopyButton value={shareLink} label={messages.copyShareLink} copiedLabel={messages.copied} />
+					)}
 				</div>
+
+				{history.length > 0 && (
+					<div className="flex flex-col gap-1.5">
+						<div className="flex items-center justify-between">
+							<span className="text-xs font-medium text-muted-foreground">{messages.historyHeading}</span>
+							<Button type="button" size="sm" variant="ghost" onClick={handleClearHistory}>
+								{messages.historyClear}
+							</Button>
+						</div>
+						<div className="flex flex-wrap gap-1.5">
+							{history.map((entry, i) => (
+								<button
+									key={`${entry.pattern}-${entry.flags}-${i}`}
+									type="button"
+									onClick={() => handleLoadHistoryEntry(entry)}
+									className="rounded-md border border-border px-2 py-1 font-mono text-xs text-foreground hover:bg-muted"
+									title={`/${entry.pattern}/${entry.flags}`}
+								>
+									/{entry.pattern.length > 24 ? `${entry.pattern.slice(0, 24)}…` : entry.pattern}/{entry.flags}
+								</button>
+							))}
+						</div>
+					</div>
+				)}
 			</div>
 
 			{segments && debouncedTestString !== '' && (

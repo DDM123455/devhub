@@ -48,7 +48,10 @@
     "cheat9": "? — zero or one of the previous token",
     "cheat10": "{n,m} — between n and m repetitions",
     "cheat11": "(...) — capturing group, (?:...) — non-capturing group",
-    "cheat12": "\\b — word boundary, | — alternation (OR)"
+    "cheat12": "\\b — word boundary, | — alternation (OR)",
+    "historyHeading": "Recent patterns",
+    "historyClear": "Clear history",
+    "copyShareLink": "Copy share link"
   },
   "related": "Related tools",
   "faq": {

@@ -48,7 +48,10 @@
     "cheat9": "? — lặp lại 0 hoặc 1 lần của ký tự/nhóm trước đó",
     "cheat10": "{n,m} — lặp lại từ n đến m lần",
     "cheat11": "(...) — capturing group, (?:...) — non-capturing group",
-    "cheat12": "\\b — ranh giới từ (word boundary), | — phép OR (một trong hai)"
+    "cheat12": "\\b — ranh giới từ (word boundary), | — phép OR (một trong hai)",
+    "historyHeading": "Pattern gần đây",
+    "historyClear": "Xóa lịch sử",
+    "copyShareLink": "Sao chép link chia sẻ"
   },
   "related": "Công cụ liên quan",
   "faq": {
