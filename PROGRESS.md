@@ -144,6 +144,11 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "Image Compressor: nút Retry riêng" (vs TinyPNG/Squoosh):
+  thêm nút "Retry" cạnh nút Download khi `item.status === 'error'`, gọi thẳng
+  `compressOne(item)` (hàm đã tách sẵn từ khi làm song song hoá batch ở M1) — không cần
+  logic mới, chỉ expose lại hàm đã có cho 1 item lỗi thay vì bắt người dùng xóa + upload lại
+  từ đầu. Build sạch (421 trang).
 - **2026-07-30** — Phase 3.6b — mục "Markdown Editor: keyboard shortcut Ctrl+B/Ctrl+I" (vs
   StackEdit/Dillinger): thêm `handleEditorKeyDown` trên textarea, bắt Ctrl+B/Ctrl+I (và
   Cmd trên Mac qua `metaKey`) gọi thẳng cùng `applyEdit(wrapInline(...))` mà nút toolbar

@@ -21,6 +21,7 @@ interface Messages {
 	skippedFiles: string;
 	resizeToggleLabel: string;
 	maxDimensionLabel: string;
+	retry: string;
 }
 
 interface ImageItem {
@@ -316,6 +317,11 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 								{item.status === 'done' && item.compressedBlob && (
 									<Button type="button" size="sm" onClick={() => handleDownload(item)}>
 										{messages.download}
+									</Button>
+								)}
+								{item.status === 'error' && (
+									<Button type="button" size="sm" variant="outline" onClick={() => void compressOne(item)}>
+										{messages.retry}
 									</Button>
 								)}
 								<Button

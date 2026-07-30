@@ -22,7 +22,8 @@
     "clearAll": "Clear all",
     "skippedFiles": "{{count}} file(s) were skipped because they're not a supported image format.",
     "resizeToggleLabel": "Resize before compressing",
-    "maxDimensionLabel": "Max width/height: {{size}}px"
+    "maxDimensionLabel": "Max width/height: {{size}}px",
+    "retry": "Retry"
   },
   "related": "Related tools",
   "faq": {
