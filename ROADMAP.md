@@ -200,9 +200,9 @@ ROADMAP)
 - [ ] Nén ảnh — vs TinyPNG/Squoosh: chọn định dạng đích ngay lúc nén (WebP/AVIF/MozJPEG output)
 - [ ] Nén ảnh — vs TinyPNG/Squoosh: chế độ "target size" (nén tới X KB thay vì chỉ theo %)
 - [x] Nén ảnh — nút Retry riêng cho ảnh bị lỗi (hiện phải xóa + upload lại)
-- [ ] Chuyển đổi định dạng ảnh — xử lý song song thay vì tuần tự (M1 trước đó CHỈ sửa Image
+- [x] Chuyển đổi định dạng ảnh — xử lý song song thay vì tuần tự (M1 trước đó CHỈ sửa Image
       Compressor, Image Converter vẫn còn vòng lặp tuần tự)
-- [ ] Chuyển đổi định dạng ảnh — ICO xuất đa kích thước (multi-size icon), không chỉ 256px
+- [x] Chuyển đổi định dạng ảnh — ICO xuất đa kích thước (multi-size icon), không chỉ 256px
 - [ ] Xóa nền ảnh — vs remove.bg: thanh tiến trình TỔNG khi xử lý hàng loạt (hiện chỉ có %
       của ảnh hiện tại)
 - [ ] Xóa nền ảnh — Download All .zip khi xử lý nhiều ảnh (nhất quán với Compressor/Splitter)

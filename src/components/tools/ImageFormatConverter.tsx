@@ -44,10 +44,20 @@ const EXTENSION_BY_FORMAT: Record<TargetFormat, string> = {
 
 const LOSSY_FORMATS = new Set<TargetFormat>(['image/jpeg', 'image/webp', 'image/avif']);
 const WHITE_BACKGROUND_FORMATS = new Set<TargetFormat>(['image/jpeg', 'image/bmp']);
-const ICO_MAX_DIMENSION = 256;
 const MIN_MAX_DIMENSION = 320;
 const MAX_MAX_DIMENSION = 4096;
 const DEFAULT_MAX_DIMENSION = 1920;
+// Real-world .ico files (favicons, Windows app icons) bundle several
+// resolutions in one container so the OS picks whichever fits — a single
+// fixed 256px output (the old behavior here) is a common icon-tool shortcut,
+// but not what a favicon generator or icon editor like RealFaviconGenerator
+// or IcoFX would produce.
+const ICO_SIZES = [16, 32, 48, 128, 256];
+// Each compression spins up async decode/encode work — running several at
+// once lets the browser overlap that work instead of waiting for one image
+// to fully finish before starting the next, same reasoning as the worker-pool
+// added to Image Compressor's batch processing.
+const CONCURRENCY = 3;
 
 interface ImageItem {
 	id: string;
@@ -142,27 +152,51 @@ function encodeBmp(imageData: ImageData): Blob {
 }
 
 // ICO has no native canvas.toBlob support either, but since Windows Vista an
-// ICO container can simply embed a full PNG image after a tiny 22-byte
-// header, so no pixel-level re-encoding is needed here.
-async function encodeIco(canvas: HTMLCanvasElement): Promise<Blob> {
-	const pngBlob = await canvasToBlob(canvas, 'image/png');
-	const pngBytes = new Uint8Array(await pngBlob.arrayBuffer());
+// ICO container can simply embed full PNG images after a directory listing
+// each one's size/offset — no pixel-level re-encoding needed. Bundling all of
+// `ICO_SIZES` in one file (rather than one fixed size) matches how a real
+// favicon/icon generator produces a .ico, so the OS or browser can pick
+// whichever resolution actually fits (taskbar vs. tab favicon vs. shortcut).
+async function encodeIcoMultiSize(bitmap: ImageBitmap): Promise<Blob> {
+	const images: { size: number; bytes: Uint8Array }[] = [];
+	for (const size of ICO_SIZES) {
+		const canvas = document.createElement('canvas');
+		canvas.width = size;
+		canvas.height = size;
+		const ctx = canvas.getContext('2d');
+		if (!ctx) throw new Error('Canvas 2D context unavailable');
+		ctx.drawImage(bitmap, 0, 0, size, size);
+		const pngBlob = await canvasToBlob(canvas, 'image/png');
+		images.push({ size, bytes: new Uint8Array(await pngBlob.arrayBuffer()) });
+	}
 
-	const header = new ArrayBuffer(22);
-	const view = new DataView(header);
-	view.setUint16(0, 0, true);
-	view.setUint16(2, 1, true);
-	view.setUint16(4, 1, true);
-	view.setUint8(6, canvas.width >= 256 ? 0 : canvas.width);
-	view.setUint8(7, canvas.height >= 256 ? 0 : canvas.height);
-	view.setUint8(8, 0);
-	view.setUint8(9, 0);
-	view.setUint16(10, 1, true);
-	view.setUint16(12, 32, true);
-	view.setUint32(14, pngBytes.byteLength, true);
-	view.setUint32(18, 22, true);
+	const HEADER_SIZE = 6;
+	const DIR_ENTRY_SIZE = 16;
+	const header = new ArrayBuffer(HEADER_SIZE);
+	const headerView = new DataView(header);
+	headerView.setUint16(0, 0, true);
+	headerView.setUint16(2, 1, true);
+	headerView.setUint16(4, images.length, true);
 
-	return new Blob([header, pngBytes], { type: 'image/x-icon' });
+	const dir = new ArrayBuffer(DIR_ENTRY_SIZE * images.length);
+	const dirView = new DataView(dir);
+	let offset = HEADER_SIZE + dir.byteLength;
+	images.forEach((img, i) => {
+		const entry = i * DIR_ENTRY_SIZE;
+		// A directory byte of 0 means "256" — ICO has no way to encode 256 in a
+		// single byte otherwise, so this is the format's own convention, not a bug.
+		dirView.setUint8(entry, img.size >= 256 ? 0 : img.size);
+		dirView.setUint8(entry + 1, img.size >= 256 ? 0 : img.size);
+		dirView.setUint8(entry + 2, 0);
+		dirView.setUint8(entry + 3, 0);
+		dirView.setUint16(entry + 4, 1, true);
+		dirView.setUint16(entry + 6, 32, true);
+		dirView.setUint32(entry + 8, img.bytes.byteLength, true);
+		dirView.setUint32(entry + 12, offset, true);
+		offset += img.bytes.byteLength;
+	});
+
+	return new Blob([header, dir, ...images.map((img) => img.bytes)], { type: 'image/x-icon' });
 }
 
 // No browser encodes GIF via canvas.toBlob, so a small pure-JS encoder
@@ -187,16 +221,18 @@ async function convertImage(
 	const decodableBlob = await toDecodableBlob(file);
 	const bitmap = await createImageBitmap(decodableBlob);
 
+	// ICO always bundles the fixed `ICO_SIZES` set regardless of the user's
+	// resize choice — resizing to one target size doesn't apply to a format
+	// whose whole point is shipping several fixed resolutions in one file.
+	if (targetFormat === 'image/x-icon') {
+		const blob = await encodeIcoMultiSize(bitmap);
+		bitmap.close();
+		return blob;
+	}
+
 	let { width, height } = bitmap;
 	if (maxDimension && (width > maxDimension || height > maxDimension)) {
 		const scale = maxDimension / Math.max(width, height);
-		width = Math.round(width * scale);
-		height = Math.round(height * scale);
-	}
-	// ICO caps at 256px regardless of the user's resize choice — applied after,
-	// so it only ever shrinks further, never overrides a smaller user setting.
-	if (targetFormat === 'image/x-icon' && (width > ICO_MAX_DIMENSION || height > ICO_MAX_DIMENSION)) {
-		const scale = ICO_MAX_DIMENSION / Math.max(width, height);
 		width = Math.round(width * scale);
 		height = Math.round(height * scale);
 	}
@@ -227,7 +263,9 @@ async function convertImage(
 		case 'image/bmp':
 			return encodeBmp(ctx.getImageData(0, 0, canvas.width, canvas.height));
 		case 'image/x-icon':
-			return encodeIco(canvas);
+			// Unreachable — handled by the early `encodeIcoMultiSize` branch above,
+			// kept only so this switch stays exhaustive over `TargetFormat`.
+			throw new Error('unreachable');
 		case 'image/gif':
 			return encodeGif(ctx.getImageData(0, 0, canvas.width, canvas.height));
 	}
@@ -270,9 +308,8 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 		setSkippedCount(0);
 	}, []);
 
-	const handleConvert = useCallback(async () => {
-		setIsProcessing(true);
-		for (const item of items) {
+	const convertOne = useCallback(
+		async (item: ImageItem) => {
 			setItems((prev) =>
 				prev.map((it) => (it.id === item.id ? { ...it, status: 'processing' } : it)),
 			);
@@ -293,17 +330,25 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 					prev.map((it) => (it.id === item.id ? { ...it, status: 'error', errorMessage } : it)),
 				);
 			}
-		}
+		},
+		[targetFormat, quality, resizeEnabled, maxDimension, messages.errorAvifUnsupported, messages.errorGeneric],
+	);
+
+	const handleConvert = useCallback(async () => {
+		setIsProcessing(true);
+		// Worker-pool pattern (same as Image Compressor's batch processing): a
+		// fixed number of lanes each pull the next pending item off the shared
+		// queue as soon as they finish their current one.
+		let cursor = 0;
+		const runLane = async (): Promise<void> => {
+			const index = cursor++;
+			if (index >= items.length) return;
+			await convertOne(items[index]);
+			return runLane();
+		};
+		await Promise.all(Array.from({ length: Math.min(CONCURRENCY, items.length) }, runLane));
 		setIsProcessing(false);
-	}, [
-		items,
-		targetFormat,
-		quality,
-		resizeEnabled,
-		maxDimension,
-		messages.errorAvifUnsupported,
-		messages.errorGeneric,
-	]);
+	}, [items, convertOne]);
 
 	const handleDownload = useCallback(
 		(item: ImageItem) => {

@@ -144,6 +144,21 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b (bắt đầu nhóm 🟠 Trung bình) — mục "Image Converter: xử lý
+  song song + ICO đa kích thước" (vs Convertio/CloudConvert/iLoveIMG): **Song song hoá** —
+  tách `convertOne()`, `handleConvert()` đổi sang cùng mô hình worker-pool `CONCURRENCY = 3`
+  đã dùng ở Image Compressor (M1) — tool này trước đó CHƯA được sửa vì M1 chỉ giới hạn phạm
+  vi ở Image Compressor. **ICO đa kích thước** — `encodeIcoMultiSize()` thay `encodeIco()` cũ
+  (chỉ xuất 1 size 256px): vẽ bitmap gốc ra 5 canvas kích thước chuẩn
+  (16/32/48/128/256px), mỗi canvas encode PNG riêng, rồi tự dựng ICO container (header 6
+  byte + bảng thư mục 16 byte/entry + nối các PNG) theo đúng spec — giống favicon/icon
+  Windows thật thay vì chỉ 1 độ phân giải. `convertImage()` giờ branch sớm cho ICO (bỏ qua
+  hẳn tùy chọn resize của người dùng vì không áp dụng — ICO tự định nghĩa bộ size riêng).
+  Verify cấu trúc binary ICO bằng script Node độc lập: dựng file giả với offset/kích thước
+  đã biết, tự parse lại header + 5 directory entry, xác nhận mọi offset/bytesInRes khớp
+  đúng 100% (kể cả quy ước byte 0 = 256 của định dạng ICO). Build sạch (421 trang). Sửa
+  `formatsNote` + `article.p4` (en+vi) không còn nhắc "256×256 duy nhất" mà mô tả đúng 5
+  size mới.
 - **2026-07-30** — Phase 3.6b — mục "Color Picker: lưu palette yêu thích" (vs Coolors/Adobe
   Color) — **hoàn tất nhóm 🟢 Thấp (9/9 mục quick-win)**: thêm nút "Save palette" cạnh
   "Generate", lưu 5 màu hiện tại (dạng hex) vào `localStorage`
