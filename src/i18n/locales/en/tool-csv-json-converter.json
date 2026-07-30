@@ -36,7 +36,10 @@
     "download": "Download",
     "csvParseError": "Row {{row}}: {{message}}",
     "jsonParseError": "Invalid JSON: {{message}}",
-    "jsonRootError": "This JSON has no object or array to convert into rows — a bare value like null or a number has nothing to tabulate."
+    "jsonRootError": "This JSON has no object or array to convert into rows — a bare value like null or a number has nothing to tabulate.",
+    "batchConvertedCount": "Converted {{count}} file(s) — the first one is loaded above for preview/editing.",
+    "batchDownloadAll": "Download All (.zip)",
+    "batchFileError": "{{file}}: {{message}}"
   },
   "related": "Related tools",
   "faq": {

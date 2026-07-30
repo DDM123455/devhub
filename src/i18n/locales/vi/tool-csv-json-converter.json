@@ -36,7 +36,10 @@
     "download": "Tải xuống",
     "csvParseError": "Dòng {{row}}: {{message}}",
     "jsonParseError": "JSON không hợp lệ: {{message}}",
-    "jsonRootError": "JSON này không có object hay mảng nào để chuyển thành các dòng — một giá trị đơn lẻ như null hay một con số thì không có gì để lập bảng."
+    "jsonRootError": "JSON này không có object hay mảng nào để chuyển thành các dòng — một giá trị đơn lẻ như null hay một con số thì không có gì để lập bảng.",
+    "batchConvertedCount": "Đã chuyển đổi {{count}} tệp — tệp đầu tiên đã hiện ở trên để xem/chỉnh sửa.",
+    "batchDownloadAll": "Tải tất cả (.zip)",
+    "batchFileError": "{{file}}: {{message}}"
   },
   "related": "Công cụ liên quan",
   "faq": {

@@ -144,6 +144,17 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "CSV↔JSON Converter: batch nhiều file" (vs CloudConvert/
+  Convertio): tách logic convert ra hàm thuần `convertOne()` (dùng chung cho cả live preview
+  qua `useMemo` lẫn xử lý batch, tránh trùng lặp code). `handleFiles` (đổi tên từ `handleFile`
+  số ít) giờ nhận `multiple`: nếu chỉ 1 file → giữ nguyên hành vi cũ (load vào editor để xem/
+  sửa); nếu >1 file → convert độc lập từng file với cùng cấu hình delimiter/header/nested/
+  pretty, load file ĐẦU TIÊN vào editor chính để vẫn xem/chỉnh được (tool này về bản chất là
+  1 editor văn bản, không phải danh sách file như Image Compressor, nên batch mode chỉ cộng
+  thêm chứ không thay thế UX chính), các file còn lại gộp vào 1 nút "Download All (.zip)"
+  (JSZip, dynamic import theo đúng convention). File nào lỗi parse thì báo riêng, không chặn
+  tải các file hợp lệ khác. Build sạch (421 trang), xác nhận label mới trong
+  `dist/en/tools/csv-json-converter/index.html`.
 - **2026-07-30** — Phase 3.6b (bắt đầu nhóm 🔴 Cao — cần quyết định kiến trúc/dependency cho
   đa số mục còn lại) — mục "Image Compressor: chế độ target size" (vs TinyPNG/Squoosh): thêm
   radio chọn "By quality" (giữ nguyên slider % cũ) vs "By target size" (slider KB, 10-10000,

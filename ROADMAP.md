@@ -229,7 +229,7 @@ ROADMAP)
       (of/the/and...)
 - [x] Chuyển đổi Case văn bản — hiển thị đếm từ/ký tự cạnh output
 - [x] Chuyển đổi Case văn bản — upload/download file
-- [ ] CSV↔JSON Converter — vs CloudConvert/Convertio: batch nhiều file
+- [x] CSV↔JSON Converter — vs CloudConvert/Convertio: batch nhiều file
 - [x] CSV↔JSON Converter — hỗ trợ TSV như 1 option riêng
 
 **Nhóm Dev/Design Tools**

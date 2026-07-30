@@ -34,6 +34,9 @@ interface Messages {
 	csvParseError: string;
 	jsonParseError: string;
 	jsonRootError: string;
+	batchConvertedCount: string;
+	batchDownloadAll: string;
+	batchFileError: string;
 }
 
 type Mode = 'csv-to-json' | 'json-to-csv';
@@ -193,6 +196,64 @@ function csvToJson(
 	};
 }
 
+// Pulled out of the live-preview useMemo so batch file conversion (each file
+// independently, same settings) can reuse the exact same logic instead of
+// duplicating the csv-to-json / json-to-csv branching.
+function convertOne(
+	text: string,
+	mode: Mode,
+	delimiter: string,
+	header: boolean,
+	nested: boolean,
+	prettyPrint: boolean,
+	messages: Messages,
+): { output: string; error: string | null; previewHeaders: string[]; previewRows: string[][] } {
+	if (text.trim() === '') return { output: '', error: null, ...EMPTY_PREVIEW };
+
+	if (mode === 'csv-to-json') {
+		const result = csvToJson(text, delimiter, header, nested, prettyPrint);
+		if (result.errorMessage !== null) {
+			return {
+				output: '',
+				error: messages.csvParseError
+					.replace('{{row}}', String(result.errorRow))
+					.replace('{{message}}', result.errorMessage),
+				...EMPTY_PREVIEW,
+			};
+		}
+		return {
+			output: result.output,
+			error: null,
+			previewHeaders: result.previewHeaders,
+			previewRows: result.previewRows,
+		};
+	}
+
+	try {
+		const parsed = JSON.parse(text);
+		const result = jsonToCsv(parsed, delimiter, header);
+		if (result.rootError) return { output: '', error: messages.jsonRootError, ...EMPTY_PREVIEW };
+		return {
+			output: result.output,
+			error: null,
+			previewHeaders: result.previewHeaders,
+			previewRows: result.previewRows,
+		};
+	} catch (e) {
+		return {
+			output: '',
+			error: messages.jsonParseError.replace('{{message}}', e instanceof Error ? e.message : ''),
+			...EMPTY_PREVIEW,
+		};
+	}
+}
+
+interface BatchResultItem {
+	fileName: string;
+	content: string;
+	error: string | null;
+}
+
 function CopyButton({ value, label, copiedLabel }: { value: string; label: string; copiedLabel: string }) {
 	const [copied, setCopied] = useState(false);
 	return (
@@ -226,46 +287,13 @@ export default function CsvJsonConverter({ messages }: { messages: Messages }) {
 
 	const delimiter = delimiterOption === 'custom' ? customDelimiter || ',' : DELIMITER_VALUES[delimiterOption];
 
-	const { output, error, previewHeaders, previewRows } = useMemo(() => {
-		if (input.trim() === '') return { output: '', error: null as string | null, ...EMPTY_PREVIEW };
+	const { output, error, previewHeaders, previewRows } = useMemo(
+		() => convertOne(input, mode, delimiter, header, nested, prettyPrint, messages),
+		[input, mode, delimiter, header, nested, prettyPrint, messages],
+	);
 
-		if (mode === 'csv-to-json') {
-			const result = csvToJson(input, delimiter, header, nested, prettyPrint);
-			if (result.errorMessage !== null) {
-				return {
-					output: '',
-					error: messages.csvParseError
-						.replace('{{row}}', String(result.errorRow))
-						.replace('{{message}}', result.errorMessage),
-					...EMPTY_PREVIEW,
-				};
-			}
-			return {
-				output: result.output,
-				error: null as string | null,
-				previewHeaders: result.previewHeaders,
-				previewRows: result.previewRows,
-			};
-		}
-
-		try {
-			const parsed = JSON.parse(input);
-			const result = jsonToCsv(parsed, delimiter, header);
-			if (result.rootError) return { output: '', error: messages.jsonRootError, ...EMPTY_PREVIEW };
-			return {
-				output: result.output,
-				error: null as string | null,
-				previewHeaders: result.previewHeaders,
-				previewRows: result.previewRows,
-			};
-		} catch (e) {
-			return {
-				output: '',
-				error: messages.jsonParseError.replace('{{message}}', e instanceof Error ? e.message : ''),
-				...EMPTY_PREVIEW,
-			};
-		}
-	}, [input, mode, delimiter, header, nested, prettyPrint, messages]);
+	const [batchResults, setBatchResults] = useState<BatchResultItem[] | null>(null);
+	const [isBatchZipping, setIsBatchZipping] = useState(false);
 
 	const handleSwap = () => {
 		setMode((m) => (m === 'csv-to-json' ? 'json-to-csv' : 'csv-to-json'));
@@ -276,16 +304,70 @@ export default function CsvJsonConverter({ messages }: { messages: Messages }) {
 		setInput(mode === 'csv-to-json' ? SAMPLE_CSV : SAMPLE_JSON);
 	};
 
-	const handleFile = (files: FileList | null) => {
-		const file = files?.[0];
-		if (!file) return;
+	const readFileAsText = (file: File): Promise<string> =>
+		new Promise((resolve) => {
+			const reader = new FileReader();
+			reader.onload = () => resolve(String(reader.result ?? ''));
+			reader.readAsText(file);
+		});
+
+	const handleFiles = (fileList: FileList | null) => {
+		if (!fileList || fileList.length === 0) return;
+		const files = Array.from(fileList);
 		// A .tsv upload almost always means tab-delimited — switching the
 		// delimiter automatically saves a manual step most CSV↔JSON converters
 		// (CloudConvert, Convertio) require the user to do themselves.
-		if (file.name.toLowerCase().endsWith('.tsv')) setDelimiterOption('tab');
-		const reader = new FileReader();
-		reader.onload = () => setInput(String(reader.result ?? ''));
-		reader.readAsText(file);
+		if (files.every((file) => file.name.toLowerCase().endsWith('.tsv'))) setDelimiterOption('tab');
+
+		if (files.length === 1) {
+			setBatchResults(null);
+			void readFileAsText(files[0]).then(setInput);
+			return;
+		}
+
+		// Batch: convert every file independently with the current settings,
+		// load the first one into the main editor so there's still something to
+		// preview/tweak, and prepare the rest for a single "Download All" zip —
+		// this tool's core UX is a single editable document, so batch mode
+		// layers on top of that rather than replacing it with a file list.
+		setBatchResults(null);
+		void Promise.all(files.map(async (file) => ({ name: file.name, text: await readFileAsText(file) }))).then(
+			(entries) => {
+				setInput(entries[0].text);
+				const outExt = mode === 'csv-to-json' ? 'json' : delimiterOption === 'tab' ? 'tsv' : 'csv';
+				setBatchResults(
+					entries.map(({ name, text }) => {
+						const result = convertOne(text, mode, delimiter, header, nested, prettyPrint, messages);
+						return {
+							fileName: `${name.replace(/\.[^./\\]+$/, '')}.${outExt}`,
+							content: result.output,
+							error: result.error,
+						};
+					}),
+				);
+			},
+		);
+	};
+
+	const handleDownloadBatch = async () => {
+		if (!batchResults || batchResults.length === 0) return;
+		setIsBatchZipping(true);
+		try {
+			const { default: JSZip } = await import('jszip');
+			const zip = new JSZip();
+			for (const item of batchResults) {
+				if (item.error === null) zip.file(item.fileName, item.content);
+			}
+			const zipBlob = await zip.generateAsync({ type: 'blob' });
+			const url = URL.createObjectURL(zipBlob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = 'converted-files.zip';
+			link.click();
+			URL.revokeObjectURL(url);
+		} finally {
+			setIsBatchZipping(false);
+		}
 	};
 
 	const handleDownload = () => {
@@ -391,7 +473,7 @@ export default function CsvJsonConverter({ messages }: { messages: Messages }) {
 				onDrop={(e) => {
 					e.preventDefault();
 					setIsDragOver(false);
-					handleFile(e.dataTransfer.files);
+					handleFiles(e.dataTransfer.files);
 				}}
 			>
 				<p className="text-xs text-muted-foreground">{messages.dropLabel}</p>
@@ -406,10 +488,35 @@ export default function CsvJsonConverter({ messages }: { messages: Messages }) {
 					ref={fileInputRef}
 					type="file"
 					accept=".csv,.tsv,.json,.txt"
+					multiple
 					className="hidden"
-					onChange={(e) => handleFile(e.target.files)}
+					onChange={(e) => handleFiles(e.target.files)}
 				/>
 			</div>
+
+			{batchResults && batchResults.length > 0 && (
+				<div className="flex flex-col gap-2 rounded-md border border-border p-3">
+					<p className="text-sm text-foreground">
+						{messages.batchConvertedCount.replace('{{count}}', String(batchResults.length))}
+					</p>
+					{batchResults.some((item) => item.error !== null) && (
+						<ul className="flex flex-col gap-0.5 text-xs text-destructive">
+							{batchResults
+								.filter((item) => item.error !== null)
+								.map((item) => (
+									<li key={item.fileName} role="alert">
+										{messages.batchFileError.replace('{{file}}', item.fileName).replace('{{message}}', item.error ?? '')}
+									</li>
+								))}
+						</ul>
+					)}
+					<div>
+						<Button type="button" size="sm" variant="secondary" onClick={() => void handleDownloadBatch()} disabled={isBatchZipping}>
+							{messages.batchDownloadAll}
+						</Button>
+					</div>
+				</div>
+			)}
 
 			<div className="flex flex-col gap-1">
 				<label htmlFor="csv-json-input" className="text-sm font-medium text-foreground">
