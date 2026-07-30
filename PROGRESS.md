@@ -144,6 +144,18 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "Xóa nền ảnh: thanh tiến trình tổng + Download All .zip"
+  (vs remove.bg): **Tiến trình tổng** — `overallPercent` gộp "số ảnh đã xong" +
+  "% của ảnh đang xử lý / 100", chia cho tổng số ảnh, hiển thị "Processing image X of Y —
+  Z% overall" khi batch >1 ảnh — trước đó chỉ thấy % của riêng ảnh hiện tại, không biết còn
+  bao lâu cho cả batch. **Download All** — tái dùng đúng pattern JSZip đã có ở Image
+  Compressor/Converter, ưu tiên `item.displayUrl` (bản đã áp dụng nền + edge softness người
+  dùng chọn) qua `fetch(blobUrl).then(r => r.blob())` thay vì `resultBlob` gốc, nhất quán với
+  hành vi nút Download từng ảnh đã có. KHÔNG song song hoá việc xử lý AI (khác Image
+  Compressor/Converter) — mô hình AI nặng, chạy đồng thời nhiều ảnh dễ tranh chấp bộ nhớ/GPU,
+  audit cũng không yêu cầu mục này cho tool riêng biệt. Verify công thức overallPercent bằng
+  script Node độc lập (3 case: đang giữa batch, chưa bắt đầu, vừa xong ảnh cuối). Build sạch
+  (421 trang), xác nhận label mới trong `dist/en/tools/remove-background/index.html`.
 - **2026-07-30** — Phase 3.6b (bắt đầu nhóm 🟠 Trung bình) — mục "Image Converter: xử lý
   song song + ICO đa kích thước" (vs Convertio/CloudConvert/iLoveIMG): **Song song hoá** —
   tách `convertOne()`, `handleConvert()` đổi sang cùng mô hình worker-pool `CONCURRENCY = 3`

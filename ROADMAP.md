@@ -203,9 +203,9 @@ ROADMAP)
 - [x] Chuyển đổi định dạng ảnh — xử lý song song thay vì tuần tự (M1 trước đó CHỈ sửa Image
       Compressor, Image Converter vẫn còn vòng lặp tuần tự)
 - [x] Chuyển đổi định dạng ảnh — ICO xuất đa kích thước (multi-size icon), không chỉ 256px
-- [ ] Xóa nền ảnh — vs remove.bg: thanh tiến trình TỔNG khi xử lý hàng loạt (hiện chỉ có %
+- [x] Xóa nền ảnh — vs remove.bg: thanh tiến trình TỔNG khi xử lý hàng loạt (hiện chỉ có %
       của ảnh hiện tại)
-- [ ] Xóa nền ảnh — Download All .zip khi xử lý nhiều ảnh (nhất quán với Compressor/Splitter)
+- [x] Xóa nền ảnh — Download All .zip khi xử lý nhiều ảnh (nhất quán với Compressor/Splitter)
 - [ ] Xóa nền ảnh — crop/resize ảnh sau khi xóa nền
 
 **Nhóm PDF**

@@ -23,6 +23,8 @@ interface Messages {
 	removeItem: string;
 	clearAll: string;
 	skippedFiles: string;
+	overallProgress: string;
+	downloadAll: string;
 }
 
 type BackgroundMode = 'transparent' | 'color' | 'image';
@@ -135,6 +137,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 	const [backgroundImageUrl, setBackgroundImageUrl] = useState<string | null>(null);
 	const [edgeSoftness, setEdgeSoftness] = useState(0);
 	const [skippedCount, setSkippedCount] = useState(0);
+	const [isZipping, setIsZipping] = useState(false);
 	const objectUrls = useRef<Set<string>>(new Set());
 
 	useEffect(() => {
@@ -239,8 +242,44 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 		if (!item.displayUrl) URL.revokeObjectURL(url);
 	}, []);
 
+	const handleDownloadAll = useCallback(async () => {
+		const doneItems = items.filter((item) => item.status === 'done' && item.resultBlob);
+		if (doneItems.length === 0) return;
+		setIsZipping(true);
+		try {
+			const { default: JSZip } = await import('jszip');
+			const zip = new JSZip();
+			for (const item of doneItems) {
+				// Prefer the rendered display version (chosen background mode + edge
+				// softness applied) over the raw AI cutout, matching what the
+				// single-item Download button already does.
+				const blob = item.displayUrl ? await (await fetch(item.displayUrl)).blob() : item.resultBlob!;
+				zip.file(`${item.file.name.replace(/\.[^./\\]+$/, '')}-no-bg.png`, blob);
+			}
+			const zipBlob = await zip.generateAsync({ type: 'blob' });
+			const url = URL.createObjectURL(zipBlob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = 'no-bg-images.zip';
+			link.click();
+			URL.revokeObjectURL(url);
+		} finally {
+			setIsZipping(false);
+		}
+	}, [items]);
+
 	const canRemove =
 		!isProcessing && items.length > 0 && items.some((item) => item.status !== 'done');
+	const doneCount = items.filter((item) => item.status === 'done').length;
+	const currentlyProcessing = items.find((item) => item.status === 'processing');
+	// Combines "how many images are fully finished" with "how far along the
+	// one currently running is" into a single 0-100 figure — the per-item %
+	// the AI model itself reports isn't useful on its own once there's more
+	// than one image in the batch.
+	const overallPercent =
+		items.length > 0
+			? Math.round(((doneCount + (currentlyProcessing ? (currentlyProcessing.progress ?? 0) / 100 : 0)) / items.length) * 100)
+			: 0;
 
 	return (
 		<div className="flex flex-col gap-4 rounded-lg border border-border p-4">
@@ -283,6 +322,15 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 			)}
 
 			<p className="text-xs text-muted-foreground">{messages.modelNotice}</p>
+
+			{isProcessing && items.length > 1 && (
+				<p role="status" className="text-sm text-muted-foreground">
+					{messages.overallProgress
+						.replace('{{current}}', String(Math.min(doneCount + 1, items.length)))
+						.replace('{{total}}', String(items.length))
+						.replace('{{percent}}', String(overallPercent))}
+				</p>
+			)}
 
 			<div className="flex flex-col gap-3 rounded-md border border-border p-3">
 				<div className="flex flex-wrap items-center gap-2">
@@ -442,6 +490,11 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 							)
 						: messages.remove}
 				</Button>
+				{doneCount > 1 && (
+					<Button type="button" variant="secondary" onClick={handleDownloadAll} disabled={isZipping}>
+						{messages.downloadAll}
+					</Button>
+				)}
 				{items.length > 0 && (
 					<Button type="button" variant="outline" onClick={handleClearAll} disabled={isProcessing}>
 						{messages.clearAll}

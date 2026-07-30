@@ -25,7 +25,9 @@
     "edgeSoftnessLabel": "Edge softness",
     "removeItem": "Remove",
     "clearAll": "Clear all",
-    "skippedFiles": "{{count}} file(s) were skipped because they're not a supported image format."
+    "skippedFiles": "{{count}} file(s) were skipped because they're not a supported image format.",
+    "overallProgress": "Processing image {{current}} of {{total}} — {{percent}}% overall",
+    "downloadAll": "Download All (.zip)"
   },
   "related": "Related tools",
   "faq": {

@@ -25,7 +25,9 @@
     "edgeSoftnessLabel": "Làm mềm viền",
     "removeItem": "Xóa",
     "clearAll": "Xóa tất cả",
-    "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ."
+    "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ.",
+    "overallProgress": "Đang xử lý ảnh {{current}}/{{total}} — {{percent}}% tổng tiến độ",
+    "downloadAll": "Tải tất cả (.zip)"
   },
   "related": "Công cụ liên quan",
   "faq": {
