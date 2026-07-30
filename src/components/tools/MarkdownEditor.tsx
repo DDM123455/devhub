@@ -246,6 +246,21 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 		});
 	};
 
+	// Mirrors the Ctrl+B/Ctrl+I shortcuts every rich-text and markdown editor
+	// (StackEdit, Dillinger, Google Docs, Word...) supports — `preventDefault`
+	// stops the browser's own handling (Firefox toggles its bookmarks toolbar
+	// on Ctrl+B otherwise) so the keys only ever affect this textarea.
+	const handleEditorKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		if (!(event.ctrlKey || event.metaKey)) return;
+		if (event.key === 'b' || event.key === 'B') {
+			event.preventDefault();
+			applyEdit(wrapInline('**', '**', messages.boldTitle));
+		} else if (event.key === 'i' || event.key === 'I') {
+			event.preventDefault();
+			applyEdit(wrapInline('_', '_', messages.italicTitle));
+		}
+	};
+
 	const handleFile = (files: FileList | null) => {
 		const file = files?.[0];
 		if (!file) return;
@@ -293,8 +308,8 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 	};
 
 	const toolbarButtons: Array<{ title: string; icon: React.ReactNode; onClick: () => void }> = [
-		{ title: messages.boldTitle, icon: <Bold className="h-4 w-4" />, onClick: () => applyEdit(wrapInline('**', '**', messages.boldTitle)) },
-		{ title: messages.italicTitle, icon: <Italic className="h-4 w-4" />, onClick: () => applyEdit(wrapInline('_', '_', messages.italicTitle)) },
+		{ title: `${messages.boldTitle} (Ctrl+B)`, icon: <Bold className="h-4 w-4" />, onClick: () => applyEdit(wrapInline('**', '**', messages.boldTitle)) },
+		{ title: `${messages.italicTitle} (Ctrl+I)`, icon: <Italic className="h-4 w-4" />, onClick: () => applyEdit(wrapInline('_', '_', messages.italicTitle)) },
 		{ title: messages.headingTitle, icon: <Heading className="h-4 w-4" />, onClick: () => applyEdit(headingTransform) },
 		{ title: messages.quoteTitle, icon: <Quote className="h-4 w-4" />, onClick: () => applyEdit(linePrefix((line) => `> ${line}`)) },
 		{ title: messages.codeTitle, icon: <Code className="h-4 w-4" />, onClick: () => applyEdit(codeTransform) },
@@ -387,6 +402,7 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 							ref={textareaRef}
 							value={content}
 							onChange={(e) => setContent(e.target.value)}
+							onKeyDown={handleEditorKeyDown}
 							onScroll={viewMode === 'split' ? handleEditorScroll : undefined}
 							placeholder={messages.inputPlaceholder}
 							rows={18}

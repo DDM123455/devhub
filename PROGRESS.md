@@ -144,6 +144,13 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "Markdown Editor: keyboard shortcut Ctrl+B/Ctrl+I" (vs
+  StackEdit/Dillinger): thêm `handleEditorKeyDown` trên textarea, bắt Ctrl+B/Ctrl+I (và
+  Cmd trên Mac qua `metaKey`) gọi thẳng cùng `applyEdit(wrapInline(...))` mà nút toolbar
+  Bold/Italic đã dùng — không tạo logic riêng, chỉ thêm lối tắt bàn phím tới hành vi có sẵn.
+  `preventDefault()` để tránh Firefox bật/tắt bookmarks toolbar khi bấm Ctrl+B. Cập nhật
+  tooltip 2 nút toolbar thành "... (Ctrl+B)"/"... (Ctrl+I)" ngay trong JSX (không cần thêm
+  key i18n mới, chỉ nối chuỗi với string có sẵn). Build sạch (421 trang).
 - **2026-07-30** — Phase 3.6b — mục "Regex Tester: lưu lịch sử pattern + URL chia sẻ state"
   (vs regex101/RegExr): **Lịch sử** — mỗi lần worker trả kết quả match thành công (không
   lỗi), lưu `{pattern, flags}` vào `localStorage` (key `regex-tester-history`, tối đa 10

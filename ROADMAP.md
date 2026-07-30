@@ -251,7 +251,7 @@ ROADMAP)
 - [ ] QR Generator — batch tạo nhiều QR cùng lúc
 - [ ] Markdown Editor — vs StackEdit/Dillinger: syntax highlighting thật cho editor (hiện
       chỉ là `<textarea>` thuần)
-- [ ] Markdown Editor — keyboard shortcut Ctrl+B/Ctrl+I
+- [x] Markdown Editor — keyboard shortcut Ctrl+B/Ctrl+I
 - [ ] Trim video ngắn — vs Clideo/CloudConvert: multi-clip (nhiều đoạn cắt), crop khung hình,
       watermark
 - [ ] Chuyển đổi Audio MP3↔WAV — vs CloudConvert: thêm định dạng AAC/OGG/FLAC/M4A
