@@ -144,6 +144,9 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "Đếm từ & ký tự: upload file" (vs WordCounter.net):
+  thêm nút "Upload .txt file" (input file ẩn + label, `FileReader.readAsText`, set thẳng
+  `text` state) — cùng pattern đã dùng ở Text Case Converter. Build sạch (421 trang).
 - **2026-07-30** — Phase 3.6b — mục "Chuyển đổi Case văn bản: đếm từ/ký tự + upload/download
   file" (vs ConvertCase.net): thêm dòng thống kê `{{chars}} characters · {{words}} words`
   dưới output (tính từ `output.length`/`output.trim().split(/\s+/)`), nút "Upload .txt file"

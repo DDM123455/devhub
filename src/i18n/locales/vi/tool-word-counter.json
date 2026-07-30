@@ -20,6 +20,7 @@
     "copy": "Sao chép",
     "copied": "Đã sao chép!",
     "download": "Tải file .txt",
+    "uploadFile": "Tải lên file .txt",
     "charLimitLabel": "Kiểm tra theo giới hạn ký tự",
     "charLimitNone": "Không giới hạn",
     "charLimitTwitter": "Bài đăng X / Twitter (280)",

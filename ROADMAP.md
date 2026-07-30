@@ -219,7 +219,7 @@ ROADMAP)
 
 **Nhóm Văn bản & Dữ liệu**
 - [ ] So sánh văn bản — vs Diffchecker.com: link chia sẻ kết quả so sánh
-- [ ] Đếm từ & ký tự — vs WordCounter.net: upload file để đếm (không chỉ paste text)
+- [x] Đếm từ & ký tự — vs WordCounter.net: upload file để đếm (không chỉ paste text)
 - [ ] JSON Formatter — vs JSONFormatter.org/JSONLint: nút "Validate" tường minh + badge
       trạng thái riêng biệt
 - [ ] JSON Formatter — expose JSON Schema validation cho người dùng (đã import

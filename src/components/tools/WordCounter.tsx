@@ -39,6 +39,7 @@ interface Messages {
 	keywordDensityWordColumn: string;
 	keywordDensityCountColumn: string;
 	keywordDensityPercentColumn: string;
+	uploadFile: string;
 }
 
 type CharLimitPreset = 'none' | 'twitter' | 'meta-description' | 'instagram' | 'youtube-title' | 'sms';
@@ -162,6 +163,16 @@ export default function WordCounter({ messages }: { messages: Messages }) {
 		[stats.words, stats.sentences, text],
 	);
 
+	const handleFileUpload = (fileList: FileList | null) => {
+		const file = fileList?.[0];
+		if (!file) return;
+		const reader = new FileReader();
+		reader.onload = () => {
+			if (typeof reader.result === 'string') setText(reader.result);
+		};
+		reader.readAsText(file);
+	};
+
 	const download = () => {
 		const blob = new Blob([text], { type: 'text/plain' });
 		const url = URL.createObjectURL(blob);
@@ -210,6 +221,19 @@ export default function WordCounter({ messages }: { messages: Messages }) {
 					<Button type="button" variant="outline" size="sm" onClick={download} disabled={text === ''}>
 						{messages.download}
 					</Button>
+					<label
+						htmlFor="word-counter-file-input"
+						className="inline-flex h-7 cursor-pointer items-center rounded-md border border-border px-2.5 text-[0.8rem] font-medium text-foreground hover:bg-muted"
+					>
+						{messages.uploadFile}
+					</label>
+					<input
+						id="word-counter-file-input"
+						type="file"
+						accept=".txt,text/plain"
+						className="hidden"
+						onChange={(event) => handleFileUpload(event.target.files)}
+					/>
 				</div>
 				<div className="flex items-center gap-2">
 					<label htmlFor="word-counter-char-limit" className="text-xs text-muted-foreground">

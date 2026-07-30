@@ -20,6 +20,7 @@
     "copy": "Copy",
     "copied": "Copied!",
     "download": "Download .txt",
+    "uploadFile": "Upload .txt file",
     "charLimitLabel": "Check against a character limit",
     "charLimitNone": "None",
     "charLimitTwitter": "X / Twitter post (280)",
