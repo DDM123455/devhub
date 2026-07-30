@@ -23,7 +23,10 @@
     "utilitiesHeading": "Utilities",
     "copy": "Copy",
     "copied": "Copied!",
-    "clear": "Clear"
+    "clear": "Clear",
+    "outputStats": "{{chars}} characters · {{words}} words",
+    "uploadFile": "Upload .txt file",
+    "downloadFile": "Download .txt"
   },
   "related": "Related tools",
   "faq": {

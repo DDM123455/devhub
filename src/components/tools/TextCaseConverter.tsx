@@ -20,6 +20,9 @@ interface Messages {
 	copy: string;
 	copied: string;
 	clear: string;
+	outputStats: string;
+	uploadFile: string;
+	downloadFile: string;
 }
 
 type CaseMode =
@@ -113,6 +116,29 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 	const [copied, setCopied] = useState(false);
 
 	const output = useMemo(() => convertCase(text, mode), [text, mode]);
+	const charCount = output.length;
+	const wordCount = output.trim() === '' ? 0 : output.trim().split(/\s+/).length;
+
+	const handleFileUpload = (fileList: FileList | null) => {
+		const file = fileList?.[0];
+		if (!file) return;
+		const reader = new FileReader();
+		reader.onload = () => {
+			if (typeof reader.result === 'string') setText(reader.result);
+		};
+		reader.readAsText(file);
+	};
+
+	const handleFileDownload = () => {
+		if (!output) return;
+		const blob = new Blob([output], { type: 'text/plain' });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = 'converted.txt';
+		link.click();
+		URL.revokeObjectURL(url);
+	};
 
 	const caseModes: Array<{ value: CaseMode; label: string }> = [
 		{ value: 'upper', label: messages.caseUpper },
@@ -147,6 +173,22 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 				rows={8}
 				className="w-full resize-y rounded-md border border-border bg-background p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
 			/>
+
+			<div>
+				<label
+					htmlFor="text-case-file-input"
+					className="inline-flex cursor-pointer items-center rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted"
+				>
+					{messages.uploadFile}
+				</label>
+				<input
+					id="text-case-file-input"
+					type="file"
+					accept=".txt,text/plain"
+					className="hidden"
+					onChange={(event) => handleFileUpload(event.target.files)}
+				/>
+			</div>
 
 			<div className="flex flex-col gap-2">
 				<h3 className="text-sm font-semibold text-foreground">{messages.caseOptionsHeading}</h3>
@@ -199,11 +241,17 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 					rows={8}
 					className="w-full resize-y rounded-md border border-border bg-muted p-3 text-sm text-foreground"
 				/>
+				<p className="text-xs text-muted-foreground">
+					{messages.outputStats.replace('{{chars}}', String(charCount)).replace('{{words}}', String(wordCount))}
+				</p>
 			</div>
 
-			<div className="flex items-center gap-3">
+			<div className="flex flex-wrap items-center gap-3">
 				<Button type="button" onClick={handleCopy} disabled={output === ''}>
 					{copied ? messages.copied : messages.copy}
+				</Button>
+				<Button type="button" variant="outline" onClick={handleFileDownload} disabled={output === ''}>
+					{messages.downloadFile}
 				</Button>
 				<Button type="button" variant="outline" onClick={() => setText('')} disabled={text === ''}>
 					{messages.clear}

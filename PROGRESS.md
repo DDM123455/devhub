@@ -144,6 +144,14 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "Chuyển đổi Case văn bản: đếm từ/ký tự + upload/download
+  file" (vs ConvertCase.net): thêm dòng thống kê `{{chars}} characters · {{words}} words`
+  dưới output (tính từ `output.length`/`output.trim().split(/\s+/)`), nút "Upload .txt file"
+  (input file ẩn + label, đọc qua `FileReader.readAsText`, set thẳng vào `text` state để
+  chạy qua case conversion đang chọn) và nút "Download .txt" (Blob + object URL, cùng pattern
+  đã dùng ở các tool khác). Build sạch (421 trang), xác nhận label mới trong
+  `dist/en/tools/text-case-converter/index.html`. Thêm 3 key i18n (`outputStats`,
+  `uploadFile`, `downloadFile`) cho en+vi + `messages` object.
 - **2026-07-30** — Phase 3.6b — mục "Color Picker: hex nhận dạng rút gọn 3 ký tự" (vs
   Coolors/Adobe Color): `hexToRgb()` trong `ColorPicker.tsx` trước đây chỉ khớp regex 6 ký
   tự (`#RRGGBB`); thêm nhánh khớp 3 ký tự (`#RGB`) và tự nhân đôi từng ký tự thành 6 ký tự

@@ -227,8 +227,8 @@ ROADMAP)
 - [ ] JSON Formatter — so sánh 2 JSON (diff)
 - [ ] Chuyển đổi Case văn bản — vs ConvertCase.net: Title Case có danh sách từ ngoại lệ
       (of/the/and...)
-- [ ] Chuyển đổi Case văn bản — hiển thị đếm từ/ký tự cạnh output
-- [ ] Chuyển đổi Case văn bản — upload/download file
+- [x] Chuyển đổi Case văn bản — hiển thị đếm từ/ký tự cạnh output
+- [x] Chuyển đổi Case văn bản — upload/download file
 - [ ] CSV↔JSON Converter — vs CloudConvert/Convertio: batch nhiều file
 - [ ] CSV↔JSON Converter — hỗ trợ TSV như 1 option riêng
 

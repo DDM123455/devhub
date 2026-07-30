@@ -23,7 +23,10 @@
     "utilitiesHeading": "Tiện ích",
     "copy": "Sao chép",
     "copied": "Đã sao chép!",
-    "clear": "Xóa hết"
+    "clear": "Xóa hết",
+    "outputStats": "{{chars}} ký tự · {{words}} từ",
+    "uploadFile": "Tải lên file .txt",
+    "downloadFile": "Tải xuống .txt"
   },
   "related": "Công cụ liên quan",
   "faq": {
