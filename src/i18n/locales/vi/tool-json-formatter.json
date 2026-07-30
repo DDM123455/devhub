@@ -17,7 +17,21 @@
     "exportInvalidJson": "Hãy sửa lỗi cú pháp JSON ở trên trước khi chuyển đổi.",
     "copy": "Sao chép",
     "copied": "Đã sao chép!",
-    "download": "Tải xuống"
+    "download": "Tải xuống",
+    "validJsonBadge": "JSON hợp lệ",
+    "invalidJsonBadge": "JSON không hợp lệ",
+    "compareHeading": "So sánh với JSON khác",
+    "compareToggle": "So sánh JSON",
+    "compareInputLabel": "Dán JSON cần so sánh",
+    "compareInputPlaceholder": "Dán một JSON khác vào đây…",
+    "compareButton": "So sánh",
+    "compareInvalidLeft": "Nội dung trong trình soạn thảo không phải JSON hợp lệ — hãy sửa trước khi so sánh.",
+    "compareInvalidRight": "JSON vừa dán không hợp lệ — kiểm tra lại lỗi cú pháp.",
+    "compareIdentical": "Không có khác biệt — 2 tài liệu JSON giống hệt nhau.",
+    "compareDiffCount": "Tìm thấy {{count}} khác biệt:",
+    "compareAdded": "thêm mới",
+    "compareRemoved": "đã xóa",
+    "compareChanged": "thay đổi"
   },
   "related": "Công cụ liên quan",
   "faq": {

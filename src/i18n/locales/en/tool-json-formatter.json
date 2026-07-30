@@ -17,7 +17,21 @@
     "exportInvalidJson": "Fix the JSON syntax error above before converting.",
     "copy": "Copy",
     "copied": "Copied!",
-    "download": "Download"
+    "download": "Download",
+    "validJsonBadge": "Valid JSON",
+    "invalidJsonBadge": "Invalid JSON",
+    "compareHeading": "Compare with another JSON",
+    "compareToggle": "Compare JSON",
+    "compareInputLabel": "Paste JSON to compare against",
+    "compareInputPlaceholder": "Paste another JSON document here…",
+    "compareButton": "Compare",
+    "compareInvalidLeft": "The editor's own content isn't valid JSON — fix it before comparing.",
+    "compareInvalidRight": "The pasted JSON isn't valid — check for a syntax error.",
+    "compareIdentical": "No differences — both JSON documents are identical.",
+    "compareDiffCount": "{{count}} difference(s) found:",
+    "compareAdded": "added",
+    "compareRemoved": "removed",
+    "compareChanged": "changed"
   },
   "related": "Related tools",
   "faq": {

@@ -220,11 +220,11 @@ ROADMAP)
 **Nhóm Văn bản & Dữ liệu**
 - [ ] So sánh văn bản — vs Diffchecker.com: link chia sẻ kết quả so sánh
 - [x] Đếm từ & ký tự — vs WordCounter.net: upload file để đếm (không chỉ paste text)
-- [ ] JSON Formatter — vs JSONFormatter.org/JSONLint: nút "Validate" tường minh + badge
+- [x] JSON Formatter — vs JSONFormatter.org/JSONLint: nút "Validate" tường minh + badge
       trạng thái riêng biệt
 - [ ] JSON Formatter — expose JSON Schema validation cho người dùng (đã import
       `SchemaValidationError` nhưng chưa dùng tới)
-- [ ] JSON Formatter — so sánh 2 JSON (diff)
+- [x] JSON Formatter — so sánh 2 JSON (diff)
 - [x] Chuyển đổi Case văn bản — vs ConvertCase.net: Title Case có danh sách từ ngoại lệ
       (of/the/and...)
 - [x] Chuyển đổi Case văn bản — hiển thị đếm từ/ký tự cạnh output

@@ -19,6 +19,20 @@ interface Messages {
 	copy: string;
 	copied: string;
 	download: string;
+	validJsonBadge: string;
+	invalidJsonBadge: string;
+	compareHeading: string;
+	compareToggle: string;
+	compareInputLabel: string;
+	compareInputPlaceholder: string;
+	compareButton: string;
+	compareInvalidLeft: string;
+	compareInvalidRight: string;
+	compareIdentical: string;
+	compareDiffCount: string;
+	compareAdded: string;
+	compareRemoved: string;
+	compareChanged: string;
 }
 
 type ExportFormat = 'xml' | 'yaml' | 'csv';
@@ -203,6 +217,67 @@ const EXPORT_MIME: Record<ExportFormat, string> = {
 	csv: 'text/csv',
 };
 
+interface DiffEntry {
+	path: string;
+	type: 'added' | 'removed' | 'changed';
+	leftValue?: unknown;
+	rightValue?: unknown;
+}
+
+function valuesEqual(a: unknown, b: unknown): boolean {
+	if (a === b) return true;
+	// Cheap deep-equality: fine here since diffJson already recurses into every
+	// object/array itself — this only ever runs on values BOTH sides agree are
+	// primitives (or one/both aren't objects), never on a full nested tree.
+	return JSON.stringify(a) === JSON.stringify(b);
+}
+
+// Structural diff between two parsed JSON values — walks both trees in
+// parallel, reporting one entry per key/index that was added, removed, or
+// whose value changed. Deliberately not a full LCS-style array diff (no
+// reordering detection): index-by-index comparison is what every "compare
+// two JSON" tool actually shows, since JSON arrays are rarely reordered
+// on purpose the way text lines are.
+function diffJson(a: unknown, b: unknown, path = '$'): DiffEntry[] {
+	if (valuesEqual(a, b)) return [];
+	const aIsObj = a !== null && typeof a === 'object';
+	const bIsObj = b !== null && typeof b === 'object';
+	if (!aIsObj || !bIsObj) return [{ path, type: 'changed', leftValue: a, rightValue: b }];
+
+	const aIsArr = Array.isArray(a);
+	const bIsArr = Array.isArray(b);
+	if (aIsArr !== bIsArr) return [{ path, type: 'changed', leftValue: a, rightValue: b }];
+
+	const entries: DiffEntry[] = [];
+	if (aIsArr) {
+		const aArr = a as unknown[];
+		const bArr = b as unknown[];
+		const maxLen = Math.max(aArr.length, bArr.length);
+		for (let i = 0; i < maxLen; i++) {
+			const childPath = `${path}[${i}]`;
+			if (i >= aArr.length) entries.push({ path: childPath, type: 'added', rightValue: bArr[i] });
+			else if (i >= bArr.length) entries.push({ path: childPath, type: 'removed', leftValue: aArr[i] });
+			else entries.push(...diffJson(aArr[i], bArr[i], childPath));
+		}
+	} else {
+		const aObj = a as Record<string, unknown>;
+		const bObj = b as Record<string, unknown>;
+		for (const key of new Set([...Object.keys(aObj), ...Object.keys(bObj)])) {
+			const childPath = `${path}.${key}`;
+			if (!(key in aObj)) entries.push({ path: childPath, type: 'added', rightValue: bObj[key] });
+			else if (!(key in bObj)) entries.push({ path: childPath, type: 'removed', leftValue: aObj[key] });
+			else entries.push(...diffJson(aObj[key], bObj[key], childPath));
+		}
+	}
+	return entries;
+}
+
+function diffValueLabel(value: unknown): string {
+	if (value === undefined) return '—';
+	if (value !== null && typeof value === 'object') return JSON.stringify(value);
+	return JSON.stringify(value);
+}
+
 // jsoneditor's UMD bundle touches `self` at module load time, which only
 // exists in the browser. Astro still server-renders `client:load` islands
 // once during the build to produce the initial HTML, so the library must be
@@ -218,6 +293,11 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 	const [exportResult, setExportResult] = useState<string | null>(null);
 	const [exportError, setExportError] = useState<string | null>(null);
 	const [copied, setCopied] = useState(false);
+	const [validationStatus, setValidationStatus] = useState<'valid' | 'invalid' | null>(null);
+	const [showCompare, setShowCompare] = useState(false);
+	const [compareInput, setCompareInput] = useState('');
+	const [compareError, setCompareError] = useState<string | null>(null);
+	const [diffResult, setDiffResult] = useState<DiffEntry[] | null>(null);
 
 	useEffect(() => {
 		if (!containerRef.current) return;
@@ -255,6 +335,7 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 				onValidationError: (errors) => {
 					const parseErr = errors.find(isParseError);
 					setParseError(parseErr ? { line: parseErr.line, message: parseErr.message.replace(/<br>/g, ' ') } : null);
+					setValidationStatus(errors.length === 0 ? 'valid' : 'invalid');
 				},
 			});
 			editor.set(SAMPLE_JSON);
@@ -296,6 +377,27 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 		setExportResult(CONVERTERS[format](json));
 	};
 
+	const handleCompare = () => {
+		setCompareError(null);
+		setDiffResult(null);
+		if (!editorRef.current) return;
+		let leftJson: unknown;
+		try {
+			leftJson = editorRef.current.get();
+		} catch {
+			setCompareError(messages.compareInvalidLeft);
+			return;
+		}
+		let rightJson: unknown;
+		try {
+			rightJson = JSON.parse(compareInput);
+		} catch {
+			setCompareError(messages.compareInvalidRight);
+			return;
+		}
+		setDiffResult(diffJson(leftJson, rightJson));
+	};
+
 	const handleCopy = () => {
 		if (exportResult === null) return;
 		void navigator.clipboard.writeText(exportResult).then(() => {
@@ -318,7 +420,19 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 	return (
 		<div className="flex flex-col gap-3">
 			<div ref={containerRef} className="h-[550px] w-full overflow-hidden rounded-md border border-border" />
-			<p className="text-xs text-muted-foreground">{messages.themeNotice}</p>
+			<div className="flex flex-wrap items-center justify-between gap-2">
+				<p className="text-xs text-muted-foreground">{messages.themeNotice}</p>
+				{validationStatus === 'valid' && (
+					<span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+						✓ {messages.validJsonBadge}
+					</span>
+				)}
+				{validationStatus === 'invalid' && (
+					<span className="rounded-full border border-destructive/40 bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
+						✗ {messages.invalidJsonBadge}
+					</span>
+				)}
+			</div>
 
 			{parseError && mode === 'text' && (
 				<div role="alert" className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
@@ -372,6 +486,82 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 							rows={10}
 							className="w-full rounded-md border border-border bg-background p-3 font-mono text-xs text-foreground"
 						/>
+					</div>
+				)}
+			</div>
+
+			<div className="flex flex-col gap-2 rounded-lg border border-border p-4">
+				<div className="flex items-center justify-between">
+					<span className="text-sm font-medium text-foreground">{messages.compareHeading}</span>
+					<Button type="button" size="sm" variant="outline" onClick={() => setShowCompare((v) => !v)}>
+						{messages.compareToggle}
+					</Button>
+				</div>
+				{showCompare && (
+					<div className="flex flex-col gap-2">
+						<div className="flex flex-col gap-1">
+							<label htmlFor="json-compare-input" className="text-xs text-muted-foreground">
+								{messages.compareInputLabel}
+							</label>
+							<textarea
+								id="json-compare-input"
+								value={compareInput}
+								onChange={(e) => setCompareInput(e.target.value)}
+								placeholder={messages.compareInputPlaceholder}
+								rows={6}
+								spellCheck={false}
+								className="w-full rounded-md border border-border bg-background p-2 font-mono text-xs text-foreground"
+							/>
+						</div>
+						<div>
+							<Button type="button" size="sm" onClick={handleCompare}>
+								{messages.compareButton}
+							</Button>
+						</div>
+						{compareError && <p role="alert" className="text-sm text-destructive">{compareError}</p>}
+						{diffResult && diffResult.length === 0 && (
+							<p role="status" className="text-sm text-primary">{messages.compareIdentical}</p>
+						)}
+						{diffResult && diffResult.length > 0 && (
+							<div className="flex flex-col gap-1">
+								<p className="text-xs text-muted-foreground">
+									{messages.compareDiffCount.replace('{{count}}', String(diffResult.length))}
+								</p>
+								<ul className="flex flex-col gap-1 rounded-md border border-border p-2 font-mono text-xs">
+									{diffResult.map((entry, i) => (
+										<li key={i} className="flex flex-wrap items-baseline gap-1.5">
+											<span
+												className={
+													entry.type === 'added'
+														? 'text-emerald-600 dark:text-emerald-400'
+														: entry.type === 'removed'
+															? 'text-destructive'
+															: 'text-amber-600 dark:text-amber-400'
+												}
+											>
+												{entry.type === 'added'
+													? messages.compareAdded
+													: entry.type === 'removed'
+														? messages.compareRemoved
+														: messages.compareChanged}
+											</span>
+											<span className="text-foreground">{entry.path}</span>
+											{entry.type === 'changed' && (
+												<span className="text-muted-foreground">
+													{diffValueLabel(entry.leftValue)} → {diffValueLabel(entry.rightValue)}
+												</span>
+											)}
+											{entry.type === 'added' && (
+												<span className="text-muted-foreground">{diffValueLabel(entry.rightValue)}</span>
+											)}
+											{entry.type === 'removed' && (
+												<span className="text-muted-foreground">{diffValueLabel(entry.leftValue)}</span>
+											)}
+										</li>
+									))}
+								</ul>
+							</div>
+						)}
 					</div>
 				)}
 			</div>

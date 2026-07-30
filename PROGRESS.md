@@ -144,6 +144,24 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "JSON Formatter: badge Validate + so sánh 2 JSON" (vs
+  JSONFormatter.org/JSONLint): **Badge trạng thái** — `jsoneditor` đã validate liên tục lúc
+  gõ (qua `onValidationError`) nhưng trước đây CHỈ hiện banner lỗi khi có lỗi, không có tín
+  hiệu tích cực khi JSON hợp lệ — thêm `validationStatus` set trong cùng callback
+  (`errors.length === 0` → 'valid'), hiển thị badge "✓ Valid JSON"/"✗ Invalid JSON" luôn hiện
+  diện thay vì chỉ xuất hiện khi lỗi. Không thêm nút "Validate" thủ công riêng vì validate đã
+  chạy liên tục — badge giải quyết đúng vấn đề audit nêu ("ẩn trong hành vi editor") mà không
+  hạ cấp UX xuống mức phải bấm nút. **So sánh 2 JSON** — thêm `diffJson()` tự viết (không
+  cần dependency mới): duyệt song song 2 cây JSON, báo từng key/index bị thêm/xóa/đổi giá
+  trị (so sánh theo chỉ số, không phát hiện reorder kiểu diff text — đúng cách mọi tool "so
+  sánh 2 JSON" thật sự hiển thị). UI: nút "Compare JSON" mở rộng 1 panel dán JSON thứ 2 +
+  nút Compare, hiển thị danh sách khác biệt màu-mã-hoá (xanh=added, đỏ=removed, vàng=changed)
+  hoặc thông báo "identical". Verify `diffJson()` bằng script Node độc lập với object lồng
+  nhau có đủ cả 3 loại thay đổi — khớp đúng kỳ vọng. Build sạch (421 trang), xác nhận label
+  mới trong `dist/en/tools/json-formatter/index.html`. **Chưa làm**: expose JSON Schema
+  validation (mục audit khác trong cùng nhóm) — cần thêm UI nhập schema + gọi
+  `editor.setSchema()`, để lại cho phiên sau vì phạm vi khác hẳn (không phải chỉ hiển thị
+  trạng thái, mà cần toàn bộ luồng nhập/validate schema mới).
 - **2026-07-30** — Phase 3.6b — mục "Xóa nền ảnh: thanh tiến trình tổng + Download All .zip"
   (vs remove.bg): **Tiến trình tổng** — `overallPercent` gộp "số ảnh đã xong" +
   "% của ảnh đang xử lý / 100", chia cho tổng số ảnh, hiển thị "Processing image X of Y —
