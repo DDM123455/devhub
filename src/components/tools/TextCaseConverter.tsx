@@ -42,6 +42,30 @@ type CaseMode =
 // existing camelCase/PascalCase boundaries into a flat list of lowercase-able
 // word tokens, so camelCase/snake_case conversion works whether the input is
 // "hello world", "hello-world", or already "helloWorld".
+// Short articles/conjunctions/prepositions that AP/Chicago-style title case
+// convention (and ConvertCase.net, the benchmark for this tool) leaves
+// lowercase — except when one starts or ends the title, which always stays
+// capitalized regardless of this list.
+const TITLE_CASE_MINOR_WORDS = new Set([
+	'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'in', 'nor', 'of', 'on', 'or', 'so', 'the', 'to', 'up', 'yet',
+]);
+
+function titleCase(text: string): string {
+	const matchCount = (text.match(/\w\S*/g) ?? []).length;
+	if (matchCount === 0) return text;
+	const lastWordIndex = matchCount - 1;
+	let wordIndex = -1;
+	return text.replace(/\w\S*/g, (word) => {
+		wordIndex++;
+		const bareWord = word.toLowerCase().replace(/[^a-z']/g, '');
+		const isMinorWord = TITLE_CASE_MINOR_WORDS.has(bareWord);
+		if (isMinorWord && wordIndex !== 0 && wordIndex !== lastWordIndex) {
+			return word.toLowerCase();
+		}
+		return word[0].toUpperCase() + word.slice(1).toLowerCase();
+	});
+}
+
 function splitWords(text: string): string[] {
 	const withSpaces = text
 		.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
@@ -56,7 +80,7 @@ function convertCase(text: string, mode: CaseMode): string {
 		case 'lower':
 			return text.toLowerCase();
 		case 'title':
-			return text.replace(/\w\S*/g, (word) => word[0].toUpperCase() + word.slice(1).toLowerCase());
+			return titleCase(text);
 		case 'camel':
 			return splitWords(text)
 				.map((word, index) =>

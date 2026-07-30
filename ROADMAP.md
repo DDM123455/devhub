@@ -225,7 +225,7 @@ ROADMAP)
 - [ ] JSON Formatter — expose JSON Schema validation cho người dùng (đã import
       `SchemaValidationError` nhưng chưa dùng tới)
 - [ ] JSON Formatter — so sánh 2 JSON (diff)
-- [ ] Chuyển đổi Case văn bản — vs ConvertCase.net: Title Case có danh sách từ ngoại lệ
+- [x] Chuyển đổi Case văn bản — vs ConvertCase.net: Title Case có danh sách từ ngoại lệ
       (of/the/and...)
 - [x] Chuyển đổi Case văn bản — hiển thị đếm từ/ký tự cạnh output
 - [x] Chuyển đổi Case văn bản — upload/download file

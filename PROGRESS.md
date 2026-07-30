@@ -144,6 +144,14 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "Chuyển đổi Case: Title Case có danh sách từ ngoại lệ"
+  (vs ConvertCase.net): thêm `titleCase()` áp dụng đúng quy ước AP/Chicago-style mà
+  ConvertCase.net dùng — 18 từ ngắn (a/an/and/as/at/but/by/for/in/nor/of/on/or/so/the/to/
+  up/yet) giữ nguyên chữ thường, TRỪ khi là từ đầu hoặc từ cuối câu (luôn viết hoa bất kể
+  danh sách). Verify bằng script Node độc lập với 5 tựa sách kinh điển ("The Lord of the
+  Rings", "A Tale of Two Cities", "Of Mice and Men", "To Kill a Mockingbird", "War and
+  Peace") — khớp đúng 100% cách viết hoa chuẩn thật của các tựa này. Build sạch (421 trang).
+  Không cần đổi i18n (hàm nội bộ).
 - **2026-07-30** — Phase 3.6b — mục "CSV↔JSON Converter: hỗ trợ TSV như 1 option riêng" (vs
   CloudConvert/Convertio): delimiter Tab đã tồn tại từ trước (chỉ là 1 trong 4 lựa chọn
   delimiter) nhưng không được trình bày như định dạng TSV riêng biệt — đổi nhãn thành
