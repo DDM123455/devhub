@@ -370,7 +370,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 					</p>
 					<p className="text-xs text-muted-foreground">{messages.dragHint}</p>
 
-					<ul className="flex max-h-[36rem] flex-col gap-3 overflow-y-auto pr-1">
+					<ul className="flex max-h-[48rem] flex-col gap-3 overflow-y-auto pr-1">
 						{pages.map((page, index) => (
 							<li
 								key={page.id}
@@ -386,7 +386,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 								}`}
 							>
 								<div
-									className="relative w-72 shrink-0 overflow-hidden rounded bg-muted"
+									className="relative w-[26rem] shrink-0 overflow-hidden rounded bg-muted"
 									onClick={splitMode === 'checkbox' ? () => handleTogglePageSelected(page.id) : undefined}
 									role={splitMode === 'checkbox' ? 'button' : undefined}
 									tabIndex={splitMode === 'checkbox' ? 0 : undefined}
@@ -549,7 +549,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 											key={i}
 											src={dataUrl}
 											alt={`${result.label} — ${i + 1}`}
-											className="h-28 w-auto rounded border border-border object-cover"
+											className="h-44 w-auto rounded border border-border object-cover"
 										/>
 									))}
 								</div>

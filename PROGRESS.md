@@ -144,6 +144,15 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — (theo yêu cầu trực tiếp người dùng: "cho phần PDF to lên được không", sau
+  khi đã chuyển sang layout dọc ở log ngay bên dưới) phóng to thêm 1 lần nữa: thumbnail chính
+  trong danh sách trang (Gộp PDF + Tách PDF) từ `w-72` (288px) → `w-[26rem]` (416px); khung
+  cuộn danh sách từ `max-h-[36rem]` → `max-h-[48rem]`; preview file kết quả sau khi tách
+  (`PdfSplitter.tsx`) từ `h-28` → `h-44`; preview trước khi tải file gộp (`PdfMerger.tsx`) từ
+  `w-36` → `w-56`. Tăng kèm `scale` render pdf.js trong `pdf-thumbnails.ts` từ 0.55 lên 0.75 để
+  ảnh không bị mờ ở kích thước hiển thị lớn hơn. Build sạch (421 trang). **Giới hạn**: không
+  có trình duyệt thật trong môi trường phiên này — người dùng nên tự mở lại 2 trang PDF để xác
+  nhận kích thước mới đã đủ to, báo tiếp nếu cần to hơn nữa hoặc cần điều chỉnh riêng phần nào.
 - **2026-07-30** — (theo yêu cầu trực tiếp người dùng, tiếp nối mục phóng to thumbnail PDF ở
   log ngay bên dưới) đổi layout danh sách trang ở cả **Gộp PDF** và **Tách PDF** từ lưới ngang
   tự xuống dòng (`flex flex-wrap`, thumbnail 192px) sang **danh sách dọc** (`flex flex-col`,

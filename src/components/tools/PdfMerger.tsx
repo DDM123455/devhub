@@ -310,7 +310,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 			) : (
 				<>
 					<p className="text-xs text-muted-foreground">{messages.dragHint}</p>
-					<ul className="flex max-h-[36rem] flex-col gap-3 overflow-y-auto pr-1">
+					<ul className="flex max-h-[48rem] flex-col gap-3 overflow-y-auto pr-1">
 						{pages.map((page, index) => (
 							<li
 								key={page.id}
@@ -325,7 +325,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 									dragPageId === page.id ? 'opacity-50' : ''
 								}`}
 							>
-								<div className="relative w-72 shrink-0 overflow-hidden rounded bg-muted">
+								<div className="relative w-[26rem] shrink-0 overflow-hidden rounded bg-muted">
 									<img
 										src={page.dataUrl}
 										alt={`${page.file.name} — page ${page.pageIndex + 1}`}
@@ -393,7 +393,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 					<span className="text-sm font-medium text-foreground">{messages.previewHeading}</span>
 					<ul className="flex flex-wrap gap-2">
 						{previewThumbnails.map((thumb) => (
-							<li key={thumb.pageIndex} className="w-36 overflow-hidden rounded border border-border bg-muted">
+							<li key={thumb.pageIndex} className="w-56 overflow-hidden rounded border border-border bg-muted">
 								<img src={thumb.dataUrl} alt={`${messages.previewHeading} — ${thumb.pageIndex + 1}`} className="w-full" />
 							</li>
 						))}

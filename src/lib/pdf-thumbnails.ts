@@ -35,11 +35,11 @@ async function loadPdfJs() {
 // scale 0.25 (the original default) rasterizes a typical Letter/A4 page at
 // only ~150-210px wide — fine as a tiny icon, but any body text is unreadable
 // even before the browser scales the <img> up further. The page picker in
-// PdfSplitter/PdfMerger now displays each thumbnail at a fixed 288px width
-// (`w-72`) in a vertical, scrollable list, so 0.55 (~340-420px native render
-// width) keeps the image sharp at that display size instead of upscaling a
-// lower-res bitmap and blurring it.
-export async function renderPdfThumbnails(bytes: ArrayBuffer, scale = 0.55): Promise<PdfPageThumbnail[]> {
+// PdfSplitter/PdfMerger now displays each thumbnail at a fixed 416px width
+// (`w-[26rem]`) in a vertical, scrollable list, so 0.75 (~460-630px native
+// render width) keeps the image sharp at that display size instead of
+// upscaling a lower-res bitmap and blurring it.
+export async function renderPdfThumbnails(bytes: ArrayBuffer, scale = 0.75): Promise<PdfPageThumbnail[]> {
 	const pdfjsLib = await loadPdfJs();
 	const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
 	const thumbnails: PdfPageThumbnail[] = [];
