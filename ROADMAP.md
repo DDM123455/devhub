@@ -212,10 +212,10 @@ ROADMAP)
 - [x] Gộp PDF — vs iLovePDF/Smallpdf: preview file PDF gộp cuối cùng trước khi tải
 - [x] Gộp PDF — xử lý/báo lỗi riêng cho PDF có mật khẩu (thay vì lỗi chung chung)
 - [x] Gộp PDF — cảnh báo giới hạn dung lượng nếu file quá lớn
-- [ ] Tách PDF — vs iLovePDF/Smallpdf: chọn trang kiểu checkbox đa lựa chọn (không chỉ cú
+- [x] Tách PDF — vs iLovePDF/Smallpdf: chọn trang kiểu checkbox đa lựa chọn (không chỉ cú
       pháp range)
-- [ ] Tách PDF — preview từng file kết quả trước khi tải
-- [ ] Tách PDF — kéo-thả sắp xếp lại thứ tự trang
+- [x] Tách PDF — preview từng file kết quả trước khi tải
+- [x] Tách PDF — kéo-thả sắp xếp lại thứ tự trang
 
 **Nhóm Văn bản & Dữ liệu**
 - [x] So sánh văn bản — vs Diffchecker.com: link chia sẻ kết quả so sánh

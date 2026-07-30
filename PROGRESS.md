@@ -144,6 +144,21 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "Tách PDF: checkbox chọn trang + preview từng file +
+  kéo-thả sắp xếp" (vs iLovePDF/Smallpdf, 3 mục cùng lúc vì cùng 1 file): **Kéo-thả** — copy
+  đúng pattern `dragPageId`/`handleDrop` đã có sẵn ở Gộp PDF, áp dụng cho danh sách trang
+  nguồn — quan trọng vì range ("1-3") và "mỗi N trang" đều tính theo VỊ TRÍ hiện tại trên màn
+  hình, nên kéo sắp xếp lại trước sẽ đổi luôn ý nghĩa của range. **Checkbox đa lựa chọn** —
+  thêm `SplitMode = 'checkbox'` thứ 3 (cạnh ranges/everyN), tách logic chung thành
+  `SplitGroup[] = {entries, label}[]` để cả 3 chế độ dùng chung 1 vòng lặp tạo file thay vì
+  code riêng — chế độ checkbox lọc `pages` theo `selectedPageIds` giữ ĐÚNG thứ tự tài liệu
+  (không phải thứ tự click chọn — verify bằng script Node: chọn theo thứ tự c,a,e vẫn trả về
+  a,c,e). **Preview từng file** — tái dùng trực tiếp `dataUrl` thumbnail đã render sẵn cho
+  từng trang nguồn (không cần rasterize lại file kết quả), gắn vào `ResultFile.
+  previewThumbnails` hiển thị dải ảnh nhỏ dưới mỗi file trong danh sách kết quả. Cũng phát
+  hiện gap tương tự Gộp PDF: trước đây danh sách trang không có gì cho biết trang nào đã
+  chọn ngoài việc gõ range bằng tay. Build sạch (421 trang), xác nhận label mới trong
+  `dist/en/tools/split-pdf/index.html`.
 - **2026-07-30** — Phase 3.6b (bắt đầu nhóm A đã thống nhất với người dùng — không cần
   dependency mới) — mục "Gộp PDF: preview file gộp + xử lý lỗi PDF có mật khẩu" (vs
   iLovePDF/Smallpdf): **Lỗi mật khẩu** — phát hiện qua `err.name === 'PasswordException'`

@@ -15,10 +15,15 @@ interface Messages {
 	modeLabel: string;
 	modeRanges: string;
 	modeEveryN: string;
+	modeCheckbox: string;
 	everyNLabel: string;
 	rangesLabel: string;
 	rangesPlaceholder: string;
 	rangesHint: string;
+	selectedCount: string;
+	selectAll: string;
+	clearSelection: string;
+	dragHint: string;
 	split: string;
 	splitting: string;
 	resultsHeading: string;
@@ -27,6 +32,8 @@ interface Messages {
 	errorGeneric: string;
 	errorInvalidRange: string;
 	errorInvalidEveryN: string;
+	errorNoPagesSelected: string;
+	selectPageAria: string;
 }
 
 interface PageEntry {
@@ -40,6 +47,7 @@ interface ResultFile {
 	id: string;
 	label: string;
 	blob: Blob;
+	previewThumbnails: string[];
 }
 
 interface PositionRange {
@@ -47,7 +55,12 @@ interface PositionRange {
 	end: number;
 }
 
-type SplitMode = 'ranges' | 'everyN';
+interface SplitGroup {
+	entries: PageEntry[];
+	label: string;
+}
+
+type SplitMode = 'ranges' | 'everyN' | 'checkbox';
 
 class RangeParseError extends Error {
 	constructor(public token: string) {
@@ -108,12 +121,15 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 	const [results, setResults] = useState<ResultFile[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [isZipping, setIsZipping] = useState(false);
+	const [selectedPageIds, setSelectedPageIds] = useState<Set<string>>(new Set());
+	const [dragPageId, setDragPageId] = useState<string | null>(null);
 
 	const loadFile = useCallback(async (candidate: File) => {
 		setError(null);
 		setResults([]);
 		setFile(null);
 		setPages([]);
+		setSelectedPageIds(new Set());
 		setIsLoadingThumbnails(true);
 		try {
 			const bytes = await candidate.arrayBuffer();
@@ -144,6 +160,12 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 	const handleDeletePage = useCallback((id: string) => {
 		setResults([]);
 		setPages((prev) => prev.filter((page) => page.id !== id));
+		setSelectedPageIds((prev) => {
+			if (!prev.has(id)) return prev;
+			const next = new Set(prev);
+			next.delete(id);
+			return next;
+		});
 	}, []);
 
 	const handleRotatePage = useCallback((id: string) => {
@@ -155,6 +177,48 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 		);
 	}, []);
 
+	const handleTogglePageSelected = useCallback((id: string) => {
+		setResults([]);
+		setSelectedPageIds((prev) => {
+			const next = new Set(prev);
+			if (next.has(id)) next.delete(id);
+			else next.add(id);
+			return next;
+		});
+	}, []);
+
+	const handleSelectAllPages = useCallback(() => {
+		setResults([]);
+		setSelectedPageIds(new Set(pages.map((page) => page.id)));
+	}, [pages]);
+
+	const handleClearSelection = useCallback(() => {
+		setResults([]);
+		setSelectedPageIds(new Set());
+	}, []);
+
+	// Drag-to-reorder pages before splitting — same pattern as PDF Merge — is
+	// useful here too: range/every-N splitting both operate on the CURRENT
+	// on-screen position of each page, so reordering first changes what "1-3"
+	// or "every 2 pages" actually selects.
+	const handleDropPage = useCallback(
+		(targetId: string) => {
+			setResults([]);
+			setPages((prev) => {
+				if (!dragPageId || dragPageId === targetId) return prev;
+				const fromIndex = prev.findIndex((page) => page.id === dragPageId);
+				const toIndex = prev.findIndex((page) => page.id === targetId);
+				if (fromIndex === -1 || toIndex === -1) return prev;
+				const next = [...prev];
+				const [moved] = next.splice(fromIndex, 1);
+				next.splice(toIndex, 0, moved);
+				return next;
+			});
+			setDragPageId(null);
+		},
+		[dragPageId],
+	);
+
 	const handleSplit = useCallback(async () => {
 		if (!file || pages.length === 0) return;
 		setIsProcessing(true);
@@ -162,42 +226,60 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 		setResults([]);
 
 		try {
-			let ranges: PositionRange[];
+			let splitGroups: SplitGroup[];
 			if (splitMode === 'everyN') {
 				if (!Number.isInteger(everyN) || everyN < 1) {
 					setError(messages.errorInvalidEveryN);
 					setIsProcessing(false);
 					return;
 				}
-				ranges = everyNRanges(everyN, pages.length);
+				splitGroups = everyNRanges(everyN, pages.length).map((r) => ({
+					entries: pages.slice(r.start - 1, r.end),
+					label: r.start === r.end ? `page-${r.start}.pdf` : `pages-${r.start}-${r.end}.pdf`,
+				}));
+			} else if (splitMode === 'checkbox') {
+				// Preserves current on-screen order (not selection order) — matches
+				// the intuitive "extract these pages in document order" behavior of
+				// checkbox-based extraction in iLovePDF/Smallpdf.
+				const selected = pages.filter((page) => selectedPageIds.has(page.id));
+				if (selected.length === 0) {
+					setError(messages.errorNoPagesSelected);
+					setIsProcessing(false);
+					return;
+				}
+				splitGroups = [{ entries: selected, label: 'selected-pages.pdf' }];
 			} else {
-				ranges = parseRanges(rangesInput, pages.length);
+				const ranges: PositionRange[] = parseRanges(rangesInput, pages.length);
+				splitGroups = ranges.map((r) => ({
+					entries: pages.slice(r.start - 1, r.end),
+					label: r.start === r.end ? `page-${r.start}.pdf` : `pages-${r.start}-${r.end}.pdf`,
+				}));
 			}
 
 			const bytes = await file.arrayBuffer();
 			const sourceDoc = await PDFDocument.load(bytes);
 
 			const newResults: ResultFile[] = [];
-			for (const range of ranges) {
-				const entries = pages.slice(range.start - 1, range.end);
+			for (const group of splitGroups) {
 				const outDoc = await PDFDocument.create();
 				const copiedPages = await outDoc.copyPages(
 					sourceDoc,
-					entries.map((entry) => entry.pageIndex),
+					group.entries.map((entry) => entry.pageIndex),
 				);
 				copiedPages.forEach((copiedPage, i) => {
-					const rotation = entries[i].rotation;
+					const rotation = group.entries[i].rotation;
 					if (rotation !== 0) copiedPage.setRotation(degrees(rotation));
 					outDoc.addPage(copiedPage);
 				});
 				const outBytes = await outDoc.save();
-				const label = range.start === range.end
-					? `page-${range.start}.pdf`
-					: `pages-${range.start}-${range.end}.pdf`;
 				newResults.push({
-					id: `${label}-${Math.random().toString(36).slice(2)}`,
-					label,
+					id: `${group.label}-${Math.random().toString(36).slice(2)}`,
+					label: group.label,
 					blob: new Blob([outBytes], { type: 'application/pdf' }),
+					// Reuses the thumbnails already rendered for the page picker —
+					// each output file's pages are a subset of the source file's, so
+					// there's nothing new to rasterize for the preview.
+					previewThumbnails: group.entries.map((entry) => entry.dataUrl),
 				});
 			}
 			setResults(newResults);
@@ -213,7 +295,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 			}
 		}
 		setIsProcessing(false);
-	}, [file, pages, splitMode, rangesInput, everyN, messages]);
+	}, [file, pages, splitMode, rangesInput, everyN, selectedPageIds, messages]);
 
 	const handleDownload = useCallback((result: ResultFile) => {
 		const url = URL.createObjectURL(result.blob);
@@ -286,11 +368,29 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 					<p className="text-sm text-foreground">
 						{file.name} — {messages.pageCount.replace('{{count}}', String(pages.length))}
 					</p>
+					<p className="text-xs text-muted-foreground">{messages.dragHint}</p>
 
 					<ul className="flex flex-wrap gap-3">
 						{pages.map((page, index) => (
-							<li key={page.id} className="flex w-28 flex-col gap-1 rounded-md border border-border bg-card p-1.5">
-								<div className="relative overflow-hidden rounded bg-muted">
+							<li
+								key={page.id}
+								draggable
+								onDragStart={() => setDragPageId(page.id)}
+								onDragOver={(event) => event.preventDefault()}
+								onDrop={(event) => {
+									event.preventDefault();
+									handleDropPage(page.id);
+								}}
+								className={`flex w-28 cursor-grab flex-col gap-1 rounded-md border border-border bg-card p-1.5 ${
+									dragPageId === page.id ? 'opacity-50' : ''
+								}`}
+							>
+								<div
+									className="relative overflow-hidden rounded bg-muted"
+									onClick={splitMode === 'checkbox' ? () => handleTogglePageSelected(page.id) : undefined}
+									role={splitMode === 'checkbox' ? 'button' : undefined}
+									tabIndex={splitMode === 'checkbox' ? 0 : undefined}
+								>
 									<img
 										src={page.dataUrl}
 										alt={`${file.name} — page ${page.pageIndex + 1}`}
@@ -300,6 +400,15 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 									<span className="absolute bottom-1 right-1 rounded bg-black/60 px-1 text-[10px] font-medium text-white">
 										{index + 1}
 									</span>
+									{splitMode === 'checkbox' && (
+										<input
+											type="checkbox"
+											checked={selectedPageIds.has(page.id)}
+											onChange={() => handleTogglePageSelected(page.id)}
+											className="absolute left-1 top-1 size-4 cursor-pointer"
+											aria-label={messages.selectPageAria.replace('{{number}}', String(index + 1))}
+										/>
+									)}
 								</div>
 								<div className="flex items-center justify-between gap-1">
 									<Button
@@ -342,9 +451,16 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 							>
 								{messages.modeEveryN}
 							</button>
+							<button
+								type="button"
+								onClick={() => setSplitMode('checkbox')}
+								className={`rounded-md border px-2.5 py-1 text-xs font-medium ${splitMode === 'checkbox' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
+							>
+								{messages.modeCheckbox}
+							</button>
 						</div>
 
-						{splitMode === 'ranges' ? (
+						{splitMode === 'ranges' && (
 							<div className="flex flex-col gap-1">
 								<label htmlFor="pdf-splitter-ranges" className="text-sm font-medium text-foreground">
 									{messages.rangesLabel}
@@ -359,7 +475,8 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 								/>
 								<p className="text-xs text-muted-foreground">{messages.rangesHint}</p>
 							</div>
-						) : (
+						)}
+						{splitMode === 'everyN' && (
 							<div className="flex items-center gap-2">
 								<label htmlFor="pdf-splitter-every-n" className="text-sm font-medium text-foreground">
 									{messages.everyNLabel}
@@ -373,6 +490,21 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 									onChange={(event) => setEveryN(Number(event.target.value))}
 									className="w-20 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
 								/>
+							</div>
+						)}
+						{splitMode === 'checkbox' && (
+							<div className="flex flex-wrap items-center gap-2">
+								<span className="text-sm text-foreground">
+									{messages.selectedCount
+										.replace('{{count}}', String(selectedPageIds.size))
+										.replace('{{total}}', String(pages.length))}
+								</span>
+								<Button type="button" size="sm" variant="outline" onClick={handleSelectAllPages}>
+									{messages.selectAll}
+								</Button>
+								<Button type="button" size="sm" variant="outline" onClick={handleClearSelection}>
+									{messages.clearSelection}
+								</Button>
 							</div>
 						)}
 					</div>
@@ -399,19 +531,28 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 					</div>
 					<ul id="split-results" className="flex flex-col gap-2">
 						{results.map((result) => (
-							<li
-								key={result.id}
-								className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-2 text-sm"
-							>
-								<span className="truncate text-foreground">{result.label}</span>
-								<Button
-									type="button"
-									size="sm"
-									variant="secondary"
-									onClick={() => handleDownload(result)}
-								>
-									{messages.download}
-								</Button>
+							<li key={result.id} className="flex flex-col gap-2 rounded-md border border-border p-2 text-sm">
+								<div className="flex flex-wrap items-center justify-between gap-2">
+									<span className="truncate text-foreground">{result.label}</span>
+									<Button
+										type="button"
+										size="sm"
+										variant="secondary"
+										onClick={() => handleDownload(result)}
+									>
+										{messages.download}
+									</Button>
+								</div>
+								<div className="flex flex-wrap gap-1">
+									{result.previewThumbnails.map((dataUrl, i) => (
+										<img
+											key={i}
+											src={dataUrl}
+											alt={`${result.label} — ${i + 1}`}
+											className="h-12 w-auto rounded border border-border object-cover"
+										/>
+									))}
+								</div>
 							</li>
 						))}
 					</ul>

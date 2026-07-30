@@ -17,10 +17,15 @@
     "modeLabel": "Split mode",
     "modeRanges": "Custom ranges",
     "modeEveryN": "Every N pages",
+    "modeCheckbox": "Select pages",
     "everyNLabel": "Pages per file",
     "rangesLabel": "Page ranges (optional)",
     "rangesPlaceholder": "e.g. 1-3, 4, 5-7",
     "rangesHint": "Leave empty to split every page into its own PDF file.",
+    "selectedCount": "{{count}} of {{total}} pages selected",
+    "selectAll": "Select all",
+    "clearSelection": "Clear selection",
+    "dragHint": "Drag a page thumbnail onto another to reorder it — ranges and \"every N pages\" both use the order shown here.",
     "split": "Split PDF",
     "splitting": "Splitting…",
     "resultsHeading": "Result files",
@@ -28,7 +33,9 @@
     "downloadAll": "Download All (.zip)",
     "errorGeneric": "Something went wrong reading this PDF. Make sure it isn't corrupted or password-protected, then try again.",
     "errorInvalidRange": "Invalid page range \"{{range}}\". Use a format like 1-3, 4, 5-7, with pages between 1 and {{max}}.",
-    "errorInvalidEveryN": "Enter a whole number of 1 or more."
+    "errorInvalidEveryN": "Enter a whole number of 1 or more.",
+    "errorNoPagesSelected": "Select at least one page to extract.",
+    "selectPageAria": "Select page {{number}}"
   },
   "related": "Related tools",
   "faq": {

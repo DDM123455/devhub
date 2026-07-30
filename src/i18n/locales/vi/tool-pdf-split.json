@@ -17,10 +17,15 @@
     "modeLabel": "Kiểu tách",
     "modeRanges": "Khoảng tùy chỉnh",
     "modeEveryN": "Mỗi N trang",
+    "modeCheckbox": "Chọn trang",
     "everyNLabel": "Số trang mỗi file",
     "rangesLabel": "Khoảng trang (không bắt buộc)",
     "rangesPlaceholder": "VD: 1-3, 4, 5-7",
     "rangesHint": "Để trống nếu muốn tách mỗi trang thành một file PDF riêng.",
+    "selectedCount": "Đã chọn {{count}}/{{total}} trang",
+    "selectAll": "Chọn tất cả",
+    "clearSelection": "Bỏ chọn hết",
+    "dragHint": "Kéo một thumbnail trang thả lên trang khác để sắp xếp lại — cả khoảng trang lẫn \"mỗi N trang\" đều dùng đúng thứ tự hiển thị ở đây.",
     "split": "Tách PDF",
     "splitting": "Đang tách…",
     "resultsHeading": "File kết quả",
@@ -28,7 +33,9 @@
     "downloadAll": "Tải tất cả (.zip)",
     "errorGeneric": "Có lỗi khi đọc file PDF này. Hãy kiểm tra xem file có bị hỏng hoặc đặt mật khẩu không, rồi thử lại.",
     "errorInvalidRange": "Khoảng trang \"{{range}}\" không hợp lệ. Dùng định dạng như 1-3, 4, 5-7, với số trang từ 1 đến {{max}}.",
-    "errorInvalidEveryN": "Nhập một số nguyên từ 1 trở lên."
+    "errorInvalidEveryN": "Nhập một số nguyên từ 1 trở lên.",
+    "errorNoPagesSelected": "Chọn ít nhất một trang để trích xuất.",
+    "selectPageAria": "Chọn trang {{number}}"
   },
   "related": "Công cụ liên quan",
   "faq": {
