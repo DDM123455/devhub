@@ -209,8 +209,8 @@ ROADMAP)
 - [x] Xóa nền ảnh — crop/resize ảnh sau khi xóa nền
 
 **Nhóm PDF**
-- [ ] Gộp PDF — vs iLovePDF/Smallpdf: preview file PDF gộp cuối cùng trước khi tải
-- [ ] Gộp PDF — xử lý/báo lỗi riêng cho PDF có mật khẩu (thay vì lỗi chung chung)
+- [x] Gộp PDF — vs iLovePDF/Smallpdf: preview file PDF gộp cuối cùng trước khi tải
+- [x] Gộp PDF — xử lý/báo lỗi riêng cho PDF có mật khẩu (thay vì lỗi chung chung)
 - [x] Gộp PDF — cảnh báo giới hạn dung lượng nếu file quá lớn
 - [ ] Tách PDF — vs iLovePDF/Smallpdf: chọn trang kiểu checkbox đa lựa chọn (không chỉ cú
       pháp range)

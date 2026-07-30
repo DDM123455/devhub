@@ -144,6 +144,20 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b (bắt đầu nhóm A đã thống nhất với người dùng — không cần
+  dependency mới) — mục "Gộp PDF: preview file gộp + xử lý lỗi PDF có mật khẩu" (vs
+  iLovePDF/Smallpdf): **Lỗi mật khẩu** — phát hiện qua `err.name === 'PasswordException'`
+  (class lỗi riêng của `pdfjs-dist`, xác nhận qua đọc thẳng source `pdf.mjs`:
+  `BaseException` set `this.name` bằng chuỗi tên class), hiện thông báo riêng biệt thay vì
+  lỗi chung chung — đồng thời phát hiện ra **gap ẩn**: trước giờ file load lỗi (mật khẩu hay
+  hỏng) không hề hiển thị GÌ cho người dùng (chỉ âm thầm không đóng góp trang nào), nay thêm
+  hẳn danh sách lỗi theo từng file. **Preview merged file** — sau khi merge xong, gọi lại
+  `renderPdfThumbnails()` (hàm dùng chung `@/lib/pdf-thumbnails.ts`, vốn đã dùng để tạo
+  thumbnail từng trang lúc chọn file) trên CHÍNH bytes vừa merge ra (không phải trang gốc) —
+  đảm bảo preview phản ánh đúng thứ tự/xoay/xóa trang thật sự đã áp dụng, không chỉ tin logic
+  đã đúng. Mọi thao tác đổi trang (xóa/xoay/di chuyển/kéo-thả) đều xóa preview cũ (6 điểm reset
+  đồng bộ với `mergedBlob`). Build sạch (421 trang), xác nhận label mới trong
+  `dist/en/tools/merge-pdf/index.html`.
 - **2026-07-30** — Phase 3.6b — mục "So sánh văn bản: link chia sẻ kết quả" (vs
   Diffchecker.com): dùng **Compression Streams API** có sẵn của trình duyệt
   (`CompressionStream`/`DecompressionStream`, hỗ trợ mọi browser evergreen, không cần thư

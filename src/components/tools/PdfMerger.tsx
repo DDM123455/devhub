@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { PDFDocument, degrees } from 'pdf-lib';
-import { renderPdfThumbnails } from '@/lib/pdf-thumbnails';
+import { renderPdfThumbnails, type PdfPageThumbnail } from '@/lib/pdf-thumbnails';
 import { Button } from '@/components/ui/button';
 
 interface Messages {
@@ -19,6 +19,10 @@ interface Messages {
 	errorGeneric: string;
 	skippedFiles: string;
 	largeFileWarning: string;
+	passwordProtectedError: string;
+	fileErrorHeading: string;
+	previewHeading: string;
+	generatingPreview: string;
 }
 
 interface PageItem {
@@ -34,6 +38,7 @@ interface FileEntry {
 	id: string;
 	file: File;
 	status: 'loading' | 'done' | 'error';
+	errorMessage?: string;
 }
 
 function formatBytes(bytes: number): string {
@@ -57,6 +62,8 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 	const [mergedBlob, setMergedBlob] = useState<Blob | null>(null);
 	const [mergeError, setMergeError] = useState<string | null>(null);
 	const [skippedCount, setSkippedCount] = useState(0);
+	const [previewThumbnails, setPreviewThumbnails] = useState<PdfPageThumbnail[] | null>(null);
+	const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
 
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList) return;
@@ -67,6 +74,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 		setSkippedCount(allFiles.length - newFiles.length);
 		if (newFiles.length === 0) return;
 		setMergedBlob(null);
+		setPreviewThumbnails(null);
 		setMergeError(null);
 
 		const entries = newFiles.map((file) => ({
@@ -97,8 +105,24 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 						),
 					]);
 					setFiles((prev) => prev.map((f) => (f.id === fileId ? { ...f, status: 'done' } : f)));
-				} catch {
-					setFiles((prev) => prev.map((f) => (f.id === fileId ? { ...f, status: 'error' } : f)));
+				} catch (err) {
+					// pdfjs-dist throws a `PasswordException` (its `.name`, set in its own
+					// BaseException base class) specifically for a PDF that needs a
+					// password to open — worth telling apart from a generically
+					// corrupt/unsupported file, since the fix ("enter the password
+					// somewhere else first") is completely different advice.
+					const isPasswordProtected = err instanceof Error && err.name === 'PasswordException';
+					setFiles((prev) =>
+						prev.map((f) =>
+							f.id === fileId
+								? {
+										...f,
+										status: 'error',
+										errorMessage: isPasswordProtected ? messages.passwordProtectedError : messages.errorGeneric,
+									}
+								: f,
+						),
+					);
 				}
 			}
 		})();
@@ -106,11 +130,13 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 
 	const handleRemovePage = useCallback((id: string) => {
 		setMergedBlob(null);
+		setPreviewThumbnails(null);
 		setPages((prev) => prev.filter((page) => page.id !== id));
 	}, []);
 
 	const handleRotatePage = useCallback((id: string) => {
 		setMergedBlob(null);
+		setPreviewThumbnails(null);
 		setPages((prev) =>
 			prev.map((page) =>
 				page.id === id ? { ...page, rotation: ((page.rotation + 90) % 360) as PageItem['rotation'] } : page,
@@ -120,6 +146,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 
 	const handleMove = useCallback((id: string, direction: -1 | 1) => {
 		setMergedBlob(null);
+		setPreviewThumbnails(null);
 		setPages((prev) => {
 			const index = prev.findIndex((page) => page.id === id);
 			const targetIndex = index + direction;
@@ -132,6 +159,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 
 	const handleDrop = useCallback((targetId: string) => {
 		setMergedBlob(null);
+		setPreviewThumbnails(null);
 		setPages((prev) => {
 			if (!dragPageId || dragPageId === targetId) return prev;
 			const fromIndex = prev.findIndex((page) => page.id === dragPageId);
@@ -149,6 +177,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 		setIsProcessing(true);
 		setMergeError(null);
 		setMergedBlob(null);
+		setPreviewThumbnails(null);
 
 		try {
 			const mergedDoc = await PDFDocument.create();
@@ -170,6 +199,24 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 
 			const mergedBytes = await mergedDoc.save();
 			setMergedBlob(new Blob([mergedBytes], { type: 'application/pdf' }));
+
+			setIsGeneratingPreview(true);
+			try {
+				// Re-rasterize the merged result itself (not just its source pages)
+				// so the preview reflects the actual output — reordering, rotation,
+				// and page removal all show up exactly as they'll appear once
+				// downloaded, instead of trusting that those steps applied correctly.
+				const mergedArrayBuffer = mergedBytes.buffer.slice(
+					mergedBytes.byteOffset,
+					mergedBytes.byteOffset + mergedBytes.byteLength,
+				) as ArrayBuffer;
+				const thumbnails = await renderPdfThumbnails(mergedArrayBuffer, 0.3);
+				setPreviewThumbnails(thumbnails);
+			} catch {
+				setPreviewThumbnails(null);
+			} finally {
+				setIsGeneratingPreview(false);
+			}
 		} catch {
 			setMergeError(messages.errorGeneric);
 		}
@@ -232,6 +279,21 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 
 			{files.some((f) => f.status === 'loading') && (
 				<p role="status" className="text-sm text-muted-foreground">{messages.loadingThumbnails}</p>
+			)}
+
+			{files.some((f) => f.status === 'error') && (
+				<div role="alert" className="flex flex-col gap-1 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
+					<span className="font-medium">{messages.fileErrorHeading}</span>
+					<ul className="flex flex-col gap-0.5">
+						{files
+							.filter((f) => f.status === 'error')
+							.map((f) => (
+								<li key={f.id}>
+									{f.file.name}: {f.errorMessage ?? messages.errorGeneric}
+								</li>
+							))}
+					</ul>
+				</div>
 			)}
 
 			{totalFileSize > LARGE_TOTAL_SIZE_WARNING_BYTES && (
@@ -321,6 +383,23 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 			)}
 
 			{mergeError && <p role="alert" className="text-sm text-destructive">{mergeError}</p>}
+
+			{isGeneratingPreview && (
+				<p role="status" className="text-sm text-muted-foreground">{messages.generatingPreview}</p>
+			)}
+
+			{previewThumbnails && previewThumbnails.length > 0 && (
+				<div className="flex flex-col gap-2 rounded-lg border border-border p-3">
+					<span className="text-sm font-medium text-foreground">{messages.previewHeading}</span>
+					<ul className="flex flex-wrap gap-2">
+						{previewThumbnails.map((thumb) => (
+							<li key={thumb.pageIndex} className="w-20 overflow-hidden rounded border border-border bg-muted">
+								<img src={thumb.dataUrl} alt={`${messages.previewHeading} — ${thumb.pageIndex + 1}`} className="w-full" />
+							</li>
+						))}
+					</ul>
+				</div>
+			)}
 
 			<div className="flex items-center gap-3">
 				<Button type="button" onClick={handleMerge} disabled={!canMerge}>
