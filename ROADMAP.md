@@ -243,7 +243,7 @@ ROADMAP)
 - [ ] Color Picker — vs Coolors/Adobe Color: export ASE/SCSS/Tailwind config
 - [ ] Color Picker — trích xuất palette từ ảnh ("Image to Palette" — tính năng chủ lực Coolors)
 - [ ] Color Picker — lưu palette yêu thích (localStorage)
-- [ ] Color Picker — hex nhận cả dạng rút gọn 3 ký tự
+- [x] Color Picker — hex nhận cả dạng rút gọn 3 ký tự
 
 **Nhóm Media & QR**
 - [ ] QR Generator — vs qr-code-generator.com: frame/CTA text dưới QR (dot-style/gradient đã

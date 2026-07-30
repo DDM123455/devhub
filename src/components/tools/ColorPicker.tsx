@@ -53,10 +53,24 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 function hexToRgb(hex: string): Rgb | null {
-	const match = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
-	if (!match) return null;
-	const int = parseInt(match[1], 16);
-	return { r: (int >> 16) & 255, g: (int >> 8) & 255, b: int & 255 };
+	const trimmed = hex.trim();
+	const match6 = /^#?([0-9a-f]{6})$/i.exec(trimmed);
+	if (match6) {
+		const int = parseInt(match6[1], 16);
+		return { r: (int >> 16) & 255, g: (int >> 8) & 255, b: int & 255 };
+	}
+	// 3-digit shorthand (#abc → #aabbcc) — the same convention CSS itself
+	// accepts, so pasting a shorthand hex from another tool just works here too.
+	const match3 = /^#?([0-9a-f]{3})$/i.exec(trimmed);
+	if (match3) {
+		const expanded = match3[1]
+			.split('')
+			.map((c) => c + c)
+			.join('');
+		const int = parseInt(expanded, 16);
+		return { r: (int >> 16) & 255, g: (int >> 8) & 255, b: int & 255 };
+	}
+	return null;
 }
 
 function rgbToHex({ r, g, b }: Rgb): string {

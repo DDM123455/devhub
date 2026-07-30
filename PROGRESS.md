@@ -144,6 +144,12 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "Color Picker: hex nhận dạng rút gọn 3 ký tự" (vs
+  Coolors/Adobe Color): `hexToRgb()` trong `ColorPicker.tsx` trước đây chỉ khớp regex 6 ký
+  tự (`#RRGGBB`); thêm nhánh khớp 3 ký tự (`#RGB`) và tự nhân đôi từng ký tự thành 6 ký tự
+  trước khi parse — đúng quy ước CSS gốc đã hỗ trợ shorthand hex này. Verify bằng script Node
+  độc lập: `#abc` và `#AABBCC` cho ra cùng 1 RGB, input rác vẫn bị từ chối đúng như trước.
+  Build sạch (421 trang). Không cần đổi i18n (hàm nội bộ, không có text UI mới).
 - **2026-07-30** — Phase 3.6b (bắt đầu) — thêm ~42 mục feature-parity bắt buộc từ mục 2
   (so sánh benchmark từng công cụ) của `AUDIT.md` vào `ROADMAP.md`, phần chưa từng được đưa
   vào roadmap ở các đợt trước (loại các gap audit tự đánh giá chấp nhận được/Low, và các gap
