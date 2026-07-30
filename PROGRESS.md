@@ -137,6 +137,22 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6 — mục 6/7 "Resize trước khi xuất (Image Compressor + Image
+  Converter)": **Image Compressor** — thêm checkbox `resizeEnabled` + slider `maxDimension`
+  (320-4096px, mặc định 1920px), truyền thẳng vào `maxWidthOrHeight` của
+  `imageCompression()` (thư viện đã hỗ trợ sẵn, không cần code resize tay). **Image
+  Converter** — tool này dùng Canvas API thuần (không dùng `browser-image-compression`), nên
+  `convertImage()` được thêm tham số `maxDimension` tính lại `width`/`height` giữ tỷ lệ khung
+  hình trước khi tạo canvas; áp dụng TRƯỚC bước resize riêng cho ICO (256px) để 2 giới hạn
+  không xung đột — ICO luôn thu nhỏ thêm nếu cần, không bao giờ phóng to lại. Cả 2 file dùng
+  chung UI pattern (checkbox + range slider) và cùng dải giá trị 320-4096px. Nhân tiện sửa
+  đoạn văn giới thiệu (`article.p3`) của Image Compressor — trước đó viết "mỗi ảnh xử lý lần
+  lượt", nay sai từ khi làm mục 5/7 (song song hoá) nên đã cập nhật lại cho đúng, cả en+vi.
+  Thêm key i18n `resizeToggleLabel`/`maxDimensionLabel` cho cả 2 namespace, cả en+vi, cộng
+  dòng `messages` tương ứng trong 2 file `*Page.astro`. Build sạch (421 trang), xác nhận
+  label mới xuất hiện trong `dist/en/tools/{compress-image,convert-image-format}/index.html`,
+  verify công thức scale giữ tỷ lệ khung hình bằng script Node độc lập (không có browser
+  test trong môi trường phiên này).
 - **2026-07-30** — Phase 3.6 — mục 5/7 "Image Compressor: song song hoá batch": tách logic
   nén 1 ảnh ra `compressOne()`, `handleCompress()` đổi từ `for...of` tuần tự sang mô hình
   "worker-pool" — `CONCURRENCY = 3` lane chạy song song, mỗi lane tự lấy ảnh tiếp theo trong

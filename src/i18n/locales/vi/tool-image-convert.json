@@ -22,7 +22,9 @@
     "formatsNote": "Ảnh ICO được tự động thu nhỏ về tối đa 256×256 (kích thước icon chuẩn). Xuất AVIF cần trình duyệt Chrome hoặc Firefox bản mới. Ảnh HEIC/HEIF từ iPhone được tự động đọc — không cần bước chuyển đổi riêng.",
     "remove": "Xóa",
     "clearAll": "Xóa tất cả",
-    "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ."
+    "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ.",
+    "resizeToggleLabel": "Thay đổi kích thước trước khi chuyển đổi",
+    "maxDimensionLabel": "Kích thước tối đa: {{size}}px"
   },
   "related": "Công cụ liên quan",
   "faq": {

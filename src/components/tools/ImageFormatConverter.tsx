@@ -19,6 +19,8 @@ interface Messages {
 	remove: string;
 	clearAll: string;
 	skippedFiles: string;
+	resizeToggleLabel: string;
+	maxDimensionLabel: string;
 }
 
 type TargetFormat =
@@ -43,6 +45,9 @@ const EXTENSION_BY_FORMAT: Record<TargetFormat, string> = {
 const LOSSY_FORMATS = new Set<TargetFormat>(['image/jpeg', 'image/webp', 'image/avif']);
 const WHITE_BACKGROUND_FORMATS = new Set<TargetFormat>(['image/jpeg', 'image/bmp']);
 const ICO_MAX_DIMENSION = 256;
+const MIN_MAX_DIMENSION = 320;
+const MAX_MAX_DIMENSION = 4096;
+const DEFAULT_MAX_DIMENSION = 1920;
 
 interface ImageItem {
 	id: string;
@@ -173,11 +178,23 @@ async function encodeGif(imageData: ImageData): Promise<Blob> {
 	return new Blob([gif.bytes()], { type: 'image/gif' });
 }
 
-async function convertImage(file: File, targetFormat: TargetFormat, quality: number): Promise<Blob> {
+async function convertImage(
+	file: File,
+	targetFormat: TargetFormat,
+	quality: number,
+	maxDimension?: number,
+): Promise<Blob> {
 	const decodableBlob = await toDecodableBlob(file);
 	const bitmap = await createImageBitmap(decodableBlob);
 
 	let { width, height } = bitmap;
+	if (maxDimension && (width > maxDimension || height > maxDimension)) {
+		const scale = maxDimension / Math.max(width, height);
+		width = Math.round(width * scale);
+		height = Math.round(height * scale);
+	}
+	// ICO caps at 256px regardless of the user's resize choice — applied after,
+	// so it only ever shrinks further, never overrides a smaller user setting.
 	if (targetFormat === 'image/x-icon' && (width > ICO_MAX_DIMENSION || height > ICO_MAX_DIMENSION)) {
 		const scale = ICO_MAX_DIMENSION / Math.max(width, height);
 		width = Math.round(width * scale);
@@ -224,6 +241,8 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 	const [items, setItems] = useState<ImageItem[]>([]);
 	const [targetFormat, setTargetFormat] = useState<TargetFormat>('image/webp');
 	const [quality, setQuality] = useState(0.8);
+	const [resizeEnabled, setResizeEnabled] = useState(false);
+	const [maxDimension, setMaxDimension] = useState(DEFAULT_MAX_DIMENSION);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isZipping, setIsZipping] = useState(false);
 	const [isDragOver, setIsDragOver] = useState(false);
@@ -258,7 +277,12 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 				prev.map((it) => (it.id === item.id ? { ...it, status: 'processing' } : it)),
 			);
 			try {
-				const resultBlob = await convertImage(item.file, targetFormat, quality);
+				const resultBlob = await convertImage(
+					item.file,
+					targetFormat,
+					quality,
+					resizeEnabled ? maxDimension : undefined,
+				);
 				setItems((prev) =>
 					prev.map((it) => (it.id === item.id ? { ...it, status: 'done', resultBlob } : it)),
 				);
@@ -271,7 +295,15 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 			}
 		}
 		setIsProcessing(false);
-	}, [items, targetFormat, quality, messages.errorAvifUnsupported, messages.errorGeneric]);
+	}, [
+		items,
+		targetFormat,
+		quality,
+		resizeEnabled,
+		maxDimension,
+		messages.errorAvifUnsupported,
+		messages.errorGeneric,
+	]);
 
 	const handleDownload = useCallback(
 		(item: ImageItem) => {
@@ -386,6 +418,34 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 							className="w-48"
 						/>
 					</>
+				)}
+			</div>
+
+			<div className="flex flex-col gap-2">
+				<label className="flex items-center gap-1.5 text-sm text-foreground">
+					<input
+						type="checkbox"
+						checked={resizeEnabled}
+						onChange={(event) => setResizeEnabled(event.target.checked)}
+					/>
+					{messages.resizeToggleLabel}
+				</label>
+				{resizeEnabled && (
+					<div className="flex items-center gap-3">
+						<label htmlFor="image-converter-max-dimension" className="shrink-0 text-sm text-foreground">
+							{messages.maxDimensionLabel.replace('{{size}}', String(maxDimension))}
+						</label>
+						<input
+							id="image-converter-max-dimension"
+							type="range"
+							min={MIN_MAX_DIMENSION}
+							max={MAX_MAX_DIMENSION}
+							step={32}
+							value={maxDimension}
+							onChange={(event) => setMaxDimension(Number(event.target.value))}
+							className="w-48"
+						/>
+					</div>
 				)}
 			</div>
 

@@ -22,7 +22,9 @@
     "formatsNote": "ICO output is resized to a maximum of 256×256 (the standard icon size). AVIF export needs a recent Chrome or Firefox. HEIC/HEIF photos from iPhone are read automatically — no separate conversion step needed.",
     "remove": "Remove",
     "clearAll": "Clear all",
-    "skippedFiles": "{{count}} file(s) were skipped because they're not a supported image format."
+    "skippedFiles": "{{count}} file(s) were skipped because they're not a supported image format.",
+    "resizeToggleLabel": "Resize before converting",
+    "maxDimensionLabel": "Max width/height: {{size}}px"
   },
   "related": "Related tools",
   "faq": {

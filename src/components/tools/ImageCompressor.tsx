@@ -19,6 +19,8 @@ interface Messages {
 	remove: string;
 	clearAll: string;
 	skippedFiles: string;
+	resizeToggleLabel: string;
+	maxDimensionLabel: string;
 }
 
 interface ImageItem {
@@ -35,6 +37,9 @@ interface ImageItem {
 // running all of them at once for a large batch would spawn dozens of workers
 // simultaneously and spike memory, so only this many run concurrently.
 const CONCURRENCY = 3;
+const MIN_MAX_DIMENSION = 320;
+const MAX_MAX_DIMENSION = 4096;
+const DEFAULT_MAX_DIMENSION = 1920;
 
 function formatBytes(bytes: number): string {
 	if (bytes < 1024) return `${bytes} B`;
@@ -45,6 +50,8 @@ function formatBytes(bytes: number): string {
 export default function ImageCompressor({ messages }: { messages: Messages }) {
 	const [items, setItems] = useState<ImageItem[]>([]);
 	const [quality, setQuality] = useState(0.8);
+	const [resizeEnabled, setResizeEnabled] = useState(false);
+	const [maxDimension, setMaxDimension] = useState(DEFAULT_MAX_DIMENSION);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isZipping, setIsZipping] = useState(false);
 	const [skippedCount, setSkippedCount] = useState(0);
@@ -101,6 +108,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 					maxSizeMB: 10,
 					useWebWorker: true,
 					initialQuality: quality,
+					maxWidthOrHeight: resizeEnabled ? maxDimension : undefined,
 				});
 				setItems((prev) =>
 					prev.map((it) =>
@@ -119,7 +127,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 				setItems((prev) => prev.map((it) => (it.id === item.id ? { ...it, status: 'error' } : it)));
 			}
 		},
-		[quality],
+		[quality, resizeEnabled, maxDimension],
 	);
 
 	const handleCompress = useCallback(async () => {
@@ -229,6 +237,34 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 					onChange={(event) => setQuality(Number(event.target.value))}
 					className="w-48"
 				/>
+			</div>
+
+			<div className="flex flex-col gap-2">
+				<label className="flex items-center gap-1.5 text-sm text-foreground">
+					<input
+						type="checkbox"
+						checked={resizeEnabled}
+						onChange={(event) => setResizeEnabled(event.target.checked)}
+					/>
+					{messages.resizeToggleLabel}
+				</label>
+				{resizeEnabled && (
+					<div className="flex items-center gap-3">
+						<label htmlFor="image-compressor-max-dimension" className="shrink-0 text-sm text-foreground">
+							{messages.maxDimensionLabel.replace('{{size}}', String(maxDimension))}
+						</label>
+						<input
+							id="image-compressor-max-dimension"
+							type="range"
+							min={MIN_MAX_DIMENSION}
+							max={MAX_MAX_DIMENSION}
+							step={32}
+							value={maxDimension}
+							onChange={(event) => setMaxDimension(Number(event.target.value))}
+							className="w-48"
+						/>
+					</div>
+				)}
 			</div>
 
 			{items.length === 0 ? (
