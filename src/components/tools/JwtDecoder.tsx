@@ -17,6 +17,9 @@ interface Messages {
 	issuedAtLabel: string;
 	expiresAtLabel: string;
 	notBeforeLabel: string;
+	audienceLabel: string;
+	issuerLabel: string;
+	subjectLabel: string;
 	expiredBadge: string;
 	validBadge: string;
 	noStandardClaims: string;
@@ -184,6 +187,17 @@ function formatTimestamp(value: unknown): string | null {
 	return new Date(value * 1000).toLocaleString();
 }
 
+// `aud` is the only standard claim the JWT spec allows as either a single
+// string or an array of strings (multiple intended audiences) — everything
+// else here is always a plain string.
+function formatStringOrArrayClaim(value: unknown): string | null {
+	if (typeof value === 'string' && value !== '') return value;
+	if (Array.isArray(value) && value.every((v) => typeof v === 'string') && value.length > 0) {
+		return value.join(', ');
+	}
+	return null;
+}
+
 function getClaim(payload: unknown, key: string): unknown {
 	if (payload === null || typeof payload !== 'object') return undefined;
 	return (payload as Record<string, unknown>)[key];
@@ -248,7 +262,13 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 	const iatText = formatTimestamp(iat);
 	const nbfText = formatTimestamp(nbf);
 	const isExpired = typeof exp === 'number' && exp * 1000 < Date.now();
-	const hasStandardClaims = expText !== null || iatText !== null || nbfText !== null;
+
+	const audText = decoded ? formatStringOrArrayClaim(getClaim(decoded.payload, 'aud')) : null;
+	const issText = decoded ? formatStringOrArrayClaim(getClaim(decoded.payload, 'iss')) : null;
+	const subText = decoded ? formatStringOrArrayClaim(getClaim(decoded.payload, 'sub')) : null;
+
+	const hasStandardClaims =
+		expText !== null || iatText !== null || nbfText !== null || audText !== null || issText !== null || subText !== null;
 
 	const resetForNewToken = (value: string) => {
 		setTokenInput(value);
@@ -410,6 +430,24 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 									<div>
 										<dt className="text-muted-foreground">{messages.notBeforeLabel}</dt>
 										<dd className="text-foreground">{nbfText}</dd>
+									</div>
+								)}
+								{subText && (
+									<div>
+										<dt className="text-muted-foreground">{messages.subjectLabel}</dt>
+										<dd className="break-all text-foreground">{subText}</dd>
+									</div>
+								)}
+								{issText && (
+									<div>
+										<dt className="text-muted-foreground">{messages.issuerLabel}</dt>
+										<dd className="break-all text-foreground">{issText}</dd>
+									</div>
+								)}
+								{audText && (
+									<div>
+										<dt className="text-muted-foreground">{messages.audienceLabel}</dt>
+										<dd className="break-all text-foreground">{audText}</dd>
 									</div>
 								)}
 							</dl>

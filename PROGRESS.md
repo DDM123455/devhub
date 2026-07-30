@@ -137,6 +137,14 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6 — mục 2/7 "JWT Decoder: hiển thị aud/iss/sub": `JwtDecoder.tsx`
+  thêm helper `formatStringOrArrayClaim()` (claim `aud` theo spec JWT có thể là string hoặc
+  mảng string, các claim còn lại luôn là string đơn), tính `audText`/`issText`/`subText` song
+  song với `expText`/`iatText`/`nbfText` sẵn có, render thêm vào cùng `<dl>` claims panel.
+  Thêm 3 key i18n `audienceLabel`/`issuerLabel`/`subjectLabel` vào `en`+`vi` của
+  `tool-jwt-decoder.json` và vào object `messages` trong `JwtDecoderPage.astro` (bắt buộc
+  theo quy ước đã ghi ở trên, nếu không sẽ render rỗng). Build sạch (421 trang), xác nhận qua
+  `dist/en/tools/jwt-decoder/index.html` có đủ 3 label mới.
 - **2026-07-30** — Phase 3.6 (bắt đầu) — mục 1/7 "Base64: mở rộng bảng MIME→extension":
   `EXTENSION_BY_MIME` trong `Base64Tool.tsx` mở rộng từ 9 lên ~35 entries, thêm ảnh
   (bmp/ico/avif/heic/tiff), audio/video phổ biến, font (woff/woff2/ttf/otf), Office

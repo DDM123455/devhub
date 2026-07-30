@@ -184,7 +184,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
       component tool (không phải nội dung dưới fold); phần article/FAQ/related-tools
       đã là Astro thuần (server-render), không có gì để đổi client directive
 - [x] Base64: mở rộng bảng MIME→extension
-- [ ] JWT Decoder: hiển thị `aud`/`iss`/`sub` tường minh trong claims panel
+- [x] JWT Decoder: hiển thị `aud`/`iss`/`sub` tường minh trong claims panel
 
 ## Phase 4 — Kiếm tiền & PWA
 
