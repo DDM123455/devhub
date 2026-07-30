@@ -40,7 +40,10 @@
     "savePalette": "Lưu bảng màu",
     "savedPalettesHeading": "Bảng màu đã lưu",
     "loadPaletteAria": "Tải bảng màu đã lưu này",
-    "deletePaletteAria": "Xóa bảng màu đã lưu này"
+    "deletePaletteAria": "Xóa bảng màu đã lưu này",
+    "copyPaletteScss": "Sao chép dạng SCSS",
+    "copyPaletteTailwind": "Sao chép dạng Tailwind config",
+    "exportPaletteAse": "Xuất file .ase"
   },
   "related": "Công cụ liên quan",
   "faq": {

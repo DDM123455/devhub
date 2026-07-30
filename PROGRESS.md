@@ -144,6 +144,20 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b (hoàn tất nhóm 🟠 Trung bình 5/5) — mục "Color Picker: export
+  ASE/SCSS/Tailwind config" (vs Coolors/Adobe Color): thêm 2 nút copy đơn giản (SCSS: `$color-
+  N: #hex;`, Tailwind: object `colors: { 'palette-N': '#hex' }`) cùng pattern với nút CSS/JSON
+  copy có sẵn. Riêng **ASE** (Adobe Swatch Exchange) — định dạng nhị phân không có spec chính
+  thức từ Adobe (cộng đồng design tool tự reverse-engineer từ nhiều năm trước, nhưng
+  Illustrator/Photoshop/Coolors đều đọc được) — tự viết `buildAseBlob()` từ đầu: header 12
+  byte (chữ ký "ASEF" + version + số block), mỗi màu là 1 block biến độ dài (tên dạng UTF-16BE
+  kết thúc bằng null, color model "RGB ", 3 số thực big-endian 0-1 cho RGB, color type).
+  Verify bằng script Node độc lập: tự dựng file .ase rồi tự viết luôn 1 parser ASE tối giản để
+  đọc ngược lại — xác nhận signature/version/block count/tên/model đều đúng, và giá trị RGB
+  round-trip khớp 100% với hex gốc (test 3 màu). Build sạch (421 trang), xác nhận label mới
+  trong `dist/en/tools/color-picker/index.html`. **Hoàn tất toàn bộ nhóm Trung bình (5/5)**
+  của Phase 3.6b: Image Converter, Background Remover, JSON Formatter, QR Generator, Color
+  Picker.
 - **2026-07-30** — Phase 3.6b — mục "QR Generator: batch tạo nhiều QR cùng lúc" (vs
   qr-code-generator.com): thêm checkbox "Batch mode" (chỉ hiện với content type URL/Text —
   các loại còn lại như WiFi/vCard/Email/SMS có nhiều trường riêng, không hợp để nhập hàng

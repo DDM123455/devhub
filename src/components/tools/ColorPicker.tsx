@@ -27,6 +27,9 @@ interface Messages {
 	unlockAria: string;
 	copyPaletteCss: string;
 	copyPaletteJson: string;
+	copyPaletteScss: string;
+	copyPaletteTailwind: string;
+	exportPaletteAse: string;
 	contrastHeading: string;
 	contrastVsWhite: string;
 	contrastVsBlack: string;
@@ -170,6 +173,65 @@ function randomHsl(): Hsl {
 	};
 }
 
+function floatToBEBytes(value: number): number[] {
+	const buffer = new ArrayBuffer(4);
+	new DataView(buffer).setFloat32(0, value, false);
+	return Array.from(new Uint8Array(buffer));
+}
+
+function stringToUtf16BENullTerminated(str: string): number[] {
+	const bytes: number[] = [];
+	for (let i = 0; i < str.length; i++) {
+		const code = str.charCodeAt(i);
+		bytes.push((code >> 8) & 0xff, code & 0xff);
+	}
+	bytes.push(0, 0);
+	return bytes;
+}
+
+// Adobe Swatch Exchange (.ase) — a documented-but-unofficial binary format
+// (no public spec from Adobe, reverse-engineered by the design tool
+// community years ago) that Illustrator, Photoshop, and Coolors' own "Export
+// ASE" all read: 12-byte header ("ASEF" signature + version + block count),
+// then one variable-length color-entry block per swatch (name, color model,
+// 3 big-endian floats 0–1 for RGB, color type).
+function buildAseBlob(hexColors: string[]): Blob {
+	const bytes: number[] = [];
+	for (const [i, hex] of hexColors.entries()) {
+		const rgb = hexToRgb(hex) ?? { r: 0, g: 0, b: 0 };
+		const nameBytes = stringToUtf16BENullTerminated(`Color ${i + 1}`);
+		const nameLength = nameBytes.length / 2;
+		const blockData = [
+			(nameLength >> 8) & 0xff,
+			nameLength & 0xff,
+			...nameBytes,
+			0x52, 0x47, 0x42, 0x20, // "RGB " color model, space-padded to 4 bytes
+			...floatToBEBytes(rgb.r / 255),
+			...floatToBEBytes(rgb.g / 255),
+			...floatToBEBytes(rgb.b / 255),
+			0x00, 0x02, // color type: process
+		];
+		const blockLength = blockData.length;
+		bytes.push(
+			0x00, 0x01, // block type: color entry
+			(blockLength >> 24) & 0xff,
+			(blockLength >> 16) & 0xff,
+			(blockLength >> 8) & 0xff,
+			blockLength & 0xff,
+			...blockData,
+		);
+	}
+	const header = [
+		0x41, 0x53, 0x45, 0x46, // "ASEF" signature
+		0x00, 0x01, 0x00, 0x00, // version 1.0
+		(hexColors.length >> 24) & 0xff,
+		(hexColors.length >> 16) & 0xff,
+		(hexColors.length >> 8) & 0xff,
+		hexColors.length & 0xff,
+	];
+	return new Blob([new Uint8Array([...header, ...bytes])], { type: 'application/octet-stream' });
+}
+
 interface SavedPalette {
 	id: string;
 	colors: string[];
@@ -259,6 +321,8 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 	const [locked, setLocked] = useState<boolean[]>(() => Array(5).fill(false));
 	const [cssCopied, setCssCopied] = useState(false);
 	const [jsonCopied, setJsonCopied] = useState(false);
+	const [scssCopied, setScssCopied] = useState(false);
+	const [tailwindCopied, setTailwindCopied] = useState(false);
 	const [savedPalettes, setSavedPalettes] = useState<SavedPalette[]>(() => loadSavedPalettes());
 
 	useEffect(() => {
@@ -507,6 +571,54 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 						}}
 					>
 						{jsonCopied ? messages.copied : messages.copyPaletteJson}
+					</Button>
+					<Button
+						type="button"
+						size="sm"
+						variant="ghost"
+						onClick={() => {
+							const scss = palette.map((c, i) => `$color-${i + 1}: ${rgbToHex(hslToRgb(c))};`).join('\n');
+							void navigator.clipboard.writeText(scss).then(() => {
+								setScssCopied(true);
+								setTimeout(() => setScssCopied(false), 1200);
+							});
+						}}
+					>
+						{scssCopied ? messages.copied : messages.copyPaletteScss}
+					</Button>
+					<Button
+						type="button"
+						size="sm"
+						variant="ghost"
+						onClick={() => {
+							const tailwind = [
+								'colors: {',
+								...palette.map((c, i) => `  'palette-${i + 1}': '${rgbToHex(hslToRgb(c))}',`),
+								'}',
+							].join('\n');
+							void navigator.clipboard.writeText(tailwind).then(() => {
+								setTailwindCopied(true);
+								setTimeout(() => setTailwindCopied(false), 1200);
+							});
+						}}
+					>
+						{tailwindCopied ? messages.copied : messages.copyPaletteTailwind}
+					</Button>
+					<Button
+						type="button"
+						size="sm"
+						variant="ghost"
+						onClick={() => {
+							const blob = buildAseBlob(palette.map((c) => rgbToHex(hslToRgb(c))));
+							const url = URL.createObjectURL(blob);
+							const link = document.createElement('a');
+							link.href = url;
+							link.download = 'palette.ase';
+							link.click();
+							URL.revokeObjectURL(url);
+						}}
+					>
+						{messages.exportPaletteAse}
 					</Button>
 				</div>
 			</div>

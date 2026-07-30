@@ -240,7 +240,7 @@ ROADMAP)
 - [ ] Regex Tester — vs regex101/RegExr: bộ chọn "flavor" (PCRE/Python/...)
 - [x] Regex Tester — lưu lịch sử pattern
 - [x] Regex Tester — URL chia sẻ state
-- [ ] Color Picker — vs Coolors/Adobe Color: export ASE/SCSS/Tailwind config
+- [x] Color Picker — vs Coolors/Adobe Color: export ASE/SCSS/Tailwind config
 - [ ] Color Picker — trích xuất palette từ ảnh ("Image to Palette" — tính năng chủ lực Coolors)
 - [x] Color Picker — lưu palette yêu thích (localStorage)
 - [x] Color Picker — hex nhận cả dạng rút gọn 3 ký tự
