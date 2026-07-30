@@ -27,7 +27,10 @@
     "clearAll": "Clear all",
     "skippedFiles": "{{count}} file(s) were skipped because they're not a supported image format.",
     "overallProgress": "Processing image {{current}} of {{total}} — {{percent}}% overall",
-    "downloadAll": "Download All (.zip)"
+    "downloadAll": "Download All (.zip)",
+    "trimTransparentEdgesLabel": "Trim transparent edges",
+    "resizeToggleLabel": "Resize before download",
+    "maxDimensionLabel": "Max width/height: {{size}}px"
   },
   "related": "Related tools",
   "faq": {

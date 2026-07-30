@@ -25,6 +25,9 @@ interface Messages {
 	skippedFiles: string;
 	overallProgress: string;
 	downloadAll: string;
+	trimTransparentEdgesLabel: string;
+	resizeToggleLabel: string;
+	maxDimensionLabel: string;
 }
 
 type BackgroundMode = 'transparent' | 'color' | 'image';
@@ -39,6 +42,10 @@ interface ImageItem {
 	comparePosition: number;
 	progress?: number;
 }
+
+const MIN_MAX_DIMENSION = 320;
+const MAX_MAX_DIMENSION = 4096;
+const DEFAULT_MAX_DIMENSION = 1920;
 
 function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality?: number): Promise<Blob> {
 	return new Promise((resolve, reject) => {
@@ -86,10 +93,36 @@ function softenAlphaEdges(imageData: ImageData, radius: number): void {
 	for (let i = 0; i < width * height; i++) data[i * 4 + 3] = Math.round(fullyBlurred[i]);
 }
 
+// Scans every pixel's alpha channel to find the smallest rectangle containing
+// anything non-transparent — a cheap way to "auto-crop" a cutout without a
+// manual drag-handle UI: the AI already produced the mask, this just trims
+// the empty margin around it.
+function computeOpaqueBoundingBox(imageData: ImageData): { x: number; y: number; width: number; height: number } | null {
+	const { width, height, data } = imageData;
+	let minX = width;
+	let minY = height;
+	let maxX = -1;
+	let maxY = -1;
+	for (let y = 0; y < height; y++) {
+		for (let x = 0; x < width; x++) {
+			if (data[(y * width + x) * 4 + 3] > 0) {
+				if (x < minX) minX = x;
+				if (x > maxX) maxX = x;
+				if (y < minY) minY = y;
+				if (y > maxY) maxY = y;
+			}
+		}
+	}
+	if (maxX < minX || maxY < minY) return null;
+	return { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 };
+}
+
 async function buildDisplayBlob(
 	resultBlob: Blob,
 	edgeSoftness: number,
 	background: { mode: BackgroundMode; color: string; imageUrl: string | null },
+	trimTransparentEdges: boolean,
+	maxDimension: number | undefined,
 ): Promise<Blob> {
 	const bitmap = await createImageBitmap(resultBlob);
 	const canvas = document.createElement('canvas');
@@ -125,7 +158,35 @@ async function buildDisplayBlob(
 	}
 	bitmap.close();
 
-	return canvasToBlob(canvas, 'image/png');
+	// Trimming only makes sense against a transparent background — a color or
+	// image fill has no "empty margin" left to detect once it's painted in.
+	let finalCanvas: HTMLCanvasElement = canvas;
+	if (background.mode === 'transparent' && trimTransparentEdges) {
+		const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+		const box = computeOpaqueBoundingBox(imageData);
+		if (box && (box.width < canvas.width || box.height < canvas.height)) {
+			const trimmed = document.createElement('canvas');
+			trimmed.width = box.width;
+			trimmed.height = box.height;
+			const trimmedCtx = trimmed.getContext('2d');
+			if (!trimmedCtx) throw new Error('Canvas 2D context unavailable');
+			trimmedCtx.drawImage(finalCanvas, -box.x, -box.y);
+			finalCanvas = trimmed;
+		}
+	}
+
+	if (maxDimension && (finalCanvas.width > maxDimension || finalCanvas.height > maxDimension)) {
+		const scale = maxDimension / Math.max(finalCanvas.width, finalCanvas.height);
+		const resized = document.createElement('canvas');
+		resized.width = Math.round(finalCanvas.width * scale);
+		resized.height = Math.round(finalCanvas.height * scale);
+		const resizedCtx = resized.getContext('2d');
+		if (!resizedCtx) throw new Error('Canvas 2D context unavailable');
+		resizedCtx.drawImage(finalCanvas, 0, 0, resized.width, resized.height);
+		finalCanvas = resized;
+	}
+
+	return canvasToBlob(finalCanvas, 'image/png');
 }
 
 export default function BackgroundRemover({ messages }: { messages: Messages }) {
@@ -136,6 +197,9 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 	const [backgroundColor, setBackgroundColor] = useState('#22C55E');
 	const [backgroundImageUrl, setBackgroundImageUrl] = useState<string | null>(null);
 	const [edgeSoftness, setEdgeSoftness] = useState(0);
+	const [trimTransparentEdges, setTrimTransparentEdges] = useState(false);
+	const [resizeEnabled, setResizeEnabled] = useState(false);
+	const [maxDimension, setMaxDimension] = useState(DEFAULT_MAX_DIMENSION);
 	const [skippedCount, setSkippedCount] = useState(0);
 	const [isZipping, setIsZipping] = useState(false);
 	const objectUrls = useRef<Set<string>>(new Set());
@@ -160,7 +224,13 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 		(async () => {
 			for (const item of items) {
 				if (item.status !== 'done' || !item.resultBlob) continue;
-				const displayBlob = await buildDisplayBlob(item.resultBlob, edgeSoftness, background);
+				const displayBlob = await buildDisplayBlob(
+					item.resultBlob,
+					edgeSoftness,
+					background,
+					trimTransparentEdges,
+					resizeEnabled ? maxDimension : undefined,
+				);
 				if (cancelled) return;
 				const displayUrl = trackUrl(URL.createObjectURL(displayBlob));
 				setItems((prev) =>
@@ -172,7 +242,16 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 			cancelled = true;
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [backgroundMode, backgroundColor, backgroundImageUrl, edgeSoftness, items.filter((i) => i.status === 'done').length]);
+	}, [
+		backgroundMode,
+		backgroundColor,
+		backgroundImageUrl,
+		edgeSoftness,
+		trimTransparentEdges,
+		resizeEnabled,
+		maxDimension,
+		items.filter((i) => i.status === 'done').length,
+	]);
 
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList) return;
@@ -399,6 +478,45 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 						onChange={(event) => setEdgeSoftness(Number(event.target.value))}
 						className="w-48"
 					/>
+				</div>
+
+				{backgroundMode === 'transparent' && (
+					<label className="flex items-center gap-1.5 text-sm text-foreground">
+						<input
+							type="checkbox"
+							checked={trimTransparentEdges}
+							onChange={(event) => setTrimTransparentEdges(event.target.checked)}
+						/>
+						{messages.trimTransparentEdgesLabel}
+					</label>
+				)}
+
+				<div className="flex flex-col gap-2">
+					<label className="flex items-center gap-1.5 text-sm text-foreground">
+						<input
+							type="checkbox"
+							checked={resizeEnabled}
+							onChange={(event) => setResizeEnabled(event.target.checked)}
+						/>
+						{messages.resizeToggleLabel}
+					</label>
+					{resizeEnabled && (
+						<div className="flex items-center gap-3">
+							<label htmlFor="background-remover-max-dimension" className="shrink-0 text-sm text-foreground">
+								{messages.maxDimensionLabel.replace('{{size}}', String(maxDimension))}
+							</label>
+							<input
+								id="background-remover-max-dimension"
+								type="range"
+								min={MIN_MAX_DIMENSION}
+								max={MAX_MAX_DIMENSION}
+								step={32}
+								value={maxDimension}
+								onChange={(event) => setMaxDimension(Number(event.target.value))}
+								className="w-48"
+							/>
+						</div>
+					)}
 				</div>
 			</div>
 

@@ -27,7 +27,10 @@
     "clearAll": "Xóa tất cả",
     "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ.",
     "overallProgress": "Đang xử lý ảnh {{current}}/{{total}} — {{percent}}% tổng tiến độ",
-    "downloadAll": "Tải tất cả (.zip)"
+    "downloadAll": "Tải tất cả (.zip)",
+    "trimTransparentEdgesLabel": "Cắt bỏ viền trong suốt thừa",
+    "resizeToggleLabel": "Thay đổi kích thước trước khi tải",
+    "maxDimensionLabel": "Kích thước tối đa: {{size}}px"
   },
   "related": "Công cụ liên quan",
   "faq": {

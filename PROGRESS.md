@@ -144,6 +144,19 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "Xóa nền ảnh: crop/resize" (vs remove.bg): thay vì cọ
+  tinh chỉnh mask thủ công (audit tự ghi nhận đây là tính năng "Pro" phức tạp, để lại phiên
+  sau nếu cần), triển khai 2 phần khả thi ngay: **Trim viền trong suốt** —
+  `computeOpaqueBoundingBox()` quét alpha channel tìm hình chữ nhật nhỏ nhất chứa toàn bộ
+  pixel không trong suốt, tự crop theo đó — auto-crop không cần UI kéo-thả tay, chỉ hiện khi
+  `backgroundMode === 'transparent'` (crop mất ý nghĩa khi đã tô màu/ảnh nền). **Resize** —
+  cùng pattern checkbox + slider maxDimension (320-4096px) đã dùng ở Image Compressor/
+  Converter, áp dụng sau bước trim. Cả 2 tích hợp vào `buildDisplayBlob()` hiện có (đã chạy
+  lại mỗi khi đổi nền/edge-softness, giờ chạy lại luôn khi đổi 2 tùy chọn mới). Verify
+  `computeOpaqueBoundingBox()` bằng script Node độc lập: ảnh giả 10×10 với vùng vuông opaque
+  đã biết tọa độ → trả đúng bounding box; ảnh toàn trong suốt → trả `null` đúng (không crash/
+  crop sai). Build sạch (421 trang), xác nhận label mới trong
+  `dist/en/tools/remove-background/index.html`.
 - **2026-07-30** — Phase 3.6b — mục "CSV↔JSON Converter: batch nhiều file" (vs CloudConvert/
   Convertio): tách logic convert ra hàm thuần `convertOne()` (dùng chung cho cả live preview
   qua `useMemo` lẫn xử lý batch, tránh trùng lặp code). `handleFiles` (đổi tên từ `handleFile`

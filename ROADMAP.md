@@ -206,7 +206,7 @@ ROADMAP)
 - [x] Xóa nền ảnh — vs remove.bg: thanh tiến trình TỔNG khi xử lý hàng loạt (hiện chỉ có %
       của ảnh hiện tại)
 - [x] Xóa nền ảnh — Download All .zip khi xử lý nhiều ảnh (nhất quán với Compressor/Splitter)
-- [ ] Xóa nền ảnh — crop/resize ảnh sau khi xóa nền
+- [x] Xóa nền ảnh — crop/resize ảnh sau khi xóa nền
 
 **Nhóm PDF**
 - [ ] Gộp PDF — vs iLovePDF/Smallpdf: preview file PDF gộp cuối cùng trước khi tải
