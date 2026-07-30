@@ -36,7 +36,11 @@
     "contrastPassAAA": "Đạt AAA",
     "contrastPassAA": "Đạt AA",
     "contrastFail": "Không đạt",
-    "invalidHexError": "Vui lòng nhập mã màu hex hợp lệ, ví dụ #3b82f6."
+    "invalidHexError": "Vui lòng nhập mã màu hex hợp lệ, ví dụ #3b82f6.",
+    "savePalette": "Lưu bảng màu",
+    "savedPalettesHeading": "Bảng màu đã lưu",
+    "loadPaletteAria": "Tải bảng màu đã lưu này",
+    "deletePaletteAria": "Xóa bảng màu đã lưu này"
   },
   "related": "Công cụ liên quan",
   "faq": {

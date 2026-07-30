@@ -144,6 +144,15 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "Color Picker: lưu palette yêu thích" (vs Coolors/Adobe
+  Color) — **hoàn tất nhóm 🟢 Thấp (9/9 mục quick-win)**: thêm nút "Save palette" cạnh
+  "Generate", lưu 5 màu hiện tại (dạng hex) vào `localStorage`
+  (`color-picker-saved-palettes`, tối đa 20 bộ, mới nhất lên đầu). Hiển thị danh sách bảng
+  màu đã lưu — mỗi bảng là 1 dải màu bấm được để load lại (`setPalette` + `rgbToHsl` từ hex
+  đã lưu) kèm nút xóa riêng. Đọc/ghi `localStorage` đều bọc try/catch (cùng pattern history
+  của Regex Tester) để không vỡ nếu private-mode/quota đầy. Build sạch (421 trang), xác nhận
+  label mới trong `dist/en/tools/color-picker/index.html`. Thêm 4 key i18n cho en+vi +
+  `messages` object.
 - **2026-07-30** — Phase 3.6b — mục "Chuyển đổi Case: Title Case có danh sách từ ngoại lệ"
   (vs ConvertCase.net): thêm `titleCase()` áp dụng đúng quy ước AP/Chicago-style mà
   ConvertCase.net dùng — 18 từ ngắn (a/an/and/as/at/but/by/for/in/nor/of/on/or/so/the/to/

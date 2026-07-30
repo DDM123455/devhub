@@ -36,7 +36,11 @@
     "contrastPassAAA": "AAA",
     "contrastPassAA": "AA",
     "contrastFail": "Fail",
-    "invalidHexError": "Enter a valid hex color, e.g. #3b82f6."
+    "invalidHexError": "Enter a valid hex color, e.g. #3b82f6.",
+    "savePalette": "Save palette",
+    "savedPalettesHeading": "Saved palettes",
+    "loadPaletteAria": "Load this saved palette",
+    "deletePaletteAria": "Delete this saved palette"
   },
   "related": "Related tools",
   "faq": {

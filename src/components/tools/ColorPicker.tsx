@@ -34,6 +34,10 @@ interface Messages {
 	contrastPassAA: string;
 	contrastFail: string;
 	invalidHexError: string;
+	savePalette: string;
+	savedPalettesHeading: string;
+	loadPaletteAria: string;
+	deletePaletteAria: string;
 }
 
 interface Rgb {
@@ -166,6 +170,29 @@ function randomHsl(): Hsl {
 	};
 }
 
+interface SavedPalette {
+	id: string;
+	colors: string[];
+}
+
+const SAVED_PALETTES_STORAGE_KEY = 'color-picker-saved-palettes';
+const SAVED_PALETTES_LIMIT = 20;
+
+function loadSavedPalettes(): SavedPalette[] {
+	try {
+		const raw = localStorage.getItem(SAVED_PALETTES_STORAGE_KEY);
+		if (!raw) return [];
+		const parsed = JSON.parse(raw);
+		if (!Array.isArray(parsed)) return [];
+		return parsed.filter(
+			(entry): entry is SavedPalette =>
+				typeof entry?.id === 'string' && Array.isArray(entry?.colors) && entry.colors.every((c: unknown) => typeof c === 'string'),
+		);
+	} catch {
+		return [];
+	}
+}
+
 function Swatch({
 	hex,
 	label,
@@ -232,6 +259,7 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 	const [locked, setLocked] = useState<boolean[]>(() => Array(5).fill(false));
 	const [cssCopied, setCssCopied] = useState(false);
 	const [jsonCopied, setJsonCopied] = useState(false);
+	const [savedPalettes, setSavedPalettes] = useState<SavedPalette[]>(() => loadSavedPalettes());
 
 	useEffect(() => {
 		setPalette(Array.from({ length: 5 }, randomHsl));
@@ -268,6 +296,39 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 	const regenerate = useCallback(() => {
 		setPalette((prev) => prev.map((color, i) => (locked[i] ? color : randomHsl())));
 	}, [locked]);
+
+	const persistSavedPalettes = (next: SavedPalette[]) => {
+		try {
+			localStorage.setItem(SAVED_PALETTES_STORAGE_KEY, JSON.stringify(next));
+		} catch {
+			// Ignore quota/private-mode errors — saved palettes are a convenience, not core functionality.
+		}
+	};
+
+	const handleSavePalette = () => {
+		const colors = palette.map((c) => rgbToHex(hslToRgb(c)));
+		setSavedPalettes((prev) => {
+			const next = [{ id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, colors }, ...prev].slice(
+				0,
+				SAVED_PALETTES_LIMIT,
+			);
+			persistSavedPalettes(next);
+			return next;
+		});
+	};
+
+	const handleLoadSavedPalette = (saved: SavedPalette) => {
+		setPalette(saved.colors.map((hex) => rgbToHsl(hexToRgb(hex) ?? { r: 0, g: 0, b: 0 })));
+		setLocked(Array(saved.colors.length).fill(false));
+	};
+
+	const handleDeleteSavedPalette = (id: string) => {
+		setSavedPalettes((prev) => {
+			const next = prev.filter((entry) => entry.id !== id);
+			persistSavedPalettes(next);
+			return next;
+		});
+	};
 
 	useEffect(() => {
 		const onKeyDown = (e: KeyboardEvent) => {
@@ -394,6 +455,9 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 							<RefreshCw />
 							{messages.generate}
 						</Button>
+						<Button type="button" size="sm" variant="outline" onClick={handleSavePalette}>
+							{messages.savePalette}
+						</Button>
 					</div>
 				</div>
 				<p className="mt-1 text-xs text-muted-foreground">{messages.generateHint}</p>
@@ -446,6 +510,37 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 					</Button>
 				</div>
 			</div>
+
+			{savedPalettes.length > 0 && (
+				<div className="rounded-lg border border-border p-4">
+					<span className="text-sm font-medium text-foreground">{messages.savedPalettesHeading}</span>
+					<ul className="mt-3 flex flex-col gap-2">
+						{savedPalettes.map((saved) => (
+							<li key={saved.id} className="flex items-center gap-2">
+								<button
+									type="button"
+									onClick={() => handleLoadSavedPalette(saved)}
+									aria-label={messages.loadPaletteAria}
+									className="flex flex-1 overflow-hidden rounded-md border border-border"
+								>
+									{saved.colors.map((hex, i) => (
+										<span key={i} className="h-8 flex-1" style={{ backgroundColor: hex }} />
+									))}
+								</button>
+								<Button
+									type="button"
+									size="icon-sm"
+									variant="ghost"
+									aria-label={messages.deletePaletteAria}
+									onClick={() => handleDeleteSavedPalette(saved.id)}
+								>
+									✕
+								</Button>
+							</li>
+						))}
+					</ul>
+				</div>
+			)}
 
 			<div className="rounded-lg border border-border p-4">
 				<span className="text-sm font-medium text-foreground">{messages.contrastHeading}</span>
