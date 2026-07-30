@@ -144,6 +144,18 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "Color Picker: trích xuất palette từ ảnh" (vs Coolors —
+  audit gọi đây là tính năng chủ lực "Image to Palette" của Coolors): tự viết thuật toán
+  **median-cut quantization** (không cần dependency mới) — cùng họ thuật toán dùng để tạo
+  bảng màu GIF 256 màu, áp dụng ở đây để chọn ra 5 màu chủ đạo: liên tục tách nhóm pixel làm
+  đôi theo kênh R/G/B có độ trải rộng lớn nhất, tới khi đủ 5 nhóm, rồi lấy trung bình mỗi
+  nhóm làm 1 màu. Ảnh được downscale về tối đa 150px trước khi lấy mẫu pixel (không cần độ
+  chính xác từng pixel cho việc trích màu, tránh ảnh 12MP làm chậm đáng kể). Kết quả ghi
+  thẳng vào `palette` state hiện có nên mọi tính năng khác (lock, save, export CSS/JSON/SCSS/
+  Tailwind/ASE) tự động hoạt động luôn không cần sửa gì thêm. Verify bằng script Node độc
+  lập: ảnh giả gồm 4 nhóm màu đã biết trước (đỏ/xanh lá/xanh dương/trắng, 100 pixel mỗi
+  nhóm) → quantize ra đúng cả 4 màu chính xác tuyệt đối. Build sạch (421 trang), xác nhận
+  label mới trong `dist/en/tools/color-picker/index.html`.
 - **2026-07-30** — Phase 3.6b — mục "Xóa nền ảnh: crop/resize" (vs remove.bg): thay vì cọ
   tinh chỉnh mask thủ công (audit tự ghi nhận đây là tính năng "Pro" phức tạp, để lại phiên
   sau nếu cần), triển khai 2 phần khả thi ngay: **Trim viền trong suốt** —

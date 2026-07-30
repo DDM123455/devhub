@@ -41,6 +41,7 @@ interface Messages {
 	savedPalettesHeading: string;
 	loadPaletteAria: string;
 	deletePaletteAria: string;
+	extractFromImageLabel: string;
 }
 
 interface Rgb {
@@ -232,6 +233,63 @@ function buildAseBlob(hexColors: string[]): Blob {
 	return new Blob([new Uint8Array([...header, ...bytes])], { type: 'application/octet-stream' });
 }
 
+interface ColorBox {
+	pixels: Rgb[];
+}
+
+function boxChannelRange(box: ColorBox): { channel: keyof Rgb; range: number } {
+	let minR = 255, maxR = 0, minG = 255, maxG = 0, minB = 255, maxB = 0;
+	for (const p of box.pixels) {
+		if (p.r < minR) minR = p.r;
+		if (p.r > maxR) maxR = p.r;
+		if (p.g < minG) minG = p.g;
+		if (p.g > maxG) maxG = p.g;
+		if (p.b < minB) minB = p.b;
+		if (p.b > maxB) maxB = p.b;
+	}
+	const rangeR = maxR - minR;
+	const rangeG = maxG - minG;
+	const rangeB = maxB - minB;
+	if (rangeR >= rangeG && rangeR >= rangeB) return { channel: 'r', range: rangeR };
+	if (rangeG >= rangeB) return { channel: 'g', range: rangeG };
+	return { channel: 'b', range: rangeB };
+}
+
+function splitBox(box: ColorBox): [ColorBox, ColorBox] {
+	const { channel } = boxChannelRange(box);
+	const sorted = [...box.pixels].sort((a, b) => a[channel] - b[channel]);
+	const mid = Math.floor(sorted.length / 2);
+	return [{ pixels: sorted.slice(0, mid) }, { pixels: sorted.slice(mid) }];
+}
+
+// Median-cut color quantization — the same classic algorithm behind GIF
+// palette generation, adapted here to pick N "dominant colors" instead of a
+// full 256-color palette: repeatedly split the pixel population in half along
+// whichever RGB channel has the widest spread, then average each final group.
+function medianCutQuantize(pixels: Rgb[], colorCount: number): Rgb[] {
+	const boxes: ColorBox[] = [{ pixels }];
+	while (boxes.length < colorCount) {
+		let splitIndex = -1;
+		let largestRange = -1;
+		boxes.forEach((box, i) => {
+			if (box.pixels.length < 2) return;
+			const { range } = boxChannelRange(box);
+			if (range > largestRange) {
+				largestRange = range;
+				splitIndex = i;
+			}
+		});
+		if (splitIndex === -1) break;
+		const [a, b] = splitBox(boxes[splitIndex]);
+		boxes.splice(splitIndex, 1, a, b);
+	}
+	return boxes.map((box) => {
+		const n = box.pixels.length;
+		const sum = box.pixels.reduce((acc, p) => ({ r: acc.r + p.r, g: acc.g + p.g, b: acc.b + p.b }), { r: 0, g: 0, b: 0 });
+		return { r: Math.round(sum.r / n), g: Math.round(sum.g / n), b: Math.round(sum.b / n) };
+	});
+}
+
 interface SavedPalette {
 	id: string;
 	colors: string[];
@@ -355,6 +413,38 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 		} else {
 			setHexError(true);
 		}
+	};
+
+	const handleExtractPaletteFromImage = (fileList: FileList | null) => {
+		const file = fileList?.[0];
+		if (!file) return;
+		const url = URL.createObjectURL(file);
+		const img = new Image();
+		img.onload = () => {
+			// Downscaled before sampling — palette extraction only cares about the
+			// overall color distribution, not per-pixel precision, so this keeps a
+			// 12MP photo from taking noticeably longer than a thumbnail.
+			const maxDim = 150;
+			const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+			const canvas = document.createElement('canvas');
+			canvas.width = Math.max(1, Math.round(img.width * scale));
+			canvas.height = Math.max(1, Math.round(img.height * scale));
+			const ctx = canvas.getContext('2d');
+			URL.revokeObjectURL(url);
+			if (!ctx) return;
+			ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+			const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+			const pixels: Rgb[] = [];
+			for (let i = 0; i < data.length; i += 4) {
+				if (data[i + 3] < 128) continue; // skip mostly-transparent pixels
+				pixels.push({ r: data[i], g: data[i + 1], b: data[i + 2] });
+			}
+			if (pixels.length === 0) return;
+			const extracted = medianCutQuantize(pixels, 5).map((rgb) => rgbToHsl(rgb));
+			setPalette(extracted);
+			setLocked(Array(extracted.length).fill(false));
+		};
+		img.src = url;
 	};
 
 	const regenerate = useCallback(() => {
@@ -522,6 +612,19 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 						<Button type="button" size="sm" variant="outline" onClick={handleSavePalette}>
 							{messages.savePalette}
 						</Button>
+						<label
+							htmlFor="color-picker-extract-image"
+							className="inline-flex h-7 cursor-pointer items-center rounded-md border border-border px-2.5 text-[0.8rem] font-medium text-foreground hover:bg-muted"
+						>
+							{messages.extractFromImageLabel}
+						</label>
+						<input
+							id="color-picker-extract-image"
+							type="file"
+							accept="image/*"
+							className="hidden"
+							onChange={(event) => handleExtractPaletteFromImage(event.target.files)}
+						/>
 					</div>
 				</div>
 				<p className="mt-1 text-xs text-muted-foreground">{messages.generateHint}</p>

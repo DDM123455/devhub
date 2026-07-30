@@ -43,7 +43,8 @@
     "deletePaletteAria": "Xóa bảng màu đã lưu này",
     "copyPaletteScss": "Sao chép dạng SCSS",
     "copyPaletteTailwind": "Sao chép dạng Tailwind config",
-    "exportPaletteAse": "Xuất file .ase"
+    "exportPaletteAse": "Xuất file .ase",
+    "extractFromImageLabel": "Trích xuất bảng màu từ ảnh"
   },
   "related": "Công cụ liên quan",
   "faq": {

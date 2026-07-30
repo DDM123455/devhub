@@ -43,7 +43,8 @@
     "deletePaletteAria": "Delete this saved palette",
     "copyPaletteScss": "Copy as SCSS",
     "copyPaletteTailwind": "Copy as Tailwind config",
-    "exportPaletteAse": "Export .ase"
+    "exportPaletteAse": "Export .ase",
+    "extractFromImageLabel": "Extract palette from image"
   },
   "related": "Related tools",
   "faq": {
