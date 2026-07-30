@@ -230,7 +230,7 @@ ROADMAP)
 - [x] Chuyển đổi Case văn bản — hiển thị đếm từ/ký tự cạnh output
 - [x] Chuyển đổi Case văn bản — upload/download file
 - [ ] CSV↔JSON Converter — vs CloudConvert/Convertio: batch nhiều file
-- [ ] CSV↔JSON Converter — hỗ trợ TSV như 1 option riêng
+- [x] CSV↔JSON Converter — hỗ trợ TSV như 1 option riêng
 
 **Nhóm Dev/Design Tools**
 - [x] JWT Decoder — vs jwt.io: URL deep-link chia sẻ token debug (`?token=...`)

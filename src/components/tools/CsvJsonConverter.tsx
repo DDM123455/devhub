@@ -279,6 +279,10 @@ export default function CsvJsonConverter({ messages }: { messages: Messages }) {
 	const handleFile = (files: FileList | null) => {
 		const file = files?.[0];
 		if (!file) return;
+		// A .tsv upload almost always means tab-delimited — switching the
+		// delimiter automatically saves a manual step most CSV↔JSON converters
+		// (CloudConvert, Convertio) require the user to do themselves.
+		if (file.name.toLowerCase().endsWith('.tsv')) setDelimiterOption('tab');
 		const reader = new FileReader();
 		reader.onload = () => setInput(String(reader.result ?? ''));
 		reader.readAsText(file);
@@ -287,11 +291,12 @@ export default function CsvJsonConverter({ messages }: { messages: Messages }) {
 	const handleDownload = () => {
 		if (output === '') return;
 		const isJson = mode === 'csv-to-json';
-		const blob = new Blob([output], { type: isJson ? 'application/json' : 'text/csv' });
+		const isTsv = !isJson && delimiterOption === 'tab';
+		const blob = new Blob([output], { type: isJson ? 'application/json' : isTsv ? 'text/tab-separated-values' : 'text/csv' });
 		const url = URL.createObjectURL(blob);
 		const link = document.createElement('a');
 		link.href = url;
-		link.download = isJson ? 'output.json' : 'output.csv';
+		link.download = isJson ? 'output.json' : isTsv ? 'output.tsv' : 'output.csv';
 		link.click();
 		URL.revokeObjectURL(url);
 	};
@@ -400,7 +405,7 @@ export default function CsvJsonConverter({ messages }: { messages: Messages }) {
 					id="csv-json-file-input"
 					ref={fileInputRef}
 					type="file"
-					accept=".csv,.json,.txt"
+					accept=".csv,.tsv,.json,.txt"
 					className="hidden"
 					onChange={(e) => handleFile(e.target.files)}
 				/>

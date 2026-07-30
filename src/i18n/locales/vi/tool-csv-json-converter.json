@@ -11,7 +11,7 @@
     "delimiterLabel": "Dấu phân cách",
     "delimiterComma": "Dấu phẩy (,)",
     "delimiterSemicolon": "Dấu chấm phẩy (;)",
-    "delimiterTab": "Tab",
+    "delimiterTab": "Tab (TSV)",
     "delimiterCustom": "Tùy chỉnh",
     "customDelimiterPlaceholder": "ví dụ: |",
     "headerLabel": "Dòng đầu là tiêu đề",

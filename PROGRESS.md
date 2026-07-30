@@ -144,6 +144,15 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "CSV↔JSON Converter: hỗ trợ TSV như 1 option riêng" (vs
+  CloudConvert/Convertio): delimiter Tab đã tồn tại từ trước (chỉ là 1 trong 4 lựa chọn
+  delimiter) nhưng không được trình bày như định dạng TSV riêng biệt — đổi nhãn thành
+  "Tab (TSV)" để dễ tìm thấy hơn; upload file `.tsv` tự động chuyển `delimiterOption` sang
+  `'tab'` (tiết kiệm 1 bước thủ công mà cả CloudConvert/Convertio đều bắt người dùng tự
+  chọn); tải xuống JSON→TSV giờ dùng đúng phần mở rộng `.tsv` + MIME
+  `text/tab-separated-values` thay vì luôn `.csv`. Thêm `.tsv` vào `accept` của input file.
+  Build sạch (421 trang), xác nhận nhãn mới trong
+  `dist/en/tools/csv-json-converter/index.html`.
 - **2026-07-30** — Phase 3.6b — mục "Gộp PDF: cảnh báo giới hạn dung lượng" (vs iLovePDF/
   Smallpdf): thêm banner cảnh báo (màu amber, không chặn thao tác) khi tổng dung lượng các
   file đã chọn vượt `LARGE_TOTAL_SIZE_WARNING_BYTES = 200MB` — khác đối thủ (giới hạn do

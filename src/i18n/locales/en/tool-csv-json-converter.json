@@ -11,7 +11,7 @@
     "delimiterLabel": "Delimiter",
     "delimiterComma": "Comma (,)",
     "delimiterSemicolon": "Semicolon (;)",
-    "delimiterTab": "Tab",
+    "delimiterTab": "Tab (TSV)",
     "delimiterCustom": "Custom",
     "customDelimiterPlaceholder": "e.g. |",
     "headerLabel": "First row is header",
