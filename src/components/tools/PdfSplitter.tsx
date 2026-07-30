@@ -381,7 +381,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 									event.preventDefault();
 									handleDropPage(page.id);
 								}}
-								className={`flex w-28 cursor-grab flex-col gap-1 rounded-md border border-border bg-card p-1.5 ${
+								className={`flex w-48 cursor-grab flex-col gap-1 rounded-md border border-border bg-card p-1.5 ${
 									dragPageId === page.id ? 'opacity-50' : ''
 								}`}
 							>
@@ -549,7 +549,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 											key={i}
 											src={dataUrl}
 											alt={`${result.label} — ${i + 1}`}
-											className="h-12 w-auto rounded border border-border object-cover"
+											className="h-28 w-auto rounded border border-border object-cover"
 										/>
 									))}
 								</div>

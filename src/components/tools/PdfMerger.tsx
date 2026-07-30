@@ -321,7 +321,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 									event.preventDefault();
 									handleDrop(page.id);
 								}}
-								className={`flex w-28 cursor-grab flex-col gap-1 rounded-md border border-border bg-card p-1.5 ${
+								className={`flex w-48 cursor-grab flex-col gap-1 rounded-md border border-border bg-card p-1.5 ${
 									dragPageId === page.id ? 'opacity-50' : ''
 								}`}
 							>
@@ -393,7 +393,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 					<span className="text-sm font-medium text-foreground">{messages.previewHeading}</span>
 					<ul className="flex flex-wrap gap-2">
 						{previewThumbnails.map((thumb) => (
-							<li key={thumb.pageIndex} className="w-20 overflow-hidden rounded border border-border bg-muted">
+							<li key={thumb.pageIndex} className="w-36 overflow-hidden rounded border border-border bg-muted">
 								<img src={thumb.dataUrl} alt={`${messages.previewHeading} — ${thumb.pageIndex + 1}`} className="w-full" />
 							</li>
 						))}

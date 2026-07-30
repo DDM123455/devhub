@@ -144,6 +144,21 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — (theo yêu cầu trực tiếp người dùng, không thuộc mục nào trong ROADMAP.md)
+  phóng to khu vực xem trước trang PDF ở cả **Gộp PDF** và **Tách PDF** — người dùng phản ánh
+  chữ trong thumbnail quá nhỏ để đọc được nội dung trang. 2 phần cần sửa cùng lúc để ảnh không
+  bị mờ khi phóng to: (1) `src/lib/pdf-thumbnails.ts` — tăng `scale` mặc định của
+  `renderPdfThumbnails()` từ 0.25 lên 0.45 (rasterize pdf.js ở độ phân giải cao hơn ~2.7 lần
+  số pixel, vì scale là tuyến tính theo từng trục); (2) tăng kích thước hiển thị CSS: card
+  chọn/sắp xếp trang ở cả 2 tool từ `w-28` (112px) lên `w-48` (192px), preview file kết quả
+  sau khi tách (`PdfSplitter.tsx`) từ `h-12` lên `h-28`, preview trước khi tải file gộp
+  (`PdfMerger.tsx`) từ `w-20` lên `w-36`. Chỉ tăng vừa phải (không phóng quá lớn) vì độ phân
+  giải nguồn (scale 0.45) vẫn có giới hạn — chữ rất nhỏ trong PDF gốc có thể vẫn khó đọc hoàn
+  toàn, nhưng đủ để nhận diện nội dung/bố cục trang, đúng yêu cầu "gần như đọc được chữ" thay
+  vì phải đọc rõ 100%. Build sạch (421 trang). **Giới hạn**: không có trình duyệt thật trong
+  môi trường phiên này để xem trực quan độ nét/độ to thực tế — người dùng nên tự mở 2 trang
+  Gộp PDF / Tách PDF, tải 1 file PDF thật lên để xác nhận thumbnail đã đủ lớn và rõ như mong
+  muốn.
 - **2026-07-30** — Phase 3.5g (theo yêu cầu trực tiếp người dùng) — mục "Virtualization
   (windowed rendering) cho khu vực so sánh chính" của Text Diff Checker: `TextDiffChecker.tsx`
   trước đây render TOÀN BỘ `entries` (một `<div>`/dòng) cho cả 2 cột so sánh, cả 2 cột Merge
