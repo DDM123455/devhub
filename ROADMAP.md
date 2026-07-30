@@ -175,7 +175,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] Image Compressor: xử lý song song (có giới hạn concurrency) thay vì tuần tự khi
       batch nhiều ảnh
 - [x] Image Compressor + Image Converter: thêm tùy chọn resize kích thước trước khi xuất
-- [ ] QR Generator: thêm dot-style/gradient cơ bản (`qr-code-styling`)
+- [x] QR Generator: thêm dot-style/gradient cơ bản (`qr-code-styling`)
 - [x] Contrast/`focus-visible` pass có chủ đích trên toàn bộ input/select/textarea
       tương tác (button đã có sẵn qua `button.tsx`)
 - [x] Trang chủ: bỏ hẳn ô "0 KB uploaded" placeholder tĩnh không có dữ liệu thật

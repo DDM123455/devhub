@@ -48,7 +48,20 @@
     "pngResolutionLabel": "PNG resolution",
     "downloadPng": "Download PNG",
     "downloadSvg": "Download SVG",
-    "errorTooLong": "This content is too long to fit in a QR code at the current error correction level. Try shortening it, or lower the error correction level below."
+    "errorTooLong": "This content is too long to fit in a QR code at the current error correction level. Try shortening it, or lower the error correction level below.",
+    "dotStyleLabel": "Dot style",
+    "dotStyleSquare": "Square",
+    "dotStyleDots": "Dots",
+    "dotStyleRounded": "Rounded",
+    "dotStyleClassy": "Classy",
+    "dotStyleClassyRounded": "Classy rounded",
+    "dotStyleExtraRounded": "Extra rounded",
+    "gradientToggleLabel": "Use gradient instead of solid color",
+    "gradientTypeLabel": "Gradient type",
+    "gradientTypeLinear": "Linear",
+    "gradientTypeRadial": "Radial",
+    "gradientStartColorLabel": "Start color",
+    "gradientEndColorLabel": "End color"
   },
   "related": "Related tools",
   "faq": {
@@ -63,8 +76,8 @@
   "article": {
     "heading": "Why generate QR codes locally instead of through a \"free\" tracker?",
     "p1": "QR codes end up everywhere — a business card, a restaurant menu, a Wi-Fi password taped to a router, a poster for an event. Many free \"QR code generator\" sites don't actually encode your link directly; instead they generate a short link to their own server and encode that, so every scan is quietly routed through — and logged by — a company you've never heard of. If that company ever shuts the redirect service down, every QR code you ever printed silently stops working, even years later.",
-    "p2": "This tool doesn't do that. It uses qrcode.react to encode your exact text or URL directly into the QR code pattern itself, rendered onto an HTML canvas entirely in your browser. There's no intermediary server, no redirect, and no scan tracking, because there's nothing for a server to be in the middle of — the code you download will keep working for as long as QR readers exist, completely independent of this website.",
-    "p3": "Choose what you're encoding from the content type menu — a plain URL or text, Wi-Fi network details that let a phone join the network the moment it scans the code, a contact card (vCard) that saves itself straight into someone's address book, or a pre-filled email or SMS ready to send — then fill in just the fields that type needs; switching types keeps your color and logo settings intact. Pick a foreground and background color to match your branding, and choose an error correction level: higher levels (Q, H) make the code more resistant to smudges, glare, or a logo covering part of the pattern, at the cost of a slightly denser-looking grid. Upload an image to place a logo in the center — doing so automatically raises the error correction level to H if it isn't already, since covering part of the pattern needs that extra redundancy to stay scannable, though you can still lower it again by hand afterward.",
+    "p2": "This tool doesn't do that. It encodes your exact text or URL directly into the QR code pattern itself, drawn entirely in your browser. There's no intermediary server, no redirect, and no scan tracking, because there's nothing for a server to be in the middle of — the code you download will keep working for as long as QR readers exist, completely independent of this website.",
+    "p3": "Choose what you're encoding from the content type menu — a plain URL or text, Wi-Fi network details that let a phone join the network the moment it scans the code, a contact card (vCard) that saves itself straight into someone's address book, or a pre-filled email or SMS ready to send — then fill in just the fields that type needs; switching types keeps your color, dot style, and logo settings intact. Pick a dot style (square, dots, rounded, classy, and more), and either a solid foreground color or a two-color gradient (linear or radial) to match your branding, plus a background color. Choose an error correction level: higher levels (Q, H) make the code more resistant to smudges, glare, or a logo covering part of the pattern, at the cost of a slightly denser-looking grid. Upload an image to place a logo in the center — doing so automatically raises the error correction level to H if it isn't already, since covering part of the pattern needs that extra redundancy to stay scannable, though you can still lower it again by hand afterward.",
     "p4": "A couple of things affect whether a QR code actually scans well in practice: keep enough contrast between your foreground and background colors — a light gray on white background looks nice but often fails to scan — and avoid making the logo too large relative to the code, since even the highest error correction level has limits. When you're happy with it, press Download PNG or Download SVG. PNG renders a fixed-size raster image — pick a resolution from 256×256 up to 2048×2048 depending on whether the code is headed for a small sticker or a large poster — while SVG is a vector file that stays perfectly crisp printed at any size, which most print shops and design tools prefer. If you're encoding a long URL, consider shortening it first; QR codes for short text render as a simpler, denser-looking grid that's easier for phone cameras to lock onto than a very long, complex one. If you also work with structured data on the developer side, the JSON Formatter & Validator tool handles that with the same local, privacy-first approach."
   }
 }

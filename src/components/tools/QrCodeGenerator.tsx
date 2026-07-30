@@ -1,25 +1,7 @@
-import { Component, useMemo, useRef, useState, type ReactNode } from 'react';
-import { QRCodeCanvas, QRCodeSVG } from 'qrcode.react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-
-// qrcode.react throws a plain RangeError ("Data too long") when the payload
-// doesn't fit the QR code's capacity at the chosen error-correction level —
-// with no error boundary that uncaught render error unmounts this entire
-// component (React's default behavior), leaving a blank tool with no way to
-// recover except a full page reload. This boundary catches it so a too-long
-// vCard/WiFi/URL/etc. degrades to an inline message instead of a blank page.
-class QrErrorBoundary extends Component<{ children: ReactNode; onError: () => void }, { hasError: boolean }> {
-	state = { hasError: false };
-	static getDerivedStateFromError() {
-		return { hasError: true };
-	}
-	componentDidCatch() {
-		this.props.onError();
-	}
-	render() {
-		return this.state.hasError ? null : this.props.children;
-	}
-}
+import type QRCodeStyling from 'qr-code-styling';
+import type { DotType, GradientType, Options } from 'qr-code-styling';
 
 interface Messages {
 	contentTypeLabel: string;
@@ -65,6 +47,19 @@ interface Messages {
 	downloadPng: string;
 	downloadSvg: string;
 	errorTooLong: string;
+	dotStyleLabel: string;
+	dotStyleSquare: string;
+	dotStyleDots: string;
+	dotStyleRounded: string;
+	dotStyleClassy: string;
+	dotStyleClassyRounded: string;
+	dotStyleExtraRounded: string;
+	gradientToggleLabel: string;
+	gradientTypeLabel: string;
+	gradientTypeLinear: string;
+	gradientTypeRadial: string;
+	gradientStartColorLabel: string;
+	gradientEndColorLabel: string;
 }
 
 type ContentType = 'url' | 'text' | 'wifi' | 'vcard' | 'email' | 'sms';
@@ -102,6 +97,8 @@ const MIN_SIZE = 128;
 const MAX_SIZE = 512;
 const PNG_RESOLUTIONS = [256, 512, 1024, 2048];
 const SVG_EXPORT_SIZE = 1024;
+
+const DOT_TYPES: DotType[] = ['square', 'dots', 'rounded', 'classy', 'classy-rounded', 'extra-rounded'];
 
 // Special characters in a WIFI: payload must be backslash-escaped per the format
 // most scanners (Android, iOS, Zebra Crossing) agree on informally — there's no
@@ -162,9 +159,14 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	const [pngResolution, setPngResolution] = useState(1024);
 	const [erroredRenderKey, setErroredRenderKey] = useState<string | null>(null);
 
-	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const exportCanvasRef = useRef<HTMLCanvasElement>(null);
-	const svgRef = useRef<SVGSVGElement>(null);
+	const [dotsType, setDotsType] = useState<DotType>('square');
+	const [gradientEnabled, setGradientEnabled] = useState(false);
+	const [gradientType, setGradientType] = useState<GradientType>('linear');
+	const [gradientColorStart, setGradientColorStart] = useState('#047857');
+	const [gradientColorEnd, setGradientColorEnd] = useState('#22d3ee');
+
+	const containerRef = useRef<HTMLDivElement>(null);
+	const qrRef = useRef<QRCodeStyling | null>(null);
 
 	const { qrValue, isEmpty } = useMemo(() => {
 		switch (contentType) {
@@ -194,8 +196,69 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	const tooLong = erroredRenderKey === renderKey;
 
 	const logoSize = Math.round(size * 0.2);
-	const exportLogoSize = Math.round(pngResolution * 0.2);
-	const svgLogoSize = Math.round(SVG_EXPORT_SIZE * 0.2);
+
+	// Shared style/content options used for both the live preview and the two
+	// export paths — only width/height/type (canvas vs svg) differ per caller.
+	const buildQrOptions = (overrides: Pick<Options, 'width' | 'height' | 'type'>): Partial<Options> => {
+		const dotsStyle = gradientEnabled
+			? {
+					gradient: {
+						type: gradientType,
+						rotation: 0,
+						colorStops: [
+							{ offset: 0, color: gradientColorStart },
+							{ offset: 1, color: gradientColorEnd },
+						],
+					},
+				}
+			: { color: fgColor };
+		return {
+			...overrides,
+			data: renderValue,
+			margin: 8,
+			qrOptions: { errorCorrectionLevel: level },
+			dotsOptions: { type: dotsType, ...dotsStyle },
+			cornersSquareOptions: { type: dotsType, ...dotsStyle },
+			cornersDotOptions: { type: dotsType, ...dotsStyle },
+			backgroundOptions: { color: bgColor },
+			image: logoUrl ?? undefined,
+			imageOptions: logoUrl ? { imageSize: 0.2, hideBackgroundDots: true, margin: 2 } : undefined,
+		};
+	};
+
+	// qr-code-styling touches `document` inside its constructor, so it's loaded
+	// dynamically inside this client-only effect rather than imported statically
+	// at the top of the file — a static import would run during Astro's
+	// build-time SSR pass (no `document` there), the same class of bug already
+	// documented in PROGRESS.md for `jsoneditor`.
+	useEffect(() => {
+		let cancelled = false;
+		void import('qr-code-styling').then(({ default: QRCodeStylingCtor }) => {
+			if (cancelled) return;
+			const container = containerRef.current;
+			if (!container) return;
+			const options = buildQrOptions({ width: size, height: size, type: 'canvas' });
+			try {
+				if (!qrRef.current) {
+					qrRef.current = new QRCodeStylingCtor(options);
+					qrRef.current.append(container);
+				} else {
+					qrRef.current.update(options);
+				}
+				setErroredRenderKey(null);
+			} catch {
+				// qr-code-styling throws a plain string ("code length overflow...")
+				// when the payload doesn't fit the QR capacity at this error
+				// correction level — caught here instead of a React error boundary
+				// since rendering is now imperative (append/update), not JSX.
+				setErroredRenderKey(renderKey);
+			}
+		});
+		return () => {
+			cancelled = true;
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [renderKey, level, fgColor, bgColor, size, logoUrl, dotsType, gradientEnabled, gradientType, gradientColorStart, gradientColorEnd]);
 
 	const handleLogoChange = (fileList: FileList | null) => {
 		const file = fileList?.[0];
@@ -210,27 +273,26 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 		reader.readAsDataURL(file);
 	};
 
-	const handleDownloadPng = () => {
-		const canvas = exportCanvasRef.current;
-		if (!canvas) return;
-		const url = canvas.toDataURL('image/png');
-		const link = document.createElement('a');
-		link.href = url;
-		link.download = 'qrcode.png';
-		link.click();
+	const handleDownloadPng = async () => {
+		if (isEmpty || tooLong) return;
+		const { default: QRCodeStylingCtor } = await import('qr-code-styling');
+		const exportQr = new QRCodeStylingCtor(buildQrOptions({ width: pngResolution, height: pngResolution, type: 'canvas' }));
+		try {
+			await exportQr.download({ name: 'qrcode', extension: 'png' });
+		} catch {
+			// Already guarded by `tooLong` above under normal use; nothing more to do.
+		}
 	};
 
-	const handleDownloadSvg = () => {
-		const svg = svgRef.current;
-		if (!svg) return;
-		const serialized = new XMLSerializer().serializeToString(svg);
-		const blob = new Blob([`<?xml version="1.0" encoding="UTF-8"?>\n${serialized}`], { type: 'image/svg+xml' });
-		const url = URL.createObjectURL(blob);
-		const link = document.createElement('a');
-		link.href = url;
-		link.download = 'qrcode.svg';
-		link.click();
-		URL.revokeObjectURL(url);
+	const handleDownloadSvg = async () => {
+		if (isEmpty || tooLong) return;
+		const { default: QRCodeStylingCtor } = await import('qr-code-styling');
+		const exportQr = new QRCodeStylingCtor(buildQrOptions({ width: SVG_EXPORT_SIZE, height: SVG_EXPORT_SIZE, type: 'svg' }));
+		try {
+			await exportQr.download({ name: 'qrcode', extension: 'svg' });
+		} catch {
+			// Already guarded by `tooLong` above under normal use; nothing more to do.
+		}
 	};
 
 	const contentTypeOptions: Array<{ value: ContentType; label: string }> = [
@@ -241,6 +303,15 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 		{ value: 'email', label: messages.typeEmail },
 		{ value: 'sms', label: messages.typeSms },
 	];
+
+	const dotStyleLabels: Record<DotType, string> = {
+		square: messages.dotStyleSquare,
+		dots: messages.dotStyleDots,
+		rounded: messages.dotStyleRounded,
+		classy: messages.dotStyleClassy,
+		'classy-rounded': messages.dotStyleClassyRounded,
+		'extra-rounded': messages.dotStyleExtraRounded,
+	};
 
 	const inputClass =
 		'w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground';
@@ -503,6 +574,79 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 					</div>
 				)}
 
+				<div className="flex flex-col gap-1">
+					<label htmlFor="qr-dot-style" className="text-sm font-medium text-foreground">
+						{messages.dotStyleLabel}
+					</label>
+					<select
+						id="qr-dot-style"
+						value={dotsType}
+						onChange={(event) => setDotsType(event.target.value as DotType)}
+						className={inputClass}
+					>
+						{DOT_TYPES.map((type) => (
+							<option key={type} value={type}>
+								{dotStyleLabels[type]}
+							</option>
+						))}
+					</select>
+				</div>
+
+				<div className="flex flex-col gap-2">
+					<label className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+						<input
+							type="checkbox"
+							checked={gradientEnabled}
+							onChange={(event) => setGradientEnabled(event.target.checked)}
+						/>
+						{messages.gradientToggleLabel}
+					</label>
+					{gradientEnabled && (
+						<div className="flex flex-col gap-2 pl-1">
+							<div className="flex flex-col gap-1">
+								<label htmlFor="qr-gradient-type" className="text-xs text-muted-foreground">
+									{messages.gradientTypeLabel}
+								</label>
+								<select
+									id="qr-gradient-type"
+									value={gradientType}
+									onChange={(event) => setGradientType(event.target.value as GradientType)}
+									className={inputClass}
+								>
+									<option value="linear">{messages.gradientTypeLinear}</option>
+									<option value="radial">{messages.gradientTypeRadial}</option>
+								</select>
+							</div>
+							<div className="flex gap-4">
+								<div className="flex flex-col gap-1">
+									<label htmlFor="qr-gradient-start" className="text-xs text-muted-foreground">
+										{messages.gradientStartColorLabel}
+									</label>
+									<input
+										id="qr-gradient-start"
+										type="color"
+										value={gradientColorStart}
+										onChange={(event) => setGradientColorStart(event.target.value)}
+										className="h-9 w-16 cursor-pointer rounded-md border border-border bg-background"
+									/>
+								</div>
+								<div className="flex flex-col gap-1">
+									<label htmlFor="qr-gradient-end" className="text-xs text-muted-foreground">
+										{messages.gradientEndColorLabel}
+									</label>
+									<input
+										id="qr-gradient-end"
+										type="color"
+										value={gradientColorEnd}
+										onChange={(event) => setGradientColorEnd(event.target.value)}
+										className="h-9 w-16 cursor-pointer rounded-md border border-border bg-background"
+									/>
+								</div>
+							</div>
+						</div>
+					)}
+				</div>
+
 				<div className="flex gap-4">
 					<div className="flex flex-col gap-1">
 						<label htmlFor="qr-fg-color" className="text-sm font-medium text-foreground">
@@ -513,7 +657,8 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 							type="color"
 							value={fgColor}
 							onChange={(event) => setFgColor(event.target.value)}
-							className="h-9 w-16 cursor-pointer rounded-md border border-border bg-background"
+							disabled={gradientEnabled}
+							className="h-9 w-16 cursor-pointer rounded-md border border-border bg-background disabled:cursor-not-allowed disabled:opacity-50"
 						/>
 					</div>
 					<div className="flex flex-col gap-1">
@@ -609,56 +754,15 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 			</div>
 
 			<div className="flex flex-1 items-center justify-center rounded-md border border-border p-6">
-				{tooLong ? (
+				{tooLong && (
 					<p role="alert" className="max-w-xs text-center text-sm text-destructive">{messages.errorTooLong}</p>
-				) : (
-					<QrErrorBoundary key={renderKey} onError={() => setErroredRenderKey(renderKey)}>
-						<QRCodeCanvas
-							ref={canvasRef}
-							value={renderValue}
-							size={size}
-							fgColor={fgColor}
-							bgColor={bgColor}
-							level={level}
-							marginSize={2}
-							imageSettings={logoUrl ? { src: logoUrl, height: logoSize, width: logoSize, excavate: true } : undefined}
-						/>
-					</QrErrorBoundary>
 				)}
-			</div>
-
-			{/* Hidden renders used purely as export sources: a high-resolution canvas for the
-			    PNG download (decoupled from the on-screen preview size) and a vector SVG for
-			    the SVG download — both kept off-screen rather than reused from the visible
-			    preview so the user can pick a PNG resolution independent of what looks good
-			    on screen. */}
-			<div className="pointer-events-none absolute h-0 w-0 overflow-hidden" aria-hidden="true">
-				<QrErrorBoundary key={`export-${renderKey}`} onError={() => setErroredRenderKey(renderKey)}>
-					<QRCodeCanvas
-						ref={exportCanvasRef}
-						value={renderValue}
-						size={pngResolution}
-						fgColor={fgColor}
-						bgColor={bgColor}
-						level={level}
-						marginSize={2}
-						imageSettings={
-							logoUrl ? { src: logoUrl, height: exportLogoSize, width: exportLogoSize, excavate: true } : undefined
-						}
-					/>
-					<QRCodeSVG
-						ref={svgRef}
-						value={renderValue}
-						size={SVG_EXPORT_SIZE}
-						fgColor={fgColor}
-						bgColor={bgColor}
-						level={level}
-						marginSize={2}
-						imageSettings={
-							logoUrl ? { src: logoUrl, height: svgLogoSize, width: svgLogoSize, excavate: true } : undefined
-						}
-					/>
-				</QrErrorBoundary>
+				{/* Kept mounted (never removed from the JSX tree) even while `tooLong` is
+				    true, just visually hidden — qr-code-styling's instance holds a
+				    reference to this exact DOM node via `.append()`, and removing it from
+				    the tree would leave `.update()` writing into a detached element that
+				    never becomes visible again once the input is valid. */}
+				<div ref={containerRef} style={{ width: size, height: size }} className={tooLong ? 'hidden' : undefined} />
 			</div>
 		</div>
 	);

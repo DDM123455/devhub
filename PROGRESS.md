@@ -19,7 +19,14 @@
   Optimizer, Color Picker & Palette Generator, CSV ↔ JSON Converter, JSON → Excel Converter,
   Markdown Viewer/Editor, Trim video ngắn, Chuyển đổi Audio MP3 ↔ WAV). Category `media`
   (thêm ở Phase 3 #9) nay có đủ 2 tool nên related-tools của cả Trim video ngắn và MP3 ↔ WAV
-  Converter đã hiển thị lẫn nhau, không còn khoảng trống. Task tiếp theo: chọn 1 hạng mục ở
+  Converter đã hiển thị lẫn nhau, không còn khoảng trống.
+- **Phase 3.6 — Audit Remediation vòng 2**: HOÀN TẤT 7/7 mục (M1 song song hoá Image
+  Compressor, M2 resize Image Compressor + Converter, M4 dot-style/gradient QR Generator
+  qua `qr-code-styling`, M5 focus-visible pass toàn site, M6 bỏ ô "0 KB uploaded", M8 mở
+  rộng bảng MIME Base64, M9 claim aud/iss/sub JWT Decoder; M7 đánh dấu N/A). Build sạch mọi
+  mục nhưng KHÔNG có Puppeteer/browser trong môi trường phiên làm việc đó để test tương tác
+  thật — đặc biệt mục M4 (đổi hẳn engine render QR) cần người dùng tự mở trang QR Generator
+  kiểm tra bằng mắt trước khi coi là chắc chắn ổn định. Task tiếp theo: chọn 1 hạng mục ở
   Phase 4 (Kiếm tiền & PWA) hoặc Phase 5 (Launch & Growth) trong `ROADMAP.md`.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
@@ -137,6 +144,40 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6 (hoàn tất 7/7) — mục 7/7 "QR Generator: dot-style/gradient" +
+  M7 (N/A, chỉ cập nhật ROADMAP): viết lại hoàn toàn cơ chế render của `QrCodeGenerator.tsx`,
+  chuyển từ `qrcode.react` (render qua JSX props, chỉ hỗ trợ màu đặc) sang thư viện mới
+  `qr-code-styling` (dependency mới, đã hỏi và được người dùng chọn) — hỗ trợ sẵn 6 kiểu chấm
+  (square/dots/rounded/classy/classy-rounded/extra-rounded) và gradient tuyến tính/tỏa tròn,
+  100% client-side (canvas/SVG). Thay đổi kiến trúc: từ component React khai báo
+  (`<QRCodeCanvas>`) sang instance mệnh lệnh (`new QRCodeStyling()` + `.append()`/`.update()`
+  trong `useEffect`) vì thư viện không phải React component. `qr-code-styling` chạm
+  `document` trong constructor nên phải `await import(...)` động bên trong `useEffect`
+  (client-only), KHÔNG import tĩnh đầu file — cùng lý do/pattern đã áp dụng cho `jsoneditor`
+  ở Phase 3, ghi trong mục "Ghi chú kỹ thuật" phía trên. Tính năng "data too long": thư viện
+  ném lỗi dạng string thô `"code length overflow. (...)"` đồng bộ trong `.update()` (khác
+  `qrcode.react` ném `RangeError` trong React render, trước đây phải bắt bằng
+  `QrErrorBoundary`) — nay bắt trực tiếp bằng try/catch quanh `.update()`, xoá hẳn class
+  `QrErrorBoundary` vì không còn cần thiết. Giữ nguyên container DOM luôn mounted (chỉ ẩn
+  bằng class `hidden` khi lỗi) thay vì gỡ khỏi cây JSX, tránh bug thật đã tự phát hiện lúc
+  code: gỡ hẳn container khi lỗi rồi mount lại node DOM mới sẽ làm instance cũ (đã
+  `.append()` vào node cũ) không bao giờ hiển thị lại được dù input hợp lệ trở lại. Export
+  PNG/SVG đơn giản hoá đáng kể: dùng `.download({name, extension})` có sẵn của thư viện thay
+  vì tự dựng Blob/canvas ẩn như trước — bỏ hẳn 2 ref canvas/svg ẩn dùng riêng cho export.
+  Verify: build sạch (421 trang) + xác nhận qua `dist/_astro/` rằng `qr-code-styling` được
+  code-split thành chunk riêng ~46KB (chỉ tải khi vào trang QR, không phình bundle chính) và
+  không còn tham chiếu `qrcode.react`/`QRCodeCanvas` nào sót lại; xác nhận trực tiếp bằng
+  script Node gọi thẳng `qrcode-generator` (dependency lõi của `qr-code-styling`) rằng chuỗi
+  lỗi thật khớp đúng `"code length overflow..."` mà code bắt. Không có Puppeteer/browser
+  trong môi trường phiên này để test tương tác thật (kéo dot-style, xem gradient render, tải
+  PNG/SVG thật) — đã verify được logic/build/bundle nhưng CHƯA verify bằng mắt UI thật, cần
+  người dùng tự kiểm tra khi mở trang QR Generator. Gỡ `qrcode.react` khỏi `package.json`
+  (không còn nơi nào dùng). Sửa đoạn văn `article.p2`/`p3` (en+vi) nhắc tên thư viện cũ
+  "qrcode.react" — cập nhật lại mô tả chung chung + thêm nhắc dot-style/gradient mới. Thêm
+  12 key i18n mới (`dotStyleLabel` + 6 kiểu, `gradientToggleLabel`/`gradientTypeLabel` + 2
+  kiểu, `gradientStartColorLabel`/`gradientEndColorLabel`) cho cả en+vi + `messages` object
+  trong `QrCodeGeneratorPage.astro`. **Phase 3.6 hoàn tất toàn bộ 7/7 mục** (M1, M2, M4, M5,
+  M6, M8, M9 đã xong; M7 đánh dấu N/A).
 - **2026-07-30** — Phase 3.6 — mục 6/7 "Resize trước khi xuất (Image Compressor + Image
   Converter)": **Image Compressor** — thêm checkbox `resizeEnabled` + slider `maxDimension`
   (320-4096px, mặc định 1920px), truyền thẳng vào `maxWidthOrHeight` của
