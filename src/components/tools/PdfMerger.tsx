@@ -18,6 +18,7 @@ interface Messages {
 	noFiles: string;
 	errorGeneric: string;
 	skippedFiles: string;
+	largeFileWarning: string;
 }
 
 interface PageItem {
@@ -34,6 +35,18 @@ interface FileEntry {
 	file: File;
 	status: 'loading' | 'done' | 'error';
 }
+
+function formatBytes(bytes: number): string {
+	if (bytes < 1024) return `${bytes} B`;
+	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+// Merging happens entirely in the tab's memory (every source PDF loaded, copied,
+// and re-saved) — there's no server-side upload limit to warn about, but a very
+// large combined selection can still spike memory enough to crash the tab, which
+// is worth flagging before the user waits through a merge that might not finish.
+const LARGE_TOTAL_SIZE_WARNING_BYTES = 200 * 1024 * 1024;
 
 export default function PdfMerger({ messages }: { messages: Messages }) {
 	const [files, setFiles] = useState<FileEntry[]>([]);
@@ -175,6 +188,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 
 	const isLoadingAny = files.some((f) => f.status === 'loading');
 	const canMerge = !isProcessing && !isLoadingAny && pages.length >= 2;
+	const totalFileSize = files.reduce((sum, f) => sum + f.file.size, 0);
 
 	return (
 		<div className="flex flex-col gap-4 rounded-lg border border-border p-4">
@@ -218,6 +232,15 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 
 			{files.some((f) => f.status === 'loading') && (
 				<p role="status" className="text-sm text-muted-foreground">{messages.loadingThumbnails}</p>
+			)}
+
+			{totalFileSize > LARGE_TOTAL_SIZE_WARNING_BYTES && (
+				<p
+					role="alert"
+					className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400"
+				>
+					{messages.largeFileWarning.replace('{{size}}', formatBytes(totalFileSize))}
+				</p>
 			)}
 
 			{pages.length === 0 ? (

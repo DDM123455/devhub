@@ -144,6 +144,11 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "Gộp PDF: cảnh báo giới hạn dung lượng" (vs iLovePDF/
+  Smallpdf): thêm banner cảnh báo (màu amber, không chặn thao tác) khi tổng dung lượng các
+  file đã chọn vượt `LARGE_TOTAL_SIZE_WARNING_BYTES = 200MB` — khác đối thủ (giới hạn do
+  upload server), rủi ro thật ở đây là bộ nhớ tab trình duyệt vì toàn bộ việc gộp diễn ra tại
+  chỗ (load + copy + re-save mọi PDF nguồn trong RAM). Build sạch (421 trang).
 - **2026-07-30** — Phase 3.6b — mục "Image Compressor: nút Retry riêng" (vs TinyPNG/Squoosh):
   thêm nút "Retry" cạnh nút Download khi `item.status === 'error'`, gọi thẳng
   `compressOne(item)` (hàm đã tách sẵn từ khi làm song song hoá batch ở M1) — không cần

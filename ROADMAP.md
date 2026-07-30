@@ -211,7 +211,7 @@ ROADMAP)
 **Nhóm PDF**
 - [ ] Gộp PDF — vs iLovePDF/Smallpdf: preview file PDF gộp cuối cùng trước khi tải
 - [ ] Gộp PDF — xử lý/báo lỗi riêng cho PDF có mật khẩu (thay vì lỗi chung chung)
-- [ ] Gộp PDF — cảnh báo giới hạn dung lượng nếu file quá lớn
+- [x] Gộp PDF — cảnh báo giới hạn dung lượng nếu file quá lớn
 - [ ] Tách PDF — vs iLovePDF/Smallpdf: chọn trang kiểu checkbox đa lựa chọn (không chỉ cú
       pháp range)
 - [ ] Tách PDF — preview từng file kết quả trước khi tải

@@ -19,7 +19,8 @@
     "dragHint": "Kéo bất kỳ trang nào để sắp xếp lại, hoặc dùng nút mũi tên.",
     "noFiles": "Chưa chọn file PDF nào.",
     "errorGeneric": "Có lỗi khi đọc file PDF này. Hãy kiểm tra xem file có bị hỏng hoặc đặt mật khẩu không, rồi thử lại.",
-    "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải file PDF."
+    "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải file PDF.",
+    "largeFileWarning": "Bạn đã chọn {{size}} PDF — việc gộp file diễn ra hoàn toàn trong bộ nhớ của tab này, nên với dung lượng lớn như vậy có thể chạy chậm hoặc tốn nhiều bộ nhớ."
   },
   "related": "Công cụ liên quan",
   "faq": {
