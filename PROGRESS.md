@@ -144,6 +144,21 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b (bắt đầu) — thêm ~42 mục feature-parity bắt buộc từ mục 2
+  (so sánh benchmark từng công cụ) của `AUDIT.md` vào `ROADMAP.md`, phần chưa từng được đưa
+  vào roadmap ở các đợt trước (loại các gap audit tự đánh giá chấp nhận được/Low, và các gap
+  đã sửa ở Phase 3.5/3.6a). Bắt đầu làm mục đầu tiên — "JWT Decoder: URL deep-link chia sẻ
+  token debug + cảnh báo `alg: none`" (vs jwt.io): thêm `useEffect` đọc `?token=` từ URL lúc
+  mount (chỉ đọc 1 lần, không đồng bộ 2 chiều — gõ token mới không sửa URL), nút "Copy share
+  link" tái dùng `CopyButton` sẵn có; thêm `isAlgNone` + badge cảnh báo màu đỏ cạnh badge
+  algorithm khi `alg` là `"none"` (JWT hợp lệ theo spec nhưng không có chữ ký — ai cũng giả
+  mạo được, khác với case "thuật toán chưa hỗ trợ verify"). Bug tự phát hiện lúc code: tính
+  `shareLink` truy cập `window.location` trực tiếp ở phần render (không phải trong
+  `useEffect`) sẽ crash SSR build vì Astro pre-render component 1 lần trong Node (không có
+  `window`) — sửa bằng guard `typeof window !== 'undefined'`, cùng loại bug đã ghi trong mục
+  "Ghi chú kỹ thuật" phía trên (hydration mismatch/browser-only global). Thêm key i18n
+  `copyShareLink`/`algNoneWarning` cho en+vi + `messages` object. Build sạch (421 trang),
+  xác nhận cả 2 string mới có trong props serialize của `dist/en/tools/jwt-decoder/index.html`.
 - **2026-07-30** — Phase 3.6 (hoàn tất 7/7) — mục 7/7 "QR Generator: dot-style/gradient" +
   M7 (N/A, chỉ cập nhật ROADMAP): viết lại hoàn toàn cơ chế render của `QrCodeGenerator.tsx`,
   chuyển từ `qrcode.react` (render qua JSX props, chỉ hỗ trợ màu đặc) sang thư viện mới

@@ -186,6 +186,77 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] Base64: mở rộng bảng MIME→extension
 - [x] JWT Decoder: hiển thị `aud`/`iss`/`sub` tường minh trong claims panel
 
+### 3.6b — Feature parity bắt buộc so với đối thủ (từ `AUDIT.md` mục 2, chưa từng lên
+ROADMAP)
+
+> Trích từ phần so sánh benchmark từng công cụ trong `AUDIT.md` (mục 2). Đã loại các gap mà
+> audit tự đánh giá "chấp nhận được"/ngoài phạm vi kỹ thuật hợp lý (Diffchecker hỗ trợ PDF/
+> Word/ảnh, Markdown Editor sync cloud/GitHub — phá nguyên tắc client-side-only) và các mục
+> đã xếp 🟢 Low trong `AUDIT.md` (font bubble Text Case, JWT ES*/PS*/EdDSA). Các gap đã sửa ở
+> Phase 3.5/3.6 (vd. Download All .zip Image Converter, Copied feedback Color Picker, preview
+> CSV↔JSON, plugin SVGO, autosave Markdown...) không lặp lại ở đây.
+
+**Nhóm Ảnh**
+- [ ] Nén ảnh — vs TinyPNG/Squoosh: chọn định dạng đích ngay lúc nén (WebP/AVIF/MozJPEG output)
+- [ ] Nén ảnh — vs TinyPNG/Squoosh: chế độ "target size" (nén tới X KB thay vì chỉ theo %)
+- [ ] Nén ảnh — nút Retry riêng cho ảnh bị lỗi (hiện phải xóa + upload lại)
+- [ ] Chuyển đổi định dạng ảnh — xử lý song song thay vì tuần tự (M1 trước đó CHỈ sửa Image
+      Compressor, Image Converter vẫn còn vòng lặp tuần tự)
+- [ ] Chuyển đổi định dạng ảnh — ICO xuất đa kích thước (multi-size icon), không chỉ 256px
+- [ ] Xóa nền ảnh — vs remove.bg: thanh tiến trình TỔNG khi xử lý hàng loạt (hiện chỉ có %
+      của ảnh hiện tại)
+- [ ] Xóa nền ảnh — Download All .zip khi xử lý nhiều ảnh (nhất quán với Compressor/Splitter)
+- [ ] Xóa nền ảnh — crop/resize ảnh sau khi xóa nền
+
+**Nhóm PDF**
+- [ ] Gộp PDF — vs iLovePDF/Smallpdf: preview file PDF gộp cuối cùng trước khi tải
+- [ ] Gộp PDF — xử lý/báo lỗi riêng cho PDF có mật khẩu (thay vì lỗi chung chung)
+- [ ] Gộp PDF — cảnh báo giới hạn dung lượng nếu file quá lớn
+- [ ] Tách PDF — vs iLovePDF/Smallpdf: chọn trang kiểu checkbox đa lựa chọn (không chỉ cú
+      pháp range)
+- [ ] Tách PDF — preview từng file kết quả trước khi tải
+- [ ] Tách PDF — kéo-thả sắp xếp lại thứ tự trang
+
+**Nhóm Văn bản & Dữ liệu**
+- [ ] So sánh văn bản — vs Diffchecker.com: link chia sẻ kết quả so sánh
+- [ ] Đếm từ & ký tự — vs WordCounter.net: upload file để đếm (không chỉ paste text)
+- [ ] JSON Formatter — vs JSONFormatter.org/JSONLint: nút "Validate" tường minh + badge
+      trạng thái riêng biệt
+- [ ] JSON Formatter — expose JSON Schema validation cho người dùng (đã import
+      `SchemaValidationError` nhưng chưa dùng tới)
+- [ ] JSON Formatter — so sánh 2 JSON (diff)
+- [ ] Chuyển đổi Case văn bản — vs ConvertCase.net: Title Case có danh sách từ ngoại lệ
+      (of/the/and...)
+- [ ] Chuyển đổi Case văn bản — hiển thị đếm từ/ký tự cạnh output
+- [ ] Chuyển đổi Case văn bản — upload/download file
+- [ ] CSV↔JSON Converter — vs CloudConvert/Convertio: batch nhiều file
+- [ ] CSV↔JSON Converter — hỗ trợ TSV như 1 option riêng
+
+**Nhóm Dev/Design Tools**
+- [x] JWT Decoder — vs jwt.io: URL deep-link chia sẻ token debug (`?token=...`)
+- [x] JWT Decoder — cảnh báo khi `alg: none`
+- [ ] Base64 — vs base64decode.org: batch nhiều file
+- [ ] Base64 — chọn encoding khác ngoài UTF-8
+- [ ] Regex Tester — vs regex101/RegExr: bộ chọn "flavor" (PCRE/Python/...)
+- [ ] Regex Tester — lưu lịch sử pattern
+- [ ] Regex Tester — URL chia sẻ state
+- [ ] Color Picker — vs Coolors/Adobe Color: export ASE/SCSS/Tailwind config
+- [ ] Color Picker — trích xuất palette từ ảnh ("Image to Palette" — tính năng chủ lực Coolors)
+- [ ] Color Picker — lưu palette yêu thích (localStorage)
+- [ ] Color Picker — hex nhận cả dạng rút gọn 3 ký tự
+
+**Nhóm Media & QR**
+- [ ] QR Generator — vs qr-code-generator.com: frame/CTA text dưới QR (dot-style/gradient đã
+      xong ở 3.6a, còn thiếu khung viền + dòng chữ kêu gọi hành động)
+- [ ] QR Generator — batch tạo nhiều QR cùng lúc
+- [ ] Markdown Editor — vs StackEdit/Dillinger: syntax highlighting thật cho editor (hiện
+      chỉ là `<textarea>` thuần)
+- [ ] Markdown Editor — keyboard shortcut Ctrl+B/Ctrl+I
+- [ ] Trim video ngắn — vs Clideo/CloudConvert: multi-clip (nhiều đoạn cắt), crop khung hình,
+      watermark
+- [ ] Chuyển đổi Audio MP3↔WAV — vs CloudConvert: thêm định dạng AAC/OGG/FLAC/M4A
+- [ ] Chuyển đổi Audio MP3↔WAV — resample/normalize/fade
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

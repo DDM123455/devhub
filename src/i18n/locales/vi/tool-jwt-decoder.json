@@ -49,7 +49,9 @@
     "resignUnsupportedAlgorithm": "Chức năng ký lại chỉ hoạt động với HS256, HS384 hoặc HS512 — hãy đặt \"alg\" trong header thành một trong các giá trị này.",
     "resignMissingSecret": "Nhập secret ở trên để ký token mới.",
     "copy": "Sao chép",
-    "copied": "Đã sao chép!"
+    "copied": "Đã sao chép!",
+    "copyShareLink": "Sao chép link chia sẻ",
+    "algNoneWarning": "alg: none — token chưa ký, đừng dùng để xác thực"
   },
   "related": "Công cụ liên quan",
   "faq": {

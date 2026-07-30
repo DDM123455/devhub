@@ -49,7 +49,9 @@
     "resignUnsupportedAlgorithm": "Re-signing only works for HS256, HS384, or HS512 — set the header's \"alg\" to one of those.",
     "resignMissingSecret": "Enter a secret above to sign the new token.",
     "copy": "Copy",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "copyShareLink": "Copy share link",
+    "algNoneWarning": "alg: none — unsigned token, don't trust it for auth"
   },
   "related": "Related tools",
   "faq": {

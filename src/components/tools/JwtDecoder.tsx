@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 interface Messages {
@@ -46,6 +46,8 @@ interface Messages {
 	resignMissingSecret: string;
 	copy: string;
 	copied: string;
+	copyShareLink: string;
+	algNoneWarning: string;
 }
 
 type DecodeErrorKind = 'format' | 'base64' | 'json';
@@ -251,6 +253,11 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 
 	const alg = typeof getClaim(decoded?.header, 'alg') === 'string' ? (getClaim(decoded?.header, 'alg') as string) : null;
 	const kind = algKind(alg);
+	// `alg: none` is a valid JWT header per spec, but it means the token carries
+	// no signature at all — anyone can forge one. Flagged separately from the
+	// "unsupported algorithm" case since this isn't a tooling gap, it's a
+	// security property of the token itself worth calling out explicitly.
+	const isAlgNone = alg?.toLowerCase() === 'none';
 
 	const headerPretty = decoded ? JSON.stringify(decoded.header, null, 2) : '';
 	const payloadPretty = decoded ? JSON.stringify(decoded.payload, null, 2) : '';
@@ -284,6 +291,24 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 			setPayloadEdit('');
 		}
 	};
+
+	// Mirrors jwt.io's `?token=` deep-link convention: lets a "Copy share link"
+	// button hand off a token under inspection (e.g. to a teammate) without
+	// retyping it. Read once on mount only — this is a one-way import, not a
+	// synced URL state, so typing a new token doesn't rewrite the address bar.
+	useEffect(() => {
+		const fromUrl = new URLSearchParams(window.location.search).get('token');
+		if (fromUrl) resetForNewToken(fromUrl);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	// `window` doesn't exist during Astro's build-time SSR pass (this component
+	// still renders once in Node then), so this stays empty on that first
+	// pre-render and fills in for real once hydrated in the browser.
+	const shareLink =
+		decoded && typeof window !== 'undefined'
+			? `${window.location.origin}${window.location.pathname}?token=${encodeURIComponent(tokenInput.trim())}`
+			: '';
 
 	const handleLoadSample = () => {
 		resetForNewToken(SAMPLE_TOKEN);
@@ -363,6 +388,9 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 					<Button type="button" size="sm" variant="outline" onClick={handleClear}>
 						{messages.clear}
 					</Button>
+					{decoded && (
+						<CopyButton value={shareLink} label={messages.copyShareLink} copiedLabel={messages.copied} />
+					)}
 				</div>
 			</div>
 
@@ -401,6 +429,11 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 							<span className="rounded-full border border-border px-2 py-0.5 font-mono text-xs text-foreground">
 								{messages.algorithmLabel}: {alg ?? '?'}
 							</span>
+							{isAlgNone && (
+								<span role="alert" className="rounded-full border border-destructive/40 bg-destructive/10 px-2 py-0.5 text-xs text-destructive">
+									{messages.algNoneWarning}
+								</span>
+							)}
 							{isExpired && (
 								<span className="rounded-full border border-destructive/40 bg-destructive/10 px-2 py-0.5 text-xs text-destructive">
 									{messages.expiredBadge}
