@@ -137,4 +137,13 @@
   html.dark {
     color-scheme: dark;
     }
+  /* Same focus-visible ring the shared Button component uses, applied to raw
+     form controls site-wide so keyboard focus is equally visible on inputs,
+     not just buttons — relying on each tool's own className would mean
+     auditing/touching every tool component individually. */
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    @apply border-ring outline-none ring-3 ring-ring/50;
+    }
 }

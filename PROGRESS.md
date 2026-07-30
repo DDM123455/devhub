@@ -137,6 +137,16 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6 — mục 4/7 "focus-visible pass cho input/select/textarea":
+  buttons đã có ring focus-visible sẵn qua `cva` trong `button.tsx`, nhưng input/select/
+  textarea "tay" ở tất cả tool component chỉ dựa vào outline mặc định trình duyệt. Thay vì
+  sửa className ở từng file `.tsx` (hàng chục file, dễ sót), thêm 1 rule global trong
+  `src/styles/global.css` (`@layer base`): `input:focus-visible, select:focus-visible,
+  textarea:focus-visible { @apply border-ring outline-none ring-3 ring-ring/50; }` — dùng
+  đúng token `--ring` mà Button đang dùng nên ring nhất quán giữa nút và input trên toàn
+  site, áp dụng tự động cho MỌI input/select/textarea kể cả tool mới sau này, không cần
+  đụng từng component. Build sạch (421 trang), xác nhận rule đã compile đúng vào CSS bundle
+  (`dist/_astro/Layout.*.css`, có `border-color/box-shadow/outline-style:none` đầy đủ).
 - **2026-07-30** — Phase 3.6 — mục 3/7 "Trang chủ: bỏ ô '0 KB uploaded'": xoá khối `<div>`
   placeholder tĩnh (không có tracking thật đứng sau, đúng triết lý zero-server — quyết định
   chọn "bỏ hẳn" thay vì "thêm số liệu thật qua localStorage" đã hỏi và được người dùng xác

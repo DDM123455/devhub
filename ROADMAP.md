@@ -176,7 +176,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
       batch nhiều ảnh
 - [ ] Image Compressor + Image Converter: thêm tùy chọn resize kích thước trước khi xuất
 - [ ] QR Generator: thêm dot-style/gradient cơ bản (`qr-code-styling`)
-- [ ] Contrast/`focus-visible` pass có chủ đích trên toàn bộ input/select/textarea
+- [x] Contrast/`focus-visible` pass có chủ đích trên toàn bộ input/select/textarea
       tương tác (button đã có sẵn qua `button.tsx`)
 - [x] Trang chủ: bỏ hẳn ô "0 KB uploaded" placeholder tĩnh không có dữ liệu thật
 - [x] `client:load` → `client:visible` cho phần article/related-tools dưới fold —
