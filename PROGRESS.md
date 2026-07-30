@@ -144,6 +144,19 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — (theo yêu cầu trực tiếp người dùng, tiếp nối mục phóng to thumbnail PDF ở
+  log ngay bên dưới) đổi layout danh sách trang ở cả **Gộp PDF** và **Tách PDF** từ lưới ngang
+  tự xuống dòng (`flex flex-wrap`, thumbnail 192px) sang **danh sách dọc** (`flex flex-col`,
+  mỗi trang 1 hàng ngang riêng: thumbnail 288px `w-72` bên trái + nút xoay/xoá/di chuyển bên
+  phải), bọc trong khung `max-h-[36rem] overflow-y-auto` để cuộn dọc thay vì đẩy cả trang dài
+  ra vô hạn khi PDF nhiều trang. Kéo-thả sắp xếp lại (`draggable`/`onDragStart`/`onDrop`) không
+  đổi logic, chỉ đổi layout hiển thị — HTML5 drag-drop không phụ thuộc hướng flex. Tăng thêm
+  `scale` render pdf.js trong `pdf-thumbnails.ts` từ 0.45 lên 0.55 để khớp độ nét với kích
+  thước hiển thị lớn hơn (288px thay vì 192px). Build sạch (421 trang) — phần `<ul>` danh sách
+  trang chỉ render phía client sau khi người dùng tải file lên (state rỗng lúc build), nên
+  không thể grep thấy trong HTML tĩnh, đúng như hành vi đã có từ trước (không phải lỗi mới).
+  **Giới hạn**: không có trình duyệt thật để xem trực quan — người dùng nên tự mở 2 trang PDF
+  này, tải file nhiều trang lên để xác nhận danh sách dọc + cuộn + kích thước thumbnail đúng ý.
 - **2026-07-30** — (theo yêu cầu trực tiếp người dùng, không thuộc mục nào trong ROADMAP.md)
   phóng to khu vực xem trước trang PDF ở cả **Gộp PDF** và **Tách PDF** — người dùng phản ánh
   chữ trong thumbnail quá nhỏ để đọc được nội dung trang. 2 phần cần sửa cùng lúc để ảnh không

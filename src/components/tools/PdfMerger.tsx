@@ -310,7 +310,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 			) : (
 				<>
 					<p className="text-xs text-muted-foreground">{messages.dragHint}</p>
-					<ul className="flex flex-wrap gap-3">
+					<ul className="flex max-h-[36rem] flex-col gap-3 overflow-y-auto pr-1">
 						{pages.map((page, index) => (
 							<li
 								key={page.id}
@@ -321,22 +321,22 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 									event.preventDefault();
 									handleDrop(page.id);
 								}}
-								className={`flex w-48 cursor-grab flex-col gap-1 rounded-md border border-border bg-card p-1.5 ${
+								className={`flex w-full cursor-grab items-center gap-4 rounded-md border border-border bg-card p-2 ${
 									dragPageId === page.id ? 'opacity-50' : ''
 								}`}
 							>
-								<div className="relative overflow-hidden rounded bg-muted">
+								<div className="relative w-72 shrink-0 overflow-hidden rounded bg-muted">
 									<img
 										src={page.dataUrl}
 										alt={`${page.file.name} — page ${page.pageIndex + 1}`}
 										className="w-full"
 										style={{ transform: `rotate(${page.rotation}deg)` }}
 									/>
-									<span className="absolute bottom-1 right-1 rounded bg-black/60 px-1 text-[10px] font-medium text-white">
+									<span className="absolute bottom-1 right-1 rounded bg-black/60 px-1.5 py-0.5 text-xs font-medium text-white">
 										{index + 1}
 									</span>
 								</div>
-								<div className="flex items-center justify-between gap-0.5">
+								<div className="flex flex-1 items-center justify-end gap-1">
 									<Button
 										type="button"
 										size="icon-xs"
