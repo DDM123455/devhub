@@ -255,7 +255,7 @@ ROADMAP)
 - [ ] Trim video ngắn — vs Clideo/CloudConvert: multi-clip (nhiều đoạn cắt), crop khung hình,
       watermark
 - [ ] Chuyển đổi Audio MP3↔WAV — vs CloudConvert: thêm định dạng AAC/OGG/FLAC/M4A
-- [ ] Chuyển đổi Audio MP3↔WAV — resample/normalize/fade
+- [x] Chuyển đổi Audio MP3↔WAV — resample/normalize/fade
 
 ## Phase 4 — Kiếm tiền & PWA
 

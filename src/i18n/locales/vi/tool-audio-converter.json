@@ -24,7 +24,12 @@
     "clear": "Chọn file khác",
     "decodeError": "Không đọc được file âm thanh này — có thể file bị hỏng hoặc định dạng mà trình duyệt này không giải mã được.",
     "encodeError": "Chuyển đổi thất bại. Thử bitrate khác, hoặc chọn file khác.",
-    "channelDownmixWarning": "File này có {{count}} kênh âm thanh. Chỉ 2 kênh đầu tiên (stereo) được giữ lại trong file chuyển đổi — các kênh còn lại sẽ bị loại bỏ."
+    "channelDownmixWarning": "File này có {{count}} kênh âm thanh. Chỉ 2 kênh đầu tiên (stereo) được giữ lại trong file chuyển đổi — các kênh còn lại sẽ bị loại bỏ.",
+    "resampleToggleLabel": "Đổi tần số lấy mẫu",
+    "sampleRateLabel": "Tần số lấy mẫu đích",
+    "normalizeToggleLabel": "Chuẩn hóa âm lượng (đỉnh về -1dB)",
+    "fadeInLabel": "Fade in: {{seconds}}s",
+    "fadeOutLabel": "Fade out: {{seconds}}s"
   },
   "related": "Công cụ liên quan",
   "faq": {

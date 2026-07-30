@@ -22,11 +22,90 @@ interface Messages {
 	decodeError: string;
 	encodeError: string;
 	channelDownmixWarning: string;
+	resampleToggleLabel: string;
+	sampleRateLabel: string;
+	normalizeToggleLabel: string;
+	fadeInLabel: string;
+	fadeOutLabel: string;
 }
 
 type OutputFormat = 'mp3' | 'wav';
 
 const BITRATES = [128, 192, 256, 320];
+const SAMPLE_RATES = [8000, 16000, 22050, 24000, 44100, 48000];
+const MAX_FADE_SECONDS = 5;
+// -1dBFS, the conventional "normalize" target most audio tools default to —
+// leaves a hair of headroom instead of slamming every peak to exactly 0dBFS.
+const NORMALIZE_TARGET_PEAK = 0.891;
+
+// Resampling via a native `OfflineAudioContext`: render the decoded buffer
+// through an offline context whose sample rate differs from the source, and
+// the Web Audio API's own internal resampler does the conversion — no DSP
+// library needed for something the platform already does correctly.
+async function resampleChannels(
+	channels: Float32Array[],
+	sourceSampleRate: number,
+	targetSampleRate: number,
+): Promise<Float32Array[]> {
+	if (sourceSampleRate === targetSampleRate) return channels;
+	const numberOfChannels = channels.length;
+	const length = channels[0].length;
+
+	const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+	const scratchCtx = new AudioCtx();
+	const sourceBuffer = scratchCtx.createBuffer(numberOfChannels, length, sourceSampleRate);
+	channels.forEach((data, i) => sourceBuffer.copyToChannel(data, i));
+	void scratchCtx.close();
+
+	const targetLength = Math.ceil(length * (targetSampleRate / sourceSampleRate));
+	const OfflineCtx =
+		window.OfflineAudioContext ||
+		(window as unknown as { webkitOfflineAudioContext: typeof OfflineAudioContext }).webkitOfflineAudioContext;
+	const offlineCtx = new OfflineCtx(numberOfChannels, targetLength, targetSampleRate);
+	const bufferSource = offlineCtx.createBufferSource();
+	bufferSource.buffer = sourceBuffer;
+	bufferSource.connect(offlineCtx.destination);
+	bufferSource.start();
+	const renderedBuffer = await offlineCtx.startRendering();
+
+	const result: Float32Array[] = [];
+	for (let i = 0; i < numberOfChannels; i++) result.push(renderedBuffer.getChannelData(i).slice());
+	return result;
+}
+
+function normalizeChannels(channels: Float32Array[], targetPeak = NORMALIZE_TARGET_PEAK): Float32Array[] {
+	let peak = 0;
+	for (const channel of channels) {
+		for (let i = 0; i < channel.length; i++) {
+			const abs = Math.abs(channel[i]);
+			if (abs > peak) peak = abs;
+		}
+	}
+	if (peak === 0) return channels;
+	const gain = targetPeak / peak;
+	return channels.map((channel) => channel.map((value) => value * gain));
+}
+
+function applyFade(
+	channels: Float32Array[],
+	sampleRate: number,
+	fadeInSeconds: number,
+	fadeOutSeconds: number,
+): Float32Array[] {
+	if (fadeInSeconds <= 0 && fadeOutSeconds <= 0) return channels;
+	const length = channels[0].length;
+	const fadeInSamples = Math.min(length, Math.round(fadeInSeconds * sampleRate));
+	const fadeOutSamples = Math.min(length, Math.round(fadeOutSeconds * sampleRate));
+	return channels.map((channel) => {
+		const out = channel.slice();
+		for (let i = 0; i < fadeInSamples; i++) out[i] *= i / fadeInSamples;
+		for (let i = 0; i < fadeOutSamples; i++) {
+			const idx = length - 1 - i;
+			out[idx] *= i / fadeOutSamples;
+		}
+		return out;
+	});
+}
 
 function formatBytes(bytes: number): string {
 	if (bytes < 1024) return `${bytes} B`;
@@ -61,6 +140,11 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 	const [resultDuration, setResultDuration] = useState<number | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [channelCount, setChannelCount] = useState<number | null>(null);
+	const [resampleEnabled, setResampleEnabled] = useState(false);
+	const [targetSampleRate, setTargetSampleRate] = useState(44100);
+	const [normalizeEnabled, setNormalizeEnabled] = useState(false);
+	const [fadeInSeconds, setFadeInSeconds] = useState(0);
+	const [fadeOutSeconds, setFadeOutSeconds] = useState(0);
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const workerRef = useRef<Worker | null>(null);
@@ -120,10 +204,23 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 			audioCtx = new AudioCtx();
 			const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
 			setChannelCount(audioBuffer.numberOfChannels > 2 ? audioBuffer.numberOfChannels : null);
-			const channels: Float32Array[] = [];
+			let channels: Float32Array[] = [];
 			for (let i = 0; i < audioBuffer.numberOfChannels; i++) channels.push(audioBuffer.getChannelData(i).slice());
-			const sampleRate = audioBuffer.sampleRate;
+			let sampleRate = audioBuffer.sampleRate;
 			const duration = audioBuffer.duration;
+
+			// All three run on the decoded samples before handing off to the
+			// encode worker — cheap per-sample math (or, for resample, a native
+			// OfflineAudioContext render), so there's no need to push this work
+			// into the worker too.
+			if (resampleEnabled && targetSampleRate !== sampleRate) {
+				channels = await resampleChannels(channels, sampleRate, targetSampleRate);
+				sampleRate = targetSampleRate;
+			}
+			if (normalizeEnabled) channels = normalizeChannels(channels);
+			if (fadeInSeconds > 0 || fadeOutSeconds > 0) {
+				channels = applyFade(channels, sampleRate, fadeInSeconds, fadeOutSeconds);
+			}
 
 			currentStage = 'encoding';
 			setStage('encoding');
@@ -251,6 +348,78 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 								</select>
 							</div>
 						)}
+					</div>
+
+					<div className="flex flex-col gap-3 rounded-lg border border-border p-4">
+						<label className="flex items-center gap-1.5 text-sm text-foreground">
+							<input
+								type="checkbox"
+								checked={resampleEnabled}
+								onChange={(e) => setResampleEnabled(e.target.checked)}
+							/>
+							{messages.resampleToggleLabel}
+						</label>
+						{resampleEnabled && (
+							<div className="flex flex-col gap-1 pl-1">
+								<label htmlFor="audio-converter-sample-rate" className="text-xs text-muted-foreground">
+									{messages.sampleRateLabel}
+								</label>
+								<select
+									id="audio-converter-sample-rate"
+									value={targetSampleRate}
+									onChange={(e) => setTargetSampleRate(Number(e.target.value))}
+									className="w-40 rounded-md border border-border bg-background p-2 text-sm text-foreground"
+								>
+									{SAMPLE_RATES.map((rate) => (
+										<option key={rate} value={rate}>
+											{rate} Hz
+										</option>
+									))}
+								</select>
+							</div>
+						)}
+
+						<label className="flex items-center gap-1.5 text-sm text-foreground">
+							<input
+								type="checkbox"
+								checked={normalizeEnabled}
+								onChange={(e) => setNormalizeEnabled(e.target.checked)}
+							/>
+							{messages.normalizeToggleLabel}
+						</label>
+
+						<div className="flex flex-wrap items-center gap-4">
+							<div className="flex items-center gap-2">
+								<label htmlFor="audio-converter-fade-in" className="shrink-0 text-sm text-foreground">
+									{messages.fadeInLabel.replace('{{seconds}}', fadeInSeconds.toFixed(1))}
+								</label>
+								<input
+									id="audio-converter-fade-in"
+									type="range"
+									min={0}
+									max={MAX_FADE_SECONDS}
+									step={0.5}
+									value={fadeInSeconds}
+									onChange={(e) => setFadeInSeconds(Number(e.target.value))}
+									className="w-32"
+								/>
+							</div>
+							<div className="flex items-center gap-2">
+								<label htmlFor="audio-converter-fade-out" className="shrink-0 text-sm text-foreground">
+									{messages.fadeOutLabel.replace('{{seconds}}', fadeOutSeconds.toFixed(1))}
+								</label>
+								<input
+									id="audio-converter-fade-out"
+									type="range"
+									min={0}
+									max={MAX_FADE_SECONDS}
+									step={0.5}
+									value={fadeOutSeconds}
+									onChange={(e) => setFadeOutSeconds(Number(e.target.value))}
+									className="w-32"
+								/>
+							</div>
+						</div>
 					</div>
 
 					<div className="flex flex-wrap items-center gap-3">

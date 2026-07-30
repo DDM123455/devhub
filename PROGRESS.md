@@ -144,6 +144,25 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "Chuyển đổi Audio: resample/normalize/fade" (vs
+  CloudConvert) — **cộng 1 bug thật tự phát hiện lúc code**: `channelDownmixWarning` (cảnh
+  báo Critical C2 tưởng đã sửa ở Phase 3.5a) hoá ra chưa từng được nối vào object `messages`
+  trong `AudioConverterPage.astro` — `messages.channelDownmixWarning` là `undefined` trong
+  production, và vì code gọi `.replace()` trực tiếp lên nó (không chỉ render rỗng như các
+  bug tương tự trước đây), **bất kỳ file audio nào có >2 kênh sẽ crash thẳng component**
+  (TypeError "Cannot read properties of undefined") thay vì hiện cảnh báo — đã sửa cùng lúc.
+  **3 tính năng mới, cả 3 dùng thuần Web Audio API có sẵn, không cần dependency mới**:
+  Resample qua `OfflineAudioContext` (render buffer gốc qua context có sample rate khác,
+  trình duyệt tự resample nội bộ — không cần thư viện DSP riêng); Normalize quét peak toàn
+  bộ kênh rồi nhân gain để đạt -1dBFS (0.891, ngưỡng chuẩn hầu hết tool audio dùng mặc định);
+  Fade in/out tuyến tính theo số giây tại 2 đầu tín hiệu. Cả 3 chạy trên main thread ngay sau
+  decode (trước khi gửi cho Worker encode) vì là phép toán rẻ theo từng sample. Verify
+  `normalizeChannels()`/`applyFade()` bằng script Node độc lập: normalize đưa đúng peak lên
+  0.891 chính xác tuyệt đối; fade tạo đúng đường tuyến tính tăng/giảm ở 2 đầu tín hiệu test
+  10 sample. Build sạch (421 trang), xác nhận cả bug fix lẫn label mới trong
+  `dist/en/tools/mp3-wav-converter/index.html`. **Nhóm A còn 1 mục cuối** (Image Compressor:
+  chọn định dạng đích lúc nén) trước khi sang nhóm B (Markdown CodeMirror, Audio thêm định
+  dạng, Video multi-clip/crop/watermark — cần thêm dependency/viết lại lớn).
 - **2026-07-30** — Phase 3.6b — mục "Tách PDF: checkbox chọn trang + preview từng file +
   kéo-thả sắp xếp" (vs iLovePDF/Smallpdf, 3 mục cùng lúc vì cùng 1 file): **Kéo-thả** — copy
   đúng pattern `dragPageId`/`handleDrop` đã có sẵn ở Gộp PDF, áp dụng cho danh sách trang
