@@ -37,7 +37,8 @@
     "acceptLeftAria": "Lấy nội dung bên trái cho thay đổi này",
     "copy": "Sao chép",
     "copied": "Đã sao chép!",
-    "save": "Lưu file .txt"
+    "save": "Lưu file .txt",
+    "copyShareLink": "Sao chép link chia sẻ"
   },
   "related": "Công cụ liên quan",
   "faq": {

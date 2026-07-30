@@ -43,9 +43,34 @@ interface Messages {
 	copy: string;
 	copied: string;
 	save: string;
+	copyShareLink: string;
 }
 
 const DEBOUNCE_MS = 150;
+
+// Uses the native Compression Streams API (supported in every evergreen
+// browser, no library needed) to gzip each text before base64-encoding it
+// into the URL — the two documents being compared can be arbitrarily long,
+// and gzip usually shrinks plain text by 60-80%, which matters since URLs
+// (even the hash portion, never sent to a server) have practical length
+// limits in browsers and chat apps that might carry the link.
+async function compressToUrlSafeBase64(text: string): Promise<string> {
+	const stream = new Blob([text]).stream().pipeThrough(new CompressionStream('gzip'));
+	const bytes = new Uint8Array(await new Response(stream).arrayBuffer());
+	let binary = '';
+	for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+	return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+async function decompressFromUrlSafeBase64(value: string): Promise<string> {
+	const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
+	const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
+	const binary = atob(padded);
+	const bytes = new Uint8Array(binary.length);
+	for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+	const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+	return new TextDecoder().decode(await new Response(stream).arrayBuffer());
+}
 
 function useDebouncedValue<T>(value: T, delayMs: number): T {
 	const [debounced, setDebounced] = useState(value);
@@ -227,6 +252,43 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	const [activeHunk, setActiveHunk] = useState(0);
 	const [copiedSide, setCopiedSide] = useState<'left' | 'right' | null>(null);
 	const [hunkOverrides, setHunkOverrides] = useState<Map<number, HunkOverride>>(new Map());
+	const [shareLinkCopied, setShareLinkCopied] = useState(false);
+
+	// Mirrors the `?token=`/`?pattern=` deep-link pattern used elsewhere on the
+	// site (JWT Decoder, Regex Tester), but via the URL *hash* instead of query
+	// params — the hash never leaves the browser (not sent to any server, not
+	// logged), and has a much higher practical length limit than query params
+	// for the potentially large documents this tool compares.
+	useEffect(() => {
+		if (!window.location.hash) return;
+		const params = new URLSearchParams(window.location.hash.slice(1));
+		const original = params.get('original');
+		const changed = params.get('changed');
+		if (!original || !changed) return;
+		Promise.all([decompressFromUrlSafeBase64(original), decompressFromUrlSafeBase64(changed)])
+			.then(([o, c]) => {
+				setOriginalText(o);
+				setChangedText(c);
+			})
+			.catch(() => {
+				// Corrupt or truncated share link (e.g. cut off by a chat app) — leave
+				// the inputs empty rather than showing a decode error for a link the
+				// user didn't necessarily create themselves.
+			});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	const handleCopyShareLink = async () => {
+		const [originalCompressed, changedCompressed] = await Promise.all([
+			compressToUrlSafeBase64(originalText),
+			compressToUrlSafeBase64(changedText),
+		]);
+		const hash = new URLSearchParams({ original: originalCompressed, changed: changedCompressed }).toString();
+		const link = `${window.location.origin}${window.location.pathname}#${hash}`;
+		await navigator.clipboard.writeText(link);
+		setShareLinkCopied(true);
+		setTimeout(() => setShareLinkCopied(false), 1500);
+	};
 
 	const debouncedOriginal = useDebouncedValue(originalText, DEBOUNCE_MS);
 	const debouncedChanged = useDebouncedValue(changedText, DEBOUNCE_MS);
@@ -484,6 +546,11 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							{messages.normalizeUnicode}
 						</label>
 					</div>
+					{(originalText !== '' || changedText !== '') && (
+						<Button type="button" size="sm" variant="outline" onClick={() => void handleCopyShareLink()}>
+							{shareLinkCopied ? messages.copied : messages.copyShareLink}
+						</Button>
+					)}
 				</div>
 				{isComputing && <p role="status" className="text-xs text-muted-foreground">{messages.computing}</p>}
 			</div>

@@ -37,7 +37,8 @@
     "acceptLeftAria": "Use the left version for this change",
     "copy": "Copy",
     "copied": "Copied!",
-    "save": "Save as .txt"
+    "save": "Save as .txt",
+    "copyShareLink": "Copy share link"
   },
   "related": "Related tools",
   "faq": {

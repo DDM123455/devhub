@@ -144,6 +144,18 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "So sánh văn bản: link chia sẻ kết quả" (vs
+  Diffchecker.com): dùng **Compression Streams API** có sẵn của trình duyệt
+  (`CompressionStream`/`DecompressionStream`, hỗ trợ mọi browser evergreen, không cần thư
+  viện) để gzip mỗi văn bản trước khi base64-encode vào URL — khác JWT Decoder/Regex Tester
+  (dùng query param `?token=`/`?pattern=`), ở đây dùng **URL hash** (`#...`) vì 2 văn bản so
+  sánh có thể rất dài: hash không giới hạn độ dài thực tế nghiêm ngặt như query string, và
+  không bao giờ gửi lên server (kể cả server của chính site) nên an toàn để chứa nội dung
+  nhạy cảm hơn. Đọc lại lúc mount qua `window.location.hash`, lỗi giải nén (link hỏng/bị cắt
+  bởi ứng dụng chat nào đó) chỉ âm thầm bỏ qua thay vì báo lỗi cho 1 link người dùng không
+  tự tạo. Verify bằng script Node độc lập: văn bản 2624 ký tự (lặp lại + ký tự Unicode/emoji)
+  nén xuống còn 119 ký tự base64 URL-safe, giải nén khớp lại chính xác 100%. Build sạch (421
+  trang), xác nhận label mới trong `dist/en/tools/text-diff-checker/index.html`.
 - **2026-07-30** — Phase 3.6b — mục "QR Generator: frame/CTA text dưới QR" (vs
   qr-code-generator.com — tính năng "premium" cuối cùng còn thiếu sau khi đã làm dot-style/
   gradient ở 3.6a): `qr-code-styling` không có sẵn tùy chọn khung viền/CTA text, nên tự viết

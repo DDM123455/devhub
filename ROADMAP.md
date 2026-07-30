@@ -218,7 +218,7 @@ ROADMAP)
 - [ ] Tách PDF — kéo-thả sắp xếp lại thứ tự trang
 
 **Nhóm Văn bản & Dữ liệu**
-- [ ] So sánh văn bản — vs Diffchecker.com: link chia sẻ kết quả so sánh
+- [x] So sánh văn bản — vs Diffchecker.com: link chia sẻ kết quả so sánh
 - [x] Đếm từ & ký tự — vs WordCounter.net: upload file để đếm (không chỉ paste text)
 - [x] JSON Formatter — vs JSONFormatter.org/JSONLint: nút "Validate" tường minh + badge
       trạng thái riêng biệt
