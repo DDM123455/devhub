@@ -25,6 +25,9 @@ interface Messages {
 	compressModeQuality: string;
 	compressModeTargetSize: string;
 	targetSizeLabel: string;
+	targetFormatLabel: string;
+	targetFormatOriginal: string;
+	errorAvifUnsupported: string;
 }
 
 interface ImageItem {
@@ -35,6 +38,7 @@ interface ImageItem {
 	compressedBlob?: Blob;
 	compressedPreviewUrl?: string;
 	compressedSize?: number;
+	errorMessage?: string;
 }
 
 // Each compression spins up its own `browser-image-compression` Web Worker —
@@ -48,6 +52,16 @@ const MIN_TARGET_SIZE_KB = 10;
 const MAX_TARGET_SIZE_KB = 10000;
 const DEFAULT_TARGET_SIZE_KB = 200;
 type CompressMode = 'quality' | 'targetSize';
+type TargetFormat = 'original' | 'image/jpeg' | 'image/webp' | 'image/avif' | 'image/png';
+
+const EXTENSION_BY_FORMAT: Record<Exclude<TargetFormat, 'original'>, string> = {
+	'image/jpeg': 'jpg',
+	'image/webp': 'webp',
+	'image/avif': 'avif',
+	'image/png': 'png',
+};
+
+class AvifUnsupportedError extends Error {}
 
 function formatBytes(bytes: number): string {
 	if (bytes < 1024) return `${bytes} B`;
@@ -62,6 +76,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 	const [targetSizeKb, setTargetSizeKb] = useState(DEFAULT_TARGET_SIZE_KB);
 	const [resizeEnabled, setResizeEnabled] = useState(false);
 	const [maxDimension, setMaxDimension] = useState(DEFAULT_MAX_DIMENSION);
+	const [targetFormat, setTargetFormat] = useState<TargetFormat>('original');
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isZipping, setIsZipping] = useState(false);
 	const [skippedCount, setSkippedCount] = useState(0);
@@ -124,7 +139,16 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 					useWebWorker: true,
 					initialQuality: compressMode === 'quality' ? quality : undefined,
 					maxWidthOrHeight: resizeEnabled ? maxDimension : undefined,
+					fileType: targetFormat === 'original' ? undefined : targetFormat,
 				});
+				// The library falls back silently (rather than rejecting) when the
+				// browser's canvas.toBlob can't actually produce the requested
+				// `fileType` — checking the result's own MIME type is the only way
+				// to tell a forced-format conversion actually happened, same
+				// AVIF-support detection already used in Image Format Converter.
+				if (targetFormat === 'image/avif' && compressedBlob.type !== 'image/avif') {
+					throw new AvifUnsupportedError();
+				}
 				setItems((prev) =>
 					prev.map((it) =>
 						it.id === item.id
@@ -138,11 +162,14 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 							: it,
 					),
 				);
-			} catch {
-				setItems((prev) => prev.map((it) => (it.id === item.id ? { ...it, status: 'error' } : it)));
+			} catch (err) {
+				const errorMessage = err instanceof AvifUnsupportedError ? messages.errorAvifUnsupported : messages.errorGeneric;
+				setItems((prev) =>
+					prev.map((it) => (it.id === item.id ? { ...it, status: 'error', errorMessage } : it)),
+				);
 			}
 		},
-		[compressMode, quality, targetSizeKb, resizeEnabled, maxDimension],
+		[compressMode, quality, targetSizeKb, resizeEnabled, maxDimension, targetFormat, messages.errorAvifUnsupported, messages.errorGeneric],
 	);
 
 	const handleCompress = useCallback(async () => {
@@ -162,15 +189,27 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 		setIsProcessing(false);
 	}, [items, compressOne]);
 
-	const handleDownload = useCallback((item: ImageItem) => {
-		if (!item.compressedBlob) return;
-		const url = URL.createObjectURL(item.compressedBlob);
-		const link = document.createElement('a');
-		link.href = url;
-		link.download = `compressed-${item.file.name}`;
-		link.click();
-		URL.revokeObjectURL(url);
-	}, []);
+	const compressedFileName = useCallback(
+		(file: File) => {
+			if (targetFormat === 'original') return `compressed-${file.name}`;
+			const base = file.name.replace(/\.[^./\\]+$/, '');
+			return `compressed-${base}.${EXTENSION_BY_FORMAT[targetFormat]}`;
+		},
+		[targetFormat],
+	);
+
+	const handleDownload = useCallback(
+		(item: ImageItem) => {
+			if (!item.compressedBlob) return;
+			const url = URL.createObjectURL(item.compressedBlob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = compressedFileName(item.file);
+			link.click();
+			URL.revokeObjectURL(url);
+		},
+		[compressedFileName],
+	);
 
 	const handleDownloadAll = useCallback(async () => {
 		const doneItems = items.filter((item) => item.status === 'done' && item.compressedBlob);
@@ -179,7 +218,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 		try {
 			const zip = new JSZip();
 			for (const item of doneItems) {
-				zip.file(`compressed-${item.file.name}`, item.compressedBlob!);
+				zip.file(compressedFileName(item.file), item.compressedBlob!);
 			}
 			const zipBlob = await zip.generateAsync({ type: 'blob' });
 			const url = URL.createObjectURL(zipBlob);
@@ -191,7 +230,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 		} finally {
 			setIsZipping(false);
 		}
-	}, [items]);
+	}, [items, compressedFileName]);
 
 	const canCompress = !isProcessing && items.length > 0;
 	const doneCount = items.filter((item) => item.status === 'done').length;
@@ -321,6 +360,24 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 				)}
 			</div>
 
+			<div className="flex items-center gap-3">
+				<label htmlFor="image-compressor-target-format" className="shrink-0 text-sm text-foreground">
+					{messages.targetFormatLabel}
+				</label>
+				<select
+					id="image-compressor-target-format"
+					value={targetFormat}
+					onChange={(event) => setTargetFormat(event.target.value as TargetFormat)}
+					className="rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+				>
+					<option value="original">{messages.targetFormatOriginal}</option>
+					<option value="image/webp">WebP</option>
+					<option value="image/jpeg">JPEG</option>
+					<option value="image/png">PNG</option>
+					<option value="image/avif">AVIF</option>
+				</select>
+			</div>
+
 			{items.length === 0 ? (
 				<p className="text-sm text-muted-foreground">{messages.noFiles}</p>
 			) : (
@@ -363,7 +420,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 											</>
 										)}
 										{item.status === 'error' && (
-											<span role="alert" className="text-destructive"> {messages.errorGeneric}</span>
+											<span role="alert" className="text-destructive"> {item.errorMessage ?? messages.errorGeneric}</span>
 										)}
 									</span>
 								</div>

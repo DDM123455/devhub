@@ -144,6 +144,19 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b (hoàn tất nhóm A 7/7) — mục "Image Compressor: chọn định dạng
+  đích ngay lúc nén" (vs TinyPNG/Squoosh): `browser-image-compression` đã có sẵn tham số
+  `fileType` (xác nhận qua đọc thẳng `.d.ts` của thư viện) — chỉ cần truyền
+  `fileType: targetFormat === 'original' ? undefined : targetFormat`, không cần code riêng.
+  Thêm select "Convert to": giữ nguyên định dạng gốc / WebP / JPEG / PNG / AVIF. AVIF cần xử
+  lý thêm vì thư viện fallback ÂM THẦM (không lỗi) khi `canvas.toBlob` của trình duyệt không
+  hỗ trợ AVIF thật — phát hiện bằng cách so `compressedBlob.type` với định dạng đã yêu cầu,
+  đúng pattern `AvifUnsupportedError` đã dùng ở Image Format Converter. Tên file tải về
+  (đơn lẻ + zip) tự đổi đuôi theo định dạng đích thay vì giữ nguyên đuôi gốc gây sai lệch với
+  nội dung thật bên trong. Build sạch (421 trang), xác nhận label mới trong
+  `dist/en/tools/compress-image/index.html`. **Hoàn tất toàn bộ 7/7 mục nhóm A** đã thống
+  nhất với người dùng — chuyển sang nhóm B (Markdown CodeMirror, Audio thêm định dạng, Video
+  multi-clip/crop/watermark).
 - **2026-07-30** — Phase 3.6b — mục "Chuyển đổi Audio: resample/normalize/fade" (vs
   CloudConvert) — **cộng 1 bug thật tự phát hiện lúc code**: `channelDownmixWarning` (cảnh
   báo Critical C2 tưởng đã sửa ở Phase 3.5a) hoá ra chưa từng được nối vào object `messages`
