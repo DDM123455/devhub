@@ -144,6 +144,16 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b (bắt đầu nhóm 🔴 Cao — cần quyết định kiến trúc/dependency cho
+  đa số mục còn lại) — mục "Image Compressor: chế độ target size" (vs TinyPNG/Squoosh): thêm
+  radio chọn "By quality" (giữ nguyên slider % cũ) vs "By target size" (slider KB, 10-10000,
+  mặc định 200) — không cần code thuật toán nén-tới-X-KB riêng, `browser-image-compression`
+  đã có sẵn tham số `maxSizeMB` tự lặp giảm chất lượng tới khi dưới ngưỡng (trước đây gọi
+  cố định `maxSizeMB: 10` chỉ như ngưỡng an toàn, chưa từng expose cho người dùng chọn).
+  Build sạch (421 trang), xác nhận label mới trong `dist/en/tools/compress-image/index.html`.
+  **Chưa làm** (cùng nhóm nhưng khác hẳn phạm vi — cần viết thêm encoder canvas riêng như
+  Image Converter đã có, dễ trùng lặp code nếu làm vội): "chọn định dạng đích ngay lúc nén
+  (WebP/AVIF/MozJPEG)" của Image Compressor — để lại phiên sau.
 - **2026-07-30** — Phase 3.6b (hoàn tất nhóm 🟠 Trung bình 5/5) — mục "Color Picker: export
   ASE/SCSS/Tailwind config" (vs Coolors/Adobe Color): thêm 2 nút copy đơn giản (SCSS: `$color-
   N: #hex;`, Tailwind: object `colors: { 'palette-N': '#hex' }`) cùng pattern với nút CSS/JSON

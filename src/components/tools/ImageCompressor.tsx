@@ -22,6 +22,9 @@ interface Messages {
 	resizeToggleLabel: string;
 	maxDimensionLabel: string;
 	retry: string;
+	compressModeQuality: string;
+	compressModeTargetSize: string;
+	targetSizeLabel: string;
 }
 
 interface ImageItem {
@@ -41,6 +44,10 @@ const CONCURRENCY = 3;
 const MIN_MAX_DIMENSION = 320;
 const MAX_MAX_DIMENSION = 4096;
 const DEFAULT_MAX_DIMENSION = 1920;
+const MIN_TARGET_SIZE_KB = 10;
+const MAX_TARGET_SIZE_KB = 10000;
+const DEFAULT_TARGET_SIZE_KB = 200;
+type CompressMode = 'quality' | 'targetSize';
 
 function formatBytes(bytes: number): string {
 	if (bytes < 1024) return `${bytes} B`;
@@ -51,6 +58,8 @@ function formatBytes(bytes: number): string {
 export default function ImageCompressor({ messages }: { messages: Messages }) {
 	const [items, setItems] = useState<ImageItem[]>([]);
 	const [quality, setQuality] = useState(0.8);
+	const [compressMode, setCompressMode] = useState<CompressMode>('quality');
+	const [targetSizeKb, setTargetSizeKb] = useState(DEFAULT_TARGET_SIZE_KB);
 	const [resizeEnabled, setResizeEnabled] = useState(false);
 	const [maxDimension, setMaxDimension] = useState(DEFAULT_MAX_DIMENSION);
 	const [isProcessing, setIsProcessing] = useState(false);
@@ -106,9 +115,14 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 					objectUrls.current.delete(item.compressedPreviewUrl);
 				}
 				const compressedBlob = await imageCompression(item.file, {
-					maxSizeMB: 10,
+					// In target-size mode, the library's own iterative
+					// quality-reduction loop drives the result down to
+					// `maxSizeMB` instead of a fixed quality — no separate
+					// "compress to X KB" algorithm needed, this option already
+					// does exactly that.
+					maxSizeMB: compressMode === 'targetSize' ? Math.max(targetSizeKb / 1024, 0.01) : 10,
 					useWebWorker: true,
-					initialQuality: quality,
+					initialQuality: compressMode === 'quality' ? quality : undefined,
 					maxWidthOrHeight: resizeEnabled ? maxDimension : undefined,
 				});
 				setItems((prev) =>
@@ -128,7 +142,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 				setItems((prev) => prev.map((it) => (it.id === item.id ? { ...it, status: 'error' } : it)));
 			}
 		},
-		[quality, resizeEnabled, maxDimension],
+		[compressMode, quality, targetSizeKb, resizeEnabled, maxDimension],
 	);
 
 	const handleCompress = useCallback(async () => {
@@ -224,21 +238,60 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 				</p>
 			)}
 
-			<div className="flex items-center gap-3">
-				<label htmlFor="image-compressor-quality" className="shrink-0 text-sm text-foreground">
-					{messages.quality}: {Math.round(quality * 100)}%
+			<div className="flex flex-wrap items-center gap-4">
+				<label className="flex items-center gap-1.5 text-sm text-foreground">
+					<input
+						type="radio"
+						name="image-compressor-mode"
+						checked={compressMode === 'quality'}
+						onChange={() => setCompressMode('quality')}
+					/>
+					{messages.compressModeQuality}
 				</label>
-				<input
-					id="image-compressor-quality"
-					type="range"
-					min={0.1}
-					max={1}
-					step={0.05}
-					value={quality}
-					onChange={(event) => setQuality(Number(event.target.value))}
-					className="w-48"
-				/>
+				<label className="flex items-center gap-1.5 text-sm text-foreground">
+					<input
+						type="radio"
+						name="image-compressor-mode"
+						checked={compressMode === 'targetSize'}
+						onChange={() => setCompressMode('targetSize')}
+					/>
+					{messages.compressModeTargetSize}
+				</label>
 			</div>
+
+			{compressMode === 'quality' ? (
+				<div className="flex items-center gap-3">
+					<label htmlFor="image-compressor-quality" className="shrink-0 text-sm text-foreground">
+						{messages.quality}: {Math.round(quality * 100)}%
+					</label>
+					<input
+						id="image-compressor-quality"
+						type="range"
+						min={0.1}
+						max={1}
+						step={0.05}
+						value={quality}
+						onChange={(event) => setQuality(Number(event.target.value))}
+						className="w-48"
+					/>
+				</div>
+			) : (
+				<div className="flex items-center gap-3">
+					<label htmlFor="image-compressor-target-size" className="shrink-0 text-sm text-foreground">
+						{messages.targetSizeLabel.replace('{{size}}', String(targetSizeKb))}
+					</label>
+					<input
+						id="image-compressor-target-size"
+						type="range"
+						min={MIN_TARGET_SIZE_KB}
+						max={MAX_TARGET_SIZE_KB}
+						step={10}
+						value={targetSizeKb}
+						onChange={(event) => setTargetSizeKb(Number(event.target.value))}
+						className="w-48"
+					/>
+				</div>
+			)}
 
 			<div className="flex flex-col gap-2">
 				<label className="flex items-center gap-1.5 text-sm text-foreground">

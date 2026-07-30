@@ -23,7 +23,10 @@
     "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ.",
     "resizeToggleLabel": "Thay đổi kích thước trước khi nén",
     "maxDimensionLabel": "Kích thước tối đa: {{size}}px",
-    "retry": "Thử lại"
+    "retry": "Thử lại",
+    "compressModeQuality": "Theo chất lượng",
+    "compressModeTargetSize": "Theo dung lượng đích",
+    "targetSizeLabel": "Dung lượng đích: {{size}} KB"
   },
   "related": "Công cụ liên quan",
   "faq": {

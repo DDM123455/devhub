@@ -23,7 +23,10 @@
     "skippedFiles": "{{count}} file(s) were skipped because they're not a supported image format.",
     "resizeToggleLabel": "Resize before compressing",
     "maxDimensionLabel": "Max width/height: {{size}}px",
-    "retry": "Retry"
+    "retry": "Retry",
+    "compressModeQuality": "By quality",
+    "compressModeTargetSize": "By target size",
+    "targetSizeLabel": "Target size: {{size}} KB"
   },
   "related": "Related tools",
   "faq": {
