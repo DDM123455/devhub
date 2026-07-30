@@ -137,6 +137,14 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6 (bắt đầu) — mục 1/7 "Base64: mở rộng bảng MIME→extension":
+  `EXTENSION_BY_MIME` trong `Base64Tool.tsx` mở rộng từ 9 lên ~35 entries, thêm ảnh
+  (bmp/ico/avif/heic/tiff), audio/video phổ biến, font (woff/woff2/ttf/otf), Office
+  (doc/docx/xls/xlsx/ppt/pptx), text (csv/html/css/js/xml/md), archive (rar/7z/gz/tar).
+  Build sạch (421 trang). Đã thêm section mới `Phase 3.6` vào `ROADMAP.md` cho 7 mục Medium
+  còn lại trong `AUDIT.md` (M1, M2, M4–M9; M3/M10 đã xong từ trước, M7 đánh dấu N/A vì mỗi
+  trang tool chỉ có 1 React island là chính component, không có nội dung dưới fold để đổi
+  `client:visible`).
 - **2026-07-29** — Nâng cấp Text Diff Checker theo yêu cầu trực tiếp người dùng (không phải
   task ROADMAP): sửa bug thật "highlight cả từ khi chỉ khác vài ký tự" (vd. `hahah` vs
   `hahahahah` trước đây tô vàng nguyên cả từ). Nguyên nhân: ở Word mode, `diffWords` coi

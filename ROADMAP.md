@@ -170,6 +170,22 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
       (100k+ dòng) — cần đổi `jumpToHunk` từ `scrollIntoView` sang tính `scrollTop` toán học;
       cân nhắc có virtualize luôn phần Merge Tool hay không. Chưa làm, để phiên sau.
 
+## Phase 3.6 — Audit Remediation vòng 2 (từ `AUDIT.md`, mục Medium)
+
+- [ ] Image Compressor: xử lý song song (có giới hạn concurrency) thay vì tuần tự khi
+      batch nhiều ảnh
+- [ ] Image Compressor + Image Converter: thêm tùy chọn resize kích thước trước khi xuất
+- [ ] QR Generator: thêm dot-style/gradient cơ bản (`qr-code-styling`)
+- [ ] Contrast/`focus-visible` pass có chủ đích trên toàn bộ input/select/textarea
+      tương tác (button đã có sẵn qua `button.tsx`)
+- [ ] Trang chủ: bỏ hẳn ô "0 KB uploaded" placeholder tĩnh không có dữ liệu thật
+- [x] `client:load` → `client:visible` cho phần article/related-tools dưới fold —
+      **N/A, đã đánh giá**: mỗi trang tool chỉ có 1 React island duy nhất là chính
+      component tool (không phải nội dung dưới fold); phần article/FAQ/related-tools
+      đã là Astro thuần (server-render), không có gì để đổi client directive
+- [x] Base64: mở rộng bảng MIME→extension
+- [ ] JWT Decoder: hiển thị `aud`/`iss`/`sub` tường minh trong claims panel
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav
