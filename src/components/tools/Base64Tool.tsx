@@ -32,6 +32,9 @@ interface Messages {
 	downloadFile: string;
 	fileDecodeError: string;
 	imagePreviewLabel: string;
+	decodeEncodingLabel: string;
+	remove: string;
+	clearAll: string;
 }
 
 type Mode = 'encode' | 'decode';
@@ -118,11 +121,28 @@ function encodeText(text: string, urlSafe: boolean, lineWrap: boolean): string {
 	return base64;
 }
 
-function decodeText(input: string): string {
+// `TextEncoder` (used for the encode direction) is UTF-8-only per the Web
+// platform spec — there's no browser API to encode into legacy encodings
+// client-side, so only the decode direction offers a choice of encodings.
+const TEXT_DECODE_ENCODINGS = [
+	'utf-8',
+	'utf-16le',
+	'utf-16be',
+	'iso-8859-1',
+	'windows-1252',
+	'shift_jis',
+	'euc-kr',
+	'gbk',
+	'big5',
+	'koi8-r',
+] as const;
+type TextDecodeEncoding = (typeof TEXT_DECODE_ENCODINGS)[number];
+
+function decodeText(input: string, encoding: TextDecodeEncoding): string {
 	const cleaned = input.trim().replace(/\s+/g, '');
 	const base64 = fromUrlSafeOrStandard(cleaned);
 	const bytes = base64ToBytes(base64);
-	return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+	return new TextDecoder(encoding, { fatal: true }).decode(bytes);
 }
 
 function extractDataUri(input: string): { mime: string; base64: string } | null {
@@ -159,46 +179,65 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 	const [textInput, setTextInput] = useState('');
 	const [urlSafe, setUrlSafe] = useState(false);
 	const [lineWrap, setLineWrap] = useState(false);
+	const [decodeEncoding, setDecodeEncoding] = useState<TextDecodeEncoding>('utf-8');
 
 	const { textOutput, textError } = useMemo(() => {
 		if (textInput === '') return { textOutput: '', textError: null as string | null };
 		try {
 			return {
-				textOutput: mode === 'encode' ? encodeText(textInput, urlSafe, lineWrap) : decodeText(textInput),
+				textOutput:
+					mode === 'encode' ? encodeText(textInput, urlSafe, lineWrap) : decodeText(textInput, decodeEncoding),
 				textError: null as string | null,
 			};
 		} catch {
 			return { textOutput: '', textError: mode === 'decode' ? messages.decodeError : null };
 		}
-	}, [textInput, mode, urlSafe, lineWrap, messages.decodeError]);
+	}, [textInput, mode, urlSafe, lineWrap, decodeEncoding, messages.decodeError]);
 
 	const handleSwap = () => {
 		setMode((m) => (m === 'encode' ? 'decode' : 'encode'));
 		setTextInput(textOutput);
 	};
 
-	// File encode state
-	const [encodedFileName, setEncodedFileName] = useState<string | null>(null);
-	const [encodedMime, setEncodedMime] = useState<string | null>(null);
-	const [encodedBase64, setEncodedBase64] = useState<string | null>(null);
-	const [encodedDataUri, setEncodedDataUri] = useState<string | null>(null);
+	// File encode state — a list so multiple files can be dropped/selected at
+	// once (each read independently; order they finish reading in doesn't
+	// matter since each item carries its own id).
+	interface EncodedFileItem {
+		id: string;
+		name: string;
+		mime: string;
+		base64: string;
+		dataUri: string;
+	}
+	const [encodedFiles, setEncodedFiles] = useState<EncodedFileItem[]>([]);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleFileEncode = (files: FileList | null) => {
-		const file = files?.[0];
-		if (!file) return;
-		const reader = new FileReader();
-		reader.onload = () => {
-			const dataUri = reader.result as string;
-			const parsed = extractDataUri(dataUri);
-			setEncodedFileName(file.name);
-			setEncodedMime(file.type || parsed?.mime || 'application/octet-stream');
-			setEncodedBase64(parsed?.base64 ?? '');
-			setEncodedDataUri(dataUri);
-		};
-		reader.readAsDataURL(file);
+		if (!files) return;
+		for (const file of Array.from(files)) {
+			const reader = new FileReader();
+			reader.onload = () => {
+				const dataUri = reader.result as string;
+				const parsed = extractDataUri(dataUri);
+				const item: EncodedFileItem = {
+					id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
+					name: file.name,
+					mime: file.type || parsed?.mime || 'application/octet-stream',
+					base64: parsed?.base64 ?? '',
+					dataUri,
+				};
+				setEncodedFiles((prev) => [...prev, item]);
+			};
+			reader.readAsDataURL(file);
+		}
 	};
+
+	const handleRemoveEncoded = (id: string) => {
+		setEncodedFiles((prev) => prev.filter((item) => item.id !== id));
+	};
+
+	const handleClearEncoded = () => setEncodedFiles([]);
 
 	// File decode state
 	const [fileDecodeInput, setFileDecodeInput] = useState('');
@@ -300,6 +339,22 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 								{messages.lineWrapLabel}
 							</label>
 						)}
+						{mode === 'decode' && (
+							<label className="flex items-center gap-1.5 text-sm text-muted-foreground">
+								{messages.decodeEncodingLabel}
+								<select
+									value={decodeEncoding}
+									onChange={(e) => setDecodeEncoding(e.target.value as TextDecodeEncoding)}
+									className="rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+								>
+									{TEXT_DECODE_ENCODINGS.map((enc) => (
+										<option key={enc} value={enc}>
+											{enc}
+										</option>
+									))}
+								</select>
+							</label>
+						)}
 					</div>
 
 					<div className="flex flex-col gap-1">
@@ -384,43 +439,67 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 								id="base64-file-input"
 								ref={fileInputRef}
 								type="file"
+								multiple
 								className="hidden"
 								onChange={(e) => handleFileEncode(e.target.files)}
 							/>
 						</div>
 
-						{encodedBase64 !== null && (
-							<div className="flex flex-col gap-3">
-								{encodedMime?.startsWith('image/') && encodedDataUri && (
-									<div className="flex flex-col gap-1">
-										<span className="text-xs text-muted-foreground">{messages.imagePreviewLabel}</span>
-										<img src={encodedDataUri} alt={encodedFileName ?? ''} className="max-h-48 max-w-full rounded-md border border-border object-contain" />
+						{encodedFiles.length > 0 && (
+							<div className="flex flex-col gap-4">
+								{encodedFiles.length > 1 && (
+									<div>
+										<Button type="button" size="sm" variant="ghost" onClick={handleClearEncoded}>
+											{messages.clearAll}
+										</Button>
 									</div>
 								)}
-								<div className="flex flex-col gap-1">
-									<div className="flex items-center justify-between">
-										<span className="text-xs text-muted-foreground">{messages.fileBase64Label}</span>
-										<CopyButton value={encodedBase64} label={messages.copy} copiedLabel={messages.copied} />
+								{encodedFiles.map((item) => (
+									<div key={item.id} className="flex flex-col gap-3 rounded-md border border-border p-3">
+										<div className="flex items-center justify-between gap-2">
+											<span className="truncate text-sm font-medium text-foreground">{item.name}</span>
+											<Button
+												type="button"
+												size="sm"
+												variant="ghost"
+												onClick={() => handleRemoveEncoded(item.id)}
+												aria-label={messages.remove}
+											>
+												✕
+											</Button>
+										</div>
+										{item.mime.startsWith('image/') && (
+											<div className="flex flex-col gap-1">
+												<span className="text-xs text-muted-foreground">{messages.imagePreviewLabel}</span>
+												<img src={item.dataUri} alt={item.name} className="max-h-48 max-w-full rounded-md border border-border object-contain" />
+											</div>
+										)}
+										<div className="flex flex-col gap-1">
+											<div className="flex items-center justify-between">
+												<span className="text-xs text-muted-foreground">{messages.fileBase64Label}</span>
+												<CopyButton value={item.base64} label={messages.copy} copiedLabel={messages.copied} />
+											</div>
+											<textarea
+												readOnly
+												value={item.base64}
+												rows={4}
+												className="w-full rounded-md border border-border bg-muted p-2 font-mono text-xs break-all text-foreground"
+											/>
+										</div>
+										<div className="flex flex-col gap-1">
+											<div className="flex items-center justify-between">
+												<span className="text-xs text-muted-foreground">{messages.fileDataUriLabel}</span>
+												<CopyButton value={item.dataUri} label={messages.copy} copiedLabel={messages.copied} />
+											</div>
+											<textarea
+												readOnly
+												value={item.dataUri}
+												rows={4}
+												className="w-full rounded-md border border-border bg-muted p-2 font-mono text-xs break-all text-foreground"
+											/>
+										</div>
 									</div>
-									<textarea
-										readOnly
-										value={encodedBase64}
-										rows={4}
-										className="w-full rounded-md border border-border bg-muted p-2 font-mono text-xs break-all text-foreground"
-									/>
-								</div>
-								<div className="flex flex-col gap-1">
-									<div className="flex items-center justify-between">
-										<span className="text-xs text-muted-foreground">{messages.fileDataUriLabel}</span>
-										<CopyButton value={encodedDataUri ?? ''} label={messages.copy} copiedLabel={messages.copied} />
-									</div>
-									<textarea
-										readOnly
-										value={encodedDataUri ?? ''}
-										rows={4}
-										className="w-full rounded-md border border-border bg-muted p-2 font-mono text-xs break-all text-foreground"
-									/>
-								</div>
+								))}
 							</div>
 						)}
 					</div>

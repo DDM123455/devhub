@@ -35,7 +35,10 @@
     "fileNamePlaceholder": "file.bin",
     "downloadFile": "Download file",
     "fileDecodeError": "Couldn't decode this — it isn't valid Base64.",
-    "imagePreviewLabel": "Preview"
+    "imagePreviewLabel": "Preview",
+    "decodeEncodingLabel": "Text encoding:",
+    "remove": "Remove",
+    "clearAll": "Clear all"
   },
   "related": "Related tools",
   "faq": {

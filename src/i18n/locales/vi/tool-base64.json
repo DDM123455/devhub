@@ -35,7 +35,10 @@
     "fileNamePlaceholder": "file.bin",
     "downloadFile": "Tải file xuống",
     "fileDecodeError": "Không giải mã được — đây không phải chuỗi Base64 hợp lệ.",
-    "imagePreviewLabel": "Xem trước"
+    "imagePreviewLabel": "Xem trước",
+    "decodeEncodingLabel": "Bảng mã văn bản:",
+    "remove": "Xóa",
+    "clearAll": "Xóa tất cả"
   },
   "related": "Công cụ liên quan",
   "faq": {

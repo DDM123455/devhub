@@ -235,8 +235,8 @@ ROADMAP)
 **Nhóm Dev/Design Tools**
 - [x] JWT Decoder — vs jwt.io: URL deep-link chia sẻ token debug (`?token=...`)
 - [x] JWT Decoder — cảnh báo khi `alg: none`
-- [ ] Base64 — vs base64decode.org: batch nhiều file
-- [ ] Base64 — chọn encoding khác ngoài UTF-8
+- [x] Base64 — vs base64decode.org: batch nhiều file
+- [x] Base64 — chọn encoding khác ngoài UTF-8
 - [ ] Regex Tester — vs regex101/RegExr: bộ chọn "flavor" (PCRE/Python/...)
 - [ ] Regex Tester — lưu lịch sử pattern
 - [ ] Regex Tester — URL chia sẻ state

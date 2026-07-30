@@ -144,6 +144,19 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "Base64: batch nhiều file + chọn encoding khác UTF-8"
+  (vs base64decode.org): **Batch encode** — đổi state file-encode từ 1 object đơn sang mảng
+  `encodedFiles`, `handleFileEncode` lặp qua mọi file trong `FileList` (đã hỗ trợ `multiple`
+  ở input + kéo-thả nhiều file vào cùng lúc), mỗi file đọc độc lập qua `FileReader` riêng,
+  hiển thị dạng danh sách card (tên, preview ảnh nếu có, base64, data URI, nút xóa từng
+  item + Clear all). **Chọn encoding khi decode** — `TextEncoder` (hướng encode) chỉ hỗ trợ
+  UTF-8 theo chuẩn Web Platform (không có API browser nào mã hóa sang encoding cũ phía
+  client), nên chỉ thêm lựa chọn encoding cho hướng **decode** qua `TextDecoder` (hỗ trợ
+  nhiều hơn hẳn): utf-8/utf-16le/utf-16be/iso-8859-1/windows-1252/shift_jis/euc-kr/gbk/big5/
+  koi8-r — verify cả 10 label hợp lệ bằng script Node gọi thẳng `new TextDecoder(label)`.
+  Build sạch (421 trang), xác nhận label mới trong
+  `dist/en/tools/base64-encoder-decoder/index.html`. Thêm 3 key i18n
+  (`decodeEncodingLabel`/`remove`/`clearAll`) cho en+vi + `messages` object.
 - **2026-07-30** — Phase 3.6b — mục "Đếm từ & ký tự: upload file" (vs WordCounter.net):
   thêm nút "Upload .txt file" (input file ẩn + label, `FileReader.readAsText`, set thẳng
   `text` state) — cùng pattern đã dùng ở Text Case Converter. Build sạch (421 trang).
