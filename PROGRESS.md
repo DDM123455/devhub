@@ -144,6 +144,39 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b (nhóm 🔴 Cao, mục 1/3) — mục "Markdown Editor: syntax
+  highlighting thật" (vs StackEdit/Dillinger): thay `<textarea>` thuần bằng **CodeMirror 6**
+  — thêm 2 dependency mới `codemirror` (meta-package bundle sẵn `basicSetup`: line number,
+  undo history, bracket matching, VÀ `syntaxHighlighting(defaultHighlightStyle)` — xác nhận
+  qua đọc thẳng source package, không cần thêm gói riêng cho màu cú pháp) và
+  `@codemirror/lang-markdown` (ngôn ngữ Markdown cho CodeMirror, tự kéo theo
+  `@codemirror/state`/`@codemirror/view`/`@codemirror/language` làm dependency bắc cầu —
+  không thêm vulnerability mới, xác nhận qua `npm audit` trước/sau giống hệt nhau).
+  **Theme**: viết `EditorView.theme()` tham chiếu thẳng CSS custom property có sẵn của site
+  (`var(--background)`, `var(--foreground)`...) thay vì dùng package theme đóng gói riêng —
+  tự động khớp light/dark mode hiện tại của site mà không cần logic JS phát hiện dark mode.
+  **Kiến trúc mới (mệnh lệnh thay vì khai báo)**: EditorView không phải React component, nên
+  `applyEdit()` (dùng lại NGUYÊN VẸN các hàm transform thuần `wrapInline`/`linePrefix`/
+  `headingTransform`/... không đổi 1 dòng nào, vì chúng chỉ thao tác trên string+offset) giờ
+  đọc `view.state.selection`/`view.state.doc` và dispatch transaction thay vì
+  `textarea.selectionStart`/`.setSelectionRange`. Ctrl+B/Ctrl+I chuyển vào
+  `EditorView.domEventHandlers` bên trong extension thay vì `onKeyDown` React. **Bug tự phát
+  hiện lúc code**: container div của CodeMirror trước đây định conditionally render theo
+  `viewMode !== 'preview'` như cũ — nếu làm vậy, chuyển sang preview-only rồi quay lại sẽ gỡ
+  DOM của CodeMirror mà không tái tạo lại (effect mount chỉ chạy 1 lần) — sửa bằng cách LUÔN
+  render div này, chỉ ẩn qua class `hidden` khi ở preview-only (cùng pattern đã dùng ở
+  QrCodeGenerator cho vấn đề tương tự). Đồng bộ nội dung 2 chiều qua 1 effect so sánh
+  `view.state.doc.toString()` với `content` state — chỉ dispatch khi khác nhau (tránh vòng
+  lặp vô hạn khi gõ). Xác nhận **an toàn cho Astro SSR** (khác `jsoneditor`/`qr-code-styling`
+  trước đó): CodeMirror 6 chỉ chạm DOM lúc gọi `new EditorView()` bên trong `useEffect`
+  (không chạy lúc SSR), import tĩnh ở đầu file KHÔNG lỗi build — build sạch xác nhận điều
+  này (421 trang, không crash "document is not defined"). Autosave/localStorage, drag-drop
+  upload file, load sample, scroll-sync 2 chiều với preview, đếm từ/ký tự — giữ nguyên logic
+  cũ, chỉ đổi cách đọc/ghi nội dung. **Giới hạn quan trọng**: đây là thay đổi kiến trúc lớn
+  nhất trong Phase 3.6b, KHÔNG có Puppeteer/trình duyệt thật trong môi trường phiên này để
+  test tương tác (gõ chữ, bấm toolbar, kéo-thả file, cuộn đồng bộ) — chỉ verify được qua
+  build sạch + đọc lại code cẩn thận. Người dùng nên tự mở trang Markdown Editor kiểm tra
+  bằng tay trước khi coi mục này chắc chắn ổn định.
 - **2026-07-30** — Phase 3.6b (hoàn tất nhóm A 7/7) — mục "Image Compressor: chọn định dạng
   đích ngay lúc nén" (vs TinyPNG/Squoosh): `browser-image-compression` đã có sẵn tham số
   `fileType` (xác nhận qua đọc thẳng `.d.ts` của thư viện) — chỉ cần truyền

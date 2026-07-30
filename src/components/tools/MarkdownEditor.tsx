@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
 	Bold,
 	Italic,
@@ -15,6 +15,10 @@ import {
 	Pencil,
 	Eye,
 } from 'lucide-react';
+import { EditorView, basicSetup } from 'codemirror';
+import { placeholder } from '@codemirror/view';
+import { EditorState } from '@codemirror/state';
+import { markdown } from '@codemirror/lang-markdown';
 import { Button } from '@/components/ui/button';
 
 interface Messages {
@@ -152,6 +156,40 @@ const PREVIEW_CLASSES =
 const DRAFT_STORAGE_KEY = 'markdown-editor-draft';
 const AUTOSAVE_DEBOUNCE_MS = 500;
 
+// Colors reference the site's own CSS custom properties (defined in
+// global.css for both light and `.dark`) instead of a packaged CodeMirror
+// theme — the editor then matches whichever mode is active automatically,
+// with no JS-side dark-mode detection needed.
+const editorTheme = EditorView.theme({
+	'&': {
+		backgroundColor: 'var(--background)',
+		color: 'var(--foreground)',
+		fontSize: '0.75rem',
+		height: '27.5rem',
+	},
+	'.cm-scroller': {
+		fontFamily: 'var(--font-mono), ui-monospace, monospace',
+		overflow: 'auto',
+	},
+	'.cm-content': {
+		caretColor: 'var(--foreground)',
+	},
+	'.cm-gutters': {
+		backgroundColor: 'var(--muted)',
+		color: 'var(--muted-foreground)',
+		border: 'none',
+	},
+	'.cm-activeLine': {
+		backgroundColor: 'var(--muted)',
+	},
+	'.cm-activeLineGutter': {
+		backgroundColor: 'var(--muted)',
+	},
+	'&.cm-focused': {
+		outline: 'none',
+	},
+});
+
 function CopyButton({ value, label, copiedLabel }: { value: string; label: string; copiedLabel: string }) {
 	const [copied, setCopied] = useState(false);
 	return (
@@ -177,7 +215,8 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 	const [renderedHtml, setRenderedHtml] = useState('');
 	const [viewMode, setViewMode] = useState<ViewMode>('split');
 	const [isDragOver, setIsDragOver] = useState(false);
-	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const editorContainerRef = useRef<HTMLDivElement>(null);
+	const editorViewRef = useRef<EditorView | null>(null);
 	const previewRef = useRef<HTMLDivElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const modulesRef = useRef<{ parse: (md: string) => string; sanitize: (html: string) => string } | null>(null);
@@ -235,31 +274,98 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 		return { words: trimmed === '' ? 0 : trimmed.split(/\s+/).length, chars: content.length };
 	}, [content]);
 
-	const applyEdit = (transform: (value: string, start: number, end: number) => EditResult) => {
-		const textarea = textareaRef.current;
-		if (!textarea) return;
-		const result = transform(textarea.value, textarea.selectionStart, textarea.selectionEnd);
-		setContent(result.value);
-		requestAnimationFrame(() => {
-			textarea.focus();
-			textarea.setSelectionRange(result.start, result.end);
-		});
-	};
+	const messagesRef = useRef(messages);
+	messagesRef.current = messages;
 
-	// Mirrors the Ctrl+B/Ctrl+I shortcuts every rich-text and markdown editor
-	// (StackEdit, Dillinger, Google Docs, Word...) supports — `preventDefault`
-	// stops the browser's own handling (Firefox toggles its bookmarks toolbar
-	// on Ctrl+B otherwise) so the keys only ever affect this textarea.
-	const handleEditorKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-		if (!(event.ctrlKey || event.metaKey)) return;
-		if (event.key === 'b' || event.key === 'B') {
-			event.preventDefault();
-			applyEdit(wrapInline('**', '**', messages.boldTitle));
-		} else if (event.key === 'i' || event.key === 'I') {
-			event.preventDefault();
-			applyEdit(wrapInline('_', '_', messages.italicTitle));
+	// Applies one of the pure (value, start, end) => EditResult transforms
+	// above by reading the current document/selection straight out of the
+	// CodeMirror view and dispatching a transaction — the transforms
+	// themselves are untouched from the plain-textarea version, since they
+	// only ever operated on strings and offsets to begin with.
+	const applyEdit = useCallback((transform: (value: string, start: number, end: number) => EditResult) => {
+		const view = editorViewRef.current;
+		if (!view) return;
+		const { from, to } = view.state.selection.main;
+		const value = view.state.doc.toString();
+		const result = transform(value, from, to);
+		view.dispatch({
+			changes: { from: 0, to: value.length, insert: result.value },
+			selection: { anchor: result.start, head: result.end },
+		});
+		view.focus();
+	}, []);
+
+	const applyEditRef = useRef(applyEdit);
+	applyEditRef.current = applyEdit;
+
+	// Mounted once and kept alive across `viewMode` changes (the container div
+	// stays in the tree, just hidden via CSS in preview-only mode — removing
+	// it would tear down CodeMirror's own DOM without a matching recreation
+	// step). Extensions reference `messagesRef`/`applyEditRef` so the Ctrl+B/
+	// Ctrl+I handler and initial doc don't need the view recreated when props
+	// change.
+	useEffect(() => {
+		const container = editorContainerRef.current;
+		if (!container || editorViewRef.current) return;
+		const view = new EditorView({
+			state: EditorState.create({
+				doc: content,
+				extensions: [
+					basicSetup,
+					markdown(),
+					EditorView.lineWrapping,
+					placeholder(messagesRef.current.inputPlaceholder),
+					editorTheme,
+					EditorView.updateListener.of((update) => {
+						if (update.docChanged) setContent(update.state.doc.toString());
+					}),
+					EditorView.domEventHandlers({
+						keydown: (event) => {
+							if (!(event.ctrlKey || event.metaKey)) return false;
+							if (event.key === 'b' || event.key === 'B') {
+								event.preventDefault();
+								applyEditRef.current(wrapInline('**', '**', messagesRef.current.boldTitle));
+								return true;
+							}
+							if (event.key === 'i' || event.key === 'I') {
+								event.preventDefault();
+								applyEditRef.current(wrapInline('_', '_', messagesRef.current.italicTitle));
+								return true;
+							}
+							return false;
+						},
+					}),
+				],
+			}),
+			parent: container,
+		});
+		editorViewRef.current = view;
+
+		const scroller = view.scrollDOM;
+		const onScroll = () => handleEditorScrollRef.current();
+		scroller.addEventListener('scroll', onScroll);
+
+		return () => {
+			scroller.removeEventListener('scroll', onScroll);
+			view.destroy();
+			editorViewRef.current = null;
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	// Pushes external content changes (load sample, clear, file upload,
+	// restored draft) into the view. Typing inside the editor already updates
+	// `content` to match the view's own doc via the update listener above, so
+	// this is a no-op on every keystroke — it only actually dispatches when
+	// `content` changed for some OTHER reason.
+	useEffect(() => {
+		const view = editorViewRef.current;
+		if (!view) return;
+		const currentDoc = view.state.doc.toString();
+		if (currentDoc !== content) {
+			view.dispatch({ changes: { from: 0, to: currentDoc.length, insert: content } });
 		}
-	};
+	}, [content]);
 
 	const handleFile = (files: FileList | null) => {
 		const file = files?.[0];
@@ -279,32 +385,39 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 		URL.revokeObjectURL(url);
 	};
 
-	const handleEditorScroll = () => {
+	// CodeMirror's actual scrollable element is `view.scrollDOM`, not the
+	// container div React renders — the mount effect attaches a native
+	// `scroll` listener to it directly (scroll events don't bubble, so a
+	// React `onScroll` prop on the container wouldn't fire for it).
+	const handleEditorScroll = useCallback(() => {
 		if (syncingRef.current === 'preview') {
 			syncingRef.current = null;
 			return;
 		}
-		const ta = textareaRef.current;
+		const scroller = editorViewRef.current?.scrollDOM;
 		const pv = previewRef.current;
-		if (!ta || !pv) return;
-		const denom = ta.scrollHeight - ta.clientHeight;
-		const ratio = denom > 0 ? ta.scrollTop / denom : 0;
+		if (!scroller || !pv) return;
+		const denom = scroller.scrollHeight - scroller.clientHeight;
+		const ratio = denom > 0 ? scroller.scrollTop / denom : 0;
 		syncingRef.current = 'editor';
 		pv.scrollTop = ratio * (pv.scrollHeight - pv.clientHeight);
-	};
+	}, []);
+
+	const handleEditorScrollRef = useRef(handleEditorScroll);
+	handleEditorScrollRef.current = handleEditorScroll;
 
 	const handlePreviewScroll = () => {
 		if (syncingRef.current === 'editor') {
 			syncingRef.current = null;
 			return;
 		}
-		const ta = textareaRef.current;
+		const scroller = editorViewRef.current?.scrollDOM;
 		const pv = previewRef.current;
-		if (!ta || !pv) return;
+		if (!scroller || !pv) return;
 		const denom = pv.scrollHeight - pv.clientHeight;
 		const ratio = denom > 0 ? pv.scrollTop / denom : 0;
 		syncingRef.current = 'preview';
-		ta.scrollTop = ratio * (ta.scrollHeight - ta.clientHeight);
+		scroller.scrollTop = ratio * (scroller.scrollHeight - scroller.clientHeight);
 	};
 
 	const toolbarButtons: Array<{ title: string; icon: React.ReactNode; onClick: () => void }> = [
@@ -392,25 +505,21 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 			)}
 
 			<div className={`grid gap-3 ${viewMode === 'split' ? 'md:grid-cols-2' : 'grid-cols-1'}`}>
-				{viewMode !== 'preview' && (
-					<div className="flex flex-col gap-1">
-						<label htmlFor="markdown-input" className="text-sm font-medium text-foreground">
-							{messages.editorLabel}
-						</label>
-						<textarea
-							id="markdown-input"
-							ref={textareaRef}
-							value={content}
-							onChange={(e) => setContent(e.target.value)}
-							onKeyDown={handleEditorKeyDown}
-							onScroll={viewMode === 'split' ? handleEditorScroll : undefined}
-							placeholder={messages.inputPlaceholder}
-							rows={18}
-							spellCheck={false}
-							className="w-full resize-y rounded-md border border-border bg-background p-3 font-mono text-xs text-foreground"
-						/>
-					</div>
-				)}
+				{/* Always rendered (never removed from the tree), just hidden via CSS
+				    in preview-only mode — CodeMirror's `EditorView` owns this div's
+				    DOM directly via `parent:`, and removing the div from JSX would
+				    tear down that DOM without a matching recreation step, since the
+				    mount effect below only runs once. */}
+				<div className={`flex flex-col gap-1 ${viewMode === 'preview' ? 'hidden' : ''}`}>
+					<label htmlFor="markdown-input" className="text-sm font-medium text-foreground">
+						{messages.editorLabel}
+					</label>
+					<div
+						id="markdown-input"
+						ref={editorContainerRef}
+						className="w-full overflow-hidden rounded-md border border-border font-mono text-xs"
+					/>
+				</div>
 
 				{viewMode !== 'editor' && (
 					<div className="flex flex-col gap-1">
