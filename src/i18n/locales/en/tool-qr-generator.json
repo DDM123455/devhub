@@ -68,7 +68,11 @@
     "batchLineCount": "{{count}} QR code(s) will be generated",
     "batchGenerateButton": "Generate & Download All (.zip)",
     "batchGenerating": "Generating…",
-    "batchPreviewNotice": "Batch mode — each line becomes its own QR code. Use \"Generate & Download All\" on the left to get a .zip of all of them."
+    "batchPreviewNotice": "Batch mode — each line becomes its own QR code. Use \"Generate & Download All\" on the left to get a .zip of all of them.",
+    "frameToggleLabel": "Add frame with caption text",
+    "frameTextLabel": "Caption text",
+    "frameTextPlaceholder": "SCAN ME",
+    "frameNotice": "The frame appears in the downloaded PNG (not in this preview) — SVG export doesn't support it."
   },
   "related": "Related tools",
   "faq": {

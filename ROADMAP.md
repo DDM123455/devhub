@@ -246,7 +246,7 @@ ROADMAP)
 - [x] Color Picker — hex nhận cả dạng rút gọn 3 ký tự
 
 **Nhóm Media & QR**
-- [ ] QR Generator — vs qr-code-generator.com: frame/CTA text dưới QR (dot-style/gradient đã
+- [x] QR Generator — vs qr-code-generator.com: frame/CTA text dưới QR (dot-style/gradient đã
       xong ở 3.6a, còn thiếu khung viền + dòng chữ kêu gọi hành động)
 - [x] QR Generator — batch tạo nhiều QR cùng lúc
 - [ ] Markdown Editor — vs StackEdit/Dillinger: syntax highlighting thật cho editor (hiện

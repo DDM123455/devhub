@@ -68,7 +68,11 @@
     "batchLineCount": "Sẽ tạo {{count}} mã QR",
     "batchGenerateButton": "Tạo & tải tất cả (.zip)",
     "batchGenerating": "Đang tạo…",
-    "batchPreviewNotice": "Chế độ hàng loạt — mỗi dòng sẽ thành 1 mã QR riêng. Bấm \"Tạo & tải tất cả\" ở bên trái để nhận file .zip chứa toàn bộ."
+    "batchPreviewNotice": "Chế độ hàng loạt — mỗi dòng sẽ thành 1 mã QR riêng. Bấm \"Tạo & tải tất cả\" ở bên trái để nhận file .zip chứa toàn bộ.",
+    "frameToggleLabel": "Thêm khung viền kèm dòng chữ",
+    "frameTextLabel": "Dòng chữ hiển thị",
+    "frameTextPlaceholder": "QUÉT MÃ",
+    "frameNotice": "Khung viền chỉ xuất hiện trong file PNG tải về (không hiện ở khung xem trước này) — xuất SVG không hỗ trợ khung viền."
   },
   "related": "Công cụ liên quan",
   "faq": {

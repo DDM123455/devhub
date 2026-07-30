@@ -67,6 +67,10 @@ interface Messages {
 	batchGenerateButton: string;
 	batchGenerating: string;
 	batchPreviewNotice: string;
+	frameToggleLabel: string;
+	frameTextLabel: string;
+	frameTextPlaceholder: string;
+	frameNotice: string;
 }
 
 type ContentType = 'url' | 'text' | 'wifi' | 'vcard' | 'email' | 'sms';
@@ -149,6 +153,44 @@ function buildSmsPayload(s: SmsFields): string {
 	return `SMSTO:${s.phone}:${s.message}`;
 }
 
+function canvasToPngBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+	return new Promise((resolve, reject) => {
+		canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('canvas.toBlob returned null'))), 'image/png');
+	});
+}
+
+// qr-code-styling has no built-in frame/CTA-text option (a "premium" feature
+// on paid QR generator sites), so this composites one by hand: draw the plain
+// QR PNG onto a larger white canvas with a border stroke and, if given, a
+// caption below it — PNG only, since compositing readable text into an SVG
+// export would need real font-metrics handling this doesn't attempt.
+async function composeFramedPng(qrPngBlob: Blob, frameText: string): Promise<Blob> {
+	const bitmap = await createImageBitmap(qrPngBlob);
+	const padding = Math.round(bitmap.width * 0.08);
+	const textAreaHeight = frameText.trim() ? Math.round(bitmap.width * 0.16) : 0;
+	const canvas = document.createElement('canvas');
+	canvas.width = bitmap.width + padding * 2;
+	canvas.height = bitmap.height + padding * 2 + textAreaHeight;
+	const ctx = canvas.getContext('2d');
+	if (!ctx) throw new Error('Canvas 2D context unavailable');
+	ctx.fillStyle = '#ffffff';
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	const borderWidth = Math.max(2, Math.round(bitmap.width * 0.008));
+	ctx.strokeStyle = '#000000';
+	ctx.lineWidth = borderWidth;
+	ctx.strokeRect(borderWidth / 2, borderWidth / 2, canvas.width - borderWidth, canvas.height - borderWidth);
+	ctx.drawImage(bitmap, padding, padding);
+	bitmap.close();
+	if (frameText.trim()) {
+		ctx.fillStyle = '#000000';
+		ctx.font = `bold ${Math.round(textAreaHeight * 0.45)}px sans-serif`;
+		ctx.textAlign = 'center';
+		ctx.textBaseline = 'middle';
+		ctx.fillText(frameText.trim(), canvas.width / 2, bitmap.height + padding * 2 + textAreaHeight / 2);
+	}
+	return canvasToPngBlob(canvas);
+}
+
 export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	const [contentType, setContentType] = useState<ContentType>('url');
 	const [urlValue, setUrlValue] = useState('https://web-tool-hub.example');
@@ -177,6 +219,9 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	const [isBatchGenerating, setIsBatchGenerating] = useState(false);
 	const canBatch = contentType === 'url' || contentType === 'text';
 	const effectiveBatchMode = canBatch && batchMode;
+
+	const [frameEnabled, setFrameEnabled] = useState(false);
+	const [frameText, setFrameText] = useState('SCAN ME');
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const qrRef = useRef<QRCodeStyling | null>(null);
@@ -295,7 +340,19 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 		const { default: QRCodeStylingCtor } = await import('qr-code-styling');
 		const exportQr = new QRCodeStylingCtor(buildQrOptions({ width: pngResolution, height: pngResolution, type: 'canvas' }));
 		try {
-			await exportQr.download({ name: 'qrcode', extension: 'png' });
+			if (frameEnabled) {
+				const raw = await exportQr.getRawData('png');
+				if (!raw) return;
+				const framedBlob = await composeFramedPng(raw as Blob, frameText);
+				const url = URL.createObjectURL(framedBlob);
+				const link = document.createElement('a');
+				link.href = url;
+				link.download = 'qrcode.png';
+				link.click();
+				URL.revokeObjectURL(url);
+			} else {
+				await exportQr.download({ name: 'qrcode', extension: 'png' });
+			}
 		} catch {
 			// Already guarded by `tooLong` above under normal use; nothing more to do.
 		}
@@ -330,7 +387,8 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 					const qr = new QRCodeStylingCtor(
 						buildQrOptions({ width: pngResolution, height: pngResolution, type: 'canvas', data }),
 					);
-					blob = (await qr.getRawData('png')) as Blob | null;
+					const raw = (await qr.getRawData('png')) as Blob | null;
+					blob = raw && frameEnabled ? await composeFramedPng(raw, frameText) : raw;
 				} catch {
 					// Skips a line whose content doesn't fit the QR capacity at the
 					// current error correction level, rather than failing the whole batch.
@@ -750,6 +808,33 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 					)}
 				</div>
 
+				<div className="flex flex-col gap-2">
+					<label className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+						<input
+							type="checkbox"
+							checked={frameEnabled}
+							onChange={(event) => setFrameEnabled(event.target.checked)}
+						/>
+						{messages.frameToggleLabel}
+					</label>
+					{frameEnabled && (
+						<div className="flex flex-col gap-1 pl-1">
+							<label htmlFor="qr-frame-text" className="text-xs text-muted-foreground">
+								{messages.frameTextLabel}
+							</label>
+							<input
+								id="qr-frame-text"
+								type="text"
+								value={frameText}
+								onChange={(event) => setFrameText(event.target.value)}
+								placeholder={messages.frameTextPlaceholder}
+								className={inputClass}
+							/>
+							<p className="text-xs text-muted-foreground">{messages.frameNotice}</p>
+						</div>
+					)}
+				</div>
+
 				<div className="flex gap-4">
 					<div className="flex flex-col gap-1">
 						<label htmlFor="qr-fg-color" className="text-sm font-medium text-foreground">
@@ -851,7 +936,12 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 						<Button type="button" onClick={handleDownloadPng} disabled={isEmpty || tooLong}>
 							{messages.downloadPng}
 						</Button>
-						<Button type="button" variant="secondary" onClick={handleDownloadSvg} disabled={isEmpty || tooLong}>
+						<Button
+							type="button"
+							variant="secondary"
+							onClick={handleDownloadSvg}
+							disabled={isEmpty || tooLong || frameEnabled}
+						>
 							{messages.downloadSvg}
 						</Button>
 					</div>

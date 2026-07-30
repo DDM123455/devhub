@@ -144,6 +144,18 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "QR Generator: frame/CTA text dưới QR" (vs
+  qr-code-generator.com — tính năng "premium" cuối cùng còn thiếu sau khi đã làm dot-style/
+  gradient ở 3.6a): `qr-code-styling` không có sẵn tùy chọn khung viền/CTA text, nên tự viết
+  `composeFramedPng()`: lấy PNG thô của QR qua `getRawData('png')`, vẽ lên canvas lớn hơn có
+  viền đen + nền trắng + dòng chữ CTA bên dưới (dùng `ctx.font`/`fillText` canvas gốc, không
+  cần thư viện). **Chỉ áp dụng cho PNG**, không áp dụng SVG (chèn text đọc được vào SVG cần
+  xử lý font-metrics thật, ngoài phạm vi hợp lý cho tính năng phụ này — nút Download SVG tự
+  disable khi bật khung viền, kèm ghi chú rõ trong UI). Áp dụng nhất quán cho cả download đơn
+  lẻ lẫn batch (mỗi QR trong zip đều có khung nếu bật). Live preview KHÔNG hiển thị khung
+  (giữ nguyên kiến trúc `.append()` hiện có của qr-code-styling, tránh phải viết lại toàn bộ
+  cách render preview) — có ghi chú rõ "khung chỉ xuất hiện trong PNG tải về". Build sạch
+  (421 trang), xác nhận label mới trong `dist/en/tools/qr-code-generator/index.html`.
 - **2026-07-30** — Phase 3.6b — mục "Color Picker: trích xuất palette từ ảnh" (vs Coolors —
   audit gọi đây là tính năng chủ lực "Image to Palette" của Coolors): tự viết thuật toán
   **median-cut quantization** (không cần dependency mới) — cùng họ thuật toán dùng để tạo
