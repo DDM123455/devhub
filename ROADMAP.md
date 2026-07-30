@@ -166,9 +166,10 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [x] Thêm 3 tùy chọn ignore còn thiếu: ignore empty lines, normalize line endings (CRLF/LF),
       Unicode normalization
 - [x] Chuyển việc tính diff sang Web Worker riêng (`textDiffWorker.ts`), không đứng UI
-- [ ] Virtualization (windowed rendering) cho khu vực so sánh chính, hỗ trợ file rất lớn
-      (100k+ dòng) — cần đổi `jumpToHunk` từ `scrollIntoView` sang tính `scrollTop` toán học;
-      cân nhắc có virtualize luôn phần Merge Tool hay không. Chưa làm, để phiên sau.
+- [x] Virtualization (windowed rendering) cho khu vực so sánh chính, hỗ trợ file rất lớn
+      (100k+ dòng) — đã đổi `jumpToHunk` từ `scrollIntoView` sang tính `scrollTop` toán học;
+      đã virtualize luôn cả Merge Tool (3 cột) và line-number gutter của 2 textarea input.
+      Xem chi tiết trong PROGRESS.md.
 
 ## Phase 3.6 — Audit Remediation vòng 2 (từ `AUDIT.md`, mục Medium)
 

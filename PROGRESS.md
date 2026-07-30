@@ -144,6 +144,48 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.5g (theo yêu cầu trực tiếp người dùng) — mục "Virtualization
+  (windowed rendering) cho khu vực so sánh chính" của Text Diff Checker: `TextDiffChecker.tsx`
+  trước đây render TOÀN BỘ `entries` (một `<div>`/dòng) cho cả 2 cột so sánh, cả 2 cột Merge
+  Tool, và gutter số dòng của 2 textarea input — với file 100k+ dòng, số node DOM tỉ lệ thuận
+  N khiến trang giật/treo. **Giải pháp**: windowing cố định chiều cao dòng (`ROW_HEIGHT = 24`,
+  khớp `leading-6` toàn bộ text trong tool) — hàm `computeVisibleRange(scrollTop, viewportHeight,
+  itemCount, overscan)` tính `[startIndex, endIndex)` cần render, phần còn lại chỉ tồn tại dưới
+  dạng chiều cao của 1 div spacer rỗng (`height: itemCount * ROW_HEIGHT`), các dòng thật sự
+  render được định vị `position: absolute; top: index * ROW_HEIGHT` bên trong spacer đó — vì
+  vậy 1 file 100k dòng tốn số DOM node y hệt 1 file 100 dòng (chỉ khác overscan 20 dòng đệm mỗi
+  bên). Áp dụng cho cả 4 khu vực: `DiffColumn` (cột so sánh chính), `MergeColumn` (2 cột preview
+  merge), `MergeAcceptColumn` (cột nút mũi tên accept — xem bug bên dưới), và gutter số dòng
+  trong `LineNumberedTextarea`.
+  **Đổi `jumpToHunk` từ `scrollIntoView` sang toán học**: dưới virtualization, dòng ngoài
+  vùng nhìn thấy không tồn tại trong DOM nên `document.getElementById('diff-row-...')` +
+  `scrollIntoView` không còn hoạt động — thay bằng tính thẳng `scrollTop` mục tiêu từ
+  `rowIndex * ROW_HEIGHT` (trừ đi nửa chiều cao viewport để căn giữa) rồi gọi
+  `leftColumnRef.current.scrollTo({ top, behavior: 'smooth' })`; cột phải tự cuộn theo nhờ cơ
+  chế đồng bộ cuộn 2 chiều có sẵn (mỗi frame animation của cột trái đều bắn sự kiện `scroll`
+  đồng bộ sang cột phải).
+  **Tổng quát hoá `useSyncedScroll` (2 chiều) thành `useSyncedScrollGroup` (N chiều)**: cần
+  cho Merge Tool có 3 cột phải khoá cuộn với nhau (trái/giữa-nút accept/phải), không chỉ 2 như
+  trước. Dùng 1 cờ boolean duy nhất bật trước khi ghi `scrollTop` đồng loạt lên mọi ref khác
+  rồi tắt ngay sau — khác cách cũ (dựa vào đúng 1 lần gọi lồng nhau để tự tắt cờ) chỉ đúng cho
+  đúng 2 pane; với 3+ pane cách cũ sẽ tắt cờ sớm giữa chừng vòng lặp.
+  **Bug thật phát hiện lúc code (không phải do lần sửa này gây ra)**: cột giữa "nút mũi tên
+  accept" của Merge Tool trước đây KHÔNG có giới hạn chiều cao/overflow nào cả (2 cột hai bên
+  có `h-72 overflow-auto`, cột giữa thì không) — với diff lớn, cột giữa kéo dài tự do và
+  chưa từng được đồng bộ cuộn với 2 cột kia. Đã sửa cùng lúc: thêm `h-72 overflow-auto` +
+  tham gia nhóm đồng bộ cuộn 3 chiều + virtualize như 2 cột còn lại.
+  **Tối ưu kèm theo**: số thứ tự dòng hiển thị ở 2 cột so sánh chính (`leftLineNumbers`/
+  `rightLineNumbers`) được tính 1 lần bằng `useMemo` (phụ thuộc `entries`) thay vì đếm lại từ
+  đầu mỗi khi render — quan trọng vì trước đây phép đếm chạy lại mỗi lần cuộn (re-render theo
+  `scrollTop`), giờ tra cứu O(1) theo index.
+  **Môi trường build**: Node hệ thống bị hạ xuống 20.19.0 (không rõ nguyên nhân, khác ghi chú
+  cũ trỏ Node 22.23.1 ở `.tools/`) — xác nhận `.tools/node-v22.23.1-win-x64/` vẫn còn nguyên,
+  dùng lại đúng bản đó để `npm run build` (421 trang, sạch). **Giới hạn quan trọng**: không có
+  Puppeteer/trình duyệt thật trong môi trường phiên này để test tương tác cuộn/kéo-thả/animation
+  mượt hay không — chỉ verify được qua build sạch + đọc lại code cẩn thận từng phép tính toạ độ.
+  Người dùng nên tự mở trang Text Diff Checker, dán 1 file rất dài (vài chục nghìn dòng), thử
+  cuộn cả 2 khu vực (so sánh chính + Merge Tool) và bấm nút prev/next change để xác nhận mượt
+  trước khi coi mục này chắc chắn ổn định.
 - **2026-07-30** — Phase 3.6b (nhóm 🔴 Cao, mục 1/3) — mục "Markdown Editor: syntax
   highlighting thật" (vs StackEdit/Dillinger): thay `<textarea>` thuần bằng **CodeMirror 6**
   — thêm 2 dependency mới `codemirror` (meta-package bundle sẵn `basicSetup`: line number,

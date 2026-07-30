@@ -98,17 +98,47 @@ function useFullscreen(ref: RefObject<HTMLElement | null>) {
 	return [isFullscreen, toggle] as const;
 }
 
-function useSyncedScroll() {
-	const isSyncingRef = useRef(false);
-	return (target: RefObject<HTMLElement | null>) => (event: UIEvent<HTMLElement>) => {
-		if (isSyncingRef.current) {
-			isSyncingRef.current = false;
-			return;
-		}
-		if (!target.current) return;
-		isSyncingRef.current = true;
-		target.current.scrollTop = event.currentTarget.scrollTop;
+// Generalizes the old 2-way scroll sync to N panes (used for 2 panes — the
+// raw input textareas, the side-by-side diff columns — and 3 panes — the
+// Merge Tool's left/accept-buttons/right columns). Setting `suppressRef` true
+// for the whole synchronous burst of cross-assignments (rather than relying
+// on exactly one nested re-entrant call to reset it, which only happens to
+// work for exactly 2 panes) is what makes this safe for 3+ panes: every
+// `scroll` event fired by our OWN assignments below re-enters this same
+// handler and bails immediately since the guard is still true, and nothing
+// resets it until the whole burst for THIS source event has finished.
+function useSyncedScrollGroup(refs: Array<RefObject<HTMLElement | null>>) {
+	const suppressRef = useRef(false);
+	return (sourceIndex: number) => (event: UIEvent<HTMLElement>) => {
+		if (suppressRef.current) return;
+		suppressRef.current = true;
+		const scrollTop = event.currentTarget.scrollTop;
+		refs.forEach((ref, i) => {
+			if (i !== sourceIndex && ref.current && ref.current.scrollTop !== scrollTop) {
+				ref.current.scrollTop = scrollTop;
+			}
+		});
+		suppressRef.current = false;
 	};
+}
+
+// Fixed-row-height windowing: every row this tool renders (diff lines, merge
+// columns, input line-number gutters) is exactly one `leading-6` (24px) line,
+// never wraps, so — unlike a general-purpose virtualizer — there's no need to
+// measure anything. Only rows within [startIndex, endIndex) actually get a
+// DOM node; the rest are represented purely by the spacer's total height, so
+// a 100k-line file costs the same number of DOM nodes as a 100-line one.
+const ROW_HEIGHT = 24;
+const DIFF_VIEWPORT_HEIGHT = 384; // matches the `h-96` column height
+const MERGE_VIEWPORT_HEIGHT = 288; // matches the `h-72` merge column height
+const INPUT_VIEWPORT_HEIGHT = 256; // matches the `h-64` input textarea height
+const OVERSCAN_ROWS = 20;
+
+function computeVisibleRange(scrollTop: number, viewportHeight: number, itemCount: number, overscan: number) {
+	const startIndex = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - overscan);
+	const visibleRows = Math.ceil(viewportHeight / ROW_HEIGHT) + overscan * 2;
+	const endIndex = Math.min(itemCount, startIndex + visibleRows);
+	return { startIndex, endIndex };
 }
 
 function lineNumbersFor(text: string): number[] {
@@ -128,10 +158,13 @@ interface LineNumberedTextareaProps {
 
 function LineNumberedTextarea({ id, value, onChange, placeholder, onScrollSync, textareaRef, gutterRef }: LineNumberedTextareaProps) {
 	const lines = lineNumbersFor(value);
+	const [scrollTop, setScrollTop] = useState(0);
 	const handleScroll = (event: UIEvent<HTMLTextAreaElement>) => {
 		if (gutterRef.current) gutterRef.current.scrollTop = event.currentTarget.scrollTop;
+		setScrollTop(event.currentTarget.scrollTop);
 		onScrollSync(event);
 	};
+	const { startIndex, endIndex } = computeVisibleRange(scrollTop, INPUT_VIEWPORT_HEIGHT, lines.length, OVERSCAN_ROWS);
 	return (
 		<div className="flex h-64 overflow-hidden rounded-md border border-border bg-background">
 			<div
@@ -139,9 +172,13 @@ function LineNumberedTextarea({ id, value, onChange, placeholder, onScrollSync, 
 				className="select-none overflow-hidden bg-muted px-2 py-3 text-right font-mono text-xs leading-6 text-muted-foreground"
 				aria-hidden="true"
 			>
-				{lines.map((n) => (
-					<div key={n}>{n}</div>
-				))}
+				<div style={{ height: lines.length * ROW_HEIGHT, position: 'relative' }}>
+					{lines.slice(startIndex, endIndex).map((n, i) => (
+						<div key={n} style={{ position: 'absolute', top: (startIndex + i) * ROW_HEIGHT, left: 0, right: 0 }}>
+							{n}
+						</div>
+					))}
+				</div>
 			</div>
 			<textarea
 				id={id}
@@ -212,30 +249,149 @@ function DiffRowContent({
 
 interface DiffColumnProps {
 	entries: DiffLineEntry[];
+	lineNumbers: Array<number | null>;
 	side: 'left' | 'right';
 	scrollRef: RefObject<HTMLDivElement | null>;
 	onScroll: (event: UIEvent<HTMLDivElement>) => void;
 	activeRowIndex: number | null;
 }
 
-function DiffColumn({ entries, side, scrollRef, onScroll, activeRowIndex }: DiffColumnProps) {
-	let runningNumber = 0;
+function DiffColumn({ entries, lineNumbers, side, scrollRef, onScroll, activeRowIndex }: DiffColumnProps) {
+	const [scrollTop, setScrollTop] = useState(0);
+	const handleScroll = (event: UIEvent<HTMLDivElement>) => {
+		setScrollTop(event.currentTarget.scrollTop);
+		onScroll(event);
+	};
+	const { startIndex, endIndex } = computeVisibleRange(scrollTop, DIFF_VIEWPORT_HEIGHT, entries.length, OVERSCAN_ROWS);
 	return (
-		<div ref={scrollRef} onScroll={onScroll} className="h-96 flex-1 overflow-auto bg-background">
-			{entries.map((entry, index) => {
-				const hasNumber = (side === 'left' ? entry.leftText : entry.rightText) !== undefined;
-				if (hasNumber) runningNumber += 1;
-				return (
-					<div key={index} id={`diff-row-${side}-${index}`} className={`flex ${index === activeRowIndex ? 'ring-1 ring-primary' : ''}`}>
-						<div className="w-10 flex-shrink-0 select-none bg-muted px-2 text-right font-mono text-xs leading-6 text-muted-foreground">
-							{hasNumber ? runningNumber : ''}
+		<div ref={scrollRef} onScroll={handleScroll} className="h-96 flex-1 overflow-auto bg-background">
+			<div style={{ height: entries.length * ROW_HEIGHT, position: 'relative' }}>
+				{entries.slice(startIndex, endIndex).map((entry, i) => {
+					const index = startIndex + i;
+					return (
+						<div
+							key={index}
+							id={`diff-row-${side}-${index}`}
+							style={{ position: 'absolute', top: index * ROW_HEIGHT, left: 0, right: 0 }}
+							className={`flex ${index === activeRowIndex ? 'ring-1 ring-primary' : ''}`}
+						>
+							<div className="w-10 flex-shrink-0 select-none bg-muted px-2 text-right font-mono text-xs leading-6 text-muted-foreground">
+								{lineNumbers[index] ?? ''}
+							</div>
+							<div className="min-w-0 flex-1">
+								<DiffRowContent entry={entry} side={side} />
+							</div>
 						</div>
-						<div className="min-w-0 flex-1">
-							<DiffRowContent entry={entry} side={side} />
+					);
+				})}
+			</div>
+		</div>
+	);
+}
+
+interface MergeColumnProps {
+	entries: DiffLineEntry[];
+	side: 'left' | 'right';
+	hunkOverrides: Map<number, HunkOverride>;
+	scrollRef: RefObject<HTMLDivElement | null>;
+	scrollTop: number;
+	onScroll: (event: UIEvent<HTMLDivElement>) => void;
+}
+
+function MergeColumn({ entries, side, hunkOverrides, scrollRef, scrollTop, onScroll }: MergeColumnProps) {
+	const { startIndex, endIndex } = computeVisibleRange(scrollTop, MERGE_VIEWPORT_HEIGHT, entries.length, OVERSCAN_ROWS);
+	return (
+		<div ref={scrollRef} onScroll={onScroll} className="h-72 overflow-auto rounded-md border border-border">
+			<div style={{ height: entries.length * ROW_HEIGHT, position: 'relative' }}>
+				{entries.slice(startIndex, endIndex).map((entry, i) => {
+					const index = startIndex + i;
+					return (
+						<div key={index} style={{ position: 'absolute', top: index * ROW_HEIGHT, left: 0, right: 0 }}>
+							<DiffRowContent
+								entry={entry}
+								side={side}
+								override={entry.hunkIndex !== null ? hunkOverrides.get(entry.hunkIndex) : undefined}
+							/>
 						</div>
-					</div>
-				);
-			})}
+					);
+				})}
+			</div>
+		</div>
+	);
+}
+
+interface MergeAcceptColumnProps {
+	entries: DiffLineEntry[];
+	hunkOverrides: Map<number, HunkOverride>;
+	onAccept: (hunkIndex: number, direction: 'leftUsesRight' | 'rightUsesLeft') => void;
+	acceptLeftAria: string;
+	acceptRightAria: string;
+	scrollRef: RefObject<HTMLDivElement | null>;
+	scrollTop: number;
+	onScroll: (event: UIEvent<HTMLDivElement>) => void;
+}
+
+// Previously this column had no height limit or overflow handling at all —
+// it rendered all N accept-buttons rows at full natural height, so for a
+// very large diff it stretched far past the other two (scrollable) columns
+// and was never actually kept in sync with them. Giving it the same
+// `h-72 overflow-auto` + scroll-sync + virtualization treatment as its
+// siblings fixes that pre-existing gap, not just the 100k-line case.
+function MergeAcceptColumn({
+	entries,
+	hunkOverrides,
+	onAccept,
+	acceptLeftAria,
+	acceptRightAria,
+	scrollRef,
+	scrollTop,
+	onScroll,
+}: MergeAcceptColumnProps) {
+	const { startIndex, endIndex } = computeVisibleRange(scrollTop, MERGE_VIEWPORT_HEIGHT, entries.length, OVERSCAN_ROWS);
+	return (
+		<div ref={scrollRef} onScroll={onScroll} className="hidden h-72 overflow-auto md:block">
+			<div style={{ height: entries.length * ROW_HEIGHT, position: 'relative' }}>
+				{entries.slice(startIndex, endIndex).map((entry, i) => {
+					const index = startIndex + i;
+					const isHunkStart = entry.hunkIndex !== null && (index === 0 || entries[index - 1].hunkIndex !== entry.hunkIndex);
+					return (
+						<div
+							key={index}
+							style={{ position: 'absolute', top: index * ROW_HEIGHT, left: 0, right: 0 }}
+							className="flex h-6 items-center justify-center"
+						>
+							{isHunkStart && entry.hunkIndex !== null && (
+								<div className="flex gap-0.5">
+									<button
+										type="button"
+										aria-label={acceptLeftAria}
+										onClick={() => onAccept(entry.hunkIndex as number, 'rightUsesLeft')}
+										className={`rounded border px-1 text-[10px] leading-4 ${
+											hunkOverrides.get(entry.hunkIndex)?.rightUsesLeft
+												? 'border-primary bg-primary text-primary-foreground'
+												: 'border-border text-foreground'
+										}`}
+									>
+										←
+									</button>
+									<button
+										type="button"
+										aria-label={acceptRightAria}
+										onClick={() => onAccept(entry.hunkIndex as number, 'leftUsesRight')}
+										className={`rounded border px-1 text-[10px] leading-4 ${
+											hunkOverrides.get(entry.hunkIndex)?.leftUsesRight
+												? 'border-primary bg-primary text-primary-foreground'
+												: 'border-border text-foreground'
+										}`}
+									>
+										→
+									</button>
+								</div>
+							)}
+						</div>
+					);
+				})}
+			</div>
 		</div>
 	);
 }
@@ -368,13 +524,52 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	const sideBySideContainerRef = useRef<HTMLDivElement>(null);
 	const mergeLeftContainerRef = useRef<HTMLDivElement>(null);
 	const mergeRightContainerRef = useRef<HTMLDivElement>(null);
+	const mergeLeftScrollRef = useRef<HTMLDivElement>(null);
+	const mergeMiddleScrollRef = useRef<HTMLDivElement>(null);
+	const mergeRightScrollRef = useRef<HTMLDivElement>(null);
 
 	const [isSideBySideFullscreen, toggleSideBySideFullscreen] = useFullscreen(sideBySideContainerRef);
 	const [isMergeLeftFullscreen, toggleMergeLeftFullscreen] = useFullscreen(mergeLeftContainerRef);
 	const [isMergeRightFullscreen, toggleMergeRightFullscreen] = useFullscreen(mergeRightContainerRef);
 
-	const syncScroll = useSyncedScroll();
-	const syncInputScroll = useSyncedScroll();
+	const syncDiffScroll = useSyncedScrollGroup([leftColumnRef, rightColumnRef]);
+	const syncInputScroll = useSyncedScrollGroup([originalInputRef, changedInputRef]);
+	const syncMergeScroll = useSyncedScrollGroup([mergeLeftScrollRef, mergeMiddleScrollRef, mergeRightScrollRef]);
+	const [mergeScrollTop, setMergeScrollTop] = useState(0);
+	const handleMergeScroll = (sourceIndex: number) => (event: UIEvent<HTMLDivElement>) => {
+		setMergeScrollTop(event.currentTarget.scrollTop);
+		syncMergeScroll(sourceIndex)(event);
+	};
+
+	// Precomputed once per diff result (not per scroll/render) so a virtualized
+	// column can look up any row's displayed line number in O(1) instead of
+	// re-counting from the top every time the visible window changes.
+	const leftLineNumbers = useMemo(() => {
+		const numbers: Array<number | null> = [];
+		let running = 0;
+		for (const entry of entries) {
+			if (entry.leftText !== undefined) {
+				running += 1;
+				numbers.push(running);
+			} else {
+				numbers.push(null);
+			}
+		}
+		return numbers;
+	}, [entries]);
+	const rightLineNumbers = useMemo(() => {
+		const numbers: Array<number | null> = [];
+		let running = 0;
+		for (const entry of entries) {
+			if (entry.rightText !== undefined) {
+				running += 1;
+				numbers.push(running);
+			} else {
+				numbers.push(null);
+			}
+		}
+		return numbers;
+	}, [entries]);
 
 	const handleUploadFile = (which: 'original' | 'changed') => (fileList: FileList | null) => {
 		const file = fileList?.[0];
@@ -393,13 +588,20 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		setChangedText(originalText);
 	};
 
+	// Rows outside the current window aren't in the DOM under virtualization,
+	// so `scrollIntoView` (which needs a real element to target) no longer
+	// works here — instead compute the scrollTop that centers the target row
+	// directly from its index and the fixed row height, and scroll the left
+	// pane to it. The right pane follows automatically via the existing
+	// left<->right scroll-sync (every `scroll` event fired while it animates
+	// re-syncs the other pane to match).
 	const jumpToHunk = (hunkPosition: number) => {
 		if (hunkStartRows.length === 0) return;
 		const clamped = ((hunkPosition % hunkStartRows.length) + hunkStartRows.length) % hunkStartRows.length;
 		setActiveHunk(clamped);
 		const rowIndex = hunkStartRows[clamped];
-		const el = document.getElementById(`diff-row-left-${rowIndex}`);
-		el?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+		const targetScrollTop = Math.max(0, rowIndex * ROW_HEIGHT - DIFF_VIEWPORT_HEIGHT / 2 + ROW_HEIGHT / 2);
+		leftColumnRef.current?.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
 	};
 
 	const handleAccept = (hunkIndex: number, direction: 'leftUsesRight' | 'rightUsesLeft') => {
@@ -466,7 +668,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							placeholder={messages.placeholder}
 							textareaRef={originalInputRef}
 							gutterRef={originalGutterRef}
-							onScrollSync={syncInputScroll(changedInputRef)}
+							onScrollSync={syncInputScroll(0)}
 						/>
 					</div>
 					<div className="flex flex-col gap-2">
@@ -500,7 +702,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							placeholder={messages.placeholder}
 							textareaRef={changedInputRef}
 							gutterRef={changedGutterRef}
-							onScrollSync={syncInputScroll(originalInputRef)}
+							onScrollSync={syncInputScroll(1)}
 						/>
 					</div>
 				</div>
@@ -593,17 +795,19 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 					<div className="flex overflow-hidden rounded-md border border-border">
 						<DiffColumn
 							entries={entries}
+							lineNumbers={leftLineNumbers}
 							side="left"
 							scrollRef={leftColumnRef}
-							onScroll={syncScroll(rightColumnRef)}
+							onScroll={syncDiffScroll(0)}
 							activeRowIndex={hunkStartRows[activeHunk] ?? null}
 						/>
 						<div className="w-px flex-shrink-0 bg-border" />
 						<DiffColumn
 							entries={entries}
+							lineNumbers={rightLineNumbers}
 							side="right"
 							scrollRef={rightColumnRef}
-							onScroll={syncScroll(leftColumnRef)}
+							onScroll={syncDiffScroll(1)}
 							activeRowIndex={hunkStartRows[activeHunk] ?? null}
 						/>
 					</div>
@@ -631,55 +835,26 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 									</Button>
 								</div>
 							</div>
-							<div className="h-72 overflow-auto rounded-md border border-border">
-								{entries.map((entry, index) => (
-									<DiffRowContent
-										key={index}
-										entry={entry}
-										side="left"
-										override={entry.hunkIndex !== null ? hunkOverrides.get(entry.hunkIndex) : undefined}
-									/>
-								))}
-							</div>
+							<MergeColumn
+								entries={entries}
+								side="left"
+								hunkOverrides={hunkOverrides}
+								scrollRef={mergeLeftScrollRef}
+								scrollTop={mergeScrollTop}
+								onScroll={handleMergeScroll(0)}
+							/>
 						</div>
 
-						<div className="hidden flex-col items-center gap-0 md:flex">
-							{entries.map((entry, index) => {
-								const isHunkStart = entry.hunkIndex !== null && (index === 0 || entries[index - 1].hunkIndex !== entry.hunkIndex);
-								return (
-									<div key={index} className="flex h-6 items-center justify-center">
-										{isHunkStart && entry.hunkIndex !== null && (
-											<div className="flex gap-0.5">
-												<button
-													type="button"
-													aria-label={messages.acceptLeftAria}
-													onClick={() => handleAccept(entry.hunkIndex as number, 'rightUsesLeft')}
-													className={`rounded border px-1 text-[10px] leading-4 ${
-														hunkOverrides.get(entry.hunkIndex)?.rightUsesLeft
-															? 'border-primary bg-primary text-primary-foreground'
-															: 'border-border text-foreground'
-													}`}
-												>
-													←
-												</button>
-												<button
-													type="button"
-													aria-label={messages.acceptRightAria}
-													onClick={() => handleAccept(entry.hunkIndex as number, 'leftUsesRight')}
-													className={`rounded border px-1 text-[10px] leading-4 ${
-														hunkOverrides.get(entry.hunkIndex)?.leftUsesRight
-															? 'border-primary bg-primary text-primary-foreground'
-															: 'border-border text-foreground'
-													}`}
-												>
-													→
-												</button>
-											</div>
-										)}
-									</div>
-								);
-							})}
-						</div>
+						<MergeAcceptColumn
+							entries={entries}
+							hunkOverrides={hunkOverrides}
+							onAccept={handleAccept}
+							acceptLeftAria={messages.acceptLeftAria}
+							acceptRightAria={messages.acceptRightAria}
+							scrollRef={mergeMiddleScrollRef}
+							scrollTop={mergeScrollTop}
+							onScroll={handleMergeScroll(1)}
+						/>
 
 						<div ref={mergeRightContainerRef} className={`flex flex-col gap-2 ${isMergeRightFullscreen ? 'bg-background p-4' : ''}`}>
 							<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
@@ -696,16 +871,14 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 									</Button>
 								</div>
 							</div>
-							<div className="h-72 overflow-auto rounded-md border border-border">
-								{entries.map((entry, index) => (
-									<DiffRowContent
-										key={index}
-										entry={entry}
-										side="right"
-										override={entry.hunkIndex !== null ? hunkOverrides.get(entry.hunkIndex) : undefined}
-									/>
-								))}
-							</div>
+							<MergeColumn
+								entries={entries}
+								side="right"
+								hunkOverrides={hunkOverrides}
+								scrollRef={mergeRightScrollRef}
+								scrollTop={mergeScrollTop}
+								onScroll={handleMergeScroll(2)}
+							/>
 						</div>
 					</div>
 				</div>
