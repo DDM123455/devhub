@@ -60,6 +60,13 @@ interface Messages {
 	gradientTypeRadial: string;
 	gradientStartColorLabel: string;
 	gradientEndColorLabel: string;
+	batchModeToggle: string;
+	batchInputLabel: string;
+	batchInputPlaceholder: string;
+	batchLineCount: string;
+	batchGenerateButton: string;
+	batchGenerating: string;
+	batchPreviewNotice: string;
 }
 
 type ContentType = 'url' | 'text' | 'wifi' | 'vcard' | 'email' | 'sms';
@@ -165,6 +172,12 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	const [gradientColorStart, setGradientColorStart] = useState('#047857');
 	const [gradientColorEnd, setGradientColorEnd] = useState('#22d3ee');
 
+	const [batchMode, setBatchMode] = useState(false);
+	const [batchInput, setBatchInput] = useState('');
+	const [isBatchGenerating, setIsBatchGenerating] = useState(false);
+	const canBatch = contentType === 'url' || contentType === 'text';
+	const effectiveBatchMode = canBatch && batchMode;
+
 	const containerRef = useRef<HTMLDivElement>(null);
 	const qrRef = useRef<QRCodeStyling | null>(null);
 
@@ -197,9 +210,12 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 
 	const logoSize = Math.round(size * 0.2);
 
-	// Shared style/content options used for both the live preview and the two
-	// export paths — only width/height/type (canvas vs svg) differ per caller.
-	const buildQrOptions = (overrides: Pick<Options, 'width' | 'height' | 'type'>): Partial<Options> => {
+	// Shared style/content options used for the live preview, the two single
+	// export paths, and batch generation — only width/height/type (canvas vs
+	// svg) and, for batch mode, `data` differ per caller.
+	const buildQrOptions = (
+		overrides: Pick<Options, 'width' | 'height' | 'type'> & { data?: string },
+	): Partial<Options> => {
 		const dotsStyle = gradientEnabled
 			? {
 					gradient: {
@@ -214,7 +230,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 			: { color: fgColor };
 		return {
 			...overrides,
-			data: renderValue,
+			data: overrides.data ?? renderValue,
 			margin: 8,
 			qrOptions: { errorCorrectionLevel: level },
 			dotsOptions: { type: dotsType, ...dotsStyle },
@@ -232,6 +248,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	// build-time SSR pass (no `document` there), the same class of bug already
 	// documented in PROGRESS.md for `jsoneditor`.
 	useEffect(() => {
+		if (effectiveBatchMode) return;
 		let cancelled = false;
 		void import('qr-code-styling').then(({ default: QRCodeStylingCtor }) => {
 			if (cancelled) return;
@@ -258,7 +275,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 			cancelled = true;
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [renderKey, level, fgColor, bgColor, size, logoUrl, dotsType, gradientEnabled, gradientType, gradientColorStart, gradientColorEnd]);
+	}, [effectiveBatchMode, renderKey, level, fgColor, bgColor, size, logoUrl, dotsType, gradientEnabled, gradientType, gradientColorStart, gradientColorEnd]);
 
 	const handleLogoChange = (fileList: FileList | null) => {
 		const file = fileList?.[0];
@@ -292,6 +309,53 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 			await exportQr.download({ name: 'qrcode', extension: 'svg' });
 		} catch {
 			// Already guarded by `tooLong` above under normal use; nothing more to do.
+		}
+	};
+
+	const handleGenerateBatch = async () => {
+		const lines = batchInput.split('\n').map((line) => line.trim()).filter(Boolean);
+		if (lines.length === 0) return;
+		setIsBatchGenerating(true);
+		try {
+			const [{ default: QRCodeStylingCtor }, { default: JSZip }] = await Promise.all([
+				import('qr-code-styling'),
+				import('jszip'),
+			]);
+			const zip = new JSZip();
+			const usedNames = new Set<string>();
+			for (let i = 0; i < lines.length; i++) {
+				const data = lines[i];
+				let blob: Blob | null = null;
+				try {
+					const qr = new QRCodeStylingCtor(
+						buildQrOptions({ width: pngResolution, height: pngResolution, type: 'canvas', data }),
+					);
+					blob = (await qr.getRawData('png')) as Blob | null;
+				} catch {
+					// Skips a line whose content doesn't fit the QR capacity at the
+					// current error correction level, rather than failing the whole batch.
+					continue;
+				}
+				if (!blob) continue;
+				let name =
+					data
+						.replace(/^https?:\/\//, '')
+						.replace(/[^a-zA-Z0-9-_]+/g, '-')
+						.replace(/^-+|-+$/g, '')
+						.slice(0, 40) || `qrcode-${i + 1}`;
+				while (usedNames.has(name)) name = `${name}-${i + 1}`;
+				usedNames.add(name);
+				zip.file(`${name}.png`, blob);
+			}
+			const zipBlob = await zip.generateAsync({ type: 'blob' });
+			const url = URL.createObjectURL(zipBlob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = 'qrcodes.zip';
+			link.click();
+			URL.revokeObjectURL(url);
+		} finally {
+			setIsBatchGenerating(false);
 		}
 	};
 
@@ -337,7 +401,14 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 					</select>
 				</div>
 
-				{contentType === 'url' && (
+				{canBatch && (
+					<label className="flex items-center gap-1.5 text-sm text-muted-foreground">
+						<input type="checkbox" checked={batchMode} onChange={(event) => setBatchMode(event.target.checked)} />
+						{messages.batchModeToggle}
+					</label>
+				)}
+
+				{contentType === 'url' && !effectiveBatchMode && (
 					<div className="flex flex-col gap-1">
 						<label htmlFor="qr-url" className="text-sm font-medium text-foreground">
 							{messages.urlLabel}
@@ -353,7 +424,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 					</div>
 				)}
 
-				{contentType === 'text' && (
+				{contentType === 'text' && !effectiveBatchMode && (
 					<div className="flex flex-col gap-1">
 						<label htmlFor="qr-text" className="text-sm font-medium text-foreground">
 							{messages.textLabel}
@@ -366,6 +437,38 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 							rows={3}
 							className={inputClass}
 						/>
+					</div>
+				)}
+
+				{effectiveBatchMode && (
+					<div className="flex flex-col gap-1">
+						<label htmlFor="qr-batch-input" className="text-sm font-medium text-foreground">
+							{messages.batchInputLabel}
+						</label>
+						<textarea
+							id="qr-batch-input"
+							value={batchInput}
+							onChange={(event) => setBatchInput(event.target.value)}
+							placeholder={messages.batchInputPlaceholder}
+							rows={6}
+							spellCheck={false}
+							className={inputClass}
+						/>
+						<p className="text-xs text-muted-foreground">
+							{messages.batchLineCount.replace(
+								'{{count}}',
+								String(batchInput.split('\n').map((line) => line.trim()).filter(Boolean).length),
+							)}
+						</p>
+						<Button
+							type="button"
+							size="sm"
+							className="w-fit"
+							onClick={() => void handleGenerateBatch()}
+							disabled={isBatchGenerating || batchInput.trim() === ''}
+						>
+							{isBatchGenerating ? messages.batchGenerating : messages.batchGenerateButton}
+						</Button>
 					</div>
 				)}
 
@@ -743,26 +846,35 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 					</select>
 				</div>
 
-				<div className="flex flex-wrap gap-2">
-					<Button type="button" onClick={handleDownloadPng} disabled={isEmpty || tooLong}>
-						{messages.downloadPng}
-					</Button>
-					<Button type="button" variant="secondary" onClick={handleDownloadSvg} disabled={isEmpty || tooLong}>
-						{messages.downloadSvg}
-					</Button>
-				</div>
+				{!effectiveBatchMode && (
+					<div className="flex flex-wrap gap-2">
+						<Button type="button" onClick={handleDownloadPng} disabled={isEmpty || tooLong}>
+							{messages.downloadPng}
+						</Button>
+						<Button type="button" variant="secondary" onClick={handleDownloadSvg} disabled={isEmpty || tooLong}>
+							{messages.downloadSvg}
+						</Button>
+					</div>
+				)}
 			</div>
 
 			<div className="flex flex-1 items-center justify-center rounded-md border border-border p-6">
-				{tooLong && (
+				{tooLong && !effectiveBatchMode && (
 					<p role="alert" className="max-w-xs text-center text-sm text-destructive">{messages.errorTooLong}</p>
+				)}
+				{effectiveBatchMode && (
+					<p className="max-w-xs text-center text-sm text-muted-foreground">{messages.batchPreviewNotice}</p>
 				)}
 				{/* Kept mounted (never removed from the JSX tree) even while `tooLong` is
 				    true, just visually hidden — qr-code-styling's instance holds a
 				    reference to this exact DOM node via `.append()`, and removing it from
 				    the tree would leave `.update()` writing into a detached element that
 				    never becomes visible again once the input is valid. */}
-				<div ref={containerRef} style={{ width: size, height: size }} className={tooLong ? 'hidden' : undefined} />
+				<div
+					ref={containerRef}
+					style={{ width: size, height: size }}
+					className={tooLong || effectiveBatchMode ? 'hidden' : undefined}
+				/>
 			</div>
 		</div>
 	);

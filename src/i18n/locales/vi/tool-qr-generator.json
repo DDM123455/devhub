@@ -61,7 +61,14 @@
     "gradientTypeLinear": "Tuyến tính",
     "gradientTypeRadial": "Tỏa tròn",
     "gradientStartColorLabel": "Màu bắt đầu",
-    "gradientEndColorLabel": "Màu kết thúc"
+    "gradientEndColorLabel": "Màu kết thúc",
+    "batchModeToggle": "Chế độ hàng loạt (mỗi dòng 1 mã)",
+    "batchInputLabel": "Mỗi dòng một giá trị",
+    "batchInputPlaceholder": "https://example.com/1\nhttps://example.com/2\nhttps://example.com/3",
+    "batchLineCount": "Sẽ tạo {{count}} mã QR",
+    "batchGenerateButton": "Tạo & tải tất cả (.zip)",
+    "batchGenerating": "Đang tạo…",
+    "batchPreviewNotice": "Chế độ hàng loạt — mỗi dòng sẽ thành 1 mã QR riêng. Bấm \"Tạo & tải tất cả\" ở bên trái để nhận file .zip chứa toàn bộ."
   },
   "related": "Công cụ liên quan",
   "faq": {

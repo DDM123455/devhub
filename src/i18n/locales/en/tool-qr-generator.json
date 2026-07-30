@@ -61,7 +61,14 @@
     "gradientTypeLinear": "Linear",
     "gradientTypeRadial": "Radial",
     "gradientStartColorLabel": "Start color",
-    "gradientEndColorLabel": "End color"
+    "gradientEndColorLabel": "End color",
+    "batchModeToggle": "Batch mode (one per line)",
+    "batchInputLabel": "One value per line",
+    "batchInputPlaceholder": "https://example.com/1\nhttps://example.com/2\nhttps://example.com/3",
+    "batchLineCount": "{{count}} QR code(s) will be generated",
+    "batchGenerateButton": "Generate & Download All (.zip)",
+    "batchGenerating": "Generating…",
+    "batchPreviewNotice": "Batch mode — each line becomes its own QR code. Use \"Generate & Download All\" on the left to get a .zip of all of them."
   },
   "related": "Related tools",
   "faq": {

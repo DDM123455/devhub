@@ -144,6 +144,20 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6b — mục "QR Generator: batch tạo nhiều QR cùng lúc" (vs
+  qr-code-generator.com): thêm checkbox "Batch mode" (chỉ hiện với content type URL/Text —
+  các loại còn lại như WiFi/vCard/Email/SMS có nhiều trường riêng, không hợp để nhập hàng
+  loạt theo dòng) thay input đơn bằng textarea nhiều dòng, mỗi dòng = 1 mã QR độc lập. Nút
+  "Generate & Download All (.zip)" dùng `qr-code-styling` dựng từng instance riêng (tái dùng
+  `buildQrOptions()` đã có, mở rộng nhận thêm `data` override thay vì luôn lấy `renderValue`
+  của form đơn) + `getRawData('png')`, gộp vào JSZip (dynamic import, cùng convention toàn
+  site). Tên file tự sinh từ nội dung dòng (bỏ `http(s)://`, thay ký tự đặc biệt bằng `-`),
+  dòng trùng tên tự thêm hậu tố số thứ tự tránh ghi đè trong zip. Dòng nào vượt sức chứa QR ở
+  mức sửa lỗi hiện tại thì bỏ qua (không làm hỏng cả batch). Live preview đơn tự ẩn khi bật
+  batch mode (effect cập nhật QR đơn có early-return khi `effectiveBatchMode`). Verify bằng
+  script Node độc lập: dòng trống/trùng lặp/có ký tự đặc biệt đều xử lý đúng (lọc dòng rỗng,
+  hậu tố dedup khi trùng tên). Build sạch (421 trang), xác nhận label mới trong
+  `dist/en/tools/qr-code-generator/index.html`.
 - **2026-07-30** — Phase 3.6b — mục "JSON Formatter: badge Validate + so sánh 2 JSON" (vs
   JSONFormatter.org/JSONLint): **Badge trạng thái** — `jsoneditor` đã validate liên tục lúc
   gõ (qua `onValidationError`) nhưng trước đây CHỈ hiện banner lỗi khi có lỗi, không có tín
