@@ -31,6 +31,11 @@ interface ImageItem {
 	compressedSize?: number;
 }
 
+// Each compression spins up its own `browser-image-compression` Web Worker —
+// running all of them at once for a large batch would spawn dozens of workers
+// simultaneously and spike memory, so only this many run concurrently.
+const CONCURRENCY = 3;
+
 function formatBytes(bytes: number): string {
 	if (bytes < 1024) return `${bytes} B`;
 	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -82,9 +87,8 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 		setSkippedCount(0);
 	}, []);
 
-	const handleCompress = useCallback(async () => {
-		setIsProcessing(true);
-		for (const item of items) {
+	const compressOne = useCallback(
+		async (item: ImageItem) => {
 			setItems((prev) =>
 				prev.map((it) => (it.id === item.id ? { ...it, status: 'processing' } : it)),
 			);
@@ -114,9 +118,26 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 			} catch {
 				setItems((prev) => prev.map((it) => (it.id === item.id ? { ...it, status: 'error' } : it)));
 			}
-		}
+		},
+		[quality],
+	);
+
+	const handleCompress = useCallback(async () => {
+		setIsProcessing(true);
+		// Worker-pool pattern: a fixed number of "lanes" each pull the next
+		// pending item off the shared queue as soon as they finish their
+		// current one, instead of waiting for the whole batch to finish
+		// before starting the next `CONCURRENCY` items.
+		let cursor = 0;
+		const runLane = async (): Promise<void> => {
+			const index = cursor++;
+			if (index >= items.length) return;
+			await compressOne(items[index]);
+			return runLane();
+		};
+		await Promise.all(Array.from({ length: Math.min(CONCURRENCY, items.length) }, runLane));
 		setIsProcessing(false);
-	}, [items, quality]);
+	}, [items, compressOne]);
 
 	const handleDownload = useCallback((item: ImageItem) => {
 		if (!item.compressedBlob) return;

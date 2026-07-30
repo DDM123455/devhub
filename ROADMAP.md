@@ -172,7 +172,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 
 ## Phase 3.6 — Audit Remediation vòng 2 (từ `AUDIT.md`, mục Medium)
 
-- [ ] Image Compressor: xử lý song song (có giới hạn concurrency) thay vì tuần tự khi
+- [x] Image Compressor: xử lý song song (có giới hạn concurrency) thay vì tuần tự khi
       batch nhiều ảnh
 - [ ] Image Compressor + Image Converter: thêm tùy chọn resize kích thước trước khi xuất
 - [ ] QR Generator: thêm dot-style/gradient cơ bản (`qr-code-styling`)

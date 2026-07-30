@@ -137,6 +137,17 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6 — mục 5/7 "Image Compressor: song song hoá batch": tách logic
+  nén 1 ảnh ra `compressOne()`, `handleCompress()` đổi từ `for...of` tuần tự sang mô hình
+  "worker-pool" — `CONCURRENCY = 3` lane chạy song song, mỗi lane tự lấy ảnh tiếp theo trong
+  hàng đợi (biến `cursor` dùng chung) ngay khi xong ảnh trước, thay vì chờ hết cả batch mới
+  xử lý batch kế. Giới hạn 3 vì mỗi lần gọi `imageCompression()` tự spawn 1 Web Worker riêng
+  (`useWebWorker: true` có sẵn) — chạy hết cỡ cùng lúc với ảnh lớn dễ tốn RAM/giật UI. Không
+  cần thêm dependency. Build sạch (421 trang). Không có Puppeteer/browser tool trong môi
+  trường phiên này để test tương tác thật — đã verify logic hàng đợi bằng 1 script Node độc
+  lập mô phỏng đúng pattern (delay ngẫu nhiên, đếm concurrency tối đa, kiểm tra mọi item được
+  xử lý đúng 1 lần) với n=1,2,7,10 ảnh, xác nhận `maxActive` không vượt 3 và không có
+  race/item bị bỏ sót hay xử lý trùng.
 - **2026-07-30** — Phase 3.6 — mục 4/7 "focus-visible pass cho input/select/textarea":
   buttons đã có ring focus-visible sẵn qua `cva` trong `button.tsx`, nhưng input/select/
   textarea "tay" ở tất cả tool component chỉ dựa vào outline mặc định trình duyệt. Thay vì
