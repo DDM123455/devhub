@@ -137,6 +137,15 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-30** — Phase 3.6 — mục 3/7 "Trang chủ: bỏ ô '0 KB uploaded'": xoá khối `<div>`
+  placeholder tĩnh (không có tracking thật đứng sau, đúng triết lý zero-server — quyết định
+  chọn "bỏ hẳn" thay vì "thêm số liệu thật qua localStorage" đã hỏi và được người dùng xác
+  nhận) khỏi `src/pages/[locale]/index.astro`, chỉ giữ 2 ô thật (số tool/số category). Xoá
+  luôn key `home.stats.uploaded` không còn dùng ở **cả 20 file** `common.json` (không chỉ
+  en/vi — key này có từ Phase 0/2, trước quy ước "chỉ en+vi cho tool mới" ban hành
+  2026-07-27) bằng 1 script Node nhỏ (JSON.parse/stringify) để đảm bảo xoá đúng key, không
+  làm hỏng cấu trúc/encoding Unicode của các ngôn ngữ khác. Build sạch (421 trang), xác nhận
+  `dist/en/index.html` không còn chuỗi "0 KB".
 - **2026-07-30** — Phase 3.6 — mục 2/7 "JWT Decoder: hiển thị aud/iss/sub": `JwtDecoder.tsx`
   thêm helper `formatStringOrArrayClaim()` (claim `aud` theo spec JWT có thể là string hoặc
   mảng string, các claim còn lại luôn là string đơn), tính `audText`/`issText`/`subText` song

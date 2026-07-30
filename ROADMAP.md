@@ -178,7 +178,7 @@ Web Worker nếu xử lý nặng, áp checklist SEO trong `CLAUDE.md`, thêm str
 - [ ] QR Generator: thêm dot-style/gradient cơ bản (`qr-code-styling`)
 - [ ] Contrast/`focus-visible` pass có chủ đích trên toàn bộ input/select/textarea
       tương tác (button đã có sẵn qua `button.tsx`)
-- [ ] Trang chủ: bỏ hẳn ô "0 KB uploaded" placeholder tĩnh không có dữ liệu thật
+- [x] Trang chủ: bỏ hẳn ô "0 KB uploaded" placeholder tĩnh không có dữ liệu thật
 - [x] `client:load` → `client:visible` cho phần article/related-tools dưới fold —
       **N/A, đã đánh giá**: mỗi trang tool chỉ có 1 React island duy nhất là chính
       component tool (không phải nội dung dưới fold); phần article/FAQ/related-tools
