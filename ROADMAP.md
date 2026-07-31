@@ -258,6 +258,47 @@ ROADMAP)
 - [ ] Chuyển đổi Audio MP3↔WAV — vs CloudConvert: thêm định dạng AAC/OGG/FLAC/M4A
 - [x] Chuyển đổi Audio MP3↔WAV — resample/normalize/fade
 
+## Phase 3.7 — UX/UI Audit Remediation (từ audit trực tiếp người dùng yêu cầu, 2026-07-31)
+
+> Nguồn: audit UX/UI toàn site theo 18 tiêu chí (đánh giá UI từng thành phần, luồng UX,
+> visual hierarchy, typography, color system, spacing, component audit, upload/processing/
+> result experience, micro-interaction, empty state, mobile UX, accessibility, benchmark
+> với 10 đối thủ, design system, bảng ưu tiên). Phát hiện cốt lõi xuyên suốt: `src/components/
+> ui/` chỉ có DUY NHẤT 1 component dùng chung (`button.tsx`) — không Card/Dialog/Tooltip/
+> Dropdown/Tabs/Progress/Toast/Badge/Switch nào tồn tại, nên cả 20 tool tự vẽ tay các phần đó
+> riêng lẻ và trôi dạt khỏi nhau. Thứ tự các task dưới đây theo đúng bảng ưu tiên (impact/
+> effort) của audit — KHÔNG làm task sau trước task trước vì phần lớn phụ thuộc vào Card/
+> Dialog/Tooltip ở task 1.
+
+- [x] 1. Xây `Card`, `Dialog`, `Tooltip` dùng chung trong `src/components/ui/` (dựng trên
+      `@base-ui/react`, cùng pattern `cva` với `button.tsx` hiện có — không thêm thư viện
+      UI kit mới)
+- [ ] 2. Color tokens: thêm `--primary` riêng cho `.dark` trong `global.css` (đề xuất
+      `#10B981`, đo contrast ~7.67:1 trên nền tối, so với `#047857` dùng chung 2 theme hiện
+      tại chỉ đạt 3.28–3.55:1 — fail WCAG AA chữ thường) + định nghĩa token
+      `--shadow-sm/md/lg` (hiện chưa có token shadow nào)
+- [ ] 3. Progress % thật + trạng thái hàng đợi ("Đang xử lý N/M") cho tool xử lý hàng loạt,
+      bắt đầu từ Image Compressor rồi áp dụng lại cho các tool batch khác (thay trạng thái
+      nhị phân pending/processing/done hiện tại)
+- [ ] 4. Định nghĩa type scale thật trong `global.css` (size/weight/line-height/letter-
+      spacing theo từng vai trò: display/heading/body/label/mono) dùng trục weight sẵn có
+      của Space Grotesk Variable — KHÔNG thêm font mới (đúng quy tắc "không thêm dependency
+      nếu chưa cần thiết")
+- [ ] 5. Touch target nút bấm ≥44px dưới `sm:` + bổ sung breakpoint responsive còn thiếu ở
+      `ImageCompressor.tsx`/`PdfMerger.tsx` (hiện 0 breakpoint, chỉ dựa `flex-wrap`)
+- [ ] 6. Micro-interaction có chủ đích (upload/success/error/delete/expand-collapse) kèm
+      `@media (prefers-reduced-motion: reduce)` ngay từ đầu, không thêm sau
+- [ ] 7. Before/after so sánh dạng slider kéo được cho Result Page (thay 2 thumbnail tĩnh
+      hiện tại), bắt đầu từ Image Compressor
+- [ ] 8. Footer 3 cột tối giản (Công cụ theo nhóm / Pháp lý / Ngôn ngữ) + thêm trang/link
+      Privacy Policy (hiện footer chỉ có 1 dòng copyright, không có link pháp lý nào dù sản
+      phẩm định vị privacy-first)
+- [ ] 9. Empty state thiết kế đầy đủ (không file / không kết quả tìm kiếm / không lịch sử /
+      lỗi upload) — có icon + câu giải thích + hành động tiếp theo, thay vì danh sách rỗng
+      không nội dung
+- [ ] 10. Hero trang chủ chuyển sang task-oriented (ô thả file/tìm kiếm làm trung tâm) thay
+      vì hero thuần chữ hiện tại (kicker+H1+tagline+2 pill, không CTA/bằng chứng sản phẩm)
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

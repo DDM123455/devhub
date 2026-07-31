@@ -26,8 +26,10 @@
   rộng bảng MIME Base64, M9 claim aud/iss/sub JWT Decoder; M7 đánh dấu N/A). Build sạch mọi
   mục nhưng KHÔNG có Puppeteer/browser trong môi trường phiên làm việc đó để test tương tác
   thật — đặc biệt mục M4 (đổi hẳn engine render QR) cần người dùng tự mở trang QR Generator
-  kiểm tra bằng mắt trước khi coi là chắc chắn ổn định. Task tiếp theo: chọn 1 hạng mục ở
-  Phase 4 (Kiếm tiền & PWA) hoặc Phase 5 (Launch & Growth) trong `ROADMAP.md`.
+  kiểm tra bằng mắt trước khi coi là chắc chắn ổn định.
+- **Phase 3.7 — UX/UI Audit Remediation**: 1/10 mục (task 1 xong). Task tiếp theo: #2 —
+  color token `--primary` riêng cho dark mode + shadow tokens. Xem chi tiết audit gốc + lý
+  do từng task trong log 2026-07-31 bên dưới và 10 dòng task trong `ROADMAP.md`.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -144,6 +146,49 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-07-31** — Phase 3.7 task 1: xây `Card` (`src/components/ui/card.tsx`),
+  `Dialog` (`dialog.tsx`), `Tooltip` (`tooltip.tsx`) dùng chung — component thứ 2/3/4 trong
+  `src/components/ui/` sau `button.tsx` (trước đây là component DUY NHẤT tồn tại ở đó).
+  Dialog/Tooltip dựng trên `@base-ui/react/dialog` và `@base-ui/react/tooltip` (đã có sẵn
+  trong `package.json`, không thêm dependency mới), theo đúng pattern `render` prop +
+  `cva` mà `button.tsx` đã dùng — không phải Radix `asChild`, base-ui dùng prop `render`
+  nhận `ReactElement` hoặc render-function. Dùng lại đúng token màu đã có (`bg-card`,
+  `text-card-foreground`, `bg-popover`, `text-popover-foreground`, `text-muted-foreground`,
+  `border-border`) — không tạo token mới ở task này (đó là task 2). Dialog dùng data-attribute
+  transition thật của base-ui (`data-starting-style`/`data-ending-style`, xác nhận bằng
+  cách grep mã đã build trong `node_modules/@base-ui/react`, không đoán tên) qua cú pháp
+  Tailwind `data-[starting-style]:...`. TooltipProvider bọc delay 400ms mặc định, wrap riêng
+  từng `Tooltip` instance (không có 1 Provider gốc dùng chung toàn site vì kiến trúc Astro
+  islands không có 1 cây React bao trọn mọi trang).
+  **Xác minh**: repo KHÔNG có pipeline typecheck (`tsc`) — Vite/esbuild của Astro chỉ strip
+  type, không check type, và cũng không compile file nào không nằm trong đồ thị import từ
+  page. Vì 3 file mới chưa được tool nào import, `npm run build` một mình sẽ không chạm tới
+  chúng. Đã tạo tạm 1 trang test (`src/pages/ui-smoke-test.astro` + component
+  `_smoke-test.tsx`) dựng cả 3 component cùng lúc (Card bọc Tooltip + Dialog có
+  trigger/close/title/description), build thật (422 trang), grep HTML output xác nhận
+  `data-slot="card"`, `data-slot="dialog-trigger"`, `data-slot="tooltip-trigger"` cùng text
+  bên trong đã render đúng qua SSR (Astro pre-render `client:load` trong Node lúc build) —
+  nghĩa là composition `Root/Trigger/Popup` với API base-ui đúng cú pháp, không lỗi runtime
+  khi render. Sau khi xác nhận, xoá cả 2 file test (không phải 1 phần deliverable), build
+  lại lần cuối ở trạng thái thật (421 trang, sạch). **Giới hạn còn lại**: chưa test bằng
+  trình duyệt thật/Puppeteer (không có trong môi trường phiên này) nên chưa xác nhận animation
+  mở/đóng, focus trap của Dialog, hay vị trí Tooltip khi va chạm mép màn hình trên thực tế —
+  chỉ xác nhận SSR không crash + cấu trúc HTML đúng. 3 component này CHƯA được dùng ở tool
+  nào — việc gắn vào `ImageCompressor`/tool khác thuộc các task sau (3, 6, 7) trong Phase 3.7.
+- **2026-07-31** — (theo yêu cầu trực tiếp người dùng: audit UX/UI toàn site theo prompt
+  "Senior UX/UI Audit & Redesign") Chạy audit 18 phần, đọc trực tiếp `global.css`,
+  `button.tsx`, `ImageCompressor.tsx`, `Layout.astro`, benchmark với TinyPNG/iLoveIMG/
+  Smallpdf/CloudConvert/Convertio/Canva/Figma/Linear/Notion/Vercel, tính contrast WCAG thật
+  (Node, công thức relative-luminance) thay vì ước lượng bằng mắt. Kết quả đầy đủ đã gửi
+  người dùng dưới dạng Artifact; theo yêu cầu tiếp theo "ghi thành các bước xử lý", đã rút
+  10 task hành động thành **Phase 3.7** trong `ROADMAP.md`, xếp theo đúng bảng ưu tiên
+  impact/effort của audit (Card/Dialog/Tooltip dùng chung đứng đầu vì hầu hết task sau đều
+  phụ thuộc nó). 2 phát hiện đáng chú ý nhất làm căn cứ cho task 1–2: (a) `src/components/
+  ui/` chỉ có 1 component (`button.tsx`) — không Card/Dialog/Tooltip/Progress/Toast/Tabs
+  nào tồn tại, 20 tool tự vẽ tay riêng lẻ; (b) `--primary` (`#047857`) dùng chung hex ở cả
+  2 theme, đo thực tế chỉ đạt 3.28–3.55:1 trên nền tối (fail AA 4.5:1 chữ thường), trong khi
+  `--accent-foreground` dark (`#34D399`) đã chứng minh team biết cách làm variant sáng hơn
+  đúng chuẩn (9.35–10.12:1) — chỉ chưa áp dụng cho `--primary`.
 - **2026-07-30** — (theo yêu cầu trực tiếp người dùng: "chuyển lại nó về dạng ban đầu cho tôi")
   **revert toàn bộ 3 commit thử nghiệm layout/kích thước thumbnail PDF ở dưới** (`3cb94f3`,
   `1c11fa4`, `48682cf`) — người dùng không ưng kết quả sau khi thử phóng to + đổi layout dọc.
