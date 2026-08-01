@@ -280,7 +280,7 @@ ROADMAP)
 - [x] 3. Progress % thật + trạng thái hàng đợi ("Đang xử lý N/M") cho tool xử lý hàng loạt,
       bắt đầu từ Image Compressor rồi áp dụng lại cho các tool batch khác (thay trạng thái
       nhị phân pending/processing/done hiện tại)
-- [ ] 4. Định nghĩa type scale thật trong `global.css` (size/weight/line-height/letter-
+- [x] 4. Định nghĩa type scale thật trong `global.css` (size/weight/line-height/letter-
       spacing theo từng vai trò: display/heading/body/label/mono) dùng trục weight sẵn có
       của Space Grotesk Variable — KHÔNG thêm font mới (đúng quy tắc "không thêm dependency
       nếu chưa cần thiết")

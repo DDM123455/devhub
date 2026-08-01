@@ -51,6 +51,44 @@
     --shadow-sm: var(--shadow-sm);
     --shadow-md: var(--shadow-md);
     --shadow-lg: var(--shadow-lg);
+    /* Type scale by role — display/heading/body/label/mono. Weight stays within
+       300-700 (Space Grotesk Variable's actual variable axis, confirmed via its
+       fontsource metadata — it has no 800/900 to reach for). Heading is split
+       into 3 levels (h1/h2/h3) since the site already has 3 distinct heading
+       roles in practice; --text-heading-1/2/3's size+line-height below match
+       what text-3xl/text-xl/(text-base + leading-tight) already render today,
+       so swapping existing markup to these tokens is a like-for-like rename,
+       not a visual change — only --text-display and --text-label/--text-mono
+       are net-new roles with no current usage (predefined for later tasks:
+       Hero redesign for display, tool-component labels for label/mono). */
+    --text-display: 2.5rem;
+    --text-display--line-height: 1.15;
+    --text-display--font-weight: 700;
+    --text-display--letter-spacing: -0.02em;
+    --text-heading-1: 1.875rem;
+    --text-heading-1--line-height: 1.2;
+    --text-heading-1--font-weight: 700;
+    --text-heading-1--letter-spacing: -0.01em;
+    --text-heading-2: 1.25rem;
+    --text-heading-2--line-height: 1.4;
+    --text-heading-2--font-weight: 600;
+    --text-heading-2--letter-spacing: normal;
+    --text-heading-3: 1rem;
+    --text-heading-3--line-height: 1.25;
+    --text-heading-3--font-weight: 600;
+    --text-heading-3--letter-spacing: normal;
+    --text-body: 1rem;
+    --text-body--line-height: 1.625;
+    --text-body--font-weight: 400;
+    --text-body--letter-spacing: normal;
+    --text-label: 0.75rem;
+    --text-label--line-height: 1.4;
+    --text-label--font-weight: 500;
+    --text-label--letter-spacing: 0.01em;
+    --text-mono: 0.8125rem;
+    --text-mono--line-height: 1.6;
+    --text-mono--font-weight: 400;
+    --text-mono--letter-spacing: normal;
 }
 
 :root {

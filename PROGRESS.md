@@ -27,13 +27,14 @@
   mục nhưng KHÔNG có Puppeteer/browser trong môi trường phiên làm việc đó để test tương tác
   thật — đặc biệt mục M4 (đổi hẳn engine render QR) cần người dùng tự mở trang QR Generator
   kiểm tra bằng mắt trước khi coi là chắc chắn ổn định.
-- **Phase 3.7 — UX/UI Audit Remediation**: 3/10 mục (task 1, 2, 3 xong). Task tiếp theo: #4 —
-  type scale thật trong `global.css`. Xem chi tiết audit gốc + lý do từng task trong log
-  2026-07-31 bên dưới và 10 dòng task trong `ROADMAP.md`. **Từ 2026-08-01, theo yêu cầu trực
-  tiếp người dùng**: làm xong 1 task trong Phase 3.7 thì tự động chuyển sang task tiếp theo
-  luôn, không dừng lại hỏi xác nhận giữa các task (khác quy trình mặc định ở `CLAUDE.md` mục
-  5) — chỉ dừng hỏi khi thật sự có quyết định cần người dùng (ví dụ xung đột thiết kế không
-  tự quyết được, như ở task 2).
+- **Phase 3.7 — UX/UI Audit Remediation**: 4/10 mục (task 1-4 xong). Task tiếp theo: #5 —
+  touch target ≥44px dưới `sm:` + breakpoint responsive cho `ImageCompressor.tsx`/
+  `PdfMerger.tsx`. Xem chi tiết audit gốc + lý do từng task trong log 2026-07-31 bên dưới và
+  10 dòng task trong `ROADMAP.md`. **Từ 2026-08-01, theo yêu cầu trực tiếp người dùng**: làm
+  xong 1 task trong Phase 3.7 thì tự động chuyển sang task tiếp theo luôn, không dừng lại hỏi
+  xác nhận giữa các task (khác quy trình mặc định ở `CLAUDE.md` mục 5) — chỉ dừng hỏi khi
+  thật sự có quyết định cần người dùng (ví dụ xung đột thiết kế không tự quyết được, như ở
+  task 2).
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -150,6 +151,55 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-08-01** — Phase 3.7 task 4: type scale thật trong `global.css` theo vai trò
+  display/heading (tách 3 mức h1/h2/h3 vì site thực tế đang có đúng 3 vai trò heading khác
+  nhau)/body/label/mono. Khảo sát bằng Explore agent trước khi thiết kế số liệu: xác nhận
+  `@fontsource-variable/space-grotesk` chỉ có trục weight 300-700 thật (đọc thẳng
+  `metadata.json` của package, `"weights": [300,400,500,600,700]`) — không có 800/900 để
+  dùng cho "black", nên toàn bộ token không vượt quá 700. Repo không có `tailwind.config.*`
+  nào (100% CSS-first Tailwind v4, `@theme inline` là cơ chế theming duy nhất).
+  **Cú pháp xác nhận qua đọc thẳng `node_modules/tailwindcss/theme.css`**: chỉ thấy
+  `--text-{name}` + `--text-{name}--line-height` trong theme mặc định của Tailwind, nhưng
+  build thử xong grep `dist/_astro/Layout.*.css` xác nhận Tailwind v4 THẬT SỰ hỗ trợ thêm 2
+  companion nữa (`--text-{name}--font-weight`, `--text-{name}--letter-spacing`) — verify bằng
+  build thật thay vì đoán, vì source `theme.css` chỉ liệt kê giá trị mặc định của Tailwind
+  (vốn không dùng 2 companion đó), không phải toàn bộ khả năng cú pháp của engine.
+  **Giá trị heading-1/2/3 cố tình khớp CHÍNH XÁC với cách site đang hiển thị hôm nay**
+  (heading-1 = `text-3xl` cỡ + line-height mặc định 1.2 của Tailwind; heading-2 = `text-xl`
+  cỡ + line-height mặc định 1.4; heading-3 = `text-base` + line-height 1.25 của
+  `leading-tight`, đúng bằng `CardTitle` hiện tại) — chỉ thêm letter-spacing âm nhẹ cho
+  heading-1 (`-0.01em`) là thay đổi thị giác duy nhất, cố ý rất nhỏ vì không có trình duyệt
+  thật để soi kỹ hơn. Nhờ vậy việc đổi 20 file `*Page.astro` + `card.tsx` sang dùng token mới
+  gần như không đổi giao diện, chỉ gộp về 1 nguồn định nghĩa duy nhất.
+  **Áp dụng token** (thay vì chỉ định nghĩa suông): 20 file `*Page.astro` (h1
+  `text-3xl font-bold text-foreground` → `text-heading-1 text-foreground`, h2 article/related
+  `text-xl font-semibold text-foreground` → `text-heading-2 text-foreground`, đổi bằng `sed`
+  cơ học vì chuỗi giống hệt nhau ở cả 20 file theo khảo sát, xác nhận đúng 20/20 h1 +
+  40/40 h2 sau khi đổi); `FaqSection.astro` (h2 vốn lệch cỡ — `text-lg font-semibold`, nhỏ
+  hơn h2 article/related — audit tự phát hiện đây là 1 inconsistency thật ở cùng 1 cấp độ
+  ngữ nghĩa, sửa về `text-heading-2` cho khớp); `card.tsx` `CardTitle` (`text-base
+  leading-tight font-semibold` → `text-heading-3`).
+  **Cố tình CHƯA áp dụng `--text-body`/`--text-label`/`--text-mono`/`--text-display`** — định
+  nghĩa đủ 4 role còn lại (đúng yêu cầu "theo từng vai trò... display/heading/body/label/
+  mono" của task) nhưng để trống, chưa gắn vào file nào:
+  (1) `--text-display` chưa có chỗ dùng — dành cho Hero trang chủ ở task 10 (chưa làm tới);
+  (2) `--text-body` không áp cho 80 thẻ `<p>` nội dung article (20 file × 4 đoạn) vì hiện tại
+  các thẻ này KHÔNG có class nào (dùng mặc định trình duyệt), giá trị mặc định đó đã trùng
+  khớp gần như hoàn toàn với giá trị `--text-body` chọn — áp thêm class vào 80 chỗ chỉ để
+  không đổi gì về mặt hiển thị là việc thừa;
+  (3) `--text-label` không retrofit vào phần label/hint-text rải rác trong 20 file
+  `.tsx` component (khảo sát cho thấy đang trộn lẫn `text-xs`/`text-sm` cho cùng 1 vai trò ở
+  nhiều file khác nhau theo nhiều kiểu khác nhau, không phải 1 chuỗi lặp lại y hệt như h1/h2 —
+  cần soát từng file, phạm vi lớn hơn hẳn 1 task, để lại cho 1 lượt dọn dẹp riêng);
+  (4) `--text-mono` chưa có chỗ dùng cụ thể nào được xác định qua khảo sát.
+  Do Tailwind v4 chỉ phát sinh CSS thật cho token nào có ít nhất 1 utility class dùng tới
+  (tree-shake theo nhu cầu), grep `dist/_astro/Layout.*.css` xác nhận `--text-heading-1/2/3`
+  đã lên CSS thật đầy đủ 4 thuộc tính, còn `--text-display/body/label/mono` CHƯA xuất hiện
+  trong CSS build (đúng như dự kiến — không phải lỗi, chỉ là "định nghĩa nhưng chưa dùng" nên
+  Tailwind chưa sinh gì, sẽ tự động có ngay khi 1 file nào đó dùng tới class tương ứng).
+  Build sạch (421 trang). **Giới hạn**: không có trình duyệt thật — người dùng nên tự xem lại
+  vài trang tool để xác nhận heading không bị lệch dòng/khoảng cách chữ bất thường sau khi
+  đổi sang token, dù về mặt số liệu đã cố tình khớp gần như tuyệt đối với trạng thái cũ.
 - **2026-08-01** — Phase 3.7 task 3: Progress % thật + "Đang xử lý N/M" cho mọi tool xử lý
   hàng loạt, thay trạng thái nhị phân pending/processing/done. Khảo sát hiện trạng bằng
   Explore agent trước khi code (10 file) để biết chỗ nào đã có % thật, chỗ nào chỉ giả định.
