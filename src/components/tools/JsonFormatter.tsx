@@ -337,6 +337,22 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 					setParseError(parseErr ? { line: parseErr.line, message: parseErr.message.replace(/<br>/g, ' ') } : null);
 					setValidationStatus(errors.length === 0 ? 'valid' : 'invalid');
 				},
+				// Without this, jsoneditor's default error handler is `window.alert(err)`
+				// (see its `_onError`) — a *synchronous, blocking* native dialog fired by
+				// the Format/Compact/Sort/Transform buttons (and Ctrl+I/Ctrl+Shift+I) the
+				// moment the current text isn't valid JSON. That reads as the whole tab
+				// freezing: no console error, nothing in the DOM to click, and it doesn't
+				// go away until the (invisible, off-page) dialog is dismissed — confirmed
+				// by reproducing it with Puppeteer, where a real mouse click on the
+				// "Format" button hung the page indefinitely while the same action via a
+				// synthetic Ctrl+I keydown did not (the alert-triggering code path is only
+				// reached through the toolbar button's onclick / the internal keydown
+				// handler that also calls `format()`, both of which land here). The parse
+				// error itself is already surfaced non-blockingly via `onValidationError`
+				// above, so this only needs to swallow it instead of alerting.
+				onError: (err) => {
+					console.error('JSON Formatter action failed:', err);
+				},
 			});
 			editor.set(SAMPLE_JSON);
 			editorRef.current = editor;

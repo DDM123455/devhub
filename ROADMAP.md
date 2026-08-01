@@ -299,6 +299,47 @@ ROADMAP)
 - [x] 10. Hero trang chủ chuyển sang task-oriented (ô thả file/tìm kiếm làm trung tâm) thay
       vì hero thuần chữ hiện tại (kicker+H1+tagline+2 pill, không CTA/bằng chứng sản phẩm)
 
+## Phase 3.8 — Audit Remediation vòng 3 (từ audit tương tác thật người dùng gửi, 2026-08-01)
+
+> Nguồn: báo cáo kiểm thử tương tác thật (browser Chromium) trên toàn bộ 20 công cụ + trang chủ
+> + SEO/security/accessibility, người dùng tự chạy và gửi trực tiếp. Giới hạn của báo cáo gốc
+> (không phải task agent tự làm được nếu thiếu công cụ): không có Lighthouse/DevTools Performance
+> thật (số liệu định tính), chỉ 1 engine Chromium (chưa test Safari/WebKit thật), không đo được
+> responsive trực quan ở từng breakpoint (chỉ suy luận qua DOM/CSS), chưa chạy thử conversion
+> thực tế Video Trimmer/MP3↔WAV (thiếu file mẫu), chưa soát reciprocal đầy đủ 20×20 cặp hreflang
+> ở quy mô lớn — các mục này KHÔNG lên checklist bên dưới, để lại cho người dùng tự kiểm tra thủ
+> công trước khi launch.
+
+### 3.8a — Bug thật Critical (phát hiện qua thao tác thật trên UI)
+- [ ] QR Code Generator: sửa báo sai "content too long" với nội dung hợp lệ/ngắn
+- [ ] JSON Formatter: sửa treo tab khi Format (Ctrl+I) trên JSON sai cú pháp
+- [x] Text Case Converter: sửa snake_case/camelCase phá dữ liệu tiếng Việt có dấu (Unicode)
+
+### 3.8b — Bug thật High
+- [ ] Compress Image: sửa hiển thị kết quả nén cũ khi đổi "By quality" → "By target size"
+- [ ] Regex Tester: panel Matches không tự cập nhật khi chỉ sửa Test String (phải bấm lại ô
+      Pattern mới refresh)
+- [ ] SVG Optimizer: nhãn % sai khi file "tối ưu" lại LỚN hơn bản gốc (vẫn ghi "0% smaller")
+- [ ] Disable nút submit khi input rỗng (Merge PDF và các nút tương tự) — hiện bấm không có
+      phản hồi gì
+- [ ] Trang chủ: chip "20 tools · 5 categories" không cập nhật số theo kết quả đang lọc
+
+### 3.8c — UX/Feature gap Medium
+- [ ] Convert Image Format: thêm before/after slider (nhất quán với Compress Image đã có)
+- [ ] Trang 404 tùy chỉnh (nav + search + logo) thay vì mặc định Astro
+- [ ] Thêm og:image/twitter:image mặc định + theo từng nhóm công cụ
+- [ ] SVG Optimizer: cảnh báo <script> còn sót lại sau tối ưu là rủi ro XSS nếu nhúng inline
+      (hành vi mặc định của svgo, không phải bug — chỉ cần cảnh báo)
+- [ ] Markdown Editor: sửa xung đột auto-continue list khi Enter với nội dung dán sẵn bắt đầu
+      bằng "-"
+- [ ] Cấu hình response security headers (CSP, X-Content-Type-Options, Referrer-Policy,
+      X-Frame-Options/frame-ancestors) cho Cloudflare qua file `public/_headers`
+- [ ] Rà soát lại aria-live cho trạng thái động (progress %, "Copied!") — Phase 3.5b từng làm,
+      xác nhận còn thiếu chỗ nào không
+- [ ] Remove Background / Video Trim / Audio Converter: tách label "đang tải model/engine lần
+      đầu" khác với "đang xử lý" để người dùng không tưởng bị treo
+- [ ] Thêm Undo tối thiểu (Ctrl+Z) cho thao tác nhiều bước (xoay/xoá trang PDF, Markdown editor)
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

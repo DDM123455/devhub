@@ -286,7 +286,13 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 			cornersDotOptions: { type: dotsType, ...dotsStyle },
 			backgroundOptions: { color: bgColor },
 			image: logoUrl ?? undefined,
-			imageOptions: logoUrl ? { imageSize: 0.2, hideBackgroundDots: true, margin: 2 } : undefined,
+			// qr-code-styling reads `imageOptions.hideBackgroundDots` unconditionally
+			// while laying out dots, even when there's no `image` — passing `undefined`
+			// here (when no logo is set) throws "Cannot read properties of undefined
+			// (reading 'hideBackgroundDots')" on every single render regardless of
+			// content length, which the effect below used to mislabel as "too long".
+			// Always supplying the object (it's inert without an `image`) avoids that.
+			imageOptions: { imageSize: 0.2, hideBackgroundDots: true, margin: 2 },
 		};
 	};
 
@@ -311,12 +317,23 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 					qrRef.current.update(options);
 				}
 				setErroredRenderKey(null);
-			} catch {
+			} catch (err) {
 				// qr-code-styling throws a plain string ("code length overflow...")
 				// when the payload doesn't fit the QR capacity at this error
 				// correction level — caught here instead of a React error boundary
-				// since rendering is now imperative (append/update), not JSX.
-				setErroredRenderKey(renderKey);
+				// since rendering is now imperative (append/update), not JSX. Any OTHER
+				// exception (a real bug, e.g. a bad option) must NOT be mislabeled as
+				// "too long" — that hid a real crash behind a misleading message before
+				// (see PROGRESS.md). Unexpected errors are logged and `qrRef` is reset so
+				// the next render attempts a fresh instance instead of calling `.update()`
+				// forever on one that may never have mounted correctly.
+				const isCapacityError = typeof err === 'string' && err.includes('code length overflow');
+				if (isCapacityError) {
+					setErroredRenderKey(renderKey);
+				} else {
+					console.error('QR code render failed unexpectedly:', err);
+					qrRef.current = null;
+				}
 			}
 		});
 		return () => {

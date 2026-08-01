@@ -29,9 +29,10 @@
   kiểm tra bằng mắt trước khi coi là chắc chắn ổn định.
 - **Phase 3.7 — UX/UI Audit Remediation: HOÀN TẤT 10/10 mục.** Toàn bộ 10 task trong bảng ưu
   tiên của audit UX/UI 2026-07-31 đã xong (task 1-10, xem log 2026-08-01 bên dưới cho từng
-  mục). Chưa có task tiếp theo nào được xác định — cần audit mới hoặc yêu cầu trực tiếp từ
-  người dùng để mở phase kế tiếp (ví dụ tiếp tục Phase 3.6b 2 mục còn treo — JSON Schema
-  validation UI, Regex flavor selector — hoặc Phase 3.5f PWA, hoặc Phase 4 kiếm tiền).
+  mục).
+- **Phase 3.8 — Audit Remediation vòng 3 (từ báo cáo QA tương tác thật người dùng gửi
+  2026-08-01)**: nhóm 3.8a (Critical) HOÀN TẤT 3/3. Còn 3.8b (High, 5 mục) và 3.8c (Medium,
+  9 mục) chưa làm — xem chi tiết từng mục trong `ROADMAP.md`.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -145,8 +146,91 @@
   Ngoài ra bấm nút phải dùng `elementHandle.click()` thật của Puppeteer (trusted mouse event
   qua CDP), không phải `btn.click()` gọi trong `page.evaluate()` (synthetic, không có user
   activation) — nếu không dù có stub clipboard cũng không chắc phản ánh đúng hành vi thật.
+- **Puppeteer đã cài sẵn tìm thấy tại `C:\Users\<user>\AppData\Local\npm-cache\_npx\
+  7d92d9a2d2ccc630\node_modules\puppeteer`** (từ 2026-08-01) — không có trong `node_modules`
+  của repo (`require.resolve('puppeteer')` từ thư mục dự án thất bại), phải require thẳng
+  bằng đường dẫn tuyệt đối này. Chrome headless đi kèm đã có sẵn tại
+  `AppData\Local\ms-playwright\chromium-*` hoặc do puppeteer tự quản lý — không cần cài lại
+  qua `npx puppeteer` (tốn thời gian tải Chromium nếu không cần thiết); nếu thư mục cache
+  trên đổi tên/mất, tìm lại bằng cách quét các thư mục con của `_npx` tìm
+  `node_modules/puppeteer/package.json`.
+- **Bẫy quan trọng khi test click bằng Puppeteer trên hành động có thể lỗi**: nếu code dưới
+  test rơi vào `window.alert()`/`confirm()`/`prompt()` (dialog gốc của trình duyệt) mà không
+  đăng ký `page.on('dialog', ...)` trước, `elementHandle.click()` của Puppeteer sẽ TREO VÔ
+  THỜI HẠN (đợi phản hồi CDP không bao giờ tới vì dialog chặn cả trang) — đây chính là cách
+  đã dùng để xác nhận bug JSON Formatter treo tab thật (xem log 2026-08-01): test bằng
+  `page.keyboard.press` (synthetic keydown) KHÔNG tái hiện được hang vì code path đó không
+  đụng `window.alert`, trong khi test bằng `elementHandle.click()` thật (trusted click qua
+  CDP) trên đúng nút UI thì tái hiện chính xác — một lần nữa xác nhận nguyên tắc đã ghi ở note
+  ngay phía trên: phải dùng click thật, không phải synthetic event, để phản ánh đúng hành vi.
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
+
+- **2026-08-01** — Phase 3.8a (**3/3 bug Critical đã sửa**), mở từ báo cáo QA tương tác thật
+  người dùng tự chạy và gửi trực tiếp (không phải audit do agent tự thực hiện). Cả 3 bug đều
+  được tái hiện thật bằng Puppeteer trên dev server (`localhost:4321`) trước khi sửa, và xác
+  nhận lại sau khi sửa — không suy đoán suông từ đọc code.
+  1. **QR Code Generator báo sai "content too long" với MỌI nội dung, kể cả rất ngắn**
+     (`QrCodeGenerator.tsx`). Root cause thật (bắt được qua `console.error` tạm thời trong
+     catch block): `TypeError: Cannot read properties of undefined (reading
+     'hideBackgroundDots')` — hoàn toàn không liên quan tới sức chứa QR.
+     `qr-code-styling@1.9.2` đọc `imageOptions.hideBackgroundDots` một cách vô điều kiện khi
+     xếp layout dot, kể cả khi không có `image` (logo) — code cũ truyền
+     `imageOptions: logoUrl ? {...} : undefined`, nên MỌI lần render không có logo (mặc định)
+     đều crash ngay từ constructor/`.append()`, và vì `qrRef.current` đã được gán trước khi
+     `.append()` chạy, mọi render sau đó rơi vào nhánh `.update()` trên 1 instance chưa từng
+     mount đúng → crash lặp lại vĩnh viễn, khớp triệu chứng "lỗi ngay từ khi tải trang, mọi
+     nội dung". Sửa: luôn truyền `imageOptions` là object đầy đủ (vô hại khi không có ảnh),
+     không còn `undefined`. Đồng thời bọc thêm 1 lớp phòng thủ ở `catch`: chỉ gắn nhãn
+     "tooLong" khi lỗi thật sự chứa `"code length overflow"` (chuỗi duy nhất
+     `qrcode`/`qr-code-styling` thật sự ném khi quá dung lượng — xác nhận trong
+     `node_modules/qr-code-styling/lib/*`); lỗi khác thì `console.error` + reset
+     `qrRef.current = null` để lần sau thử tạo mới thay vì tiếp tục vá 1 instance hỏng —
+     tránh lặp lại kiểu bug "gắn nhầm nhãn lỗi" này trong tương lai dù nguyên nhân gốc có
+     đổi khác. Verify bằng Puppeteer: `tooLongVisible` từ `true` → `false`, xác nhận có
+     `<canvas>` thật render ra sau khi nhập `https://a.com`.
+  2. **JSON Formatter "treo tab" khi bấm nút Format với JSON sai cú pháp** (`JsonFormatter.tsx`).
+     KHÔNG phải vòng lặp vô hạn/ReDoS như nghi ngờ ban đầu (đã loại trừ bằng cách test
+     `page.keyboard.press('KeyI')` với Ctrl giữ sẵn — phản hồi trong 6-18ms, không treo).
+     Root cause thật tìm thấy qua đọc `node_modules/jsoneditor/dist/jsoneditor.js`:
+     `JSONEditor.prototype._onError` mặc định gọi `window.alert(err.toString())` — một dialog
+     gốc trình duyệt, ĐỒNG BỘ, CHẶN TOÀN BỘ TRANG — khi không có option `onError` nào được
+     truyền vào constructor (code cũ thiếu hẳn option này). Nút "Format"/"Compact"/"Sort"/
+     "Transform" trên toolbar của jsoneditor đều gọi `_onError` khi thao tác thất bại; với
+     JSON không hợp lệ, `format()` luôn thất bại → luôn bật `alert()`. Chính @types/jsoneditor
+     cũng ghi chú thẳng: "`onError`... or clicking the Format button whilst the editor
+     doesn't contain valid JSON." Vì `window.alert()` không log console và dialog gốc không
+     nằm trong DOM trang, người dùng (và cả agent lái trình duyệt tự động không xử lý
+     `page.on('dialog')`) trải nghiệm y hệt "tab đơ, không phản hồi, không lỗi gì" — khớp
+     100% mô tả trong báo cáo. Xác nhận thực nghiệm: test bằng `elementHandle.click()` thật
+     (trusted click qua CDP) trên nút `.jsoneditor-format` treo Puppeteer vô thời hạn (phải
+     kill), trong khi test bằng phím Ctrl+I synthetic thì KHÔNG treo — vì đường dẫn code khác
+     nhau nhưng cùng đích `_onError`/`alert()`, chỉ là click thật qua CDP bị chặn chờ dialog
+     gốc trong khi synthetic keydown né được phần nào của luồng sự kiện trình duyệt thật (xem
+     note kỹ thuật Puppeteer mới thêm ở trên). Sửa: thêm option
+     `onError: (err) => console.error(...)` vào constructor `JSONEditorCtor` — thay `alert()`
+     bằng console log không chặn trang; lỗi vẫn hiển thị đầy đủ cho người dùng qua banner
+     `parseError` đã có sẵn (được cập nhật realtime bởi `onValidationError` ngay khi gõ, độc
+     lập với việc có bấm Format hay không). Verify bằng Puppeteer: click thật nút Format và
+     nút Repair trên JSON lỗi đều phản hồi trong ~16-17ms, không còn treo.
+  3. **Text Case Converter: snake_case/camelCase phá dữ liệu tiếng Việt có dấu**
+     (`TextCaseConverter.tsx`). Root cause: `splitWords()` dùng
+     `.split(/[^a-zA-Z0-9]+/)` và `titleCase()` dùng `/\w\S*/` — cả hai chỉ khớp ASCII, nên
+     MỌI ký tự có dấu (à, ậ, Đ, ê...) bị coi là dấu phân cách từ, xé nát chuỗi thành các mảnh
+     1 ký tự hoặc rỗng (khớp đúng bug report: `"Xin Chào..."` → `"xin_ch_o..."`). UPPERCASE/
+     lowercase/Title Case không dùng `\w`/regex tách từ nên không bị ảnh hưởng, khớp đúng
+     quan sát trong báo cáo QA. Sửa: đổi cả 2 hàm sang Unicode property escape `\p{L}`/`\p{N}`
+     (cờ `u`) thay vì `a-zA-Z0-9`/`\w` — nhận diện đúng chữ cái mọi ngôn ngữ, không chỉ ASCII.
+     Verify bằng cả Node thuần (hàm JS không đụng DOM) lẫn Puppeteer trên trình duyệt thật:
+     `"Xin Chào Các Bạn - Đây Là Tiêu Đề"` → snake_case
+     `xin_chào_các_bạn_đây_là_tiêu_đề`, camelCase `xinChàoCácBạnĐâyLàTiêuĐề` — giữ nguyên đủ
+     ký tự có dấu.
+
+  **Build**: `npm run build` sạch, 441 trang (không đổi so với lần build gần nhất trong log
+  2026-08-01 phía trên — không có regression số trang).
+  **Còn lại của Phase 3.8**: nhóm 3.8b (High, 5 mục) và 3.8c (Medium, 9 mục) trong
+  `ROADMAP.md` — chưa làm trong phiên này, để lại cho phiên sau hoặc theo yêu cầu tiếp theo
+  của người dùng.
 
 - **2026-08-01** — Phase 3.7 task 10 (**hoàn tất toàn bộ Phase 3.7, 10/10**): Hero trang chủ
   chuyển sang task-oriented (ô tìm kiếm làm trung tâm) thay cho hero thuần chữ cũ

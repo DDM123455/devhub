@@ -50,14 +50,18 @@ const TITLE_CASE_MINOR_WORDS = new Set([
 	'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'in', 'nor', 'of', 'on', 'or', 'so', 'the', 'to', 'up', 'yet',
 ]);
 
+// `\w` only covers ASCII, so a plain `/\w\S*/` (or `[a-zA-Z0-9]` split below)
+// silently treats every accented letter (Vietnamese, French, ...) as a word
+// separator — `\p{L}`/`\p{N}` (Unicode letter/number property escapes) match
+// any script instead, which is what's needed to keep those words intact.
 function titleCase(text: string): string {
-	const matchCount = (text.match(/\w\S*/g) ?? []).length;
+	const matchCount = (text.match(/[\p{L}\p{N}]\S*/gu) ?? []).length;
 	if (matchCount === 0) return text;
 	const lastWordIndex = matchCount - 1;
 	let wordIndex = -1;
-	return text.replace(/\w\S*/g, (word) => {
+	return text.replace(/[\p{L}\p{N}]\S*/gu, (word) => {
 		wordIndex++;
-		const bareWord = word.toLowerCase().replace(/[^a-z']/g, '');
+		const bareWord = word.toLowerCase().replace(/[^\p{L}']/gu, '');
 		const isMinorWord = TITLE_CASE_MINOR_WORDS.has(bareWord);
 		if (isMinorWord && wordIndex !== 0 && wordIndex !== lastWordIndex) {
 			return word.toLowerCase();
@@ -68,9 +72,9 @@ function titleCase(text: string): string {
 
 function splitWords(text: string): string[] {
 	const withSpaces = text
-		.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-		.replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
-	return withSpaces.split(/[^a-zA-Z0-9]+/).filter(Boolean);
+		.replace(/(\p{Ll}|\p{N})(\p{Lu})/gu, '$1 $2')
+		.replace(/(\p{Lu}+)(\p{Lu}\p{Ll})/gu, '$1 $2');
+	return withSpaces.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
 }
 
 function convertCase(text: string, mode: CaseMode): string {
