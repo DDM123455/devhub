@@ -27,9 +27,13 @@
   mục nhưng KHÔNG có Puppeteer/browser trong môi trường phiên làm việc đó để test tương tác
   thật — đặc biệt mục M4 (đổi hẳn engine render QR) cần người dùng tự mở trang QR Generator
   kiểm tra bằng mắt trước khi coi là chắc chắn ổn định.
-- **Phase 3.7 — UX/UI Audit Remediation**: 1/10 mục (task 1 xong). Task tiếp theo: #2 —
-  color token `--primary` riêng cho dark mode + shadow tokens. Xem chi tiết audit gốc + lý
-  do từng task trong log 2026-07-31 bên dưới và 10 dòng task trong `ROADMAP.md`.
+- **Phase 3.7 — UX/UI Audit Remediation**: 2/10 mục (task 1, 2 xong). Task tiếp theo: #3 —
+  Progress % thật + trạng thái hàng đợi cho tool xử lý hàng loạt. Xem chi tiết audit gốc + lý
+  do từng task trong log 2026-07-31 bên dưới và 10 dòng task trong `ROADMAP.md`. **Từ
+  2026-08-01, theo yêu cầu trực tiếp người dùng**: làm xong 1 task trong Phase 3.7 thì tự
+  động chuyển sang task tiếp theo luôn, không dừng lại hỏi xác nhận giữa các task (khác quy
+  trình mặc định ở `CLAUDE.md` mục 5) — chỉ dừng hỏi khi thật sự có quyết định cần người dùng
+  (ví dụ xung đột thiết kế không tự quyết được, như ở task 2 dưới đây).
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -146,6 +150,55 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-08-01** — Phase 3.7 task 2: color token `--primary` riêng cho dark mode +
+  `--shadow-sm/md/lg`, cả trong `src/styles/global.css`. **Phát hiện xung đột thật khi
+  code** (audit gốc không tính tới): `--primary` không chỉ dùng làm text/link/border màu
+  xanh — nó còn là NỀN nút bấm chính (`bg-primary` + `text-primary-foreground` trắng) ở
+  ~20 file (button.tsx variant mặc định, mọi nút hành động chính/toggle-pill của 20 tool,
+  dropzone active state, focus ring, badge info). Nếu chỉ đổi `--primary` sang `#10B981`
+  như audit đề xuất mà giữ nguyên `--primary-foreground: #FFFFFF`, chữ trắng trên nền
+  `#10B981` chỉ đạt 2.54:1 (fail nặng hơn hiện trạng 3.55:1). Đã tính contrast thật bằng
+  script Node độc lập (công thức WCAG relative-luminance chuẩn) cho nhiều tổ hợp trước khi
+  quyết định, hỏi người dùng qua AskUserQuestion 3 phương án xử lý xung đột — chọn phương án
+  khuyến nghị: đổi luôn CẢ `--primary-foreground` dark thành `#0B0D10` (trùng
+  `--background` dark). Kết quả: `--primary: #10B981` / `--primary-foreground: #0B0D10` chỉ
+  trong `.dark` (giữ nguyên `:root` — light mode đã đạt chuẩn, không đổi). 1 cặp token này
+  sửa được TẤT CẢ các nhóm dùng cùng lúc: text/link/border/ring (`text-primary` trong mọi
+  `*Page.astro` phần "related tools", `card.tsx` hover border, badge info
+  `JsonFormatter.tsx`/`JwtDecoder.tsx`, link trong nội dung Markdown preview) đi từ
+  3.28–3.55:1 (fail AA) lên 6.75–7.67:1 tùy nền (background/card/popover); nút bấm nền
+  primary đi từ 5.48:1 (trắng trên `#047857`, vốn đã đạt) lên 7.67:1 (chữ tối trên
+  `#10B981`, vẫn đạt, chỉ đổi diện mạo — nút chính dark mode giờ chữ tối trên nền xanh sáng
+  thay vì chữ trắng trên nền xanh đậm, đã được người dùng xác nhận chấp nhận đổi diện mạo
+  này). Các chỗ dùng `bg-primary/NN` (opacity, không kèm `primary-foreground`) như vùng tô
+  trim video, highlight regex, dropzone active bg chỉ đổi sắc độ (xanh sáng/bão hòa hơn),
+  không ảnh hưởng contrast. Đồng thời đổi luôn `--sidebar-primary`/
+  `--sidebar-primary-foreground` dark theo cùng cặp giá trị — xác nhận qua grep 2 token này
+  KHÔNG được component nào dùng hiện tại (chỉ tồn tại sẵn theo convention shadcn), nên đổi
+  không có rủi ro hiển thị, chỉ để tránh lặp lại đúng bug contrast này nếu sau này có chỗ
+  dùng tới. Không đổi `--ring`/`--sidebar-ring` (`#047857`, dùng cho focus-visible ring) —
+  ngoài phạm vi audit, không phải chỗ bị đo fail.
+  **Shadow tokens**: thêm `--shadow-sm/md/lg` (giá trị `box-shadow` thật, không phải màu)
+  trong cả `:root` và `.dark`, đăng ký thêm vào `@theme inline` theo đúng convention file đã
+  dùng cho mọi token màu (`--shadow-md: var(--shadow-md);`) — xác nhận qua đọc
+  `node_modules/shadcn/dist/tailwind.css` và `tw-animate-css` KHÔNG định nghĩa sẵn thang
+  `--shadow-*` nào (site trước giờ dùng thẳng thang mặc định của Tailwind v4 qua class
+  `shadow-md`/`shadow-lg` trong `dialog.tsx`/`tooltip.tsx`), nên không có xung đột khi định
+  nghĩa mới. Giá trị `:root` giữ đúng độ mờ 10% đen như thang mặc định Tailwind (không đổi
+  diện mạo light mode Dialog/Tooltip hiện có); `.dark` tăng độ mờ lên 30–45% vì shadow đen
+  mờ 10% gần như vô hình trên nền gần đen (`#0B0D10`) — elevation cần tăng alpha bù lại thay
+  vì tăng kích thước blur. `dialog.tsx` (`shadow-lg`) và `tooltip.tsx` (`shadow-md`) tự động
+  nhận giá trị mới, không cần sửa file nào khác. Không thêm shadow cho `card.tsx` (hiện chưa
+  có) — ngoài phạm vi câu chữ task 2, không phải yêu cầu của mục này.
+  Build sạch (421 trang). Xác nhận trực tiếp trong CSS đã build (`dist/_astro/Layout.*.css`):
+  `--primary:#047857` (light) / `--primary:#10b981` (dark), `--primary-foreground:#fff`
+  (light) / `#0b0d10` (dark), `--sidebar-primary` khớp cặp dark mới, và cả 3
+  `--shadow-sm/md/lg` xuất hiện 2 lần với alpha khác nhau (`#0000001a` ~10% light,
+  `#0000004d`/`#00000059`/`#00000073` ~30/35/45% dark) đúng như định nghĩa — xác nhận
+  `@theme inline` đã thật sự map đúng, không bị Tailwind bỏ qua âm thầm. **Giới hạn**: không
+  có trình duyệt thật trong môi trường phiên này — người dùng nên tự bật dark mode kiểm tra
+  bằng mắt nút bấm chính, link, Dialog/Tooltip trước khi coi mục này chắc chắn ổn định về
+  mặt thẩm mỹ (contrast đã verify bằng số, thẩm mỹ thì chưa).
 - **2026-07-31** — Phase 3.7 task 1: xây `Card` (`src/components/ui/card.tsx`),
   `Dialog` (`dialog.tsx`), `Tooltip` (`tooltip.tsx`) dùng chung — component thứ 2/3/4 trong
   `src/components/ui/` sau `button.tsx` (trước đây là component DUY NHẤT tồn tại ở đó).

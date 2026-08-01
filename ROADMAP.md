@@ -273,7 +273,7 @@ ROADMAP)
 - [x] 1. Xây `Card`, `Dialog`, `Tooltip` dùng chung trong `src/components/ui/` (dựng trên
       `@base-ui/react`, cùng pattern `cva` với `button.tsx` hiện có — không thêm thư viện
       UI kit mới)
-- [ ] 2. Color tokens: thêm `--primary` riêng cho `.dark` trong `global.css` (đề xuất
+- [x] 2. Color tokens: thêm `--primary` riêng cho `.dark` trong `global.css` (đề xuất
       `#10B981`, đo contrast ~7.67:1 trên nền tối, so với `#047857` dùng chung 2 theme hiện
       tại chỉ đạt 3.28–3.55:1 — fail WCAG AA chữ thường) + định nghĩa token
       `--shadow-sm/md/lg` (hiện chưa có token shadow nào)
