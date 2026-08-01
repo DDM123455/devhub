@@ -4,6 +4,8 @@ import JSZip from 'jszip';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { BeforeAfterSlider } from '@/components/ui/before-after-slider';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ImageOff } from 'lucide-react';
 
 interface Messages {
 	selectFiles: string;
@@ -428,7 +430,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 			)}
 
 			{items.length === 0 ? (
-				<p className="text-sm text-muted-foreground">{messages.noFiles}</p>
+				<EmptyState icon={ImageOff} heading={messages.noFiles} />
 			) : (
 				<ul className="flex flex-col gap-3">
 					{items.map((item) => (

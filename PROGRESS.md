@@ -27,13 +27,12 @@
   mục nhưng KHÔNG có Puppeteer/browser trong môi trường phiên làm việc đó để test tương tác
   thật — đặc biệt mục M4 (đổi hẳn engine render QR) cần người dùng tự mở trang QR Generator
   kiểm tra bằng mắt trước khi coi là chắc chắn ổn định.
-- **Phase 3.7 — UX/UI Audit Remediation**: 8/10 mục (task 1-8 xong). Task tiếp theo: #9 —
-  empty state đầy đủ (icon + giải thích + hành động tiếp theo). Xem chi tiết audit gốc + lý
-  do từng task trong log 2026-07-31 bên dưới và 10 dòng task trong `ROADMAP.md`. **Từ
-  2026-08-01, theo yêu cầu trực tiếp người dùng**: làm xong 1 task trong Phase 3.7 thì tự
-  động chuyển sang task tiếp theo luôn, không dừng lại hỏi xác nhận giữa các task (khác quy
-  trình mặc định ở `CLAUDE.md` mục 5) — chỉ dừng hỏi khi thật sự có quyết định cần người dùng
-  (ví dụ xung đột thiết kế không tự quyết được, như ở task 2).
+- **Phase 3.7 — UX/UI Audit Remediation**: 9/10 mục (task 1-9 xong). Task tiếp theo: #10 —
+  Hero trang chủ chuyển sang task-oriented. Đây là task CUỐI CÙNG của Phase 3.7 — sau khi
+  xong, toàn bộ Phase 3.7 hoàn tất 10/10. Xem chi tiết audit gốc + lý do từng task trong log
+  2026-07-31 bên dưới và 10 dòng task trong `ROADMAP.md`. **Từ 2026-08-01, theo yêu cầu trực
+  tiếp người dùng**: làm xong 1 task trong Phase 3.7 thì tự động chuyển sang task tiếp theo
+  luôn, không dừng lại hỏi xác nhận giữa các task.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -150,6 +149,30 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-08-01** — Phase 3.7 task 9: empty state đầy đủ (icon + câu giải thích + hành động
+  tiếp theo) thay cho danh sách rỗng không nội dung.
+  **Component dùng chung mới** `src/components/ui/empty-state.tsx` (component thứ 8 trong
+  `src/components/ui/`) — icon (dùng `lucide-react`, đã có sẵn trong `package.json` từ nút
+  đóng Dialog ở task 1, không thêm dependency mới) + heading + description tùy chọn + slot
+  `action` tùy chọn cho nút/link hành động tiếp theo, khung viền nét đứt phân biệt rõ với
+  card/border thường của site.
+  **Áp dụng cho 2 chỗ đại diện** (không dàn trải hết mọi trạng thái rỗng trong 20 tool ngay —
+  cùng cách tiếp cận "làm mẫu ở 1-2 nơi tiêu biểu trước" đã dùng ở task 3/6/7): (1) trang chủ
+  — trạng thái "không kết quả tìm kiếm" (`tool-search-empty`), icon `SearchX`, thêm hẳn 1 câu
+  giải thích/gợi ý mới (`search.noResultsHint`, chưa từng có trước đây, chỉ có 1 dòng "No
+  tools match" cụt lủn) — giữ nguyên hành vi hiện có (từ khóa tìm kiếm vẫn hiện lại y hệt
+  qua `#tool-search-empty-query`, chỉ đổi vị trí/kiểu hiển thị, script JS toggle
+  `classList.hidden` không đổi vì vẫn nhắm đúng ID cũ). (2) Image Compressor — trạng thái
+  "chưa chọn ảnh nào", icon `ImageOff`; KHÔNG thêm nút hành động riêng vì nút "Select images"
+  đã hiện sẵn ngay phía trên trong khung kéo-thả — thêm 1 CTA trùng lặp ngay bên dưới sẽ dư
+  thừa, không phải thiếu sót.
+  Build sạch (441 trang, không đổi số trang). Xác nhận `data-slot="empty-state"` xuất hiện
+  trong HTML tĩnh trang chủ, câu hint mới `search.noResultsHint` hiện đúng chữ, và
+  `dist/_astro/ImageCompressor.*.js` có chứa chuỗi `empty-state` (component đã được import và
+  bundle đúng). **Giới hạn**: chưa áp dụng cho phần còn lại (trạng thái rỗng của 19 tool
+  khác, lỗi upload riêng biệt, lịch sử pattern rỗng của Regex Tester...) — để lại cho lượt
+  dọn dẹp sau nếu cần, component dùng chung đã sẵn sàng để tái sử dụng ngay không cần viết
+  thêm gì. Không có trình duyệt thật để xem trực quan layout icon/text căn giữa.
 - **2026-08-01** — Phase 3.7 task 8: footer 3 cột (Công cụ theo nhóm / Pháp lý / Ngôn ngữ) +
   trang Privacy Policy — trước đây footer chỉ có 1 dòng copyright, không có link pháp lý nào
   dù sản phẩm định vị "privacy-first".

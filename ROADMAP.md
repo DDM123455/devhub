@@ -293,7 +293,7 @@ ROADMAP)
 - [x] 8. Footer 3 cột tối giản (Công cụ theo nhóm / Pháp lý / Ngôn ngữ) + thêm trang/link
       Privacy Policy (hiện footer chỉ có 1 dòng copyright, không có link pháp lý nào dù sản
       phẩm định vị privacy-first)
-- [ ] 9. Empty state thiết kế đầy đủ (không file / không kết quả tìm kiếm / không lịch sử /
+- [x] 9. Empty state thiết kế đầy đủ (không file / không kết quả tìm kiếm / không lịch sử /
       lỗi upload) — có icon + câu giải thích + hành động tiếp theo, thay vì danh sách rỗng
       không nội dung
 - [ ] 10. Hero trang chủ chuyển sang task-oriented (ô thả file/tìm kiếm làm trung tâm) thay

@@ -15,7 +15,8 @@
   },
   "search": {
     "placeholder": "Search tools…",
-    "noResults": "No tools match"
+    "noResults": "No tools match",
+    "noResultsHint": "Try a different keyword, or browse tools by category below."
   },
   "sidebar": {
     "note": "New tools are added regularly. Nothing you touch here ever reaches a server."

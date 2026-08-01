@@ -4,6 +4,8 @@ import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { categories } from '@/data/categories';
 import { tools } from '@/data/tools';
+import { EmptyState } from '@/components/ui/empty-state';
+import { SearchX } from 'lucide-react';
 
 export function getStaticPaths() {
 	return locales.map((locale) => ({ params: { locale } }));
@@ -35,9 +37,11 @@ const categoryCount = categories.length;
 		</div>
 	</section>
 
-	<p id="tool-search-empty" class="hidden px-4 py-8 text-sm text-muted-foreground sm:px-8">
-		{t('search.noResults')} <span id="tool-search-empty-query" class="font-medium text-foreground"></span>
-	</p>
+	<div id="tool-search-empty" class="hidden px-4 pb-8 sm:px-8">
+		<EmptyState icon={SearchX} heading={t('search.noResults')} description={t('search.noResultsHint')}>
+			<span id="tool-search-empty-query" class="text-sm font-medium text-foreground"></span>
+		</EmptyState>
+	</div>
 
 	<section class="grid grid-cols-1 gap-5 px-4 pb-16 sm:px-8 lg:grid-cols-2">
 		{

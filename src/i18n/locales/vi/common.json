@@ -15,7 +15,8 @@
   },
   "search": {
     "placeholder": "Tìm công cụ…",
-    "noResults": "Không tìm thấy công cụ nào khớp với"
+    "noResults": "Không tìm thấy công cụ nào khớp với",
+    "noResultsHint": "Thử từ khóa khác, hoặc duyệt công cụ theo nhóm bên dưới."
   },
   "sidebar": {
     "note": "Công cụ mới được bổ sung thường xuyên. Không gì bạn dùng ở đây từng chạm tới máy chủ."
