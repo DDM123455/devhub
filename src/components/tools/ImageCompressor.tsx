@@ -3,6 +3,7 @@ import imageCompression from 'browser-image-compression';
 import JSZip from 'jszip';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { BeforeAfterSlider } from '@/components/ui/before-after-slider';
 
 interface Messages {
 	selectFiles: string;
@@ -48,6 +49,9 @@ interface ImageItem {
 	compressedBlob?: Blob;
 	compressedPreviewUrl?: string;
 	compressedSize?: number;
+	// Drag position (0-100) of the before/after compare slider — only set once
+	// a compressed result exists to compare against.
+	comparePosition?: number;
 	errorMessage?: string;
 }
 
@@ -180,6 +184,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 									compressedBlob,
 									compressedPreviewUrl: trackUrl(URL.createObjectURL(compressedBlob)),
 									compressedSize: compressedBlob.size,
+									comparePosition: 50,
 								}
 							: it,
 					),
@@ -440,25 +445,27 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 							}`}
 						>
 							<div className="flex flex-wrap items-center gap-3">
-								<div className="flex items-center gap-1.5">
+								{item.status === 'done' && item.compressedPreviewUrl ? (
+									<BeforeAfterSlider
+										beforeSrc={item.previewUrl}
+										beforeAlt={`${item.file.name} — ${messages.original}`}
+										afterSrc={item.compressedPreviewUrl}
+										afterAlt={`${item.file.name} — ${messages.compressed}`}
+										value={item.comparePosition ?? 50}
+										onValueChange={(comparePosition) =>
+											setItems((prev) =>
+												prev.map((it) => (it.id === item.id ? { ...it, comparePosition } : it)),
+											)
+										}
+										label={`${messages.original} / ${messages.compressed}`}
+									/>
+								) : (
 									<img
 										src={item.previewUrl}
 										alt={`${item.file.name} — ${messages.original}`}
 										className="size-16 rounded-md border border-border object-cover"
 									/>
-									{item.status === 'done' && item.compressedPreviewUrl && (
-										<>
-											<span aria-hidden="true" className="text-muted-foreground">
-												→
-											</span>
-											<img
-												src={item.compressedPreviewUrl}
-												alt={`${item.file.name} — ${messages.compressed}`}
-												className="size-16 rounded-md border border-border object-cover"
-											/>
-										</>
-									)}
-								</div>
+								)}
 								<div className="flex min-w-0 flex-1 flex-col gap-0.5">
 									<span className="truncate text-foreground">{item.file.name}</span>
 									<span className="text-muted-foreground">

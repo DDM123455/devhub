@@ -27,13 +27,13 @@
   mục nhưng KHÔNG có Puppeteer/browser trong môi trường phiên làm việc đó để test tương tác
   thật — đặc biệt mục M4 (đổi hẳn engine render QR) cần người dùng tự mở trang QR Generator
   kiểm tra bằng mắt trước khi coi là chắc chắn ổn định.
-- **Phase 3.7 — UX/UI Audit Remediation**: 6/10 mục (task 1-6 xong). Task tiếp theo: #7 —
-  before/after slider so sánh cho Result Page, bắt đầu từ Image Compressor. Xem chi tiết
-  audit gốc + lý do từng task trong log 2026-07-31 bên dưới và 10 dòng task trong
-  `ROADMAP.md`. **Từ 2026-08-01, theo yêu cầu trực tiếp người dùng**: làm xong 1 task trong
-  Phase 3.7 thì tự động chuyển sang task tiếp theo luôn, không dừng lại hỏi xác nhận giữa các
-  task (khác quy trình mặc định ở `CLAUDE.md` mục 5) — chỉ dừng hỏi khi thật sự có quyết định
-  cần người dùng (ví dụ xung đột thiết kế không tự quyết được, như ở task 2).
+- **Phase 3.7 — UX/UI Audit Remediation**: 7/10 mục (task 1-7 xong). Task tiếp theo: #8 —
+  footer 3 cột (Công cụ theo nhóm/Pháp lý/Ngôn ngữ) + trang Privacy Policy. Xem chi tiết audit
+  gốc + lý do từng task trong log 2026-07-31 bên dưới và 10 dòng task trong `ROADMAP.md`.
+  **Từ 2026-08-01, theo yêu cầu trực tiếp người dùng**: làm xong 1 task trong Phase 3.7 thì
+  tự động chuyển sang task tiếp theo luôn, không dừng lại hỏi xác nhận giữa các task (khác
+  quy trình mặc định ở `CLAUDE.md` mục 5) — chỉ dừng hỏi khi thật sự có quyết định cần người
+  dùng (ví dụ xung đột thiết kế không tự quyết được, như ở task 2).
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -150,6 +150,33 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-08-01** — Phase 3.7 task 7: before/after so sánh dạng slider kéo được cho Result
+  Page, bắt đầu từ Image Compressor. Phát hiện Background Remover ĐÃ có đúng loại slider này
+  từ Phase 1.5 ("Preview dạng slider kéo qua lại trước/sau khi xóa nền") — thay vì viết lại
+  từ đầu cho Image Compressor rồi để 2 bản trôi dạt khỏi nhau (đúng vấn đề cốt lõi audit gốc
+  đã nêu ở task 1), tách phần đó ra component dùng chung mới
+  `src/components/ui/before-after-slider.tsx` (component thứ 6 trong `src/components/ui/`).
+  Kỹ thuật giữ nguyên y hệt bản gốc của Background Remover (không phải viết lại) — 1
+  `<input type="range">` phủ trong suốt (`opacity-0`) đè lên toàn bộ ảnh, kéo nó điều khiển
+  luôn `clipPath: inset(0 0 0 X%)` của lớp ảnh "sau" nằm trên lớp ảnh "trước": tận dụng hoàn
+  toàn hành vi kéo-thả/bàn phím có sẵn của range input (mũi tên trái/phải, Home/End, kéo
+  chuột/chạm) thay vì tự viết `pointerdown`/`pointermove` — không cần dependency mới, không
+  cần state phức tạp, tự động accessible qua `aria-label`. Prop `checkerboard` (tùy chọn) bật
+  nền ca-rô sau lớp ảnh "sau" — chỉ cần cho Background Remover (ảnh có vùng trong suốt thật),
+  tắt cho Image Compressor (ảnh nén luôn là ảnh đặc, không có ý nghĩa hiển thị ca-rô).
+  **Background Remover**: refactor phần JSX slider hiện có sang gọi component mới — verify
+  bằng cách so khớp từng dòng CSS/style với bản cũ trước khi xoá, đảm bảo output giống hệt
+  100% (không đổi hành vi, chỉ đổi chỗ đặt code).
+  **Image Compressor**: thêm `comparePosition?: number` vào `ImageItem`, khởi tạo `50` ngay
+  lúc nén xong (`status: 'done'`). Thay cặp thumbnail tĩnh "gốc → đã nén" (`size-16`, mũi tên
+  `→` ở giữa) bằng `<BeforeAfterSlider>` (chỉ khi đã có `compressedPreviewUrl`; lúc pending/
+  processing/error vẫn hiện đúng 1 ảnh gốc tĩnh như cũ, vì chưa có ảnh "sau" để so sánh).
+  Build sạch (421 trang). Xác nhận qua grep bundle: Vite/Rolldown tách `before-after-
+  slider.tsx` thành 1 chunk JS DÙNG CHUNG riêng (`before-after-slider.{hash}.js`), cả
+  `ImageCompressor.*.js` lẫn `BackgroundRemover.*.js` cùng import đúng chunk đó — xác nhận
+  đây là code chia sẻ thật (bundler-level), không phải 2 bản copy-paste trông giống nhau.
+  **Giới hạn**: không có trình duyệt thật — người dùng nên tự nén 1 ảnh và kéo slider so
+  sánh, xác nhận thao tác chuột/chạm/bàn phím trên input range đều mượt và đúng vị trí.
 - **2026-08-01** — Phase 3.7 task 6: micro-interaction có chủ đích (upload/success/error/
   delete/expand-collapse) kèm `prefers-reduced-motion` ngay từ đầu.
   **Rule an toàn toàn site thay vì gắn `motion-reduce:` lẻ tẻ từng class**: thêm 1 khối

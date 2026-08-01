@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { removeBackground } from '@imgly/background-removal';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { BeforeAfterSlider } from '@/components/ui/before-after-slider';
 
 interface Messages {
 	selectFiles: string;
@@ -530,46 +531,31 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 				<ul className="flex flex-col gap-4">
 					{items.map((item) => (
 						<li key={item.id} className="flex flex-wrap items-center gap-4 rounded-md border border-border p-3 text-sm">
-							<div className="relative aspect-square w-40 shrink-0 select-none overflow-hidden rounded-md border border-border">
-								<img
-									src={item.previewUrl}
-									alt={`${messages.original}: ${item.file.name}`}
-									className="absolute inset-0 h-full w-full object-cover"
+							{item.displayUrl ? (
+								<BeforeAfterSlider
+									className="w-40"
+									beforeSrc={item.previewUrl}
+									beforeAlt={`${messages.original}: ${item.file.name}`}
+									afterSrc={item.displayUrl}
+									afterAlt={`${messages.result}: ${item.file.name}`}
+									value={item.comparePosition}
+									onValueChange={(comparePosition) =>
+										setItems((prev) =>
+											prev.map((it) => (it.id === item.id ? { ...it, comparePosition } : it)),
+										)
+									}
+									label={`${messages.original} / ${messages.result}`}
+									checkerboard
 								/>
-								{item.displayUrl && (
-									<>
-										<div
-											className="absolute inset-0 overflow-hidden bg-[repeating-conic-gradient(#d4d4d4_0%_25%,#fff_0%_50%)] bg-[length:14px_14px]"
-											style={{ clipPath: `inset(0 0 0 ${item.comparePosition}%)` }}
-										>
-											<img
-												src={item.displayUrl}
-												alt={`${messages.result}: ${item.file.name}`}
-												className="absolute inset-0 h-full w-full object-cover"
-											/>
-										</div>
-										<div
-											aria-hidden="true"
-											className="pointer-events-none absolute inset-y-0 w-0.5 bg-white shadow"
-											style={{ left: `${item.comparePosition}%` }}
-										/>
-										<input
-											type="range"
-											min={0}
-											max={100}
-											value={item.comparePosition}
-											onChange={(event) => {
-												const comparePosition = Number(event.target.value);
-												setItems((prev) =>
-													prev.map((it) => (it.id === item.id ? { ...it, comparePosition } : it)),
-												);
-											}}
-											className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0"
-											aria-label={`${messages.original} / ${messages.result}`}
-										/>
-									</>
-								)}
-							</div>
+							) : (
+								<div className="relative aspect-square w-40 shrink-0 select-none overflow-hidden rounded-md border border-border">
+									<img
+										src={item.previewUrl}
+										alt={`${messages.original}: ${item.file.name}`}
+										className="absolute inset-0 h-full w-full object-cover"
+									/>
+								</div>
+							)}
 							<div className="flex min-w-0 flex-1 flex-col gap-1">
 								<span className="truncate text-foreground">{item.file.name}</span>
 								{item.status === 'processing' && (

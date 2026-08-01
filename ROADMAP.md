@@ -288,7 +288,7 @@ ROADMAP)
       `ImageCompressor.tsx`/`PdfMerger.tsx` (hiện 0 breakpoint, chỉ dựa `flex-wrap`)
 - [x] 6. Micro-interaction có chủ đích (upload/success/error/delete/expand-collapse) kèm
       `@media (prefers-reduced-motion: reduce)` ngay từ đầu, không thêm sau
-- [ ] 7. Before/after so sánh dạng slider kéo được cho Result Page (thay 2 thumbnail tĩnh
+- [x] 7. Before/after so sánh dạng slider kéo được cho Result Page (thay 2 thumbnail tĩnh
       hiện tại), bắt đầu từ Image Compressor
 - [ ] 8. Footer 3 cột tối giản (Công cụ theo nhóm / Pháp lý / Ngôn ngữ) + thêm trang/link
       Privacy Policy (hiện footer chỉ có 1 dòng copyright, không có link pháp lý nào dù sản
