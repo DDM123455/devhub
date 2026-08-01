@@ -41,6 +41,10 @@ interface ImageItem {
 	// Real 0-100 value from browser-image-compression's onProgress callback —
 	// only meaningful while status === 'processing'.
 	progress?: number;
+	// Set right before actually splicing the item out of `items`, so its exit
+	// animation (see REMOVE_ANIMATION_MS) has a state to key off — removing it
+	// from the array immediately would unmount the <li> with no chance to animate.
+	removing?: boolean;
 	compressedBlob?: Blob;
 	compressedPreviewUrl?: string;
 	compressedSize?: number;
@@ -51,6 +55,10 @@ interface ImageItem {
 // running all of them at once for a large batch would spawn dozens of workers
 // simultaneously and spike memory, so only this many run concurrently.
 const CONCURRENCY = 3;
+// Must match the `duration-150` used on the exit-animation class below —
+// the item is only spliced out of state once its fade/shrink-out has had
+// time to actually play.
+const REMOVE_ANIMATION_MS = 150;
 const MIN_MAX_DIMENSION = 320;
 const MAX_MAX_DIMENSION = 4096;
 const DEFAULT_MAX_DIMENSION = 1920;
@@ -117,7 +125,10 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 	}, []);
 
 	const handleRemove = useCallback((id: string) => {
-		setItems((prev) => prev.filter((item) => item.id !== id));
+		setItems((prev) => prev.map((item) => (item.id === id ? { ...item, removing: true } : item)));
+		setTimeout(() => {
+			setItems((prev) => prev.filter((item) => item.id !== id));
+		}, REMOVE_ANIMATION_MS);
 	}, []);
 
 	const handleClearAll = useCallback(() => {
@@ -416,7 +427,18 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 			) : (
 				<ul className="flex flex-col gap-3">
 					{items.map((item) => (
-						<li key={item.id} className="flex flex-col gap-2 rounded-md border border-border p-3 text-sm">
+						<li
+							key={item.id}
+							className={`flex flex-col gap-2 rounded-md border p-3 text-sm transition-[color,background-color,border-color,opacity,transform] duration-300 animate-in fade-in slide-in-from-top-1 ${
+								item.removing
+									? 'animate-out fade-out zoom-out-95 duration-150'
+									: item.status === 'done'
+										? 'border-emerald-500/40'
+										: item.status === 'error'
+											? 'border-destructive/40'
+											: 'border-border'
+							}`}
+						>
 							<div className="flex flex-wrap items-center gap-3">
 								<div className="flex items-center gap-1.5">
 									<img
@@ -472,7 +494,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 									size="sm"
 									variant="ghost"
 									onClick={() => handleRemove(item.id)}
-									disabled={item.status === 'processing'}
+									disabled={item.status === 'processing' || item.removing}
 									aria-label={messages.remove}
 								>
 									✕

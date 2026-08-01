@@ -286,7 +286,7 @@ ROADMAP)
       nếu chưa cần thiết")
 - [x] 5. Touch target nút bấm ≥44px dưới `sm:` + bổ sung breakpoint responsive còn thiếu ở
       `ImageCompressor.tsx`/`PdfMerger.tsx` (hiện 0 breakpoint, chỉ dựa `flex-wrap`)
-- [ ] 6. Micro-interaction có chủ đích (upload/success/error/delete/expand-collapse) kèm
+- [x] 6. Micro-interaction có chủ đích (upload/success/error/delete/expand-collapse) kèm
       `@media (prefers-reduced-motion: reduce)` ngay từ đầu, không thêm sau
 - [ ] 7. Before/after so sánh dạng slider kéo được cho Result Page (thay 2 thumbnail tĩnh
       hiện tại), bắt đầu từ Image Compressor

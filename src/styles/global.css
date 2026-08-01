@@ -193,4 +193,19 @@
   textarea:focus-visible {
     @apply border-ring outline-none ring-3 ring-ring/50;
     }
+  /* Blanket reduced-motion guard, applied once here instead of a `motion-reduce:`
+     variant on every individual `transition-*`/`animate-*` class site-wide (Dialog/
+     Tooltip's open/close transitions, Button's active-state translate, the
+     upload/success/delete micro-interactions in tool components...). Near-zero
+     duration rather than `animation: none`/`transition: none` so code that waits
+     on a `transitionend`/`animationend` event (e.g. Dialog's exit-animation state)
+     still gets one, just effectively instantly, instead of hanging forever. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }

@@ -27,14 +27,13 @@
   mục nhưng KHÔNG có Puppeteer/browser trong môi trường phiên làm việc đó để test tương tác
   thật — đặc biệt mục M4 (đổi hẳn engine render QR) cần người dùng tự mở trang QR Generator
   kiểm tra bằng mắt trước khi coi là chắc chắn ổn định.
-- **Phase 3.7 — UX/UI Audit Remediation**: 5/10 mục (task 1-5 xong). Task tiếp theo: #6 —
-  micro-interaction có chủ đích (upload/success/error/delete/expand-collapse) kèm
-  `prefers-reduced-motion`. Xem chi tiết audit gốc + lý do từng task trong log 2026-07-31 bên
-  dưới và 10 dòng task trong `ROADMAP.md`. **Từ 2026-08-01, theo yêu cầu trực tiếp người
-  dùng**: làm xong 1 task trong Phase 3.7 thì tự động chuyển sang task tiếp theo luôn, không
-  dừng lại hỏi xác nhận giữa các task (khác quy trình mặc định ở `CLAUDE.md` mục 5) — chỉ
-  dừng hỏi khi thật sự có quyết định cần người dùng (ví dụ xung đột thiết kế không tự quyết
-  được, như ở task 2).
+- **Phase 3.7 — UX/UI Audit Remediation**: 6/10 mục (task 1-6 xong). Task tiếp theo: #7 —
+  before/after slider so sánh cho Result Page, bắt đầu từ Image Compressor. Xem chi tiết
+  audit gốc + lý do từng task trong log 2026-07-31 bên dưới và 10 dòng task trong
+  `ROADMAP.md`. **Từ 2026-08-01, theo yêu cầu trực tiếp người dùng**: làm xong 1 task trong
+  Phase 3.7 thì tự động chuyển sang task tiếp theo luôn, không dừng lại hỏi xác nhận giữa các
+  task (khác quy trình mặc định ở `CLAUDE.md` mục 5) — chỉ dừng hỏi khi thật sự có quyết định
+  cần người dùng (ví dụ xung đột thiết kế không tự quyết được, như ở task 2).
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -151,6 +150,50 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-08-01** — Phase 3.7 task 6: micro-interaction có chủ đích (upload/success/error/
+  delete/expand-collapse) kèm `prefers-reduced-motion` ngay từ đầu.
+  **Rule an toàn toàn site thay vì gắn `motion-reduce:` lẻ tẻ từng class**: thêm 1 khối
+  `@media (prefers-reduced-motion: reduce)` DUY NHẤT vào `@layer base` trong `global.css`
+  (ép `animation-duration`/`transition-duration` về `0.01ms`, không dùng `animation: none`
+  vì sẽ khiến `animationend`/`transitionend` không bao giờ bắn nếu code nào đó đang chờ sự
+  kiện này — 0.01ms vẫn bắn sự kiện gần như ngay lập tức) — phủ được TẤT CẢ transition/
+  animation đã có từ trước (Dialog/Tooltip mở-đóng ở task 1, `active:translate-y` của
+  `button.tsx`, `animate-pulse` của Progress indeterminate ở task 3) LẪN mọi micro-
+  interaction mới thêm trong task này, mà không phải sửa từng file/từng class riêng lẻ —
+  đúng yêu cầu "ngay từ đầu, không thêm sau" theo nghĩa rộng nhất (bảo vệ luôn những gì đã
+  lỡ thêm trước khi có rule này).
+  **Expand-collapse — `FaqSection.astro`** (1 file, dùng chung cho FAQ của cả 20 trang tool):
+  animate mở/đóng `<details>` bằng kỹ thuật CSS `grid-template-rows: 0fr → 1fr` thuần, không
+  cần JS. Phát hiện + xử lý 1 vướng mắc thật khi code: trình duyệt có sẵn UA stylesheet
+  `details:not([open]) > :not(summary) { display: none }`, đặc hiệu hơn class Tailwind
+  `grid` nên luôn thắng — khiến nội dung bị `display:none` hoàn toàn lúc đóng thay vì được
+  giữ trong layout với chiều cao 0fr, làm cả 2 chiều mở/đóng bị "nhảy" tức thì thay vì
+  animate (phần tử `display:none` không tồn tại trong layout nên không có gì để transition
+  từ/đến). Sửa bằng 1 `<style>` scoped trong chính file (`display: grid !important` cho
+  class `.faq-collapse`) để giao toàn bộ việc ẩn/hiện cho transition `grid-template-rows`,
+  không để trình duyệt tự ý `display:none` nữa. Verify bằng build thật + grep CSS đã build
+  (`_slug_.*.css`): xác nhận Astro compile đúng
+  `.faq-collapse[data-astro-cid-xxx]{display:grid!important}`.
+  **Upload/success/error/delete — `ImageCompressor.tsx`** (tool đại diện, đã sửa nhiều nhất
+  phiên này nên chọn làm nơi áp dụng mẫu trước, chưa lan sang 19 tool khác — để lại cho lượt
+  dọn dẹp sau nếu cần, giống cách task 3/5 chỉ làm 1 tool đại diện đầy đủ thay vì dàn mỏng 20
+  tool): item mới thêm vào danh sách có `animate-in fade-in slide-in-from-top-1 duration-300`
+  (dùng tiện ích có sẵn của `tw-animate-css`, đã import sẵn trong `global.css`, không thêm
+  dependency mới). Trạng thái thành công/lỗi có viền đổi màu mượt qua
+  `transition-[color,background-color,border-color,opacity,transform] duration-300`
+  (`border-emerald-500/40` khi `done`, `border-destructive/40` khi `error`, giữ nguyên border
+  mặc định lúc pending/processing). Xoá ảnh (nút ✕) giờ có animation thoát thật:
+  `handleRemove` không xoá khỏi mảng `items` ngay, mà set cờ `removing: true` trước
+  (`animate-out fade-out zoom-out-95 duration-150`), rồi mới `setTimeout` xoá thật khỏi mảng
+  sau đúng 150ms (khớp `REMOVE_ANIMATION_MS`, hằng số dùng chung để 2 chỗ không lệch nhau) —
+  nếu xoá khỏi mảng ngay lập tức thì React unmount `<li>` tức thì, không kịp chạy animation
+  thoát. Nút xoá tự vô hiệu hoá thêm khi `item.removing` để tránh bấm 2 lần trong lúc đang
+  chờ animation. Build sạch (421 trang), grep bundle JS xác nhận cả `animate-in fade-in
+  slide-in-from-top-1` lẫn `border-emerald-500/40` đã lên đúng chuỗi class trong
+  `dist/_astro/ImageCompressor.*.js`. **Giới hạn**: không có trình duyệt thật — người dùng
+  nên tự tải/xoá vài ảnh trên trang Image Compressor để xác nhận animation mượt, và thử bật
+  "Reduce motion" trong OS/trình duyệt để xác nhận mọi hiệu ứng tắt hẳn (chỉ verify được bằng
+  đọc code + build sạch, chưa test tương tác thật).
 - **2026-08-01** — Phase 3.7 task 5: touch target nút bấm ≥44px dưới `sm:` + breakpoint
   responsive còn thiếu ở `ImageCompressor.tsx`/`PdfMerger.tsx`.
   **`button.tsx`** (sửa 1 chỗ, ảnh hưởng toàn site vì đây là component dùng chung): 4 size

@@ -34,10 +34,26 @@ const schema = {
 					<summary class="cursor-pointer text-sm font-medium text-foreground marker:text-muted-foreground">
 						{item.question}
 					</summary>
-					<p class="mt-2 text-sm text-muted-foreground">{item.answer}</p>
+					<div class="faq-collapse grid grid-rows-[0fr] transition-[grid-template-rows] duration-200 ease-out group-open:grid-rows-[1fr]">
+						<div class="overflow-hidden">
+							<p class="pt-2 text-sm text-muted-foreground">{item.answer}</p>
+						</div>
+					</div>
 				</details>
 			))
 		}
 	</div>
 </section>
 <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+<style>
+	/* Browsers hide every non-`summary` child of a closed `<details>` via a
+	   UA-stylesheet `details:not([open]) > :not(summary) { display: none }`
+	   rule — that beats the grid-rows collapse trick below (an element with
+	   `display: none` was never laid out, so there's nothing to transition
+	   FROM/TO, and the open/close just snaps instantly). Forcing `display:
+	   grid` here hands all of the show/hide behavior to the grid-rows
+	   transition instead, so it can actually animate both directions. */
+	.faq-collapse {
+		display: grid !important;
+	}
+</style>
