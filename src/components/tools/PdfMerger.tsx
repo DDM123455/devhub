@@ -258,7 +258,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 			>
 				<label
 					htmlFor="pdf-merger-input"
-					className="inline-flex cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80"
+					className="inline-flex min-h-11 cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80 sm:min-h-0"
 				>
 					{messages.selectFiles}
 				</label>
@@ -418,7 +418,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 				</div>
 			)}
 
-			<div className="flex items-center gap-3">
+			<div className="flex flex-wrap items-center gap-3">
 				<Button type="button" onClick={handleMerge} disabled={!canMerge}>
 					{isProcessing ? messages.merging : messages.merge}
 				</Button>

@@ -278,7 +278,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 			>
 				<label
 					htmlFor="image-compressor-input"
-					className="inline-flex cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80"
+					className="inline-flex min-h-11 cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80 sm:min-h-0"
 				>
 					{messages.selectFiles}
 				</label>
@@ -321,7 +321,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 			</div>
 
 			{compressMode === 'quality' ? (
-				<div className="flex items-center gap-3">
+				<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
 					<label htmlFor="image-compressor-quality" className="shrink-0 text-sm text-foreground">
 						{messages.quality}: {Math.round(quality * 100)}%
 					</label>
@@ -333,11 +333,11 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 						step={0.05}
 						value={quality}
 						onChange={(event) => setQuality(Number(event.target.value))}
-						className="w-48"
+						className="w-full sm:w-48"
 					/>
 				</div>
 			) : (
-				<div className="flex items-center gap-3">
+				<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
 					<label htmlFor="image-compressor-target-size" className="shrink-0 text-sm text-foreground">
 						{messages.targetSizeLabel.replace('{{size}}', String(targetSizeKb))}
 					</label>
@@ -349,7 +349,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 						step={10}
 						value={targetSizeKb}
 						onChange={(event) => setTargetSizeKb(Number(event.target.value))}
-						className="w-48"
+						className="w-full sm:w-48"
 					/>
 				</div>
 			)}
@@ -364,7 +364,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 					{messages.resizeToggleLabel}
 				</label>
 				{resizeEnabled && (
-					<div className="flex items-center gap-3">
+					<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
 						<label htmlFor="image-compressor-max-dimension" className="shrink-0 text-sm text-foreground">
 							{messages.maxDimensionLabel.replace('{{size}}', String(maxDimension))}
 						</label>
@@ -376,13 +376,13 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 							step={32}
 							value={maxDimension}
 							onChange={(event) => setMaxDimension(Number(event.target.value))}
-							className="w-48"
+							className="w-full sm:w-48"
 						/>
 					</div>
 				)}
 			</div>
 
-			<div className="flex items-center gap-3">
+			<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
 				<label htmlFor="image-compressor-target-format" className="shrink-0 text-sm text-foreground">
 					{messages.targetFormatLabel}
 				</label>
@@ -390,7 +390,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 					id="image-compressor-target-format"
 					value={targetFormat}
 					onChange={(event) => setTargetFormat(event.target.value as TargetFormat)}
-					className="rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+					className="min-h-11 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground sm:min-h-0"
 				>
 					<option value="original">{messages.targetFormatOriginal}</option>
 					<option value="image/webp">WebP</option>

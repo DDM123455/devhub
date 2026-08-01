@@ -284,7 +284,7 @@ ROADMAP)
       spacing theo từng vai trò: display/heading/body/label/mono) dùng trục weight sẵn có
       của Space Grotesk Variable — KHÔNG thêm font mới (đúng quy tắc "không thêm dependency
       nếu chưa cần thiết")
-- [ ] 5. Touch target nút bấm ≥44px dưới `sm:` + bổ sung breakpoint responsive còn thiếu ở
+- [x] 5. Touch target nút bấm ≥44px dưới `sm:` + bổ sung breakpoint responsive còn thiếu ở
       `ImageCompressor.tsx`/`PdfMerger.tsx` (hiện 0 breakpoint, chỉ dựa `flex-wrap`)
 - [ ] 6. Micro-interaction có chủ đích (upload/success/error/delete/expand-collapse) kèm
       `@media (prefers-reduced-motion: reduce)` ngay từ đầu, không thêm sau

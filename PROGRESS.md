@@ -27,14 +27,14 @@
   mục nhưng KHÔNG có Puppeteer/browser trong môi trường phiên làm việc đó để test tương tác
   thật — đặc biệt mục M4 (đổi hẳn engine render QR) cần người dùng tự mở trang QR Generator
   kiểm tra bằng mắt trước khi coi là chắc chắn ổn định.
-- **Phase 3.7 — UX/UI Audit Remediation**: 4/10 mục (task 1-4 xong). Task tiếp theo: #5 —
-  touch target ≥44px dưới `sm:` + breakpoint responsive cho `ImageCompressor.tsx`/
-  `PdfMerger.tsx`. Xem chi tiết audit gốc + lý do từng task trong log 2026-07-31 bên dưới và
-  10 dòng task trong `ROADMAP.md`. **Từ 2026-08-01, theo yêu cầu trực tiếp người dùng**: làm
-  xong 1 task trong Phase 3.7 thì tự động chuyển sang task tiếp theo luôn, không dừng lại hỏi
-  xác nhận giữa các task (khác quy trình mặc định ở `CLAUDE.md` mục 5) — chỉ dừng hỏi khi
-  thật sự có quyết định cần người dùng (ví dụ xung đột thiết kế không tự quyết được, như ở
-  task 2).
+- **Phase 3.7 — UX/UI Audit Remediation**: 5/10 mục (task 1-5 xong). Task tiếp theo: #6 —
+  micro-interaction có chủ đích (upload/success/error/delete/expand-collapse) kèm
+  `prefers-reduced-motion`. Xem chi tiết audit gốc + lý do từng task trong log 2026-07-31 bên
+  dưới và 10 dòng task trong `ROADMAP.md`. **Từ 2026-08-01, theo yêu cầu trực tiếp người
+  dùng**: làm xong 1 task trong Phase 3.7 thì tự động chuyển sang task tiếp theo luôn, không
+  dừng lại hỏi xác nhận giữa các task (khác quy trình mặc định ở `CLAUDE.md` mục 5) — chỉ
+  dừng hỏi khi thật sự có quyết định cần người dùng (ví dụ xung đột thiết kế không tự quyết
+  được, như ở task 2).
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -151,6 +151,36 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-08-01** — Phase 3.7 task 5: touch target nút bấm ≥44px dưới `sm:` + breakpoint
+  responsive còn thiếu ở `ImageCompressor.tsx`/`PdfMerger.tsx`.
+  **`button.tsx`** (sửa 1 chỗ, ảnh hưởng toàn site vì đây là component dùng chung): 4 size
+  variant dùng cho hành động chính/dễ bấm — `default` (h-8→h-11), `lg` (h-9→h-11), `icon`
+  (size-8→size-11), `icon-lg` (size-9→size-11) — đổi thành 44px (`h-11`/`size-11`, đúng
+  ngưỡng WCAG 2.5.8 AAA / Apple HIG) dưới breakpoint `sm:`, quay lại kích thước desktop gọn
+  hơn từ `sm:` trở lên (`sm:h-8`, `sm:h-9`). 4 variant còn lại (`xs`, `sm`, `icon-xs`,
+  `icon-sm`) CỐ TÌNH giữ nguyên nhỏ ở mọi breakpoint — đây là các nút phụ trong danh sách dày
+  đặc (nút xoá/xoay/di chuyển từng trang PDF, nút xoá từng ảnh trong danh sách nén...), nếu
+  bắt buộc 44px sẽ phá vỡ layout dạng thẻ nhỏ (ví dụ thẻ trang PDF rộng chỉ 112px chứa 4 nút
+  cạnh nhau). Build xong grep `dist/_astro/Layout.*.css` xác nhận `size-11`/`sm:h-8`/`sm:h-9`
+  đã lên CSS thật (`icon`/`icon-lg` hiện chưa có component nào dùng tới nên `sm:size-8`/
+  `sm:size-9` chưa xuất hiện trong CSS build — giống tình huống token chưa dùng ở task 4, sẽ
+  tự động có ngay khi có chỗ dùng `size="icon"`/`size="icon-lg"`).
+  **`ImageCompressor.tsx`/`PdfMerger.tsx`**: xác nhận cả 2 file đang có đúng 0 breakpoint
+  (`grep -c "sm:\|md:\|lg:"` ra 0) trước khi sửa. Nút "Select files"/"Select images" là
+  `<label>` tự vẽ tay (không dùng `Button` component) nên không tự động hưởng phần sửa
+  `button.tsx` — thêm riêng `min-h-11 sm:min-h-0` cho cả 2 file. 3 hàng "label + range
+  slider" trong Image Compressor (quality/target-size/max-dimension) và 1 hàng "label +
+  select" (target format) đang dùng `flex items-center gap-3` KHÔNG bọc dòng — đổi sang
+  `flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3` để label và control xếp dọc
+  trên màn hình hẹp thay vì ép nằm chung 1 hàng ngang; slider đổi `w-48` → `w-full sm:w-48`
+  để chiếm hết chiều rộng khi xếp dọc. Hàng nút merge/download ở `PdfMerger.tsx` (`flex
+  items-center gap-3`, không wrap) đổi thêm `flex-wrap`. Các phần đã tự wrap tốt từ trước
+  (danh sách trang PDF `flex flex-wrap`, hàng info từng ảnh nén `flex flex-wrap`, hàng nút
+  hành động chính ở Image Compressor) giữ nguyên, không sửa. Build sạch (421 trang), grep
+  HTML tĩnh xác nhận `min-h-11 ... sm:min-h-0` đã lên đúng nút Select ở cả 2 trang.
+  **Giới hạn**: không có trình duyệt thật/DevTools responsive mode trong môi trường phiên
+  này — người dùng nên tự mở 2 trang này ở độ rộng ~375px (iPhone SE) để xác nhận không còn
+  tràn ngang, và bấm thử nút chính bằng ngón tay trên thiết bị thật nếu có.
 - **2026-08-01** — Phase 3.7 task 4: type scale thật trong `global.css` theo vai trò
   display/heading (tách 3 mức h1/h2/h3 vì site thực tế đang có đúng 3 vai trò heading khác
   nhau)/body/label/mono. Khảo sát bằng Explore agent trước khi thiết kế số liệu: xác nhận
