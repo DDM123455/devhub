@@ -290,7 +290,7 @@ ROADMAP)
       `@media (prefers-reduced-motion: reduce)` ngay từ đầu, không thêm sau
 - [x] 7. Before/after so sánh dạng slider kéo được cho Result Page (thay 2 thumbnail tĩnh
       hiện tại), bắt đầu từ Image Compressor
-- [ ] 8. Footer 3 cột tối giản (Công cụ theo nhóm / Pháp lý / Ngôn ngữ) + thêm trang/link
+- [x] 8. Footer 3 cột tối giản (Công cụ theo nhóm / Pháp lý / Ngôn ngữ) + thêm trang/link
       Privacy Policy (hiện footer chỉ có 1 dòng copyright, không có link pháp lý nào dù sản
       phẩm định vị privacy-first)
 - [ ] 9. Empty state thiết kế đầy đủ (không file / không kết quả tìm kiếm / không lịch sử /

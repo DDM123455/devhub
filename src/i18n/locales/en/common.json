@@ -34,7 +34,11 @@
   },
   "footer": {
     "copyright": "© {{year}} Web Tool Hub",
-    "tagline": "Built for people who like their files to stay theirs."
+    "tagline": "Built for people who like their files to stay theirs.",
+    "toolsByCategory": "Tools",
+    "legal": "Legal",
+    "language": "Language",
+    "privacyPolicy": "Privacy Policy"
   },
   "banner": {
     "privacy": "100% Privacy — Files Stay On Your Device"

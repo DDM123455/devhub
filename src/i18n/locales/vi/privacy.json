@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "title": "Chính sách bảo mật — Web Tool Hub",
+    "description": "Web Tool Hub xử lý dữ liệu của bạn thế nào: tệp không bao giờ được tải lên, không tài khoản, không theo dõi. Đọc đầy đủ chính sách bảo mật."
+  },
+  "heading": "Chính sách bảo mật",
+  "updated": "Cập nhật lần cuối: Tháng 8, 2026",
+  "intro": "Web Tool Hub được xây dựng quanh một nguyên tắc duy nhất: tệp của bạn không bao giờ rời khỏi thiết bị. Mọi công cụ trên trang này — nén ảnh, gộp PDF, định dạng JSON — đều chạy hoàn toàn trên trình duyệt của bạn bằng JavaScript và Web API. Không có bước tải lên nào cả, vì không có máy chủ nào xử lý tệp của bạn.",
+  "sections": [
+    {
+      "heading": "Những gì chúng tôi KHÔNG thu thập",
+      "body": "Chúng tôi không yêu cầu bạn tạo tài khoản. Chúng tôi không thu thập tệp, nội dung tệp, hay tên tệp của bạn. Chúng tôi không chạy bất kỳ công cụ phân tích hay quảng cáo theo dõi nào trên trang này — không có Google Analytics, không có Facebook Pixel, không có script bên thứ ba nào theo dõi hành vi của bạn ở đây."
+    },
+    {
+      "heading": "Mỗi công cụ thực sự hoạt động thế nào",
+      "body": "Khi bạn \"tải lên\" một tệp vào bất kỳ công cụ nào ở đây, tệp đó được đọc thẳng vào bộ nhớ trình duyệt của bạn qua File API và xử lý bằng JavaScript, WebAssembly, hoặc Canvas/Web Audio API — tùy công cụ cần gì. Các tác vụ nặng hơn (nén ảnh, cắt video) chạy trong Web Worker để trang không bị treo, nhưng việc xử lý vẫn diễn ra trên máy bạn, ngay trong tab trình duyệt. Không có gì được gửi đi bất kỳ đâu để xử lý."
+    },
+    {
+      "heading": "Lưu trữ cục bộ (local storage)",
+      "body": "Một vài công cụ lưu lại vài mẩu trạng thái nhỏ trực tiếp trong local storage của trình duyệt — ví dụ: giao diện sáng/tối bạn chọn lần cuối, bản nháp Markdown bạn đang soạn, hay lịch sử pattern regex. Dữ liệu này chỉ lưu trên thiết bị của bạn, không bao giờ được gửi cho chúng tôi, và bạn có thể xóa bất cứ lúc nào bằng cách xóa dữ liệu trang web của tên miền này trong trình duyệt."
+    },
+    {
+      "heading": "Hosting và log kỹ thuật",
+      "body": "Trang này được lưu trữ trên hạ tầng của Cloudflare. Như hầu hết mọi website, mạng lưới biên (edge network) của Cloudflare có thể ghi lại dữ liệu yêu cầu kỹ thuật tiêu chuẩn (như địa chỉ IP, user agent, thời điểm yêu cầu) vì mục đích bảo mật và vận hành — đây là log ở tầng hạ tầng, phổ biến với mọi dịch vụ hosting web, không phải thứ Web Tool Hub tự thu thập hay có quyền truy cập để theo dõi từng cá nhân."
+    },
+    {
+      "heading": "Cookie",
+      "body": "Chúng tôi không đặt bất kỳ cookie nào để theo dõi hay quảng cáo. Nếu trong tương lai có dùng cookie (ví dụ khi tích hợp quảng cáo), điều đó sẽ được công bố ở đây và có banner xin sự đồng ý nếu pháp luật yêu cầu."
+    },
+    {
+      "heading": "Thay đổi chính sách này",
+      "body": "Nếu chính sách này thay đổi, ngày \"Cập nhật lần cuối\" phía trên cũng sẽ thay đổi theo. Vì đây là trang tĩnh không có hệ thống tài khoản, chúng tôi không có cách nào thông báo riêng cho từng người — hãy quay lại trang này nếu bạn muốn biết điều khoản hiện hành."
+    }
+  ]
+}

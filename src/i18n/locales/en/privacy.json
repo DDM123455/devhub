@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "title": "Privacy Policy — Web Tool Hub",
+    "description": "How Web Tool Hub handles your data: your files are never uploaded, no accounts, no tracking. Read the full privacy policy."
+  },
+  "heading": "Privacy Policy",
+  "updated": "Last updated: August 2026",
+  "intro": "Web Tool Hub is built around one rule: your files never leave your device. Every tool on this site — compressing an image, merging a PDF, formatting JSON — runs entirely in your browser using JavaScript and Web APIs. There is no upload step, because there is no server that processes your files.",
+  "sections": [
+    {
+      "heading": "What we don't collect",
+      "body": "We don't ask you to create an account. We don't collect your files, their contents, or their filenames. We don't run any analytics or advertising trackers on this site — there is no Google Analytics, no Facebook Pixel, no third-party script watching what you do here."
+    },
+    {
+      "heading": "How each tool actually works",
+      "body": "When you \"upload\" a file into any tool here, it's read directly into your browser's memory using the File API and processed with JavaScript, WebAssembly, or the Canvas/Web Audio APIs — whichever the tool needs. Heavier jobs (image compression, video trimming) run inside a Web Worker so the page doesn't freeze, but the work still happens on your machine, in your browser tab. Nothing is ever transmitted anywhere for processing."
+    },
+    {
+      "heading": "Local storage",
+      "body": "A few tools save small pieces of state directly in your browser's local storage — for example, your last theme choice (light/dark), a Markdown draft you were editing, or a regex pattern history. This data is stored only on your device, is never sent to us, and you can clear it at any time by clearing your browser's site data for this domain."
+    },
+    {
+      "heading": "Hosting and technical logs",
+      "body": "This site is hosted on Cloudflare's infrastructure. Like virtually any website, Cloudflare's edge network may log standard technical request data (such as IP address, user agent, and request timestamp) for security and operational purposes — this is infrastructure-level logging common to all web hosting, not something Web Tool Hub itself collects or has access to for tracking individuals."
+    },
+    {
+      "heading": "Cookies",
+      "body": "We don't set any cookies for tracking or advertising. Any future use of cookies (for example, if ads are introduced) will be disclosed here and gated behind a consent banner where required by law."
+    },
+    {
+      "heading": "Changes to this policy",
+      "body": "If this policy changes, the \"Last updated\" date above will change too. Since this is a static site with no account system, we have no way to notify you individually — check back here if you want to know the current terms."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { locales, type Locale } from '@/i18n/config';
+import { getFixedT } from '@/i18n/i18next';
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({ params: { locale } }));
+}
+
+const { locale } = Astro.params as { locale: Locale };
+const t = getFixedT(locale, 'privacy');
+
+const sections = t('sections', { returnObjects: true }) as { heading: string; body: string }[];
+---
+
+<Layout title={t('meta.title')} description={t('meta.description')} lang={locale}>
+	<section class="px-4 py-10">
+		<h1 class="text-heading-1 text-foreground">{t('heading')}</h1>
+		<p class="mt-2 text-xs text-muted-foreground">{t('updated')}</p>
+		<div class="mt-6 flex max-w-3xl flex-col gap-6 text-muted-foreground">
+			<p>{t('intro')}</p>
+			{
+				sections.map((section) => (
+					<div class="flex flex-col gap-1.5">
+						<h2 class="text-heading-2 text-foreground">{section.heading}</h2>
+						<p>{section.body}</p>
+					</div>
+				))
+			}
+		</div>
+	</section>
+</Layout>

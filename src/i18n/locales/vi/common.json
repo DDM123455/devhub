@@ -34,7 +34,11 @@
   },
   "footer": {
     "copyright": "© {{year}} Web Tool Hub",
-    "tagline": "Xây dựng cho những ai muốn tệp của mình luôn thuộc về mình."
+    "tagline": "Xây dựng cho những ai muốn tệp của mình luôn thuộc về mình.",
+    "toolsByCategory": "Công cụ",
+    "legal": "Pháp lý",
+    "language": "Ngôn ngữ",
+    "privacyPolicy": "Chính sách bảo mật"
   },
   "banner": {
     "privacy": "100% Riêng tư — Tệp luôn ở trên thiết bị của bạn"

@@ -1,6 +1,7 @@
 ---
 import { getFixedT } from '@/i18n/i18next';
-import type { Locale } from '@/i18n/config';
+import { locales, type Locale } from '@/i18n/config';
+import { categories } from '@/data/categories';
 
 interface Props {
 	lang: Locale;
@@ -9,10 +10,87 @@ interface Props {
 const { lang } = Astro.props;
 const t = getFixedT(lang);
 const year = new Date().getFullYear();
+
+const nativeNames: Record<Locale, string> = {
+	en: 'English',
+	vi: 'Tiếng Việt',
+	es: 'Español',
+	pt: 'Português',
+	fr: 'Français',
+	de: 'Deutsch',
+	ja: '日本語',
+	ko: '한국어',
+	zh: '简体中文',
+	'zh-tw': '繁體中文',
+	it: 'Italiano',
+	ru: 'Русский',
+	nl: 'Nederlands',
+	pl: 'Polski',
+	tr: 'Türkçe',
+	id: 'Bahasa Indonesia',
+	ar: 'العربية',
+	hi: 'हिन्दी',
+	th: 'ไทย',
+	sv: 'Svenska',
+};
+
+const currentPath = Astro.url.pathname;
+const pathWithoutLocale = currentPath.replace(new RegExp(`^/${lang}(?=/|$)`), '') || '/';
 ---
 
-<footer class="flex items-center justify-center gap-2 border-t border-border px-4 py-5 text-center text-xs text-muted-foreground">
-	<span>{t('footer.copyright', { year })}</span>
-	<span aria-hidden="true">·</span>
-	<span>{t('footer.tagline')}</span>
+<footer class="border-t border-border px-4 py-10 sm:px-8">
+	<div class="grid grid-cols-1 gap-8 text-sm sm:grid-cols-3">
+		<div class="flex flex-col gap-2">
+			<h2 class="text-xs font-semibold tracking-wide text-foreground uppercase">{t('footer.toolsByCategory')}</h2>
+			<ul class="flex flex-col gap-1.5">
+				{
+					categories.map((category) => (
+						<li>
+							<a href={`/${lang}/#category-${category.slug}`} class="text-muted-foreground hover:text-foreground hover:underline">
+								{t(`nav.categories.${category.slug}`)}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+
+		<div class="flex flex-col gap-2">
+			<h2 class="text-xs font-semibold tracking-wide text-foreground uppercase">{t('footer.legal')}</h2>
+			<ul class="flex flex-col gap-1.5">
+				<li>
+					<a href={`/${lang}/privacy/`} class="text-muted-foreground hover:text-foreground hover:underline">
+						{t('footer.privacyPolicy')}
+					</a>
+				</li>
+			</ul>
+		</div>
+
+		<div class="flex flex-col gap-2">
+			<h2 class="text-xs font-semibold tracking-wide text-foreground uppercase">{t('footer.language')}</h2>
+			<ul class="flex flex-wrap gap-x-3 gap-y-1.5">
+				{
+					locales.map((loc) => (
+						<li>
+							<a
+								href={`/${loc}${pathWithoutLocale}`}
+								class:list={[
+									'text-muted-foreground hover:text-foreground hover:underline',
+									{ 'font-medium text-foreground': loc === lang },
+								]}
+							>
+								{nativeNames[loc]}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</div>
+
+	<div class="mt-8 flex flex-col items-center gap-2 border-t border-border pt-6 text-center text-xs text-muted-foreground sm:flex-row sm:justify-center">
+		<span>{t('footer.copyright', { year })}</span>
+		<span aria-hidden="true" class="hidden sm:inline">·</span>
+		<span>{t('footer.tagline')}</span>
+	</div>
 </footer>

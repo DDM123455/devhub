@@ -27,13 +27,13 @@
   mục nhưng KHÔNG có Puppeteer/browser trong môi trường phiên làm việc đó để test tương tác
   thật — đặc biệt mục M4 (đổi hẳn engine render QR) cần người dùng tự mở trang QR Generator
   kiểm tra bằng mắt trước khi coi là chắc chắn ổn định.
-- **Phase 3.7 — UX/UI Audit Remediation**: 7/10 mục (task 1-7 xong). Task tiếp theo: #8 —
-  footer 3 cột (Công cụ theo nhóm/Pháp lý/Ngôn ngữ) + trang Privacy Policy. Xem chi tiết audit
-  gốc + lý do từng task trong log 2026-07-31 bên dưới và 10 dòng task trong `ROADMAP.md`.
-  **Từ 2026-08-01, theo yêu cầu trực tiếp người dùng**: làm xong 1 task trong Phase 3.7 thì
-  tự động chuyển sang task tiếp theo luôn, không dừng lại hỏi xác nhận giữa các task (khác
-  quy trình mặc định ở `CLAUDE.md` mục 5) — chỉ dừng hỏi khi thật sự có quyết định cần người
-  dùng (ví dụ xung đột thiết kế không tự quyết được, như ở task 2).
+- **Phase 3.7 — UX/UI Audit Remediation**: 8/10 mục (task 1-8 xong). Task tiếp theo: #9 —
+  empty state đầy đủ (icon + giải thích + hành động tiếp theo). Xem chi tiết audit gốc + lý
+  do từng task trong log 2026-07-31 bên dưới và 10 dòng task trong `ROADMAP.md`. **Từ
+  2026-08-01, theo yêu cầu trực tiếp người dùng**: làm xong 1 task trong Phase 3.7 thì tự
+  động chuyển sang task tiếp theo luôn, không dừng lại hỏi xác nhận giữa các task (khác quy
+  trình mặc định ở `CLAUDE.md` mục 5) — chỉ dừng hỏi khi thật sự có quyết định cần người dùng
+  (ví dụ xung đột thiết kế không tự quyết được, như ở task 2).
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -150,6 +150,46 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-08-01** — Phase 3.7 task 8: footer 3 cột (Công cụ theo nhóm / Pháp lý / Ngôn ngữ) +
+  trang Privacy Policy — trước đây footer chỉ có 1 dòng copyright, không có link pháp lý nào
+  dù sản phẩm định vị "privacy-first".
+  **`Footer.astro`** viết lại thành `grid grid-cols-1 sm:grid-cols-3`: cột 1 "Công cụ" — 5
+  link nhóm công cụ trỏ `/{lang}/#category-{slug}`, tái dùng đúng key i18n
+  `nav.categories.*` đã có sẵn (dùng chung với Sidebar, không tạo chuỗi dịch trùng lặp) và
+  đúng URL pattern Sidebar đã dùng; cột 2 "Pháp lý" — link Privacy Policy; cột 3 "Ngôn ngữ" —
+  đủ cả 20 link ngôn ngữ (không chỉ vài ngôn ngữ chính), copy logic
+  `pathWithoutLocale`/`nativeNames` gần như nguyên vẹn từ `LanguageSwitcher.astro` (đổi
+  `<select onchange>` — JS mới điều hướng được — sang `<a href>` thật, index hóa được thật
+  sự bởi crawler, bổ sung chứ không thay thế dropdown ở header). Dòng copyright/tagline cũ
+  giữ nguyên, đẩy xuống dưới 3 cột kèm đường kẻ phân cách.
+  **Trang Privacy Policy** — `src/pages/[locale]/privacy.astro`, route
+  `/{lang}/privacy/` (slug tiếng Anh dùng chung mọi ngôn ngữ, không bản địa hóa slug — khác
+  quy tắc "slug bản địa hóa" trong `CLAUDE.md` vốn áp dụng cho TRANG CÔNG CỤ, đây là trang
+  pháp lý/tiện ích, theo đúng thông lệ phổ biến các site đa ngôn ngữ vẫn giữ `/privacy`
+  English cho mọi locale). Namespace i18n mới `privacy` — CHỈ tạo `en`+`vi`
+  (đúng quy ước i18n hiện hành đã thống nhất với người dùng từ 2026-07-27 cho nội dung mới,
+  áp dụng luôn cho trang không phải "tool" vì cùng lý do/cùng cơ chế). Nội dung viết trung
+  thực đúng thực trạng đã xác minh trong code, không phải văn mẫu chung chung: xác nhận qua
+  `ROADMAP.md` Phase 5 rằng site CHƯA gắn Google Analytics/Plausible nào (nêu thẳng "không
+  analytics/tracker" là đúng sự thật hiện tại, không phải lời hứa suông); nêu rõ cơ chế xử lý
+  thật (File API đọc vào bộ nhớ trình duyệt, Web Worker cho tác vụ nặng — đúng những gì đã
+  code ở các tool); nêu rõ local storage dùng cho theme/autosave Markdown/lịch sử regex (3 ví
+  dụ thật đã cài, không bịa); có 1 đoạn thừa nhận Cloudflare (hosting hiện tại, xác nhận qua
+  ghi chú kỹ thuật Deploy trong `PROGRESS.md`) có thể ghi log kỹ thuật tiêu chuẩn ở tầng hạ
+  tầng (IP/user-agent) — tránh tuyên bố tuyệt đối "không log gì cả" dễ trở thành sai sự thật.
+  **Cả 2 key mới trong `common.json`** (`footer.toolsByCategory`/`legal`/`language`/
+  `privacyPolicy`) chỉ thêm vào `en`+`vi` dù `common.json` vốn đã dịch đủ 20 ngôn ngữ từ Phase
+  2 — xác nhận i18next tự fallback ĐÚNG TỪNG KEY thiếu sang tiếng Anh (không phải fallback cả
+  namespace như lỗi ẩn từng gặp ở `zh-tw` Phase 2), nhờ `fallbackLng` đã cấu hình sẵn trong
+  `i18next.ts`; verify bằng cách build xong grep `dist/es/index.html` thấy đúng 3 tiêu đề cột
+  hiện tiếng Anh ("Tools"/"Legal"/"Language") trong khi phần còn lại của trang vẫn tiếng Tây
+  Ban Nha bình thường — xác nhận per-key fallback hoạt động đúng như kỳ vọng, không hỏng cả
+  trang. Build sạch, **421 → 441 trang** (+20, đúng bằng 20 trang privacy mới sinh ra qua
+  `getStaticPaths`), xác nhận `sitemap-0.xml` tự động chứa `/privacy/` cho mọi locale — không
+  cần thao tác tay, đúng checklist SEO "trang tự động có mặt trong sitemap.xml".
+  **Giới hạn**: không có trình duyệt thật — người dùng nên tự xem lại layout 3 cột trên di
+  động (dưới `sm:` co về 1 cột dọc) và đọc lại nội dung Privacy Policy để xác nhận không thiếu
+  ý pháp lý nào cần bổ sung trước khi site có traffic thật.
 - **2026-08-01** — Phase 3.7 task 7: before/after so sánh dạng slider kéo được cho Result
   Page, bắt đầu từ Image Compressor. Phát hiện Background Remover ĐÃ có đúng loại slider này
   từ Phase 1.5 ("Preview dạng slider kéo qua lại trước/sau khi xóa nền") — thay vì viết lại
