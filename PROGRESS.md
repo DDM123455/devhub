@@ -27,12 +27,11 @@
   mục nhưng KHÔNG có Puppeteer/browser trong môi trường phiên làm việc đó để test tương tác
   thật — đặc biệt mục M4 (đổi hẳn engine render QR) cần người dùng tự mở trang QR Generator
   kiểm tra bằng mắt trước khi coi là chắc chắn ổn định.
-- **Phase 3.7 — UX/UI Audit Remediation**: 9/10 mục (task 1-9 xong). Task tiếp theo: #10 —
-  Hero trang chủ chuyển sang task-oriented. Đây là task CUỐI CÙNG của Phase 3.7 — sau khi
-  xong, toàn bộ Phase 3.7 hoàn tất 10/10. Xem chi tiết audit gốc + lý do từng task trong log
-  2026-07-31 bên dưới và 10 dòng task trong `ROADMAP.md`. **Từ 2026-08-01, theo yêu cầu trực
-  tiếp người dùng**: làm xong 1 task trong Phase 3.7 thì tự động chuyển sang task tiếp theo
-  luôn, không dừng lại hỏi xác nhận giữa các task.
+- **Phase 3.7 — UX/UI Audit Remediation: HOÀN TẤT 10/10 mục.** Toàn bộ 10 task trong bảng ưu
+  tiên của audit UX/UI 2026-07-31 đã xong (task 1-10, xem log 2026-08-01 bên dưới cho từng
+  mục). Chưa có task tiếp theo nào được xác định — cần audit mới hoặc yêu cầu trực tiếp từ
+  người dùng để mở phase kế tiếp (ví dụ tiếp tục Phase 3.6b 2 mục còn treo — JSON Schema
+  validation UI, Regex flavor selector — hoặc Phase 3.5f PWA, hoặc Phase 4 kiếm tiền).
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -149,6 +148,44 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-08-01** — Phase 3.7 task 10 (**hoàn tất toàn bộ Phase 3.7, 10/10**): Hero trang chủ
+  chuyển sang task-oriented (ô tìm kiếm làm trung tâm) thay cho hero thuần chữ cũ
+  (kicker+H1+tagline+2 pill, không có hành động nào để bấm ngay).
+  **Chọn "ô tìm kiếm" thay vì "ô thả file"** trong 2 lựa chọn audit đề xuất: ô tìm kiếm lọc
+  danh sách công cụ (`#tool-search` + script `data-tool-item`/`data-category-card`) đã tồn
+  tại sẵn, chạy đúng, chỉ đang nằm khiêm tốn trong header — nâng cấp thành trung tâm của Hero
+  chỉ là dời + phóng to, không phải viết tính năng mới từ đầu. Ô thả file tự nhận diện định
+  dạng rồi gợi ý đúng tool cần thêm hẳn 1 bảng ánh xạ MIME→tool cho 20 công cụ và test kéo-thả
+  đa trình duyệt — rủi ro/công sức cao hơn hẳn trong khi không có trình duyệt thật để kiểm tra
+  tương tác kéo-thả ở phiên này.
+  **`src/pages/[locale]/index.astro`**: chuyển `<input id="tool-search">` (nguyên vẹn cùng
+  ID, cùng placeholder, cùng icon kính lúp SVG) từ `Header.astro` vào thẳng Hero, phóng to
+  (icon `size-5` thay `size-4`, `text-base` thay `text-sm`, bọc khung `border` +
+  `shadow-sm` + `focus-within:ring` dùng đúng token `--shadow-sm` mới ở task 2) — script lọc
+  ở cuối file KHÔNG cần sửa gì vì vẫn nhắm đúng `#tool-search` bằng ID, bất kể phần tử đó nằm
+  ở đâu trong DOM. H1 đổi từ cỡ chữ tay `text-[2rem] sm:text-[2.375rem]` sang dùng ĐÚNG token
+  type scale đã định nghĩa sẵn nhưng chưa từng dùng ở task 4 (`text-heading-1 sm:text-display`
+  — comment lúc đó đã ghi rõ "--text-display chưa có chỗ dùng, dành cho Hero task 10", nay
+  dùng đúng như dự tính). Thêm `min-h-11 sm:min-h-0` cho khung tìm kiếm — tiếp nối nguyên tắc
+  touch-target ≥44px dưới `sm:` đã lập ở task 5, áp dụng luôn cho input mới này.
+  **Dọn dead code**: sau khi search dời khỏi header, prop `showSearch` (Header.astro,
+  Layout.astro) không còn nơi nào truyền `true` nữa (trước đây CHỈ trang chủ dùng) — xoá hẳn
+  prop này khỏi cả 2 file thay vì để lại nhánh code không bao giờ chạy, đúng nguyên tắc
+  "không giữ code chắc chắn không dùng" của dự án.
+  Build sạch (441 trang, không đổi số trang). Xác nhận `grep -c 'id="tool-search"'` ra đúng 1
+  lần trên trang chủ và 0 lần trên trang tool (trước đây header hiện search trên MỌI trang dù
+  `showSearch` chỉ bật ở trang chủ — thật ra không đổi hành vi observable vì Header trước giờ
+  vẫn chỉ nhận `showSearch=true` từ trang chủ, chỉ là dọn sạch code không dùng). Grep CSS đã
+  build xác nhận `sm:text-display` compile đúng đủ 4 thuộc tính (size/line-height/letter-
+  spacing/weight) — và phát hiện thêm 1 điều nhỏ về hành vi Tailwind v4: MỘT khi có utility
+  nào đó trong nhóm tên tuỳ biến `--text-*` được dùng thật (ở đây là `sm:text-display`),
+  Tailwind gộp phát ra luôn TOÀN BỘ khai báo `--text-*` còn lại (kể cả `--text-body`/`--text-
+  label`/`--text-mono` vẫn chưa có utility class nào dùng) vào cùng khối `:root` — khác với
+  suy đoán ở task 4 rằng mỗi token tree-shake độc lập; không phải lỗi, chỉ là biến CSS nằm đó
+  vô hại, KHÔNG có nghĩa các token đó đã thực sự được áp dụng ở đâu (vẫn chưa, như đã ghi ở
+  task 4). **Giới hạn**: không có trình duyệt thật để xem trực quan layout Hero mới, đặc biệt
+  độ to của H1 dùng `--text-display` (40px) trên các độ rộng màn hình khác nhau — người dùng
+  nên tự mở trang chủ ở vài kích thước để xác nhận trước khi coi mục này chắc chắn ổn định.
 - **2026-08-01** — Phase 3.7 task 9: empty state đầy đủ (icon + câu giải thích + hành động
   tiếp theo) thay cho danh sách rỗng không nội dung.
   **Component dùng chung mới** `src/components/ui/empty-state.tsx` (component thứ 8 trong

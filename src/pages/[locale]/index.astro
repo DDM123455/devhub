@@ -18,13 +18,36 @@ const toolCount = tools.length;
 const categoryCount = categories.length;
 ---
 
-<Layout title={t('meta.title')} description={t('meta.description')} lang={locale} showSearch>
+<Layout title={t('meta.title')} description={t('meta.description')} lang={locale}>
 	<section class="max-w-2xl px-4 pt-8 pb-9 sm:px-8 sm:pt-9">
 		<p class="mb-3.5 font-mono text-xs tracking-wide text-emerald-700 dark:text-emerald-400">{t('home.kicker')}</p>
-		<h1 class="mb-3.5 text-[2rem] leading-tight font-bold tracking-tight text-foreground sm:text-[2.375rem]">
+		<h1 class="mb-3.5 text-heading-1 text-foreground sm:text-display">
 			{t('home.heading')}
 		</h1>
 		<p class="mb-6 text-[15.5px] leading-relaxed text-muted-foreground">{t('home.tagline')}</p>
+
+		<div class="mb-4 flex items-center gap-2.5 rounded-xl border border-border bg-card px-4 py-3 shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50">
+			<svg
+				aria-hidden="true"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2.2"
+				stroke-linecap="round"
+				class="size-5 shrink-0 text-muted-foreground"
+			>
+				<circle cx="11" cy="11" r="7" />
+				<path d="M21 21l-4.3-4.3" />
+			</svg>
+			<input
+				id="tool-search"
+				type="text"
+				placeholder={t('search.placeholder')}
+				class="min-h-11 w-full border-none bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground sm:min-h-0"
+				autocomplete="off"
+			/>
+		</div>
+
 		<div class="flex flex-wrap gap-2.5">
 			<div class="flex items-baseline gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs text-muted-foreground">
 				<strong class="font-mono text-sm font-normal text-foreground">{toolCount}</strong>

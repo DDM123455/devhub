@@ -11,10 +11,9 @@ interface Props {
 	title: string;
 	lang: Locale;
 	description?: string;
-	showSearch?: boolean;
 }
 
-const { title, lang, description, showSearch = false } = Astro.props;
+const { title, lang, description } = Astro.props;
 const dir = rtlLocales.has(lang) ? 'rtl' : 'ltr';
 const t = getFixedT(lang);
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
@@ -89,7 +88,7 @@ const OG_LOCALE: Record<Locale, string> = {
 			{t('nav.skipToContent')}
 		</a>
 		<PrivacyBanner lang={lang} />
-		<Header lang={lang} showSearch={showSearch} />
+		<Header lang={lang} />
 		<div class="flex flex-1">
 			<Sidebar lang={lang} />
 			<main id="main-content" tabindex="-1" class="flex-1 focus:outline-none">

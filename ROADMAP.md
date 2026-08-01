@@ -296,7 +296,7 @@ ROADMAP)
 - [x] 9. Empty state thiết kế đầy đủ (không file / không kết quả tìm kiếm / không lịch sử /
       lỗi upload) — có icon + câu giải thích + hành động tiếp theo, thay vì danh sách rỗng
       không nội dung
-- [ ] 10. Hero trang chủ chuyển sang task-oriented (ô thả file/tìm kiếm làm trung tâm) thay
+- [x] 10. Hero trang chủ chuyển sang task-oriented (ô thả file/tìm kiếm làm trung tâm) thay
       vì hero thuần chữ hiện tại (kicker+H1+tagline+2 pill, không CTA/bằng chứng sản phẩm)
 
 ## Phase 4 — Kiếm tiền & PWA
