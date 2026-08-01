@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { PDFDocument, degrees } from 'pdf-lib';
 import { renderPdfThumbnails } from '@/lib/pdf-thumbnails';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 
 interface Messages {
 	selectFile: string;
@@ -34,6 +35,7 @@ interface Messages {
 	errorInvalidEveryN: string;
 	errorNoPagesSelected: string;
 	selectPageAria: string;
+	processingQueue: string;
 }
 
 interface PageEntry {
@@ -117,6 +119,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 	const [rangesInput, setRangesInput] = useState('');
 	const [everyN, setEveryN] = useState(1);
 	const [isProcessing, setIsProcessing] = useState(false);
+	const [splitProgress, setSplitProgress] = useState<{ current: number; total: number } | null>(null);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [results, setResults] = useState<ResultFile[]>([]);
 	const [error, setError] = useState<string | null>(null);
@@ -224,6 +227,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 		setIsProcessing(true);
 		setError(null);
 		setResults([]);
+		setSplitProgress(null);
 
 		try {
 			let splitGroups: SplitGroup[];
@@ -260,7 +264,8 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 			const sourceDoc = await PDFDocument.load(bytes);
 
 			const newResults: ResultFile[] = [];
-			for (const group of splitGroups) {
+			setSplitProgress({ current: 0, total: splitGroups.length });
+			for (const [groupIndex, group] of splitGroups.entries()) {
 				const outDoc = await PDFDocument.create();
 				const copiedPages = await outDoc.copyPages(
 					sourceDoc,
@@ -281,6 +286,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 					// there's nothing new to rasterize for the preview.
 					previewThumbnails: group.entries.map((entry) => entry.dataUrl),
 				});
+				setSplitProgress({ current: groupIndex + 1, total: splitGroups.length });
 			}
 			setResults(newResults);
 		} catch (err) {
@@ -512,6 +518,17 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 			)}
 
 			{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+
+			{isProcessing && splitProgress && splitProgress.total > 1 && (
+				<div role="status" className="flex flex-col gap-1.5">
+					<p className="text-xs text-muted-foreground">
+						{messages.processingQueue
+							.replace('{{current}}', String(splitProgress.current))
+							.replace('{{total}}', String(splitProgress.total))}
+					</p>
+					<Progress value={Math.round((splitProgress.current / splitProgress.total) * 100)} />
+				</div>
+			)}
 
 			<div>
 				<Button type="button" onClick={handleSplit} disabled={!canSplit}>

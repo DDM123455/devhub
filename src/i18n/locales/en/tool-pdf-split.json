@@ -35,7 +35,8 @@
     "errorInvalidRange": "Invalid page range \"{{range}}\". Use a format like 1-3, 4, 5-7, with pages between 1 and {{max}}.",
     "errorInvalidEveryN": "Enter a whole number of 1 or more.",
     "errorNoPagesSelected": "Select at least one page to extract.",
-    "selectPageAria": "Select page {{number}}"
+    "selectPageAria": "Select page {{number}}",
+    "processingQueue": "Processing {{current}}/{{total}}"
   },
   "related": "Related tools",
   "faq": {

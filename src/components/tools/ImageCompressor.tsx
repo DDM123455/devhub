@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import imageCompression from 'browser-image-compression';
 import JSZip from 'jszip';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 
 interface Messages {
 	selectFiles: string;
@@ -28,6 +29,8 @@ interface Messages {
 	targetFormatLabel: string;
 	targetFormatOriginal: string;
 	errorAvifUnsupported: string;
+	processingQueue: string;
+	progressPercent: string;
 }
 
 interface ImageItem {
@@ -35,6 +38,9 @@ interface ImageItem {
 	file: File;
 	previewUrl: string;
 	status: 'pending' | 'processing' | 'done' | 'error';
+	// Real 0-100 value from browser-image-compression's onProgress callback —
+	// only meaningful while status === 'processing'.
+	progress?: number;
 	compressedBlob?: Blob;
 	compressedPreviewUrl?: string;
 	compressedSize?: number;
@@ -122,7 +128,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 	const compressOne = useCallback(
 		async (item: ImageItem) => {
 			setItems((prev) =>
-				prev.map((it) => (it.id === item.id ? { ...it, status: 'processing' } : it)),
+				prev.map((it) => (it.id === item.id ? { ...it, status: 'processing', progress: 0 } : it)),
 			);
 			try {
 				if (item.compressedPreviewUrl) {
@@ -140,6 +146,11 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 					initialQuality: compressMode === 'quality' ? quality : undefined,
 					maxWidthOrHeight: resizeEnabled ? maxDimension : undefined,
 					fileType: targetFormat === 'original' ? undefined : targetFormat,
+					onProgress: (progress) => {
+						setItems((prev) =>
+							prev.map((it) => (it.id === item.id ? { ...it, progress } : it)),
+						);
+					},
 				});
 				// The library falls back silently (rather than rejecting) when the
 				// browser's canvas.toBlob can't actually produce the requested
@@ -234,6 +245,17 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 
 	const canCompress = !isProcessing && items.length > 0;
 	const doneCount = items.filter((item) => item.status === 'done').length;
+	// Aggregate progress across the whole batch: finished/errored items count as
+	// a full 100 units, an in-flight item contributes its own real 0-100 value —
+	// so the overall bar advances continuously as CONCURRENCY lanes each finish
+	// their current item, not just in discrete per-item jumps.
+	const settledCount = items.filter((item) => item.status === 'done' || item.status === 'error').length;
+	const progressUnits = items.reduce((sum, item) => {
+		if (item.status === 'done' || item.status === 'error') return sum + 100;
+		if (item.status === 'processing') return sum + (item.progress ?? 0);
+		return sum;
+	}, 0);
+	const overallPercent = items.length > 0 ? Math.round(progressUnits / items.length) : 0;
 
 	const [isDragOver, setIsDragOver] = useState(false);
 
@@ -378,6 +400,17 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 				</select>
 			</div>
 
+			{isProcessing && items.length > 1 && (
+				<div role="status" className="flex flex-col gap-1.5">
+					<p className="text-xs text-muted-foreground">
+						{messages.processingQueue
+							.replace('{{current}}', String(settledCount))
+							.replace('{{total}}', String(items.length))}
+					</p>
+					<Progress value={overallPercent} />
+				</div>
+			)}
+
 			{items.length === 0 ? (
 				<p className="text-sm text-muted-foreground">{messages.noFiles}</p>
 			) : (
@@ -445,6 +478,14 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 									✕
 								</Button>
 							</div>
+							{item.status === 'processing' && (
+								<div className="flex items-center gap-2">
+									<Progress value={item.progress ?? 0} className="flex-1" />
+									<span className="w-9 shrink-0 text-right text-xs text-muted-foreground">
+										{messages.progressPercent.replace('{{percent}}', String(Math.round(item.progress ?? 0)))}
+									</span>
+								</div>
+							)}
 						</li>
 					))}
 				</ul>

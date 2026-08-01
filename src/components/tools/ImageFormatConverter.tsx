@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 
 interface Messages {
 	selectFiles: string;
@@ -21,6 +22,7 @@ interface Messages {
 	skippedFiles: string;
 	resizeToggleLabel: string;
 	maxDimensionLabel: string;
+	processingQueue: string;
 }
 
 type TargetFormat =
@@ -387,6 +389,11 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 
 	const canConvert = !isProcessing && items.length > 0;
 	const doneCount = items.filter((item) => item.status === 'done').length;
+	// No byte-level progress source exists for canvas-based encoding (unlike
+	// Image Compressor's onProgress hook), so the aggregate here only counts
+	// fully settled items rather than interpolating an in-flight item's %.
+	const settledCount = items.filter((item) => item.status === 'done' || item.status === 'error').length;
+	const overallPercent = items.length > 0 ? Math.round((settledCount / items.length) * 100) : 0;
 
 	return (
 		<div className="flex flex-col gap-4 rounded-lg border border-border p-4">
@@ -495,6 +502,17 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 			</div>
 
 			<p className="text-xs text-muted-foreground">{messages.formatsNote}</p>
+
+			{isProcessing && items.length > 1 && (
+				<div role="status" className="flex flex-col gap-1.5">
+					<p className="text-xs text-muted-foreground">
+						{messages.processingQueue
+							.replace('{{current}}', String(settledCount))
+							.replace('{{total}}', String(items.length))}
+					</p>
+					<Progress value={overallPercent} />
+				</div>
+			)}
 
 			{items.length === 0 ? (
 				<p className="text-sm text-muted-foreground">{messages.noFiles}</p>

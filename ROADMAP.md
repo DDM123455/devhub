@@ -277,7 +277,7 @@ ROADMAP)
       `#10B981`, đo contrast ~7.67:1 trên nền tối, so với `#047857` dùng chung 2 theme hiện
       tại chỉ đạt 3.28–3.55:1 — fail WCAG AA chữ thường) + định nghĩa token
       `--shadow-sm/md/lg` (hiện chưa có token shadow nào)
-- [ ] 3. Progress % thật + trạng thái hàng đợi ("Đang xử lý N/M") cho tool xử lý hàng loạt,
+- [x] 3. Progress % thật + trạng thái hàng đợi ("Đang xử lý N/M") cho tool xử lý hàng loạt,
       bắt đầu từ Image Compressor rồi áp dụng lại cho các tool batch khác (thay trạng thái
       nhị phân pending/processing/done hiện tại)
 - [ ] 4. Định nghĩa type scale thật trong `global.css` (size/weight/line-height/letter-

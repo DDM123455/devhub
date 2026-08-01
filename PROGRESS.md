@@ -27,13 +27,13 @@
   mục nhưng KHÔNG có Puppeteer/browser trong môi trường phiên làm việc đó để test tương tác
   thật — đặc biệt mục M4 (đổi hẳn engine render QR) cần người dùng tự mở trang QR Generator
   kiểm tra bằng mắt trước khi coi là chắc chắn ổn định.
-- **Phase 3.7 — UX/UI Audit Remediation**: 2/10 mục (task 1, 2 xong). Task tiếp theo: #3 —
-  Progress % thật + trạng thái hàng đợi cho tool xử lý hàng loạt. Xem chi tiết audit gốc + lý
-  do từng task trong log 2026-07-31 bên dưới và 10 dòng task trong `ROADMAP.md`. **Từ
-  2026-08-01, theo yêu cầu trực tiếp người dùng**: làm xong 1 task trong Phase 3.7 thì tự
-  động chuyển sang task tiếp theo luôn, không dừng lại hỏi xác nhận giữa các task (khác quy
-  trình mặc định ở `CLAUDE.md` mục 5) — chỉ dừng hỏi khi thật sự có quyết định cần người dùng
-  (ví dụ xung đột thiết kế không tự quyết được, như ở task 2 dưới đây).
+- **Phase 3.7 — UX/UI Audit Remediation**: 3/10 mục (task 1, 2, 3 xong). Task tiếp theo: #4 —
+  type scale thật trong `global.css`. Xem chi tiết audit gốc + lý do từng task trong log
+  2026-07-31 bên dưới và 10 dòng task trong `ROADMAP.md`. **Từ 2026-08-01, theo yêu cầu trực
+  tiếp người dùng**: làm xong 1 task trong Phase 3.7 thì tự động chuyển sang task tiếp theo
+  luôn, không dừng lại hỏi xác nhận giữa các task (khác quy trình mặc định ở `CLAUDE.md` mục
+  5) — chỉ dừng hỏi khi thật sự có quyết định cần người dùng (ví dụ xung đột thiết kế không
+  tự quyết được, như ở task 2).
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -150,6 +150,54 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-08-01** — Phase 3.7 task 3: Progress % thật + "Đang xử lý N/M" cho mọi tool xử lý
+  hàng loạt, thay trạng thái nhị phân pending/processing/done. Khảo sát hiện trạng bằng
+  Explore agent trước khi code (10 file) để biết chỗ nào đã có % thật, chỗ nào chỉ giả định.
+  **Component mới**: `src/components/ui/progress.tsx` — component UI dùng chung thứ 5 (sau
+  Button/Card/Dialog/Tooltip), dựng trên `@base-ui/react/progress` (đã có sẵn trong
+  `package.json`, cùng thư viện headless đã dùng cho Dialog/Tooltip ở task 1, không thêm
+  dependency mới). `Progress.Indicator` của base-ui tự tính sẵn `width: X%` inline dựa vào
+  prop `value` (đọc thẳng source `ProgressIndicator.mjs` để xác nhận, không đoán) nên chỉ
+  cần bọc Root/Track/Indicator với class Tailwind, không cần tự viết phép tính %.
+  **Image Compressor** (điểm khởi đầu theo đúng thứ tự audit): phát hiện
+  `browser-image-compression` có sẵn tham số `onProgress?: (progress: number) => void`
+  (0-100) trong `.d.ts` của thư viện nhưng trước giờ chưa từng được truyền vào — chỉ cần nối
+  dây là có % thật cho từng ảnh, không cần mô phỏng. Thêm `progress?: number` vào
+  `ImageItem`, hiện progress bar riêng dưới mỗi ảnh đang xử lý, cộng 1 progress bar TỔNG phía
+  trên danh sách (chỉ hiện khi >1 ảnh) — công thức gộp cộng dồn 100 đơn vị cho mỗi ảnh đã
+  done/error, cộng thêm % thật của (các) ảnh đang `processing`, chia cho `total*100` — đúng
+  với kiến trúc worker-pool 3 lane chạy song song đã có sẵn (`CONCURRENCY = 3`), không phải
+  chỉ đếm tuần tự 1 ảnh một lúc.
+  **Background Remover**: hoá ra tool này đã có sẵn % thật + progress tổng "N/M" từ Phase
+  3.6b (`overallPercent`, dùng progress callback thật của `@imgly/background-removal`) —
+  chỉ thiếu phần HIỂN THỊ dùng component dùng chung (trước đó chỉ là text thuần). Gắn thêm
+  `<Progress>` cạnh text đã có (per-item và tổng), giữ nguyên 100% phần tính toán vốn đã
+  đúng — rủi ro thấp nhất trong các thay đổi của task này vì chỉ là thêm 1 phần tử hiển thị.
+  **Image Format Converter**: xác nhận không có hook progress byte-level nào từ thư viện
+  (code tự viết canvas/bitmap, không phải thư viện ngoài có báo tiến độ) — không mô phỏng số
+  % giả, chỉ đếm số ảnh đã xong thật (`settledCount/total`) cho progress bar tổng + text
+  "N/M", trung thực hơn là bịa % cho từng ảnh không có cách đo thật.
+  **PDF Splitter / QR Generator (batch mode) / PDF Merger (giai đoạn đọc thumbnail nhiều
+  file)**: cả 3 đều là vòng lặp `for` tuần tự có sẵn index thật — thêm state đếm
+  `{current, total}` cập nhật ngay trong vòng lặp (không phải ước lượng), hiện progress bar +
+  text "N/M" khi có nhiều hơn 1 phần tử xử lý. PDF Merger là trường hợp biên: bản thân bước
+  MERGE cuối cùng không có khái niệm N file kết quả (gộp N input → 1 output), nhưng bước ĐỌC
+  THUMBNAIL từng file trước đó thì có (đã cố ý tuần tự để giữ đúng thứ tự trang, xem comment
+  sẵn trong code) — chỉ áp dụng progress cho giai đoạn đọc, không áp cho bước merge.
+  **Không áp dụng cho Base64 (batch file) và CSV↔JSON Converter (batch file)**: cả 2 xử lý
+  hoàn toàn trong bộ nhớ (FileReader/Papa Parse), không có bước async nào đủ chậm để hiện
+  % hay N/M có ý nghĩa (khảo sát xác nhận: đọc/convert hàng chục file vẫn chỉ mất vài chục
+  mili-giây, không có trạng thái "đang xử lý" nào tồn tại đủ lâu để người dùng thấy) — quyết
+  định có chủ đích, không phải bỏ sót.
+  Mỗi tool sửa xong đều thêm i18n key mới (`processingQueue`, `progressPercent` cho riêng
+  Image Compressor) cho cả `en`+`vi`, VÀ thêm dòng tương ứng vào object `messages` trong
+  `*Page.astro` (đúng lưu ý đã ghi ở mục "⚙️ Ghi chú kỹ thuật" — thiếu bước này sẽ khiến prop
+  là `undefined`, không lỗi build). Build sạch sau mỗi tool (421 trang), xác nhận từng chuỗi
+  `processingQueue` mới xuất hiện đúng trong HTML tĩnh của từng trang tool (`dist/en/tools/
+  {slug}/index.html`) thay vì rỗng. **Giới hạn**: không có trình duyệt thật trong môi trường
+  phiên này để xem progress bar chạy mượt thế nào trong lúc thao tác thực tế (đặc biệt phần
+  worker-pool 3 lane của Image Compressor, nơi 3 progress bar khác nhau cùng chạy song song)
+  — người dùng nên tự thử nén/xóa nền/tách PDF/tạo QR hàng loạt với nhiều file để xác nhận.
 - **2026-08-01** — Phase 3.7 task 2: color token `--primary` riêng cho dark mode +
   `--shadow-sm/md/lg`, cả trong `src/styles/global.css`. **Phát hiện xung đột thật khi
   code** (audit gốc không tính tới): `--primary` không chỉ dùng làm text/link/border màu

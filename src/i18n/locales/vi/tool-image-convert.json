@@ -24,7 +24,8 @@
     "clearAll": "Xóa tất cả",
     "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ.",
     "resizeToggleLabel": "Thay đổi kích thước trước khi chuyển đổi",
-    "maxDimensionLabel": "Kích thước tối đa: {{size}}px"
+    "maxDimensionLabel": "Kích thước tối đa: {{size}}px",
+    "processingQueue": "Đang xử lý {{current}}/{{total}}"
   },
   "related": "Công cụ liên quan",
   "faq": {

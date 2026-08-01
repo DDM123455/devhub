@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import type QRCodeStyling from 'qr-code-styling';
 import type { DotType, GradientType, Options } from 'qr-code-styling';
 
@@ -66,6 +67,7 @@ interface Messages {
 	batchLineCount: string;
 	batchGenerateButton: string;
 	batchGenerating: string;
+	processingQueue: string;
 	batchPreviewNotice: string;
 	frameToggleLabel: string;
 	frameTextLabel: string;
@@ -217,6 +219,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	const [batchMode, setBatchMode] = useState(false);
 	const [batchInput, setBatchInput] = useState('');
 	const [isBatchGenerating, setIsBatchGenerating] = useState(false);
+	const [batchProgress, setBatchProgress] = useState<{ current: number; total: number } | null>(null);
 	const canBatch = contentType === 'url' || contentType === 'text';
 	const effectiveBatchMode = canBatch && batchMode;
 
@@ -373,6 +376,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 		const lines = batchInput.split('\n').map((line) => line.trim()).filter(Boolean);
 		if (lines.length === 0) return;
 		setIsBatchGenerating(true);
+		setBatchProgress({ current: 0, total: lines.length });
 		try {
 			const [{ default: QRCodeStylingCtor }, { default: JSZip }] = await Promise.all([
 				import('qr-code-styling'),
@@ -382,6 +386,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 			const usedNames = new Set<string>();
 			for (let i = 0; i < lines.length; i++) {
 				const data = lines[i];
+				setBatchProgress({ current: i + 1, total: lines.length });
 				let blob: Blob | null = null;
 				try {
 					const qr = new QRCodeStylingCtor(
@@ -414,6 +419,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 			URL.revokeObjectURL(url);
 		} finally {
 			setIsBatchGenerating(false);
+			setBatchProgress(null);
 		}
 	};
 
@@ -527,6 +533,16 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 						>
 							{isBatchGenerating ? messages.batchGenerating : messages.batchGenerateButton}
 						</Button>
+						{batchProgress && batchProgress.total > 1 && (
+							<div role="status" className="flex flex-col gap-1.5">
+								<p className="text-xs text-muted-foreground">
+									{messages.processingQueue
+										.replace('{{current}}', String(batchProgress.current))
+										.replace('{{total}}', String(batchProgress.total))}
+								</p>
+								<Progress value={Math.round((batchProgress.current / batchProgress.total) * 100)} />
+							</div>
+						)}
 					</div>
 				)}
 

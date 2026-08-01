@@ -68,6 +68,7 @@
     "batchLineCount": "Sẽ tạo {{count}} mã QR",
     "batchGenerateButton": "Tạo & tải tất cả (.zip)",
     "batchGenerating": "Đang tạo…",
+    "processingQueue": "Đang xử lý {{current}}/{{total}}",
     "batchPreviewNotice": "Chế độ hàng loạt — mỗi dòng sẽ thành 1 mã QR riêng. Bấm \"Tạo & tải tất cả\" ở bên trái để nhận file .zip chứa toàn bộ.",
     "frameToggleLabel": "Thêm khung viền kèm dòng chữ",
     "frameTextLabel": "Dòng chữ hiển thị",

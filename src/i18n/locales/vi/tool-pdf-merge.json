@@ -24,7 +24,8 @@
     "passwordProtectedError": "File PDF này có mật khẩu bảo vệ — hãy gỡ mật khẩu trước (ví dụ bằng phần mềm đọc PDF) rồi mới gộp.",
     "fileErrorHeading": "Một số file không tải được:",
     "previewHeading": "Xem trước file đã gộp",
-    "generatingPreview": "Đang tạo bản xem trước…"
+    "generatingPreview": "Đang tạo bản xem trước…",
+    "processingQueue": "Đang xử lý {{current}}/{{total}}"
   },
   "related": "Công cụ liên quan",
   "faq": {

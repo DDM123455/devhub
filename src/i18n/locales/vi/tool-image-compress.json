@@ -29,7 +29,9 @@
     "retry": "Thử lại",
     "compressModeQuality": "Theo chất lượng",
     "compressModeTargetSize": "Theo dung lượng đích",
-    "targetSizeLabel": "Dung lượng đích: {{size}} KB"
+    "targetSizeLabel": "Dung lượng đích: {{size}} KB",
+    "processingQueue": "Đang xử lý {{current}}/{{total}}",
+    "progressPercent": "{{percent}}%"
   },
   "related": "Công cụ liên quan",
   "faq": {

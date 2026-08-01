@@ -29,7 +29,9 @@
     "retry": "Retry",
     "compressModeQuality": "By quality",
     "compressModeTargetSize": "By target size",
-    "targetSizeLabel": "Target size: {{size}} KB"
+    "targetSizeLabel": "Target size: {{size}} KB",
+    "processingQueue": "Processing {{current}}/{{total}}",
+    "progressPercent": "{{percent}}%"
   },
   "related": "Related tools",
   "faq": {

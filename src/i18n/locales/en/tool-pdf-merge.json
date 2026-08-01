@@ -24,7 +24,8 @@
     "passwordProtectedError": "This PDF is password-protected — remove the password first (e.g. in your PDF reader) before merging it.",
     "fileErrorHeading": "Some files couldn't be loaded:",
     "previewHeading": "Preview of merged file",
-    "generatingPreview": "Generating preview…"
+    "generatingPreview": "Generating preview…",
+    "processingQueue": "Processing {{current}}/{{total}}"
   },
   "related": "Related tools",
   "faq": {

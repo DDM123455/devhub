@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { PDFDocument, degrees } from 'pdf-lib';
 import { renderPdfThumbnails, type PdfPageThumbnail } from '@/lib/pdf-thumbnails';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 
 interface Messages {
 	selectFiles: string;
@@ -23,6 +24,7 @@ interface Messages {
 	fileErrorHeading: string;
 	previewHeading: string;
 	generatingPreview: string;
+	processingQueue: string;
 }
 
 interface PageItem {
@@ -278,7 +280,22 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 			)}
 
 			{files.some((f) => f.status === 'loading') && (
-				<p role="status" className="text-sm text-muted-foreground">{messages.loadingThumbnails}</p>
+				<div role="status" className="flex flex-col gap-1.5">
+					<p className="text-sm text-muted-foreground">
+						{files.length > 1
+							? messages.processingQueue
+									.replace('{{current}}', String(files.filter((f) => f.status !== 'loading').length))
+									.replace('{{total}}', String(files.length))
+							: messages.loadingThumbnails}
+					</p>
+					{files.length > 1 && (
+						<Progress
+							value={Math.round(
+								(files.filter((f) => f.status !== 'loading').length / files.length) * 100,
+							)}
+						/>
+					)}
+				</div>
 			)}
 
 			{files.some((f) => f.status === 'error') && (

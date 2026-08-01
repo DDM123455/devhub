@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { removeBackground } from '@imgly/background-removal';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 
 interface Messages {
 	selectFiles: string;
@@ -403,12 +404,15 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 			<p className="text-xs text-muted-foreground">{messages.modelNotice}</p>
 
 			{isProcessing && items.length > 1 && (
-				<p role="status" className="text-sm text-muted-foreground">
-					{messages.overallProgress
-						.replace('{{current}}', String(Math.min(doneCount + 1, items.length)))
-						.replace('{{total}}', String(items.length))
-						.replace('{{percent}}', String(overallPercent))}
-				</p>
+				<div role="status" className="flex flex-col gap-1.5">
+					<p className="text-sm text-muted-foreground">
+						{messages.overallProgress
+							.replace('{{current}}', String(Math.min(doneCount + 1, items.length)))
+							.replace('{{total}}', String(items.length))
+							.replace('{{percent}}', String(overallPercent))}
+					</p>
+					<Progress value={overallPercent} />
+				</div>
 			)}
 
 			<div className="flex flex-col gap-3 rounded-md border border-border p-3">
@@ -569,8 +573,9 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 							<div className="flex min-w-0 flex-1 flex-col gap-1">
 								<span className="truncate text-foreground">{item.file.name}</span>
 								{item.status === 'processing' && (
-									<span role="status" className="text-muted-foreground">
+									<span role="status" className="flex items-center gap-2 text-muted-foreground">
 										{messages.removing.replace('{{percent}}', String(item.progress ?? 0))}
+										<Progress value={item.progress ?? 0} className="w-24" />
 									</span>
 								)}
 								{item.status === 'error' && (
