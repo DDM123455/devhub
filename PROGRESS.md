@@ -246,26 +246,30 @@
 
 - **2026-08-09 (3.8c #5)** — Markdown Editor: sửa xung đột auto-continue list khi Enter với
   nội dung bắt đầu bằng "-". Không có Puppeteer/browser để tái hiện y hệt thao tác chuột thật
-  của báo cáo gốc, nên đã điều tra ở tầng thấp hơn nhưng CHẮC CHẮN hơn: gọi thẳng command
-  `insertNewlineContinueMarkup` của `@codemirror/lang-markdown` (thứ đứng sau hành vi
+  của báo cáo gốc, nên đã điều tra bằng cách gọi thẳng command
+  `insertNewlineContinueMarkup` của `@codemirror/lang-markdown` (đứng sau hành vi
   "auto-continue list" khi Enter — do `markdown()` tự bind qua `markdownKeymap`, không phải
   code tự viết trong dự án) trên một `EditorState` dựng tay, không cần mount view/DOM thật.
-  Root cause thật xác nhận được: dán/gõ dòng `"- item"` rồi Enter → tự thêm dòng marker rỗng
-  mới `"- "` (đúng ý muốn — continue list). Nhưng Enter **lần nữa** trên marker rỗng đó
-  (thao tác bình thường để THOÁT list, như GitHub/Notion/Typora) — gọi lại đúng command đó
-  cho ra **y hệt** document, không đổi gì, dù trả về `handled: true` (nuốt luôn phím Enter,
-  không rơi xuống hành vi Enter thường) → người dùng bấm Enter mãi mà không có phản hồi gì,
-  kẹt trong list. Test lặp lại 3 lần Enter liên tiếp đều cho cùng 1 kết quả, xác nhận đây là
-  dead-end thật chứ không phải nhiễu số liệu.
+  **Đính chính lại kết luận ban đầu**: lần kiểm tra đầu dùng một test harness có bug (đối
+  tượng `target` truyền cho command là object literal tĩnh, không phản ánh state MỚI sau mỗi
+  lần dispatch), khiến kết quả in ra trông như "Enter lần 2 trở đi hoàn toàn không đổi gì" —
+  kết luận đó SAI. Viết lại harness đúng (dùng getter phản ánh state hiện tại) thì hành vi
+  gốc thật của thư viện là: Enter #1 tiếp tục list (`"- item\n- "`, đúng ý), Enter #2 KHÔNG
+  thoát list ngay mà chèn thêm 1 dòng trống rồi giữ nguyên marker (biến tight-list thành
+  loose-list — nhánh xử lý riêng trong chính command gốc), phải đến Enter #3 mới thực sự xoá
+  marker/thoát list. Tức là không phải "kẹt vĩnh viễn" như mô tả sai ban đầu, mà là mất tới
+  3 lần Enter mới thoát được list thay vì 1-2 lần như GitHub/Notion/Typora — vẫn là một sự
+  khác biệt hành vi thật gây khó chịu, chỉ là nhẹ hơn so với chẩn đoán đầu tiên.
   Sửa bằng cách thêm 1 keymap Enter riêng ở `Prec.highest` (ưu tiên cao hơn `Prec.high` mà
   `markdown()` tự dùng): `exitEmptyListItem` — nếu dòng hiện tại chỉ có marker
-  (`-`/`*`/`+`/số thứ tự) + khoảng trắng và không có gì khác, xoá marker (thoát list) thay vì
-  để command gốc nuốt phím không làm gì. Mọi trường hợp khác trả `false`, rơi xuống đúng
-  `insertNewlineContinueMarkup` như cũ (không đổi hành vi continue-list bình thường). Verify
-  bằng script mô phỏng đúng thứ tự precedence 2 keymap: Enter #1 tiếp tục list đúng như cũ,
-  Enter #2 giờ xoá marker/thoát list (trước đây đứng yên), test riêng continue-list với item
-  không rỗng vẫn y hệt hành vi cũ (không regressions). Build sạch (462 trang, chỉ code, không
-  đổi i18n key).
+  (`-`/`*`/`+`/số thứ tự) + khoảng trắng và không có gì khác, xoá marker (thoát list) ngay
+  thay vì rơi vào nhánh "loose-list" của command gốc. Mọi trường hợp khác trả `false`, rơi
+  xuống đúng `insertNewlineContinueMarkup` như cũ (không đổi hành vi continue-list bình
+  thường). Verify LẠI bằng harness đã sửa đúng: với fix, Enter #1 tiếp tục list, Enter #2 xoá
+  marker/thoát list ngay (rút từ 3 lần xuống còn 2 lần, khớp hành vi GitHub/Notion); test
+  riêng continue-list với item không rỗng vẫn y hệt hành vi cũ (không regression). Build sạch
+  (462 trang, chỉ code, không đổi i18n key). Code fix giữ nguyên như đã commit — chỉ phần mô
+  tả root cause ở log được đính chính lại cho đúng.
 
 - **2026-08-09 (3.8c #4)** — SVG Optimizer: cảnh báo khi output còn sót thẻ `<script>`.
   Không phải bug (SVGO mặc định không có plugin nào trong `preset-default` xoá
