@@ -32,8 +32,9 @@
   mục).
 - **Phase 3.8 — Audit Remediation vòng 3 (từ báo cáo QA tương tác thật người dùng gửi
   2026-08-01)**: nhóm 3.8a (Critical) HOÀN TẤT 3/3, nhóm 3.8b (High) HOÀN TẤT 5/5. Đang làm
-  3.8c (Medium): 2/9 xong (Convert Image Format before/after slider, trang 404 tùy chỉnh) —
-  xem chi tiết từng mục trong `ROADMAP.md`.
+  3.8c (Medium): 3/9 xong (Convert Image Format before/after slider, trang 404 tùy chỉnh,
+  og:image/twitter:image mặc định + theo category) — xem chi tiết từng mục trong
+  `ROADMAP.md`.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -166,6 +167,32 @@
   ngay phía trên: phải dùng click thật, không phải synthetic event, để phản ánh đúng hành vi.
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
+
+- **2026-08-09 (3.8c #3)** — og:image/twitter:image mặc định + theo từng nhóm công cụ.
+  Trước khi làm, đã hỏi lại người dùng vì mục này thực sự cần 1 dependency mới (dự án
+  không có sẵn thư viện render ảnh raster ở server nào, và SVG thuần không được
+  Facebook/Twitter render ổn định làm og:image) — người dùng chọn "thêm dependency để có
+  PNG thật". Đã cài `@resvg/resvg-js` làm **devDependency** (rasterize SVG → PNG bằng Rust
+  binding, KHÔNG vào bundle client, không vi phạm nguyên tắc 100% client-side xử lý dữ liệu
+  người dùng — ảnh og:image là asset tĩnh của site, không phải dữ liệu người dùng).
+  - `scripts/generate-og-images.mjs`: script chạy TAY 1 lần (không gắn vào `npm run build`
+    vì nội dung ảnh không đổi theo build/dữ liệu động), tự vẽ SVG (nền gradient theo màu
+    brand `--primary` xoay hue giống hệt cách 5 badge category trên trang chủ tính màu —
+    dùng xoay Hue trong HSL thay vì mô phỏng lại ma trận CSS `hue-rotate()`, đơn giản hơn
+    nhiều mà kết quả thị giác tương đương cho nền phẳng 1 màu — cùng logo ">_", "Web Tool
+    Hub", tên category, tagline) rồi rasterize bằng `Resvg` ra PNG 1200×630 thật. Đã chạy 1
+    lần, tạo 6 file: `public/og/default.png` + 5 file theo category
+    (`image/pdf/text/dev/media.png`), commit thẳng làm asset tĩnh.
+  - `Layout.astro`: thêm prop `ogImage` (mặc định `/og/default.png`), thêm
+    `og:image`/`og:image:width`/`og:image:height`/`twitter:image`, đổi `twitter:card` từ
+    `summary` sang `summary_large_image` (đúng chuẩn khi đã có ảnh lớn thật).
+  - Cả 20 file `src/components/tools/*Page.astro` đều gọi `<Layout ... lang={lang}>` giống
+    hệt nhau và đã sẵn có biến `tool` (từ `tools.find(...)`) — batch sed thêm
+    `ogImage={\`/og/${tool.category}.png\`}` vào cả 20 file cùng lúc thay vì sửa tay từng
+    file. Trang chủ/404/privacy không truyền `ogImage` nên tự dùng ảnh mặc định.
+  - Xác nhận qua build: `dist/en/tools/compress-image/index.html` có
+    `og:image=.../og/image.png` (category `image`), `dist/en/index.html` và
+    `dist/en/404.html` có `.../og/default.png`. Build sạch (462 trang).
 
 - **2026-08-09 (3.8c #2)** — Trang 404 tùy chỉnh (nav + search + logo) thay vì trang trắng
   mặc định của Astro. Tạo `src/pages/[locale]/404.astro` (dùng chung `Layout` nên tự có
