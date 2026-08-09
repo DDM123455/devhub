@@ -340,6 +340,7 @@ function Swatch({
 		<div className="flex flex-1 flex-col overflow-hidden rounded-lg border border-border">
 			<button
 				type="button"
+				aria-live="polite"
 				className="flex h-24 w-full flex-col items-center justify-center gap-1 text-xs font-medium"
 				style={{ backgroundColor: hex, color: textColor }}
 				title={copyLabel}
@@ -645,6 +646,7 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 				<div className="mt-3 flex flex-wrap gap-2">
 					<Button
 						type="button"
+						aria-live="polite"
 						size="sm"
 						variant="ghost"
 						onClick={() => {
@@ -663,6 +665,7 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 					</Button>
 					<Button
 						type="button"
+						aria-live="polite"
 						size="sm"
 						variant="ghost"
 						onClick={() => {
@@ -677,6 +680,7 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 					</Button>
 					<Button
 						type="button"
+						aria-live="polite"
 						size="sm"
 						variant="ghost"
 						onClick={() => {
@@ -691,6 +695,7 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 					</Button>
 					<Button
 						type="button"
+						aria-live="polite"
 						size="sm"
 						variant="ghost"
 						onClick={() => {

@@ -749,7 +749,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 						</label>
 					</div>
 					{(originalText !== '' || changedText !== '') && (
-						<Button type="button" size="sm" variant="outline" onClick={() => void handleCopyShareLink()}>
+						<Button type="button" size="sm" variant="outline" aria-live="polite" onClick={() => void handleCopyShareLink()}>
 							{shareLinkCopied ? messages.copied : messages.copyShareLink}
 						</Button>
 					)}
@@ -824,7 +824,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
 								<span className="text-sm font-medium text-foreground">{messages.mergeLeftHeading}</span>
 								<div className="flex gap-1">
-									<Button type="button" size="sm" variant="ghost" onClick={() => handleCopy('left', mergedLeftText)}>
+									<Button type="button" size="sm" variant="ghost" aria-live="polite" onClick={() => handleCopy('left', mergedLeftText)}>
 										{copiedSide === 'left' ? messages.copied : messages.copy}
 									</Button>
 									<Button type="button" size="sm" variant="ghost" onClick={() => handleSave('left', mergedLeftText)}>
@@ -860,7 +860,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
 								<span className="text-sm font-medium text-foreground">{messages.mergeRightHeading}</span>
 								<div className="flex gap-1">
-									<Button type="button" size="sm" variant="ghost" onClick={() => handleCopy('right', mergedRightText)}>
+									<Button type="button" size="sm" variant="ghost" aria-live="polite" onClick={() => handleCopy('right', mergedRightText)}>
 										{copiedSide === 'right' ? messages.copied : messages.copy}
 									</Button>
 									<Button type="button" size="sm" variant="ghost" onClick={() => handleSave('right', mergedRightText)}>

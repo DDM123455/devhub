@@ -334,7 +334,7 @@ ROADMAP)
       bằng "-"
 - [x] Cấu hình response security headers (CSP, X-Content-Type-Options, Referrer-Policy,
       X-Frame-Options/frame-ancestors) cho Cloudflare qua file `public/_headers`
-- [ ] Rà soát lại aria-live cho trạng thái động (progress %, "Copied!") — Phase 3.5b từng làm,
+- [x] Rà soát lại aria-live cho trạng thái động (progress %, "Copied!") — Phase 3.5b từng làm,
       xác nhận còn thiếu chỗ nào không
 - [ ] Remove Background / Video Trim / Audio Converter: tách label "đang tải model/engine lần
       đầu" khác với "đang xử lý" để người dùng không tưởng bị treo

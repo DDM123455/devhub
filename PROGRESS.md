@@ -32,10 +32,11 @@
   mục).
 - **Phase 3.8 — Audit Remediation vòng 3 (từ báo cáo QA tương tác thật người dùng gửi
   2026-08-01)**: nhóm 3.8a (Critical) HOÀN TẤT 3/3, nhóm 3.8b (High) HOÀN TẤT 5/5. Đang làm
-  3.8c (Medium): 6/9 xong (Convert Image Format before/after slider, trang 404 tùy chỉnh,
+  3.8c (Medium): 7/9 xong (Convert Image Format before/after slider, trang 404 tùy chỉnh,
   og:image/twitter:image mặc định + theo category, cảnh báo <script> sót lại ở SVG
   Optimizer, xung đột auto-continue list ở Markdown Editor, security response headers qua
-  `public/_headers`) — xem chi tiết từng mục trong `ROADMAP.md`.
+  `public/_headers`, rà soát bổ sung aria-live cho toàn bộ nút "Copied!") — xem chi tiết
+  từng mục trong `ROADMAP.md`.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -168,6 +169,28 @@
   ngay phía trên: phải dùng click thật, không phải synthetic event, để phản ánh đúng hành vi.
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
+
+- **2026-08-09 (3.8c #7)** — Rà soát lại aria-live cho trạng thái động, xác nhận còn thiếu
+  chỗ nào so với Phase 3.5b. Grep toàn bộ `src/components/tools/*.tsx` tìm file KHÔNG có
+  bất kỳ `aria-live`/`role="status"`/`role="alert"` nào: chỉ còn `MarkdownEditor.tsx` và
+  `TextCaseConverter.tsx` — nhưng đào sâu hơn phát hiện lỗ hổng thật không nằm ở việc "cả
+  file thiếu" mà ở một PATTERN LẶP LẠI bị bỏ sót: nút Copy tự đổi nhãn "Copy" → "Copied!"
+  (state `copied` cục bộ) không có `aria-live`, nên khi phát hiện 1 file thiếu, các file khác
+  ĐÃ có `role="status"` ở chỗ khác (progress %, lỗi) che khuất việc riêng nút Copy trong
+  cùng file đó cũng thiếu. Rà theo đúng pattern `setCopied(true)`/`Copied(true)` xuyên suốt
+  toàn bộ thư mục thay vì chỉ tin vào kết quả grep "thiếu cả file", tìm ra đúng 11 file với
+  tổng cộng 17 nút Copy/Copied chưa có `aria-live`:
+  - 7 file dùng chung 1 pattern `function CopyButton` cục bộ giống hệt nhau (không phải
+    component dùng chung, mỗi file tự định nghĩa riêng): `Base64Tool.tsx`,
+    `CsvJsonConverter.tsx`, `JwtDecoder.tsx`, `MarkdownEditor.tsx`, `RegexTester.tsx`,
+    `SvgOptimizer.tsx`, `WordCounter.tsx`.
+  - `ColorPicker.tsx`: 5 chỗ (nút `Swatch` bấm để copy hex, + 4 nút export palette
+    CSS/JSON/SCSS/Tailwind).
+  - `TextCaseConverter.tsx`, `JsonFormatter.tsx`: nút Copy chính.
+  - `TextDiffChecker.tsx`: 3 chỗ (copy share link, copy merge-tool cột trái, cột phải).
+  Sửa bằng cách thêm `aria-live="polite"` thẳng vào phần tử nút (không đổi `role` — button
+  vẫn giữ nguyên vai trò tương tác, `aria-live` chỉ là thuộc tính live-region độc lập, hoàn
+  toàn hợp lệ đặt trên `<button>`). Build sạch (462 trang).
 
 - **2026-08-09 (3.8c #6)** — Cấu hình security response headers cho Cloudflare qua
   `public/_headers` (CSP, X-Content-Type-Options, Referrer-Policy, X-Frame-Options,

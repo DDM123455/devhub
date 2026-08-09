@@ -275,7 +275,7 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 			</div>
 
 			<div className="flex flex-wrap items-center gap-3">
-				<Button type="button" onClick={handleCopy} disabled={output === ''}>
+				<Button type="button" aria-live="polite" onClick={handleCopy} disabled={output === ''}>
 					{copied ? messages.copied : messages.copy}
 				</Button>
 				<Button type="button" variant="outline" onClick={handleFileDownload} disabled={output === ''}>

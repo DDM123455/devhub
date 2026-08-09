@@ -258,6 +258,7 @@ function CopyButton({ value, label, copiedLabel }: { value: string; label: strin
 	const [copied, setCopied] = useState(false);
 	return (
 		<Button
+			aria-live="polite"
 			type="button"
 			size="sm"
 			variant="ghost"

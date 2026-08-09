@@ -488,7 +488,7 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 						<div className="flex items-center justify-between">
 							<span className="text-xs uppercase text-muted-foreground">{exportFormat}</span>
 							<div className="flex gap-2">
-								<Button type="button" size="sm" variant="ghost" onClick={handleCopy}>
+								<Button type="button" size="sm" variant="ghost" aria-live="polite" onClick={handleCopy}>
 									{copied ? messages.copied : messages.copy}
 								</Button>
 								<Button type="button" size="sm" variant="ghost" onClick={handleDownload}>
