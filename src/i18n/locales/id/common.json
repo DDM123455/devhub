@@ -38,5 +38,11 @@
   },
   "banner": {
     "privacy": "100% Privasi — File Tetap di Perangkat Anda"
+  },
+  "notFound": {
+    "title": "404 — Halaman Tidak Ditemukan",
+    "heading": "Halaman ini tidak ada",
+    "message": "Tautan mungkin rusak, atau halaman telah dipindahkan. Coba cari alat di bawah, atau kembali ke beranda.",
+    "backHome": "Kembali ke beranda"
   }
 }

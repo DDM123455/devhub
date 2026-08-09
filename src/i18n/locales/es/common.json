@@ -38,5 +38,11 @@
   },
   "banner": {
     "privacy": "100% Privacidad — Tus archivos permanecen en tu dispositivo"
+  },
+  "notFound": {
+    "title": "404 — Página no encontrada",
+    "heading": "Esta página no existe",
+    "message": "El enlace puede estar roto o la página se ha movido. Busca una herramienta abajo o vuelve al inicio.",
+    "backHome": "Volver al inicio"
   }
 }

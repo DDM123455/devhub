@@ -43,5 +43,11 @@
   },
   "banner": {
     "privacy": "100% Riêng tư — Tệp luôn ở trên thiết bị của bạn"
+  },
+  "notFound": {
+    "title": "404 — Không tìm thấy trang",
+    "heading": "Trang này không tồn tại",
+    "message": "Đường dẫn có thể đã hỏng hoặc trang đã được chuyển đi. Hãy thử tìm công cụ bên dưới, hoặc quay về trang chủ.",
+    "backHome": "Về trang chủ"
   }
 }

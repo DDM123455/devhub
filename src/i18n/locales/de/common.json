@@ -38,5 +38,11 @@
   },
   "banner": {
     "privacy": "100% Privatsphäre — Deine Dateien bleiben auf deinem Gerät"
+  },
+  "notFound": {
+    "title": "404 — Seite nicht gefunden",
+    "heading": "Diese Seite existiert nicht",
+    "message": "Der Link ist möglicherweise defekt oder die Seite wurde verschoben. Suche unten nach einem Tool oder kehre zur Startseite zurück.",
+    "backHome": "Zurück zur Startseite"
   }
 }

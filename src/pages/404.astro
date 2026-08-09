@@ -1,0 +1,139 @@
+---
+// Root-level fallback for any request that doesn't even match a `/{locale}/...`
+// prefix (a bare typo'd path, an old bookmark, etc). Cloudflare Pages walks up
+// the directory tree looking for the nearest `404.html`, so `/vi/no-such-page`
+// still gets the localized `src/pages/[locale]/404.astro` build output first —
+// this one only catches what that can't. Hardcoded to English since there's no
+// locale segment in the URL to read a language from.
+import Layout from '../layouts/Layout.astro';
+import { getFixedT } from '@/i18n/i18next';
+import { categories } from '@/data/categories';
+import { tools } from '@/data/tools';
+import { EmptyState } from '@/components/ui/empty-state';
+import { SearchX } from 'lucide-react';
+
+const locale = 'en' as const;
+const t = getFixedT(locale);
+---
+
+<Layout title={t('notFound.title')} description={t('notFound.message')} lang={locale}>
+	<section class="max-w-2xl px-4 pt-8 pb-9 sm:px-8 sm:pt-9">
+		<p class="mb-3.5 font-mono text-xs tracking-wide text-emerald-700 dark:text-emerald-400">404</p>
+		<h1 class="mb-3.5 text-heading-1 text-foreground sm:text-display">{t('notFound.heading')}</h1>
+		<p class="mb-6 text-[15.5px] leading-relaxed text-muted-foreground">{t('notFound.message')}</p>
+
+		<div class="mb-4 flex items-center gap-2.5 rounded-xl border border-border bg-card px-4 py-3 shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50">
+			<svg
+				aria-hidden="true"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2.2"
+				stroke-linecap="round"
+				class="size-5 shrink-0 text-muted-foreground"
+			>
+				<circle cx="11" cy="11" r="7" />
+				<path d="M21 21l-4.3-4.3" />
+			</svg>
+			<input
+				id="tool-search"
+				type="text"
+				placeholder={t('search.placeholder')}
+				class="min-h-11 w-full border-none bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground sm:min-h-0"
+				autocomplete="off"
+			/>
+		</div>
+
+		<a
+			href={`/${locale}/`}
+			class="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400"
+		>
+			← {t('notFound.backHome')}
+		</a>
+	</section>
+
+	<div id="tool-search-empty" class="hidden px-4 pb-8 sm:px-8">
+		<EmptyState icon={SearchX} heading={t('search.noResults')} description={t('search.noResultsHint')}>
+			<span id="tool-search-empty-query" class="text-sm font-medium text-foreground"></span>
+		</EmptyState>
+	</div>
+
+	<section class="grid grid-cols-1 gap-5 px-4 pb-16 sm:px-8 lg:grid-cols-2">
+		{
+			categories.map((category) => (
+				<div
+					id={`category-${category.slug}`}
+					data-category-card
+					class="rounded-2xl border border-border bg-card p-6"
+				>
+					<div class="mb-4 flex items-center gap-3">
+						<span
+							class="flex size-10 shrink-0 items-center justify-center rounded-[10px] font-mono text-[10px] font-semibold tracking-wide text-white"
+							style={`background: var(--color-primary); filter: hue-rotate(${category.hue}deg);`}
+						>
+							{category.letter}
+						</span>
+						<h2 class="text-[17px] font-semibold tracking-tight text-foreground">
+							{t(`nav.categories.${category.slug}`)}
+						</h2>
+					</div>
+					<div class="flex flex-col gap-0.5">
+						{tools
+							.filter((tool) => tool.category === category.slug)
+							.map((tool) => (
+								<a
+									href={`/${locale}/tools/${tool.slugs[locale]}/`}
+									data-tool-item
+									data-tool-name={tool.names[locale].toLowerCase()}
+									class="group flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+								>
+									<span class="flex-1">{tool.names[locale]}</span>
+									<svg
+										aria-hidden="true"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.4"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										class="size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+									>
+										<path d="M5 12h14M13 6l6 6-6 6" />
+									</svg>
+								</a>
+							))}
+					</div>
+				</div>
+			))
+		}
+	</section>
+</Layout>
+
+<script>
+	const searchInput = document.getElementById('tool-search') as HTMLInputElement | null;
+	const emptyState = document.getElementById('tool-search-empty');
+	const emptyStateQuery = document.getElementById('tool-search-empty-query');
+	const toolItems = Array.from(document.querySelectorAll<HTMLElement>('[data-tool-item]'));
+	const categoryCards = Array.from(document.querySelectorAll<HTMLElement>('[data-category-card]'));
+
+	searchInput?.addEventListener('input', () => {
+		const query = searchInput.value.trim().toLowerCase();
+
+		for (const item of toolItems) {
+			const name = item.dataset.toolName ?? '';
+			item.classList.toggle('hidden', query !== '' && !name.includes(query));
+		}
+
+		let anyVisible = false;
+		for (const card of categoryCards) {
+			const hasVisibleTool = Array.from(card.querySelectorAll<HTMLElement>('[data-tool-item]')).some(
+				(item) => !item.classList.contains('hidden'),
+			);
+			card.classList.toggle('hidden', !hasVisibleTool);
+			if (hasVisibleTool) anyVisible = true;
+		}
+
+		if (emptyStateQuery) emptyStateQuery.textContent = `"${searchInput.value.trim()}"`;
+		emptyState?.classList.toggle('hidden', query === '' || anyVisible);
+	});
+</script>

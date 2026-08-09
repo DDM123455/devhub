@@ -38,5 +38,11 @@
   },
   "banner": {
     "privacy": "%100 Gizlilik — Dosyalar Cihazınızda Kalır"
+  },
+  "notFound": {
+    "title": "404 — Sayfa Bulunamadı",
+    "heading": "Bu sayfa mevcut değil",
+    "message": "Bağlantı bozuk olabilir veya sayfa taşınmış olabilir. Aşağıda bir araç arayın veya ana sayfaya dönün.",
+    "backHome": "Ana sayfaya dön"
   }
 }

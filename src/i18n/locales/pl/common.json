@@ -38,5 +38,11 @@
   },
   "banner": {
     "privacy": "100% Prywatności — Pliki zostają na Twoim urządzeniu"
+  },
+  "notFound": {
+    "title": "404 — Nie znaleziono strony",
+    "heading": "Ta strona nie istnieje",
+    "message": "Link może być uszkodzony lub strona została przeniesiona. Wyszukaj narzędzie poniżej lub wróć na stronę główną.",
+    "backHome": "Wróć na stronę główną"
   }
 }

@@ -38,5 +38,11 @@
   },
   "banner": {
     "privacy": "100 % integritet — Filerna stannar på din enhet"
+  },
+  "notFound": {
+    "title": "404 — Sidan hittades inte",
+    "heading": "Den här sidan finns inte",
+    "message": "Länken kan vara trasig eller sidan har flyttats. Sök efter ett verktyg nedan, eller gå tillbaka till startsidan.",
+    "backHome": "Tillbaka till startsidan"
   }
 }

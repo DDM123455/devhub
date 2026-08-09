@@ -38,5 +38,11 @@
   },
   "banner": {
     "privacy": "100% Privacy — Bestanden blijven op je eigen apparaat"
+  },
+  "notFound": {
+    "title": "404 — Pagina niet gevonden",
+    "heading": "Deze pagina bestaat niet",
+    "message": "De link is mogelijk verbroken of de pagina is verplaatst. Zoek hieronder naar een tool of ga terug naar de homepage.",
+    "backHome": "Terug naar homepage"
   }
 }

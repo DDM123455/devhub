@@ -32,8 +32,8 @@
   mục).
 - **Phase 3.8 — Audit Remediation vòng 3 (từ báo cáo QA tương tác thật người dùng gửi
   2026-08-01)**: nhóm 3.8a (Critical) HOÀN TẤT 3/3, nhóm 3.8b (High) HOÀN TẤT 5/5. Đang làm
-  3.8c (Medium): 1/9 xong (Convert Image Format before/after slider) — xem chi tiết từng mục
-  trong `ROADMAP.md`.
+  3.8c (Medium): 2/9 xong (Convert Image Format before/after slider, trang 404 tùy chỉnh) —
+  xem chi tiết từng mục trong `ROADMAP.md`.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -166,6 +166,27 @@
   ngay phía trên: phải dùng click thật, không phải synthetic event, để phản ánh đúng hành vi.
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
+
+- **2026-08-09 (3.8c #2)** — Trang 404 tùy chỉnh (nav + search + logo) thay vì trang trắng
+  mặc định của Astro. Tạo `src/pages/[locale]/404.astro` (dùng chung `Layout` nên tự có
+  Header/logo/Sidebar/Footer + banner privacy) tái sử dụng nguyên khối search-box + lưới
+  category/tool từ `index.astro` (copy y hệt markup/script filter, không viết lại logic mới)
+  để người dùng lạc trang vẫn tìm được công cụ ngay. Thêm 20 bản dịch `notFound.{title,
+  heading, message, backHome}` vào `common.json` cho TẤT CẢ 20 ngôn ngữ (không chỉ en+vi —
+  khác quy ước tool mới, vì `common.json` vốn luôn dịch đủ 20 ngôn ngữ ngay từ đầu, không áp
+  dụng "quy ước i18n rút gọn cho tool mới" ở đây).
+  Vướng mắc kỹ thuật phát hiện qua build thật: Astro chỉ tự build "phẳng" `404.html` (không
+  bọc `index.html`, kiểu Cloudflare Pages cần để tự động phục vụ khi request không khớp route
+  nào) cho ĐÚNG file `src/pages/404.astro` ở gốc — file lồng trong route động
+  `[locale]/404.astro` build ra `dist/{locale}/404/index.html` (dạng thư mục), Cloudflare
+  Pages walk-up-directory sẽ KHÔNG tự nhặt được dạng này. Sửa bằng script hậu-build
+  `scripts/fix-404-output.mjs` (đổi tên `dist/{locale}/404/index.html` →
+  `dist/{locale}/404.html`, xoá thư mục rỗng), gắn vào `package.json` (`"build": "astro build
+  && node scripts/fix-404-output.mjs"`). Cũng thêm `src/pages/404.astro` ở gốc (tiếng Anh, vì
+  không có locale segment để đọc) làm fallback cuối cùng cho path hoàn toàn không khớp locale
+  nào. Xác nhận bằng cách đọc `dist/{locale}/404.html` sau build: đúng 21 file phẳng (20 locale
+  + 1 gốc), nội dung dịch đúng ngôn ngữ (kiểm `<h1>`/`<title>` của `en` và `vi`). Build sạch
+  (462 trang, tăng từ 441 vì thêm 20 trang 404 theo locale + 1 trang gốc).
 
 - **2026-08-09 (3.8c #1)** — Convert Image Format: thêm before/after compare slider, tái sử
   dụng `BeforeAfterSlider` (`src/components/ui/before-after-slider.tsx`) y hệt cách Image
