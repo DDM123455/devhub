@@ -14,6 +14,7 @@
     "pageCount": "{{count}} pages",
     "rotate": "Pivoter la page",
     "deletePage": "Supprimer la page",
+    "undo": "Annuler",
     "modeLabel": "Mode de division",
     "modeRanges": "Plages personnalisées",
     "modeEveryN": "Toutes les N pages",

@@ -14,6 +14,7 @@
     "pageCount": "{{count}} halaman",
     "rotate": "Putar halaman",
     "deletePage": "Hapus halaman",
+    "undo": "Urungkan",
     "modeLabel": "Mode pemisahan",
     "modeRanges": "Rentang khusus",
     "modeEveryN": "Setiap N halaman",

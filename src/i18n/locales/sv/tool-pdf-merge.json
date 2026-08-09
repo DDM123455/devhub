@@ -15,6 +15,7 @@
     "moveDown": "Flytta senare",
     "remove": "Ta bort sida",
     "rotate": "Rotera sida",
+    "undo": "Ångra",
     "loadingThumbnails": "Läser sidor…",
     "dragHint": "Dra en sida för att ändra dess ordning, eller använd pilknapparna.",
     "noFiles": "Inga PDF-filer valda än.",

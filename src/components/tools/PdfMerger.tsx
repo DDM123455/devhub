@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { PDFDocument, degrees } from 'pdf-lib';
 import { renderPdfThumbnails, type PdfPageThumbnail } from '@/lib/pdf-thumbnails';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ interface Messages {
 	moveDown: string;
 	remove: string;
 	rotate: string;
+	undo: string;
 	loadingThumbnails: string;
 	dragHint: string;
 	noFiles: string;
@@ -66,6 +67,43 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 	const [skippedCount, setSkippedCount] = useState(0);
 	const [previewThumbnails, setPreviewThumbnails] = useState<PdfPageThumbnail[] | null>(null);
 	const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
+
+	// Minimal undo for the multi-step page operations below (rotate/remove/
+	// reorder) — a plain array-in-a-ref stack of previous `pages` snapshots,
+	// since these are cheap (arrays of ids/metadata, not the underlying PDF
+	// bytes) and there's no need for anything fancier than "go back one step".
+	// `canUndo` is a separate bit of state purely to make the Undo button's
+	// disabled state re-render — the ref itself doesn't trigger React updates.
+	const undoStackRef = useRef<PageItem[][]>([]);
+	const [canUndo, setCanUndo] = useState(false);
+
+	const pushUndoSnapshot = useCallback((snapshot: PageItem[]) => {
+		undoStackRef.current.push(snapshot);
+		if (undoStackRef.current.length > 50) undoStackRef.current.shift();
+		setCanUndo(true);
+	}, []);
+
+	const handleUndo = useCallback(() => {
+		const previous = undoStackRef.current.pop();
+		if (!previous) return;
+		setCanUndo(undoStackRef.current.length > 0);
+		setMergedBlob(null);
+		setPreviewThumbnails(null);
+		setPages(previous);
+	}, []);
+
+	// Ctrl+Z / Cmd+Z anywhere on the tool undoes the last rotate/remove/reorder —
+	// there's no text input on this page whose own native undo could conflict.
+	useEffect(() => {
+		const onKeyDown = (event: KeyboardEvent) => {
+			const isUndoShortcut = (event.ctrlKey || event.metaKey) && !event.shiftKey && event.key.toLowerCase() === 'z';
+			if (!isUndoShortcut) return;
+			event.preventDefault();
+			handleUndo();
+		};
+		window.addEventListener('keydown', onKeyDown);
+		return () => window.removeEventListener('keydown', onKeyDown);
+	}, [handleUndo]);
 
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList) return;
@@ -133,18 +171,22 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 	const handleRemovePage = useCallback((id: string) => {
 		setMergedBlob(null);
 		setPreviewThumbnails(null);
-		setPages((prev) => prev.filter((page) => page.id !== id));
-	}, []);
+		setPages((prev) => {
+			pushUndoSnapshot(prev);
+			return prev.filter((page) => page.id !== id);
+		});
+	}, [pushUndoSnapshot]);
 
 	const handleRotatePage = useCallback((id: string) => {
 		setMergedBlob(null);
 		setPreviewThumbnails(null);
-		setPages((prev) =>
-			prev.map((page) =>
+		setPages((prev) => {
+			pushUndoSnapshot(prev);
+			return prev.map((page) =>
 				page.id === id ? { ...page, rotation: ((page.rotation + 90) % 360) as PageItem['rotation'] } : page,
-			),
-		);
-	}, []);
+			);
+		});
+	}, [pushUndoSnapshot]);
 
 	const handleMove = useCallback((id: string, direction: -1 | 1) => {
 		setMergedBlob(null);
@@ -153,11 +195,12 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 			const index = prev.findIndex((page) => page.id === id);
 			const targetIndex = index + direction;
 			if (index === -1 || targetIndex < 0 || targetIndex >= prev.length) return prev;
+			pushUndoSnapshot(prev);
 			const next = [...prev];
 			[next[index], next[targetIndex]] = [next[targetIndex], next[index]];
 			return next;
 		});
-	}, []);
+	}, [pushUndoSnapshot]);
 
 	const handleDrop = useCallback((targetId: string) => {
 		setMergedBlob(null);
@@ -167,13 +210,14 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 			const fromIndex = prev.findIndex((page) => page.id === dragPageId);
 			const toIndex = prev.findIndex((page) => page.id === targetId);
 			if (fromIndex === -1 || toIndex === -1) return prev;
+			pushUndoSnapshot(prev);
 			const next = [...prev];
 			const [moved] = next.splice(fromIndex, 1);
 			next.splice(toIndex, 0, moved);
 			return next;
 		});
 		setDragPageId(null);
-	}, [dragPageId]);
+	}, [dragPageId, pushUndoSnapshot]);
 
 	const handleMerge = useCallback(async () => {
 		setIsProcessing(true);
@@ -326,7 +370,12 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 				<p className="text-sm text-muted-foreground">{messages.noFiles}</p>
 			) : (
 				<>
-					<p className="text-xs text-muted-foreground">{messages.dragHint}</p>
+					<div className="flex items-center justify-between gap-2">
+						<p className="text-xs text-muted-foreground">{messages.dragHint}</p>
+						<Button type="button" size="sm" variant="ghost" onClick={handleUndo} disabled={!canUndo} title={`${messages.undo} (Ctrl+Z)`}>
+							{messages.undo}
+						</Button>
+					</div>
 					<ul className="flex flex-wrap gap-3">
 						{pages.map((page, index) => (
 							<li

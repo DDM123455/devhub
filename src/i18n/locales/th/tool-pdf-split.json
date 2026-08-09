@@ -14,6 +14,7 @@
     "pageCount": "{{count}} หน้า",
     "rotate": "หมุนหน้า",
     "deletePage": "ลบหน้า",
+    "undo": "เลิกทำ",
     "modeLabel": "รูปแบบการแยก",
     "modeRanges": "ช่วงหน้าที่กำหนดเอง",
     "modeEveryN": "ทุก N หน้า",

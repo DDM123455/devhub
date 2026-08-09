@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { PDFDocument, degrees } from 'pdf-lib';
 import { renderPdfThumbnails } from '@/lib/pdf-thumbnails';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ interface Messages {
 	pageCount: string;
 	rotate: string;
 	deletePage: string;
+	undo: string;
 	modeLabel: string;
 	modeRanges: string;
 	modeEveryN: string;
@@ -127,6 +128,39 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 	const [selectedPageIds, setSelectedPageIds] = useState<Set<string>>(new Set());
 	const [dragPageId, setDragPageId] = useState<string | null>(null);
 
+	// Minimal undo for rotate/delete/reorder (same pattern as PDF Merge): a
+	// stack of `{pages, selectedPageIds}` snapshots — both together, since
+	// deleting a page also drops it from the selection, and undoing the
+	// delete should bring the selection back too.
+	const undoStackRef = useRef<{ pages: PageEntry[]; selectedPageIds: Set<string> }[]>([]);
+	const [canUndo, setCanUndo] = useState(false);
+
+	const pushUndoSnapshot = useCallback((snapshot: { pages: PageEntry[]; selectedPageIds: Set<string> }) => {
+		undoStackRef.current.push(snapshot);
+		if (undoStackRef.current.length > 50) undoStackRef.current.shift();
+		setCanUndo(true);
+	}, []);
+
+	const handleUndo = useCallback(() => {
+		const previous = undoStackRef.current.pop();
+		if (!previous) return;
+		setCanUndo(undoStackRef.current.length > 0);
+		setResults([]);
+		setPages(previous.pages);
+		setSelectedPageIds(previous.selectedPageIds);
+	}, []);
+
+	useEffect(() => {
+		const onKeyDown = (event: KeyboardEvent) => {
+			const isUndoShortcut = (event.ctrlKey || event.metaKey) && !event.shiftKey && event.key.toLowerCase() === 'z';
+			if (!isUndoShortcut) return;
+			event.preventDefault();
+			handleUndo();
+		};
+		window.addEventListener('keydown', onKeyDown);
+		return () => window.removeEventListener('keydown', onKeyDown);
+	}, [handleUndo]);
+
 	const loadFile = useCallback(async (candidate: File) => {
 		setError(null);
 		setResults([]);
@@ -161,6 +195,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 	}, [loadFile]);
 
 	const handleDeletePage = useCallback((id: string) => {
+		pushUndoSnapshot({ pages, selectedPageIds });
 		setResults([]);
 		setPages((prev) => prev.filter((page) => page.id !== id));
 		setSelectedPageIds((prev) => {
@@ -169,16 +204,17 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 			next.delete(id);
 			return next;
 		});
-	}, []);
+	}, [pages, selectedPageIds, pushUndoSnapshot]);
 
 	const handleRotatePage = useCallback((id: string) => {
+		pushUndoSnapshot({ pages, selectedPageIds });
 		setResults([]);
 		setPages((prev) =>
 			prev.map((page) =>
 				page.id === id ? { ...page, rotation: ((page.rotation + 90) % 360) as PageEntry['rotation'] } : page,
 			),
 		);
-	}, []);
+	}, [pages, selectedPageIds, pushUndoSnapshot]);
 
 	const handleTogglePageSelected = useCallback((id: string) => {
 		setResults([]);
@@ -212,6 +248,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 				const fromIndex = prev.findIndex((page) => page.id === dragPageId);
 				const toIndex = prev.findIndex((page) => page.id === targetId);
 				if (fromIndex === -1 || toIndex === -1) return prev;
+				pushUndoSnapshot({ pages: prev, selectedPageIds });
 				const next = [...prev];
 				const [moved] = next.splice(fromIndex, 1);
 				next.splice(toIndex, 0, moved);
@@ -219,7 +256,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 			});
 			setDragPageId(null);
 		},
-		[dragPageId],
+		[dragPageId, selectedPageIds, pushUndoSnapshot],
 	);
 
 	const handleSplit = useCallback(async () => {
@@ -371,9 +408,14 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 				!isLoadingThumbnails && <p className="text-sm text-muted-foreground">{messages.noFile}</p>
 			) : (
 				<div className="flex flex-col gap-4">
-					<p className="text-sm text-foreground">
-						{file.name} — {messages.pageCount.replace('{{count}}', String(pages.length))}
-					</p>
+					<div className="flex items-center justify-between gap-2">
+						<p className="text-sm text-foreground">
+							{file.name} — {messages.pageCount.replace('{{count}}', String(pages.length))}
+						</p>
+						<Button type="button" size="sm" variant="ghost" onClick={handleUndo} disabled={!canUndo} title={`${messages.undo} (Ctrl+Z)`}>
+							{messages.undo}
+						</Button>
+					</div>
 					<p className="text-xs text-muted-foreground">{messages.dragHint}</p>
 
 					<ul className="flex flex-wrap gap-3">

@@ -31,13 +31,8 @@
   tiên của audit UX/UI 2026-07-31 đã xong (task 1-10, xem log 2026-08-01 bên dưới cho từng
   mục).
 - **Phase 3.8 — Audit Remediation vòng 3 (từ báo cáo QA tương tác thật người dùng gửi
-  2026-08-01)**: nhóm 3.8a (Critical) HOÀN TẤT 3/3, nhóm 3.8b (High) HOÀN TẤT 5/5. Đang làm
-  3.8c (Medium): 8/9 xong (Convert Image Format before/after slider, trang 404 tùy chỉnh,
-  og:image/twitter:image mặc định + theo category, cảnh báo <script> sót lại ở SVG
-  Optimizer, xung đột auto-continue list ở Markdown Editor, security response headers qua
-  `public/_headers`, rà soát bổ sung aria-live cho toàn bộ nút "Copied!", tách label
-  loading-model/engine ở Remove Background) — còn 1 mục (Undo Ctrl+Z) — xem chi tiết từng
-  mục trong `ROADMAP.md`.
+  2026-08-01)**: **HOÀN TẤT CẢ 3 NHÓM** — 3.8a (Critical) 3/3, 3.8b (High) 5/5, 3.8c
+  (Medium) 9/9. Xem log chi tiết từng mục bên dưới; `ROADMAP.md` đã tick đủ.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -170,6 +165,31 @@
   ngay phía trên: phải dùng click thật, không phải synthetic event, để phản ánh đúng hành vi.
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
+
+- **2026-08-09 (3.8c #9 — HOÀN TẤT Phase 3.8)** — Thêm Undo tối thiểu (Ctrl+Z) cho thao tác
+  nhiều bước. Kiểm tra riêng từng chỗ ROADMAP nêu trước khi sửa:
+  - **Markdown Editor: ĐÃ CÓ SẴN, không cần sửa** — CodeMirror's `basicSetup` (import từ
+    package `codemirror`) đã tự bao gồm `commands.history()` + `historyKeymap` (Ctrl+Z/
+    Ctrl+Shift+Z), và mọi thao tác toolbar (Bold/Italic/Heading/List...) đi qua
+    `view.dispatch({changes: ...})` — một transaction CodeMirror bình thường, được
+    `history()` tự ghi nhận. Xác nhận bằng script gọi trực tiếp `undo()`/`redo()` của
+    `@codemirror/commands` trên 1 `EditorState` dựng tay có `history()`: undo/redo hoạt động
+    đúng, trả về `true` và đảo ngược nội dung chính xác.
+  - **Merge PDF / Split PDF (xoay/xoá/kéo-thả sắp xếp trang): bug thật, ĐÃ SỬA** — không có
+    undo nào từ trước (state `pages` quản lý bằng `useState` thuần, không qua CodeMirror).
+    Thêm 1 stack undo tối giản bằng `useRef` (không phải state, tránh re-render thừa) +
+    1 `useState<boolean> canUndo` chỉ để cập nhật trạng thái disable của nút Undo:
+    `pushUndoSnapshot` lưu snapshot `pages` (và cả `selectedPageIds` ở PDF Split, vì xoá
+    trang cũng xoá khỏi selection — undo phải khôi phục cả hai cùng lúc) TRƯỚC mỗi lần
+    xoay/xoá/kéo-thả; `handleUndo` pop snapshot gần nhất và khôi phục. Bind phím tắt qua
+    `useEffect` lắng nghe `keydown` toàn trang (`Ctrl+Z`/`Cmd+Z`, không xung đột vì 2 tool
+    này không có ô nhập text nào có undo riêng của trình duyệt). Thêm nút "Undo" hiện rõ
+    trên UI (không chỉ phím tắt ẩn), disable khi stack rỗng. `dataUrl` của thumbnail là
+    base64 (`canvas.toDataURL`, không phải object URL) nên snapshot cũ không bao giờ bị
+    revoke — không cần dọn dẹp khi undo. Thêm key i18n `undo` cho cả 20 locale của cả
+    `tool-pdf-merge.json` và `tool-pdf-split.json` (2 tool này vốn dịch đủ 20 ngôn ngữ).
+  Build sạch (462 trang). **Đây là mục cuối cùng của Phase 3.8 — cả 3 nhóm 3.8a/3.8b/3.8c
+  đã HOÀN TẤT.**
 
 - **2026-08-09 (3.8c #8)** — Tách label "đang tải model/engine lần đầu" khỏi "đang xử lý"
   cho Remove Background / Video Trim / Audio Converter. Kiểm tra thực tế từng tool trước khi

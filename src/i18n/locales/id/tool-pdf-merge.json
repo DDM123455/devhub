@@ -15,6 +15,7 @@
     "moveDown": "Pindah ke belakang",
     "remove": "Hapus halaman",
     "rotate": "Putar halaman",
+    "undo": "Urungkan",
     "loadingThumbnails": "Membaca halaman…",
     "dragHint": "Seret halaman mana pun untuk mengurutkan ulang, atau gunakan tombol panah.",
     "noFiles": "Belum ada file PDF yang dipilih.",

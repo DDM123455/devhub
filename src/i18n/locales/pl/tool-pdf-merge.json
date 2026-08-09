@@ -15,6 +15,7 @@
     "moveDown": "Przenieś później",
     "remove": "Usuń stronę",
     "rotate": "Obróć stronę",
+    "undo": "Cofnij",
     "loadingThumbnails": "Wczytywanie stron…",
     "dragHint": "Przeciągnij dowolną stronę, aby zmienić jej kolejność, lub użyj przycisków strzałek.",
     "noFiles": "Nie wybrano jeszcze żadnych plików PDF.",

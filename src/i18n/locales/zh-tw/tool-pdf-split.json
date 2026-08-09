@@ -14,6 +14,7 @@
     "pageCount": "共 {{count}} 頁",
     "rotate": "旋轉此頁",
     "deletePage": "刪除此頁",
+    "undo": "復原",
     "modeLabel": "分割模式",
     "modeRanges": "自訂頁碼範圍",
     "modeEveryN": "每 N 頁一份",

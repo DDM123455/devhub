@@ -15,6 +15,7 @@
     "moveDown": "Move later",
     "remove": "Delete page",
     "rotate": "Rotate page",
+    "undo": "Undo",
     "loadingThumbnails": "Reading pages…",
     "dragHint": "Drag any page to reorder it, or use the arrow buttons.",
     "noFiles": "No PDF files selected yet.",

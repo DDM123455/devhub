@@ -14,6 +14,7 @@
     "pageCount": "{{count}} pagine",
     "rotate": "Ruota pagina",
     "deletePage": "Elimina pagina",
+    "undo": "Annulla",
     "modeLabel": "Modalità divisione",
     "modeRanges": "Intervalli personalizzati",
     "modeEveryN": "Ogni N pagine",

@@ -14,6 +14,7 @@
     "pageCount": "{{count}} पेज",
     "rotate": "पेज घुमाएं",
     "deletePage": "पेज डिलीट करें",
+    "undo": "पूर्ववत करें",
     "modeLabel": "स्प्लिट मोड",
     "modeRanges": "कस्टम रेंज",
     "modeEveryN": "हर N पेज",

@@ -15,6 +15,7 @@
     "moveDown": "Nach hinten",
     "remove": "Seite löschen",
     "rotate": "Seite drehen",
+    "undo": "Rückgängig",
     "loadingThumbnails": "Seiten werden gelesen…",
     "dragHint": "Ziehe eine beliebige Seite, um sie umzusortieren, oder nutze die Pfeile.",
     "noFiles": "Noch keine PDF-Dateien ausgewählt.",

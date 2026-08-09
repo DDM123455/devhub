@@ -15,6 +15,7 @@
     "moveDown": "Déplacer après",
     "remove": "Supprimer la page",
     "rotate": "Pivoter la page",
+    "undo": "Annuler",
     "loadingThumbnails": "Lecture des pages…",
     "dragHint": "Glissez n'importe quelle page pour la réorganiser, ou utilisez les flèches.",
     "noFiles": "Aucun fichier PDF sélectionné pour le moment.",

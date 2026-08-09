@@ -14,6 +14,7 @@
     "pageCount": "{{count}} sidor",
     "rotate": "Rotera sida",
     "deletePage": "Ta bort sida",
+    "undo": "Ångra",
     "modeLabel": "Delningsläge",
     "modeRanges": "Egna intervall",
     "modeEveryN": "Var N:e sida",

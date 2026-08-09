@@ -14,6 +14,7 @@
     "pageCount": "{{count}} صفحة",
     "rotate": "تدوير الصفحة",
     "deletePage": "حذف الصفحة",
+    "undo": "تراجع",
     "modeLabel": "وضع التقسيم",
     "modeRanges": "نطاقات مخصصة",
     "modeEveryN": "كل N صفحة",

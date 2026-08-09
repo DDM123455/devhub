@@ -14,6 +14,7 @@
     "pageCount": "全{{count}}ページ",
     "rotate": "ページを回転",
     "deletePage": "ページを削除",
+    "undo": "元に戻す",
     "modeLabel": "分割方法",
     "modeRanges": "範囲を指定",
     "modeEveryN": "Nページごと",

@@ -15,6 +15,7 @@
     "moveDown": "后移",
     "remove": "删除该页",
     "rotate": "旋转该页",
+    "undo": "撤销",
     "loadingThumbnails": "正在读取页面…",
     "dragHint": "拖动任意页面即可调整顺序，也可以使用箭头按钮。",
     "noFiles": "还没有选择 PDF 文件。",

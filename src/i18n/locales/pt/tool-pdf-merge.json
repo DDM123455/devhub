@@ -15,6 +15,7 @@
     "moveDown": "Mover para depois",
     "remove": "Excluir página",
     "rotate": "Girar página",
+    "undo": "Desfazer",
     "loadingThumbnails": "Lendo páginas…",
     "dragHint": "Arraste qualquer página para reordenar, ou use as setas.",
     "noFiles": "Nenhum arquivo PDF selecionado ainda.",

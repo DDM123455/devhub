@@ -14,6 +14,7 @@
     "pageCount": "{{count}} pagina's",
     "rotate": "Pagina roteren",
     "deletePage": "Pagina verwijderen",
+    "undo": "Ongedaan maken",
     "modeLabel": "Splitsmodus",
     "modeRanges": "Aangepaste bereiken",
     "modeEveryN": "Om de N pagina's",

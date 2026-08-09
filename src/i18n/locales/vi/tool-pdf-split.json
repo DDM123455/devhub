@@ -14,6 +14,7 @@
     "pageCount": "{{count}} trang",
     "rotate": "Xoay trang",
     "deletePage": "Xóa trang",
+    "undo": "Hoàn tác",
     "modeLabel": "Kiểu tách",
     "modeRanges": "Khoảng tùy chỉnh",
     "modeEveryN": "Mỗi N trang",

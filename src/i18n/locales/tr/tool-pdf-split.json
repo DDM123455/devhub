@@ -14,6 +14,7 @@
     "pageCount": "{{count}} sayfa",
     "rotate": "Sayfayı döndür",
     "deletePage": "Sayfayı sil",
+    "undo": "Geri al",
     "modeLabel": "Bölme modu",
     "modeRanges": "Özel aralıklar",
     "modeEveryN": "Her N sayfada bir",

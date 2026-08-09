@@ -14,6 +14,7 @@
     "pageCount": "총 {{count}}페이지",
     "rotate": "페이지 회전",
     "deletePage": "페이지 삭제",
+    "undo": "실행 취소",
     "modeLabel": "분할 방식",
     "modeRanges": "사용자 지정 범위",
     "modeEveryN": "N페이지마다",

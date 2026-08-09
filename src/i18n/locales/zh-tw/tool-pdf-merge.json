@@ -15,6 +15,7 @@
     "moveDown": "往後移",
     "remove": "刪除此頁",
     "rotate": "旋轉此頁",
+    "undo": "復原",
     "loadingThumbnails": "正在讀取頁面…",
     "dragHint": "拖曳任一頁即可調整順序，也可以用箭頭按鈕。",
     "noFiles": "尚未選擇任何 PDF 檔案。",
