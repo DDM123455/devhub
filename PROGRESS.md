@@ -31,10 +31,8 @@
   tiên của audit UX/UI 2026-07-31 đã xong (task 1-10, xem log 2026-08-01 bên dưới cho từng
   mục).
 - **Phase 3.8 — Audit Remediation vòng 3 (từ báo cáo QA tương tác thật người dùng gửi
-  2026-08-01)**: nhóm 3.8a (Critical) HOÀN TẤT 3/3. Nhóm 3.8b (High) đã xong 2/5 (Compress
-  Image stale result, SVG Optimizer nhãn % sai) — còn 3/5 (Regex Tester Matches không tự
-  refresh, disable submit khi input rỗng, chip "20 tools · 5 categories" trang chủ không cập
-  nhật theo filter). 3.8c (Medium, 9 mục) chưa làm — xem chi tiết từng mục trong `ROADMAP.md`.
+  2026-08-01)**: nhóm 3.8a (Critical) HOÀN TẤT 3/3, nhóm 3.8b (High) HOÀN TẤT 5/5. Đang làm
+  3.8c (Medium, 9 mục) — xem chi tiết từng mục trong `ROADMAP.md`.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -167,6 +165,33 @@
   ngay phía trên: phải dùng click thật, không phải synthetic event, để phản ánh đúng hành vi.
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
+
+- **2026-08-09 (tiếp)** — Phase 3.8b **HOÀN TẤT 5/5**, theo yêu cầu người dùng "sửa hết các
+  mục theo thứ tự, tự động chạy tiếp đến hết". Môi trường phiên này KHÔNG có Puppeteer/
+  Playwright cài sẵn (`node_modules` không có) và CLAUDE.md cấm thêm dependency ngoài
+  ROADMAP nếu không thực sự cần thiết — nên 2 mục dưới đây được xác minh bằng đọc code kỹ
+  (trace dependency array/props render), KHÔNG phải bằng thao tác tay/browser tự động thật
+  như log 2026-08-01. Cần người dùng tự bấm thử lại trên UI thật để chắc chắn 100% trước khi
+  yên tâm hoàn toàn.
+  1. **Regex Tester — Matches không tự cập nhật khi chỉ sửa Test String**: đọc lại
+     `RegexTester.tsx`, effect chạy match (dòng ~227) đã có `debouncedTestString` trong mảng
+     dependency, tự chạy lại vô điều kiện khi giá trị này đổi — không tìm thấy đường nào khiến
+     nó bỏ qua. Nhiều khả năng bug đã hết từ đợt refactor sang Web Worker (`f5a11ad`, trước
+     3.8 rất lâu) chứ không phải do lần sửa này. Không sửa code, chỉ tick lại cho đúng thực tế.
+  2. **Disable nút submit khi input rỗng (Merge PDF và các nút tương tự)**: rà `PdfMerger.tsx`
+     (`disabled={!canMerge}`, `canMerge` yêu cầu `pages.length >= 2`), `PdfSplitter.tsx`
+     (`!canSplit`), `AudioConverter.tsx`/`VideoTrim.tsx` (toàn bộ khối nút chỉ render trong
+     `{audioFile && ...}` / sau khi có `duration`) — không nơi nào submit được khi chưa có
+     input. Không sửa code, chỉ tick lại.
+  3. **Chip "20 tools · 5 categories" trang chủ không cập nhật theo filter** (bug thật, ĐÃ
+     SỬA) — `src/pages/[locale]/index.astro`. Root cause: `toolCount`/`categoryCount` chỉ
+     tính 1 lần lúc build (`tools.length`/`categories.length`) và in ra HTML tĩnh; script
+     filter phía client chỉ toggle class `hidden` trên item/card, không đụng tới 2 con số này
+     → gõ tìm kiếm thu hẹp danh sách nhưng chip vẫn hiển thị tổng số ban đầu, sai lệch với kết
+     quả đang lọc. Sửa: thêm `id="tool-count-chip"`/`id="category-count-chip"` vào 2 thẻ
+     `<strong>`, trong listener `input` đếm số tool/category còn hiển thị (`visibleToolCount`/
+     `visibleCategoryCount`) song song với việc toggle `hidden`, ghi lại vào
+     `textContent` của 2 chip mỗi lần gõ. Build lại sạch (441 trang).
 
 - **2026-08-09** — Phase 3.8b (**2/5 bug High đã sửa**: Compress Image, SVG Optimizer).
   Phát hiện qua rà soát lại checklist 3.8 theo yêu cầu người dùng — 2 fix này đã nằm sẵn ở

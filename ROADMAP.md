@@ -317,12 +317,12 @@ ROADMAP)
 
 ### 3.8b — Bug thật High
 - [x] Compress Image: sửa hiển thị kết quả nén cũ khi đổi "By quality" → "By target size"
-- [ ] Regex Tester: panel Matches không tự cập nhật khi chỉ sửa Test String (phải bấm lại ô
+- [x] Regex Tester: panel Matches không tự cập nhật khi chỉ sửa Test String (phải bấm lại ô
       Pattern mới refresh)
 - [x] SVG Optimizer: nhãn % sai khi file "tối ưu" lại LỚN hơn bản gốc (vẫn ghi "0% smaller")
-- [ ] Disable nút submit khi input rỗng (Merge PDF và các nút tương tự) — hiện bấm không có
+- [x] Disable nút submit khi input rỗng (Merge PDF và các nút tương tự) — hiện bấm không có
       phản hồi gì
-- [ ] Trang chủ: chip "20 tools · 5 categories" không cập nhật số theo kết quả đang lọc
+- [x] Trang chủ: chip "20 tools · 5 categories" không cập nhật số theo kết quả đang lọc
 
 ### 3.8c — UX/Feature gap Medium
 - [ ] Convert Image Format: thêm before/after slider (nhất quán với Compress Image đã có)

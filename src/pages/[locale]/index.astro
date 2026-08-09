@@ -50,11 +50,11 @@ const categoryCount = categories.length;
 
 		<div class="flex flex-wrap gap-2.5">
 			<div class="flex items-baseline gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs text-muted-foreground">
-				<strong class="font-mono text-sm font-normal text-foreground">{toolCount}</strong>
+				<strong id="tool-count-chip" class="font-mono text-sm font-normal text-foreground">{toolCount}</strong>
 				<span>{t('home.stats.tools')}</span>
 			</div>
 			<div class="flex items-baseline gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs text-muted-foreground">
-				<strong class="font-mono text-sm font-normal text-foreground">{categoryCount}</strong>
+				<strong id="category-count-chip" class="font-mono text-sm font-normal text-foreground">{categoryCount}</strong>
 				<span>{t('home.stats.categories')}</span>
 			</div>
 		</div>
@@ -123,25 +123,37 @@ const categoryCount = categories.length;
 	const emptyStateQuery = document.getElementById('tool-search-empty-query');
 	const toolItems = Array.from(document.querySelectorAll<HTMLElement>('[data-tool-item]'));
 	const categoryCards = Array.from(document.querySelectorAll<HTMLElement>('[data-category-card]'));
+	const toolCountChip = document.getElementById('tool-count-chip');
+	const categoryCountChip = document.getElementById('category-count-chip');
 
 	searchInput?.addEventListener('input', () => {
 		const query = searchInput.value.trim().toLowerCase();
 
+		let visibleToolCount = 0;
 		for (const item of toolItems) {
 			const name = item.dataset.toolName ?? '';
-			item.classList.toggle('hidden', query !== '' && !name.includes(query));
+			const isVisible = query === '' || name.includes(query);
+			item.classList.toggle('hidden', !isVisible);
+			if (isVisible) visibleToolCount += 1;
 		}
 
-		let anyVisible = false;
+		let visibleCategoryCount = 0;
 		for (const card of categoryCards) {
 			const hasVisibleTool = Array.from(card.querySelectorAll<HTMLElement>('[data-tool-item]')).some(
 				(item) => !item.classList.contains('hidden'),
 			);
 			card.classList.toggle('hidden', !hasVisibleTool);
-			if (hasVisibleTool) anyVisible = true;
+			if (hasVisibleTool) visibleCategoryCount += 1;
 		}
 
+		// Reflect the filtered result count in the "N tools · N categories" chips
+		// instead of leaving the build-time totals displayed — otherwise the
+		// chips silently lie about how many tools/categories are actually shown
+		// once a search query narrows the list.
+		if (toolCountChip) toolCountChip.textContent = String(visibleToolCount);
+		if (categoryCountChip) categoryCountChip.textContent = String(visibleCategoryCount);
+
 		if (emptyStateQuery) emptyStateQuery.textContent = `"${searchInput.value.trim()}"`;
-		emptyState?.classList.toggle('hidden', query === '' || anyVisible);
+		emptyState?.classList.toggle('hidden', query === '' || visibleCategoryCount > 0);
 	});
 </script>
