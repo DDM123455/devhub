@@ -29,7 +29,8 @@
     "download": "İndir",
     "invalidSvgError": "Bu SVG ayrıştırılamadı: {{message}}",
     "notSvgError": "Bu bir SVG dosyasına benzemiyor (<svg> kök öğesi eksik).",
-    "noInput": "Başlamak için SVG kodu yapıştırın veya bir dosya yükleyin."
+    "noInput": "Başlamak için SVG kodu yapıştırın veya bir dosya yükleyin.",
+    "scriptTagWarning": "Bu optimize edilmiş SVG hâlâ bir <script> etiketi içeriyor. Bu normaldir (SVGO betikleri kaldırmaz), ancak bu SVG'yi bir HTML sayfasına satır içi olarak gömerseniz gerçek bir XSS riski oluşturur."
   },
   "related": "İlgili araçlar",
   "article": {

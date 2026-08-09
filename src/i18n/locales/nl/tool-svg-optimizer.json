@@ -29,7 +29,8 @@
     "download": "Downloaden",
     "invalidSvgError": "Kon deze SVG niet verwerken: {{message}}",
     "notSvgError": "Dit lijkt geen SVG-bestand te zijn (ontbrekend <svg>-hoofdelement).",
-    "noInput": "Plak SVG-code of upload een bestand om te beginnen."
+    "noInput": "Plak SVG-code of upload een bestand om te beginnen.",
+    "scriptTagWarning": "Deze geoptimaliseerde SVG bevat nog een <script>-tag. Dat is normaal (SVGO verwijdert geen scripts), maar vormt een echt XSS-risico als je deze SVG inline in een HTML-pagina insluit."
   },
   "related": "Gerelateerde tools",
   "article": {

@@ -32,9 +32,9 @@
   mục).
 - **Phase 3.8 — Audit Remediation vòng 3 (từ báo cáo QA tương tác thật người dùng gửi
   2026-08-01)**: nhóm 3.8a (Critical) HOÀN TẤT 3/3, nhóm 3.8b (High) HOÀN TẤT 5/5. Đang làm
-  3.8c (Medium): 3/9 xong (Convert Image Format before/after slider, trang 404 tùy chỉnh,
-  og:image/twitter:image mặc định + theo category) — xem chi tiết từng mục trong
-  `ROADMAP.md`.
+  3.8c (Medium): 4/9 xong (Convert Image Format before/after slider, trang 404 tùy chỉnh,
+  og:image/twitter:image mặc định + theo category, cảnh báo <script> sót lại ở SVG
+  Optimizer) — xem chi tiết từng mục trong `ROADMAP.md`.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -167,6 +167,17 @@
   ngay phía trên: phải dùng click thật, không phải synthetic event, để phản ánh đúng hành vi.
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
+
+- **2026-08-09 (3.8c #4)** — SVG Optimizer: cảnh báo khi output còn sót thẻ `<script>`.
+  Không phải bug (SVGO mặc định không có plugin nào trong `preset-default` xoá
+  `<script>` — hành vi có chủ đích, vì SVG dùng làm file ảnh độc lập thì giữ script cũng
+  không sao), nhưng rủi ro XSS thật nếu người dùng sau đó nhúng inline `<svg>` này vào một
+  trang HTML (script sẽ chạy trong context của trang chứa). Thêm `hasScriptTag` (regex
+  `/<script[\s>]/i` trên `output`), hiện banner amber (cùng style với cảnh báo downmix kênh
+  của Audio Converter) khi phát hiện. Thêm key `scriptTagWarning` vào cả 20 file
+  `tool-svg-optimizer.json` (tool này vốn đã dịch đủ 20 ngôn ngữ từ trước, không phải tool
+  mới nên không áp dụng quy ước rút gọn en+vi). Build sạch (462 trang) — xác nhận giá trị
+  dịch đúng được nhúng vào props SSR của trang `en`/`vi` (không phải fallback text thiếu key).
 
 - **2026-08-09 (3.8c #3)** — og:image/twitter:image mặc định + theo từng nhóm công cụ.
   Trước khi làm, đã hỏi lại người dùng vì mục này thực sự cần 1 dependency mới (dự án

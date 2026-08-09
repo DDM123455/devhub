@@ -29,7 +29,8 @@
     "download": "Descargar",
     "invalidSvgError": "No se pudo procesar este SVG: {{message}}",
     "notSvgError": "Esto no parece un archivo SVG (falta el elemento raíz <svg>).",
-    "noInput": "Pega código SVG o sube un archivo para empezar."
+    "noInput": "Pega código SVG o sube un archivo para empezar.",
+    "scriptTagWarning": "Este SVG optimizado todavía contiene una etiqueta <script>. Es normal (SVGO no elimina scripts), pero supone un riesgo real de XSS si incrustas este SVG en línea en una página HTML."
   },
   "related": "Herramientas relacionadas",
   "article": {

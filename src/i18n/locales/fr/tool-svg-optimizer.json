@@ -29,7 +29,8 @@
     "download": "Télécharger",
     "invalidSvgError": "Impossible d'analyser ce SVG : {{message}}",
     "notSvgError": "Ceci ne ressemble pas à un fichier SVG (élément racine <svg> manquant).",
-    "noInput": "Collez du code SVG ou importez un fichier pour commencer."
+    "noInput": "Collez du code SVG ou importez un fichier pour commencer.",
+    "scriptTagWarning": "Ce SVG optimisé contient encore une balise <script>. C'est normal (SVGO ne supprime pas les scripts), mais cela représente un vrai risque XSS si vous intégrez ce SVG en ligne dans une page HTML."
   },
   "related": "Outils similaires",
   "article": {

@@ -65,7 +65,8 @@
     "pluginSortAttrs": "Sắp xếp thuộc tính (giúp nén gzip tốt hơn)",
     "pluginSortDefsChildren": "Sắp xếp các phần tử con trong <defs>",
     "pluginRemoveDesc": "Xóa thẻ <desc> rỗng",
-    "pluginRemoveViewBox": "Xóa viewBox (chỉ khi đã có width/height)"
+    "pluginRemoveViewBox": "Xóa viewBox (chỉ khi đã có width/height)",
+    "scriptTagWarning": "SVG đã tối ưu vẫn còn thẻ <script>. Đây là bình thường (SVGO không xoá script), nhưng sẽ là rủi ro XSS thật nếu bạn nhúng SVG này inline vào trang HTML."
   },
   "related": "Công cụ liên quan",
   "faq": {

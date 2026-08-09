@@ -29,7 +29,8 @@
     "download": "Pobierz",
     "invalidSvgError": "Nie udało się przetworzyć tego SVG: {{message}}",
     "notSvgError": "To nie wygląda na plik SVG (brak elementu głównego <svg>).",
-    "noInput": "Wklej kod SVG lub wgraj plik, aby zacząć."
+    "noInput": "Wklej kod SVG lub wgraj plik, aby zacząć.",
+    "scriptTagWarning": "Ten zoptymalizowany SVG nadal zawiera znacznik <script>. To normalne (SVGO nie usuwa skryptów), ale stanowi realne ryzyko XSS, jeśli osadzisz ten SVG bezpośrednio na stronie HTML."
   },
   "related": "Powiązane narzędzia",
   "article": {

@@ -29,7 +29,8 @@
     "download": "Unduh",
     "invalidSvgError": "Tidak dapat mem-parsing SVG ini: {{message}}",
     "notSvgError": "Ini sepertinya bukan file SVG (elemen root <svg> tidak ada).",
-    "noInput": "Tempelkan kode SVG atau unggah file untuk memulai."
+    "noInput": "Tempelkan kode SVG atau unggah file untuk memulai.",
+    "scriptTagWarning": "SVG yang dioptimalkan ini masih berisi tag <script>. Ini normal (SVGO tidak menghapus skrip), tetapi menjadi risiko XSS nyata jika Anda menyematkan SVG ini secara inline di halaman HTML."
   },
   "related": "Alat terkait",
   "article": {

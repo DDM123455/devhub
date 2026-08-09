@@ -65,7 +65,8 @@
     "pluginSortAttrs": "Sort attributes (improves gzip compression)",
     "pluginSortDefsChildren": "Sort children of <defs>",
     "pluginRemoveDesc": "Remove empty <desc>",
-    "pluginRemoveViewBox": "Remove viewBox (only if width/height are present)"
+    "pluginRemoveViewBox": "Remove viewBox (only if width/height are present)",
+    "scriptTagWarning": "This optimized SVG still contains a <script> tag. That’s normal — SVGO doesn’t strip scripts — but it’s a real XSS risk if you embed this SVG inline in an HTML page."
   },
   "related": "Related tools",
   "faq": {

@@ -29,7 +29,8 @@
     "download": "다운로드",
     "invalidSvgError": "SVG를 해석할 수 없습니다: {{message}}",
     "notSvgError": "SVG 파일이 아닌 것 같습니다 (<svg> 루트 요소가 없습니다).",
-    "noInput": "시작하려면 SVG 코드를 붙여넣거나 파일을 업로드하세요."
+    "noInput": "시작하려면 SVG 코드를 붙여넣거나 파일을 업로드하세요.",
+    "scriptTagWarning": "최적화된 SVG에 여전히 <script> 태그가 포함되어 있습니다. 이는 정상입니다(SVGO는 스크립트를 제거하지 않음). 하지만 이 SVG를 HTML 페이지에 인라인으로 삽입하면 실제 XSS 위험이 있습니다."
   },
   "related": "관련 도구",
   "article": {

@@ -328,7 +328,7 @@ ROADMAP)
 - [x] Convert Image Format: thêm before/after slider (nhất quán với Compress Image đã có)
 - [x] Trang 404 tùy chỉnh (nav + search + logo) thay vì mặc định Astro
 - [x] Thêm og:image/twitter:image mặc định + theo từng nhóm công cụ
-- [ ] SVG Optimizer: cảnh báo <script> còn sót lại sau tối ưu là rủi ro XSS nếu nhúng inline
+- [x] SVG Optimizer: cảnh báo <script> còn sót lại sau tối ưu là rủi ro XSS nếu nhúng inline
       (hành vi mặc định của svgo, không phải bug — chỉ cần cảnh báo)
 - [ ] Markdown Editor: sửa xung đột auto-continue list khi Enter với nội dung dán sẵn bắt đầu
       bằng "-"

@@ -29,7 +29,8 @@
     "download": "下载",
     "invalidSvgError": "无法解析此 SVG：{{message}}",
     "notSvgError": "这似乎不是一个 SVG 文件（缺少 <svg> 根元素）。",
-    "noInput": "粘贴 SVG 代码或上传文件即可开始。"
+    "noInput": "粘贴 SVG 代码或上传文件即可开始。",
+    "scriptTagWarning": "优化后的 SVG 中仍包含 <script> 标签。这是正常现象（SVGO 不会删除脚本），但如果将此 SVG 内联嵌入 HTML 页面，会带来真实的 XSS 风险。"
   },
   "related": "相关工具",
   "article": {

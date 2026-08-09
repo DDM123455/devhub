@@ -29,7 +29,8 @@
     "download": "Ladda ner",
     "invalidSvgError": "Kunde inte tolka denna SVG: {{message}}",
     "notSvgError": "Detta verkar inte vara en SVG-fil (roten <svg> saknas).",
-    "noInput": "Klistra in SVG-kod eller ladda upp en fil för att komma igång."
+    "noInput": "Klistra in SVG-kod eller ladda upp en fil för att komma igång.",
+    "scriptTagWarning": "Denna optimerade SVG innehåller fortfarande en <script>-tagg. Det är normalt (SVGO tar inte bort skript), men det är en verklig XSS-risk om du bäddar in denna SVG direkt i en HTML-sida."
   },
   "related": "Relaterade verktyg",
   "article": {

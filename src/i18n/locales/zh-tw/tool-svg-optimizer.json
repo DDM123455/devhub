@@ -29,7 +29,8 @@
     "download": "下載",
     "invalidSvgError": "無法解析這份 SVG：{{message}}",
     "notSvgError": "這似乎不是 SVG 檔案（缺少 <svg> 根元素）。",
-    "noInput": "貼上 SVG 程式碼，或上傳檔案來開始使用。"
+    "noInput": "貼上 SVG 程式碼，或上傳檔案來開始使用。",
+    "scriptTagWarning": "優化後的 SVG 中仍包含 <script> 標籤。這是正常現象（SVGO 不會移除腳本），但若將此 SVG 內嵌到 HTML 頁面中，會有實際的 XSS 風險。"
   },
   "related": "相關工具",
   "article": {

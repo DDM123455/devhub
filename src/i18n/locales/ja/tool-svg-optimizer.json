@@ -29,7 +29,8 @@
     "download": "ダウンロード",
     "invalidSvgError": "このSVGを解析できませんでした: {{message}}",
     "notSvgError": "SVGファイルではないようです（<svg> ルート要素が見つかりません）。",
-    "noInput": "SVGコードを貼り付けるか、ファイルをアップロードして開始してください。"
+    "noInput": "SVGコードを貼り付けるか、ファイルをアップロードして開始してください。",
+    "scriptTagWarning": "この最適化されたSVGにはまだ<script>タグが含まれています。これは正常です（SVGOはスクリプトを削除しません）が、このSVGをHTMLページにインラインで埋め込む場合、実際のXSSリスクとなります。"
   },
   "related": "関連ツール",
   "article": {

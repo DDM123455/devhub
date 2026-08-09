@@ -29,7 +29,8 @@
     "download": "Herunterladen",
     "invalidSvgError": "SVG konnte nicht verarbeitet werden: {{message}}",
     "notSvgError": "Das sieht nicht nach einer SVG-Datei aus (fehlendes <svg>-Root-Element).",
-    "noInput": "SVG-Code einfügen oder eine Datei hochladen, um loszulegen."
+    "noInput": "SVG-Code einfügen oder eine Datei hochladen, um loszulegen.",
+    "scriptTagWarning": "Dieses optimierte SVG enthält noch ein <script>-Tag. Das ist normal (SVGO entfernt keine Skripte), stellt aber ein echtes XSS-Risiko dar, wenn du dieses SVG inline in eine HTML-Seite einbettest."
   },
   "related": "Ähnliche Tools",
   "article": {

@@ -21,6 +21,7 @@ interface Messages {
 	sizeLabel: string;
 	reduced: string;
 	increased: string;
+	scriptTagWarning: string;
 	copy: string;
 	copied: string;
 	download: string;
@@ -230,6 +231,13 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 	// display a misleading "0% smaller" instead of admitting the file grew.
 	const percentDelta = originalSize > 0 && output ? Math.round((1 - optimizedSize / originalSize) * 100) : 0;
 	const isLarger = percentDelta < 0;
+	// SVGO's default behavior is to preserve <script> elements verbatim (it's
+	// not something any preset-default plugin strips) — correct for SVGs used
+	// as standalone image files, but a real risk if the user then embeds the
+	// "optimized" output inline in an HTML page: an inline <svg> runs its
+	// <script> in the host page's context. Not a bug to fix, just something
+	// worth surfacing since it's easy to assume "optimized" implies "sanitized".
+	const hasScriptTag = /<script[\s>]/i.test(output);
 
 	const handleFile = (files: FileList | null) => {
 		const file = files?.[0];
@@ -359,6 +367,12 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 			</details>
 
 			{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+
+			{hasScriptTag && !error && (
+				<p role="status" className="rounded-md border border-amber-500/40 bg-amber-500/10 p-2 text-sm text-amber-700 dark:text-amber-300">
+					{messages.scriptTagWarning}
+				</p>
+			)}
 
 			{input !== '' && !error && (
 				<>
