@@ -332,7 +332,7 @@ ROADMAP)
       (hành vi mặc định của svgo, không phải bug — chỉ cần cảnh báo)
 - [x] Markdown Editor: sửa xung đột auto-continue list khi Enter với nội dung dán sẵn bắt đầu
       bằng "-"
-- [ ] Cấu hình response security headers (CSP, X-Content-Type-Options, Referrer-Policy,
+- [x] Cấu hình response security headers (CSP, X-Content-Type-Options, Referrer-Policy,
       X-Frame-Options/frame-ancestors) cho Cloudflare qua file `public/_headers`
 - [ ] Rà soát lại aria-live cho trạng thái động (progress %, "Copied!") — Phase 3.5b từng làm,
       xác nhận còn thiếu chỗ nào không

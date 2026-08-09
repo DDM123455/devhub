@@ -1,0 +1,27 @@
+# Cloudflare Pages reads this file to attach extra response headers to every
+# request — see https://developers.cloudflare.com/pages/configuration/headers/
+#
+# CSP notes (read before tightening this further):
+# - `script-src`/`style-src` need 'unsafe-inline': this is a fully static site
+#   (no per-request server to mint a nonce), Layout.astro has a real inline
+#   <script> for early dark-mode detection (must run before first paint, so it
+#   can't be deferred to an external file), and several components set inline
+#   `style="...hue-rotate(...)"` (category badges on the homepage/404). Hashing
+#   every inline script/style across 20+ locales would be fragile to keep in
+#   sync — 'unsafe-inline' is the deliberate, pragmatic tradeoff for a static
+#   multi-page export like this one, not an oversight.
+# - `connect-src`/`worker-src` allow two specific external hosts because two
+#   tools genuinely fetch from them at runtime (checked in source, not
+#   guessed): Video Trim's @ffmpeg/core loads its wasm binary from
+#   cdn.jsdelivr.net, and Remove Background (@imgly/background-removal) fetches
+#   its ONNX models/wasm runtime from staticimgly.com. Removing either without
+#   self-hosting those assets first would silently break that tool (CSP
+#   violations don't throw catchable JS errors — they just fail the fetch).
+# - 'wasm-unsafe-eval' is required for any of the WebAssembly-based tools
+#   (ffmpeg.wasm, onnxruntime-web, heic2any/libheif) to compile at all.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data:; connect-src 'self' https://cdn.jsdelivr.net https://staticimgly.com; worker-src 'self' blob:; child-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'

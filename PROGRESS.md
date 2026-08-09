@@ -32,10 +32,10 @@
   mục).
 - **Phase 3.8 — Audit Remediation vòng 3 (từ báo cáo QA tương tác thật người dùng gửi
   2026-08-01)**: nhóm 3.8a (Critical) HOÀN TẤT 3/3, nhóm 3.8b (High) HOÀN TẤT 5/5. Đang làm
-  3.8c (Medium): 5/9 xong (Convert Image Format before/after slider, trang 404 tùy chỉnh,
+  3.8c (Medium): 6/9 xong (Convert Image Format before/after slider, trang 404 tùy chỉnh,
   og:image/twitter:image mặc định + theo category, cảnh báo <script> sót lại ở SVG
-  Optimizer, xung đột auto-continue list ở Markdown Editor) — xem chi tiết từng mục trong
-  `ROADMAP.md`.
+  Optimizer, xung đột auto-continue list ở Markdown Editor, security response headers qua
+  `public/_headers`) — xem chi tiết từng mục trong `ROADMAP.md`.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -168,6 +168,34 @@
   ngay phía trên: phải dùng click thật, không phải synthetic event, để phản ánh đúng hành vi.
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
+
+- **2026-08-09 (3.8c #6)** — Cấu hình security response headers cho Cloudflare qua
+  `public/_headers` (CSP, X-Content-Type-Options, Referrer-Policy, X-Frame-Options,
+  Permissions-Policy). Trước khi viết CSP, rà lại code để liệt kê chính xác domain ngoài
+  nào thực sự được gọi lúc runtime (không đoán): `VideoTrim.tsx` tải `@ffmpeg/core` wasm
+  từ `cdn.jsdelivr.net`; `BackgroundRemover.tsx` dùng `@imgly/background-removal` không
+  truyền `publicPath` tuỳ chỉnh nên tự fetch model ONNX/wasm runtime từ mặc định của thư
+  viện (`staticimgly.com`) — cả 2 phải nằm trong `connect-src`/`worker-src`, thiếu 1 trong
+  2 sẽ âm thầm làm hỏng đúng tool đó (CSP chặn fetch không throw lỗi JS bắt được, chỉ có
+  request fail). `pdfjs-dist` và các Web Worker khác (`audioEncodeWorker`,
+  `regexMatchWorker`, `textDiffWorker`) đều bundle same-origin, không cần domain ngoài nào
+  khác.
+  Vì đây là site 100% static (không có server per-request để phát nonce), và
+  `Layout.astro` có 1 `<script>` inline thật (dark-mode detection, phải chạy trước paint
+  đầu tiên nên không thể tách file ngoài + defer), cùng nhiều chỗ dùng `style="...
+  hue-rotate(...)"` inline (category badge trang chủ/404) — `script-src`/`style-src` phải
+  có `'unsafe-inline'`, đánh đổi có chủ đích (ghi rõ lý do làm comment ngay trong file
+  `_headers`) thay vì cố hash từng inline script/style rải rác qua 20+ locale (dễ vỡ khi
+  update sau này). `'wasm-unsafe-eval'` cần cho mọi tool dùng WebAssembly (ffmpeg.wasm,
+  onnxruntime-web, heic2any/libheif). `Permissions-Policy` chỉ khoá `camera/microphone/
+  geolocation/interest-cohort` — đã grep xác nhận không tool nào dùng `getUserMedia`/
+  camera nên khoá an toàn, không đụng tới clipboard (nhiều nút Copy dùng
+  `navigator.clipboard`).
+  Không có Puppeteer để test trực tiếp CSP có chặn nhầm resource nào không (CSP vi phạm
+  không luôn hiện lỗi console dễ thấy qua đọc code tĩnh) — người dùng nên tự mở DevTools
+  Console kiểm tra tab Video Trim và Remove Background sau khi deploy thật lên Cloudflare
+  để chắc chắn không bị chặn. Build sạch (462 trang), xác nhận `public/_headers` được
+  Astro copy nguyên vẹn thành `dist/_headers`.
 
 - **2026-08-09 (3.8c #5)** — Markdown Editor: sửa xung đột auto-continue list khi Enter với
   nội dung bắt đầu bằng "-". Không có Puppeteer/browser để tái hiện y hệt thao tác chuột thật
