@@ -1,0 +1,27 @@
+{
+  "heading": "Kubernetes-YAML-validator",
+  "tagline": "Plak een of meer Kubernetes-manifests (gescheiden door ---) en valideer ze tegen het echte schema voordat je kubectl apply uitvoert.",
+  "related": "Gerelateerde tools",
+  "ui": {
+    "inputLabel": "Kubernetes-manifest",
+    "inputPlaceholder": "Plak hier je YAML-manifest…",
+    "dropHint": "Sleep hier een .yaml/.yml-bestand naartoe, of plak de manifesttekst hierboven.",
+    "chooseFile": "Bestand kiezen",
+    "loadSample": "Voorbeeld laden",
+    "clear": "Wissen",
+    "privacyNote": "Parsen en validatie draaien in je browser — alleen het resource-schema (nooit je manifest) wordt van een openbare CDN gehaald.",
+    "versionLabel": "Kubernetes-versie",
+    "versionMaster": "Nieuwste (master)",
+    "validating": "Bezig met valideren…",
+    "documentHeading": "Document {{index}}",
+    "kindBadge": "{{kind}} ({{apiVersion}})",
+    "noIssues": "Geen problemen gevonden.",
+    "summaryLabel": "{{errors}} fouten, {{warnings}} waarschuwingen",
+    "severityError": "Fout",
+    "severityWarning": "Waarschuwing",
+    "jumpToLine": "Regel {{line}}",
+    "fixApiVersion": "Kopiëren met gecorrigeerde apiVersion",
+    "fixApiVersionCopied": "Gekopieerd!",
+    "multiDocHint": "Manifests gescheiden door \"---\" worden als aparte documenten gevalideerd."
+  }
+}

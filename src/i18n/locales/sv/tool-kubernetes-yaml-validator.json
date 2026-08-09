@@ -1,0 +1,27 @@
+{
+  "heading": "Kubernetes-YAML-validerare",
+  "tagline": "Klistra in en eller flera Kubernetes-manifest (åtskilda med ---) och validera dem mot det verkliga schemat innan du kör kubectl apply.",
+  "related": "Relaterade verktyg",
+  "ui": {
+    "inputLabel": "Kubernetes-manifest",
+    "inputPlaceholder": "Klistra in ditt YAML-manifest här…",
+    "dropHint": "Släpp en .yaml/.yml-fil här, eller klistra in manifesttexten ovan.",
+    "chooseFile": "Välj fil",
+    "loadSample": "Läs in exempel",
+    "clear": "Rensa",
+    "privacyNote": "Parsning och validering körs i din webbläsare — endast resursschemat (aldrig ditt manifest) hämtas från ett offentligt CDN.",
+    "versionLabel": "Kubernetes-version",
+    "versionMaster": "Senaste (master)",
+    "validating": "Validerar…",
+    "documentHeading": "Dokument {{index}}",
+    "kindBadge": "{{kind}} ({{apiVersion}})",
+    "noIssues": "Inga problem hittades.",
+    "summaryLabel": "{{errors}} fel, {{warnings}} varningar",
+    "severityError": "Fel",
+    "severityWarning": "Varning",
+    "jumpToLine": "Rad {{line}}",
+    "fixApiVersion": "Kopiera med rättad apiVersion",
+    "fixApiVersionCopied": "Kopierad!",
+    "multiDocHint": "Manifest åtskilda med \"---\" valideras som separata dokument."
+  }
+}

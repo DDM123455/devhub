@@ -1,0 +1,27 @@
+{
+  "heading": "Validador YAML de Kubernetes",
+  "tagline": "Pega uno o varios manifiestos de Kubernetes (separados por ---) y valídalos contra el esquema real antes de hacer kubectl apply.",
+  "related": "Herramientas relacionadas",
+  "ui": {
+    "inputLabel": "Manifiesto de Kubernetes",
+    "inputPlaceholder": "Pega aquí tu manifiesto YAML…",
+    "dropHint": "Arrastra un archivo .yaml/.yml aquí, o pega el texto del manifiesto arriba.",
+    "chooseFile": "Elegir archivo",
+    "loadSample": "Cargar ejemplo",
+    "clear": "Borrar",
+    "privacyNote": "El análisis y la validación se ejecutan en tu navegador — solo el esquema del recurso (nunca tu manifiesto) se descarga de una CDN pública.",
+    "versionLabel": "Versión de Kubernetes",
+    "versionMaster": "Más reciente (master)",
+    "validating": "Validando…",
+    "documentHeading": "Documento {{index}}",
+    "kindBadge": "{{kind}} ({{apiVersion}})",
+    "noIssues": "No se encontraron problemas.",
+    "summaryLabel": "{{errors}} errores, {{warnings}} advertencias",
+    "severityError": "Error",
+    "severityWarning": "Advertencia",
+    "jumpToLine": "Línea {{line}}",
+    "fixApiVersion": "Copiar con apiVersion corregido",
+    "fixApiVersionCopied": "¡Copiado!",
+    "multiDocHint": "Los manifiestos separados por \"---\" se validan como documentos independientes."
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "heading": "Kubernetes YAML検証ツール",
+  "tagline": "Kubernetesマニフェスト（複数の場合は---で区切る）を貼り付けて、kubectl applyする前に実際のスキーマと照合してください。",
+  "related": "関連ツール",
+  "ui": {
+    "inputLabel": "Kubernetesマニフェスト",
+    "inputPlaceholder": "ここにYAMLマニフェストを貼り付けてください…",
+    "dropHint": "ここに.yaml/.ymlファイルをドロップするか、上にマニフェストのテキストを貼り付けてください。",
+    "chooseFile": "ファイルを選択",
+    "loadSample": "サンプルを読み込む",
+    "clear": "クリア",
+    "privacyNote": "解析と検証はブラウザ内で行われます — サーバーに送信されるのはリソースのスキーマのみで、マニフェスト自体は送信されません。",
+    "versionLabel": "Kubernetesバージョン",
+    "versionMaster": "最新（master）",
+    "validating": "検証中…",
+    "documentHeading": "ドキュメント {{index}}",
+    "kindBadge": "{{kind}}（{{apiVersion}}）",
+    "noIssues": "問題は見つかりませんでした。",
+    "summaryLabel": "エラー{{errors}}件、警告{{warnings}}件",
+    "severityError": "エラー",
+    "severityWarning": "警告",
+    "jumpToLine": "{{line}}行目",
+    "fixApiVersion": "apiVersionを修正してコピー",
+    "fixApiVersionCopied": "コピーしました！",
+    "multiDocHint": "\"---\"で区切られた複数のマニフェストは、それぞれ別のドキュメントとして検証されます。"
+  }
+}

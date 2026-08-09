@@ -1,0 +1,27 @@
+{
+  "heading": "Kubernetes YAML Doğrulayıcı",
+  "tagline": "kubectl apply yapmadan önce bir veya birden fazla Kubernetes manifestosunu (--- ile ayrılmış) yapıştırın ve gerçek şemaya göre doğrulayın.",
+  "related": "İlgili araçlar",
+  "ui": {
+    "inputLabel": "Kubernetes manifestosu",
+    "inputPlaceholder": "YAML manifestonuzu buraya yapıştırın…",
+    "dropHint": "Buraya bir .yaml/.yml dosyası bırakın veya manifesto metnini yukarıya yapıştırın.",
+    "chooseFile": "Dosya seç",
+    "loadSample": "Örnek yükle",
+    "clear": "Temizle",
+    "privacyNote": "Ayrıştırma ve doğrulama tarayıcınızda çalışır — genel bir CDN'den yalnızca kaynak şeması indirilir, manifestonuz asla indirilmez.",
+    "versionLabel": "Kubernetes sürümü",
+    "versionMaster": "En yeni (master)",
+    "validating": "Doğrulanıyor…",
+    "documentHeading": "Belge {{index}}",
+    "kindBadge": "{{kind}} ({{apiVersion}})",
+    "noIssues": "Herhangi bir sorun bulunamadı.",
+    "summaryLabel": "{{errors}} hata, {{warnings}} uyarı",
+    "severityError": "Hata",
+    "severityWarning": "Uyarı",
+    "jumpToLine": "Satır {{line}}",
+    "fixApiVersion": "Düzeltilmiş apiVersion ile kopyala",
+    "fixApiVersionCopied": "Kopyalandı!",
+    "multiDocHint": "\"---\" ile ayrılmış birden çok manifesto ayrı belgeler olarak doğrulanır."
+  }
+}

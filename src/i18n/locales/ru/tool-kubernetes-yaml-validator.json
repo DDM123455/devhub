@@ -1,0 +1,27 @@
+{
+  "heading": "Валидатор YAML Kubernetes",
+  "tagline": "Вставьте один или несколько манифестов Kubernetes (разделённых ---) и проверьте их по настоящей схеме перед kubectl apply.",
+  "related": "Похожие инструменты",
+  "ui": {
+    "inputLabel": "Манифест Kubernetes",
+    "inputPlaceholder": "Вставьте сюда ваш YAML-манифест…",
+    "dropHint": "Перетащите файл .yaml/.yml сюда или вставьте текст манифеста выше.",
+    "chooseFile": "Выбрать файл",
+    "loadSample": "Загрузить пример",
+    "clear": "Очистить",
+    "privacyNote": "Разбор и проверка выполняются в вашем браузере — с публичного CDN загружается только схема ресурса, но никогда не сам манифест.",
+    "versionLabel": "Версия Kubernetes",
+    "versionMaster": "Последняя (master)",
+    "validating": "Проверка…",
+    "documentHeading": "Документ {{index}}",
+    "kindBadge": "{{kind}} ({{apiVersion}})",
+    "noIssues": "Проблем не найдено.",
+    "summaryLabel": "Ошибок: {{errors}}, предупреждений: {{warnings}}",
+    "severityError": "Ошибка",
+    "severityWarning": "Предупреждение",
+    "jumpToLine": "Строка {{line}}",
+    "fixApiVersion": "Скопировать с исправленным apiVersion",
+    "fixApiVersionCopied": "Скопировано!",
+    "multiDocHint": "Манифесты, разделённые \"---\", проверяются как отдельные документы."
+  }
+}

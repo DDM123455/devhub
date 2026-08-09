@@ -1,0 +1,27 @@
+{
+  "heading": "أداة التحقق من YAML الخاص بـ Kubernetes",
+  "tagline": "الصق واحدًا أو أكثر من ملفات Kubernetes (مفصولة بـ ---) وتحقق منها مقابل المخطط الحقيقي قبل تنفيذ kubectl apply.",
+  "related": "أدوات ذات صلة",
+  "ui": {
+    "inputLabel": "ملف Kubernetes",
+    "inputPlaceholder": "الصق ملف YAML هنا…",
+    "dropHint": "أفلت ملف .yaml/.yml هنا، أو الصق نص الملف أعلاه.",
+    "chooseFile": "اختيار ملف",
+    "loadSample": "تحميل مثال",
+    "clear": "مسح",
+    "privacyNote": "يتم التحليل والتحقق في متصفحك — لا يتم تحميل سوى مخطط المورد (وليس ملفك أبدًا) من شبكة توصيل محتوى عامة.",
+    "versionLabel": "إصدار Kubernetes",
+    "versionMaster": "الأحدث (master)",
+    "validating": "جارٍ التحقق…",
+    "documentHeading": "المستند {{index}}",
+    "kindBadge": "{{kind}} ({{apiVersion}})",
+    "noIssues": "لم يتم العثور على أي مشاكل.",
+    "summaryLabel": "{{errors}} أخطاء، {{warnings}} تحذيرات",
+    "severityError": "خطأ",
+    "severityWarning": "تحذير",
+    "jumpToLine": "السطر {{line}}",
+    "fixApiVersion": "نسخ مع إصلاح apiVersion",
+    "fixApiVersionCopied": "تم النسخ!",
+    "multiDocHint": "يتم التحقق من الملفات المفصولة بـ \"---\" كمستندات منفصلة."
+  }
+}

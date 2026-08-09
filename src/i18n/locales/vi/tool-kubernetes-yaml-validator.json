@@ -1,0 +1,49 @@
+{
+  "meta": {
+    "title": "Kiểm Tra YAML Kubernetes Miễn Phí — Web Tool Hub",
+    "description": "Kiểm tra manifest Kubernetes theo đúng schema OpenAPI thật, phát hiện apiVersion đã lỗi thời và lỗi cú pháp YAML — hoàn toàn trong trình duyệt, không tải lên server."
+  },
+  "heading": "Kiểm tra YAML Kubernetes",
+  "tagline": "Dán 1 (hoặc nhiều, ngăn cách bằng ---) manifest Kubernetes vào đây để kiểm tra theo đúng schema Kubernetes thật trước khi bạn kubectl apply.",
+  "related": "Công cụ liên quan",
+  "ui": {
+    "inputLabel": "Manifest Kubernetes",
+    "inputPlaceholder": "Dán nội dung YAML manifest vào đây…",
+    "dropHint": "Kéo-thả file .yaml/.yml vào đây, hoặc dán nội dung manifest ở trên.",
+    "chooseFile": "Chọn file",
+    "loadSample": "Nạp ví dụ mẫu",
+    "clear": "Xoá",
+    "privacyNote": "Việc parse và kiểm tra diễn ra ngay trong trình duyệt — chỉ có schema (không phải manifest của bạn) được tải từ 1 CDN công khai.",
+    "versionLabel": "Phiên bản Kubernetes",
+    "versionMaster": "Mới nhất (master)",
+    "validating": "Đang kiểm tra…",
+    "documentHeading": "Document {{index}}",
+    "kindBadge": "{{kind}} ({{apiVersion}})",
+    "noIssues": "Không phát hiện lỗi nào.",
+    "summaryLabel": "{{errors}} lỗi, {{warnings}} cảnh báo",
+    "severityError": "Lỗi",
+    "severityWarning": "Cảnh báo",
+    "jumpToLine": "Dòng {{line}}",
+    "fixApiVersion": "Copy bản đã sửa apiVersion",
+    "fixApiVersionCopied": "Đã copy!",
+    "multiDocHint": "Nhiều manifest ngăn cách bằng \"---\" sẽ được kiểm tra riêng từng document."
+  },
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Công cụ này có thay thế `kubectl apply --dry-run` hoặc `kubeconform` không?",
+    "a1": "Không. `kubectl apply --dry-run=server` là kiểm tra DUY NHẤT chạy thật trên API server của cluster bạn (bao gồm cả CRD/admission webhook đã cài), còn `kubeconform`/`kubeval` là công cụ CLI trưởng thành dành cho pipeline CI. Công cụ này kiểm tra cùng nhóm vấn đề (cú pháp YAML, hình dạng schema, apiVersion lỗi thời) ngay từ 1 tab trình duyệt, trước khi bạn có `kubectl` cấu hình vào bất kỳ đâu, hoặc khi đang review 1 manifest ai đó gửi cho bạn.",
+    "q2": "Schema lấy từ đâu?",
+    "a2": "Từ `yannh/kubernetes-json-schema`, 1 bản mirror do cộng đồng duy trì, tự động cập nhật theo đúng JSON Schema OpenAPI thật của Kubernetes, tải theo yêu cầu từ CDN công khai đúng theo phiên bản Kubernetes bạn chọn. Không có gì trong manifest của bạn được gửi đi đâu cả — chỉ có file schema (công khai, theo phiên bản) được tải về, giống hệt nhau cho mọi người dùng kiểm tra cùng loại/phiên bản đó.",
+    "q3": "Vì sao chỉ hỗ trợ 10 loại resource?",
+    "a3": "Deployment, Service, Ingress, ConfigMap, Secret, StatefulSet, DaemonSet, Job, CronJob, và PersistentVolumeClaim đã bao phủ phần lớn manifest viết tay ngoài đời thật. Các loại resource khác vẫn được kiểm tra đầy đủ cú pháp YAML và phát hiện apiVersion lỗi thời — chỉ là chưa kiểm tra được đúng hình dạng theo schema.",
+    "q4": "YAML của tôi có bao giờ rời khỏi trình duyệt không?",
+    "a4": "Không. Cả việc parse lẫn kiểm tra schema đều chạy bằng JavaScript thuần ngay trong tab này — request mạng DUY NHẤT công cụ này từng gửi là tải file JSON Schema công khai đúng loại resource/phiên bản Kubernetes bạn chọn, không bao giờ là nội dung manifest của bạn."
+  },
+  "article": {
+    "heading": "Bắt lỗi manifest Kubernetes trước khi kubectl bắt được",
+    "p1": "Một lệnh `kubectl apply` bị từ chối thường là lần ĐẦU TIÊN 1 lỗi trong manifest Kubernetes lộ diện — và lúc đó bạn thường đang giữa chừng deploy, nhìn chằm chằm vào 1 thông báo lỗi trích dẫn đường dẫn kiểu JSON Schema (`spec.template.spec.containers[0].image: Required value`) mà không dễ ánh xạ ngược lại đúng vị trí trong file YAML bạn vừa sửa. Bắt được cùng nhóm lỗi đó sớm hơn, kèm đúng dòng được tô sáng, biến việc này thành 1 sửa lỗi 5 giây thay vì phải chuyển ngữ cảnh giữa chừng.",
+    "p2": "Cú pháp YAML tự nó có những góc sắc bén không xuất hiện ở hầu hết định dạng config khác: thụt lề có ý nghĩa và việc lẫn lộn tab/space đôi khi âm thầm tạo ra 1 cấu trúc KHÁC (sai) thay vì báo lỗi; dấu ngăn cách document `---` rất dễ bị lạc mất trong 1 file dài nhiều resource; và 1 cấp lồng thừa ra đọc vẫn là YAML hợp lệ nhưng lại mang nghĩa hoàn toàn khác với Kubernetes. Công cụ này parse bằng cách tiếp cận thư viện vẫn giữ nguyên vị trí gốc trong toàn bộ quá trình parse, nên 1 vấn đề cú pháp được báo đúng dòng thật nó xảy ra, chứ không chỉ là \"đâu đó trong file 200 dòng này\".",
+    "p3": "ApiVersion lỗi thời là cái bẫy diễn ra chậm hơn: Deployment dùng `extensions/v1beta1`, StatefulSet/DaemonSet dùng `apps/v1beta1`/`apps/v1beta2`, Ingress dùng `networking.k8s.io/v1beta1` — tất cả vẫn parse như YAML hoàn toàn hợp lệ và thậm chí từng chạy được trên cluster cũ — cho tới khi cluster được nâng cấp qua đúng phiên bản Kubernetes cuối cùng loại bỏ hẳn API group cũ đó, lúc đó MỌI manifest dùng nó bắt đầu apply thất bại mà không có cảnh báo trước. Bắt lỗi này ngay lúc soạn thảo (kèm gợi ý đúng apiVersion thay thế) giúp tránh việc phát hiện ra nó ngay giữa 1 lần nâng cấp cluster.",
+    "p4": "Kiểm tra theo đúng schema OpenAPI thật của Kubernetes bắt phần còn lại: 1 trường `replicas` lỡ thành chuỗi có dấu ngoặc kép thay vì số, 1 `containerPort` nằm ngoài khoảng giá trị hợp lệ, 1 trường bắt buộc như `spec.selector` của Deployment bị xoá mất trong lúc copy-paste giữa các manifest. Không cái nào trong số này là lỗi cú pháp YAML — file vẫn parse tốt — đó chính xác là lý do vì sao cần 1 lượt kiểm tra schema riêng để bắt được thứ mà đọc lướt bằng mắt qua file thường bỏ sót."
+  }
+}

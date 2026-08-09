@@ -35,8 +35,9 @@
   (Medium) 9/9. Xem log chi tiết từng mục bên dưới; `ROADMAP.md` đã tick đủ.
 - **Phase 3.9 — 2 công cụ DevOps mới (Nginx Config Validator & Kubernetes YAML Validator)**:
   đang làm theo yêu cầu trực tiếp người dùng 2026-08-09, chia bước có xin duyệt giữa chừng.
-  3.9a (Nginx): Step 1 xong (tool chính + parser + test), CHỜ DUYỆT Step 2. 3.9b
-  (Kubernetes): chưa bắt đầu.
+  3.9a (Nginx): Step 1 xong (tool chính + parser + test). 3.9b (Kubernetes): Step 2 xong (tool
+  chính + parser/validator + test). CHỜ DUYỆT Step 3 (các trang tham khảo directive/error/
+  resource cho cả 2 tool, theo đúng kế hoạch trong prompt gốc — bước 5-6).
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -174,6 +175,53 @@
   ngay phía trên: phải dùng click thật, không phải synthetic event, để phản ánh đúng hành vi.
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
+
+- **2026-08-09 (Phase 3.9b Step 2)** — Kubernetes YAML Validator. Trước khi code, đã dùng
+  WebFetch xác nhận THẬT (không đoán) cấu trúc CDN mirror `yannh/kubernetes-json-schema`:
+  fetch trực tiếp `https://cdn.jsdelivr.net/gh/yannh/kubernetes-json-schema@master/
+  v1.28.0-standalone/deployment-apps-v1.json` và `.../v1.31.0-standalone/...`,
+  `.../master-standalone/...`, `.../ingress-networking-v1.json`,
+  `.../cronjob-batch-v1.json` — đều trả về JSON Schema thật hợp lệ, xác nhận đúng quy tắc đặt
+  tên file (`{kind-thường}-{group}-{version}.json`, core group không có đoạn group).
+  - `src/lib/k8s-yaml-validator.ts`: dùng package `yaml` (không phải `js-yaml`) vì
+    `parseAllDocuments` + `LineCounter` cho AST có `.range` trên MỌI node — cần thiết để trỏ
+    đúng dòng cho lỗi SCHEMA (vd `spec.replicas`), không chỉ lỗi cú pháp (đã thử nghiệm xác
+    nhận: `doc.getIn(['spec','replicas'], true).range` → `lineCounter.linePos(range[0]).line`
+    ra đúng số dòng thật). `ajv` với `strict: false, logger: false` (schema OpenAPI-derived
+    của k8s có keyword `x-kubernetes-*` ajv không biết — strict mode sẽ throw; và có hàng
+    chục field dùng format `int32`/`int64` ajv không hỗ trợ — không tắt logger sẽ spam console
+    warning cho mỗi field mỗi lần load schema, đã tự kiểm bằng schema Deployment thật).
+    Bảng ánh xạ deprecated apiVersion cho 5/10 kind (Deployment/DaemonSet/StatefulSet/
+    Ingress/CronJob — 5 kind còn lại luôn ở `v1`, không có deprecation). Cache schema đã
+    fetch + validator đã compile theo `version:kind` (session-lifetime, không refetch mỗi
+    lần gõ). Multi-document qua `parseAllDocuments` xử lý độc lập từng document. Auto-fix
+    apiVersion bằng cách splice trực tiếp theo `.range` của node (không đụng phần còn lại
+    của file).
+  - `src/lib/__tests__/k8s-yaml-validator.test.ts`: 13 test case, mock `global.fetch`. **Bug
+    thật tự phát hiện khi viết test**: lúc đầu chỉ mock fetch trong 1 describe block —
+    describe block "deprecated apiVersion" chạy TRƯỚC đó vẫn dùng `global.fetch` THẬT (gọi
+    ra Internet thật), kết quả bị cache vào `schemaCache` module-level (cache theo session,
+    cố ý — xem comment trong code) dưới đúng key mà describe block sau (đã mock) cũng dùng →
+    các test "mocked fetch" ngỡ đang test với schema giả lại vô tình test với schema
+    Kubernetes THẬT, fail vì đòi `spec.selector` (trường bắt buộc thật, không có trong schema
+    giả của tôi). Sửa bằng cách chuyển mock `fetch` lên `beforeEach` Ở CẤP FILE (áp dụng cho
+    mọi test, không chỉ 1 describe block) — sau khi sửa, thời gian chạy test cũng giảm từ
+    ~2.2s xuống ~50ms (bằng chứng test trước đó thật sự gọi mạng).
+  - `KubernetesYamlValidator.tsx`: khác nginx tool ở chỗ validate là ASYNC (fetch schema lần
+    đầu qua mạng) — dùng pattern request-counter y hệt Web Worker của Regex Tester để tránh
+    kết quả validate cũ (từ 1 lần gõ trước) ghi đè lên kết quả mới hơn đã resolve trước.
+  - Đăng ký tool trong `tools.ts` (đã có sẵn từ Step 1, chỉ cần dán lại — xem log Step 1),
+    wire vào `[slug].astro`. i18n: en+vi đầy đủ, 18 locale còn lại chỉ heading/tagline/
+    related/ui.* (fallback tiếng Anh cho content dài, cùng quy ước 3.9a).
+  - CSP: `cdn.jsdelivr.net` đã có sẵn trong `connect-src` từ trước (thêm cho Video Trim) nên
+    KHÔNG cần sửa `_headers` — chỉ cập nhật lại comment cho đúng thực tế (giờ 2 tool dùng
+    chung domain này, không phải 1).
+  - `npm test`: 33/33 pass (20 nginx + 13 k8s). `npm run build`: sạch, 502 trang (+20 đúng 1
+    tool × 20 locale).
+  - **Việc CHƯA làm (đợi duyệt)**: trang tham khảo `/k8s/resources/[kind]`,
+    `/k8s/errors/[error-slug]`; `/k8s/api-versions/[migration-slug]` và
+    `/compare/kubeval-vs-kubeconform` (đúng kế hoạch gốc, để Phase sau); tương tự phần
+    `/nginx/directives|errors|examples` còn treo từ Step 1.
 
 - **2026-08-09 (Phase 3.9a Step 1)** — Bắt đầu Phase 3.9 theo prompt trực tiếp người dùng: 2
   tool DevOps mới (Nginx Config Validator, Kubernetes YAML Validator). Prompt gốc yêu cầu

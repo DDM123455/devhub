@@ -347,7 +347,7 @@ ROADMAP)
 > long-tail). Làm theo từng bước, dừng lại xin duyệt giữa các bước — xem chi tiết quyết định
 > (routing/i18n/testing) trong log `PROGRESS.md` 2026-08-09.
 
-### 3.9a — Nginx Config Validator (Step 1 — ĐÃ XONG, chờ duyệt Step 2)
+### 3.9a — Nginx Config Validator (Step 1 — ĐÃ XONG)
 
 - [x] Module logic thuần `src/lib/nginx-parser.ts` (tokenizer, phát hiện lỗi cấu trúc/context/
       bảo mật, regex tester, rewrite/return simulator, auto-fix) — tách khỏi UI, có test
@@ -361,16 +361,21 @@ ROADMAP)
       `/{locale}/nginx/errors/[error-slug]`, `/{locale}/nginx/examples/[use-case]` — CHƯA làm,
       để sau khi duyệt mẫu 3-5 trang (bước 5 trong prompt gốc)
 
-### 3.9b — Kubernetes YAML Validator (Step 2 — CHƯA BẮT ĐẦU, chờ duyệt)
+### 3.9b — Kubernetes YAML Validator (Step 2 — ĐÃ XONG, chờ duyệt Step 3)
 
-- [ ] Module logic `src/lib/k8s-yaml-validator.ts` (parse YAML giữ vị trí dòng, validate theo
-      JSON Schema qua `ajv`, fetch schema on-demand từ CDN theo apiVersion/kind/version, phát
-      hiện deprecated apiVersion + auto-fix, hỗ trợ multi-document `---`)
-  - Cần thêm dependency mới: `js-yaml`/`yaml` + `ajv` (đã được người dùng xác nhận trong prompt)
-- [ ] Component + trang `KubernetesYamlValidatorPage.astro`, đăng ký route
-      `/{locale}/tools/kubernetes-yaml-validator/` (20 locale)
-- [ ] i18n UI 20 ngôn ngữ, content SEO en+vi trước (cùng quy ước với 3.9a)
-- [ ] Test cho parser/validator
+- [x] Module logic `src/lib/k8s-yaml-validator.ts` (parse YAML giữ vị trí dòng bằng package
+      `yaml` + `LineCounter`, validate theo JSON Schema qua `ajv`, fetch schema on-demand từ
+      CDN jsdelivr mirror của `yannh/kubernetes-json-schema` theo kind/version — đã xác nhận
+      URL thật qua WebFetch trước khi code, không đoán — phát hiện deprecated apiVersion +
+      auto-fix, hỗ trợ multi-document `---`)
+  - Đã thêm dependency mới: `yaml` + `ajv` (người dùng đã xác nhận trong prompt gốc)
+- [x] Component `KubernetesYamlValidator.tsx` + trang `KubernetesYamlValidatorPage.astro`,
+      đăng ký route `/{locale}/tools/kubernetes-yaml-validator/` (20 locale) trong `tools.ts`
+- [x] i18n: `ui.*`/`heading`/`tagline`/`related` đủ 20 ngôn ngữ; `meta.*`/`faq.*`/`article.*`
+      chỉ en+vi trước (cùng quy ước với 3.9a)
+- [x] Test cho parser/validator (`src/lib/__tests__/k8s-yaml-validator.test.ts`, mock `fetch`
+      để không phụ thuộc mạng khi chạy test — phát hiện 1 bug thật trong chính bộ test lúc
+      viết: cache module-level bị nhiễm bởi 1 lần fetch thật chưa mock ở block test trước)
 - [ ] Trang tham khảo `/{locale}/k8s/resources/[kind]`, `/{locale}/k8s/errors/[error-slug]` —
       sau khi duyệt mẫu
 - [ ] `/{locale}/k8s/api-versions/[migration-slug]` và `/{locale}/compare/kubeval-vs-kubeconform`

@@ -1,0 +1,27 @@
+{
+  "heading": "Kubernetes YAML सत्यापनकर्ता",
+  "tagline": "kubectl apply करने से पहले एक या कई Kubernetes मैनिफेस्ट (--- से अलग किए हुए) पेस्ट करें और असली स्कीमा के विरुद्ध जांचें।",
+  "related": "संबंधित टूल्स",
+  "ui": {
+    "inputLabel": "Kubernetes मैनिफेस्ट",
+    "inputPlaceholder": "यहाँ अपना YAML मैनिफेस्ट पेस्ट करें…",
+    "dropHint": "यहाँ .yaml/.yml फ़ाइल ड्रॉप करें, या ऊपर मैनिफेस्ट टेक्स्ट पेस्ट करें।",
+    "chooseFile": "फ़ाइल चुनें",
+    "loadSample": "उदाहरण लोड करें",
+    "clear": "साफ़ करें",
+    "privacyNote": "पार्सिंग और सत्यापन आपके ब्राउज़र में ही होते हैं — सार्वजनिक CDN से केवल रिसोर्स स्कीमा लाया जाता है, आपका मैनिफेस्ट कभी नहीं।",
+    "versionLabel": "Kubernetes संस्करण",
+    "versionMaster": "नवीनतम (master)",
+    "validating": "सत्यापन हो रहा है…",
+    "documentHeading": "दस्तावेज़ {{index}}",
+    "kindBadge": "{{kind}} ({{apiVersion}})",
+    "noIssues": "कोई समस्या नहीं मिली।",
+    "summaryLabel": "{{errors}} त्रुटियाँ, {{warnings}} चेतावनियाँ",
+    "severityError": "त्रुटि",
+    "severityWarning": "चेतावनी",
+    "jumpToLine": "पंक्ति {{line}}",
+    "fixApiVersion": "सुधारे गए apiVersion के साथ कॉपी करें",
+    "fixApiVersionCopied": "कॉपी हो गया!",
+    "multiDocHint": "\"---\" से अलग किए गए कई मैनिफेस्ट अलग-अलग दस्तावेज़ों के रूप में जांचे जाते हैं।"
+  }
+}

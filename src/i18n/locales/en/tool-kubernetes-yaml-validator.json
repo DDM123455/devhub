@@ -1,0 +1,49 @@
+{
+  "meta": {
+    "title": "Kubernetes YAML Validator Online Free — Web Tool Hub",
+    "description": "Validate Kubernetes manifests against the real OpenAPI schema, catch deprecated apiVersions, and find YAML syntax errors — entirely in your browser, no upload."
+  },
+  "heading": "Kubernetes YAML Validator",
+  "tagline": "Paste a Kubernetes manifest (or several, separated by ---) and check it against the real Kubernetes schema before you kubectl apply it.",
+  "related": "Related tools",
+  "ui": {
+    "inputLabel": "Kubernetes manifest",
+    "inputPlaceholder": "Paste your YAML manifest here…",
+    "dropHint": "Drop a .yaml/.yml file here, or paste manifest text above.",
+    "chooseFile": "Choose file",
+    "loadSample": "Load sample",
+    "clear": "Clear",
+    "privacyNote": "Parsing and validation run in your browser — only the resource schema itself (never your manifest) is fetched from a public CDN.",
+    "versionLabel": "Kubernetes version",
+    "versionMaster": "latest (master)",
+    "validating": "Validating…",
+    "documentHeading": "Document {{index}}",
+    "kindBadge": "{{kind}} ({{apiVersion}})",
+    "noIssues": "No issues found.",
+    "summaryLabel": "{{errors}} errors, {{warnings}} warnings",
+    "severityError": "Error",
+    "severityWarning": "Warning",
+    "jumpToLine": "Line {{line}}",
+    "fixApiVersion": "Copy with apiVersion fixed",
+    "fixApiVersionCopied": "Copied!",
+    "multiDocHint": "Multiple manifests separated by \"---\" are validated as separate documents."
+  },
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Does this replace `kubectl apply --dry-run` or `kubeconform`?",
+    "a1": "No. `kubectl apply --dry-run=server` is the only check that runs against your actual cluster's API server (including any CRDs and admission webhooks it has installed), and `kubeconform`/`kubeval` are mature CLI tools built for CI pipelines. This validates the same class of things — YAML syntax, schema shape, deprecated apiVersions — from a browser tab, before you have `kubectl` configured against anything, or while reviewing a manifest someone else sent you.",
+    "q2": "Where do the schemas come from?",
+    "a2": "From `yannh/kubernetes-json-schema`, a community-maintained, automatically-updated mirror of Kubernetes's own OpenAPI-derived JSON Schemas, fetched on demand from a public CDN for the Kubernetes version you pick. Nothing about your manifest is sent anywhere — only the (versioned, public) schema file itself is downloaded, the same file for every user validating that kind/version.",
+    "q3": "Why only 10 resource kinds?",
+    "a3": "Deployment, Service, Ingress, ConfigMap, Secret, StatefulSet, DaemonSet, Job, CronJob, and PersistentVolumeClaim cover the large majority of hand-written manifests. Other kinds still get full YAML syntax checking and deprecated-apiVersion detection — they just don't get schema-shape validation yet.",
+    "q4": "Does my YAML ever leave my browser?",
+    "a4": "No. Parsing and schema validation both run with plain JavaScript in this tab — the only network request this tool ever makes is fetching the public JSON Schema file for the resource kind and Kubernetes version you selected, never your manifest content."
+  },
+  "article": {
+    "heading": "Catching Kubernetes manifest mistakes before kubectl does",
+    "p1": "A rejected `kubectl apply` is usually the first time a mistake in a Kubernetes manifest becomes visible — and by then you're often mid-deploy, staring at an error message that quotes a JSON Schema validation path (`spec.template.spec.containers[0].image: Required value`) that doesn't obviously map back to the YAML file you were just editing. Catching the same class of error earlier, with the exact line highlighted, turns that into a five-second fix instead of a context switch.",
+    "p2": "YAML's own syntax has sharp edges that don't show up in most other config formats: indentation is significant and inconsistent tabs/spaces will silently produce a different (wrong) structure rather than an error in some cases, `---` document separators are easy to lose track of in a long multi-resource file, and a stray extra level of nesting reads as valid YAML while meaning something completely different to Kubernetes. This tool parses with the same library approach that keeps full source position information through parsing, so a syntax problem is reported against the real line it occurs on, not just \"somewhere in this 200-line file.\"",
+    "p3": "Deprecated apiVersions are a slower-motion trap: `extensions/v1beta1` Deployments, `apps/v1beta1`/`apps/v1beta2` StatefulSets and DaemonSets, and `networking.k8s.io/v1beta1` Ingresses all still parse as perfectly valid YAML and even worked on older clusters — until the cluster gets upgraded past the version where Kubernetes finally removes the old API group entirely, at which point every manifest using it starts failing to apply with no warning beforehand. Catching these while editing (with the exact replacement apiVersion suggested) avoids finding out during a cluster upgrade instead.",
+    "p4": "Schema validation against the real Kubernetes OpenAPI spec catches the rest: a `replicas` field that ended up as a quoted string instead of a number, a `containerPort` outside the valid range, a required field like `spec.selector` on a Deployment that got deleted while copy-pasting between manifests. None of these are YAML syntax errors — the file parses fine — which is exactly why a dedicated schema pass catches what a quick visual read of the file usually doesn't."
+  }
+}

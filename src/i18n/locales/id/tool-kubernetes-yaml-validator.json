@@ -1,0 +1,27 @@
+{
+  "heading": "Validator YAML Kubernetes",
+  "tagline": "Tempel satu atau beberapa manifest Kubernetes (dipisahkan ---) dan validasi terhadap skema asli sebelum kubectl apply.",
+  "related": "Alat terkait",
+  "ui": {
+    "inputLabel": "Manifest Kubernetes",
+    "inputPlaceholder": "Tempel manifest YAML Anda di sini…",
+    "dropHint": "Seret file .yaml/.yml ke sini, atau tempel teks manifest di atas.",
+    "chooseFile": "Pilih file",
+    "loadSample": "Muat contoh",
+    "clear": "Bersihkan",
+    "privacyNote": "Parsing dan validasi berjalan di browser Anda — hanya skema resource (bukan manifest Anda) yang diambil dari CDN publik.",
+    "versionLabel": "Versi Kubernetes",
+    "versionMaster": "Terbaru (master)",
+    "validating": "Memvalidasi…",
+    "documentHeading": "Dokumen {{index}}",
+    "kindBadge": "{{kind}} ({{apiVersion}})",
+    "noIssues": "Tidak ditemukan masalah.",
+    "summaryLabel": "{{errors}} error, {{warnings}} peringatan",
+    "severityError": "Error",
+    "severityWarning": "Peringatan",
+    "jumpToLine": "Baris {{line}}",
+    "fixApiVersion": "Salin dengan apiVersion yang diperbaiki",
+    "fixApiVersionCopied": "Disalin!",
+    "multiDocHint": "Beberapa manifest yang dipisahkan \"---\" divalidasi sebagai dokumen terpisah."
+  }
+}

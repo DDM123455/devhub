@@ -1,0 +1,27 @@
+{
+  "heading": "Kubernetes-YAML-Prüfer",
+  "tagline": "Füge ein oder mehrere Kubernetes-Manifeste (getrennt durch ---) ein und prüfe sie gegen das echte Schema, bevor du kubectl apply ausführst.",
+  "related": "Verwandte Tools",
+  "ui": {
+    "inputLabel": "Kubernetes-Manifest",
+    "inputPlaceholder": "Füge hier dein YAML-Manifest ein…",
+    "dropHint": "Lege hier eine .yaml/.yml-Datei ab, oder füge den Manifest-Text oben ein.",
+    "chooseFile": "Datei auswählen",
+    "loadSample": "Beispiel laden",
+    "clear": "Leeren",
+    "privacyNote": "Parsen und Validierung laufen in deinem Browser — nur das Ressourcen-Schema (niemals dein Manifest) wird von einem öffentlichen CDN geladen.",
+    "versionLabel": "Kubernetes-Version",
+    "versionMaster": "Neueste (master)",
+    "validating": "Wird geprüft…",
+    "documentHeading": "Dokument {{index}}",
+    "kindBadge": "{{kind}} ({{apiVersion}})",
+    "noIssues": "Keine Probleme gefunden.",
+    "summaryLabel": "{{errors}} Fehler, {{warnings}} Warnungen",
+    "severityError": "Fehler",
+    "severityWarning": "Warnung",
+    "jumpToLine": "Zeile {{line}}",
+    "fixApiVersion": "Mit korrigierter apiVersion kopieren",
+    "fixApiVersionCopied": "Kopiert!",
+    "multiDocHint": "Durch \"---\" getrennte Manifeste werden als eigenständige Dokumente geprüft."
+  }
+}

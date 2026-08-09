@@ -1,0 +1,27 @@
+{
+  "heading": "เครื่องมือตรวจสอบ YAML ของ Kubernetes",
+  "tagline": "วาง Kubernetes manifest หนึ่งรายการหรือมากกว่า (คั่นด้วย ---) แล้วตรวจสอบกับสคีมาจริงก่อนที่คุณจะ kubectl apply",
+  "related": "เครื่องมือที่เกี่ยวข้อง",
+  "ui": {
+    "inputLabel": "Kubernetes manifest",
+    "inputPlaceholder": "วาง YAML manifest ของคุณที่นี่…",
+    "dropHint": "ลากไฟล์ .yaml/.yml มาวางที่นี่ หรือวางข้อความ manifest ด้านบน",
+    "chooseFile": "เลือกไฟล์",
+    "loadSample": "โหลดตัวอย่าง",
+    "clear": "ล้าง",
+    "privacyNote": "การแยกวิเคราะห์และตรวจสอบทำงานในเบราว์เซอร์ของคุณ — มีเพียงสคีมาของรีซอร์สเท่านั้น (ไม่ใช่ manifest ของคุณ) ที่จะถูกดึงจาก CDN สาธารณะ",
+    "versionLabel": "เวอร์ชัน Kubernetes",
+    "versionMaster": "ล่าสุด (master)",
+    "validating": "กำลังตรวจสอบ…",
+    "documentHeading": "เอกสารที่ {{index}}",
+    "kindBadge": "{{kind}} ({{apiVersion}})",
+    "noIssues": "ไม่พบปัญหาใดๆ",
+    "summaryLabel": "ข้อผิดพลาด {{errors}} รายการ คำเตือน {{warnings}} รายการ",
+    "severityError": "ข้อผิดพลาด",
+    "severityWarning": "คำเตือน",
+    "jumpToLine": "บรรทัดที่ {{line}}",
+    "fixApiVersion": "คัดลอกพร้อมแก้ไข apiVersion",
+    "fixApiVersionCopied": "คัดลอกแล้ว!",
+    "multiDocHint": "manifest หลายรายการที่คั่นด้วย \"---\" จะถูกตรวจสอบแยกเป็นเอกสารแต่ละรายการ"
+  }
+}

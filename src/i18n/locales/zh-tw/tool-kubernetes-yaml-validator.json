@@ -1,0 +1,27 @@
+{
+  "heading": "Kubernetes YAML驗證工具",
+  "tagline": "貼上一個或多個 Kubernetes 清單（用 --- 分隔），在 kubectl apply 之前對照真實 schema 進行驗證。",
+  "related": "相關工具",
+  "ui": {
+    "inputLabel": "Kubernetes 清單",
+    "inputPlaceholder": "在此貼上你的 YAML 清單…",
+    "dropHint": "將 .yaml/.yml 檔案拖放到這裡，或在上方貼上清單文字。",
+    "chooseFile": "選擇檔案",
+    "loadSample": "載入範例",
+    "clear": "清空",
+    "privacyNote": "解析與驗證都在你的瀏覽器內完成 —— 從公開 CDN 取得的只有資源 schema，絕不會是你的清單內容。",
+    "versionLabel": "Kubernetes 版本",
+    "versionMaster": "最新（master）",
+    "validating": "驗證中…",
+    "documentHeading": "文件 {{index}}",
+    "kindBadge": "{{kind}}（{{apiVersion}}）",
+    "noIssues": "未發現任何問題。",
+    "summaryLabel": "{{errors}} 個錯誤，{{warnings}} 個警告",
+    "severityError": "錯誤",
+    "severityWarning": "警告",
+    "jumpToLine": "第 {{line}} 行",
+    "fixApiVersion": "複製修正 apiVersion 後的內容",
+    "fixApiVersionCopied": "已複製！",
+    "multiDocHint": "用 \"---\" 分隔的多個清單會作為獨立文件分別驗證。"
+  }
+}

@@ -10,13 +10,16 @@
 #   every inline script/style across 20+ locales would be fragile to keep in
 #   sync — 'unsafe-inline' is the deliberate, pragmatic tradeoff for a static
 #   multi-page export like this one, not an oversight.
-# - `connect-src`/`worker-src` allow two specific external hosts because two
+# - `connect-src`/`worker-src` allow two specific external hosts because
 #   tools genuinely fetch from them at runtime (checked in source, not
 #   guessed): Video Trim's @ffmpeg/core loads its wasm binary from
-#   cdn.jsdelivr.net, and Remove Background (@imgly/background-removal) fetches
-#   its ONNX models/wasm runtime from staticimgly.com. Removing either without
-#   self-hosting those assets first would silently break that tool (CSP
-#   violations don't throw catchable JS errors — they just fail the fetch).
+#   cdn.jsdelivr.net, Kubernetes YAML Validator fetches the public
+#   yannh/kubernetes-json-schema JSON Schema files (never the user's own YAML)
+#   from the same cdn.jsdelivr.net, and Remove Background
+#   (@imgly/background-removal) fetches its ONNX models/wasm runtime from
+#   staticimgly.com. Removing either host without self-hosting those assets
+#   first would silently break that tool (CSP violations don't throw
+#   catchable JS errors — they just fail the fetch).
 # - 'wasm-unsafe-eval' is required for any of the WebAssembly-based tools
 #   (ffmpeg.wasm, onnxruntime-web, heic2any/libheif) to compile at all.
 /*

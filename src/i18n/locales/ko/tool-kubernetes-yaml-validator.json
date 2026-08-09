@@ -1,0 +1,27 @@
+{
+  "heading": "Kubernetes YAML 검사기",
+  "tagline": "kubectl apply를 하기 전에 Kubernetes 매니페스트(여러 개면 ---로 구분)를 붙여넣어 실제 스키마와 대조해 보세요.",
+  "related": "관련 도구",
+  "ui": {
+    "inputLabel": "Kubernetes 매니페스트",
+    "inputPlaceholder": "여기에 YAML 매니페스트를 붙여넣으세요…",
+    "dropHint": "여기에 .yaml/.yml 파일을 드롭하거나, 위에 매니페스트 텍스트를 붙여넣으세요.",
+    "chooseFile": "파일 선택",
+    "loadSample": "예제 불러오기",
+    "clear": "지우기",
+    "privacyNote": "파싱과 검증은 브라우저 안에서 이루어집니다 — 공개 CDN에서 가져오는 것은 리소스 스키마뿐이며, 매니페스트 내용은 전송되지 않습니다.",
+    "versionLabel": "Kubernetes 버전",
+    "versionMaster": "최신 (master)",
+    "validating": "검사 중…",
+    "documentHeading": "문서 {{index}}",
+    "kindBadge": "{{kind}} ({{apiVersion}})",
+    "noIssues": "발견된 문제가 없습니다.",
+    "summaryLabel": "오류 {{errors}}개, 경고 {{warnings}}개",
+    "severityError": "오류",
+    "severityWarning": "경고",
+    "jumpToLine": "{{line}}번째 줄",
+    "fixApiVersion": "apiVersion 수정본 복사",
+    "fixApiVersionCopied": "복사됨!",
+    "multiDocHint": "\"---\"로 구분된 여러 매니페스트는 각각 별도의 문서로 검사됩니다."
+  }
+}

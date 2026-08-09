@@ -1,0 +1,27 @@
+{
+  "heading": "Walidator YAML Kubernetes",
+  "tagline": "Wklej jeden lub więcej manifestów Kubernetes (rozdzielonych ---) i zwaliduj je względem prawdziwego schematu przed kubectl apply.",
+  "related": "Powiązane narzędzia",
+  "ui": {
+    "inputLabel": "Manifest Kubernetes",
+    "inputPlaceholder": "Wklej tutaj swój manifest YAML…",
+    "dropHint": "Przeciągnij tu plik .yaml/.yml lub wklej tekst manifestu powyżej.",
+    "chooseFile": "Wybierz plik",
+    "loadSample": "Wczytaj przykład",
+    "clear": "Wyczyść",
+    "privacyNote": "Parsowanie i walidacja działają w Twojej przeglądarce — z publicznego CDN pobierany jest wyłącznie schemat zasobu, nigdy Twój manifest.",
+    "versionLabel": "Wersja Kubernetes",
+    "versionMaster": "Najnowsza (master)",
+    "validating": "Walidacja…",
+    "documentHeading": "Dokument {{index}}",
+    "kindBadge": "{{kind}} ({{apiVersion}})",
+    "noIssues": "Nie znaleziono żadnych problemów.",
+    "summaryLabel": "{{errors}} błędów, {{warnings}} ostrzeżeń",
+    "severityError": "Błąd",
+    "severityWarning": "Ostrzeżenie",
+    "jumpToLine": "Linia {{line}}",
+    "fixApiVersion": "Kopiuj z poprawionym apiVersion",
+    "fixApiVersionCopied": "Skopiowano!",
+    "multiDocHint": "Manifesty rozdzielone znakiem \"---\" są walidowane jako osobne dokumenty."
+  }
+}

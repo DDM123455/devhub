@@ -1,0 +1,27 @@
+{
+  "heading": "Validatore YAML Kubernetes",
+  "tagline": "Incolla uno o più manifest Kubernetes (separati da ---) e validali rispetto allo schema reale prima di eseguire kubectl apply.",
+  "related": "Strumenti correlati",
+  "ui": {
+    "inputLabel": "Manifest Kubernetes",
+    "inputPlaceholder": "Incolla qui il tuo manifest YAML…",
+    "dropHint": "Trascina qui un file .yaml/.yml, oppure incolla il testo del manifest sopra.",
+    "chooseFile": "Scegli file",
+    "loadSample": "Carica esempio",
+    "clear": "Cancella",
+    "privacyNote": "L'analisi e la validazione vengono eseguite nel tuo browser — viene scaricato da un CDN pubblico solo lo schema della risorsa, mai il tuo manifest.",
+    "versionLabel": "Versione Kubernetes",
+    "versionMaster": "Più recente (master)",
+    "validating": "Convalida in corso…",
+    "documentHeading": "Documento {{index}}",
+    "kindBadge": "{{kind}} ({{apiVersion}})",
+    "noIssues": "Nessun problema trovato.",
+    "summaryLabel": "{{errors}} errori, {{warnings}} avvisi",
+    "severityError": "Errore",
+    "severityWarning": "Avviso",
+    "jumpToLine": "Riga {{line}}",
+    "fixApiVersion": "Copia con apiVersion corretto",
+    "fixApiVersionCopied": "Copiato!",
+    "multiDocHint": "I manifest separati da \"---\" vengono convalidati come documenti separati."
+  }
+}
