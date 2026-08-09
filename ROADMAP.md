@@ -325,7 +325,7 @@ ROADMAP)
 - [x] Trang chủ: chip "20 tools · 5 categories" không cập nhật số theo kết quả đang lọc
 
 ### 3.8c — UX/Feature gap Medium
-- [ ] Convert Image Format: thêm before/after slider (nhất quán với Compress Image đã có)
+- [x] Convert Image Format: thêm before/after slider (nhất quán với Compress Image đã có)
 - [ ] Trang 404 tùy chỉnh (nav + search + logo) thay vì mặc định Astro
 - [ ] Thêm og:image/twitter:image mặc định + theo từng nhóm công cụ
 - [ ] SVG Optimizer: cảnh báo <script> còn sót lại sau tối ưu là rủi ro XSS nếu nhúng inline

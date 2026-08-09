@@ -32,7 +32,8 @@
   mục).
 - **Phase 3.8 — Audit Remediation vòng 3 (từ báo cáo QA tương tác thật người dùng gửi
   2026-08-01)**: nhóm 3.8a (Critical) HOÀN TẤT 3/3, nhóm 3.8b (High) HOÀN TẤT 5/5. Đang làm
-  3.8c (Medium, 9 mục) — xem chi tiết từng mục trong `ROADMAP.md`.
+  3.8c (Medium): 1/9 xong (Convert Image Format before/after slider) — xem chi tiết từng mục
+  trong `ROADMAP.md`.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -165,6 +166,18 @@
   ngay phía trên: phải dùng click thật, không phải synthetic event, để phản ánh đúng hành vi.
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
+
+- **2026-08-09 (3.8c #1)** — Convert Image Format: thêm before/after compare slider, tái sử
+  dụng `BeforeAfterSlider` (`src/components/ui/before-after-slider.tsx`) y hệt cách Image
+  Compressor dùng — không viết component mới. `ImageFormatConverter.tsx` trước đó không lưu
+  object URL nào cho ảnh gốc (chỉ hiện tên file dạng text), nên phải thêm cả cơ chế tracking:
+  `previewUrl` cho ảnh gốc lúc thêm file, `resultPreviewUrl` tạo từ `resultBlob` khi convert
+  xong, `comparePosition` cho vị trí kéo, cùng `objectUrls`/`trackUrl`/cleanup `useEffect` y
+  hệt pattern đã có ở `ImageCompressor.tsx`. Nhân tiện phát hiện và chặn trước 1 bug tương tự
+  bug Compress Image vừa sửa (nếu không chặn sẽ tự tạo ra bug mới khi thêm preview): đổi
+  format/quality/resize sau khi đã convert xong sẽ khiến slider so sánh với kết quả CŨ — thêm
+  `settingsSignature` + effect reset `done`/`error` về `pending` khi setting đổi, giống hệt
+  cách đã sửa ở `ImageCompressor.tsx`. Build sạch (441 trang).
 
 - **2026-08-09 (tiếp)** — Phase 3.8b **HOÀN TẤT 5/5**, theo yêu cầu người dùng "sửa hết các
   mục theo thứ tự, tự động chạy tiếp đến hết". Môi trường phiên này KHÔNG có Puppeteer/

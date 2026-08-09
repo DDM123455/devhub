@@ -1,6 +1,7 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { BeforeAfterSlider } from '@/components/ui/before-after-slider';
 
 interface Messages {
 	selectFiles: string;
@@ -64,8 +65,14 @@ const CONCURRENCY = 3;
 interface ImageItem {
 	id: string;
 	file: File;
+	previewUrl: string;
 	status: 'pending' | 'processing' | 'done' | 'error';
 	resultBlob?: Blob;
+	resultPreviewUrl?: string;
+	// Drag position (0-100) of the before/after compare slider — only set once
+	// a converted result exists to compare against (same pattern as Image
+	// Compressor's `comparePosition`).
+	comparePosition?: number;
 	errorMessage?: string;
 }
 
@@ -287,6 +294,22 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 	const [isZipping, setIsZipping] = useState(false);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [skippedCount, setSkippedCount] = useState(0);
+	const objectUrls = useRef<Set<string>>(new Set());
+
+	// Every object URL created for a preview (original or converted) is tracked
+	// here and revoked on unmount, since nothing else in this component's
+	// lifecycle naturally triggers a revoke for images the user never removes
+	// (same pattern as Image Compressor's `objectUrls`/`trackUrl`).
+	useEffect(() => {
+		return () => {
+			for (const url of objectUrls.current) URL.revokeObjectURL(url);
+		};
+	}, []);
+
+	const trackUrl = (url: string) => {
+		objectUrls.current.add(url);
+		return url;
+	};
 
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList) return;
@@ -296,6 +319,7 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 		const newItems: ImageItem[] = acceptedFiles.map((file) => ({
 			id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
 			file,
+			previewUrl: trackUrl(URL.createObjectURL(file)),
 			status: 'pending' as const,
 		}));
 		setItems((prev) => [...prev, ...newItems]);
@@ -316,14 +340,23 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 				prev.map((it) => (it.id === item.id ? { ...it, status: 'processing' } : it)),
 			);
 			try {
+				if (item.resultPreviewUrl) {
+					URL.revokeObjectURL(item.resultPreviewUrl);
+					objectUrls.current.delete(item.resultPreviewUrl);
+				}
 				const resultBlob = await convertImage(
 					item.file,
 					targetFormat,
 					quality,
 					resizeEnabled ? maxDimension : undefined,
 				);
+				const resultPreviewUrl = trackUrl(URL.createObjectURL(resultBlob));
 				setItems((prev) =>
-					prev.map((it) => (it.id === item.id ? { ...it, status: 'done', resultBlob } : it)),
+					prev.map((it) =>
+						it.id === item.id
+							? { ...it, status: 'done', resultBlob, resultPreviewUrl, comparePosition: 50 }
+							: it,
+					),
 				);
 			} catch (err) {
 				const errorMessage =
@@ -386,6 +419,36 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 			setIsZipping(false);
 		}
 	}, [items, targetFormat]);
+
+	// A previously converted/failed result no longer reflects the current
+	// settings once format/quality/resize change — leaving it displayed as
+	// "done" would show the before/after slider comparing against a stale
+	// conversion (same bug fixed in Image Compressor for its "By quality" ->
+	// "By target size" switch). Reverting those items to 'pending' keeps the
+	// UI honest that nothing has been converted with the current settings yet.
+	const settingsSignature = `${targetFormat}|${quality}|${resizeEnabled}|${maxDimension}`;
+	const prevSettingsSignature = useRef(settingsSignature);
+	useEffect(() => {
+		if (prevSettingsSignature.current === settingsSignature) return;
+		prevSettingsSignature.current = settingsSignature;
+		setItems((prev) =>
+			prev.map((item) => {
+				if (item.status !== 'done' && item.status !== 'error') return item;
+				if (item.resultPreviewUrl) {
+					URL.revokeObjectURL(item.resultPreviewUrl);
+					objectUrls.current.delete(item.resultPreviewUrl);
+				}
+				return {
+					...item,
+					status: 'pending',
+					resultBlob: undefined,
+					resultPreviewUrl: undefined,
+					comparePosition: undefined,
+					errorMessage: undefined,
+				};
+			}),
+		);
+	}, [settingsSignature]);
 
 	const canConvert = !isProcessing && items.length > 0;
 	const doneCount = items.filter((item) => item.status === 'done').length;
@@ -521,8 +584,30 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 					{items.map((item) => (
 						<li
 							key={item.id}
-							className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-2 text-sm"
+							className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border p-2 text-sm"
 						>
+							{item.status === 'done' && item.resultPreviewUrl ? (
+								<BeforeAfterSlider
+									beforeSrc={item.previewUrl}
+									beforeAlt={`${item.file.name} — ${messages.original}`}
+									afterSrc={item.resultPreviewUrl}
+									afterAlt={`${item.file.name} — ${messages.converted}`}
+									value={item.comparePosition ?? 50}
+									onValueChange={(comparePosition) =>
+										setItems((prev) =>
+											prev.map((it) => (it.id === item.id ? { ...it, comparePosition } : it)),
+										)
+									}
+									className="size-16"
+									label={`${messages.original} / ${messages.converted}`}
+								/>
+							) : (
+								<img
+									src={item.previewUrl}
+									alt={`${item.file.name} — ${messages.original}`}
+									className="size-16 shrink-0 rounded-md border border-border object-cover"
+								/>
+							)}
 							<div className="flex min-w-0 flex-1 flex-col gap-0.5">
 								<span className="truncate text-foreground">{item.file.name}</span>
 								<span className="text-muted-foreground">
