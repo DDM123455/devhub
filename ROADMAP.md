@@ -330,7 +330,7 @@ ROADMAP)
 - [x] Thêm og:image/twitter:image mặc định + theo từng nhóm công cụ
 - [x] SVG Optimizer: cảnh báo <script> còn sót lại sau tối ưu là rủi ro XSS nếu nhúng inline
       (hành vi mặc định của svgo, không phải bug — chỉ cần cảnh báo)
-- [ ] Markdown Editor: sửa xung đột auto-continue list khi Enter với nội dung dán sẵn bắt đầu
+- [x] Markdown Editor: sửa xung đột auto-continue list khi Enter với nội dung dán sẵn bắt đầu
       bằng "-"
 - [ ] Cấu hình response security headers (CSP, X-Content-Type-Options, Referrer-Policy,
       X-Frame-Options/frame-ancestors) cho Cloudflare qua file `public/_headers`

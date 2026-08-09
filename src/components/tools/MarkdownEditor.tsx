@@ -16,8 +16,8 @@ import {
 	Eye,
 } from 'lucide-react';
 import { EditorView, basicSetup } from 'codemirror';
-import { placeholder } from '@codemirror/view';
-import { EditorState } from '@codemirror/state';
+import { keymap, placeholder } from '@codemirror/view';
+import { EditorState, Prec, type StateCommand } from '@codemirror/state';
 import { markdown } from '@codemirror/lang-markdown';
 import { Button } from '@/components/ui/button';
 
@@ -141,6 +141,36 @@ function hrTransform(value: string, start: number, end: number): EditResult {
 	const newValue = value.slice(0, start) + insertion + value.slice(end);
 	return { value: newValue, start: start + insertion.length, end: start + insertion.length };
 }
+
+// `@codemirror/lang-markdown`'s own Enter-key list-continuation command
+// (`insertNewlineContinueMarkup`, bound via `markdown()`'s `markdownKeymap`)
+// has a real dead-end for a plain top-level tight list: pasting a line that
+// starts with "- " and pressing Enter auto-continues it with a fresh empty
+// "- " marker (expected), but pressing Enter *again* on that empty marker —
+// the normal way to stop a list in GitHub, Notion, or Typora — does nothing
+// at all. Confirmed by calling the library's command directly against that
+// exact document/selection: it reports the keystroke as handled but produces
+// a byte-for-byte identical document every time, so the user is stuck typing
+// Enter with no visible result. This binds our own fallback at the highest
+// precedence: an empty marker line at the cursor gets its marker cleared
+// (exiting the list) here; every other case returns `false` so the
+// library's own Enter binding still runs exactly as before.
+const exitEmptyListItem: StateCommand = ({ state, dispatch }) => {
+	const sel = state.selection.main;
+	if (!sel.empty) return false;
+	const line = state.doc.lineAt(sel.head);
+	if (sel.head !== line.to) return false;
+	if (!/^\s*(?:[-*+]|\d+[.)])\s+$/.test(line.text)) return false;
+	dispatch(
+		state.update({
+			changes: { from: line.from, to: line.to, insert: '' },
+			selection: { anchor: line.from },
+			scrollIntoView: true,
+			userEvent: 'delete',
+		}),
+	);
+	return true;
+};
 
 const PREVIEW_CLASSES =
 	'[&_h1]:mt-4 [&_h1]:mb-2 [&_h1]:text-2xl [&_h1]:font-bold [&_h2]:mt-4 [&_h2]:mb-2 [&_h2]:text-xl [&_h2]:font-bold ' +
@@ -313,6 +343,9 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 				extensions: [
 					basicSetup,
 					markdown(),
+					// Must outrank markdown()'s own `Prec.high` Enter binding, or that
+					// binding intercepts Enter first and this fallback never runs.
+					Prec.highest(keymap.of([{ key: 'Enter', run: exitEmptyListItem }])),
 					EditorView.lineWrapping,
 					placeholder(messagesRef.current.inputPlaceholder),
 					editorTheme,

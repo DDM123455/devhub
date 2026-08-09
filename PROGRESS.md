@@ -32,9 +32,10 @@
   mục).
 - **Phase 3.8 — Audit Remediation vòng 3 (từ báo cáo QA tương tác thật người dùng gửi
   2026-08-01)**: nhóm 3.8a (Critical) HOÀN TẤT 3/3, nhóm 3.8b (High) HOÀN TẤT 5/5. Đang làm
-  3.8c (Medium): 4/9 xong (Convert Image Format before/after slider, trang 404 tùy chỉnh,
+  3.8c (Medium): 5/9 xong (Convert Image Format before/after slider, trang 404 tùy chỉnh,
   og:image/twitter:image mặc định + theo category, cảnh báo <script> sót lại ở SVG
-  Optimizer) — xem chi tiết từng mục trong `ROADMAP.md`.
+  Optimizer, xung đột auto-continue list ở Markdown Editor) — xem chi tiết từng mục trong
+  `ROADMAP.md`.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -167,6 +168,29 @@
   ngay phía trên: phải dùng click thật, không phải synthetic event, để phản ánh đúng hành vi.
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
+
+- **2026-08-09 (3.8c #5)** — Markdown Editor: sửa xung đột auto-continue list khi Enter với
+  nội dung bắt đầu bằng "-". Không có Puppeteer/browser để tái hiện y hệt thao tác chuột thật
+  của báo cáo gốc, nên đã điều tra ở tầng thấp hơn nhưng CHẮC CHẮN hơn: gọi thẳng command
+  `insertNewlineContinueMarkup` của `@codemirror/lang-markdown` (thứ đứng sau hành vi
+  "auto-continue list" khi Enter — do `markdown()` tự bind qua `markdownKeymap`, không phải
+  code tự viết trong dự án) trên một `EditorState` dựng tay, không cần mount view/DOM thật.
+  Root cause thật xác nhận được: dán/gõ dòng `"- item"` rồi Enter → tự thêm dòng marker rỗng
+  mới `"- "` (đúng ý muốn — continue list). Nhưng Enter **lần nữa** trên marker rỗng đó
+  (thao tác bình thường để THOÁT list, như GitHub/Notion/Typora) — gọi lại đúng command đó
+  cho ra **y hệt** document, không đổi gì, dù trả về `handled: true` (nuốt luôn phím Enter,
+  không rơi xuống hành vi Enter thường) → người dùng bấm Enter mãi mà không có phản hồi gì,
+  kẹt trong list. Test lặp lại 3 lần Enter liên tiếp đều cho cùng 1 kết quả, xác nhận đây là
+  dead-end thật chứ không phải nhiễu số liệu.
+  Sửa bằng cách thêm 1 keymap Enter riêng ở `Prec.highest` (ưu tiên cao hơn `Prec.high` mà
+  `markdown()` tự dùng): `exitEmptyListItem` — nếu dòng hiện tại chỉ có marker
+  (`-`/`*`/`+`/số thứ tự) + khoảng trắng và không có gì khác, xoá marker (thoát list) thay vì
+  để command gốc nuốt phím không làm gì. Mọi trường hợp khác trả `false`, rơi xuống đúng
+  `insertNewlineContinueMarkup` như cũ (không đổi hành vi continue-list bình thường). Verify
+  bằng script mô phỏng đúng thứ tự precedence 2 keymap: Enter #1 tiếp tục list đúng như cũ,
+  Enter #2 giờ xoá marker/thoát list (trước đây đứng yên), test riêng continue-list với item
+  không rỗng vẫn y hệt hành vi cũ (không regressions). Build sạch (462 trang, chỉ code, không
+  đổi i18n key).
 
 - **2026-08-09 (3.8c #4)** — SVG Optimizer: cảnh báo khi output còn sót thẻ `<script>`.
   Không phải bug (SVGO mặc định không có plugin nào trong `preset-default` xoá
