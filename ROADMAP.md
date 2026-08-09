@@ -311,8 +311,8 @@ ROADMAP)
 > công trước khi launch.
 
 ### 3.8a — Bug thật Critical (phát hiện qua thao tác thật trên UI)
-- [ ] QR Code Generator: sửa báo sai "content too long" với nội dung hợp lệ/ngắn
-- [ ] JSON Formatter: sửa treo tab khi Format (Ctrl+I) trên JSON sai cú pháp
+- [x] QR Code Generator: sửa báo sai "content too long" với nội dung hợp lệ/ngắn
+- [x] JSON Formatter: sửa treo tab khi Format (Ctrl+I) trên JSON sai cú pháp
 - [x] Text Case Converter: sửa snake_case/camelCase phá dữ liệu tiếng Việt có dấu (Unicode)
 
 ### 3.8b — Bug thật High
