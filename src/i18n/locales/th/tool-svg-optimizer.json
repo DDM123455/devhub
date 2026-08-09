@@ -23,6 +23,7 @@
     "codeTab": "โค้ด",
     "sizeLabel": "{{size}}",
     "reduced": "เล็กลง {{percent}}%",
+    "increased": "ใหญ่ขึ้น {{percent}}%",
     "copy": "คัดลอก",
     "copied": "คัดลอกแล้ว!",
     "download": "ดาวน์โหลด",

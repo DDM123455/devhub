@@ -23,6 +23,7 @@
     "codeTab": "Kode",
     "sizeLabel": "{{size}}",
     "reduced": "{{percent}}% lebih kecil",
+    "increased": "{{percent}}% lebih besar",
     "copy": "Salin",
     "copied": "Tersalin!",
     "download": "Unduh",

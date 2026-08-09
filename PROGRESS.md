@@ -31,8 +31,10 @@
   tiên của audit UX/UI 2026-07-31 đã xong (task 1-10, xem log 2026-08-01 bên dưới cho từng
   mục).
 - **Phase 3.8 — Audit Remediation vòng 3 (từ báo cáo QA tương tác thật người dùng gửi
-  2026-08-01)**: nhóm 3.8a (Critical) HOÀN TẤT 3/3. Còn 3.8b (High, 5 mục) và 3.8c (Medium,
-  9 mục) chưa làm — xem chi tiết từng mục trong `ROADMAP.md`.
+  2026-08-01)**: nhóm 3.8a (Critical) HOÀN TẤT 3/3. Nhóm 3.8b (High) đã xong 2/5 (Compress
+  Image stale result, SVG Optimizer nhãn % sai) — còn 3/5 (Regex Tester Matches không tự
+  refresh, disable submit khi input rỗng, chip "20 tools · 5 categories" trang chủ không cập
+  nhật theo filter). 3.8c (Medium, 9 mục) chưa làm — xem chi tiết từng mục trong `ROADMAP.md`.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -165,6 +167,40 @@
   ngay phía trên: phải dùng click thật, không phải synthetic event, để phản ánh đúng hành vi.
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
+
+- **2026-08-09** — Phase 3.8b (**2/5 bug High đã sửa**: Compress Image, SVG Optimizer).
+  Phát hiện qua rà soát lại checklist 3.8 theo yêu cầu người dùng — 2 fix này đã nằm sẵn ở
+  working tree (chưa rõ từ phiên nào) nhưng chưa build-verify/tick ROADMAP/commit theo đúng
+  quy trình CLAUDE.md; lần này hoàn tất nốt phần sổ sách.
+  1. **Compress Image hiển thị kết quả nén cũ khi đổi mode "By quality" → "By target size"**
+     (`ImageCompressor.tsx`). Root cause: đổi `compressMode`/`quality`/`targetSizeKb`/
+     resize/`targetFormat` không làm mất trạng thái `done`/`error` của các item đã nén trước
+     đó — kết quả hiển thị (dung lượng, % giảm, preview) vẫn là của lần nén với setting CŨ,
+     trong khi UI trông như đã áp dụng setting mới. Sửa: thêm `settingsSignature` gộp toàn bộ
+     setting liên quan, `useEffect` so sánh với giá trị trước đó qua `useRef` — khi đổi, revoke
+     object URL cũ và reset các item `done`/`error` về `pending`, buộc người dùng bấm nén lại
+     để thấy kết quả đúng với setting hiện tại thay vì số liệu cũ gây hiểu lầm.
+  2. **SVG Optimizer luôn ghi "0% smaller" khi file tối ưu ra LỚN hơn bản gốc**
+     (`SvgOptimizer.tsx`, `SvgOptimizerPage.astro`, 21 file `tool-svg-optimizer.json`). Root
+     cause: `percentSaved` dùng `Math.max(0, ...)` để clamp số âm về 0 — một số SVG rất nhỏ/
+     đặc thù qua svgo ra kết quả LỚN hơn input (do prettify hoặc plugin mở rộng shorthand cho
+     đúng ngữ nghĩa), nhưng UI vẫn báo "0% smaller" thay vì thừa nhận file tăng kích thước. Sửa:
+     đổi thành `percentDelta` giữ dấu (không clamp), thêm cờ `isLarger`; khi âm, hiển thị
+     `messages.increased` ("X% larger") màu `text-destructive` thay vì `messages.reduced`. Thêm
+     key i18n `increased` cho cả 21 locale (nội dung tiếng Anh — theo quy ước i18n hiện hành,
+     dịch các ngôn ngữ khác để người dùng tự bổ sung sau nếu cần).
+  3. Còn lại 3/5 mục 3.8b chưa làm: Regex Tester (đọc lại code thấy `debouncedTestString` đã
+     nằm trong dependency của effect chạy match — có thể đã hết bug từ đợt refactor Web Worker
+     trước đó, cần bấm thử tay để xác nhận chắc chắn thay vì chỉ tin đọc code tĩnh); disable nút
+     submit khi input rỗng (đọc code `PdfMerger.tsx`/`PdfSplitter.tsx` thấy đã có
+     `disabled={!canMerge}`/`!canSplit}` — cũng cần xác nhận qua thao tác tay); chip
+     "20 tools · 5 categories" trang chủ vẫn tính tĩnh lúc build (`toolCount`/`categoryCount`
+     trong `index.astro`), script filter chỉ ẩn/hiện thẻ chứ không cập nhật lại số hiển thị —
+     đây là bug thật, chưa sửa.
+  4. Ghi chú tiện lợi: rà soát ROADMAP.md 3.8a phát hiện commit `4817be7` đã sửa xong CẢ 3 bug
+     Critical (QR Code Generator, JSON Formatter, Text Case Converter) nhưng checkbox chỉ tick
+     Text Case Converter — có vẻ là sót khi cập nhật ROADMAP, chưa tự sửa lại vì ngoài phạm vi
+     việc được yêu cầu lần này, cần hỏi người dùng trước.
 
 - **2026-08-01** — Phase 3.8a (**3/3 bug Critical đã sửa**), mở từ báo cáo QA tương tác thật
   người dùng tự chạy và gửi trực tiếp (không phải audit do agent tự thực hiện). Cả 3 bug đều

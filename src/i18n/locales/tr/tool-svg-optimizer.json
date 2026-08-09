@@ -23,6 +23,7 @@
     "codeTab": "Kod",
     "sizeLabel": "{{size}}",
     "reduced": "%{{percent}} daha küçük",
+    "increased": "%{{percent}} daha büyük",
     "copy": "Kopyala",
     "copied": "Kopyalandı!",
     "download": "İndir",

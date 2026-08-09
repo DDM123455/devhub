@@ -316,10 +316,10 @@ ROADMAP)
 - [x] Text Case Converter: sửa snake_case/camelCase phá dữ liệu tiếng Việt có dấu (Unicode)
 
 ### 3.8b — Bug thật High
-- [ ] Compress Image: sửa hiển thị kết quả nén cũ khi đổi "By quality" → "By target size"
+- [x] Compress Image: sửa hiển thị kết quả nén cũ khi đổi "By quality" → "By target size"
 - [ ] Regex Tester: panel Matches không tự cập nhật khi chỉ sửa Test String (phải bấm lại ô
       Pattern mới refresh)
-- [ ] SVG Optimizer: nhãn % sai khi file "tối ưu" lại LỚN hơn bản gốc (vẫn ghi "0% smaller")
+- [x] SVG Optimizer: nhãn % sai khi file "tối ưu" lại LỚN hơn bản gốc (vẫn ghi "0% smaller")
 - [ ] Disable nút submit khi input rỗng (Merge PDF và các nút tương tự) — hiện bấm không có
       phản hồi gì
 - [ ] Trang chủ: chip "20 tools · 5 categories" không cập nhật số theo kết quả đang lọc

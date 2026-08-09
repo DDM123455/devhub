@@ -23,6 +23,7 @@
     "codeTab": "कोड",
     "sizeLabel": "{{size}}",
     "reduced": "{{percent}}% छोटा",
+    "increased": "{{percent}}% बड़ा",
     "copy": "कॉपी करें",
     "copied": "कॉपी हो गया!",
     "download": "डाउनलोड करें",

@@ -20,6 +20,7 @@ interface Messages {
 	codeTab: string;
 	sizeLabel: string;
 	reduced: string;
+	increased: string;
 	copy: string;
 	copied: string;
 	download: string;
@@ -223,7 +224,12 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 
 	const originalSize = new TextEncoder().encode(input).length;
 	const optimizedSize = new TextEncoder().encode(output).length;
-	const percentSaved = originalSize > 0 && output ? Math.max(0, Math.round((1 - optimizedSize / originalSize) * 100)) : 0;
+	// Signed, not clamped to 0: a handful of already-tiny/unusual SVGs come out
+	// of svgo LARGER than the input (e.g. prettified output, or plugins that
+	// expand shorthand for correctness) — clamping negative values to 0 used to
+	// display a misleading "0% smaller" instead of admitting the file grew.
+	const percentDelta = originalSize > 0 && output ? Math.round((1 - optimizedSize / originalSize) * 100) : 0;
+	const isLarger = percentDelta < 0;
 
 	const handleFile = (files: FileList | null) => {
 		const file = files?.[0];
@@ -380,9 +386,14 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 						<div className="flex flex-col gap-2">
 							<div className="flex items-center justify-between">
 								<span className="text-sm font-medium text-foreground">{messages.optimizedHeading}</span>
-								<span className="text-xs text-muted-foreground">
+								<span className={`text-xs ${isLarger ? 'text-destructive' : 'text-muted-foreground'}`}>
 									{messages.sizeLabel.replace('{{size}}', formatBytes(optimizedSize))}
-									{output && ` — ${messages.reduced.replace('{{percent}}', String(percentSaved))}`}
+									{output &&
+										` — ${
+											isLarger
+												? messages.increased.replace('{{percent}}', String(Math.abs(percentDelta)))
+												: messages.reduced.replace('{{percent}}', String(percentDelta))
+										}`}
 								</span>
 							</div>
 							{view === 'preview' ? (

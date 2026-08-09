@@ -23,6 +23,7 @@
     "codeTab": "코드",
     "sizeLabel": "{{size}}",
     "reduced": "{{percent}}% 감소",
+    "increased": "{{percent}}% 증가",
     "copy": "복사",
     "copied": "복사됨!",
     "download": "다운로드",

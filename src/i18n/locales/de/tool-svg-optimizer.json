@@ -23,6 +23,7 @@
     "codeTab": "Code",
     "sizeLabel": "{{size}}",
     "reduced": "{{percent}}% kleiner",
+    "increased": "{{percent}}% größer",
     "copy": "Kopieren",
     "copied": "Kopiert!",
     "download": "Herunterladen",

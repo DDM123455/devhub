@@ -23,6 +23,7 @@
     "codeTab": "Mã nguồn",
     "sizeLabel": "{{size}}",
     "reduced": "Giảm {{percent}}%",
+    "increased": "Tăng {{percent}}%",
     "copy": "Sao chép",
     "copied": "Đã sao chép!",
     "download": "Tải xuống",

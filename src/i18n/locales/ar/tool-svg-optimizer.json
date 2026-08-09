@@ -23,6 +23,7 @@
     "codeTab": "الكود",
     "sizeLabel": "{{size}}",
     "reduced": "أصغر بنسبة {{percent}}%",
+    "increased": "أكبر بنسبة {{percent}}%",
     "copy": "نسخ",
     "copied": "تم النسخ!",
     "download": "تنزيل",

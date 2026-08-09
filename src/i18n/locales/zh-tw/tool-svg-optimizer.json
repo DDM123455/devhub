@@ -23,6 +23,7 @@
     "codeTab": "程式碼",
     "sizeLabel": "{{size}}",
     "reduced": "縮小 {{percent}}%",
+    "increased": "增大 {{percent}}%",
     "copy": "複製",
     "copied": "已複製！",
     "download": "下載",

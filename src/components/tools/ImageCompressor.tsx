@@ -261,6 +261,38 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 		}
 	}, [items, compressedFileName]);
 
+	// A previously compressed/failed result no longer reflects the current
+	// settings once mode/quality/target size/resize/format change — leaving it
+	// displayed as "done" reads as though the new settings were already applied
+	// (reported bug: switching "By quality" -> "By target size" kept showing
+	// the old quality-mode result untouched). Reverting those items to
+	// 'pending' makes the UI honestly show nothing has been compressed with
+	// the current settings yet, instead of a stale result.
+	const settingsSignature = `${compressMode}|${quality}|${targetSizeKb}|${resizeEnabled}|${maxDimension}|${targetFormat}`;
+	const prevSettingsSignature = useRef(settingsSignature);
+	useEffect(() => {
+		if (prevSettingsSignature.current === settingsSignature) return;
+		prevSettingsSignature.current = settingsSignature;
+		setItems((prev) =>
+			prev.map((item) => {
+				if (item.status !== 'done' && item.status !== 'error') return item;
+				if (item.compressedPreviewUrl) {
+					URL.revokeObjectURL(item.compressedPreviewUrl);
+					objectUrls.current.delete(item.compressedPreviewUrl);
+				}
+				return {
+					...item,
+					status: 'pending',
+					compressedBlob: undefined,
+					compressedPreviewUrl: undefined,
+					compressedSize: undefined,
+					comparePosition: undefined,
+					errorMessage: undefined,
+				};
+			}),
+		);
+	}, [settingsSignature]);
+
 	const canCompress = !isProcessing && items.length > 0;
 	const doneCount = items.filter((item) => item.status === 'done').length;
 	// Aggregate progress across the whole batch: finished/errored items count as

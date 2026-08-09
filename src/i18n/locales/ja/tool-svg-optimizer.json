@@ -23,6 +23,7 @@
     "codeTab": "コード",
     "sizeLabel": "{{size}}",
     "reduced": "{{percent}}% 削減",
+    "increased": "{{percent}}% 増加",
     "copy": "コピー",
     "copied": "コピーしました！",
     "download": "ダウンロード",

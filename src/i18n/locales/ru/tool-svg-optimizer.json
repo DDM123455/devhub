@@ -23,6 +23,7 @@
     "codeTab": "Код",
     "sizeLabel": "{{size}}",
     "reduced": "Меньше на {{percent}}%",
+    "increased": "Больше на {{percent}}%",
     "copy": "Копировать",
     "copied": "Скопировано!",
     "download": "Скачать",
