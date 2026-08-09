@@ -10,6 +10,7 @@
     "dropHint": "oppure trascina qui le immagini",
     "remove": "Rimuovi sfondo",
     "removing": "Rimozione sfondo… {{percent}}%",
+    "loadingModel": "Download del modello IA in corso (solo la prima volta)… {{percent}}%",
     "download": "Scarica",
     "original": "Originale",
     "result": "Risultato",

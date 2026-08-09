@@ -10,6 +10,7 @@
     "dropHint": "or drag and drop images here",
     "remove": "Remove Background",
     "removing": "Removing background… {{percent}}%",
+    "loadingModel": "Downloading AI model (first run only)… {{percent}}%",
     "download": "Download",
     "original": "Original",
     "result": "Result",

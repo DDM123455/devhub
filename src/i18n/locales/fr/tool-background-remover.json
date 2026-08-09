@@ -10,6 +10,7 @@
     "dropHint": "ou glissez-déposez vos images ici",
     "remove": "Supprimer l'arrière-plan",
     "removing": "Suppression de l'arrière-plan… {{percent}} %",
+    "loadingModel": "Téléchargement du modèle IA (première fois uniquement)… {{percent}}%",
     "download": "Télécharger",
     "original": "Original",
     "result": "Résultat",

@@ -10,6 +10,7 @@
     "dropHint": "atau seret dan lepas gambar di sini",
     "remove": "Hapus Latar Belakang",
     "removing": "Menghapus latar belakang… {{percent}}%",
+    "loadingModel": "Mengunduh model AI (hanya sekali di awal)… {{percent}}%",
     "download": "Unduh",
     "original": "Asli",
     "result": "Hasil",

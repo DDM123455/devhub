@@ -10,6 +10,7 @@
     "dropHint": "またはここに画像をドラッグ＆ドロップ",
     "remove": "背景を除去",
     "removing": "背景を除去中… {{percent}}%",
+    "loadingModel": "AIモデルをダウンロード中（初回のみ）… {{percent}}%",
     "download": "ダウンロード",
     "original": "元の画像",
     "result": "結果",

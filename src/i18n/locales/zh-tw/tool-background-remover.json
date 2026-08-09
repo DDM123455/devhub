@@ -10,6 +10,7 @@
     "dropHint": "或將圖片拖曳到這裡",
     "remove": "去除背景",
     "removing": "去背中… {{percent}}%",
+    "loadingModel": "正在下載 AI 模型（僅限首次）… {{percent}}%",
     "download": "下載",
     "original": "原始圖片",
     "result": "去背結果",

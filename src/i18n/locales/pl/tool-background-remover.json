@@ -10,6 +10,7 @@
     "dropHint": "lub przeciągnij i upuść zdjęcia tutaj",
     "remove": "Usuń tło",
     "removing": "Usuwanie tła… {{percent}}%",
+    "loadingModel": "Pobieranie modelu AI (tylko za pierwszym razem)… {{percent}}%",
     "download": "Pobierz",
     "original": "Oryginał",
     "result": "Wynik",

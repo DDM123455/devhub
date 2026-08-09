@@ -9,6 +9,7 @@ interface Messages {
 	dropHint: string;
 	remove: string;
 	removing: string;
+	loadingModel: string;
 	download: string;
 	original: string;
 	result: string;
@@ -43,6 +44,14 @@ interface ImageItem {
 	displayUrl?: string;
 	comparePosition: number;
 	progress?: number;
+	// @imgly/background-removal's progress callback reports two very different
+	// phases under the same 0-100 number: downloading the AI model/wasm runtime
+	// (only on the very first run per session — cached after that) vs. actually
+	// running inference on this image. Showing "Removing background: 12%" while
+	// what's really happening is a multi-MB download over a slow connection
+	// reads as a stuck/hung progress bar — surfacing which phase it actually is
+	// avoids that.
+	stage?: 'loading-model' | 'processing';
 }
 
 const MIN_MAX_DIMENSION = 320;
@@ -296,10 +305,14 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 			try {
 				const resultBlob = await removeBackground(item.file, {
 					output: { format: 'image/png' },
-					progress: (_key, current, total) => {
+					// `key` is namespaced by the library itself: "fetch:*" while
+					// downloading the model/wasm runtime, "compute:*" while actually
+					// running inference on this image — see note on `ImageItem.stage`.
+					progress: (key, current, total) => {
 						const percent = total > 0 ? Math.round((current / total) * 100) : 0;
+						const stage = key.startsWith('fetch:') ? 'loading-model' : 'processing';
 						setItems((prev) =>
-							prev.map((it) => (it.id === item.id ? { ...it, progress: percent } : it)),
+							prev.map((it) => (it.id === item.id ? { ...it, progress: percent, stage } : it)),
 						);
 					},
 				});
@@ -560,7 +573,9 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 								<span className="truncate text-foreground">{item.file.name}</span>
 								{item.status === 'processing' && (
 									<span role="status" className="flex items-center gap-2 text-muted-foreground">
-										{messages.removing.replace('{{percent}}', String(item.progress ?? 0))}
+										{item.stage === 'loading-model'
+											? messages.loadingModel.replace('{{percent}}', String(item.progress ?? 0))
+											: messages.removing.replace('{{percent}}', String(item.progress ?? 0))}
 										<Progress value={item.progress ?? 0} className="w-24" />
 									</span>
 								)}
@@ -593,10 +608,11 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 			<div className="flex flex-wrap items-center gap-3">
 				<Button type="button" onClick={handleRemove} disabled={!canRemove}>
 					{isProcessing
-						? messages.removing.replace(
-								'{{percent}}',
-								String(items.find((item) => item.status === 'processing')?.progress ?? 0),
-							)
+						? (() => {
+								const active = items.find((item) => item.status === 'processing');
+								const label = active?.stage === 'loading-model' ? messages.loadingModel : messages.removing;
+								return label.replace('{{percent}}', String(active?.progress ?? 0));
+							})()
 						: messages.remove}
 				</Button>
 				{doneCount > 1 && (

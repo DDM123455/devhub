@@ -10,6 +10,7 @@
     "dropHint": "veya resimleri buraya sürükleyip bırakın",
     "remove": "Arka Planı Kaldır",
     "removing": "Arka plan kaldırılıyor… %{{percent}}",
+    "loadingModel": "Yapay zeka modeli indiriliyor (yalnızca ilk seferde)… {{percent}}%",
     "download": "İndir",
     "original": "Orijinal",
     "result": "Sonuç",

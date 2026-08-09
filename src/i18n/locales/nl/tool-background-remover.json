@@ -10,6 +10,7 @@
     "dropHint": "of sleep afbeeldingen hierheen",
     "remove": "Achtergrond verwijderen",
     "removing": "Achtergrond wordt verwijderd… {{percent}}%",
+    "loadingModel": "AI-model wordt gedownload (alleen de eerste keer)… {{percent}}%",
     "download": "Downloaden",
     "original": "Origineel",
     "result": "Resultaat",

@@ -10,6 +10,7 @@
     "dropHint": "eller dra och släpp bilder här",
     "remove": "Ta bort bakgrund",
     "removing": "Tar bort bakgrund… {{percent}}%",
+    "loadingModel": "Laddar ner AI-modell (endast första gången)… {{percent}}%",
     "download": "Ladda ner",
     "original": "Original",
     "result": "Resultat",

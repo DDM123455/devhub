@@ -10,6 +10,7 @@
     "dropHint": "oder Bilder hierher ziehen",
     "remove": "Hintergrund entfernen",
     "removing": "Hintergrund wird entfernt… {{percent}} %",
+    "loadingModel": "KI-Modell wird heruntergeladen (nur beim ersten Mal)… {{percent}}%",
     "download": "Herunterladen",
     "original": "Original",
     "result": "Ergebnis",

@@ -10,6 +10,7 @@
     "dropHint": "또는 이미지를 여기로 드래그하세요",
     "remove": "배경 제거",
     "removing": "배경 제거 중… {{percent}}%",
+    "loadingModel": "AI 모델 다운로드 중(최초 1회만)… {{percent}}%",
     "download": "다운로드",
     "original": "원본",
     "result": "결과",

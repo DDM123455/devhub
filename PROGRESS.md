@@ -32,11 +32,12 @@
   mục).
 - **Phase 3.8 — Audit Remediation vòng 3 (từ báo cáo QA tương tác thật người dùng gửi
   2026-08-01)**: nhóm 3.8a (Critical) HOÀN TẤT 3/3, nhóm 3.8b (High) HOÀN TẤT 5/5. Đang làm
-  3.8c (Medium): 7/9 xong (Convert Image Format before/after slider, trang 404 tùy chỉnh,
+  3.8c (Medium): 8/9 xong (Convert Image Format before/after slider, trang 404 tùy chỉnh,
   og:image/twitter:image mặc định + theo category, cảnh báo <script> sót lại ở SVG
   Optimizer, xung đột auto-continue list ở Markdown Editor, security response headers qua
-  `public/_headers`, rà soát bổ sung aria-live cho toàn bộ nút "Copied!") — xem chi tiết
-  từng mục trong `ROADMAP.md`.
+  `public/_headers`, rà soát bổ sung aria-live cho toàn bộ nút "Copied!", tách label
+  loading-model/engine ở Remove Background) — còn 1 mục (Undo Ctrl+Z) — xem chi tiết từng
+  mục trong `ROADMAP.md`.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -169,6 +170,29 @@
   ngay phía trên: phải dùng click thật, không phải synthetic event, để phản ánh đúng hành vi.
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
+
+- **2026-08-09 (3.8c #8)** — Tách label "đang tải model/engine lần đầu" khỏi "đang xử lý"
+  cho Remove Background / Video Trim / Audio Converter. Kiểm tra thực tế từng tool trước khi
+  sửa thay vì áp dụng máy móc cho cả 3:
+  - **Video Trim: ĐÃ CÓ SẴN, không cần sửa** — `engineState === 'loading'` đã hiện riêng
+    `messages.loadingEngineLabel` ("Loading video engine (~30 MB, first time only...)…"),
+    tách biệt hẳn với `processingLabel` lúc trim thật.
+  - **Audio Converter: KHÔNG áp dụng** — đọc `audioEncodeWorker.ts` xác nhận
+    `@breezystack/lamejs` chỉ `await import(...)` một chunk JS cùng-origin do Vite bundle
+    (không phải model AI/WASM vài MB tải từ CDN ngoài như 2 tool kia), không có phase "tải
+    lần đầu" đáng kể để tách riêng.
+  - **Remove Background: bug thật, ĐÃ SỬA** — `BackgroundRemover.tsx` trước đó bỏ qua tham
+    số `key` của callback `progress` (đặt tên `_key`, không dùng). Đọc source đã build của
+    `@imgly/background-removal` (`node_modules/@imgly/background-removal/dist/*.mjs`) xác
+    nhận `key` luôn có dạng `"fetch:*"` khi đang tải model ONNX/wasm runtime (chỉ xảy ra 1
+    lần, cache lại sau đó), và `"compute:*"` khi đang chạy suy luận thật trên ảnh — nghĩa là
+    progress bar hiện "Removing background: 12%" trong khi thực ra đang tải file vài MB qua
+    mạng chậm, đúng cảm giác "tưởng bị treo" mà ROADMAP mô tả. Sửa: thêm field `stage:
+    'loading-model' | 'processing'` vào `ImageItem`, set theo `key.startsWith('fetch:')`,
+    UI (cả label item riêng lẻ lẫn label nút "Remove Background" chính) hiện
+    `messages.loadingModel` khi đang ở stage tải model. Thêm key `loadingModel` vào cả 20
+    file `tool-background-remover.json` (tool này vốn dịch đủ 20 ngôn ngữ).
+  Build sạch (462 trang).
 
 - **2026-08-09 (3.8c #7)** — Rà soát lại aria-live cho trạng thái động, xác nhận còn thiếu
   chỗ nào so với Phase 3.5b. Grep toàn bộ `src/components/tools/*.tsx` tìm file KHÔNG có

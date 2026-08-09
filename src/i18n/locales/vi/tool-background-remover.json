@@ -10,6 +10,7 @@
     "dropHint": "hoặc kéo thả ảnh vào đây",
     "remove": "Xóa nền",
     "removing": "Đang xóa nền… {{percent}}%",
+    "loadingModel": "Đang tải model AI (chỉ lần đầu)… {{percent}}%",
     "download": "Tải xuống",
     "original": "Gốc",
     "result": "Kết quả",

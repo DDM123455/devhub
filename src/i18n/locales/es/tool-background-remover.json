@@ -10,6 +10,7 @@
     "dropHint": "o arrastra y suelta las imágenes aquí",
     "remove": "Quitar fondo",
     "removing": "Quitando el fondo… {{percent}}%",
+    "loadingModel": "Descargando modelo de IA (solo la primera vez)… {{percent}}%",
     "download": "Descargar",
     "original": "Original",
     "result": "Resultado",
