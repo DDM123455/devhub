@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "title": "Nginx Config Validator Online Free — Web Tool Hub",
+    "description": "Validate nginx.conf syntax, catch missing semicolons/braces, wrong-context directives, and common security misconfigurations — entirely in your browser, no upload."
+  },
+  "heading": "Nginx Config Validator",
+  "tagline": "Paste an nginx.conf and catch syntax errors, misplaced directives, and common security mistakes — before you reload nginx.",
+  "related": "Related tools",
+  "ui": {
+    "inputLabel": "Nginx config",
+    "inputPlaceholder": "Paste your nginx.conf here…",
+    "dropHint": "Drop a .conf file here, or paste config text above.",
+    "chooseFile": "Choose file",
+    "loadSample": "Load sample",
+    "clear": "Clear",
+    "privacyNote": "Everything runs in your browser — your config is never uploaded to any server.",
+    "issuesHeading": "Issues",
+    "noIssues": "No issues found.",
+    "summaryLabel": "{{errors}} errors, {{warnings}} warnings",
+    "severityError": "Error",
+    "severityWarning": "Warning",
+    "jumpToLine": "Line {{line}}",
+    "copyFixed": "Copy auto-fixed config",
+    "copyFixedCopied": "Copied!",
+    "regexTesterHeading": "Location Regex Tester",
+    "regexPatternLabel": "Pattern (as used after location ~ or ~*)",
+    "regexCaseInsensitiveLabel": "Case-insensitive (~*)",
+    "regexTestUrlLabel": "Test URL path",
+    "regexMatched": "Matches",
+    "regexNoMatch": "Does not match",
+    "regexPcreNote": "Uses JavaScript's regex engine, not nginx's real PCRE engine — close, but not identical (e.g. no possessive quantifiers/atomic groups).",
+    "rewriteHeading": "Rewrite / Return Simulator",
+    "rewritePatternLabel": "Pattern",
+    "rewriteReplacementLabel": "Replacement (use $1, $2… for captured groups)",
+    "rewriteTestUrlLabel": "Test URL path",
+    "rewriteResultLabel": "Result:",
+    "rewriteNoMatch": "Pattern does not match — rewrite would not apply."
+  },
+  "faq": {
+    "heading": "Frequently asked questions",
+    "q1": "Does this replace `nginx -t`?",
+    "a1": "No. `nginx -t` is the only tool that checks your config against the exact nginx build and modules actually installed on your server, and it's the final word before a reload. This validator catches the same class of mistakes (syntax errors, wrong directive placement, a handful of security smells) before you even get to a server with nginx installed — useful while editing locally, in a CI step, or when you don't have shell access to the target machine yet.",
+    "q2": "Is the security checklist exhaustive?",
+    "a2": "No — it covers a small, deliberately chosen set of checks (missing `server_tokens off;`, `autoindex on;`, and `$uri` used where `$request_uri` is safer) loosely inspired by Gixy, the open-source nginx config auditor. It is not a replacement for Gixy or a full security audit.",
+    "q3": "Why does the regex tester behave slightly differently from real nginx?",
+    "a3": "nginx's `location ~` and `location ~*` matching uses PCRE (via the bundled PCRE library in the nginx binary). This tool runs entirely in your browser, so it uses JavaScript's built-in RegExp engine instead — the two are very close for common patterns, but PCRE-only features like possessive quantifiers or atomic groups won't behave the same way here.",
+    "q4": "Does my config ever leave my browser?",
+    "a4": "No. Parsing, validation, and both simulators run with plain JavaScript in this tab. Nothing is uploaded, logged, or sent anywhere — you can even disconnect from the internet after the page loads and it keeps working."
+  },
+  "article": {
+    "heading": "Catching nginx config mistakes before they reach production",
+    "p1": "A broken nginx.conf usually announces itself in one of two unpleasant ways: `nginx -t` refusing to reload with a cryptic line-number error, or — worse — a `reload` silently keeping the old (working) config in memory while the new one sits broken on disk, so nothing seems wrong until the next full restart. Both are avoidable by catching the same class of mistakes earlier, while you're still editing.",
+    "p2": "The most common real-world nginx.conf mistake isn't exotic — it's a forgotten semicolon. Because nginx's grammar only cares about `;`, `{`, and `}` (not line breaks), a missing `;` doesn't produce a clean \"line 12: expected ;\" error the way most modern parsers do; instead, the next directive's name and arguments silently get absorbed as extra arguments of the previous directive, sometimes with no error at all until something downstream behaves strangely. This tool's line-break heuristic specifically watches for that pattern — a known directive name appearing mid-argument-list on a new source line — and flags it before it becomes a support ticket.",
+    "p3": "Directive placement is the second common trap: `proxy_pass` only makes sense inside a `location` (or `if`) block, `listen`/`server_name` only inside `server`, and so on — but nginx's own parser doesn't reject a directive just because it's in an unusual place if the directive name is one it recognizes at all in a broader sense, and error messages are pointed at nginx's own internal directive registry rather than at \"you nested this wrong.\" This validator checks the directive-to-context table directly, so a `proxy_pass` accidentally left at the `http` level (outside any `server`/`location`) gets flagged with the exact line, not just \"the config failed to load.\"",
+    "p4": "Beyond syntax, a handful of small config choices have outsized security consequences: leaving `server_tokens` at its default (`on`) hands out your exact nginx version in every response header and default error page, which is free reconnaissance for anyone probing for a version-specific CVE; using the URL-decoded `$uri` variable inside a `return`/`rewrite`/`add_header` (instead of the raw `$request_uri`) can let an attacker inject characters into a redirect target under some configurations. Neither of these breaks anything visibly during normal testing, which is exactly why they're worth a dedicated pass rather than relying on noticing them by eye in a 200-line config."
+  }
+}

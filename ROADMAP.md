@@ -340,6 +340,42 @@ ROADMAP)
       đầu" khác với "đang xử lý" để người dùng không tưởng bị treo
 - [x] Thêm Undo tối thiểu (Ctrl+Z) cho thao tác nhiều bước (xoay/xoá trang PDF, Markdown editor)
 
+## Phase 3.9 — 2 công cụ DevOps mới (theo yêu cầu trực tiếp người dùng, 2026-08-09)
+
+> Nguồn: prompt trực tiếp từ người dùng yêu cầu thêm Nginx Config Validator & Kubernetes YAML
+> Validator, có kèm route đề xuất cho các trang tham khảo directive/error/resource (SEO
+> long-tail). Làm theo từng bước, dừng lại xin duyệt giữa các bước — xem chi tiết quyết định
+> (routing/i18n/testing) trong log `PROGRESS.md` 2026-08-09.
+
+### 3.9a — Nginx Config Validator (Step 1 — ĐÃ XONG, chờ duyệt Step 2)
+
+- [x] Module logic thuần `src/lib/nginx-parser.ts` (tokenizer, phát hiện lỗi cấu trúc/context/
+      bảo mật, regex tester, rewrite/return simulator, auto-fix) — tách khỏi UI, có test
+- [x] Cài Vitest làm devDependency đầu tiên của repo (`npm test`), viết 20 test case cho parser
+- [x] Component `NginxConfigValidator.tsx` + trang `NginxConfigValidatorPage.astro`
+- [x] Đăng ký route `/{locale}/tools/nginx-config-validator/` (20 locale) trong `tools.ts` +
+      wire vào `[slug].astro`, đúng convention routing hiện có (không tạo route trần riêng)
+- [x] i18n: `ui.*`/`heading`/`tagline`/`related` dịch đủ 20 ngôn ngữ; `meta.*`/`faq.*`/
+      `article.*` (nội dung SEO dài) chỉ en+vi trước, 18 ngôn ngữ còn lại fallback tiếng Anh
+- [ ] Các trang tham khảo `/{locale}/nginx/directives/[directive]`,
+      `/{locale}/nginx/errors/[error-slug]`, `/{locale}/nginx/examples/[use-case]` — CHƯA làm,
+      để sau khi duyệt mẫu 3-5 trang (bước 5 trong prompt gốc)
+
+### 3.9b — Kubernetes YAML Validator (Step 2 — CHƯA BẮT ĐẦU, chờ duyệt)
+
+- [ ] Module logic `src/lib/k8s-yaml-validator.ts` (parse YAML giữ vị trí dòng, validate theo
+      JSON Schema qua `ajv`, fetch schema on-demand từ CDN theo apiVersion/kind/version, phát
+      hiện deprecated apiVersion + auto-fix, hỗ trợ multi-document `---`)
+  - Cần thêm dependency mới: `js-yaml`/`yaml` + `ajv` (đã được người dùng xác nhận trong prompt)
+- [ ] Component + trang `KubernetesYamlValidatorPage.astro`, đăng ký route
+      `/{locale}/tools/kubernetes-yaml-validator/` (20 locale)
+- [ ] i18n UI 20 ngôn ngữ, content SEO en+vi trước (cùng quy ước với 3.9a)
+- [ ] Test cho parser/validator
+- [ ] Trang tham khảo `/{locale}/k8s/resources/[kind]`, `/{locale}/k8s/errors/[error-slug]` —
+      sau khi duyệt mẫu
+- [ ] `/{locale}/k8s/api-versions/[migration-slug]` và `/{locale}/compare/kubeval-vs-kubeconform`
+      — Phase sau, chưa làm ngay (đúng như prompt gốc yêu cầu)
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

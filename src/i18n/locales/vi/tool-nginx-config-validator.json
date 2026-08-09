@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "title": "Kiểm Tra Cấu Hình Nginx Miễn Phí — Web Tool Hub",
+    "description": "Kiểm tra cú pháp nginx.conf, phát hiện thiếu dấu chấm phẩy/dấu ngoặc, directive đặt sai chỗ và các lỗi bảo mật thường gặp — hoàn toàn trong trình duyệt, không tải lên server."
+  },
+  "heading": "Kiểm tra cấu hình Nginx",
+  "tagline": "Dán file nginx.conf vào đây để phát hiện lỗi cú pháp, directive đặt sai vị trí và các lỗi bảo mật thường gặp — trước khi bạn reload nginx thật.",
+  "related": "Công cụ liên quan",
+  "ui": {
+    "inputLabel": "Cấu hình Nginx",
+    "inputPlaceholder": "Dán nội dung nginx.conf vào đây…",
+    "dropHint": "Kéo-thả file .conf vào đây, hoặc dán nội dung config ở trên.",
+    "chooseFile": "Chọn file",
+    "loadSample": "Nạp ví dụ mẫu",
+    "clear": "Xoá",
+    "privacyNote": "Mọi xử lý diễn ra ngay trong trình duyệt của bạn — config không bao giờ được tải lên bất kỳ server nào.",
+    "issuesHeading": "Danh sách lỗi/cảnh báo",
+    "noIssues": "Không phát hiện lỗi nào.",
+    "summaryLabel": "{{errors}} lỗi, {{warnings}} cảnh báo",
+    "severityError": "Lỗi",
+    "severityWarning": "Cảnh báo",
+    "jumpToLine": "Dòng {{line}}",
+    "copyFixed": "Copy config đã tự sửa",
+    "copyFixedCopied": "Đã copy!",
+    "regexTesterHeading": "Trình thử Regex cho Location",
+    "regexPatternLabel": "Pattern (dùng sau location ~ hoặc ~*)",
+    "regexCaseInsensitiveLabel": "Không phân biệt hoa/thường (~*)",
+    "regexTestUrlLabel": "URL để thử",
+    "regexMatched": "Khớp",
+    "regexNoMatch": "Không khớp",
+    "regexPcreNote": "Dùng engine regex của JavaScript, không phải PCRE thật của nginx — rất gần nhau nhưng không hoàn toàn giống (ví dụ: không có possessive quantifier/atomic group).",
+    "rewriteHeading": "Mô phỏng Rewrite / Return",
+    "rewritePatternLabel": "Pattern",
+    "rewriteReplacementLabel": "Chuỗi thay thế (dùng $1, $2… cho nhóm bắt được)",
+    "rewriteTestUrlLabel": "URL để thử",
+    "rewriteResultLabel": "Kết quả:",
+    "rewriteNoMatch": "Pattern không khớp — rule rewrite sẽ không được áp dụng."
+  },
+  "faq": {
+    "heading": "Câu hỏi thường gặp",
+    "q1": "Công cụ này có thay thế được `nginx -t` không?",
+    "a1": "Không. `nginx -t` là công cụ DUY NHẤT kiểm tra config đúng theo bản build nginx và các module thực sự cài trên server của bạn, và là lời khẳng định cuối cùng trước khi reload thật. Công cụ này bắt cùng nhóm lỗi (sai cú pháp, đặt sai directive, vài dấu hiệu bảo mật) NGAY CẢ KHI bạn chưa có server nào cài nginx — hữu ích khi soạn config trên máy local, trong bước CI, hoặc khi chưa có quyền truy cập shell vào máy đích.",
+    "q2": "Danh sách kiểm tra bảo mật đã đầy đủ chưa?",
+    "a2": "Chưa — hiện chỉ có 1 số ít kiểm tra được chọn lọc có chủ đích (thiếu `server_tokens off;`, `autoindex on;`, dùng `$uri` ở nơi nên dùng `$request_uri`), lấy cảm hứng lỏng lẻo từ Gixy — công cụ audit config nginx mã nguồn mở. Đây KHÔNG phải bản thay thế cho Gixy hay 1 audit bảo mật đầy đủ.",
+    "q3": "Vì sao trình thử regex hoạt động hơi khác nginx thật?",
+    "a3": "Cơ chế khớp `location ~` và `location ~*` của nginx dùng PCRE (thư viện PCRE nhúng sẵn trong binary nginx). Công cụ này chạy hoàn toàn trong trình duyệt nên dùng engine RegExp có sẵn của JavaScript thay thế — rất giống nhau với các pattern thông thường, nhưng tính năng chỉ PCRE mới có như possessive quantifier hay atomic group sẽ không hoạt động giống hệt ở đây.",
+    "q4": "Config của tôi có bao giờ rời khỏi trình duyệt không?",
+    "a4": "Không. Việc parse, kiểm tra, và cả 2 trình mô phỏng đều chạy bằng JavaScript thuần ngay trong tab này. Không có gì được tải lên, ghi log, hay gửi đi bất kỳ đâu — bạn thậm chí có thể ngắt mạng sau khi trang tải xong và mọi thứ vẫn hoạt động."
+  },
+  "article": {
+    "heading": "Bắt lỗi cấu hình Nginx trước khi chúng chạm tới production",
+    "p1": "Một file nginx.conf hỏng thường tự lộ diện theo 1 trong 2 cách khó chịu: `nginx -t` từ chối reload kèm lỗi số dòng khó hiểu, hoặc — tệ hơn — lệnh `reload` âm thầm giữ nguyên config CŨ (đang chạy tốt) trong bộ nhớ trong khi config MỚI nằm hỏng trên đĩa, khiến mọi thứ trông như bình thường cho tới lần restart toàn bộ tiếp theo. Cả hai đều tránh được nếu bắt đúng nhóm lỗi này sớm hơn, ngay khi bạn còn đang soạn thảo.",
+    "p2": "Lỗi thật phổ biến nhất trong nginx.conf ngoài đời không hề kỳ lạ — chỉ đơn giản là quên dấu chấm phẩy. Vì cú pháp nginx chỉ quan tâm `;`, `{`, `}` (không quan tâm xuống dòng), thiếu 1 dấu `;` sẽ KHÔNG cho ra lỗi rõ ràng kiểu \"dòng 12: thiếu dấu ;\" như hầu hết parser hiện đại khác; thay vào đó, tên và tham số của directive tiếp theo âm thầm bị \"nuốt\" thành tham số thừa của directive trước đó, đôi khi không báo lỗi gì cho tới khi có gì đó ở phía sau chạy sai. Cơ chế heuristic dựa vào ranh giới dòng của công cụ này chuyên theo dõi đúng mẫu hình đó — 1 tên directive quen thuộc xuất hiện giữa danh sách tham số ở 1 dòng mới — và gắn cờ nó trước khi nó trở thành 1 ticket hỗ trợ thật.",
+    "p3": "Đặt sai vị trí directive là cái bẫy phổ biến thứ hai: `proxy_pass` chỉ có ý nghĩa bên trong block `location` (hoặc `if`), `listen`/`server_name` chỉ trong `server`, v.v — nhưng parser gốc của nginx không từ chối 1 directive chỉ vì nó nằm ở vị trí bất thường, miễn là tên directive đó nó vẫn nhận ra ở nghĩa rộng hơn nào đó, và thông báo lỗi (nếu có) thường trỏ vào bảng đăng ký directive nội bộ của nginx chứ không nói thẳng \"bạn lồng sai chỗ rồi\". Công cụ kiểm tra này tra thẳng bảng ánh xạ directive-theo-context, nên 1 `proxy_pass` lỡ để ở cấp `http` (ngoài mọi `server`/`location`) sẽ bị gắn cờ kèm đúng số dòng, chứ không chỉ là \"config tải thất bại\".",
+    "p4": "Ngoài cú pháp, một vài lựa chọn cấu hình nhỏ lại kéo theo hậu quả bảo mật lớn không tương xứng: để `server_tokens` ở giá trị mặc định (`on`) sẽ tự nguyện công khai đúng phiên bản nginx trong MỌI header phản hồi và trang lỗi mặc định — đây là thông tin trinh sát miễn phí cho bất kỳ ai đang dò tìm CVE theo phiên bản cụ thể; dùng biến `$uri` đã giải mã URL bên trong `return`/`rewrite`/`add_header` (thay vì `$request_uri` thô) có thể cho phép kẻ tấn công chèn ký tự vào đích redirect trong một số cấu hình nhất định. Cả hai đều không làm hỏng gì thấy được ngay khi test bình thường — chính vì vậy chúng đáng được rà soát riêng thay vì trông chờ tự nhìn thấy bằng mắt trong 1 file config dài 200 dòng."
+  }
+}

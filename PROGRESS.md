@@ -33,10 +33,19 @@
 - **Phase 3.8 — Audit Remediation vòng 3 (từ báo cáo QA tương tác thật người dùng gửi
   2026-08-01)**: **HOÀN TẤT CẢ 3 NHÓM** — 3.8a (Critical) 3/3, 3.8b (High) 5/5, 3.8c
   (Medium) 9/9. Xem log chi tiết từng mục bên dưới; `ROADMAP.md` đã tick đủ.
+- **Phase 3.9 — 2 công cụ DevOps mới (Nginx Config Validator & Kubernetes YAML Validator)**:
+  đang làm theo yêu cầu trực tiếp người dùng 2026-08-09, chia bước có xin duyệt giữa chừng.
+  3.9a (Nginx): Step 1 xong (tool chính + parser + test), CHỜ DUYỆT Step 2. 3.9b
+  (Kubernetes): chưa bắt đầu.
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
   đây là quyết định chủ động, KHÔNG phải bug fallback âm thầm.
+- **Ngoại lệ cho Phase 3.9 (2026-08-09, theo yêu cầu trực tiếp người dùng cho riêng 2 tool
+  này)**: `ui.*`/`heading`/`tagline`/`related` dịch đủ NGAY 20 ngôn ngữ (không chờ bổ sung
+  sau như quy ước ở trên) — chỉ nội dung SEO dài (`meta.*`/`faq.*`/`article.*`) mới áp dụng
+  quy ước en+vi trước, 18 ngôn ngữ fallback tiếng Anh. Không áp dụng ngược lại cho 20 tool
+  cũ hay các tool tương lai khác trừ khi được yêu cầu lại.
 
 ## ⚙️ Ghi chú kỹ thuật quan trọng (áp dụng lâu dài, không phải log)
 
@@ -165,6 +174,62 @@
   ngay phía trên: phải dùng click thật, không phải synthetic event, để phản ánh đúng hành vi.
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
+
+- **2026-08-09 (Phase 3.9a Step 1)** — Bắt đầu Phase 3.9 theo prompt trực tiếp người dùng: 2
+  tool DevOps mới (Nginx Config Validator, Kubernetes YAML Validator). Prompt gốc yêu cầu
+  dừng lại xin duyệt sau mỗi bước — Step 0 (khám phá convention) xong, phát hiện 3 điểm lệch
+  với đề xuất trong prompt, đã hỏi lại người dùng trước khi code:
+  1. **Routing**: prompt đề xuất route trần `/tools/...`, `/nginx/...` không locale. Site
+     thật bắt buộc `/{locale}/tools/{slug}/` (đăng ký tập trung `src/data/tools.ts`, 20 slug
+     bản địa hoá/tool). Người dùng chọn: theo đúng convention site (không tạo hệ thống route
+     song song).
+  2. **i18n UI**: quy ước cũ (2026-07-27) là tool mới chỉ cần en+vi. Người dùng chọn: 2 tool
+     Phase 3.9 này dịch UI đủ 20 ngôn ngữ NGAY (ngoại lệ, xem note ở mục "Trạng thái hiện
+     tại" bên trên) — riêng nội dung SEO dài (article/FAQ 300-500 từ) vẫn theo en+vi trước.
+  3. **Testing**: repo chưa có test runner nào. Người dùng chọn: thêm Vitest làm devDependency
+     đầu tiên của repo.
+  Step 1 — Nginx Config Validator (tool chính, CHƯA làm trang tham khảo directive/error):
+  - `src/lib/nginx-parser.ts`: tokenizer thuần JS (không dependency, cùng tinh thần "tự viết
+    encoder/parser" như BMP/ICO encoder của Image Format Converter) — nhận diện block `{}`,
+    directive kết thúc `;`, comment `#`, chuỗi có quote. Phát hiện: brace không khớp (kèm
+    đúng dòng của block chưa đóng), thiếu `;` cuối file/trước `}`, directive đặt sai context
+    (bảng ánh xạ ~40 directive phổ biến theo context `main/events/http/server/location/
+    upstream/if`), và 1 heuristic quan trọng: **thiếu `;` giữa 2 directive liền nhau** — vì
+    ngữ pháp nginx thật KHÔNG coi xuống dòng là ranh giới câu lệnh (chỉ `;`/`{`/`}` mới là),
+    nên lỗi phổ biến nhất (quên `;`) không tự nhiên sinh ra lỗi cú pháp rõ ràng mà âm thầm
+    "nuốt" directive sau làm tham số thừa của directive trước — heuristic phát hiện khi 1 từ
+    khớp tên directive đã biết xuất hiện ở dòng mới giữa 1 chuỗi tham số chưa kết thúc.
+    **Phát hiện bug thật của chính mình khi viết test**: bản đầu tiên (buffer ký tự thô, chỉ
+    dùng `;`/`{`/`}` làm ranh giới) hoàn toàn bỏ sót lỗi thiếu `;` này — 2 directive dính làm
+    1 mà không báo gì. Viết lại tokenizer sang dạng token có line-tracking cho từng từ để sửa.
+  - Kiểm tra bảo mật (lấy cảm hứng 1 phần nhỏ từ Gixy, không phải bản sao): `$uri` (đã giải
+    mã) dùng trong `return`/`rewrite`/`add_header` → gợi ý `$request_uri` (rủi ro CRLF/response
+    splitting); thiếu `server_tokens off;` (lộ version); `autoindex on;` (lộ danh sách thư mục).
+  - Regex tester (dùng JS RegExp, ghi chú rõ khác PCRE thật) + rewrite/return simulator (hỗ trợ
+    capture group `$1`/`$2`) + auto-fix cho 2 lỗi vặt (thêm `;`/`}` còn thiếu).
+  - `src/lib/text-line-utils.ts`: helper `jumpTextareaToLine` dùng chung (tách từ pattern
+    click-to-jump đã có sẵn trong `JsonFormatter.tsx`, để tool K8s sau này dùng lại được).
+  - Cài `vitest` (devDependency đầu tiên của repo), `npm test` chạy 20 test case cho parser
+    (`src/lib/__tests__/nginx-parser.test.ts`) — PASS toàn bộ.
+  - `NginxConfigValidator.tsx` + `NginxConfigValidatorPage.astro` theo đúng pattern
+    `Base64ToolPage.astro` (Layout + JSON-LD `WebApplication` + h1/tagline + React island +
+    article 300-500 từ + FAQ + related tools).
+  - Đăng ký tool trong `src/data/tools.ts` (category `dev`, 20 slug/tên bản địa hoá), wire vào
+    `src/pages/[locale]/tools/[slug].astro`.
+  - i18n: `en`+`vi` đầy đủ (meta/heading/tagline/ui/faq/article — nội dung 300-500 từ viết
+    riêng, không AI-spin lặp giữa 2 ngôn ngữ); 18 locale còn lại chỉ có `heading`/`tagline`/
+    `related`/`ui.*` (fallback tiếng Anh cho meta/faq/article — đã xác nhận qua build, xem
+    ví dụ trang `ja`: h1 hiện đúng tiếng Nhật, FAQ/meta fallback tiếng Anh sạch, không có key
+    bị lộ dạng "ui.xxx").
+  - **Lưu ý dọn dẹp**: đã thêm CẢ 2 tool (nginx + k8s) vào `tools.ts` cùng lúc cho tiện, sau đó
+    NHẬN RA đây là nhảy trước sang phạm vi Step 2 (k8s chưa có component/route thật → sẽ hiện
+    trang "coming soon" trong sitemap/trang chủ) — đã bỏ lại entry k8s khỏi `tools.ts`, chỉ giữ
+    nginx, đúng tinh thần "một task tại một thời điểm".
+  - Build sạch (482 trang, +20 so với 462 trước đó — đúng 1 tool × 20 locale). `npm test`
+    20/20 pass.
+  - **Việc CHƯA làm (đợi duyệt)**: trang tham khảo `/nginx/directives/[directive]`,
+    `/nginx/errors/[error-slug]`, `/nginx/examples/[use-case]`; toàn bộ Kubernetes YAML
+    Validator (Step 2).
 
 - **2026-08-09 (3.8c #9 — HOÀN TẤT Phase 3.8)** — Thêm Undo tối thiểu (Ctrl+Z) cho thao tác
   nhiều bước. Kiểm tra riêng từng chỗ ROADMAP nêu trước khi sửa:
