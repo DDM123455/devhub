@@ -42,7 +42,9 @@
     "formatButton": "Formatera",
     "formatDetectedJson": "Formaterad som JSON",
     "formatDetectedXml": "Formaterad som XML",
-    "formatError": "Inte giltig JSON eller XML — lämnades oförändrad"
+    "formatError": "Inte giltig JSON eller XML — lämnades oförändrad",
+    "clearedNotice": "Rensat.",
+    "undo": "Ångra"
   },
   "related": "Relaterade verktyg",
   "faq": {

@@ -42,7 +42,9 @@
     "formatButton": "Format",
     "formatDetectedJson": "Diformat sebagai JSON",
     "formatDetectedXml": "Diformat sebagai XML",
-    "formatError": "Bukan JSON atau XML yang valid — dibiarkan tidak berubah"
+    "formatError": "Bukan JSON atau XML yang valid — dibiarkan tidak berubah",
+    "clearedNotice": "Dihapus.",
+    "undo": "Urungkan"
   },
   "related": "Alat terkait",
   "faq": {

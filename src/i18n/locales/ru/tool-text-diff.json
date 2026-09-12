@@ -42,7 +42,9 @@
     "formatButton": "Форматировать",
     "formatDetectedJson": "Отформатировано как JSON",
     "formatDetectedXml": "Отформатировано как XML",
-    "formatError": "Это не корректный JSON или XML — текст не изменён"
+    "formatError": "Это не корректный JSON или XML — текст не изменён",
+    "clearedNotice": "Очищено.",
+    "undo": "Отменить"
   },
   "related": "Похожие инструменты",
   "faq": {

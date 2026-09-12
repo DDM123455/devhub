@@ -42,7 +42,9 @@
     "formatButton": "Formatteren",
     "formatDetectedJson": "Geformatteerd als JSON",
     "formatDetectedXml": "Geformatteerd als XML",
-    "formatError": "Geen geldige JSON of XML — ongewijzigd gelaten"
+    "formatError": "Geen geldige JSON of XML — ongewijzigd gelaten",
+    "clearedNotice": "Gewist.",
+    "undo": "Ongedaan maken"
   },
   "related": "Gerelateerde tools",
   "faq": {

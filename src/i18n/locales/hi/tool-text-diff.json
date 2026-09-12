@@ -42,7 +42,9 @@
     "formatButton": "फ़ॉर्मेट करें",
     "formatDetectedJson": "JSON के रूप में फ़ॉर्मेट किया गया",
     "formatDetectedXml": "XML के रूप में फ़ॉर्मेट किया गया",
-    "formatError": "मान्य JSON या XML नहीं है — अपरिवर्तित छोड़ा गया"
+    "formatError": "मान्य JSON या XML नहीं है — अपरिवर्तित छोड़ा गया",
+    "clearedNotice": "साफ़ किया गया.",
+    "undo": "पूर्ववत करें"
   },
   "related": "जुड़े हुए टूल्स",
   "faq": {

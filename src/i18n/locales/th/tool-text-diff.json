@@ -42,7 +42,9 @@
     "formatButton": "จัดรูปแบบ",
     "formatDetectedJson": "จัดรูปแบบเป็น JSON แล้ว",
     "formatDetectedXml": "จัดรูปแบบเป็น XML แล้ว",
-    "formatError": "ไม่ใช่ JSON หรือ XML ที่ถูกต้อง — ไม่มีการเปลี่ยนแปลง"
+    "formatError": "ไม่ใช่ JSON หรือ XML ที่ถูกต้อง — ไม่มีการเปลี่ยนแปลง",
+    "clearedNotice": "ล้างแล้ว",
+    "undo": "เลิกทำ"
   },
   "related": "เครื่องมือที่เกี่ยวข้อง",
   "faq": {

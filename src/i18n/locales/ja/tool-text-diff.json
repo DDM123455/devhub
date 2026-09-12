@@ -42,7 +42,9 @@
     "formatButton": "フォーマット",
     "formatDetectedJson": "JSONとして整形しました",
     "formatDetectedXml": "XMLとして整形しました",
-    "formatError": "有効なJSONまたはXMLではありません — 変更せずそのままにしました"
+    "formatError": "有効なJSONまたはXMLではありません — 変更せずそのままにしました",
+    "clearedNotice": "消去しました。",
+    "undo": "元に戻す"
   },
   "related": "関連ツール",
   "faq": {

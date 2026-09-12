@@ -42,7 +42,9 @@
     "formatButton": "格式化",
     "formatDetectedJson": "已格式化为 JSON",
     "formatDetectedXml": "已格式化为 XML",
-    "formatError": "不是有效的 JSON 或 XML — 已保持原样"
+    "formatError": "不是有效的 JSON 或 XML — 已保持原样",
+    "clearedNotice": "已清空。",
+    "undo": "撤销"
   },
   "related": "相关工具",
   "faq": {

@@ -42,7 +42,9 @@
     "formatButton": "Formatar",
     "formatDetectedJson": "Formatado como JSON",
     "formatDetectedXml": "Formatado como XML",
-    "formatError": "Não é JSON nem XML válido — mantido sem alterações"
+    "formatError": "Não é JSON nem XML válido — mantido sem alterações",
+    "clearedNotice": "Limpo.",
+    "undo": "Desfazer"
   },
   "related": "Ferramentas relacionadas",
   "faq": {

@@ -178,6 +178,34 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-09-12 (3 cải tiến UX sau QA, theo yêu cầu trực tiếp người dùng "làm ngay cả 3")** —
+  Text Diff Checker, làm tiếp 3 gợi ý còn lại trong báo cáo tester ở log ngay dưới:
+  1) **Stack diff trên mobile**: side-by-side 2 cột (`flex overflow-hidden`) đổi thành
+     `flex-col md:flex-row` + thêm nhãn "Original text"/"Changed text" riêng cho từng khối
+     khi xếp chồng — bỏ `flex-1` khỏi `DiffColumn` (chuyển trách nhiệm chia 50/50 chiều
+     ngang lên wrapper `md:flex-1 md:min-w-0`, vì ở chế độ cột thì `flex-1` lại tính theo
+     trục dọc, không phải điều muốn). Verify: `scrollWidth` = `clientWidth` = 375 ở viewport
+     375px kể cả khi diff + merge tool đang hiển thị, screenshot xác nhận đọc được.
+  2) **Undo cho Clear**: không dùng dialog xác nhận (thêm ma sát cho thao tác Clear-để-làm-
+     lại bình thường) — giữ snapshot text cũ 6 giây, hiện nút "Undo" ngay trong vùng
+     `aria-live` đã có sẵn cạnh mỗi khung. Verify bằng Puppeteer: Clear xóa đúng, bấm Undo
+     khôi phục đúng y hệt text trước đó.
+  3) **Autosave localStorage**: theo đúng pattern đã có ở Markdown Editor (debounce 500ms,
+     xóa draft khi cả 2 ô rỗng thay vì lưu chuỗi rỗng, khôi phục trong `useEffect` riêng chạy
+     sau mount vì `localStorage` không có lúc Astro SSR build). Phải xử lý đúng thứ tự ưu
+     tiên với link chia sẻ đã có (Phase 3.5g): effect khôi phục autosave tự bỏ qua nếu
+     `window.location.hash` có giá trị, để link share luôn thắng draft cũ trong trình duyệt.
+     **Bẫy khi tự test tính năng này**: lần đầu verify bằng `page.goto()` sang cùng URL chỉ
+     đổi phần hash trong CÙNG một tab/page Puppeteer — Chrome coi đây là điều hướng
+     same-document (không remount), nên effect khôi phục hash (chỉ chạy 1 lần lúc mount,
+     dep `[]`) không chạy lại, khiến kết quả test SAI (tưởng nhầm là draft "đè" lên share
+     link). Test lại đúng cách bằng tab mới hoàn toàn mở thẳng share link (đúng kịch bản
+     người dùng thật khi mở link từ nơi khác) thì thứ tự ưu tiên đúng như thiết kế.
+  4) i18n 2 key mới `clearedNotice`/`undo` — thêm đủ ngay cả 20 locale (không để nợ lại,
+     khác với thói quen "en+vi trước" trước đây, vì tool này vừa được đưa về đủ parity ở
+     log ngay dưới, không muốn tái tạo lại đúng cái gap vừa dọn xong).
+  Build lại full site (502 trang, exit 0), 39/39 test Vitest pass, dọn hết script/screenshot
+  test tạm sau khi xong (không commit rác vào repo).
 - **2026-09-12 (QA senior-tester pass, theo yêu cầu trực tiếp người dùng)** — Text Diff
   Checker: test tương tác thật bằng Puppeteer trên bundle production (`npm run preview`,
   không phải dev server, đúng quy tắc đã ghi). **Bug thật tìm thấy (High)**: hàng 5 checkbox

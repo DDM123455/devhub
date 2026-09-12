@@ -406,6 +406,18 @@ ROADMAP)
       dịch cũ từ Phase 3.5g/3.6b. Cả 20 locale giờ đủ 37 key `ui` + 7 key `faq`, đã build lại
       full site (502 trang, exit 0) và grep xác nhận HTML thật của de/ja/ru/ar/zh có chữ đã
       dịch (không chỉ tin JSON đúng).
+- [x] **QA senior-tester pass (theo yêu cầu trực tiếp người dùng, test thật bằng Puppeteer
+      trên bundle production)**: tìm + sửa 1 bug High (tràn ngang mobile ở hàng checkbox
+      ignore, có từ Phase 3.5g) + làm 3 cải tiến UX được đề xuất trong báo cáo:
+  - [x] Diff side-by-side chuyển thành xếp chồng (stacked, có nhãn Original/Changed riêng)
+        dưới breakpoint `md`, thay vì ép 2 cột ~180px khó đọc trên điện thoại
+  - [x] Nút Clear giờ có Undo inline (giữ snapshot 6 giây, không cần dialog xác nhận gây
+        vướng cho thao tác Clear-để-làm-lại bình thường)
+  - [x] Autosave vào localStorage (theo đúng pattern Markdown Editor: debounce 500ms, xoá
+        draft khi cả 2 ô rỗng, khôi phục sau F5) — có ưu tiên đúng: share-link hash luôn
+        thắng draft cũ (verify bằng tab mới thật, không chỉ điều hướng hash trong cùng tab)
+  - [x] i18n 2 key mới (`clearedNotice`/`undo`) thêm đủ **cả 20 locale** ngay từ đầu (không
+        để nợ lại như trước, vì tool này vừa mới được đưa về đủ parity ở mục trên)
 
 ## Phase 4 — Kiếm tiền & PWA
 

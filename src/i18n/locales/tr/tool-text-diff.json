@@ -42,7 +42,9 @@
     "formatButton": "Biçimlendir",
     "formatDetectedJson": "JSON olarak biçimlendirildi",
     "formatDetectedXml": "XML olarak biçimlendirildi",
-    "formatError": "Geçerli JSON veya XML değil — değiştirilmeden bırakıldı"
+    "formatError": "Geçerli JSON veya XML değil — değiştirilmeden bırakıldı",
+    "clearedNotice": "Temizlendi.",
+    "undo": "Geri al"
   },
   "related": "İlgili araçlar",
   "faq": {

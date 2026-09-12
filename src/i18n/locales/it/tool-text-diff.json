@@ -42,7 +42,9 @@
     "formatButton": "Formatta",
     "formatDetectedJson": "Formattato come JSON",
     "formatDetectedXml": "Formattato come XML",
-    "formatError": "Non è JSON o XML valido — lasciato invariato"
+    "formatError": "Non è JSON o XML valido — lasciato invariato",
+    "clearedNotice": "Cancellato.",
+    "undo": "Annulla"
   },
   "related": "Strumenti correlati",
   "faq": {

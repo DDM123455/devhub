@@ -49,9 +49,14 @@ interface Messages {
 	formatDetectedJson: string;
 	formatDetectedXml: string;
 	formatError: string;
+	clearedNotice: string;
+	undo: string;
 }
 
 const DEBOUNCE_MS = 150;
+const DRAFT_STORAGE_KEY = 'text-diff-draft';
+const AUTOSAVE_DEBOUNCE_MS = 500;
+const CLEAR_UNDO_TIMEOUT_MS = 6000;
 
 // Uses the native Compression Streams API (supported in every evergreen
 // browser, no library needed) to gzip each text before base64-encoding it
@@ -269,7 +274,7 @@ function DiffColumn({ entries, lineNumbers, side, scrollRef, onScroll, activeRow
 	};
 	const { startIndex, endIndex } = computeVisibleRange(scrollTop, DIFF_VIEWPORT_HEIGHT, entries.length, OVERSCAN_ROWS);
 	return (
-		<div ref={scrollRef} onScroll={handleScroll} className="h-96 flex-1 overflow-auto bg-background">
+		<div ref={scrollRef} onScroll={handleScroll} className="h-96 overflow-auto bg-background">
 			<div style={{ height: entries.length * ROW_HEIGHT, position: 'relative' }}>
 				{entries.slice(startIndex, endIndex).map((entry, i) => {
 					const index = startIndex + i;
@@ -415,6 +420,8 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	const [hunkOverrides, setHunkOverrides] = useState<Map<number, HunkOverride>>(new Map());
 	const [shareLinkCopied, setShareLinkCopied] = useState(false);
 	const [formatFeedback, setFormatFeedback] = useState<{ side: 'original' | 'changed'; message: string } | null>(null);
+	const [clearUndo, setClearUndo] = useState<{ side: 'original' | 'changed'; previousText: string } | null>(null);
+	const clearUndoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	// Mirrors the `?token=`/`?pattern=` deep-link pattern used elsewhere on the
 	// site (JWT Decoder, Regex Tester), but via the URL *hash* instead of query
@@ -439,6 +446,66 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 			});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+
+	// Restores an autosaved draft after mount — localStorage isn't available during Astro's
+	// build-time SSR pass, so this must run client-side only (same pattern as Markdown
+	// Editor's autosave). Skipped entirely when a share-link hash is present: a link the
+	// user explicitly opened should win over whatever was left in this browser before,
+	// not get silently replaced once the hash effect above finishes decompressing.
+	useEffect(() => {
+		if (window.location.hash) return;
+		try {
+			const saved = localStorage.getItem(DRAFT_STORAGE_KEY);
+			if (!saved) return;
+			const draft = JSON.parse(saved) as { original?: string; changed?: string };
+			if (typeof draft.original === 'string') setOriginalText(draft.original);
+			if (typeof draft.changed === 'string') setChangedText(draft.changed);
+		} catch {
+			// Unavailable (private browsing, quota) or corrupt JSON — autosave is a
+			// convenience, not a requirement, so fail silently and start from empty.
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	// Debounced autosave: clearing both boxes removes the saved draft instead of persisting
+	// two empty strings, so hitting Clear (or its Undo) doesn't leave a stale draft to
+	// resurrect on the next visit.
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			try {
+				if (originalText || changedText) {
+					localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({ original: originalText, changed: changedText }));
+				} else {
+					localStorage.removeItem(DRAFT_STORAGE_KEY);
+				}
+			} catch {
+				// See note above — autosave failures are non-fatal.
+			}
+		}, AUTOSAVE_DEBOUNCE_MS);
+		return () => clearTimeout(timer);
+	}, [originalText, changedText]);
+
+	// Clearing a box is a one-click, full-content-loss action with no confirmation prompt
+	// (a modal would add friction for the common case of clearing to start fresh) — instead
+	// the previous text is kept in memory for a few seconds and offered back via an inline
+	// Undo, the same "clear now, offer to undo" pattern as most mail/notes apps.
+	const handleClear = (which: 'original' | 'changed') => {
+		const previousText = which === 'original' ? originalText : changedText;
+		if (previousText === '') return;
+		if (which === 'original') setOriginalText('');
+		else setChangedText('');
+		setClearUndo({ side: which, previousText });
+		if (clearUndoTimerRef.current) clearTimeout(clearUndoTimerRef.current);
+		clearUndoTimerRef.current = setTimeout(() => setClearUndo(null), CLEAR_UNDO_TIMEOUT_MS);
+	};
+
+	const handleUndoClear = () => {
+		if (!clearUndo) return;
+		if (clearUndo.side === 'original') setOriginalText(clearUndo.previousText);
+		else setChangedText(clearUndo.previousText);
+		setClearUndo(null);
+		if (clearUndoTimerRef.current) clearTimeout(clearUndoTimerRef.current);
+	};
 
 	const handleCopyShareLink = async () => {
 		const [originalCompressed, changedCompressed] = await Promise.all([
@@ -503,6 +570,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	useEffect(() => {
 		return () => {
 			diffWorkerRef.current?.terminate();
+			if (clearUndoTimerRef.current) clearTimeout(clearUndoTimerRef.current);
 		};
 	}, []);
 
@@ -670,7 +738,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 								{messages.originalLabel}
 							</label>
 							<div className="flex gap-1">
-								<Button type="button" size="sm" variant="ghost" onClick={() => setOriginalText('')}>
+								<Button type="button" size="sm" variant="ghost" onClick={() => handleClear('original')}>
 									{messages.clear}
 								</Button>
 								<Button type="button" size="sm" variant="ghost" onClick={handleSwap}>
@@ -700,8 +768,19 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							gutterRef={originalGutterRef}
 							onScrollSync={syncInputScroll(0)}
 						/>
-						<p role="status" aria-live="polite" className="min-h-4 text-xs text-muted-foreground">
-							{formatFeedback?.side === 'original' ? formatFeedback.message : ''}
+						<p role="status" aria-live="polite" className="flex min-h-4 items-center gap-1.5 text-xs text-muted-foreground">
+							{clearUndo?.side === 'original' ? (
+								<>
+									{messages.clearedNotice}
+									<button type="button" onClick={handleUndoClear} className="font-medium text-primary underline-offset-2 hover:underline">
+										{messages.undo}
+									</button>
+								</>
+							) : formatFeedback?.side === 'original' ? (
+								formatFeedback.message
+							) : (
+								''
+							)}
 						</p>
 					</div>
 					<div className="flex flex-col gap-2">
@@ -710,7 +789,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 								{messages.changedLabel}
 							</label>
 							<div className="flex gap-1">
-								<Button type="button" size="sm" variant="ghost" onClick={() => setChangedText('')}>
+								<Button type="button" size="sm" variant="ghost" onClick={() => handleClear('changed')}>
 									{messages.clear}
 								</Button>
 								<Button type="button" size="sm" variant="ghost" onClick={handleSwap}>
@@ -740,8 +819,19 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							gutterRef={changedGutterRef}
 							onScrollSync={syncInputScroll(1)}
 						/>
-						<p role="status" aria-live="polite" className="min-h-4 text-xs text-muted-foreground">
-							{formatFeedback?.side === 'changed' ? formatFeedback.message : ''}
+						<p role="status" aria-live="polite" className="flex min-h-4 items-center gap-1.5 text-xs text-muted-foreground">
+							{clearUndo?.side === 'changed' ? (
+								<>
+									{messages.clearedNotice}
+									<button type="button" onClick={handleUndoClear} className="font-medium text-primary underline-offset-2 hover:underline">
+										{messages.undo}
+									</button>
+								</>
+							) : formatFeedback?.side === 'changed' ? (
+								formatFeedback.message
+							) : (
+								''
+							)}
 						</p>
 					</div>
 				</div>
@@ -831,24 +921,38 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 						</div>
 					</div>
 
-					<div className="flex overflow-hidden rounded-md border border-border">
-						<DiffColumn
-							entries={entries}
-							lineNumbers={leftLineNumbers}
-							side="left"
-							scrollRef={leftColumnRef}
-							onScroll={syncDiffScroll(0)}
-							activeRowIndex={hunkStartRows[activeHunk] ?? null}
-						/>
-						<div className="w-px flex-shrink-0 bg-border" />
-						<DiffColumn
-							entries={entries}
-							lineNumbers={rightLineNumbers}
-							side="right"
-							scrollRef={rightColumnRef}
-							onScroll={syncDiffScroll(1)}
-							activeRowIndex={hunkStartRows[activeHunk] ?? null}
-						/>
+					{/* Side by side on desktop; stacked (Original above Changed) below `md` — two
+					    ~180px-wide diff columns are too cramped to read comfortably on a phone,
+					    so each gets the full width and its own labeled block instead. */}
+					<div className="flex flex-col overflow-hidden rounded-md border border-border md:flex-row">
+						<div className="flex flex-col md:min-w-0 md:flex-1">
+							<span className="border-b border-border bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
+								{messages.originalLabel}
+							</span>
+							<DiffColumn
+								entries={entries}
+								lineNumbers={leftLineNumbers}
+								side="left"
+								scrollRef={leftColumnRef}
+								onScroll={syncDiffScroll(0)}
+								activeRowIndex={hunkStartRows[activeHunk] ?? null}
+							/>
+						</div>
+						<div className="h-px bg-border md:hidden" />
+						<div className="hidden w-px flex-shrink-0 bg-border md:block" />
+						<div className="flex flex-col md:min-w-0 md:flex-1">
+							<span className="border-b border-border bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
+								{messages.changedLabel}
+							</span>
+							<DiffColumn
+								entries={entries}
+								lineNumbers={rightLineNumbers}
+								side="right"
+								scrollRef={rightColumnRef}
+								onScroll={syncDiffScroll(1)}
+								activeRowIndex={hunkStartRows[activeHunk] ?? null}
+							/>
+						</div>
 					</div>
 				</div>
 			) : (

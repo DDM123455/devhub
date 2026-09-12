@@ -42,7 +42,9 @@
     "formatButton": "تنسيق",
     "formatDetectedJson": "تم التنسيق كـ JSON",
     "formatDetectedXml": "تم التنسيق كـ XML",
-    "formatError": "ليس JSON أو XML صالحًا — تُرك بدون تغيير"
+    "formatError": "ليس JSON أو XML صالحًا — تُرك بدون تغيير",
+    "clearedNotice": "تم المسح.",
+    "undo": "تراجع"
   },
   "related": "أدوات ذات صلة",
   "faq": {

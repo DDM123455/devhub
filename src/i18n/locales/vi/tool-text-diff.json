@@ -42,7 +42,9 @@
     "formatButton": "Định dạng",
     "formatDetectedJson": "Đã định dạng theo JSON",
     "formatDetectedXml": "Đã định dạng theo XML",
-    "formatError": "Không phải JSON hay XML hợp lệ — giữ nguyên văn bản"
+    "formatError": "Không phải JSON hay XML hợp lệ — giữ nguyên văn bản",
+    "clearedNotice": "Đã xóa.",
+    "undo": "Hoàn tác"
   },
   "related": "Công cụ liên quan",
   "faq": {

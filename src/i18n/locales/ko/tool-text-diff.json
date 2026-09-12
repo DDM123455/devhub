@@ -42,7 +42,9 @@
     "formatButton": "포맷",
     "formatDetectedJson": "JSON 형식으로 정렬됨",
     "formatDetectedXml": "XML 형식으로 정렬됨",
-    "formatError": "유효한 JSON 또는 XML이 아닙니다 — 변경하지 않았습니다"
+    "formatError": "유효한 JSON 또는 XML이 아닙니다 — 변경하지 않았습니다",
+    "clearedNotice": "지웠습니다.",
+    "undo": "실행 취소"
   },
   "related": "관련 도구",
   "faq": {
