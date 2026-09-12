@@ -178,6 +178,20 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-09-12 (QA senior-tester pass, theo yêu cầu trực tiếp người dùng)** — Text Diff
+  Checker: test tương tác thật bằng Puppeteer trên bundle production (`npm run preview`,
+  không phải dev server, đúng quy tắc đã ghi). **Bug thật tìm thấy (High)**: hàng 5 checkbox
+  "ignore" (`ignoreWhitespace`/`ignoreCase`/`ignoreEmptyLines`/`normalizeLineEndings`/
+  `normalizeUnicode`) thiếu `flex-wrap` — trên viewport ≤500px (điện thoại thật), hàng này ép
+  cả trang cuộn ngang, cắt mất tiêu đề H1 và các nút Format/Upload — lỗi có sẵn TỪ Phase
+  3.5g (lúc thêm 3 checkbox cuối vào hàng vốn chỉ có 2 checkbox), không phải do task Format
+  hôm nay gây ra, chỉ tình cờ lộ ra khi test thật lần đầu ở viewport hẹp. Đã sửa (thêm
+  `flex-wrap` + đổi `gap-3` → `gap-x-3 gap-y-2`), xác nhận bằng script đo `scrollWidth` (532→
+  375, khớp viewport) + screenshot trước/sau ở 375px, cả dark mode và locale `ar` (RTL) đều
+  không còn tràn ngang. Test cũng xác nhận nút Format hoạt động đúng (JSON/XML tự nhận diện,
+  text không hợp lệ giữ nguyên + báo lỗi, không lẫn giữa 2 khung Original/Changed), diff +
+  merge tool không tràn ngang trên mobile dù layout diff 2 cột hơi chật ở 375px (ghi nhận là
+  gợi ý cải tiến, không phải bug). Build lại 502 trang sạch, 39/39 test Vitest pass.
 - **2026-09-12 (Phase 3.10, việc phụ)** — Text Diff Checker: dịch bổ sung 18/20 locale
   (mọi locale trừ en/vi) đang thiếu 9 key `ui` và toàn bộ khối `faq` trong
   `tool-text-diff.json` — phát hiện lúc làm task Format ở trên: các key thêm từ Phase

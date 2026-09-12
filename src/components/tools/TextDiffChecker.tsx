@@ -761,7 +761,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							</button>
 						))}
 					</div>
-					<div className="flex items-center gap-3 text-sm text-foreground">
+					<div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-foreground">
 						<label className="flex cursor-pointer items-center gap-1.5">
 							<input type="checkbox" checked={ignoreWhitespace} onChange={(event) => setIgnoreWhitespace(event.target.checked)} />
 							{messages.ignoreWhitespace}
