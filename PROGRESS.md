@@ -178,6 +178,27 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-09-12 (Phase 3.11 — layout không mở hết chiều rộng, theo yêu cầu trực tiếp người
+  dùng)** — Người dùng hỏi tại sao trang không mở hết bên phải trên màn rộng. Điều tra bằng
+  screenshot Puppeteer 1920px, xác nhận: TOÀN BỘ 22 trang tool bọc khu vực tương tác trong
+  `max-w-4xl`/`max-w-5xl` **không có `mx-auto`** → ghim sát trái, để trống ~650px (~34% màn
+  hình 1920px) bên phải; trang chủ cũng bị tương tự (hero `max-w-2xl` ghim trái, lưới danh
+  mục cứng tối đa `lg:grid-cols-2`). Hỏi người dùng 2 quyết định thiết kế trước khi sửa hàng
+  loạt (AskUserQuestion): (1) khu vực tool → **mở full-width, bỏ hẳn max-width**; (2) bài
+  viết SEO (article/FAQ) → **giữ hẹp `max-w-3xl` nhưng thêm căn giữa**. Thực thi bằng 1 script
+  Node chạy 1 lần trên cả 22 file `*Page.astro` (đã xác nhận cả 22/22 khớp đúng 2 pattern
+  giống hệt nhau trước khi chạy, an toàn hơn sửa tay từng file) — bỏ `max-w-Nxl` khỏi wrapper
+  tool, thêm `mx-auto` vào wrapper article. Component `FaqSection.astro` dùng chung (không
+  lặp per-file) trước đó hoàn toàn KHÔNG có max-width nào (bug có sẵn, không do task này) —
+  tiện sửa luôn thành `mx-auto max-w-3xl` theo đúng tinh thần vừa chọn. Trang chủ: thêm
+  `mx-auto` cho hero, thêm `xl:grid-cols-3` cho lưới danh mục — phần này **không nằm trong 2
+  câu hỏi đã hỏi người dùng** (chỉ hỏi phạm vi trang tool), nhưng cùng root cause và đã dùng
+  chính trang chủ minh họa lúc giải thích vấn đề nên sửa luôn cho nhất quán, có nói rõ với
+  người dùng đây là phần tự mở rộng phạm vi. Verify: build 502 trang exit 0, 39/39 test
+  Vitest pass, screenshot 1920px cho 5 trang đại diện (home/Text Diff/JSON Formatter/Regex
+  Tester/Markdown Editor) xác nhận lấp đầy đúng ý, và đo `scrollWidth` ở 375px cho cùng 5
+  trang xác nhận không có hồi quy tràn ngang mobile (bỏ max-width không ảnh hưởng viewport
+  hẹp hơn max-width cũ).
 - **2026-09-12 (3 cải tiến UX sau QA, theo yêu cầu trực tiếp người dùng "làm ngay cả 3")** —
   Text Diff Checker, làm tiếp 3 gợi ý còn lại trong báo cáo tester ở log ngay dưới:
   1) **Stack diff trên mobile**: side-by-side 2 cột (`flex overflow-hidden`) đổi thành

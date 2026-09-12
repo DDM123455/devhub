@@ -419,6 +419,39 @@ ROADMAP)
   - [x] i18n 2 key mới (`clearedNotice`/`undo`) thêm đủ **cả 20 locale** ngay từ đầu (không
         để nợ lại như trước, vì tool này vừa mới được đưa về đủ parity ở mục trên)
 
+## Phase 3.11 — Layout: khu vực tool + trang chủ không mở hết chiều rộng màn hình
+(theo yêu cầu trực tiếp người dùng, 2026-09-12)
+
+> Người dùng hỏi tại sao các trang không mở hết về phía bên phải trên màn rộng. Xác nhận
+> bằng screenshot 1920px: đúng — khu vực tương tác của TOÀN BỘ 22 trang tool bị `max-w-4xl`/
+> `max-w-5xl` ghim sát trái, để trống ~650px (~34% màn hình) bên phải; trang chủ cũng bị
+> tương tự (hero `max-w-2xl` ghim trái, lưới danh mục cứng tối đa 2 cột). Đã hỏi người dùng 2
+> quyết định thiết kế trước khi sửa hàng loạt: (1) khu vực tool → mở full-width, bỏ hẳn
+> max-width; (2) bài viết SEO (article/FAQ) → giữ hẹp `max-w-3xl` để dễ đọc nhưng thêm căn
+> giữa thay vì ghim trái.
+
+- [x] 22 file `*Page.astro`: bỏ `max-w-2xl/3xl/4xl/5xl` khỏi wrapper khu vực tool (`<div
+      class="mt-6 ...">`), giữ nguyên `mt-6` — dùng 1 script Node chạy 1 lần (áp dụng đồng
+      loạt an toàn hơn sửa tay 22 file, xác nhận cả 22/22 khớp pattern giống hệt nhau trước
+      khi chạy) thay vì sửa từng file
+- [x] 22 file `*Page.astro`: thêm `mx-auto` vào wrapper `article` (`max-w-3xl` giữ nguyên) —
+      cùng 1 script ở trên
+- [x] `FaqSection.astro` (component dùng chung, không lặp lại per-file): thêm `mx-auto
+      max-w-3xl` vào `<section>` gốc — phát hiện lúc làm: phần FAQ trước đây KHÔNG hề có
+      max-width nào (không phải do task này gây ra), đã bị bỏ sót từ trước, tiện sửa luôn
+      theo đúng tinh thần "article/FAQ giữ hẹp + căn giữa" người dùng vừa chọn
+- [x] Trang chủ (`src/pages/[locale]/index.astro`): thêm `mx-auto` cho hero section
+      (`max-w-2xl`); lưới danh mục thêm breakpoint `xl:grid-cols-3` (trước đó cứng tối đa 2
+      cột `lg:grid-cols-2` dù màn hình rộng bao nhiêu) — không nằm trong 2 câu hỏi đã hỏi
+      người dùng (chỉ hỏi về trang tool + article/FAQ), nhưng cùng root cause và đã dùng
+      chính trang chủ làm bằng chứng minh họa lúc giải thích vấn đề, nên sửa luôn cho nhất
+      quán — cần nói rõ với người dùng đây là phần mở rộng phạm vi tự quyết định
+- [x] Verify: build lại full site (502 trang, exit 0), 39/39 test Vitest pass, screenshot
+      1920px cho 5 trang đại diện (trang chủ, Text Diff, JSON Formatter, Regex Tester,
+      Markdown Editor) xác nhận lấp đầy chiều rộng đúng ý, và screenshot/đo `scrollWidth` ở
+      375px cho cùng 5 trang xác nhận KHÔNG có hồi quy tràn ngang mobile (bỏ max-width chỉ
+      ảnh hưởng khi có đủ chỗ rộng hơn max-width cũ, không ảnh hưởng viewport hẹp)
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

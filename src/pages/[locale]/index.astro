@@ -19,7 +19,7 @@ const categoryCount = categories.length;
 ---
 
 <Layout title={t('meta.title')} description={t('meta.description')} lang={locale}>
-	<section class="max-w-2xl px-4 pt-8 pb-9 sm:px-8 sm:pt-9">
+	<section class="mx-auto max-w-2xl px-4 pt-8 pb-9 sm:px-8 sm:pt-9">
 		<p class="mb-3.5 font-mono text-xs tracking-wide text-emerald-700 dark:text-emerald-400">{t('home.kicker')}</p>
 		<h1 class="mb-3.5 text-heading-1 text-foreground sm:text-display">
 			{t('home.heading')}
@@ -66,7 +66,7 @@ const categoryCount = categories.length;
 		</EmptyState>
 	</div>
 
-	<section class="grid grid-cols-1 gap-5 px-4 pb-16 sm:px-8 lg:grid-cols-2">
+	<section class="grid grid-cols-1 gap-5 px-4 pb-16 sm:px-8 lg:grid-cols-2 xl:grid-cols-3">
 		{
 			categories.map((category) => (
 				<div

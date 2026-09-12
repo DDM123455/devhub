@@ -81,13 +81,13 @@ const schema = {
 	<section class="px-4 py-10">
 		<h1 class="text-heading-1 text-foreground">{t('heading')}</h1>
 		<p class="mt-2 text-muted-foreground">{t('tagline')}</p>
-		<div class="mt-6 max-w-4xl">
+		<div class="mt-6">
 			<CsvJsonConverter client:load messages={messages} />
 		</div>
 	</section>
 	<section class="border-t border-border px-4 py-10">
 		<h2 class="text-heading-2 text-foreground">{t('article.heading')}</h2>
-		<div class="mt-4 flex max-w-3xl flex-col gap-4 text-muted-foreground">
+		<div class="mt-4 flex max-w-3xl flex-col gap-4 mx-auto text-muted-foreground">
 			<p>{t('article.p1')}</p>
 			<p>{t('article.p2')}</p>
 			<p>{t('article.p3')}</p>
