@@ -489,6 +489,16 @@ người dùng, 2026-09-12)
       người dùng tự bấm thử 1 lần trên trình duyệt thật trước khi coi tính năng chắc chắn ổn
       định đầu-cuối.
 
+### 3.12b — Bug thật High: "chọn ảnh xong không thấy xử lý gì" (theo báo cáo trực tiếp
+người dùng, phát hiện ngay sau khi Phase 3.12 xong)
+
+- [x] Tự động gọi `handleRemove()` ngay khi có ảnh `pending` (không cần bấm thêm nút "Remove
+      Background" riêng) — nguyên nhân gốc: phải bấm 2 lần (chọn ảnh + bấm nút riêng) trong
+      khi các tool cùng loại (remove.bg...) tự chạy ngay sau khi chọn, khiến người dùng tưởng
+      tool không phản ứng gì. Áp dụng cho cả chọn qua nút lẫn kéo-thả; giữ nút thủ công cho
+      retry item lỗi. Verify Puppeteer: trạng thái tự chuyển "Removing background… 0%" trong
+      <500ms sau khi chọn file, không cần click gì thêm, 0 console error.
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

@@ -178,6 +178,18 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-09-12 (Phase 3.12b — Xóa nền ảnh: bug thật "chọn ảnh xong không thấy làm gì", theo
+  báo cáo trực tiếp người dùng)** — Người dùng báo chọn ảnh xong không thấy xử lý gì. Điều
+  tra bằng Puppeteer trên trang thật: kỹ thuật thì KHÔNG lỗi — chọn ảnh vẫn hiện thumbnail +
+  tên file + nút "Remove Background" đúng, 0 console error. Nhưng đây chính là vấn đề UX
+  thật: phải bấm THÊM 1 nút riêng nằm dưới cả khối cài đặt (dễ bị bỏ sót) thì AI mới bắt đầu
+  chạy — khác với hành vi người dùng quen thuộc ở các tool cùng loại (remove.bg... tự chạy
+  ngay khi chọn ảnh), nên đọc như "không phản ứng gì". Sửa bằng 1 `useEffect` tự gọi
+  `handleRemove()` ngay khi có item `status === 'pending'` và không đang xử lý dở — áp dụng
+  cho cả chọn qua nút lẫn kéo-thả, giữ nguyên nút "Remove Background" thủ công cho trường hợp
+  retry item bị lỗi. Verify bằng Puppeteer: sau khi set `input.files` (không bấm gì thêm),
+  dòng trạng thái tự chuyển sang "Removing background… 0%" trong <500ms, 0 console error.
+  Build 502 trang exit 0, 39/39 test Vitest pass.
 - **2026-09-12 (Phase 3.12 — Xóa nền ảnh: kích thước ảnh thẻ chuẩn, theo yêu cầu trực tiếp
   người dùng)** — Người dùng hỏi 2 việc: "thay áo" cho ảnh + crop theo khổ ảnh thẻ (3x4...).
   Đã hỏi rõ (AskUserQuestion) trước khi code: (1) thay trang phục — giải thích cần model AI

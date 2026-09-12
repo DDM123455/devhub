@@ -443,6 +443,20 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 		setIsProcessing(false);
 	}, [items]);
 
+	// Auto-starts removal as soon as file(s) are added — selecting a photo and then having
+	// to notice and click a *separate* "Remove Background" button read as "nothing
+	// happened" to users trying the tool for the first time (the button sits below the
+	// settings panel, easy to miss). The button itself stays in the UI for retrying items
+	// that ended up in 'error' without re-selecting files, and as a visible indicator of
+	// what's currently running — it just no longer has to be clicked for the common case.
+	useEffect(() => {
+		if (isProcessing) return;
+		if (items.some((item) => item.status === 'pending')) {
+			void handleRemove();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [items, isProcessing]);
+
 	const handleDownload = useCallback((item: ImageItem) => {
 		if (!item.resultBlob) return;
 		const url = item.displayUrl ?? URL.createObjectURL(item.resultBlob);
