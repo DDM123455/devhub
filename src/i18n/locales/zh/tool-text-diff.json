@@ -15,6 +15,10 @@
     "placeholder": "在此粘贴或输入文字…",
     "ignoreWhitespace": "忽略空白字符",
     "ignoreCase": "忽略大小写",
+    "ignoreEmptyLines": "忽略空行",
+    "normalizeLineEndings": "规范化换行符 (CRLF/LF)",
+    "normalizeUnicode": "Unicode 规范化",
+    "computing": "正在计算差异…",
     "statsAdded": "新增 {{count}} 处",
     "statsRemoved": "删除 {{count}} 处",
     "statsModified": "修改 {{count}} 处",
@@ -33,9 +37,23 @@
     "acceptLeftAria": "此处采用左侧版本",
     "copy": "复制",
     "copied": "已复制！",
-    "save": "保存为 .txt"
+    "save": "保存为 .txt",
+    "copyShareLink": "复制分享链接",
+    "formatButton": "格式化",
+    "formatDetectedJson": "已格式化为 JSON",
+    "formatDetectedXml": "已格式化为 XML",
+    "formatError": "不是有效的 JSON 或 XML — 已保持原样"
   },
   "related": "相关工具",
+  "faq": {
+    "heading": "常见问题",
+    "q1": "可以按字符而不是按行比较文本吗？",
+    "a1": "可以 — 在字符级、单词级和行级比较粒度之间切换。",
+    "q2": "可以把两个版本合并成一份最终文本吗？",
+    "a2": "可以 — 内置的合并工具让你逐处更改地选择采用左侧或右侧版本。",
+    "q3": "可以忽略空格或大小写的差异吗？",
+    "a3": "可以 — 分别独立开启\"忽略空格\"和\"忽略大小写\"。"
+  },
   "article": {
     "heading": "为什么要用文本对比工具？",
     "p1": "只要同一份文档存在两个版本——律师修改前后的合同、反馈修改前后的文章、同事提交前后的配置文件——真正重要的问题往往不是“这两份文件是不是一样”，而是“到底改了哪里”。把两个版本并排看、试图靠肉眼揪出每一个新增的逗号、删掉的条款或改写的句子，既慢又容易出错，文档一旦超过一两页就更是如此。文本对比工具能自动完成这种比较，精确高亮出哪些词或哪些行不一样，让你几秒钟就能审阅完一处改动，而不用花上好几分钟。",

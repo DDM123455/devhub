@@ -15,6 +15,10 @@
     "placeholder": "Text hier einfügen oder eingeben…",
     "ignoreWhitespace": "Leerzeichen ignorieren",
     "ignoreCase": "Groß-/Kleinschreibung ignorieren",
+    "ignoreEmptyLines": "Leere Zeilen ignorieren",
+    "normalizeLineEndings": "Zeilenenden normalisieren (CRLF/LF)",
+    "normalizeUnicode": "Unicode-Normalisierung",
+    "computing": "Diff wird berechnet…",
     "statsAdded": "{{count}} hinzugefügt",
     "statsRemoved": "{{count}} entfernt",
     "statsModified": "{{count}} geändert",
@@ -33,9 +37,23 @@
     "acceptLeftAria": "Linke Version für diese Änderung übernehmen",
     "copy": "Kopieren",
     "copied": "Kopiert!",
-    "save": "Als .txt speichern"
+    "save": "Als .txt speichern",
+    "copyShareLink": "Freigabelink kopieren",
+    "formatButton": "Formatieren",
+    "formatDetectedJson": "Als JSON formatiert",
+    "formatDetectedXml": "Als XML formatiert",
+    "formatError": "Kein gültiges JSON oder XML — unverändert gelassen"
   },
   "related": "Verwandte Tools",
+  "faq": {
+    "heading": "Häufig gestellte Fragen",
+    "q1": "Kann ich Text zeichenweise statt zeilenweise vergleichen?",
+    "a1": "Ja — wechseln Sie zwischen Zeichen-, Wort- und Zeilenebene für die Vergleichsgranularität.",
+    "q2": "Kann ich die beiden Versionen zu einem finalen Text zusammenführen?",
+    "a2": "Ja — mit dem integrierten Merge-Tool können Sie die linke oder rechte Version Änderung für Änderung übernehmen.",
+    "q3": "Kann ich Unterschiede bei Leerzeichen oder Groß-/Kleinschreibung ignorieren?",
+    "a3": "Ja — aktivieren Sie \"Leerzeichen ignorieren\" und \"Groß-/Kleinschreibung ignorieren\" unabhängig voneinander."
+  },
   "article": {
     "heading": "Wozu dient ein Textvergleich?",
     "p1": "Sobald zwei Versionen desselben Dokuments existieren — ein Vertrag vor und nach der Prüfung durch einen Anwalt, ein Text vor und nach einer Feedbackrunde, eine Konfigurationsdatei vor und nach dem Commit eines Kollegen —, lautet die eigentlich wichtige Frage fast nie 'sind diese Dateien gleich', sondern 'was genau hat sich geändert'. Beide Versionen nebeneinander zu lesen und jedes hinzugefügte Komma oder jeden umformulierten Satz von Hand zu finden, ist langsam und fehleranfällig, besonders wenn das Dokument mehr als eine Seite umfasst. Ein Textvergleich automatisiert genau das und hebt exakt die Wörter oder Zeilen hervor, die sich unterscheiden — eine Änderung lässt sich so in Sekunden statt Minuten prüfen.",

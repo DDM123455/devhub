@@ -15,6 +15,10 @@
     "placeholder": "在這裡貼上或輸入文字…",
     "ignoreWhitespace": "忽略空白字元",
     "ignoreCase": "忽略大小寫",
+    "ignoreEmptyLines": "忽略空白行",
+    "normalizeLineEndings": "統一換行符號 (CRLF/LF)",
+    "normalizeUnicode": "Unicode 正規化",
+    "computing": "正在計算差異…",
     "statsAdded": "新增 {{count}} 處",
     "statsRemoved": "刪除 {{count}} 處",
     "statsModified": "修改 {{count}} 處",
@@ -33,9 +37,23 @@
     "acceptLeftAria": "這處差異採用左側版本",
     "copy": "複製",
     "copied": "已複製！",
-    "save": "另存為 .txt"
+    "save": "另存為 .txt",
+    "copyShareLink": "複製分享連結",
+    "formatButton": "格式化",
+    "formatDetectedJson": "已格式化為 JSON",
+    "formatDetectedXml": "已格式化為 XML",
+    "formatError": "不是有效的 JSON 或 XML — 已保持原樣"
   },
   "related": "相關工具",
+  "faq": {
+    "heading": "常見問題",
+    "q1": "可以按字元而不是按行比較文字嗎？",
+    "a1": "可以 — 在字元、單字和行的比較精細度之間切換。",
+    "q2": "可以把兩個版本合併成一份最終文字嗎？",
+    "a2": "可以 — 內建的合併工具讓你逐處變更選擇採用左側或右側版本。",
+    "q3": "可以忽略空白或大小寫的差異嗎？",
+    "a3": "可以 — 分別獨立開啟「忽略空白」和「忽略大小寫」。"
+  },
   "article": {
     "heading": "為什麼要用文字差異比對工具？",
     "p1": "只要同一份文件出現兩個版本——律師改過前後的合約、收到回饋意見前後的一篇文章、同事提交前後的設定檔——真正重要的問題往往不是「這兩份是不是同一份檔案」，而是「到底具體改了什麼」。把兩個版本並排閱讀，靠肉眼去抓每一個新增的逗號、刪掉的條款、改寫的句子，既慢又容易漏看，文件一旦超過一兩頁就更難掌握。差異比對工具能自動完成這項比較，精準標示出哪些字詞或哪些行不一樣，讓你幾秒鐘就能看完原本要花好幾分鐘檢查的內容。",

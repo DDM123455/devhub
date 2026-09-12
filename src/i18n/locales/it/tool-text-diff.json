@@ -15,6 +15,10 @@
     "placeholder": "Incolla o digita il testo qui…",
     "ignoreWhitespace": "Ignora spazi",
     "ignoreCase": "Ignora maiuscole/minuscole",
+    "ignoreEmptyLines": "Ignora righe vuote",
+    "normalizeLineEndings": "Normalizza fine riga (CRLF/LF)",
+    "normalizeUnicode": "Normalizzazione Unicode",
+    "computing": "Calcolo delle differenze…",
     "statsAdded": "{{count}} aggiunte",
     "statsRemoved": "{{count}} rimosse",
     "statsModified": "{{count}} modificate",
@@ -33,9 +37,23 @@
     "acceptLeftAria": "Usa la versione sinistra per questa modifica",
     "copy": "Copia",
     "copied": "Copiato!",
-    "save": "Salva come .txt"
+    "save": "Salva come .txt",
+    "copyShareLink": "Copia link di condivisione",
+    "formatButton": "Formatta",
+    "formatDetectedJson": "Formattato come JSON",
+    "formatDetectedXml": "Formattato come XML",
+    "formatError": "Non è JSON o XML valido — lasciato invariato"
   },
   "related": "Strumenti correlati",
+  "faq": {
+    "heading": "Domande frequenti",
+    "q1": "Posso confrontare il testo carattere per carattere invece che riga per riga?",
+    "a1": "Sì — passa tra i livelli di confronto per carattere, parola o riga.",
+    "q2": "Posso unire le due versioni in un unico testo finale?",
+    "a2": "Sì — lo strumento di merge integrato permette di accettare la versione sinistra o destra modifica per modifica.",
+    "q3": "Posso ignorare le differenze di spazi o maiuscole/minuscole?",
+    "a3": "Sì — attiva separatamente \"ignora spazi\" e \"ignora maiuscole/minuscole\"."
+  },
   "article": {
     "heading": "Perché usare un confronto testi (diff checker)?",
     "p1": "Ogni volta che esistono due versioni dello stesso documento — un contratto prima e dopo le modifiche di un avvocato, un saggio prima e dopo un giro di revisioni, un file di configurazione prima e dopo il commit di un collega — la domanda importante raramente è \"questi file sono uguali\" ma \"cosa è cambiato esattamente\". Leggere entrambe le versioni fianco a fianco cercando di individuare ogni virgola aggiunta, clausola cancellata o frase riformulata è lento e soggetto a errori, specialmente quando il documento supera una pagina o due. Uno strumento di confronto automatizza questo processo ed evidenzia con precisione le parole o le righe che differiscono, così puoi revisionare una modifica in secondi invece che in minuti.",

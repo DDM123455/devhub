@@ -15,6 +15,10 @@
     "placeholder": "Collez ou saisissez le texte ici…",
     "ignoreWhitespace": "Ignorer les espaces",
     "ignoreCase": "Ignorer la casse",
+    "ignoreEmptyLines": "Ignorer les lignes vides",
+    "normalizeLineEndings": "Normaliser les fins de ligne (CRLF/LF)",
+    "normalizeUnicode": "Normalisation Unicode",
+    "computing": "Calcul des différences…",
     "statsAdded": "{{count}} ajoutés",
     "statsRemoved": "{{count}} supprimés",
     "statsModified": "{{count}} modifiés",
@@ -33,9 +37,23 @@
     "acceptLeftAria": "Utiliser la version de gauche pour ce changement",
     "copy": "Copier",
     "copied": "Copié !",
-    "save": "Enregistrer en .txt"
+    "save": "Enregistrer en .txt",
+    "copyShareLink": "Copier le lien de partage",
+    "formatButton": "Formater",
+    "formatDetectedJson": "Formaté en JSON",
+    "formatDetectedXml": "Formaté en XML",
+    "formatError": "Ni JSON ni XML valide — laissé inchangé"
   },
   "related": "Outils associés",
+  "faq": {
+    "heading": "Questions fréquentes",
+    "q1": "Puis-je comparer le texte caractère par caractère plutôt que ligne par ligne ?",
+    "a1": "Oui — basculez entre les niveaux de comparaison par caractère, par mot ou par ligne.",
+    "q2": "Puis-je fusionner les deux versions en un seul texte final ?",
+    "a2": "Oui — l'outil de fusion intégré permet d'accepter la version de gauche ou de droite, changement par changement.",
+    "q3": "Puis-je ignorer les différences d'espaces ou de casse ?",
+    "a3": "Oui — activez indépendamment « ignorer les espaces » et « ignorer la casse »."
+  },
   "article": {
     "heading": "À quoi sert un comparateur de texte ?",
     "p1": "Dès qu'il existe deux versions d'un même document — un contrat avant et après la relecture d'un avocat, un article avant et après une correction, un fichier de configuration avant et après le commit d'un collègue — la question qui compte n'est presque jamais « ces fichiers sont-ils identiques » mais « qu'est-ce qui a exactement changé ». Lire les deux versions côte à côte en essayant de repérer chaque virgule ajoutée ou chaque phrase reformulée est lent et source d'erreurs, surtout au-delà d'une page. Un comparateur de texte automatise cette tâche et met en évidence précisément les mots ou les lignes qui diffèrent, pour que la relecture d'une modification prenne quelques secondes plutôt que plusieurs minutes.",

@@ -395,9 +395,17 @@ ROADMAP)
 - [x] Nút "Format" cho từng khung nhập (Original/Changed) trong `TextDiffChecker.tsx`, phản
       hồi `aria-live` cho biết đã format theo JSON/XML hay không nhận diện được
 - [x] i18n: 4 key mới (`formatButton`/`formatDetectedJson`/`formatDetectedXml`/`formatError`)
-      — chỉ thêm en+vi (tool cũ này thực tế đã có tiền lệ: các key thêm ở Phase 3.5g/3.6b như
-      `copyShareLink`, cả khối `faq` v.v. cũng chỉ có ở en+vi, 18 locale còn lại đang fallback
-      tiếng Anh âm thầm cho các key đó — theo đúng quy ước hiện hành, không phải thiếu sót mới)
+      — ban đầu chỉ thêm en+vi (tool cũ này thực tế đã có tiền lệ: các key thêm ở Phase
+      3.5g/3.6b như `copyShareLink`, cả khối `faq` v.v. cũng chỉ có ở en+vi, 18 locale còn lại
+      đang fallback tiếng Anh âm thầm cho các key đó)
+- [x] **Việc phụ đã xử lý (theo yêu cầu trực tiếp người dùng)**: dịch bổ sung đủ 18 locale còn
+      thiếu — 9 key UI (`ignoreEmptyLines`/`normalizeLineEndings`/`normalizeUnicode`/
+      `computing`/`copyShareLink`/`formatButton`/`formatDetectedJson`/`formatDetectedXml`/
+      `formatError`) + toàn bộ khối `faq` (heading + 3 câu hỏi/đáp) — dịch tay từng ngôn ngữ
+      (không máy dịch thô), không chỉ riêng 4 key mới của task này mà dọn sạch luôn phần nợ
+      dịch cũ từ Phase 3.5g/3.6b. Cả 20 locale giờ đủ 37 key `ui` + 7 key `faq`, đã build lại
+      full site (502 trang, exit 0) và grep xác nhận HTML thật của de/ja/ru/ar/zh có chữ đã
+      dịch (không chỉ tin JSON đúng).
 
 ## Phase 4 — Kiếm tiền & PWA
 

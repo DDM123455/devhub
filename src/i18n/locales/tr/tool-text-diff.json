@@ -15,6 +15,10 @@
     "placeholder": "Metni buraya yapıştırın veya yazın…",
     "ignoreWhitespace": "Boşlukları yok say",
     "ignoreCase": "Büyük/küçük harfi yok say",
+    "ignoreEmptyLines": "Boş satırları yoksay",
+    "normalizeLineEndings": "Satır sonlarını normalleştir (CRLF/LF)",
+    "normalizeUnicode": "Unicode normalleştirme",
+    "computing": "Fark hesaplanıyor…",
     "statsAdded": "{{count}} eklendi",
     "statsRemoved": "{{count}} kaldırıldı",
     "statsModified": "{{count}} değiştirildi",
@@ -33,9 +37,23 @@
     "acceptLeftAria": "Bu değişiklik için sol sürümü kullan",
     "copy": "Kopyala",
     "copied": "Kopyalandı!",
-    "save": ".txt olarak kaydet"
+    "save": ".txt olarak kaydet",
+    "copyShareLink": "Paylaşım bağlantısını kopyala",
+    "formatButton": "Biçimlendir",
+    "formatDetectedJson": "JSON olarak biçimlendirildi",
+    "formatDetectedXml": "XML olarak biçimlendirildi",
+    "formatError": "Geçerli JSON veya XML değil — değiştirilmeden bırakıldı"
   },
   "related": "İlgili araçlar",
+  "faq": {
+    "heading": "Sık sorulan sorular",
+    "q1": "Metni satır satır değil, karakter karakter karşılaştırabilir miyim?",
+    "a1": "Evet — karakter, kelime ve satır düzeyinde karşılaştırma arasında geçiş yapabilirsiniz.",
+    "q2": "İki sürümü tek bir son metinde birleştirebilir miyim?",
+    "a2": "Evet — yerleşik birleştirme aracı, değişiklik değişiklik sol veya sağ sürümü kabul etmenizi sağlar.",
+    "q3": "Boşluk veya büyük/küçük harf farklarını yoksayabilir miyim?",
+    "a3": "Evet — \"boşlukları yoksay\" ve \"büyük/küçük harfi yoksay\" seçeneklerini birbirinden bağımsız açabilirsiniz."
+  },
   "article": {
     "heading": "Neden bir metin karşılaştırma aracı kullanmalısınız?",
     "p1": "Aynı belgenin iki sürümü var olduğunda — bir avukatın düzenlemelerinden önce ve sonraki bir sözleşme, bir geri bildirim turundan önce ve sonraki bir makale, bir ekip arkadaşının commit'inden önce ve sonraki bir yapılandırma dosyası — önemli soru nadiren \"bu dosyalar aynı mı\" sorusudur; genellikle \"tam olarak ne değişti\" sorusudur. İki sürümü yan yana okuyup eklenen her virgülü, silinen her cümleyi ya da yeniden yazılan her cümleyi fark etmeye çalışmak yavaştır ve hata yapmaya açıktır; özellikle belge bir iki sayfayı aştığında. Bir karşılaştırma aracı bu kıyaslamayı otomatikleştirir ve tam olarak hangi kelimelerin ya da satırların farklı olduğunu vurgular; böylece bir değişikliği dakikalar yerine saniyeler içinde inceleyebilirsiniz.",

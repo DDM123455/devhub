@@ -15,6 +15,10 @@
     "placeholder": "Wklej lub wpisz tekst tutaj…",
     "ignoreWhitespace": "Ignoruj białe znaki",
     "ignoreCase": "Ignoruj wielkość liter",
+    "ignoreEmptyLines": "Ignoruj puste wiersze",
+    "normalizeLineEndings": "Normalizuj końce wierszy (CRLF/LF)",
+    "normalizeUnicode": "Normalizacja Unicode",
+    "computing": "Obliczanie różnic…",
     "statsAdded": "dodano: {{count}}",
     "statsRemoved": "usunięto: {{count}}",
     "statsModified": "zmieniono: {{count}}",
@@ -33,9 +37,23 @@
     "acceptLeftAria": "Użyj lewej wersji dla tej zmiany",
     "copy": "Kopiuj",
     "copied": "Skopiowano!",
-    "save": "Zapisz jako .txt"
+    "save": "Zapisz jako .txt",
+    "copyShareLink": "Kopiuj link do udostępniania",
+    "formatButton": "Formatuj",
+    "formatDetectedJson": "Sformatowano jako JSON",
+    "formatDetectedXml": "Sformatowano jako XML",
+    "formatError": "To nie jest prawidłowy JSON ani XML — pozostawiono bez zmian"
   },
   "related": "Powiązane narzędzia",
+  "faq": {
+    "heading": "Najczęściej zadawane pytania",
+    "q1": "Czy mogę porównywać tekst znak po znaku, a nie wiersz po wierszu?",
+    "a1": "Tak — przełączaj się między porównaniem na poziomie znaków, słów i wierszy.",
+    "q2": "Czy mogę scalić obie wersje w jeden ostateczny tekst?",
+    "a2": "Tak — wbudowane narzędzie scalania pozwala zaakceptować lewą lub prawą wersję zmiana po zmianie.",
+    "q3": "Czy mogę ignorować różnice w białych znakach lub wielkości liter?",
+    "a3": "Tak — włącz niezależnie opcje \"ignoruj białe znaki\" i \"ignoruj wielkość liter\"."
+  },
   "article": {
     "heading": "Po co używać porównywarki tekstów?",
     "p1": "Zawsze gdy istnieją dwie wersje tego samego dokumentu — umowa przed i po poprawkach prawnika, esej przed i po rundzie uwag, plik konfiguracyjny przed i po commicie kolegi z zespołu — najważniejsze pytanie rzadko brzmi „czy to te same pliki”, a raczej „co dokładnie się zmieniło”. Czytanie obu wersji obok siebie i próba wychwycenia każdego dodanego przecinka, usuniętej klauzuli czy przeredagowanego zdania jest powolne i podatne na błędy, zwłaszcza gdy dokument przekracza stronę czy dwie. Porównywarka tekstów automatyzuje to porównanie i podświetla dokładnie te słowa lub linie, które się różnią, dzięki czemu przegląd zmiany zajmuje sekundy zamiast minut.",

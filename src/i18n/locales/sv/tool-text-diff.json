@@ -15,6 +15,10 @@
     "placeholder": "Klistra in eller skriv text här…",
     "ignoreWhitespace": "Ignorera blanksteg",
     "ignoreCase": "Skiftlägesokänslig",
+    "ignoreEmptyLines": "Ignorera tomma rader",
+    "normalizeLineEndings": "Normalisera radslut (CRLF/LF)",
+    "normalizeUnicode": "Unicode-normalisering",
+    "computing": "Beräknar skillnad…",
     "statsAdded": "{{count}} tillagda",
     "statsRemoved": "{{count}} borttagna",
     "statsModified": "{{count}} ändrade",
@@ -33,9 +37,23 @@
     "acceptLeftAria": "Använd vänster version för denna ändring",
     "copy": "Kopiera",
     "copied": "Kopierat!",
-    "save": "Spara som .txt"
+    "save": "Spara som .txt",
+    "copyShareLink": "Kopiera delningslänk",
+    "formatButton": "Formatera",
+    "formatDetectedJson": "Formaterad som JSON",
+    "formatDetectedXml": "Formaterad som XML",
+    "formatError": "Inte giltig JSON eller XML — lämnades oförändrad"
   },
   "related": "Relaterade verktyg",
+  "faq": {
+    "heading": "Vanliga frågor",
+    "q1": "Kan jag jämföra text tecken för tecken istället för rad för rad?",
+    "a1": "Ja — växla mellan jämförelse på teckennivå, ordnivå och radnivå.",
+    "q2": "Kan jag slå ihop de två versionerna till en slutlig text?",
+    "a2": "Ja — det inbyggda sammanslagningsverktyget låter dig acceptera vänster eller höger version ändring för ändring.",
+    "q3": "Kan jag ignorera skillnader i blanksteg eller skiftläge?",
+    "a3": "Ja — aktivera \"ignorera blanksteg\" och \"ignorera skiftläge\" var för sig."
+  },
   "article": {
     "heading": "Varför använda ett verktyg för textjämförelse?",
     "p1": "Så fort det finns två versioner av samma dokument — ett kontrakt före och efter en jurists ändringar, en uppsats före och efter en omgång feedback, en konfigurationsfil före och efter en kollegas commit — är den viktiga frågan sällan \"är det här samma fil\" utan \"vad exakt har ändrats\". Att läsa båda versionerna sida vid sida och försöka upptäcka varje tillagt kommatecken, borttagen sats eller omformulerad mening är långsamt och felbenäget, särskilt när dokumentet går över en sida eller två. Ett textjämförelseverktyg automatiserar den jämförelsen och markerar precis de ord eller rader som skiljer sig åt, så att du kan granska en ändring på några sekunder istället för minuter.",

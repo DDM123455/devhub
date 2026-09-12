@@ -15,6 +15,10 @@
     "placeholder": "Plak of typ hier tekst…",
     "ignoreWhitespace": "Witruimte negeren",
     "ignoreCase": "Hoofdlettergevoeligheid negeren",
+    "ignoreEmptyLines": "Lege regels negeren",
+    "normalizeLineEndings": "Regeleinden normaliseren (CRLF/LF)",
+    "normalizeUnicode": "Unicode-normalisatie",
+    "computing": "Verschil berekenen…",
     "statsAdded": "{{count}} toegevoegd",
     "statsRemoved": "{{count}} verwijderd",
     "statsModified": "{{count}} gewijzigd",
@@ -33,9 +37,23 @@
     "acceptLeftAria": "Gebruik de linkerversie voor deze wijziging",
     "copy": "Kopiëren",
     "copied": "Gekopieerd!",
-    "save": "Opslaan als .txt"
+    "save": "Opslaan als .txt",
+    "copyShareLink": "Deellink kopiëren",
+    "formatButton": "Formatteren",
+    "formatDetectedJson": "Geformatteerd als JSON",
+    "formatDetectedXml": "Geformatteerd als XML",
+    "formatError": "Geen geldige JSON of XML — ongewijzigd gelaten"
   },
   "related": "Gerelateerde tools",
+  "faq": {
+    "heading": "Veelgestelde vragen",
+    "q1": "Kan ik tekst per teken vergelijken in plaats van per regel?",
+    "a1": "Ja — wissel tussen vergelijking per teken, per woord of per regel.",
+    "q2": "Kan ik de twee versies samenvoegen tot één definitieve tekst?",
+    "a2": "Ja — met de ingebouwde samenvoegtool accepteer je de linker of rechter versie per wijziging.",
+    "q3": "Kan ik verschillen in witruimte of hoofdlettergebruik negeren?",
+    "a3": "Ja — schakel \"witruimte negeren\" en \"hoofdlettergebruik negeren\" onafhankelijk van elkaar in."
+  },
   "article": {
     "heading": "Waarom een tool voor tekstvergelijking gebruiken?",
     "p1": "Zodra er twee versies van hetzelfde document bestaan — een contract voor en na de opmerkingen van een advocaat, een essay voor en na een feedbackronde, een configuratiebestand voor en na de commit van een collega — is de belangrijke vraag zelden \"zijn dit dezelfde bestanden\", maar \"wat is er precies veranderd\". Beide versies naast elkaar lezen en proberen elke toegevoegde komma, verwijderde clausule of herschreven zin te ontdekken, is traag en foutgevoelig, zeker zodra een document langer wordt dan een pagina of twee. Een diff-tool automatiseert die vergelijking en markeert precies de woorden of regels die verschillen, zodat je een wijziging in seconden kunt beoordelen in plaats van in minuten.",

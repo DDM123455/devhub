@@ -15,6 +15,10 @@
     "placeholder": "Tempel atau ketik teks di sini…",
     "ignoreWhitespace": "Abaikan spasi",
     "ignoreCase": "Abaikan huruf besar/kecil",
+    "ignoreEmptyLines": "Abaikan baris kosong",
+    "normalizeLineEndings": "Normalisasi akhir baris (CRLF/LF)",
+    "normalizeUnicode": "Normalisasi Unicode",
+    "computing": "Menghitung perbedaan…",
     "statsAdded": "{{count}} ditambahkan",
     "statsRemoved": "{{count}} dihapus",
     "statsModified": "{{count}} diubah",
@@ -33,9 +37,23 @@
     "acceptLeftAria": "Gunakan versi kiri untuk perubahan ini",
     "copy": "Salin",
     "copied": "Tersalin!",
-    "save": "Simpan sebagai .txt"
+    "save": "Simpan sebagai .txt",
+    "copyShareLink": "Salin tautan bagikan",
+    "formatButton": "Format",
+    "formatDetectedJson": "Diformat sebagai JSON",
+    "formatDetectedXml": "Diformat sebagai XML",
+    "formatError": "Bukan JSON atau XML yang valid — dibiarkan tidak berubah"
   },
   "related": "Alat terkait",
+  "faq": {
+    "heading": "Pertanyaan yang sering diajukan",
+    "q1": "Bisakah saya membandingkan teks per karakter, bukan per baris?",
+    "a1": "Ya — beralih antara tingkat perbandingan karakter, kata, dan baris.",
+    "q2": "Bisakah saya menggabungkan kedua versi menjadi satu teks akhir?",
+    "a2": "Ya — alat gabung bawaan memungkinkan Anda menerima versi kiri atau kanan per perubahan.",
+    "q3": "Bisakah saya mengabaikan perbedaan spasi atau huruf besar/kecil?",
+    "a3": "Ya — aktifkan \"abaikan spasi\" dan \"abaikan huruf besar/kecil\" secara independen."
+  },
   "article": {
     "heading": "Mengapa menggunakan text diff checker?",
     "p1": "Setiap kali ada dua versi dari dokumen yang sama — kontrak sebelum dan sesudah revisi pengacara, esai sebelum dan sesudah sesi masukan, file konfigurasi sebelum dan sesudah commit rekan tim — pertanyaan pentingnya jarang \"apakah kedua file ini sama\" melainkan \"apa sebenarnya yang berubah\". Membaca kedua versi secara berdampingan dan berusaha menemukan setiap koma yang ditambahkan, klausul yang dihapus, atau kalimat yang diubah susunannya itu lambat dan rawan salah, apalagi ketika dokumennya sudah lebih dari satu-dua halaman. Diff checker mengotomatiskan perbandingan itu dan menyoroti tepat kata atau baris mana yang berbeda, sehingga Anda bisa meninjau sebuah perubahan dalam hitungan detik, bukan menit.",

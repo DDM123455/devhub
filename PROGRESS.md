@@ -178,6 +178,19 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-09-12 (Phase 3.10, việc phụ)** — Text Diff Checker: dịch bổ sung 18/20 locale
+  (mọi locale trừ en/vi) đang thiếu 9 key `ui` và toàn bộ khối `faq` trong
+  `tool-text-diff.json` — phát hiện lúc làm task Format ở trên: các key thêm từ Phase
+  3.5g (`ignoreEmptyLines`, `normalizeLineEndings`, `normalizeUnicode`, `computing`) và
+  3.6b (`copyShareLink`, cả khối `faq`) trước đây chỉ từng được thêm vào en+vi, không phải
+  do task Format gây ra. Dịch tay (không máy dịch) cho cả 18 ngôn ngữ: de, es, fr, it, pt,
+  nl, pl, sv, tr, ru, ar, hi, id, ja, ko, th, zh, zh-tw — viết 1 script Node tạm
+  (`.tmp-fix-textdiff-i18n.cjs`, đã xoá sau khi chạy) để chèn đúng vị trí key theo thứ tự
+  của en (sau `ignoreCase` và sau `save` cho `ui`, sau `related` cho `faq`) mà không đụng
+  các key/nội dung `meta`/`article` đã có. Đã xác minh bằng script so khớp key giữa 20 file
+  (37/37 `ui`, 7/7 `faq` — ALL GOOD), build lại full site (502 trang, exit 0), và grep trực
+  tiếp HTML build ra (không chỉ tin JSON/build sạch) xác nhận chữ đã dịch thật xuất hiện ở
+  `dist/de`, `dist/ja`, `dist/ru`, `dist/ar`, `dist/zh` (cả nút Format và heading FAQ).
 - **2026-09-12 (Phase 3.10)** — Text Diff Checker: thêm nút "Format" (beautify) cho từng
   khung Original/Changed, auto-detect JSON hoặc XML, 0 dependency mới (`JSON.parse`/
   `stringify` + `DOMParser`/`XMLSerializer` có sẵn của browser) — module thuần

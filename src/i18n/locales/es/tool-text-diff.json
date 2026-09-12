@@ -15,6 +15,10 @@
     "placeholder": "Pega o escribe el texto aquí…",
     "ignoreWhitespace": "Ignorar espacios en blanco",
     "ignoreCase": "Ignorar mayúsculas/minúsculas",
+    "ignoreEmptyLines": "Ignorar líneas vacías",
+    "normalizeLineEndings": "Normalizar fin de línea (CRLF/LF)",
+    "normalizeUnicode": "Normalización Unicode",
+    "computing": "Calculando diferencias…",
     "statsAdded": "{{count}} añadidos",
     "statsRemoved": "{{count}} eliminados",
     "statsModified": "{{count}} modificados",
@@ -33,9 +37,23 @@
     "acceptLeftAria": "Usar la versión izquierda para este cambio",
     "copy": "Copiar",
     "copied": "¡Copiado!",
-    "save": "Guardar como .txt"
+    "save": "Guardar como .txt",
+    "copyShareLink": "Copiar enlace para compartir",
+    "formatButton": "Formatear",
+    "formatDetectedJson": "Formateado como JSON",
+    "formatDetectedXml": "Formateado como XML",
+    "formatError": "No es JSON ni XML válido — se dejó sin cambios"
   },
   "related": "Herramientas relacionadas",
+  "faq": {
+    "heading": "Preguntas frecuentes",
+    "q1": "¿Puedo comparar el texto carácter por carácter en lugar de por línea?",
+    "a1": "Sí — cambia entre los niveles de comparación por carácter, por palabra o por línea.",
+    "q2": "¿Puedo combinar las dos versiones en un texto final?",
+    "a2": "Sí — la herramienta de combinación integrada te permite aceptar la versión izquierda o derecha cambio por cambio.",
+    "q3": "¿Puedo ignorar las diferencias de espacios en blanco o mayúsculas/minúsculas?",
+    "a3": "Sí — activa \"ignorar espacios\" e \"ignorar mayúsculas/minúsculas\" de forma independiente."
+  },
   "article": {
     "heading": "¿Para qué sirve un comparador de textos?",
     "p1": "Cada vez que existen dos versiones de un mismo documento —un contrato antes y después de que lo revise un abogado, un artículo antes y después de una ronda de correcciones, un archivo de configuración antes y después del commit de un compañero— la pregunta importante casi nunca es si los archivos son iguales, sino qué ha cambiado exactamente. Leer las dos versiones en paralelo intentando detectar cada coma añadida o cada frase reescrita es lento y propenso a errores, sobre todo cuando el documento ocupa más de una página. Un comparador de textos automatiza esa tarea y resalta con precisión las palabras o líneas que difieren, para que revisar un cambio te lleve segundos en lugar de minutos.",
