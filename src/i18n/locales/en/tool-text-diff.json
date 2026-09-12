@@ -38,7 +38,11 @@
     "copy": "Copy",
     "copied": "Copied!",
     "save": "Save as .txt",
-    "copyShareLink": "Copy share link"
+    "copyShareLink": "Copy share link",
+    "formatButton": "Format",
+    "formatDetectedJson": "Formatted as JSON",
+    "formatDetectedXml": "Formatted as XML",
+    "formatError": "Not valid JSON or XML — left unchanged"
   },
   "related": "Related tools",
   "faq": {

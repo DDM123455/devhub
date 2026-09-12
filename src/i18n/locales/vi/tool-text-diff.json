@@ -38,7 +38,11 @@
     "copy": "Sao chép",
     "copied": "Đã sao chép!",
     "save": "Lưu file .txt",
-    "copyShareLink": "Sao chép link chia sẻ"
+    "copyShareLink": "Sao chép link chia sẻ",
+    "formatButton": "Định dạng",
+    "formatDetectedJson": "Đã định dạng theo JSON",
+    "formatDetectedXml": "Đã định dạng theo XML",
+    "formatError": "Không phải JSON hay XML hợp lệ — giữ nguyên văn bản"
   },
   "related": "Công cụ liên quan",
   "faq": {

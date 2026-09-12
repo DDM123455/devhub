@@ -38,6 +38,8 @@
   3.9a (Nginx): Step 1 xong (tool chính + parser + test). 3.9b (Kubernetes): Step 2 xong (tool
   chính + parser/validator + test). CHỜ DUYỆT Step 3 (các trang tham khảo directive/error/
   resource cho cả 2 tool, theo đúng kế hoạch trong prompt gốc — bước 5-6).
+- **Phase 3.10 — Text Diff Checker: nút Format JSON/XML: HOÀN TẤT** (theo yêu cầu trực tiếp
+  người dùng 2026-09-12, xem log chi tiết bên dưới).
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -176,6 +178,21 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-09-12 (Phase 3.10)** — Text Diff Checker: thêm nút "Format" (beautify) cho từng
+  khung Original/Changed, auto-detect JSON hoặc XML, 0 dependency mới (`JSON.parse`/
+  `stringify` + `DOMParser`/`XMLSerializer` có sẵn của browser) — module thuần
+  `src/lib/text-format.ts` (indent XML tự viết tay, không có pretty-printer built-in), 6 test
+  Vitest (`src/lib/__tests__/text-format.test.ts`, chỉ test nhánh JSON — nhánh XML dùng
+  `DOMParser` không chạy được trong môi trường Vitest mặc định (Node thuần, repo không có
+  `jsdom`/`happy-dom`), xác minh tay trên browser thay thế). i18n: chỉ thêm en+vi cho 4 key
+  mới, theo đúng tiền lệ ĐÃ CÓ SẴN của chính tool này (phát hiện lúc làm task: các key thêm ở
+  Phase 3.5g/3.6b như `copyShareLink`, cả khối `faq`, và nhiều key khác — `ignoreEmptyLines`,
+  `uploadFile`, `mergeToolHeading`... — chỉ tồn tại ở en/vi, 18 locale còn lại đang fallback
+  tiếng Anh âm thầm cho toàn bộ các key đó từ trước, không phải do task này gây ra). Build
+  full site sạch (502 trang, exit code 0), xác nhận HTML build ra có chữ "Format"/"Định dạng"
+  ở cả `dist/en` và `dist/vi`. **Phát hiện phụ lúc bắt đầu phiên**: `PROGRESS.md` bị rỗng
+  hoàn toàn (1932 dòng bị xóa) trong working tree, chưa commit — không phải do phiên này gây
+  ra, đã `git checkout -- PROGRESS.md` khôi phục từ HEAD trước khi làm gì khác.
 - **2026-08-09 (Phase 3.9b Step 2)** — Kubernetes YAML Validator. Trước khi code, đã dùng
   WebFetch xác nhận THẬT (không đoán) cấu trúc CDN mirror `yannh/kubernetes-json-schema`:
   fetch trực tiếp `https://cdn.jsdelivr.net/gh/yannh/kubernetes-json-schema@master/

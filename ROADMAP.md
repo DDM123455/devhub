@@ -381,6 +381,24 @@ ROADMAP)
 - [ ] `/{locale}/k8s/api-versions/[migration-slug]` và `/{locale}/compare/kubeval-vs-kubeconform`
       — Phase sau, chưa làm ngay (đúng như prompt gốc yêu cầu)
 
+## Phase 3.10 — Text Diff Checker: nút Format JSON/XML (theo yêu cầu trực tiếp người dùng, 2026-09-12)
+
+> Nguồn: người dùng yêu cầu xem xét thêm chức năng format (làm đẹp) XML/JSON ngay trong công
+> cụ So sánh văn bản, để so 2 payload API/config bị minify khác cách không báo "khác toàn bộ"
+> một cách giả. Không thêm dependency mới — dùng `JSON.parse/stringify` + `DOMParser`/
+> `XMLSerializer` có sẵn của browser.
+
+- [x] Module thuần `src/lib/text-format.ts`: auto-detect JSON/XML, beautify, có test
+      (`src/lib/__tests__/text-format.test.ts`; nhánh XML dùng `DOMParser` không test được
+      trong Vitest môi trường Node mặc định — không có `jsdom`/`happy-dom` — chỉ test nhánh
+      JSON + fallback null, nhánh XML xác minh tay trên browser thật)
+- [x] Nút "Format" cho từng khung nhập (Original/Changed) trong `TextDiffChecker.tsx`, phản
+      hồi `aria-live` cho biết đã format theo JSON/XML hay không nhận diện được
+- [x] i18n: 4 key mới (`formatButton`/`formatDetectedJson`/`formatDetectedXml`/`formatError`)
+      — chỉ thêm en+vi (tool cũ này thực tế đã có tiền lệ: các key thêm ở Phase 3.5g/3.6b như
+      `copyShareLink`, cả khối `faq` v.v. cũng chỉ có ở en+vi, 18 locale còn lại đang fallback
+      tiếng Anh âm thầm cho các key đó — theo đúng quy ước hiện hành, không phải thiếu sót mới)
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

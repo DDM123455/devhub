@@ -8,6 +8,7 @@ import {
 	type HunkOverride,
 } from '@/lib/text-diff';
 import type { TextDiffRequest, TextDiffResponse } from './textDiffWorker';
+import { autoFormatText } from '@/lib/text-format';
 import { Button } from '@/components/ui/button';
 
 interface Messages {
@@ -44,6 +45,10 @@ interface Messages {
 	copied: string;
 	save: string;
 	copyShareLink: string;
+	formatButton: string;
+	formatDetectedJson: string;
+	formatDetectedXml: string;
+	formatError: string;
 }
 
 const DEBOUNCE_MS = 150;
@@ -409,6 +414,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	const [copiedSide, setCopiedSide] = useState<'left' | 'right' | null>(null);
 	const [hunkOverrides, setHunkOverrides] = useState<Map<number, HunkOverride>>(new Map());
 	const [shareLinkCopied, setShareLinkCopied] = useState(false);
+	const [formatFeedback, setFormatFeedback] = useState<{ side: 'original' | 'changed'; message: string } | null>(null);
 
 	// Mirrors the `?token=`/`?pattern=` deep-link pattern used elsewhere on the
 	// site (JWT Decoder, Regex Tester), but via the URL *hash* instead of query
@@ -588,6 +594,27 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		setChangedText(originalText);
 	};
 
+	// Beautifies whichever of JSON/XML the pasted text auto-detects as, so two payloads
+	// that only differ in whitespace/line-breaking (a common case for API responses and
+	// config exports) don't diff as "everything changed". Detection + formatting is 100%
+	// client-side (see `text-format.ts`) — nothing here is sent anywhere.
+	const handleFormat = (which: 'original' | 'changed') => {
+		const text = which === 'original' ? originalText : changedText;
+		const result = autoFormatText(text);
+		if (!result) {
+			setFormatFeedback({ side: which, message: messages.formatError });
+			setTimeout(() => setFormatFeedback(null), 2500);
+			return;
+		}
+		if (which === 'original') setOriginalText(result.value);
+		else setChangedText(result.value);
+		setFormatFeedback({
+			side: which,
+			message: result.detected === 'json' ? messages.formatDetectedJson : messages.formatDetectedXml,
+		});
+		setTimeout(() => setFormatFeedback(null), 2000);
+	};
+
 	// Rows outside the current window aren't in the DOM under virtualization,
 	// so `scrollIntoView` (which needs a real element to target) no longer
 	// works here — instead compute the scrollTop that centers the target row
@@ -652,6 +679,9 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 								<Button type="button" size="sm" variant="ghost" onClick={() => originalFileInputRef.current?.click()}>
 									{messages.uploadFile}
 								</Button>
+								<Button type="button" size="sm" variant="ghost" onClick={() => handleFormat('original')}>
+									{messages.formatButton}
+								</Button>
 								<input
 									ref={originalFileInputRef}
 									type="file"
@@ -670,6 +700,9 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							gutterRef={originalGutterRef}
 							onScrollSync={syncInputScroll(0)}
 						/>
+						<p role="status" aria-live="polite" className="min-h-4 text-xs text-muted-foreground">
+							{formatFeedback?.side === 'original' ? formatFeedback.message : ''}
+						</p>
 					</div>
 					<div className="flex flex-col gap-2">
 						<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
@@ -685,6 +718,9 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 								</Button>
 								<Button type="button" size="sm" variant="ghost" onClick={() => changedFileInputRef.current?.click()}>
 									{messages.uploadFile}
+								</Button>
+								<Button type="button" size="sm" variant="ghost" onClick={() => handleFormat('changed')}>
+									{messages.formatButton}
 								</Button>
 								<input
 									ref={changedFileInputRef}
@@ -704,6 +740,9 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							gutterRef={changedGutterRef}
 							onScrollSync={syncInputScroll(1)}
 						/>
+						<p role="status" aria-live="polite" className="min-h-4 text-xs text-muted-foreground">
+							{formatFeedback?.side === 'changed' ? formatFeedback.message : ''}
+						</p>
 					</div>
 				</div>
 
