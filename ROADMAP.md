@@ -452,6 +452,43 @@ ROADMAP)
       375px cho cùng 5 trang xác nhận KHÔNG có hồi quy tràn ngang mobile (bỏ max-width chỉ
       ảnh hưởng khi có đủ chỗ rộng hơn max-width cũ, không ảnh hưởng viewport hẹp)
 
+## Phase 3.12 — Xóa nền ảnh: kích thước ảnh thẻ/hộ chiếu chuẩn (theo yêu cầu trực tiếp
+người dùng, 2026-09-12)
+
+> Người dùng hỏi 2 việc: (1) "thay áo" cho ảnh, (2) crop theo khổ ảnh thẻ chuẩn (3x4 và
+> tương tự). Đã hỏi rõ trước khi làm: (1) **BỎ QUA** — thay trang phục cần model AI sinh ảnh
+> (generative/virtual try-on), nặng vài GB + cần GPU server, không khả thi 100% client-side,
+> phá nguyên tắc zero-server-cost nếu làm — người dùng xác nhận bỏ qua, không đổi hướng sang
+> server. (2) **LÀM** — chỉ cần crop+resize bằng Canvas, không cần model AI mới/dependency
+> mới.
+
+- [x] Preset kích thước ảnh thẻ chuẩn: 3×4cm, 4×6cm, 2×3cm, 3.5×4.5cm/35×45mm (visa Trung
+      Quốc = hộ chiếu EU/UK, cùng 1 kích thước vật lý — gộp thành 1 preset thay vì 2 mục
+      trùng số đo), 2×2in (hộ chiếu/visa Mỹ)
+- [x] Chuyển đổi mm → px chính xác theo DPI người dùng chọn (thanh trượt 150–600, mặc định
+      300) — `mmToPx = round(mm / 25.4 * dpi)`
+- [x] Crop tự động căn giữa theo đúng tỷ lệ khung ảnh thẻ (không méo hình), kèm thanh trượt
+      "vị trí theo chiều dọc" (-50..50) để đẩy khung crop lên/xuống khi ảnh gốc cho thấy
+      nhiều hơn phần đầu-vai cần thiết — không làm cropper kéo-thả-zoom đầy đủ (MVP theo
+      đúng phạm vi đã thống nhất)
+- [x] Ẩn/hiện đúng: chọn preset → ẩn khối "Resize before download" cũ (2 tính năng xung đột
+      nhau về kích thước xuất cuối, không cho bật cùng lúc), hiện DPI + vị trí dọc + dòng
+      "Output: WxHpx" tính sẵn
+- [x] i18n: 10 key UI mới + FAQ q4/a4 mới — en+vi (theo đúng tiền lệ hiện hành của tool này,
+      tool đã có sẵn khoảng cách i18n từ trước ở các key resize/trim thêm phase trước, không
+      phải do task này gây ra)
+- [x] Verify: viết test toán học thuần (không cần Canvas/DOM) đối chiếu công thức crop-rect
+      với giá trị tính tay cho 6 kịch bản (nguồn cao/rộng/vuông, offset ±50 bị clamp đúng,
+      quy ước dấu offset đúng chiều) — PASS toàn bộ; test Puppeteer xác nhận UI ẩn/hiện đúng
+      + dòng "Output" tính đúng theo DPI thay đổi trực tiếp trên trang thật (không phải qua
+      AI); build 502 trang exit 0.
+- [ ] **Giới hạn đã biết, CHƯA verify được**: chạy full pipeline thật (upload ảnh → AI xóa
+      nền → áp crop ảnh thẻ) bằng Puppeteer bị timeout >120s trong môi trường sandbox này
+      (suy đoán: suy luận WASM CPU-only không GPU chạy rất chậm trong môi trường headless
+      hạn chế tài nguyên, không phải lỗi code — 0 console error suốt quá trình chờ). Cần
+      người dùng tự bấm thử 1 lần trên trình duyệt thật trước khi coi tính năng chắc chắn ổn
+      định đầu-cuối.
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

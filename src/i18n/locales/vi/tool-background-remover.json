@@ -31,7 +31,17 @@
     "downloadAll": "Tải tất cả (.zip)",
     "trimTransparentEdgesLabel": "Cắt bỏ viền trong suốt thừa",
     "resizeToggleLabel": "Thay đổi kích thước trước khi tải",
-    "maxDimensionLabel": "Kích thước tối đa: {{size}}px"
+    "maxDimensionLabel": "Kích thước tối đa: {{size}}px",
+    "photoSizeLabel": "Kích thước ảnh thẻ / hộ chiếu",
+    "photoSizeNone": "Giữ nguyên (không cắt)",
+    "photoSizePreset3x4": "3×4 cm",
+    "photoSizePreset4x6": "4×6 cm",
+    "photoSizePreset2x3": "2×3 cm",
+    "photoSizePreset35x45": "3.5×4.5 cm / 35×45 mm (visa Trung Quốc, hộ chiếu EU/UK)",
+    "photoSizePreset2x2in": "2×2 in (hộ chiếu/visa Mỹ)",
+    "dpiLabel": "Chất lượng in: {{value}} DPI",
+    "verticalPositionLabel": "Vị trí theo chiều dọc",
+    "outputSizeHint": "Kích thước xuất: {{width}}×{{height}}px — mẹo: chọn nền màu đặc (vd: trắng) để in ảnh"
   },
   "related": "Công cụ liên quan",
   "faq": {
@@ -41,7 +51,9 @@
     "q2": "Có thể thay nền thay vì để trong suốt không?",
     "a2": "Có — sau khi xóa nền, bạn có thể giữ trong suốt hoặc thay bằng màu solid hay một ảnh khác.",
     "q3": "Có thể tinh chỉnh viền cắt không?",
-    "a3": "Có — thanh trượt làm mềm viền giúp phần cắt hòa vào nền mới tự nhiên hơn."
+    "a3": "Có — thanh trượt làm mềm viền giúp phần cắt hòa vào nền mới tự nhiên hơn.",
+    "q4": "Có thể cắt ảnh theo kích thước ảnh thẻ/hộ chiếu chuẩn như 3x4 cm không?",
+    "a4": "Có — chọn 1 trong các kích thước có sẵn (3×4 cm, 4×6 cm, 2×3 cm, 3.5×4.5 cm / 35×45 mm, hoặc 2×2 in), công cụ sẽ tự cắt căn giữa đúng tỷ lệ rồi phóng đúng số pixel cần thiết để in theo DPI bạn chọn, kèm thanh trượt chỉnh vị trí lên/xuống để khuôn mặt nằm đúng khung như chụp ở tiệm ảnh."
   },
   "article": {
     "heading": "Xóa nền ảnh bằng AI ngay trên trình duyệt hoạt động thế nào?",

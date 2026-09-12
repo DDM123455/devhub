@@ -178,6 +178,41 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-09-12 (Phase 3.12 — Xóa nền ảnh: kích thước ảnh thẻ chuẩn, theo yêu cầu trực tiếp
+  người dùng)** — Người dùng hỏi 2 việc: "thay áo" cho ảnh + crop theo khổ ảnh thẻ (3x4...).
+  Đã hỏi rõ (AskUserQuestion) trước khi code: (1) thay trang phục — giải thích cần model AI
+  sinh ảnh (generative/virtual try-on) khác hẳn về bản chất với model phân đoạn dùng cho xóa
+  nền hiện tại, nặng vài GB + cần GPU, không khả thi client-side, phá nguyên tắc
+  zero-server-cost nếu làm → người dùng chọn **bỏ qua**, không code gì cho phần này. (2) ảnh
+  thẻ chuẩn → người dùng chọn "preset kích thước + crop tự động căn giữa" (không làm cropper
+  kéo-thả-zoom, không làm layout in nhiều ảnh/tờ).
+  - Thêm `PhotoSizeOptions`/`cropToPhotoSize`/`mmToPx` vào `BackgroundRemover.tsx`: 5 preset
+    (3×4cm, 4×6cm, 2×3cm, 3.5×4.5cm/35×45mm, 2×2in) — phát hiện lúc soạn preset: "3.5×4.5cm
+    visa Trung Quốc" và "35×45mm hộ chiếu EU/UK" là **CÙNG MỘT kích thước vật lý** (3.5cm =
+    35mm), suýt tạo 2 preset trùng số đo dưới 2 tên khác nhau — gộp lại thành 1 preset, ghi
+    cả 2 ngữ cảnh trong nhãn.
+  - Thanh trượt DPI (150–600, mặc định 300) + thanh trượt "vị trí dọc" (-50..50, có clamp)
+    để bù khi crop-căn-giữa-tự-động cắt sai chỗ (ảnh gốc cho thấy nhiều hơn đầu-vai cần
+    thiết) — quy ước dấu: âm = đẩy khung crop lên trên nguồn, dương = đẩy xuống.
+  - Chọn preset → tự ẩn khối "Resize before download" cũ (2 cơ chế cùng quyết định kích
+    thước xuất cuối, không cho bật đồng thời — tránh 2 tính năng đá nhau).
+  - **Verify 2 lớp** (không chạy được full AI end-to-end trong sandbox, xem giới hạn dưới):
+    (a) script Node thuần đối chiếu công thức crop-rect với giá trị tính tay cho 6 kịch bản
+    (nguồn cao/rộng/vuông, offset ±50 clamp đúng, quy ước dấu offset đúng chiều) — PASS hết;
+    (b) Puppeteer trên trang thật (không qua AI) xác nhận chọn preset → DPI/vị-trí-dọc hiện,
+    khối resize cũ ẩn, dòng "Output: 354×472px" khớp đúng `mmToPx(30,300)`×`mmToPx(40,300)`,
+    đổi DPI→600 thì hint cập nhật đúng 709×945; quay lại "Original" thì khối resize cũ hiện
+    lại. 0 console error trong mọi bước.
+  - **Giới hạn đã biết**: thử chạy full pipeline thật (upload ảnh synthetic → gọi
+    `removeBackground()` AI thật → áp crop) bằng Puppeteer, timeout sau 120s không ra kết
+    quả (không có lỗi console, không có error state — nghi ngờ suy luận WASM CPU-only chạy
+    quá chậm trong môi trường sandbox hạn chế tài nguyên/không GPU, không phải bug code, vì
+    `cropToPhotoSize` dùng đúng các Canvas primitive (`createImageBitmap`/`drawImage`/
+    `getContext`) đã chạy ổn định sẵn ở nhánh trim/resize cũ trong cùng hàm mà tôi không
+    đụng tới). Cần người dùng tự bấm thử 1 lần trên trình duyệt thật để xác nhận chắc chắn.
+  - i18n: 10 key UI mới + `faq.q4`/`a4` — chỉ en+vi (tool này đã có sẵn khoảng cách i18n từ
+    trước ở các key resize/trim thêm phase trước, không phải do task này tạo ra).
+  - Build 502 trang exit 0.
 - **2026-09-12 (Phase 3.11 — layout không mở hết chiều rộng, theo yêu cầu trực tiếp người
   dùng)** — Người dùng hỏi tại sao trang không mở hết bên phải trên màn rộng. Điều tra bằng
   screenshot Puppeteer 1920px, xác nhận: TOÀN BỘ 22 trang tool bọc khu vực tương tác trong

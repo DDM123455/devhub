@@ -31,7 +31,17 @@
     "downloadAll": "Download All (.zip)",
     "trimTransparentEdgesLabel": "Trim transparent edges",
     "resizeToggleLabel": "Resize before download",
-    "maxDimensionLabel": "Max width/height: {{size}}px"
+    "maxDimensionLabel": "Max width/height: {{size}}px",
+    "photoSizeLabel": "ID / passport photo size",
+    "photoSizeNone": "Original (no crop)",
+    "photoSizePreset3x4": "3×4 cm",
+    "photoSizePreset4x6": "4×6 cm",
+    "photoSizePreset2x3": "2×3 cm",
+    "photoSizePreset35x45": "3.5×4.5 cm / 35×45 mm (China visa, EU/UK passport)",
+    "photoSizePreset2x2in": "2×2 in (US passport/visa)",
+    "dpiLabel": "Print quality: {{value}} DPI",
+    "verticalPositionLabel": "Vertical position",
+    "outputSizeHint": "Output: {{width}}×{{height}}px — tip: pick a solid background color (e.g. white) for printing"
   },
   "related": "Related tools",
   "faq": {
@@ -41,7 +51,9 @@
     "q2": "Can I replace the background instead of leaving it transparent?",
     "a2": "Yes — after removing the background you can keep it transparent or swap in a solid color or another image.",
     "q3": "Can I fine-tune the cutout edges?",
-    "a3": "Yes — an edge-softness slider feathers the cutout edge for a more natural blend."
+    "a3": "Yes — an edge-softness slider feathers the cutout edge for a more natural blend.",
+    "q4": "Can I crop the result to a standard ID or passport photo size like 3×4 cm?",
+    "a4": "Yes — pick a size preset (3×4 cm, 4×6 cm, 2×3 cm, 3.5×4.5 cm / 35×45 mm, or 2×2 in) and the tool center-crops the cutout to that exact aspect ratio and scales it to the precise pixel size for printing at your chosen DPI, with a slider to nudge the crop up or down so the face lands where a photo booth would put it."
   },
   "article": {
     "heading": "How does local, in-browser background removal work?",
