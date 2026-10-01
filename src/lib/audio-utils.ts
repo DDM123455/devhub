@@ -58,3 +58,44 @@ export function downmixToStereo(channels: Float32Array[]): Float32Array[] {
 	}
 	return [left, right];
 }
+
+// ---------------------------------------------------------------------------
+// Channel layout + trimming (operate on decoded Float32 channel data)
+// ---------------------------------------------------------------------------
+
+export type ChannelMode = 'keep' | 'mono' | 'stereo';
+
+/** Average all channels into one. */
+export function toMono(channels: Float32Array[]): Float32Array[] {
+	if (channels.length <= 1) return channels;
+	const len = channels[0].length;
+	const out = new Float32Array(len);
+	const inv = 1 / channels.length;
+	for (const ch of channels) for (let i = 0; i < len; i++) out[i] += ch[i] * inv;
+	return [out];
+}
+
+/** Mono -> two identical channels; stereo (or more, already downmixed) untouched. */
+export function toStereo(channels: Float32Array[]): Float32Array[] {
+	if (channels.length >= 2) return channels.slice(0, 2);
+	return [channels[0], channels[0].slice()];
+}
+
+export function applyChannelMode(channels: Float32Array[], mode: ChannelMode): Float32Array[] {
+	if (mode === 'mono') return toMono(channels);
+	if (mode === 'stereo') return toStereo(channels);
+	return channels;
+}
+
+/**
+ * Cuts [startSec, endSec) out of every channel. endSec <= 0 or beyond the end means "until the end".
+ * Returns null when the range is empty/invalid.
+ */
+export function trimChannels(channels: Float32Array[], sampleRate: number, startSec: number, endSec: number): Float32Array[] | null {
+	const total = channels[0]?.length ?? 0;
+	const from = Math.max(0, Math.round(startSec * sampleRate));
+	const to = endSec > 0 ? Math.min(total, Math.round(endSec * sampleRate)) : total;
+	if (!(to > from)) return null;
+	if (from === 0 && to === total) return channels;
+	return channels.map((c) => c.slice(from, to));
+}

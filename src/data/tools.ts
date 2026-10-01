@@ -948,8 +948,8 @@ export const tools: ToolDefinition[] = [
 			sv: 'mp3-wav-omvandlare',
 		},
 		names: {
-			en: 'MP3 ↔ WAV Converter',
-			vi: 'Chuyển đổi MP3 ↔ WAV',
+			en: 'Audio Converter (MP3, WAV, OGG, FLAC)',
+			vi: 'Chuyển đổi âm thanh (MP3, WAV, OGG, FLAC)',
 			es: 'Convertidor MP3 ↔ WAV',
 			pt: 'Conversor MP3 ↔ WAV',
 			fr: 'Convertisseur MP3 ↔ WAV',

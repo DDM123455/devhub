@@ -180,6 +180,34 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-10-01 (Phase 3.14 — xử lý thiếu sót so với đối thủ, theo yêu cầu trực tiếp người dùng)** —
+  4 agent làm song song theo `COMPETITOR_GAP.md`. Ảnh/PDF: SVG→ảnh, ảnh→PDF, thêm ảnh vào Gộp PDF
+  (sort/trang trắng/đánh số), Tách PDF theo dung lượng/bookmark/lẻ-chẵn, Nén ảnh MozJPEG+OxiPNG
+  (worker, WASM lazy), HEIC/GIF/BMP/AVIF + Ctrl+V, Xóa nền: brush Restore/Erase, WebP/JPG, gradient/
+  blur/shadow, preset marketplace. Media/design: QR (eye riêng, JPEG/PDF, 6 loại nội dung, frame SVG,
+  mẫu thiết kế), SVG (gzip, batch zip, data-URI/JSX, so sánh), Color (mù màu, OKLCH/CMYK/HSB, shades,
+  contrast tuỳ ý+APCA, EyeDropper, share hash), Video (GIF/MP3/nhiều đoạn/mute/tốc độ/resize/CRF/
+  thumbnail strip), Audio (batch+zip, input video, OGG-Vorbis/FLAC/M4A, trim, mono/stereo, WAV bit
+  depth; đổi tên hiển thị "Audio Converter", slug giữ nguyên). Text/dev: Case (nhiều kiểu + tiện ích
+  dòng + Unicode style), JSON (repair, indent, sinh code TS/Go/Java/C#/Python, schema, JSONPath, share
+  hash), Regex (explain, thư viện mẫu, codegen 7 ngôn ngữ, cờ d/v, unit test), JWT (ES/PS/RS/HS ký+verify,
+  JWK/JWKS, encoder), Base64 (phân tích, Hex/Base32/58/85, gzip/zlib), Text Diff (unified, ẩn dòng
+  không đổi, export .diff/HTML, ignore regex), Word Counter (n-gram, preset, mục tiêu, .docx/.pdf),
+  Markdown (KaTeX, highlight, TOC, find/replace, nhiều tab, PDF). Data/devops: K8s (scorer bảo mật 26
+  check, CRD catalog, cross-check, ghim SHA schema, JSON report), Nginx (check kiểu Gixy, validate tham
+  số, trùng server_name/listen, JSON report), CSV (JSONL/keyed/SQL/YAML/MD/HTML/XML, encoding, transpose,
+  chọn cột), JSON→Excel (Date, mảng lồng, freeze/filter/style, CSV). Cài thêm dependency: jsonrepair,
+  @jsquash/oxipng, @jsquash/jpeg, highlight.js, katex, mammoth; GỠ `ajv`.
+  **Bug CSP thật phát hiện khi tổng hợp**: K8s validator dùng ajv (`new Function`) nhưng CSP production
+  (`script-src` không có 'unsafe-eval') sẽ chặn → từ Phase 3.9 validator K8s có thể hỏng trên production
+  dù preview chạy. Đã thay bằng `src/lib/json-schema-validate.ts` (interpretive, có params additionalProperty/
+  missingProperty/type/allowedValues). Verify: server tĩnh áp đúng CSP từ `_headers` → 22 trang tải sạch
+  0 lỗi console, K8s vẫn báo `/spec/replicas must be integer|null` đúng dòng, Markdown KaTeX+hljs 0 vi
+  phạm. Còn nghi ngờ: `heic2any` có 3 chỗ `new Function` (chưa test HEIC thật dưới CSP). Chưa làm (cần
+  quyết định/server/quá lớn): nén PDF, model WebGPU, flavor regex, Mermaid, fetch JWKS, sync cloud,
+  self-host ffmpeg, TIFF, EXIF giữ nguyên. Cần chủ dự án xác nhận: kích thước Etsy 2000×1500 và nhãn
+  Shopee/Lazada 800×800 (agent chọn theo hiểu biết chung). Vitest 507/507, build 522 trang. Chưa có
+  `tsc` (repo chưa cài typescript). 18 locale còn lại fallback en cho key mới.
 - **2026-10-01 (Phase 3.13c — nốt nhóm LOW sau test tương tác)** — Image Converter: nút Retry
   riêng cho item lỗi + thông báo AVIF rõ hơn (en+vi); JSON→Excel: cảnh báo khi tên sheet bị
   đổi ("History → History_"); SVG Optimizer: cảnh báo `@import`/`url(http…)` trong CSS. Thêm

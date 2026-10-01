@@ -1,7 +1,51 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useCopyToClipboard } from './useCopyToClipboard';
-import { computeTextStats, computeTopWords, fleschReadingEase, looksEnglish, type Duration } from '@/lib/word-count';
+import { computeTextStats, fleschReadingEase, looksEnglish, toDuration, type Duration } from '@/lib/word-count';
+import {
+	computeKeywordRows,
+	estimatePages,
+	goalProgress,
+	gradeMetrics,
+	HANDWRITING_WORDS_PER_MINUTE,
+	smsSegments,
+	WORDS_PER_PAGE_DOUBLE,
+	WORDS_PER_PAGE_SINGLE,
+} from '@/lib/word-count-extra';
+import { extractTextFromFile, MAX_DOCUMENT_BYTES } from '@/lib/doc-extract';
+
+export interface WordCounterExtraMessages {
+	presetMetaTitle: string;
+	presetLinkedin: string;
+	presetTiktok: string;
+	presetSmsSegments: string;
+	presetNote: string;
+	smsInfo: string;
+	goalHeading: string;
+	goalLabel: string;
+	goalWords: string;
+	goalCharacters: string;
+	goalProgress: string;
+	goalReached: string;
+	keywordSizeLabel: string;
+	keywordSingle: string;
+	keywordBigram: string;
+	keywordTrigram: string;
+	keywordStopWords: string;
+	keywordNone: string;
+	uploadDocHint: string;
+	uploading: string;
+	uploadTooLarge: string;
+	uploadFailed: string;
+	draftSaved: string;
+	gradeHeading: string;
+	fleschKincaid: string;
+	gunningFog: string;
+	gradeUnit: string;
+	pagesLabel: string;
+	pagesValue: string;
+	handwritingLabel: string;
+}
 
 interface Messages {
 	placeholder: string;
@@ -49,19 +93,27 @@ interface Messages {
 	readabilityCalibrationNote: string;
 	fileReadError: string;
 	copyFailed: string;
+	x: WordCounterExtraMessages;
 }
 
-type CharLimitPreset = 'none' | 'twitter' | 'meta-description' | 'instagram' | 'youtube-title' | 'sms';
+type CharLimitPreset = 'none' | 'twitter' | 'meta-title' | 'meta-description' | 'linkedin-post' | 'tiktok-caption' | 'instagram' | 'youtube-title' | 'sms' | 'sms-segments';
+
+const DRAFT_KEY = 'word-counter-draft';
 
 const CHAR_LIMITS: Record<Exclude<CharLimitPreset, 'none'>, number> = {
 	twitter: 280,
+	'meta-title': 60,
 	'meta-description': 160,
+	'linkedin-post': 3000,
+	'tiktok-caption': 2200,
 	instagram: 2200,
 	'youtube-title': 100,
 	sms: 160,
+	'sms-segments': 160,
 };
 
 const TOP_WORDS_LIMIT = 10;
+const KEYWORD_LIMIT = 15;
 
 function readabilityLevel(score: number, messages: Messages): string {
 	if (score >= 90) return messages.readabilityVeryEasy;
@@ -109,10 +161,50 @@ function formatDuration(duration: Duration, minutesTemplate: string, hoursTempla
 export default function WordCounter({ messages, lang = 'en' }: { messages: Messages; lang?: string }) {
 	const [text, setText] = useState('');
 	const [charLimitPreset, setCharLimitPreset] = useState<CharLimitPreset>('none');
-	const [uploadError, setUploadError] = useState(false);
+	const [uploadError, setUploadError] = useState<string | null>(null);
+	const [uploading, setUploading] = useState(false);
+	const [goalValue, setGoalValue] = useState('');
+	const [goalUnit, setGoalUnit] = useState<'words' | 'characters'>('words');
+	const [keywordSize, setKeywordSize] = useState<1 | 2 | 3>(1);
+	const [excludeStopWords, setExcludeStopWords] = useState(false);
+	const [draftRestored, setDraftRestored] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const { stats, wordList } = useMemo(() => computeTextStats(text, lang), [text, lang]);
-	const topWords = useMemo(() => computeTopWords(wordList, TOP_WORDS_LIMIT), [wordList]);
+	const topWords = useMemo(
+		() => computeKeywordRows(wordList, { limit: keywordSize === 1 && !excludeStopWords ? TOP_WORDS_LIMIT : KEYWORD_LIMIT, size: keywordSize, excludeStopWords }),
+		[wordList, keywordSize, excludeStopWords],
+	);
+	const grades = useMemo(() => (looksEnglish(text) ? gradeMetrics(text, stats.sentences) : null), [text, stats.sentences]);
+	const pages = estimatePages(stats.words);
+	const handwriting = toDuration(stats.words, HANDWRITING_WORDS_PER_MINUTE);
+	const sms = useMemo(() => smsSegments(text), [text]);
+	const goalNumber = Number(goalValue);
+	const goal = goalProgress(goalUnit === 'words' ? stats.words : stats.characters, goalNumber);
+
+	// Autosave the draft (localStorage may be unavailable: private mode, quota, SSR pass).
+	useEffect(() => {
+		try {
+			const saved = localStorage.getItem(DRAFT_KEY);
+			if (saved) {
+				setText(saved);
+				setDraftRestored(true);
+			}
+		} catch {
+			// storage unavailable - start empty
+		}
+	}, []);
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			try {
+				if (text === '') localStorage.removeItem(DRAFT_KEY);
+				else localStorage.setItem(DRAFT_KEY, text);
+			} catch {
+				// ignore quota / private mode
+			}
+		}, 600);
+		return () => clearTimeout(timer);
+	}, [text]);
+
 	const isEnglishText = useMemo(() => looksEnglish(text), [text]);
 	const readabilityScore = useMemo(
 		() => (isEnglishText ? fleschReadingEase(text, stats.sentences) : null),
@@ -121,17 +213,18 @@ export default function WordCounter({ messages, lang = 'en' }: { messages: Messa
 
 	const handleFileUpload = (input: HTMLInputElement) => {
 		const file = input.files?.[0];
-		if (!file) return;
-		setUploadError(false);
-		const reader = new FileReader();
-		reader.onload = () => {
-			// CRLF -> LF so Windows files don't differ from pasted text in any count.
-			if (typeof reader.result === 'string') setText(reader.result.replace(/\r\n?/g, '\n'));
-		};
-		reader.onerror = () => setUploadError(true);
-		reader.readAsText(file);
-		// Allow re-selecting the same file afterwards.
 		input.value = '';
+		if (!file) return;
+		setUploadError(null);
+		if (file.size > MAX_DOCUMENT_BYTES) {
+			setUploadError(messages.x.uploadTooLarge.replace('{{max}}', String(MAX_DOCUMENT_BYTES / 1024 / 1024)));
+			return;
+		}
+		setUploading(true);
+		extractTextFromFile(file)
+			.then((extracted) => setText(extracted))
+			.catch(() => setUploadError(file.name.match(/\.(docx|pdf)$/i) ? messages.x.uploadFailed : messages.fileReadError))
+			.finally(() => setUploading(false));
 	};
 
 	const download = () => {
@@ -156,6 +249,18 @@ export default function WordCounter({ messages, lang = 'en' }: { messages: Messa
 		{
 			label: messages.readingTimeLabel,
 			value: formatDuration(stats.reading, messages.readingTimeValue, messages.readingTimeHoursValue),
+		},
+		{
+			label: messages.x.pagesLabel,
+			value: messages.x.pagesValue
+				.replace('{{single}}', String(pages.single))
+				.replace('{{double}}', String(pages.double))
+				.replace('{{singleWords}}', String(WORDS_PER_PAGE_SINGLE))
+				.replace('{{doubleWords}}', String(WORDS_PER_PAGE_DOUBLE)),
+		},
+		{
+			label: messages.x.handwritingLabel,
+			value: formatDuration(handwriting, messages.readingTimeValue, messages.readingTimeHoursValue),
 		},
 		{
 			label: messages.speakingTimeLabel,
@@ -193,7 +298,7 @@ export default function WordCounter({ messages, lang = 'en' }: { messages: Messa
 						id="word-counter-file-input"
 						ref={fileInputRef}
 						type="file"
-						accept=".txt,text/plain"
+						accept=".txt,.md,.docx,.pdf,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 						className="sr-only"
 						onChange={(event) => handleFileUpload(event.target)}
 					/>
@@ -210,19 +315,30 @@ export default function WordCounter({ messages, lang = 'en' }: { messages: Messa
 					>
 						<option value="none">{messages.charLimitNone}</option>
 						<option value="twitter">{messages.charLimitTwitter}</option>
+						<option value="meta-title">{messages.x.presetMetaTitle}</option>
 						<option value="meta-description">{messages.charLimitMetaDescription}</option>
+						<option value="linkedin-post">{messages.x.presetLinkedin}</option>
+						<option value="tiktok-caption">{messages.x.presetTiktok}</option>
 						<option value="instagram">{messages.charLimitInstagram}</option>
 						<option value="youtube-title">{messages.charLimitYoutubeTitle}</option>
 						<option value="sms">{messages.charLimitSms}</option>
+						<option value="sms-segments">{messages.x.presetSmsSegments}</option>
 					</select>
 				</div>
 			</div>
 
-			{uploadError && (
-				<p role="alert" className="text-sm text-destructive">
-					{messages.fileReadError}
+			{uploading && (
+				<p role="status" className="text-xs text-muted-foreground">
+					{messages.x.uploading}
 				</p>
 			)}
+			{uploadError && (
+				<p role="alert" className="text-sm text-destructive">
+					{uploadError}
+				</p>
+			)}
+			{draftRestored && text !== '' && <p className="text-xs text-muted-foreground">{messages.x.draftSaved}</p>}
+			<p className="text-xs text-muted-foreground">{messages.x.uploadDocHint}</p>
 
 			{charLimitRemaining !== null && (
 				<p
@@ -234,6 +350,64 @@ export default function WordCounter({ messages, lang = 'en' }: { messages: Messa
 						: messages.charLimitRemaining.replace('{{count}}', String(charLimitRemaining))}
 				</p>
 			)}
+
+			{charLimitPreset === 'sms-segments' && text !== '' && (
+				<p role="status" className="text-sm text-foreground">
+					{messages.x.smsInfo
+						.replace('{{segments}}', String(sms.segments))
+						.replace('{{encoding}}', sms.encoding)
+						.replace('{{units}}', String(sms.units))
+						.replace('{{per}}', String(sms.perSegment))}
+				</p>
+			)}
+			{charLimitPreset !== 'none' && <p className="text-xs text-muted-foreground">{messages.x.presetNote}</p>}
+
+			<div className="flex flex-col gap-2 rounded-md border border-border p-3">
+				<h2 className="text-sm font-semibold text-foreground">{messages.x.goalHeading}</h2>
+				<div className="flex flex-wrap items-center gap-2">
+					<label className="flex items-center gap-2 text-sm text-foreground">
+						{messages.x.goalLabel}
+						<input
+							type="number"
+							min={1}
+							inputMode="numeric"
+							value={goalValue}
+							onChange={(event) => setGoalValue(event.target.value)}
+							className="min-h-9 w-28 rounded-md border border-border bg-background px-2 text-sm"
+						/>
+					</label>
+					<select
+						value={goalUnit}
+						onChange={(event) => setGoalUnit(event.target.value as 'words' | 'characters')}
+						aria-label={messages.x.goalLabel}
+						className="min-h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+					>
+						<option value="words">{messages.x.goalWords}</option>
+						<option value="characters">{messages.x.goalCharacters}</option>
+					</select>
+				</div>
+				{goalNumber > 0 && (
+					<div className="flex flex-col gap-1">
+						<div
+							role="progressbar"
+							aria-valuemin={0}
+							aria-valuemax={100}
+							aria-valuenow={Math.round(goal.percent)}
+							aria-label={messages.x.goalHeading}
+							className="h-2 w-full overflow-hidden rounded-full bg-muted"
+						>
+							<div className={goal.reached ? 'h-full bg-primary' : 'h-full bg-primary/60'} style={{ width: `${goal.percent}%` }} />
+						</div>
+						<p role="status" className="text-xs text-muted-foreground">
+							{goal.reached
+								? messages.x.goalReached
+								: messages.x.goalProgress
+										.replace('{{percent}}', String(Math.floor(goal.percent)))
+										.replace('{{remaining}}', String(Math.max(0, goalNumber - (goalUnit === 'words' ? stats.words : stats.characters))))}
+						</p>
+					</div>
+				)}
+			</div>
 
 			<dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
 				{statItems.map((item) => (
@@ -259,34 +433,68 @@ export default function WordCounter({ messages, lang = 'en' }: { messages: Messa
 						</div>
 					</div>
 				)}
+				{grades && (
+					<dl className="grid grid-cols-2 gap-3 text-sm">
+						<div>
+							<dt className="text-xs text-muted-foreground">{messages.x.fleschKincaid}</dt>
+							<dd className="font-semibold text-foreground">{messages.x.gradeUnit.replace('{{grade}}', grades.fleschKincaidGrade.toFixed(1))}</dd>
+						</div>
+						<div>
+							<dt className="text-xs text-muted-foreground">{messages.x.gunningFog}</dt>
+							<dd className="font-semibold text-foreground">{messages.x.gradeUnit.replace('{{grade}}', grades.gunningFog.toFixed(1))}</dd>
+						</div>
+					</dl>
+				)}
 				{readabilityScore !== null && lang !== 'en' && (
 					<p className="text-xs text-muted-foreground">{messages.readabilityCalibrationNote}</p>
 				)}
 			</div>
 
-			{topWords.length > 0 && (
+			{wordList.length > 0 && (
 				<div className="flex flex-col gap-2">
 					<h2 className="text-sm font-semibold text-foreground">{messages.keywordDensityHeading}</h2>
-					<div className="overflow-x-auto rounded-md border border-border">
-						<table className="w-full text-left text-sm">
-							<thead>
-								<tr className="border-b border-border text-xs text-muted-foreground">
-									<th className="px-3 py-2 font-medium">{messages.keywordDensityWordColumn}</th>
-									<th className="px-3 py-2 font-medium">{messages.keywordDensityCountColumn}</th>
-									<th className="px-3 py-2 font-medium">{messages.keywordDensityPercentColumn}</th>
-								</tr>
-							</thead>
-							<tbody>
-								{topWords.map((item) => (
-									<tr key={item.word} className="border-b border-border last:border-0">
-										<td className="px-3 py-2 text-foreground">{item.word}</td>
-										<td className="px-3 py-2 text-foreground">{item.count}</td>
-										<td className="px-3 py-2 text-foreground">{item.percent.toFixed(1)}%</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
+					<div className="flex flex-wrap items-center gap-3">
+						<label className="flex items-center gap-2 text-sm text-foreground">
+							{messages.x.keywordSizeLabel}
+							<select
+								value={keywordSize}
+								onChange={(event) => setKeywordSize(Number(event.target.value) as 1 | 2 | 3)}
+								className="min-h-9 rounded-md border border-border bg-background px-2 text-sm"
+							>
+								<option value={1}>{messages.x.keywordSingle}</option>
+								<option value={2}>{messages.x.keywordBigram}</option>
+								<option value={3}>{messages.x.keywordTrigram}</option>
+							</select>
+						</label>
+						<label className="flex min-h-9 cursor-pointer items-center gap-2 text-sm text-foreground">
+							<input type="checkbox" checked={excludeStopWords} onChange={(event) => setExcludeStopWords(event.target.checked)} />
+							{messages.x.keywordStopWords}
+						</label>
 					</div>
+					{topWords.length === 0 ? (
+						<p className="text-sm text-muted-foreground">{messages.x.keywordNone}</p>
+					) : (
+						<div className="overflow-x-auto rounded-md border border-border">
+							<table className="w-full text-left text-sm">
+								<thead>
+									<tr className="border-b border-border text-xs text-muted-foreground">
+										<th className="px-3 py-2 font-medium">{messages.keywordDensityWordColumn}</th>
+										<th className="px-3 py-2 font-medium">{messages.keywordDensityCountColumn}</th>
+										<th className="px-3 py-2 font-medium">{messages.keywordDensityPercentColumn}</th>
+									</tr>
+								</thead>
+								<tbody>
+									{topWords.map((item) => (
+										<tr key={item.phrase} className="border-b border-border last:border-0">
+											<td className="px-3 py-2 text-foreground [overflow-wrap:anywhere]">{item.phrase}</td>
+											<td className="px-3 py-2 text-foreground">{item.count}</td>
+											<td className="px-3 py-2 text-foreground">{item.percent.toFixed(1)}%</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					)}
 				</div>
 			)}
 		</div>

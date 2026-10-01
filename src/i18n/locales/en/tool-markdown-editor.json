@@ -42,7 +42,36 @@
     "draftSaved": "Draft saved in this browser.",
     "draftSaveFailed": "Could not save the draft in this browser (storage full or blocked).",
     "copyFailed": "Copy failed",
-    "fileReadError": "Could not read that file."
+    "fileReadError": "Could not read that file.",
+    "x": {
+      "tabsLabel": "Documents",
+      "newDoc": "New document",
+      "closeDoc": "Close document {{name}}",
+      "closeConfirm": "Close this document? Its text will be deleted from this browser.",
+      "untitled": "Untitled",
+      "docLimit": "Document limit reached (10 documents or about 2 MB of text).",
+      "outlineHeading": "Outline (table of contents)",
+      "outlineEmpty": "Add headings (# Title) to build an outline.",
+      "exportPdf": "Export PDF",
+      "exportPdfHint": "Opens your browser's print dialog - choose \"Save as PDF\" as the destination.",
+      "findReplace": "Find and replace",
+      "zen": "Zen / full screen",
+      "exitZen": "Exit full screen",
+      "fontSize": "Font size",
+      "phrases": {
+        "Find": "Find",
+        "Replace": "Replace",
+        "next": "next",
+        "previous": "previous",
+        "all": "all",
+        "match case": "match case",
+        "by word": "whole word",
+        "regexp": "regex",
+        "replace": "replace",
+        "replace all": "replace all",
+        "close": "close"
+      }
+    }
   },
   "related": "Related tools",
   "faq": {

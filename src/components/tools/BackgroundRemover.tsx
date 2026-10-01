@@ -4,8 +4,23 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { BeforeAfterSlider } from '@/components/ui/before-after-slider';
 import { baseNameOf, dedupeName } from '@/lib/file-utils';
+import { isHeicLike } from '@/lib/image-compress-utils';
+import {
+	blurDownscaleFactor,
+	computeContainLayout,
+	exportExtension,
+	exportMime,
+	gradientEndpoints,
+	MARKETPLACE_PRESETS,
+	needsFlatten,
+	shadowParams,
+	type ExportFormat,
+	type GradientDirection,
+	type MarketplacePreset,
+} from '@/lib/bg-remove-utils';
+import BackgroundMaskEditor, { type MaskEditorMessages } from './BackgroundMaskEditor';
 
-interface Messages {
+interface Messages extends MaskEditorMessages {
 	selectFiles: string;
 	dropHint: string;
 	remove: string;
@@ -42,10 +57,35 @@ interface Messages {
 	photoSizePreset2x2in: string;
 	dpiLabel: string;
 	verticalPositionLabel: string;
-	outputSizeHint: string;
+		outputSizeHint: string;
+	editMask: string;
+	resetEdits: string;
+	editedBadge: string;
+	backgroundGradient: string;
+	backgroundBlur: string;
+	gradientFromLabel: string;
+	gradientToLabel: string;
+	gradientDirectionLabel: string;
+	directionVertical: string;
+	directionHorizontal: string;
+	directionDiagonal: string;
+	blurAmountLabel: string;
+	shadowToggle: string;
+	shadowSizeLabel: string;
+	shadowOpacityLabel: string;
+	formatLabel: string;
+	qualityLabel: string;
+	jpgFlattenNote: string;
+	photoSizeGroup: string;
+	marketplaceGroup: string;
+	marketplaceAmazon: string;
+	marketplaceShopee: string;
+	marketplaceEtsy: string;
+	marketplacePaddingLabel: string;
+	marketplaceHint: string;
 }
 
-type BackgroundMode = 'transparent' | 'color' | 'image';
+type BackgroundMode = 'transparent' | 'color' | 'image' | 'gradient' | 'blur';
 
 interface ImageItem {
 	id: string;
@@ -53,7 +93,12 @@ interface ImageItem {
 	previewUrl: string;
 	status: 'pending' | 'processing' | 'done' | 'error';
 	resultBlob?: Blob;
-	displayUrl?: string;
+		displayUrl?: string;
+	// Đuôi file của displayUrl hiện tại (png/webp/jpg), chốt lúc dựng để tên tải về luôn khớp nội dung.
+	displayExt?: string;
+	// Kết quả sau khi người dùng chỉnh mask bằng brush (thay cho resultBlob khi dựng ảnh); editVersion để kích hoạt dựng lại.
+	editedBlob?: Blob;
+	editVersion: number;
 	comparePosition: number;
 	// Lý do kỹ thuật của lỗi (message gốc từ thư viện), hiện kèm thông báo i18n để dễ chẩn đoán.
 	errorDetail?: string;
@@ -68,8 +113,11 @@ interface ImageItem {
 	stage?: 'loading-model' | 'processing';
 }
 
-// Chỉ nhận đúng các định dạng mà input[accept] liệt kê.
+// Chỉ nhận đúng các định dạng mà input[accept] liệt kê (HEIC được giải mã bằng heic2any nạp lazy).
 const ACCEPTED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+function isAcceptedInput(file: File): boolean {
+	return ACCEPTED_TYPES.has(file.type) || isHeicLike(file);
+}
 const DISPLAY_DEBOUNCE_MS = 200;
 
 const MIN_MAX_DIMENSION = 320;
@@ -225,84 +273,199 @@ function cropToPhotoSize(source: HTMLCanvasElement, options: PhotoSizeOptions): 
 	return out;
 }
 
-async function buildDisplayBlob(
-	resultBlob: Blob,
-	edgeSoftness: number,
-	background: { mode: BackgroundMode; color: string; imageUrl: string | null },
-	trimTransparentEdges: boolean,
-	maxDimension: number | undefined,
-	photoSize: PhotoSizeOptions | undefined,
-): Promise<Blob> {
-	const bitmap = await createImageBitmap(resultBlob);
+interface DisplayBackground {
+	mode: BackgroundMode;
+	color: string;
+	imageUrl: string | null;
+	gradientFrom: string;
+	gradientTo: string;
+	gradientDirection: GradientDirection;
+	blurAmount: number;
+}
+
+interface DisplayOptions {
+	edgeSoftness: number;
+	background: DisplayBackground;
+	// Ảnh gốc của item (dùng cho nền blur).
+	originalUrl: string;
+	trimTransparentEdges: boolean;
+	maxDimension: number | undefined;
+	photoSize: PhotoSizeOptions | undefined;
+	marketplace: { preset: MarketplacePreset; paddingPercent: number } | undefined;
+	shadow: { sizePercent: number; opacity: number } | undefined;
+	format: ExportFormat;
+	quality: number;
+}
+
+function createCanvas(width: number, height: number): HTMLCanvasElement {
 	const canvas = document.createElement('canvas');
-	canvas.width = bitmap.width;
-	canvas.height = bitmap.height;
+	canvas.width = width;
+	canvas.height = height;
+	return canvas;
+}
+
+function get2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
 	const ctx = canvas.getContext('2d');
 	if (!ctx) throw new Error('Canvas 2D context unavailable');
+	return ctx;
+}
 
+function drawCover(ctx: CanvasRenderingContext2D, source: ImageBitmap | HTMLCanvasElement, W: number, H: number) {
+	const scale = Math.max(W / source.width, H / source.height);
+	const w = source.width * scale;
+	const h = source.height * scale;
+	ctx.drawImage(source, (W - w) / 2, (H - h) / 2, w, h);
+}
+
+// Blur nền không dùng ctx.filter: thu nhỏ ảnh gốc rồi phóng lên từng bậc x2 với làm mượt.
+function drawBlurredCover(ctx: CanvasRenderingContext2D, source: ImageBitmap, W: number, H: number, strength: number) {
+	const factor = blurDownscaleFactor(strength, W, H);
+	let current = createCanvas(Math.max(1, Math.round(W / factor)), Math.max(1, Math.round(H / factor)));
+	const smallCtx = get2d(current);
+	smallCtx.imageSmoothingQuality = 'high';
+	drawCover(smallCtx, source, current.width, current.height);
+	while (current.width * 2 < W) {
+		const next = createCanvas(current.width * 2, current.height * 2);
+		const nextCtx = get2d(next);
+		nextCtx.imageSmoothingQuality = 'high';
+		nextCtx.drawImage(current, 0, 0, next.width, next.height);
+		current = next;
+	}
+	ctx.imageSmoothingQuality = 'high';
+	ctx.drawImage(current, 0, 0, W, H);
+}
+
+async function paintBackground(ctx: CanvasRenderingContext2D, W: number, H: number, options: DisplayOptions) {
+	const { background } = options;
 	if (background.mode === 'color') {
 		ctx.fillStyle = background.color;
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		ctx.fillRect(0, 0, W, H);
+	} else if (background.mode === 'gradient') {
+		const { x0, y0, x1, y1 } = gradientEndpoints(background.gradientDirection, W, H);
+		const gradient = ctx.createLinearGradient(x0, y0, x1, y1);
+		gradient.addColorStop(0, background.gradientFrom);
+		gradient.addColorStop(1, background.gradientTo);
+		ctx.fillStyle = gradient;
+		ctx.fillRect(0, 0, W, H);
 	} else if (background.mode === 'image' && background.imageUrl) {
 		const bgBitmap = await createImageBitmap(await (await fetch(background.imageUrl)).blob());
-		const scale = Math.max(canvas.width / bgBitmap.width, canvas.height / bgBitmap.height);
-		const w = bgBitmap.width * scale;
-		const h = bgBitmap.height * scale;
-		ctx.drawImage(bgBitmap, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+		drawCover(ctx, bgBitmap, W, H);
 		bgBitmap.close();
+	} else if (background.mode === 'blur') {
+		const original = await createImageBitmap(await (await fetch(options.originalUrl)).blob());
+		drawBlurredCover(ctx, original, W, H, background.blurAmount);
+		original.close();
 	}
+}
 
-	if (edgeSoftness > 0) {
-		const fgCanvas = document.createElement('canvas');
-		fgCanvas.width = bitmap.width;
-		fgCanvas.height = bitmap.height;
-		const fgCtx = fgCanvas.getContext('2d')!;
-		fgCtx.drawImage(bitmap, 0, 0);
-		const imageData = fgCtx.getImageData(0, 0, fgCanvas.width, fgCanvas.height);
-		softenAlphaEdges(imageData, edgeSoftness);
-		fgCtx.putImageData(imageData, 0, 0);
-		ctx.drawImage(fgCanvas, 0, 0);
-	} else {
-		ctx.drawImage(bitmap, 0, 0);
-	}
+async function buildDisplayBlob(cutoutBlob: Blob, options: DisplayOptions): Promise<Blob> {
+	const bitmap = await createImageBitmap(cutoutBlob);
+	const fg = createCanvas(bitmap.width, bitmap.height);
+	const fgCtx = get2d(fg);
+	fgCtx.drawImage(bitmap, 0, 0);
 	bitmap.close();
+	if (options.edgeSoftness > 0) {
+		const imageData = fgCtx.getImageData(0, 0, fg.width, fg.height);
+		softenAlphaEdges(imageData, options.edgeSoftness);
+		fgCtx.putImageData(imageData, 0, 0);
+	}
 
-	// Trimming only makes sense against a transparent background — a color or
-	// image fill has no "empty margin" left to detect once it's painted in.
-	let finalCanvas: HTMLCanvasElement = canvas;
-	if (background.mode === 'transparent' && trimTransparentEdges) {
-		const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-		const box = computeOpaqueBoundingBox(imageData);
-		if (box && (box.width < canvas.width || box.height < canvas.height)) {
-			const trimmed = document.createElement('canvas');
-			trimmed.width = box.width;
-			trimmed.height = box.height;
-			const trimmedCtx = trimmed.getContext('2d');
-			if (!trimmedCtx) throw new Error('Canvas 2D context unavailable');
-			trimmedCtx.drawImage(finalCanvas, -box.x, -box.y);
-			finalCanvas = trimmed;
+	// Nền + (tuỳ chọn) bóng đổ + chủ thể lên 1 canvas W×H. place mô tả vùng nguồn trên fg và vùng đích.
+	const compose = async (
+		W: number,
+		H: number,
+		place: { sx: number; sy: number; sw: number; sh: number; dx: number; dy: number; dw: number; dh: number },
+	) => {
+		const canvas = createCanvas(W, H);
+		const ctx = get2d(canvas);
+		await paintBackground(ctx, W, H, options);
+		if (options.shadow) {
+			const shadow = shadowParams(options.shadow.sizePercent, options.shadow.opacity, W, H);
+			ctx.save();
+			ctx.shadowColor = shadow.color;
+			ctx.shadowBlur = shadow.blur;
+			ctx.shadowOffsetX = shadow.offsetX;
+			ctx.shadowOffsetY = shadow.offsetY;
+			ctx.drawImage(fg, place.sx, place.sy, place.sw, place.sh, place.dx, place.dy, place.dw, place.dh);
+			ctx.restore();
+		} else {
+			ctx.drawImage(fg, place.sx, place.sy, place.sw, place.sh, place.dx, place.dy, place.dw, place.dh);
+		}
+		return canvas;
+	};
+
+	let finalCanvas: HTMLCanvasElement;
+	if (options.marketplace) {
+		// Ảnh sản phẩm marketplace: cắt sát chủ thể, đặt vừa khung W×H cố định với lề %, rồi phủ nền.
+		const { preset, paddingPercent } = options.marketplace;
+		const box = computeOpaqueBoundingBox(fgCtx.getImageData(0, 0, fg.width, fg.height)) ?? {
+			x: 0,
+			y: 0,
+			width: fg.width,
+			height: fg.height,
+		};
+		const layout = computeContainLayout(box.width, box.height, preset.width, preset.height, paddingPercent);
+		finalCanvas = await compose(preset.width, preset.height, {
+			sx: box.x,
+			sy: box.y,
+			sw: box.width,
+			sh: box.height,
+			dx: layout.dx,
+			dy: layout.dy,
+			dw: layout.dw,
+			dh: layout.dh,
+		});
+	} else {
+		finalCanvas = await compose(fg.width, fg.height, {
+			sx: 0,
+			sy: 0,
+			sw: fg.width,
+			sh: fg.height,
+			dx: 0,
+			dy: 0,
+			dw: fg.width,
+			dh: fg.height,
+		});
+
+		// Trimming only makes sense against a transparent background — a color or
+		// image fill has no "empty margin" left to detect once it's painted in.
+		if (options.background.mode === 'transparent' && options.trimTransparentEdges) {
+			const imageData = get2d(finalCanvas).getImageData(0, 0, finalCanvas.width, finalCanvas.height);
+			const box = computeOpaqueBoundingBox(imageData);
+			if (box && (box.width < finalCanvas.width || box.height < finalCanvas.height)) {
+				const trimmed = createCanvas(box.width, box.height);
+				get2d(trimmed).drawImage(finalCanvas, -box.x, -box.y);
+				finalCanvas = trimmed;
+			}
+		}
+
+		const { maxDimension } = options;
+		if (maxDimension && (finalCanvas.width > maxDimension || finalCanvas.height > maxDimension)) {
+			const scale = maxDimension / Math.max(finalCanvas.width, finalCanvas.height);
+			const resized = createCanvas(Math.round(finalCanvas.width * scale), Math.round(finalCanvas.height * scale));
+			get2d(resized).drawImage(finalCanvas, 0, 0, resized.width, resized.height);
+			finalCanvas = resized;
+		}
+
+		// A photo-size preset dictates the exact final pixel dimensions itself (from mm + DPI),
+		// so it's mutually exclusive with the generic max-dimension resize above in practice —
+		// the component only ever supplies one of the two at a time.
+		if (options.photoSize) {
+			finalCanvas = cropToPhotoSize(finalCanvas, options.photoSize);
 		}
 	}
 
-	if (maxDimension && (finalCanvas.width > maxDimension || finalCanvas.height > maxDimension)) {
-		const scale = maxDimension / Math.max(finalCanvas.width, finalCanvas.height);
-		const resized = document.createElement('canvas');
-		resized.width = Math.round(finalCanvas.width * scale);
-		resized.height = Math.round(finalCanvas.height * scale);
-		const resizedCtx = resized.getContext('2d');
-		if (!resizedCtx) throw new Error('Canvas 2D context unavailable');
-		resizedCtx.drawImage(finalCanvas, 0, 0, resized.width, resized.height);
-		finalCanvas = resized;
+	// JPG không có alpha: vùng trong suốt còn lại được đổ nền trắng.
+	if (needsFlatten(options.format, options.background.mode === 'transparent')) {
+		const flat = createCanvas(finalCanvas.width, finalCanvas.height);
+		const flatCtx = get2d(flat);
+		flatCtx.fillStyle = '#ffffff';
+		flatCtx.fillRect(0, 0, flat.width, flat.height);
+		flatCtx.drawImage(finalCanvas, 0, 0);
+		finalCanvas = flat;
 	}
 
-	// A photo-size preset dictates the exact final pixel dimensions itself (from mm + DPI),
-	// so it's mutually exclusive with the generic max-dimension resize above in practice —
-	// the component only ever supplies one of the two at a time.
-	if (photoSize) {
-		finalCanvas = cropToPhotoSize(finalCanvas, photoSize);
-	}
-
-	return canvasToBlob(finalCanvas, 'image/png');
+	return canvasToBlob(finalCanvas, exportMime(options.format), options.format === 'png' ? undefined : options.quality);
 }
 
 export default function BackgroundRemover({ messages }: { messages: Messages }) {
@@ -314,6 +477,17 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 	const [backgroundImageUrl, setBackgroundImageUrl] = useState<string | null>(null);
 	const [edgeSoftness, setEdgeSoftness] = useState(0);
 	const [trimTransparentEdges, setTrimTransparentEdges] = useState(false);
+	const [gradientFrom, setGradientFrom] = useState('#6366F1');
+	const [gradientTo, setGradientTo] = useState('#EC4899');
+	const [gradientDirection, setGradientDirection] = useState<GradientDirection>('vertical');
+	const [blurAmount, setBlurAmount] = useState(12);
+	const [shadowEnabled, setShadowEnabled] = useState(false);
+	const [shadowSize, setShadowSize] = useState(3);
+	const [shadowOpacity, setShadowOpacity] = useState(0.35);
+	const [outputFormat, setOutputFormat] = useState<ExportFormat>('png');
+	const [exportQuality, setExportQuality] = useState(0.92);
+	const [marketplacePadding, setMarketplacePadding] = useState(8);
+	const [editingId, setEditingId] = useState<string | null>(null);
 	const [resizeEnabled, setResizeEnabled] = useState(false);
 	const [maxDimension, setMaxDimension] = useState(DEFAULT_MAX_DIMENSION);
 	// 'none' keeps today's behavior untouched (free crop via the generic resize toggle
@@ -351,9 +525,21 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 	// choice or edge softness changes — cheap canvas work, so there's no need
 	// to re-run the (much more expensive) AI segmentation model again.
 	const activePhotoSizePreset = PHOTO_SIZE_PRESETS.find((preset) => preset.id === photoSizePresetId);
+	const activeMarketplace = MARKETPLACE_PRESETS.find((preset) => `mp-${preset.id}` === photoSizePresetId);
+	// Preset ảnh thẻ hoặc marketplace: cả hai tự quyết kích thước đầu ra nên loại trừ trim/resize chung.
+	const hasSizePreset = !!(activePhotoSizePreset || activeMarketplace);
+	const editVersionSum = items.reduce((sum, item) => sum + item.editVersion, 0);
 
 	useEffect(() => {
-		const background = { mode: backgroundMode, color: backgroundColor, imageUrl: backgroundImageUrl };
+		const background: DisplayBackground = {
+			mode: backgroundMode,
+			color: backgroundColor,
+			imageUrl: backgroundImageUrl,
+			gradientFrom,
+			gradientTo,
+			gradientDirection,
+			blurAmount,
+		};
 		const photoSize: PhotoSizeOptions | undefined = activePhotoSizePreset
 			? {
 					widthMm: activePhotoSizePreset.widthMm,
@@ -368,17 +554,24 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 			void (async () => {
 				for (const snapshotItem of itemsRef.current) {
 					if (cancelled) return;
-					if (snapshotItem.status !== 'done' || !snapshotItem.resultBlob) continue;
+					const source = snapshotItem.editedBlob ?? snapshotItem.resultBlob;
+					if (snapshotItem.status !== 'done' || !source) continue;
 					try {
-						const displayBlob = await buildDisplayBlob(
-							snapshotItem.resultBlob,
+						const displayBlob = await buildDisplayBlob(source, {
 							edgeSoftness,
 							background,
+							originalUrl: snapshotItem.previewUrl,
 							// Preset ảnh thẻ tự cắt đúng tỉ lệ/kích thước nên bỏ qua trim để khung không bị lệch.
-							trimTransparentEdges && !photoSize,
-							photoSize ? undefined : resizeEnabled ? maxDimension : undefined,
+							trimTransparentEdges: trimTransparentEdges && !hasSizePreset,
+							maxDimension: hasSizePreset ? undefined : resizeEnabled ? maxDimension : undefined,
 							photoSize,
-						);
+							marketplace: activeMarketplace
+								? { preset: activeMarketplace, paddingPercent: marketplacePadding }
+								: undefined,
+							shadow: shadowEnabled ? { sizePercent: shadowSize, opacity: shadowOpacity } : undefined,
+							format: outputFormat,
+							quality: exportQuality,
+						});
 						if (cancelled) return;
 						// Item có thể đã bị xoá trong lúc dựng ảnh: không tạo URL mồ côi.
 						if (!itemsRef.current.some((it) => it.id === snapshotItem.id)) continue;
@@ -387,7 +580,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 							prev.map((it) => {
 								if (it.id !== snapshotItem.id) return it;
 								untrackAndRevoke(it.displayUrl);
-								return { ...it, displayUrl };
+								return { ...it, displayUrl, displayExt: exportExtension(outputFormat) };
 							}),
 						);
 					} catch {
@@ -405,6 +598,10 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 		backgroundMode,
 		backgroundColor,
 		backgroundImageUrl,
+		gradientFrom,
+		gradientTo,
+		gradientDirection,
+		blurAmount,
 		edgeSoftness,
 		trimTransparentEdges,
 		resizeEnabled,
@@ -412,13 +609,37 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 		photoSizePresetId,
 		photoSizeDpi,
 		photoSizeVerticalOffset,
+		marketplacePadding,
+		shadowEnabled,
+		shadowSize,
+		shadowOpacity,
+		outputFormat,
+		exportQuality,
+		editVersionSum,
 		items.filter((i) => i.status === 'done').length,
 	]);
+
+	// Giải mã HEIC (heic2any nạp lazy) một lần cho mỗi item; dùng chung cho preview và bước xoá nền.
+	const decodePromises = useRef(new Map<string, Promise<File>>());
+	const getDecodedSource = useCallback((item: ImageItem): Promise<File> => {
+		if (!isHeicLike(item.file)) return Promise.resolve(item.file);
+		let promise = decodePromises.current.get(item.id);
+		if (!promise) {
+			promise = (async () => {
+				const { default: heic2any } = await import('heic2any');
+				const result = await heic2any({ blob: item.file, toType: 'image/png' });
+				const blob = Array.isArray(result) ? result[0] : result;
+				return new File([blob], baseNameOf(item.file.name, 'image') + '.png', { type: 'image/png' });
+			})();
+			decodePromises.current.set(item.id, promise);
+		}
+		return promise;
+	}, []);
 
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList) return;
 		const allFiles = Array.from(fileList);
-		const imageFiles = allFiles.filter((file) => ACCEPTED_TYPES.has(file.type));
+		const imageFiles = allFiles.filter((file) => isAcceptedInput(file));
 		setSkippedCount(allFiles.length - imageFiles.length);
 		const newItems: ImageItem[] = imageFiles.map((file) => ({
 			id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
@@ -426,9 +647,30 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 			previewUrl: trackUrl(URL.createObjectURL(file)),
 			status: 'pending' as const,
 			comparePosition: 50,
+			editVersion: 0,
 		}));
 		setItems((prev) => [...prev, ...newItems]);
-	}, []);
+
+		// HEIC: trình duyệt không hiển thị được <img> trực tiếp -> thay preview bằng bản PNG đã giải mã.
+		void (async () => {
+			for (const item of newItems.filter((it) => isHeicLike(it.file))) {
+				try {
+					const decoded = await getDecodedSource(item);
+					if (!itemsRef.current.some((it) => it.id === item.id)) continue;
+					const decodedUrl = trackUrl(URL.createObjectURL(decoded));
+					setItems((prev) =>
+						prev.map((it) => {
+							if (it.id !== item.id) return it;
+							untrackAndRevoke(it.previewUrl);
+							return { ...it, previewUrl: decodedUrl };
+						}),
+					);
+				} catch {
+					/* giữ preview gốc; lỗi sẽ báo khi xử lý */
+				}
+			}
+		})();
+	}, [getDecodedSource]);
 
 	const handleRemoveItem = useCallback((id: string) => {
 		const removed = itemsRef.current.find((item) => item.id === id);
@@ -485,7 +727,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 					),
 				);
 				try {
-					const resultBlob = await removeBackground(item.file, {
+					const resultBlob = await removeBackground(await getDecodedSource(item), {
 						output: { format: 'image/png' },
 						// `key` is namespaced by the library itself: "fetch:*" while
 						// downloading the model/wasm runtime, "compute:*" while actually
@@ -533,7 +775,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 		const url = item.displayUrl ?? URL.createObjectURL(item.resultBlob);
 		const link = document.createElement('a');
 		link.href = url;
-		link.download = `${baseNameOf(item.file.name, 'image')}-no-bg.png`;
+		link.download = `${baseNameOf(item.file.name, 'image')}-no-bg.${item.displayExt ?? 'png'}`;
 		link.click();
 		if (!item.displayUrl) URL.revokeObjectURL(url);
 	}, []);
@@ -551,7 +793,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 				// softness applied) over the raw AI cutout, matching what the
 				// single-item Download button already does.
 				const blob = item.displayUrl ? await (await fetch(item.displayUrl)).blob() : item.resultBlob!;
-				zip.file(dedupeName(`${baseNameOf(item.file.name, 'image')}-no-bg.png`, usedNames), blob);
+				zip.file(dedupeName(`${baseNameOf(item.file.name, 'image')}-no-bg.${item.displayExt ?? 'png'}`, usedNames), blob);
 			}
 			const zipBlob = await zip.generateAsync({ type: 'blob' });
 			const url = URL.createObjectURL(zipBlob);
@@ -600,8 +842,8 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 					<input
 						id="background-remover-input"
 						type="file"
-						accept="image/jpeg,image/png,image/webp"
-						multiple
+						accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
+							multiple
 						className="sr-only"
 						onChange={(event) => {
 							handleFiles(event.target.files);
@@ -660,8 +902,24 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 							className="h-11 w-11 cursor-pointer sm:h-7 sm:w-10 rounded border border-border bg-background"
 						/>
 					)}
-					<label
-						className={`inline-flex min-h-11 cursor-pointer items-center rounded-md border px-2.5 py-1 text-xs font-medium focus-within:ring-3 focus-within:ring-ring/50 sm:min-h-0 ${backgroundMode === 'image' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
+					<button
+							type="button"
+							onClick={() => setBackgroundMode('gradient')}
+							aria-pressed={backgroundMode === 'gradient'}
+							className={`min-h-11 rounded-md border px-2.5 py-1 text-xs sm:min-h-0 font-medium ${backgroundMode === 'gradient' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
+						>
+							{messages.backgroundGradient}
+						</button>
+						<button
+							type="button"
+							onClick={() => setBackgroundMode('blur')}
+							aria-pressed={backgroundMode === 'blur'}
+							className={`min-h-11 rounded-md border px-2.5 py-1 text-xs sm:min-h-0 font-medium ${backgroundMode === 'blur' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
+						>
+							{messages.backgroundBlur}
+						</button>
+						<label
+							className={`inline-flex min-h-11 cursor-pointer items-center rounded-md border px-2.5 py-1 text-xs font-medium focus-within:ring-3 focus-within:ring-ring/50 sm:min-h-0 ${backgroundMode === 'image' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
 					>
 						{backgroundImageUrl ? messages.backgroundImage : messages.backgroundImageSelect}
 						<input
@@ -693,6 +951,97 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 					)}
 				</div>
 
+				{backgroundMode === 'gradient' && (
+					<div className="flex flex-wrap items-center gap-3">
+						<label className="flex items-center gap-1.5 text-sm text-foreground">
+							{messages.gradientFromLabel}
+							<input
+								type="color"
+								value={gradientFrom}
+								onChange={(event) => setGradientFrom(event.target.value)}
+								className="h-9 w-10 cursor-pointer rounded border border-border bg-background"
+							/>
+						</label>
+						<label className="flex items-center gap-1.5 text-sm text-foreground">
+							{messages.gradientToLabel}
+							<input
+								type="color"
+								value={gradientTo}
+								onChange={(event) => setGradientTo(event.target.value)}
+								className="h-9 w-10 cursor-pointer rounded border border-border bg-background"
+							/>
+						</label>
+						<label htmlFor="background-remover-gradient-direction" className="text-sm text-foreground">
+							{messages.gradientDirectionLabel}
+						</label>
+						<select
+							id="background-remover-gradient-direction"
+							value={gradientDirection}
+							onChange={(event) => setGradientDirection(event.target.value as GradientDirection)}
+							className="min-h-9 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+						>
+							<option value="vertical">{messages.directionVertical}</option>
+							<option value="horizontal">{messages.directionHorizontal}</option>
+							<option value="diagonal">{messages.directionDiagonal}</option>
+						</select>
+					</div>
+				)}
+
+				{backgroundMode === 'blur' && (
+					<div className="flex items-center gap-3">
+						<label htmlFor="background-remover-blur" className="shrink-0 text-sm text-foreground">
+							{messages.blurAmountLabel.replace('{{value}}', String(blurAmount))}
+						</label>
+						<input
+							id="background-remover-blur"
+							type="range"
+							min={1}
+							max={30}
+							step={1}
+							value={blurAmount}
+							onChange={(event) => setBlurAmount(Number(event.target.value))}
+							className="w-48"
+						/>
+					</div>
+				)}
+
+				<div className="flex flex-col gap-2">
+					<label className="flex min-h-9 items-center gap-1.5 text-sm text-foreground">
+						<input type="checkbox" checked={shadowEnabled} onChange={(event) => setShadowEnabled(event.target.checked)} />
+						{messages.shadowToggle}
+					</label>
+					{shadowEnabled && (
+						<div className="flex flex-wrap items-center gap-3">
+							<label htmlFor="background-remover-shadow-size" className="shrink-0 text-sm text-foreground">
+								{messages.shadowSizeLabel.replace('{{value}}', String(shadowSize))}
+							</label>
+							<input
+								id="background-remover-shadow-size"
+								type="range"
+								min={1}
+								max={10}
+								step={0.5}
+								value={shadowSize}
+								onChange={(event) => setShadowSize(Number(event.target.value))}
+								className="w-40"
+							/>
+							<label htmlFor="background-remover-shadow-opacity" className="shrink-0 text-sm text-foreground">
+								{messages.shadowOpacityLabel.replace('{{value}}', String(Math.round(shadowOpacity * 100)))}
+							</label>
+							<input
+								id="background-remover-shadow-opacity"
+								type="range"
+								min={0.1}
+								max={0.8}
+								step={0.05}
+								value={shadowOpacity}
+								onChange={(event) => setShadowOpacity(Number(event.target.value))}
+								className="w-40"
+							/>
+						</div>
+					)}
+				</div>
+
 				<div className="flex items-center gap-3">
 					<label htmlFor="edge-softness" className="shrink-0 text-sm text-foreground">
 						{messages.edgeSoftnessLabel}: {edgeSoftness}px
@@ -709,7 +1058,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 					/>
 				</div>
 
-				{backgroundMode === 'transparent' && !activePhotoSizePreset && (
+				{backgroundMode === 'transparent' && !hasSizePreset && (
 					<label className="flex items-center gap-1.5 text-sm text-foreground">
 						<input
 							type="checkbox"
@@ -727,16 +1076,56 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 					<select
 						id="background-remover-photo-size"
 						value={photoSizePresetId}
-						onChange={(event) => setPhotoSizePresetId(event.target.value)}
+						onChange={(event) => {
+								const value = event.target.value;
+								setPhotoSizePresetId(value);
+								// Amazon yêu cầu nền trắng tinh: nếu đang để trong suốt thì chuyển sang màu trắng (đổi lại được).
+								const market = MARKETPLACE_PRESETS.find((preset) => `mp-${preset.id}` === value);
+								if (market?.recommendedBackground && backgroundMode === 'transparent') {
+									setBackgroundMode('color');
+									setBackgroundColor(market.recommendedBackground);
+								}
+							}}
 						className="w-fit max-w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-sm text-foreground"
 					>
 						<option value="none">{messages.photoSizeNone}</option>
-						{PHOTO_SIZE_PRESETS.map((preset) => (
-							<option key={preset.id} value={preset.id}>
-								{messages[preset.labelKey]}
-							</option>
-						))}
+						<optgroup label={messages.photoSizeGroup}>
+							{PHOTO_SIZE_PRESETS.map((preset) => (
+								<option key={preset.id} value={preset.id}>
+									{messages[preset.labelKey]}
+								</option>
+							))}
+						</optgroup>
+						<optgroup label={messages.marketplaceGroup}>
+							<option value="mp-amazon">{messages.marketplaceAmazon}</option>
+							<option value="mp-shopee">{messages.marketplaceShopee}</option>
+							<option value="mp-etsy">{messages.marketplaceEtsy}</option>
+						</optgroup>
 					</select>
+					{activeMarketplace && (
+						<>
+							<div className="flex items-center gap-3">
+								<label htmlFor="background-remover-marketplace-padding" className="shrink-0 text-sm text-foreground">
+									{messages.marketplacePaddingLabel.replace('{{value}}', String(marketplacePadding))}
+								</label>
+								<input
+									id="background-remover-marketplace-padding"
+									type="range"
+									min={0}
+									max={25}
+									step={1}
+									value={marketplacePadding}
+									onChange={(event) => setMarketplacePadding(Number(event.target.value))}
+									className="w-48"
+								/>
+							</div>
+							<p className="text-xs text-muted-foreground">
+								{messages.marketplaceHint
+									.replace('{{width}}', String(activeMarketplace.width))
+									.replace('{{height}}', String(activeMarketplace.height))}
+							</p>
+						</>
+					)}
 					{activePhotoSizePreset && (
 						<>
 							<div className="flex items-center gap-3">
@@ -778,8 +1167,8 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 					)}
 				</div>
 
-				{!activePhotoSizePreset && (
-					<div className="flex flex-col gap-2">
+				{!hasSizePreset && (
+						<div className="flex flex-col gap-2">
 						<label className="flex items-center gap-1.5 text-sm text-foreground">
 							<input
 								type="checkbox"
@@ -806,6 +1195,42 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 							</div>
 						)}
 					</div>
+				)}
+			</div>
+
+			<div className="flex flex-wrap items-center gap-3">
+				<label htmlFor="background-remover-format" className="shrink-0 text-sm font-medium text-foreground">
+					{messages.formatLabel}
+				</label>
+				<select
+					id="background-remover-format"
+					value={outputFormat}
+					onChange={(event) => setOutputFormat(event.target.value as ExportFormat)}
+					className="min-h-9 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+				>
+					<option value="png">PNG</option>
+					<option value="webp">WebP</option>
+					<option value="jpg">JPG</option>
+				</select>
+				{outputFormat !== 'png' && (
+					<>
+						<label htmlFor="background-remover-export-quality" className="shrink-0 text-sm text-foreground">
+							{messages.qualityLabel.replace('{{value}}', String(Math.round(exportQuality * 100)))}
+						</label>
+						<input
+							id="background-remover-export-quality"
+							type="range"
+							min={0.5}
+							max={1}
+							step={0.01}
+							value={exportQuality}
+							onChange={(event) => setExportQuality(Number(event.target.value))}
+							className="w-40"
+						/>
+					</>
+				)}
+				{outputFormat === 'jpg' && backgroundMode === 'transparent' && (
+					<p className="w-full text-xs text-muted-foreground">{messages.jpgFlattenNote}</p>
 				)}
 			</div>
 
@@ -841,7 +1266,12 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 								</div>
 							)}
 							<div className="flex min-w-0 flex-1 flex-col gap-1">
-								<span className="truncate text-foreground">{item.file.name}</span>
+								<span className="truncate text-foreground">
+										{item.file.name}
+										{item.editedBlob && (
+											<span className="ml-2 rounded bg-primary/10 px-1.5 py-0.5 text-[11px] text-primary">{messages.editedBadge}</span>
+										)}
+									</span>
 								{item.status === 'processing' && (
 									<span role="status" className="flex items-center gap-2 text-muted-foreground">
 										{item.stage === 'loading-model'
@@ -859,10 +1289,39 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 							</div>
 							<div className="flex shrink-0 items-center gap-2">
 								{item.status === 'done' && item.resultBlob && (
-									<Button type="button" size="sm" onClick={() => handleDownload(item)}>
-										{messages.download}
-									</Button>
-								)}
+										<Button type="button" size="sm" onClick={() => handleDownload(item)}>
+											{messages.download}
+										</Button>
+									)}
+									{item.status === 'done' && item.resultBlob && (
+										<Button
+											type="button"
+											size="sm"
+											variant="outline"
+											className="min-h-9"
+											onClick={() => setEditingId(item.id)}
+											disabled={isProcessing}
+										>
+											{messages.editMask}
+										</Button>
+									)}
+									{item.editedBlob && (
+										<Button
+											type="button"
+											size="sm"
+											variant="ghost"
+											className="min-h-9"
+											onClick={() =>
+												setItems((prev) =>
+													prev.map((it) =>
+														it.id === item.id ? { ...it, editedBlob: undefined, editVersion: it.editVersion + 1 } : it,
+													),
+												)
+											}
+										>
+											{messages.resetEdits}
+										</Button>
+									)}
 								{item.status === 'error' && (
 									<Button type="button" size="sm" variant="outline" onClick={() => handleRetryItem(item.id)}>
 										{messages.retryItem}
@@ -883,6 +1342,29 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 					))}
 				</ul>
 			)}
+
+			{editingId &&
+				(() => {
+					const editing = items.find((it) => it.id === editingId);
+					const cutout = editing?.editedBlob ?? editing?.resultBlob;
+					if (!editing || !cutout) return null;
+					return (
+						<BackgroundMaskEditor
+							messages={messages}
+							originalUrl={editing.previewUrl}
+							cutoutBlob={cutout}
+							onCancel={() => setEditingId(null)}
+							onApply={(blob) => {
+								setItems((prev) =>
+									prev.map((it) =>
+										it.id === editing.id ? { ...it, editedBlob: blob, editVersion: it.editVersion + 1 } : it,
+									),
+								);
+								setEditingId(null);
+							}}
+						/>
+					);
+				})()}
 
 			<div className="flex flex-wrap items-center gap-3">
 				<Button type="button" onClick={() => void handleRemove(true)} disabled={!canRemove}>

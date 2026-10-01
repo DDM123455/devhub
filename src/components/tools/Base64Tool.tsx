@@ -8,6 +8,8 @@ import {
 	extractDataUri,
 	fromUrlSafeOrStandard,
 } from '@/lib/base64';
+import { analyzeBase64, mapLinesSafe, prettyPrintIfJson } from '@/lib/base64-extra';
+import Base64Advanced, { type Base64ExtraMessages } from './Base64Advanced';
 import { useCopyToClipboard } from './useCopyToClipboard';
 
 const MAX_FILE_BYTES = 20 * 1024 * 1024;
@@ -75,10 +77,11 @@ interface Messages {
 	copyFieldAria: string;
 	removeFileAria: string;
 	downloadAria: string;
+	x: Base64ExtraMessages;
 }
 
 type Mode = 'encode' | 'decode';
-type Tab = 'text' | 'file';
+type Tab = 'text' | 'file' | 'advanced';
 
 const EXTENSION_BY_MIME: Record<string, string> = {
 	'image/png': 'png',
@@ -153,16 +156,42 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 	const [urlSafe, setUrlSafe] = useState(false);
 	const [lineWrap, setLineWrap] = useState(false);
 	const [decodeEncoding, setDecodeEncoding] = useState<TextDecodeEncoding>('utf-8');
+	const [lineMode, setLineMode] = useState(false);
+	const [prettyJson, setPrettyJson] = useState(false);
 
 	const { textOutput, textError } = useMemo(() => {
 		if (textInput === '') return { textOutput: '', textError: null as string | null };
+		if (lineMode) {
+			// Each non-empty line is encoded/decoded on its own; failing lines are marked, not fatal.
+			const output = mapLinesSafe(
+				textInput,
+				(line) => {
+					if (mode === 'encode') return encodeText(line, urlSafe, false);
+					const decoded = decodeText(line, decodeEncoding);
+					if (!decoded.ok) throw new Error(decoded.reason);
+					return decoded.text;
+				},
+				(line) => `${messages.x.lineError}: ${line}`,
+			);
+			return { textOutput: output, textError: null as string | null };
+		}
 		if (mode === 'encode') {
 			return { textOutput: encodeText(textInput, urlSafe, lineWrap), textError: null as string | null };
 		}
 		const result = decodeText(textInput, decodeEncoding);
-		if (result.ok) return { textOutput: result.text, textError: null as string | null };
+		if (result.ok) {
+			const pretty = prettyJson ? prettyPrintIfJson(result.text) : null;
+			return { textOutput: pretty ?? result.text, textError: null as string | null };
+		}
 		return { textOutput: '', textError: result.reason === 'notText' ? messages.decodeNotText : messages.decodeError };
-	}, [textInput, mode, urlSafe, lineWrap, decodeEncoding, messages.decodeError, messages.decodeNotText]);
+	}, [textInput, mode, urlSafe, lineWrap, decodeEncoding, lineMode, prettyJson, messages.decodeError, messages.decodeNotText, messages.x.lineError]);
+
+	const analysis = useMemo(() => (mode === 'decode' && textInput.trim() !== '' && !lineMode ? analyzeBase64(textInput) : null), [mode, textInput, lineMode]);
+	const decodedLooksLikeJson = useMemo(() => {
+		if (mode !== 'decode' || lineMode || textInput.trim() === '') return false;
+		const result = decodeText(textInput, decodeEncoding);
+		return result.ok && prettyPrintIfJson(result.text) !== null;
+	}, [mode, lineMode, textInput, decodeEncoding]);
 
 	const handleSwap = () => {
 		setMode((m) => (m === 'encode' ? 'decode' : 'encode'));
@@ -276,6 +305,9 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 				<Button type="button" size="sm" variant={tab === 'file' ? 'default' : 'outline'} aria-pressed={tab === 'file'} onClick={() => setTab('file')}>
 					{messages.fileTabLabel}
 				</Button>
+				<Button type="button" size="sm" variant={tab === 'advanced' ? 'default' : 'outline'} aria-pressed={tab === 'advanced'} onClick={() => setTab('advanced')}>
+					{messages.x.tabAdvanced}
+				</Button>
 			</div>
 
 			{tab === 'text' && (
@@ -319,6 +351,16 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 									disabled={urlSafe}
 								/>
 								{messages.lineWrapLabel}
+							</label>
+						)}
+						<label className="flex min-h-9 items-center gap-1.5 text-sm text-muted-foreground">
+							<input type="checkbox" checked={lineMode} onChange={(e) => setLineMode(e.target.checked)} />
+							{messages.x.lineByLine}
+						</label>
+						{mode === 'decode' && decodedLooksLikeJson && (
+							<label className="flex min-h-9 items-center gap-1.5 text-sm text-muted-foreground">
+								<input type="checkbox" checked={prettyJson} onChange={(e) => setPrettyJson(e.target.checked)} />
+								{messages.x.prettyJson}
 							</label>
 						)}
 						{mode === 'decode' && (
@@ -376,6 +418,34 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 						/>
 					</div>
 
+					{analysis && (
+						<div className="flex flex-col gap-1 rounded-md border border-border p-2 text-xs" aria-label={messages.x.analysisHeading}>
+							<div className="flex flex-wrap items-center gap-1.5">
+								<span className={analysis.valid ? 'font-medium text-primary' : 'font-medium text-destructive'}>
+									{analysis.valid ? messages.x.validBase64 : messages.x.invalidBase64}
+								</span>
+								{analysis.alphabet === 'standard' && <span className="rounded-full border border-border px-2 py-0.5">{messages.x.alphStandard}</span>}
+								{analysis.alphabet === 'urlsafe' && <span className="rounded-full border border-border px-2 py-0.5">{messages.x.alphUrlSafe}</span>}
+								{analysis.alphabet === 'mixed' && <span className="rounded-full border border-destructive/40 px-2 py-0.5 text-destructive">{messages.x.alphMixed}</span>}
+								{analysis.paddingState === 'present' && <span className="rounded-full border border-border px-2 py-0.5">{messages.x.padPresent}</span>}
+								{analysis.paddingState === 'missing' && <span className="rounded-full border border-border px-2 py-0.5">{messages.x.padMissing}</span>}
+								{analysis.paddingState === 'notNeeded' && <span className="rounded-full border border-border px-2 py-0.5">{messages.x.padNotNeeded}</span>}
+								{analysis.paddingState === 'misplaced' && <span className="rounded-full border border-destructive/40 px-2 py-0.5 text-destructive">{messages.x.padMisplaced}</span>}
+								{analysis.hadWhitespace && <span className="rounded-full border border-border px-2 py-0.5">{messages.x.hadWhitespace}</span>}
+								{analysis.dataUriMime && <span className="rounded-full border border-border px-2 py-0.5">{messages.x.dataUri.replace('{{mime}}', analysis.dataUriMime)}</span>}
+							</div>
+							{analysis.badLength && <p className="text-destructive">{messages.x.badLength}</p>}
+							{analysis.problems.map((problem) => (
+								<p key={problem.index} className="text-destructive">
+									{messages.x.problemAt
+										.replace('{{char}}', problem.char)
+										.replace('{{line}}', String(problem.line))
+										.replace('{{column}}', String(problem.column))
+										.replace('{{index}}', String(problem.index + 1))}
+								</p>
+							))}
+						</div>
+					)}
 					{textError && <p role="alert" className="text-sm text-destructive">{textError}</p>}
 					{textInput !== '' && !textError && (
 						<p className="text-xs text-muted-foreground">
@@ -390,6 +460,8 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 					</div>
 				</div>
 			)}
+
+			{tab === 'advanced' && <Base64Advanced m={messages.x} />}
 
 			{tab === 'file' && (
 				<div className="flex flex-col gap-6">

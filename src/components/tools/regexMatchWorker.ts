@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import { runRegex, type RegexMatchGroup } from '@/lib/regex-match';
+import { runRegex, runRegexTests, type RegexMatchGroup } from '@/lib/regex-match';
 
 export type { RegexMatchGroup };
 
@@ -10,6 +10,8 @@ export interface RegexMatchRequest {
 	flags: string;
 	testString: string;
 	replacement: string;
+	/** Texts for the unit-test panel; each is tested independently. */
+	tests?: string[];
 }
 
 export interface RegexMatchResponse {
@@ -21,6 +23,8 @@ export interface RegexMatchResponse {
 	totalCount: number;
 	countCapped: boolean;
 	replaceResult: string | null;
+	/** One entry per requested test text: did the pattern match anywhere in it? */
+	testResults: boolean[];
 }
 
 /** Sent once when the worker script has been loaded, so the caller's timeout excludes startup time. */
@@ -29,10 +33,11 @@ export interface RegexWorkerReady {
 }
 
 self.onmessage = (event: MessageEvent<RegexMatchRequest>) => {
-	const { requestId, pattern, flags, testString, replacement } = event.data;
+	const { requestId, pattern, flags, testString, replacement, tests } = event.data;
 	try {
 		const result = runRegex(pattern, flags, testString, replacement);
-		postMessage({ requestId, error: null, ...result } satisfies RegexMatchResponse);
+		const testResults = tests && tests.length > 0 ? runRegexTests(pattern, flags, tests) : [];
+		postMessage({ requestId, error: null, ...result, testResults } satisfies RegexMatchResponse);
 	} catch (err) {
 		postMessage({
 			requestId,
@@ -41,6 +46,7 @@ self.onmessage = (event: MessageEvent<RegexMatchRequest>) => {
 			totalCount: 0,
 			countCapped: false,
 			replaceResult: null,
+			testResults: [],
 		} satisfies RegexMatchResponse);
 	}
 };

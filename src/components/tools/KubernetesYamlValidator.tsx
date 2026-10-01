@@ -4,10 +4,12 @@ import {
 	autoFixDeprecatedApiVersions,
 	clearSchemaCache,
 	validateK8sManifests,
+	buildK8sJsonReport,
 	K8S_VERSION_OPTIONS,
 	DEFAULT_K8S_VERSION,
 	type K8sDocumentResult,
 	type K8sIssue,
+	type SecurityFinding,
 } from '@/lib/k8s-yaml-validator';
 import { useCopyToClipboard } from './useCopyToClipboard';
 
@@ -47,6 +49,32 @@ interface Messages {
 	validationFailed: string;
 	fileReadError: string;
 	copyFailed: string;
+	advanced: string;
+	optCrd: string;
+	optSkipUnknown: string;
+	optSecurity: string;
+	optCross: string;
+	securityHeading: string;
+	securityScore: string;
+	securityCritical: string;
+	securityAdvisory: string;
+	securityFixLabel: string;
+	securityAllGood: string;
+	exportReport: string;
+	schemaSourceCrd: string;
+	securityChecks: Record<string, string>;
+	securityFixes: Record<string, string>;
+}
+
+function fill(template: string | undefined, params: Record<string, string | number>, fallback: string): string {
+	if (!template) return fallback;
+	return template.replace(/\{\{(\w+)\}\}/g, (whole, name: string) => String(params[name] ?? whole));
+}
+
+function scoreClass(score: number): string {
+	if (score >= 80) return 'text-emerald-700 dark:text-emerald-400';
+	if (score >= 50) return 'text-amber-700 dark:text-amber-400';
+	return 'text-destructive';
 }
 
 const SAMPLE_MANIFEST = `apiVersion: apps/v1
@@ -93,6 +121,10 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 	const [retryCount, setRetryCount] = useState(0);
 	const [validationFailed, setValidationFailed] = useState(false);
 	const [fileError, setFileError] = useState(false);
+	const [crdCatalog, setCrdCatalog] = useState(true);
+	const [skipUnknownKinds, setSkipUnknownKinds] = useState(false);
+	const [security, setSecurity] = useState(true);
+	const [crossCheck, setCrossCheck] = useState(true);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const requestIdRef = useRef(0);
 
@@ -114,7 +146,7 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 		}
 		setIsValidating(true);
 		const timer = setTimeout(() => {
-			validateK8sManifests(input, k8sVersion)
+			validateK8sManifests(input, k8sVersion, { crdCatalog, skipUnknownKinds, security, crossCheck })
 				.then((result) => {
 					if (requestId !== requestIdRef.current) return;
 					setDocuments(result.documents);
@@ -130,7 +162,7 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 				});
 		}, VALIDATE_DEBOUNCE_MS);
 		return () => clearTimeout(timer);
-	}, [input, k8sVersion, retryCount]);
+	}, [input, k8sVersion, retryCount, crdCatalog, skipUnknownKinds, security, crossCheck]);
 
 	const hasAutoFixableApiVersion = documents.some((doc) => doc.suggestedApiVersion !== null);
 	const fixedManifest = hasAutoFixableApiVersion ? autoFixDeprecatedApiVersions(input) : input;
@@ -149,6 +181,54 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 		if (line === null || !textareaRef.current) return;
 		jumpTextareaToLine(textareaRef.current, line);
 	};
+
+	const handleExportReport = () => {
+		const report = buildK8sJsonReport({ documents }, k8sVersion);
+		const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'kubernetes-validation-report.json';
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+		setTimeout(() => URL.revokeObjectURL(url), 1000);
+	};
+
+	const options: [string, boolean, (v: boolean) => void, string][] = [
+		['k8s-opt-crd', crdCatalog, setCrdCatalog, messages.optCrd],
+		['k8s-opt-skip', skipUnknownKinds, setSkipUnknownKinds, messages.optSkipUnknown],
+		['k8s-opt-security', security, setSecurity, messages.optSecurity],
+		['k8s-opt-cross', crossCheck, setCrossCheck, messages.optCross],
+	];
+
+	const renderFinding = (finding: SecurityFinding, key: number) => (
+		<li key={key} className="rounded-md border border-border p-2.5 text-xs">
+			<button
+				type="button"
+				onClick={() => jumpToLine(finding.line ?? null)}
+				disabled={finding.line == null}
+				className="flex min-h-9 w-full flex-col gap-1 rounded-md text-left enabled:hover:bg-accent disabled:cursor-default"
+			>
+				<div className="flex items-center gap-2">
+					<span
+						className={`rounded px-1.5 py-0.5 font-mono font-semibold ${
+							finding.severity === 'critical' ? 'bg-destructive/15 text-destructive' : 'bg-amber-500/15 text-amber-700 dark:text-amber-400'
+						}`}
+					>
+						{finding.severity === 'critical' ? messages.securityCritical : messages.securityAdvisory}
+					</span>
+					{finding.line != null && (
+						<span className="font-mono text-muted-foreground">{messages.jumpToLine.replace('{{line}}', String(finding.line))}</span>
+					)}
+				</div>
+				<span className="break-words text-foreground">{fill(messages.securityChecks[finding.id], finding.params, finding.id)}</span>
+				<span className="break-words text-muted-foreground">
+					{messages.securityFixLabel} {messages.securityFixes[finding.id] ?? ''}
+				</span>
+			</button>
+		</li>
+	);
 
 	const handleCopyFixed = () => {
 		void copy(fixedManifest);
@@ -214,6 +294,19 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 				</div>
 				<p className="text-xs text-muted-foreground">{messages.dropHint}</p>
 				<p className="text-xs text-muted-foreground">{messages.multiDocHint}</p>
+					<details className="rounded-md border border-border px-3 py-2">
+						<summary className="min-h-9 cursor-pointer text-xs font-medium text-foreground focus-visible:outline-2 focus-visible:outline-ring">
+							{messages.advanced}
+						</summary>
+						<div className="mt-2 flex flex-col gap-2">
+							{options.map(([id, checked, setChecked, label]) => (
+								<label key={id} htmlFor={id} className="flex min-h-9 cursor-pointer items-center gap-2 text-xs text-foreground">
+									<input id={id} type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} className="size-4" />
+									<span className="min-w-0 break-words">{label}</span>
+								</label>
+							))}
+						</div>
+					</details>
 				<textarea
 					id="k8s-yaml-input"
 					ref={textareaRef}
@@ -233,7 +326,12 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 							{copied ? messages.fixApiVersionCopied : copyFailed ? messages.copyFailed : messages.fixApiVersion}
 						</Button>
 					)}
-					{isValidating && <span role="status" className="text-xs text-muted-foreground">{messages.validating}</span>}
+											{documents.length > 0 && (
+							<Button type="button" size="sm" variant="outline" onClick={handleExportReport}>
+								{messages.exportReport}
+							</Button>
+						)}
+						{isValidating && <span role="status" className="text-xs text-muted-foreground">{messages.validating}</span>}
 					{fileError && <span role="alert" className="text-xs text-destructive">{messages.fileReadError}</span>}
 					{validationFailed && <span role="alert" className="text-xs text-destructive">{messages.validationFailed}</span>}
 				</div>
@@ -255,7 +353,10 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 							<span className="text-sm font-medium text-foreground">
 								{messages.documentHeading.replace('{{index}}', String(docIndex + 1))}
 							</span>
-							{doc.kind && (
+															{doc.schemaSource === 'crd' && (
+									<span className="text-xs text-muted-foreground">{messages.schemaSourceCrd}</span>
+								)}
+								{doc.kind && (
 								<span className="rounded-full border border-border bg-muted px-2.5 py-0.5 font-mono text-xs text-foreground">
 									{messages.kindBadge.replace('{{kind}}', doc.kind).replace('{{apiVersion}}', doc.apiVersion ?? '?')}
 								</span>
@@ -311,10 +412,32 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 									</li>
 								))}
 							</ul>
-						)}
-					</div>
-				);
-			})}
+							)}
+							{doc.security && (
+								<div className="mt-2 flex flex-col gap-2 border-t border-border pt-3">
+									<div className="flex flex-wrap items-center justify-between gap-2">
+										<span className="text-sm font-medium text-foreground">{messages.securityHeading}</span>
+										<span role="status" className={`text-xs font-semibold ${scoreClass(doc.security.score)}`}>
+											{messages.securityScore
+												.replace('{{score}}', String(doc.security.score))
+												.replace('{{passed}}', String(doc.security.passed))
+												.replace('{{checked}}', String(doc.security.checked))}
+										</span>
+									</div>
+									{doc.security.findings.length === 0 ? (
+										<p className="text-sm text-emerald-700 dark:text-emerald-400">{messages.securityAllGood}</p>
+									) : (
+										<ul className="flex flex-col gap-2">
+											{[...doc.security.findings]
+												.sort((a, b) => (a.severity === b.severity ? 0 : a.severity === 'critical' ? -1 : 1))
+												.map((finding, i) => renderFinding(finding, i))}
+										</ul>
+									)}
+								</div>
+							)}
+						</div>
+					);
+				})}
 		</div>
 	);
 }

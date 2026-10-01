@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import type { RegexMatchGroup, RegexMatchRequest, RegexMatchResponse, RegexWorkerReady } from './regexMatchWorker';
+import { parseRegexTestCases } from '@/lib/regex-match';
+import { RegexCodePanel, RegexExplainPanel, RegexLibraryPanel, type RegexExtraMessages } from './RegexExtras';
 import { useCopyToClipboard } from './useCopyToClipboard';
 
 function CopyButton({
@@ -78,6 +80,7 @@ interface Messages {
 	copyFailed: string;
 	copyResultAria: string;
 	clearAria: string;
+	x: RegexExtraMessages;
 }
 
 interface FlagState {
@@ -87,9 +90,11 @@ interface FlagState {
 	s: boolean;
 	u: boolean;
 	y: boolean;
+	d: boolean;
+	v: boolean;
 }
 
-const DEFAULT_FLAGS: FlagState = { g: true, i: false, m: false, s: false, u: false, y: false };
+const DEFAULT_FLAGS: FlagState = { g: true, i: false, m: false, s: false, u: false, y: false, d: false, v: false };
 const DEBOUNCE_MS = 300;
 const WORKER_TIMEOUT_MS = 1500;
 const HISTORY_STORAGE_KEY = 'regex-tester-history';
@@ -101,7 +106,7 @@ interface HistoryEntry {
 }
 
 function flagsToString(flags: FlagState): string {
-	return (['g', 'i', 'm', 's', 'u', 'y'] as const).filter((f) => flags[f]).join('');
+	return (['d', 'g', 'i', 'm', 's', 'u', 'v', 'y'] as const).filter((f) => flags[f]).join('');
 }
 
 function flagsFromString(value: string): FlagState {
@@ -112,6 +117,8 @@ function flagsFromString(value: string): FlagState {
 		s: value.includes('s'),
 		u: value.includes('u'),
 		y: value.includes('y'),
+		d: value.includes('d'),
+		v: value.includes('v'),
 	};
 }
 
@@ -143,6 +150,20 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 	const [flags, setFlags] = useState<FlagState>(DEFAULT_FLAGS);
 	const [testString, setTestString] = useState('');
 	const [replacement, setReplacement] = useState('');
+	const [testsSource, setTestsSource] = useState('');
+	// Flags d (hasIndices) and v (unicodeSets) need a recent browser; detected after mount.
+	const [flagSupport, setFlagSupport] = useState({ d: true, v: true });
+	useEffect(() => {
+		const supports = (flag: string) => {
+			try {
+				new RegExp('', flag);
+				return true;
+			} catch {
+				return false;
+			}
+		};
+		setFlagSupport({ d: supports('d'), v: supports('v') });
+	}, []);
 
 	const selectedFlags = flagsToString(flags);
 
@@ -156,6 +177,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 					flags: selectedFlags,
 					test: testString,
 					replacement,
+					...(testsSource.trim() !== '' ? { tests: testsSource } : {}),
 				}).toString()}`
 			: '';
 
@@ -163,6 +185,9 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 	const debouncedFlags = useDebouncedValue(selectedFlags, DEBOUNCE_MS);
 	const debouncedTestString = useDebouncedValue(testString, DEBOUNCE_MS);
 	const debouncedReplacement = useDebouncedValue(replacement, DEBOUNCE_MS);
+	const debouncedTestsSource = useDebouncedValue(testsSource, DEBOUNCE_MS);
+	const testCases = useMemo(() => parseRegexTestCases(debouncedTestsSource), [debouncedTestsSource]);
+	const [testResults, setTestResults] = useState<boolean[]>([]);
 
 	const [matches, setMatches] = useState<RegexMatchGroup[]>([]);
 	const [totalCount, setTotalCount] = useState(0);
@@ -191,6 +216,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 		setFlags(flagsFromString(params.get('flags') ?? ''));
 		setTestString(params.get('test') ?? '');
 		setReplacement(params.get('replacement') ?? '');
+		setTestsSource(params.get('tests') ?? '');
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -277,6 +303,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 			flags: debouncedFlags,
 			testString: debouncedTestString,
 			replacement: debouncedReplacement,
+			tests: testCases.map((c) => c.text),
 		};
 
 		worker.onmessage = (event: MessageEvent<RegexMatchResponse | RegexWorkerReady>) => {
@@ -308,6 +335,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 				setTotalCount(event.data.totalCount);
 				setCountCapped(event.data.countCapped);
 				setReplaceResult(event.data.replaceResult);
+				setTestResults(event.data.testResults);
 				// The matches belong to THIS text — highlighting must not pair them with newer text.
 				setResultText(request.testString);
 			}
@@ -324,7 +352,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 
 		return stopWorker;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [debouncedPattern, debouncedFlags, debouncedTestString, debouncedReplacement]);
+	}, [debouncedPattern, debouncedFlags, debouncedTestString, debouncedReplacement, testCases]);
 
 	const segments = useMemo(() => {
 		if (debouncedPattern === '' || error) return null;
@@ -344,16 +372,45 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 		return parts;
 	}, [matches, resultText, debouncedPattern, error]);
 
-	const flagCheckbox = (key: keyof FlagState, label: string) => (
-		<label className="flex items-center gap-1.5 text-sm text-muted-foreground">
-			<input
-				type="checkbox"
-				checked={flags[key]}
-				onChange={(e) => setFlags((prev) => ({ ...prev, [key]: e.target.checked }))}
-			/>
-			<span className="font-mono">{key}</span> {label}
-		</label>
-	);
+	const flagCheckbox = (key: keyof FlagState, label: string) => {
+		const unsupported = (key === 'd' && !flagSupport.d) || (key === 'v' && !flagSupport.v);
+		return (
+			<label
+				className={`flex min-h-9 items-center gap-1.5 text-sm ${unsupported ? 'text-muted-foreground/60' : 'text-muted-foreground'}`}
+				title={unsupported ? messages.x.flagUnsupported : undefined}
+			>
+				<input
+					type="checkbox"
+					checked={flags[key]}
+					disabled={unsupported}
+					onChange={(e) =>
+						setFlags((prev) => {
+							const next = { ...prev, [key]: e.target.checked };
+							// u and v are mutually exclusive (v is the superset of u).
+							if (e.target.checked && key === 'u') next.v = false;
+							if (e.target.checked && key === 'v') next.u = false;
+							return next;
+						})
+					}
+				/>
+				<span className="font-mono">{key}</span> {label}
+			</label>
+		);
+	};
+
+	const testRows = testCases.map((testCase, index) => ({
+		...testCase,
+		ran: testResults.length === testCases.length,
+		matched: testResults[index],
+	}));
+	const testsPassed = testRows.filter((row) => row.ran && row.matched === row.shouldMatch).length;
+
+	const handlePickLibrary = (entry: { pattern: string; flags: string; sample: string }) => {
+		setPattern(entry.pattern);
+		setFlags(flagsFromString(entry.flags));
+		setTestString(entry.sample);
+		setReplacement('');
+	};
 
 	const cheatItems = [
 		messages.cheat1,
@@ -397,6 +454,8 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 					</div>
 				</div>
 
+				<p className="text-xs text-muted-foreground">{messages.x.engineNote}</p>
+
 				<div className="flex flex-col gap-1">
 					<span className="text-sm font-medium text-foreground">{messages.flagsLabel}</span>
 					<div className="flex flex-wrap gap-4">
@@ -406,6 +465,8 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 						{flagCheckbox('s', messages.flagDotAll)}
 						{flagCheckbox('u', messages.flagUnicode)}
 						{flagCheckbox('y', messages.flagSticky)}
+						{flagCheckbox('d', messages.x.flagHasIndices)}
+						{flagCheckbox('v', messages.x.flagUnicodeSets)}
 					</div>
 				</div>
 
@@ -442,6 +503,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 							setPattern('');
 							setTestString('');
 							setReplacement('');
+							setTestsSource('');
 						}}
 					>
 						{messages.clear}
@@ -510,6 +572,11 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 										{messages.fullMatchLabel}: <span className="text-foreground">{m.fullMatch}</span>{' '}
 										({messages.indexLabel}: {m.index})
 									</div>
+									{m.indices && (
+										<div className="mt-0.5 font-mono text-muted-foreground">
+											{messages.x.indicesLabel}: {m.indices.map((pair) => (pair ? `[${pair[0]}, ${pair[1]}]` : '-')).join(' ')}
+										</div>
+									)}
 									{m.groups.map((group, gi) =>
 										group === undefined ? null : (
 											<div key={gi} className="mt-0.5 font-mono text-muted-foreground">
@@ -567,6 +634,49 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 					)}
 				</div>
 			)}
+
+			<RegexExplainPanel pattern={debouncedPattern} messages={messages.x} />
+
+			<RegexLibraryPanel messages={messages.x} onPick={handlePickLibrary} />
+
+			<div className="flex flex-col gap-2 rounded-lg border border-border p-4">
+				<label htmlFor="regex-tests" className="text-sm font-medium text-foreground">
+					{messages.x.testsHeading}
+				</label>
+				<p className="text-xs text-muted-foreground">{messages.x.testsHelp}</p>
+				<textarea
+					id="regex-tests"
+					value={testsSource}
+					onChange={(e) => setTestsSource(e.target.value)}
+					placeholder={messages.x.testsPlaceholder}
+					rows={4}
+					spellCheck={false}
+					className="w-full rounded-md border border-border bg-background p-3 font-mono text-xs text-foreground"
+				/>
+				{testRows.length > 0 && debouncedPattern !== '' && !error && (
+					<div className="flex flex-col gap-1">
+						<p role="status" className="text-xs font-medium text-foreground">
+							{messages.x.testsSummary.replace('{{pass}}', String(testsPassed)).replace('{{total}}', String(testRows.length))}
+						</p>
+						<ul className="flex flex-col gap-1 font-mono text-xs">
+							{testRows.map((row, i) => {
+								const ok = row.ran && row.matched === row.shouldMatch;
+								return (
+									<li key={i} className="flex flex-wrap items-baseline gap-2">
+										<span className={row.ran ? (ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive') : 'text-muted-foreground'}>
+											{row.ran ? (ok ? '✓ ' + messages.x.testPass : '✗ ' + messages.x.testFail) : messages.x.testRunning}
+										</span>
+										<span className="text-muted-foreground">{row.shouldMatch ? messages.x.testExpectMatch : messages.x.testExpectNoMatch}</span>
+										<span className="text-foreground [overflow-wrap:anywhere]">{row.text}</span>
+									</li>
+								);
+							})}
+						</ul>
+					</div>
+				)}
+			</div>
+
+			<RegexCodePanel pattern={debouncedPattern} flags={debouncedFlags} replacement={debouncedReplacement} messages={messages.x} />
 
 			<div className="flex flex-col gap-2 rounded-lg border border-border p-4">
 				<span className="text-sm font-medium text-foreground">{messages.cheatSheetHeading}</span>

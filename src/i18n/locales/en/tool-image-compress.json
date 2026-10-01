@@ -7,7 +7,7 @@
   "tagline": "Shrink your photos in seconds, right in your browser.",
   "ui": {
     "selectFiles": "Select images",
-    "dropHint": "or drag and drop images here",
+    "dropHint": "or drag and drop images here, or paste with Ctrl+V (JPG, PNG, WebP, GIF, BMP, AVIF, HEIC)",
     "quality": "Quality",
     "compress": "Compress",
     "compressing": "Compressing…",
@@ -32,7 +32,17 @@
     "targetSizeLabel": "Target size: {{size}} KB",
     "processingQueue": "Processing {{current}}/{{total}}",
     "progressPercent": "{{percent}}%",
-    "notReduced": "no size reduction"
+    "notReduced": "no size reduction",
+    "advancedHeading": "Advanced",
+    "deepOptimize": "Deep optimisation (MozJPEG for JPEG, OxiPNG for PNG)",
+    "deepOptimizeHint": "Runs in a Web Worker and loads its WebAssembly encoder only when you use it. Gives smaller files than the default encoder but takes longer. PNG output is always lossless; WebP/AVIF output keeps using the default encoder. GIF keeps only its first frame; HEIC/AVIF/GIF/BMP are saved as JPEG or PNG when the output format is \"Keep original\".",
+    "losslessPng": "Lossless PNG (optimise the original file, no pixel changes, ignores resize)",
+    "oxipngLevel": "OxiPNG effort",
+    "levelFast": "Fast",
+    "levelBalanced": "Balanced",
+    "levelMax": "Maximum (slow)",
+    "metadataNote": "Re-encoding removes metadata (EXIF, GPS, camera info, colour profile) — good for privacy, but keeping metadata is not supported.",
+    "targetNotMet": "Could not reach {{size}} KB even at the lowest quality; this is the smallest result. Try enabling resize."
   },
   "related": "Related tools",
   "faq": {

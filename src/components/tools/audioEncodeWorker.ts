@@ -1,10 +1,14 @@
 /// <reference lib="webworker" />
 
+import { encodeWavPcm, type WavBitDepth } from '../../lib/wav-encode';
+
 export interface EncodeRequest {
 	format: 'mp3' | 'wav';
 	bitrate: number;
 	sampleRate: number;
 	channels: Float32Array[];
+	/** WAV only: 8/16/24 PCM or 32 (IEEE float). Defaults to 16. */
+	bitDepth?: WavBitDepth;
 }
 
 export interface EncodeProgressMessage {
@@ -70,63 +74,16 @@ async function encodeMp3(channels: Int16Array[], sampleRate: number, bitrate: nu
 	return concatUint8Arrays(chunks);
 }
 
-function encodeWav(channels: Int16Array[], sampleRate: number): Uint8Array {
-	const numChannels = Math.min(channels.length, 2);
-	const frameCount = channels[0].length;
-	const bytesPerSample = 2;
-	const blockAlign = numChannels * bytesPerSample;
-	const dataSize = frameCount * blockAlign;
-	const buffer = new ArrayBuffer(44 + dataSize);
-	const view = new DataView(buffer);
-
-	const writeString = (offset: number, str: string) => {
-		for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
-	};
-
-	writeString(0, 'RIFF');
-	view.setUint32(4, 36 + dataSize, true);
-	writeString(8, 'WAVE');
-	writeString(12, 'fmt ');
-	view.setUint32(16, 16, true);
-	view.setUint16(20, 1, true); // PCM
-	view.setUint16(22, numChannels, true);
-	view.setUint32(24, sampleRate, true);
-	view.setUint32(28, sampleRate * blockAlign, true);
-	view.setUint16(32, blockAlign, true);
-	view.setUint16(34, bytesPerSample * 8, true);
-	writeString(36, 'data');
-	view.setUint32(40, dataSize, true);
-
-	let offset = 44;
-	if (numChannels === 2) {
-		const [left, right] = channels;
-		for (let i = 0; i < frameCount; i++) {
-			view.setInt16(offset, left[i], true);
-			offset += 2;
-			view.setInt16(offset, right[i], true);
-			offset += 2;
-		}
-	} else {
-		const mono = channels[0];
-		for (let i = 0; i < frameCount; i++) {
-			view.setInt16(offset, mono[i], true);
-			offset += 2;
-		}
-	}
-
-	return new Uint8Array(buffer);
-}
-
 self.onmessage = async (event: MessageEvent<EncodeRequest>) => {
-	const { format, bitrate, sampleRate, channels } = event.data;
+	const { format, bitrate, sampleRate, channels, bitDepth = 16 } = event.data;
 	try {
-		const pcmChannels = channels.map(floatTo16BitPCM);
 		postMessage({ type: 'progress', percent: 0 } satisfies EncodeProgressMessage);
 		if (format === 'mp3') {
+			const pcmChannels = channels.map(floatTo16BitPCM);
 			const data = await encodeMp3(pcmChannels, sampleRate, bitrate);
 			postMessage({ type: 'done', data, mimeType: 'audio/mpeg' } satisfies EncodeDoneMessage, [data.buffer]);
 		} else {
-			const data = encodeWav(pcmChannels, sampleRate);
+			const data = encodeWavPcm(channels, sampleRate, bitDepth);
 			postMessage({ type: 'progress', percent: 100 } satisfies EncodeProgressMessage);
 			postMessage({ type: 'done', data, mimeType: 'audio/wav' } satisfies EncodeDoneMessage, [data.buffer]);
 		}

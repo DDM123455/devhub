@@ -13,7 +13,9 @@ import {
 	type DiffEntry,
 	type JsonTextWarnings,
 } from '@/lib/json-convert';
+import { decompressFromUrlSafeBase64 } from '@/lib/hash-share';
 import { useCopyToClipboard } from './useCopyToClipboard';
+import JsonAdvancedPanel, { type JsonAdvancedMessages } from './JsonAdvancedPanel';
 
 interface Messages {
 	heading: string;
@@ -49,6 +51,7 @@ interface Messages {
 	copyFailed: string;
 	copyExportAria: string;
 	downloadExportAria: string;
+	adv: JsonAdvancedMessages;
 }
 
 type ExportFormat = 'xml' | 'yaml' | 'csv';
@@ -174,6 +177,17 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 			});
 			editor.set(SAMPLE_JSON);
 			editorRef.current = editor;
+			// Share link: #json=<gzip+base64url> (the hash never leaves the browser).
+			const sharedValue = new URLSearchParams(window.location.hash.slice(1)).get('json');
+			if (sharedValue) {
+				decompressFromUrlSafeBase64(sharedValue)
+					.then((shared) => {
+						if (!cancelled) editor.setText(shared);
+					})
+					.catch(() => {
+						// corrupt or truncated link: keep the sample
+					});
+			}
 		});
 
 		return () => {
@@ -290,6 +304,12 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 					)}
 				</div>
 			)}
+
+			<JsonAdvancedPanel
+				messages={messages.adv}
+				getText={() => editorRef.current?.getText() ?? ''}
+				setText={(text) => editorRef.current?.setText(text)}
+			/>
 
 			<div className="flex flex-col gap-2 rounded-lg border border-border p-4">
 				<span className="text-sm font-medium text-foreground">{messages.exportHeading}</span>

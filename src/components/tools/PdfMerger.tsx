@@ -1,9 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { PDFDocument, degrees } from 'pdf-lib';
+import { PDFDocument, StandardFonts, degrees, rgb } from 'pdf-lib';
 import { renderPdfThumbnails, type PdfPageThumbnail } from '@/lib/pdf-thumbnails';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { combineRotation, isPasswordError } from '@/lib/pdf-utils';
+import { computePdfPlacement, PAGE_SIZES_PT, type PdfPageMode } from '@/lib/image-pdf';
+import {
+	computePageNumberPlacement,
+	isJpegFile,
+	isMergeImageFile,
+	isPdfFile,
+	isPngFile,
+	readJpegOrientation,
+	sortPageGroups,
+	type MergeFileMeta,
+	type MergeSortMode,
+} from '@/lib/pdf-merge-utils';
 
 interface Messages {
 	selectFiles: string;
@@ -26,13 +38,25 @@ interface Messages {
 	fileErrorHeading: string;
 	previewHeading: string;
 	generatingPreview: string;
-	processingQueue: string;
+		processingQueue: string;
+	sortHeading: string;
+	sortNameAsc: string;
+	sortNameDesc: string;
+	sortDateAsc: string;
+	sortDateDesc: string;
+	insertBlankAfter: string;
+	blankPage: string;
+	addPageNumbers: string;
+	imagePageSizeLabel: string;
+	imagePageFit: string;
 }
 
 interface PageItem {
 	id: string;
 	fileId: string;
-	file: File;
+		kind: 'pdf' | 'image' | 'blank';
+	// null cho trang trắng.
+	file: File | null;
 	pageIndex: number;
 	dataUrl: string;
 	rotation: 0 | 90 | 180 | 270;
@@ -57,6 +81,69 @@ function formatBytes(bytes: number): string {
 // is worth flagging before the user waits through a merge that might not finish.
 const LARGE_TOTAL_SIZE_WARNING_BYTES = 200 * 1024 * 1024;
 
+function bitmapHasAlpha(ctx: CanvasRenderingContext2D, w: number, h: number): boolean {
+	const data = ctx.getImageData(0, 0, w, h).data;
+	for (let i = 3; i < data.length; i += 4) if (data[i] < 255) return true;
+	return false;
+}
+
+// Ảnh thumbnail nhỏ (createImageBitmap áp EXIF orientation mặc định ở trình duyệt hiện đại).
+async function renderImageThumbnail(file: File): Promise<string> {
+	const bitmap = await createImageBitmap(file);
+	try {
+		const scale = Math.min(1, 240 / Math.max(bitmap.width, bitmap.height));
+		const canvas = document.createElement('canvas');
+		canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+		canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+		const ctx = canvas.getContext('2d');
+		if (!ctx) throw new Error('2D canvas context unavailable');
+		ctx.fillStyle = '#ffffff';
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+		const url = canvas.toDataURL('image/jpeg', 0.7);
+		canvas.width = 0;
+		canvas.height = 0;
+		return url;
+	} finally {
+		bitmap.close();
+	}
+}
+
+// JPEG gốc không xoay EXIF và PNG được nhúng nguyên bản (không nén lại); các định dạng khác
+// (WebP, GIF, BMP, AVIF, JPEG có EXIF orientation) đi qua canvas -> PNG nếu có alpha, JPEG 0.92 nếu không.
+async function embedImageFile(doc: PDFDocument, file: File) {
+	const bytes = new Uint8Array(await file.arrayBuffer());
+	try {
+		if (isJpegFile(file) && readJpegOrientation(bytes) === 1) return await doc.embedJpg(bytes);
+		if (isPngFile(file)) return await doc.embedPng(bytes);
+	} catch {
+		/* rơi xuống đường canvas */
+	}
+	const bitmap = await createImageBitmap(file);
+	try {
+		const canvas = document.createElement('canvas');
+		canvas.width = bitmap.width;
+		canvas.height = bitmap.height;
+		const ctx = canvas.getContext('2d');
+		if (!ctx) throw new Error('2D canvas context unavailable');
+		ctx.drawImage(bitmap, 0, 0);
+		const alpha = bitmapHasAlpha(ctx, canvas.width, canvas.height);
+		const blob = await new Promise<Blob>((resolve, reject) =>
+			canvas.toBlob(
+				(b) => (b ? resolve(b) : reject(new Error('toBlob null'))),
+				alpha ? 'image/png' : 'image/jpeg',
+				0.92,
+			),
+		);
+		const out = new Uint8Array(await blob.arrayBuffer());
+		canvas.width = 0;
+		canvas.height = 0;
+		return alpha ? await doc.embedPng(out) : await doc.embedJpg(out);
+	} finally {
+		bitmap.close();
+	}
+}
+
 export default function PdfMerger({ messages }: { messages: Messages }) {
 	const [files, setFiles] = useState<FileEntry[]>([]);
 	const [pages, setPages] = useState<PageItem[]>([]);
@@ -67,7 +154,10 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 	const [mergeError, setMergeError] = useState<string | null>(null);
 	const [skippedCount, setSkippedCount] = useState(0);
 	const [previewThumbnails, setPreviewThumbnails] = useState<PdfPageThumbnail[] | null>(null);
-	const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
+		const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
+	const [addNumbers, setAddNumbers] = useState(false);
+	const [imagePageMode, setImagePageMode] = useState<PdfPageMode>('a4');
+
 
 	// Minimal undo for the multi-step page operations below (rotate/remove/
 	// reorder) — a plain array-in-a-ref stack of previous `pages` snapshots,
@@ -99,7 +189,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 		setCanUndo(undoStackRef.current.length > 0);
 		setMergedBlob(null);
 		setPreviewThumbnails(null);
-		setPages((current) => [...previous.pages, ...current.filter((page) => !previous.known.has(page.fileId))]);
+		setPages((current) => [...previous.pages, ...current.filter((page) => page.kind !== 'blank' && !previous.known.has(page.fileId))]);
 	}, []);
 
 	// Ctrl+Z / Cmd+Z anywhere on the tool undoes the last rotate/remove/reorder —
@@ -121,7 +211,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 		if (!fileList) return;
 		const allFiles = Array.from(fileList);
 		const newFiles = allFiles.filter(
-			(file) => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'),
+						(file) => isPdfFile(file) || isMergeImageFile(file),
 		);
 		setSkippedCount(allFiles.length - newFiles.length);
 		if (newFiles.length === 0) return;
@@ -142,8 +232,10 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 		void (async () => {
 			for (const { fileId, file } of entries) {
 				try {
-					const bytes = await file.arrayBuffer();
-					const thumbnails = await renderPdfThumbnails(bytes);
+										const isImage = !isPdfFile(file);
+					const thumbnails: { pageIndex: number; dataUrl: string }[] = isImage
+						? [{ pageIndex: 0, dataUrl: await renderImageThumbnail(file) }]
+						: await renderPdfThumbnails(await file.arrayBuffer());
 					versionRef.current++;
 					knownFileIdsRef.current.add(fileId);
 					setMergedBlob(null);
@@ -153,7 +245,8 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 						...thumbnails.map(
 							(thumb): PageItem => ({
 								id: `${fileId}-${thumb.pageIndex}`,
-								fileId,
+																fileId,
+								kind: isImage ? 'image' : 'pdf',
 								file,
 								pageIndex: thumb.pageIndex,
 								dataUrl: thumb.dataUrl,
@@ -244,6 +337,39 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 		setDragPageId(null);
 	}, [dragPageId, pushUndoSnapshot]);
 
+		const fileMeta = new Map(
+		files.map((f): [string, MergeFileMeta] => [f.id, { name: f.file.name, lastModified: f.file.lastModified }]),
+	);
+	const fileMetaRef = useRef(fileMeta);
+	fileMetaRef.current = fileMeta;
+
+	const handleSort = useCallback((mode: MergeSortMode) => {
+		if (isProcessingRef.current) return;
+		versionRef.current++;
+		setMergedBlob(null);
+		setPreviewThumbnails(null);
+		setPages((prev) => {
+			pushUndoSnapshot(prev);
+			return sortPageGroups(prev, fileMetaRef.current, mode);
+		});
+	}, [pushUndoSnapshot]);
+
+	const handleInsertBlank = useCallback((afterId: string | null) => {
+		if (isProcessingRef.current) return;
+		versionRef.current++;
+		setMergedBlob(null);
+		setPreviewThumbnails(null);
+		const id = `blank-${Math.random().toString(36).slice(2)}`;
+		const blank: PageItem = { id, fileId: id, kind: 'blank', file: null, pageIndex: 0, dataUrl: '', rotation: 0 };
+		setPages((prev) => {
+			pushUndoSnapshot(prev);
+			const index = afterId === null ? prev.length - 1 : prev.findIndex((page) => page.id === afterId);
+			const next = [...prev];
+			next.splice(index + 1, 0, blank);
+			return next;
+		});
+	}, [pushUndoSnapshot]);
+
 	const handleMerge = useCallback(async () => {
 		if (isProcessingRef.current) return;
 		isProcessingRef.current = true;
@@ -259,7 +385,8 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 
 			// Gom theo file: mỗi file chỉ load 1 lần và copyPages 1 lần cho tất cả trang cần dùng.
 			const indexesByFile = new Map<string, { file: File; indexes: number[] }>();
-			for (const pageItem of snapshotPages) {
+						for (const pageItem of snapshotPages) {
+				if (pageItem.kind !== 'pdf' || !pageItem.file) continue;
 				const entry = indexesByFile.get(pageItem.fileId) ?? { file: pageItem.file, indexes: [] };
 				entry.indexes.push(pageItem.pageIndex);
 				indexesByFile.set(pageItem.fileId, entry);
@@ -272,7 +399,27 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 				copied.forEach((page, i) => copiedByKey.set(fileId + ':' + indexes[i], page));
 			}
 
+						const embeddedImages = new Map<string, Awaited<ReturnType<typeof embedImageFile>>>();
 			for (const pageItem of snapshotPages) {
+				if (pageItem.kind === 'blank') {
+					// Trang trắng lấy khổ của trang đứng trước (hoặc A4 nếu ở đầu).
+					const count = mergedDoc.getPageCount();
+					const size = count > 0 ? mergedDoc.getPage(count - 1).getSize() : null;
+					mergedDoc.addPage(size ? [size.width, size.height] : PAGE_SIZES_PT.a4);
+					continue;
+				}
+				if (pageItem.kind === 'image' && pageItem.file) {
+					let image = embeddedImages.get(pageItem.fileId);
+					if (!image) {
+						image = await embedImageFile(mergedDoc, pageItem.file);
+						embeddedImages.set(pageItem.fileId, image);
+					}
+					const place = computePdfPlacement(image.width, image.height, imagePageMode, 0);
+					const imagePage = mergedDoc.addPage([place.pageWidth, place.pageHeight]);
+					imagePage.drawImage(image, { x: place.x, y: place.y, width: place.width, height: place.height });
+					if (pageItem.rotation !== 0) imagePage.setRotation(degrees(pageItem.rotation));
+					continue;
+				}
 				const copiedPage = copiedByKey.get(pageItem.fileId + ':' + pageItem.pageIndex)!;
 				if (pageItem.rotation !== 0) {
 					// Cộng với /Rotate gốc của trang thay vì ghi đè.
@@ -280,6 +427,31 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 				}
 				mergedDoc.addPage(copiedPage);
 			}
+
+			if (addNumbers) {
+				const font = await mergedDoc.embedFont(StandardFonts.Helvetica);
+				const all = mergedDoc.getPages();
+				const fontSize = 10;
+				all.forEach((page, i) => {
+					const text = `${i + 1} / ${all.length}`;
+					const { width, height } = page.getSize();
+					const place = computePageNumberPlacement(
+						width,
+						height,
+						page.getRotation().angle,
+						font.widthOfTextAtSize(text, fontSize),
+					);
+					page.drawText(text, {
+						x: place.x,
+						y: place.y,
+						size: fontSize,
+						font,
+						color: rgb(0.25, 0.25, 0.25),
+						rotate: degrees(place.rotate),
+					});
+				});
+			}
+
 
 			const mergedBytes = await mergedDoc.save();
 			// Người dùng đã đổi danh sách trang trong lúc đang gộp -> kết quả đã cũ, bỏ.
@@ -311,7 +483,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 			isProcessingRef.current = false;
 			setIsProcessing(false);
 		}
-	}, [pages, messages.errorGeneric, messages.passwordProtectedError]);
+	}, [pages, addNumbers, imagePageMode, messages.errorGeneric, messages.passwordProtectedError]);
 
 	const handleDownload = useCallback(() => {
 		if (!mergedBlob) return;
@@ -324,7 +496,8 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 	}, [mergedBlob]);
 
 	const isLoadingAny = files.some((f) => f.status === 'loading');
-	const canMerge = !isProcessing && !isLoadingAny && pages.length >= 2;
+	const canMerge =
+		!isProcessing && !isLoadingAny && (pages.length >= 2 || (pages.length === 1 && pages[0].kind === 'image'));
 	const totalFileSize = files.reduce((sum, f) => sum + f.file.size, 0);
 
 	return (
@@ -349,7 +522,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 					<input
 						id="pdf-merger-input"
 						type="file"
-						accept="application/pdf"
+						accept="application/pdf,image/jpeg,image/png,image/webp,image/gif,image/bmp,image/avif,.pdf,.jpg,.jpeg,.png,.webp"
 						multiple
 						className="sr-only"
 						onChange={(event) => {
@@ -420,8 +593,41 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 							{messages.undo}
 						</Button>
 					</div>
-					<ul className="flex flex-wrap gap-3">
-						{pages.map((page, index) => (
+					<div className="flex flex-wrap items-center gap-2" role="group" aria-label={messages.sortHeading}>
+							<span className="text-xs text-muted-foreground">{messages.sortHeading}:</span>
+							{(
+								[
+									['name-asc', messages.sortNameAsc],
+									['name-desc', messages.sortNameDesc],
+									['date-asc', messages.sortDateAsc],
+									['date-desc', messages.sortDateDesc],
+								] as [MergeSortMode, string][]
+							).map(([mode, label]) => (
+								<Button
+									key={mode}
+									type="button"
+									size="sm"
+									variant="outline"
+									className="min-h-9"
+									disabled={isProcessing || files.length < 2}
+									onClick={() => handleSort(mode)}
+								>
+									{label}
+								</Button>
+							))}
+							<Button
+								type="button"
+								size="sm"
+								variant="outline"
+								className="min-h-9"
+								disabled={isProcessing}
+								onClick={() => handleInsertBlank(null)}
+							>
+								+ {messages.blankPage}
+							</Button>
+						</div>
+						<ul className="flex flex-wrap gap-3">
+							{pages.map((page, index) => (
 							<li
 								key={page.id}
 								draggable={!isProcessing}
@@ -436,17 +642,28 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 								}`}
 							>
 								<div className="relative overflow-hidden rounded bg-muted">
-									<img
-										src={page.dataUrl}
-										alt={`${page.file.name} — page ${page.pageIndex + 1}`}
-										className="w-full"
-										style={{ transform: `rotate(${page.rotation}deg)` }}
-									/>
+									{page.kind === 'blank' ? (
+											<div
+												role="img"
+												aria-label={messages.blankPage}
+												className="flex aspect-[1/1.414] w-full items-center justify-center bg-white text-[10px] text-neutral-400"
+												style={{ transform: `rotate(${page.rotation}deg)` }}
+											>
+												{messages.blankPage}
+											</div>
+										) : (
+											<img
+												src={page.dataUrl}
+												alt={`${page.file?.name ?? ''} — page ${page.pageIndex + 1}`}
+												className="w-full"
+												style={{ transform: `rotate(${page.rotation}deg)` }}
+											/>
+										)}
 									<span className="absolute bottom-1 right-1 rounded bg-black/60 px-1 text-[11px] font-medium text-white">
 										{index + 1}
 									</span>
 								</div>
-								<div className="flex items-center justify-between gap-0.5">
+								<div className="flex flex-wrap items-center justify-between gap-0.5">
 									<Button
 										type="button"
 										size="icon-xs"
@@ -476,6 +693,17 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 										onClick={() => handleMove(page.id, 1)}
 									>
 										→
+									</Button>
+									<Button
+										type="button"
+										size="icon-xs"
+										variant="outline"
+										aria-label={`${messages.insertBlankAfter} ${index + 1}`}
+										title={`${messages.insertBlankAfter} ${index + 1}`}
+										disabled={isProcessing}
+										onClick={() => handleInsertBlank(page.id)}
+									>
+										＋
 									</Button>
 									<Button
 										type="button"
@@ -510,6 +738,48 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 							</li>
 						))}
 					</ul>
+				</div>
+			)}
+
+			{pages.length > 0 && (
+				<div className="flex flex-wrap items-center gap-4">
+					<label className="flex min-h-9 items-center gap-1.5 text-sm text-foreground">
+						<input
+							type="checkbox"
+							checked={addNumbers}
+							disabled={isProcessing}
+							onChange={(event) => {
+								versionRef.current++;
+								setMergedBlob(null);
+								setPreviewThumbnails(null);
+								setAddNumbers(event.target.checked);
+							}}
+						/>
+						{messages.addPageNumbers}
+					</label>
+					{pages.some((page) => page.kind === 'image') && (
+						<div className="flex items-center gap-2">
+							<label htmlFor="pdf-merger-image-size" className="text-sm text-foreground">
+								{messages.imagePageSizeLabel}
+							</label>
+							<select
+								id="pdf-merger-image-size"
+								value={imagePageMode}
+								disabled={isProcessing}
+								onChange={(event) => {
+									versionRef.current++;
+									setMergedBlob(null);
+									setPreviewThumbnails(null);
+									setImagePageMode(event.target.value as PdfPageMode);
+								}}
+								className="min-h-9 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+							>
+								<option value="a4">A4</option>
+								<option value="letter">Letter</option>
+								<option value="fit">{messages.imagePageFit}</option>
+							</select>
+						</div>
+					)}
 				</div>
 			)}
 

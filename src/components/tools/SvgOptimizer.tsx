@@ -3,6 +3,7 @@ import { optimize } from 'svgo/browser';
 import { Button } from '@/components/ui/button';
 import { copyTextSafe } from '@/lib/safe-clipboard';
 import { SVG_MAX_BYTES, SVG_WARN_BYTES, buildPreviewDoc, detectSvgRisks, type SvgRisk } from '@/lib/svg-safety';
+import { compressedSize, svgToDataUri, svgToJsx, uniqueFileName } from '@/lib/svg-export';
 
 interface Messages {
 	inputLabel: string;
@@ -82,9 +83,56 @@ interface Messages {
 	largeWarning: string;
 	fileReadError: string;
 	copyFailed: string;
+	gzipLabel: string;
+	brotliLabel: string;
+	copyDataUriBase64: string;
+	copyDataUriEncoded: string;
+	copyJsx: string;
+	compareTab: string;
+	compareSliderLabel: string;
+	compareBefore: string;
+	compareAfter: string;
+	previewBgLabel: string;
+	bgChecker: string;
+	bgWhite: string;
+	bgBlack: string;
+	bgCustom: string;
+	bgCustomColorLabel: string;
+	optTransformPrecisionLabel: string;
+	batchHeading: string;
+	batchDropHint: string;
+	batchFileCount: string;
+	batchSkipped: string;
+	batchTooMany: string;
+	batchTotal: string;
+	batchColName: string;
+	batchColOriginal: string;
+	batchColOptimized: string;
+	batchColSaved: string;
+	batchColStatus: string;
+	batchFailedRow: string;
+	batchDownloadZip: string;
+	batchClear: string;
+	batchZipError: string;
 }
 
-type View = 'preview' | 'code';
+type View = 'preview' | 'code' | 'compare';
+type PreviewBg = 'checker' | 'white' | 'black' | 'custom';
+
+const BATCH_MAX_FILES = 50;
+const BATCH_MAX_TOTAL_BYTES = 20 * 1024 * 1024;
+const DEFAULT_TRANSFORM_PRECISION = 5;
+
+interface OptJob {
+	multipass: boolean;
+	precision: number;
+	transformPrecision: number;
+	removeDimensions: boolean;
+	removeViewBox: boolean;
+	prettify: boolean;
+	removeScripts: boolean;
+	pluginEnabled: Record<string, boolean>;
+}
 
 // Every plugin bundled in SVGO's preset-default (v4), in the order SVGO itself declares
 // them. Each is individually toggleable via preset-default's `overrides` option — passing
@@ -131,6 +179,29 @@ const PRESET_PLUGIN_IDS = [
 ] as const;
 
 type PresetPluginId = (typeof PRESET_PLUGIN_IDS)[number];
+
+// Runs SVGO with the user's settings; throws on malformed SVG. Shared by the single editor and batch mode.
+function runOptimize(svg: string, job: OptJob): string {
+	const overrides: Record<string, false | { transformPrecision: number }> = {};
+	for (const id of PRESET_PLUGIN_IDS) {
+		if (!job.pluginEnabled[id]) overrides[id] = false;
+	}
+	if (job.transformPrecision !== DEFAULT_TRANSFORM_PRECISION) {
+		for (const id of ['convertTransform', 'convertPathData'] as const) {
+			if (job.pluginEnabled[id]) overrides[id] = { transformPrecision: job.transformPrecision };
+		}
+	}
+	return optimize(svg, {
+		multipass: job.multipass,
+		js2svg: job.prettify ? { indent: 2, pretty: true } : undefined,
+		plugins: [
+			{ name: 'preset-default', params: { floatPrecision: job.precision, overrides } },
+			...(job.removeDimensions ? [{ name: 'removeDimensions' as const }] : []),
+			...(job.removeViewBox ? [{ name: 'removeViewBox' as const }] : []),
+			...(job.removeScripts ? [{ name: 'removeScripts' as const }] : []),
+		],
+	}).data;
+}
 
 function messageKeyForPlugin(id: PresetPluginId | 'removeViewBox'): keyof Messages {
 	return (`plugin${id[0].toUpperCase()}${id.slice(1)}`) as keyof Messages;
@@ -200,13 +271,70 @@ function useDebounced<T>(value: T, ms: number): T {
 	return debounced;
 }
 
-function SvgPreview({ svg, title }: { svg: string; title: string }) {
+function previewBgStyle(bg: PreviewBg, custom: string): React.CSSProperties | undefined {
+	if (bg === 'white') return { background: '#ffffff' };
+	if (bg === 'black') return { background: '#000000' };
+	if (bg === 'custom') return { background: custom };
+	return undefined;
+}
+
+function SvgPreview({ svg, title, bg, customBg }: { svg: string; title: string; bg: PreviewBg; customBg: string }) {
 	// sandbox="" blocks scripts; the CSP meta additionally blocks any network access from the SVG.
 	const srcDoc = buildPreviewDoc(svg);
 	return (
 		<div className="relative h-56 w-full overflow-hidden rounded-md border border-border">
-			<div className="absolute inset-0 bg-[repeating-conic-gradient(#d4d4d4_0%_25%,#fff_0%_50%)] bg-[length:14px_14px]" />
+			<div
+				className={`absolute inset-0 ${bg === 'checker' ? 'bg-[repeating-conic-gradient(#d4d4d4_0%_25%,#fff_0%_50%)] bg-[length:14px_14px]' : ''}`}
+				style={previewBgStyle(bg, customBg)}
+			/>
 			<iframe title={title} sandbox="" srcDoc={srcDoc} className="relative h-full w-full" />
+		</div>
+	);
+}
+
+// Before/after slider: both renders are stacked and the optimized one is clipped from the left edge
+// to the slider position, so dragging reveals the original underneath.
+function CompareView({
+	original,
+	optimized,
+	bg,
+	customBg,
+	sliderLabel,
+	beforeLabel,
+	afterLabel,
+}: {
+	original: string;
+	optimized: string;
+	bg: PreviewBg;
+	customBg: string;
+	sliderLabel: string;
+	beforeLabel: string;
+	afterLabel: string;
+}) {
+	const [pos, setPos] = useState(50);
+	return (
+		<div className="flex flex-col gap-2">
+			<div className="relative h-72 w-full overflow-hidden rounded-md border border-border">
+				<div
+					className={`absolute inset-0 ${bg === 'checker' ? 'bg-[repeating-conic-gradient(#d4d4d4_0%_25%,#fff_0%_50%)] bg-[length:14px_14px]' : ''}`}
+					style={previewBgStyle(bg, customBg)}
+				/>
+				<iframe title={beforeLabel} sandbox="" srcDoc={buildPreviewDoc(original)} className="absolute inset-0 h-full w-full" />
+				<iframe
+					title={afterLabel}
+					sandbox=""
+					srcDoc={buildPreviewDoc(optimized)}
+					className="absolute inset-0 h-full w-full"
+					style={{ clipPath: `inset(0 0 0 ${pos}%)`, background: bg === 'checker' ? 'transparent' : undefined }}
+				/>
+				<div className="pointer-events-none absolute inset-y-0 w-0.5 bg-primary" style={{ left: `${pos}%` }} />
+				<span className="pointer-events-none absolute left-2 top-2 rounded bg-background/80 px-1.5 text-xs text-foreground">{beforeLabel}</span>
+				<span className="pointer-events-none absolute right-2 top-2 rounded bg-background/80 px-1.5 text-xs text-foreground">{afterLabel}</span>
+			</div>
+			<label className="flex items-center gap-2 text-sm text-muted-foreground">
+				{sliderLabel}
+				<input type="range" min={0} max={100} value={pos} onChange={(e) => setPos(Number(e.target.value))} className="h-9 flex-1" />
+			</label>
 		</div>
 	);
 }
@@ -223,6 +351,17 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 	const [pluginEnabled, setPluginEnabled] = useState<Record<PresetPluginId, boolean>>(defaultPluginState);
 	const [view, setView] = useState<View>('preview');
 	const [isDragOver, setIsDragOver] = useState(false);
+	const [transformPrecision, setTransformPrecision] = useState(DEFAULT_TRANSFORM_PRECISION);
+	const [previewBg, setPreviewBg] = useState<PreviewBg>('checker');
+	const [customBg, setCustomBg] = useState('#ffcc00');
+	const [batchFiles, setBatchFiles] = useState<Array<{ name: string; text: string }>>([]);
+	const [batchNotice, setBatchNotice] = useState<string | null>(null);
+	const [gzipSizes, setGzipSizes] = useState<{
+		original: number | null;
+		optimized: number | null;
+		brotliOriginal: number | null;
+		brotliOptimized: number | null;
+	} | null>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const togglePlugin = (id: PresetPluginId) => {
@@ -232,8 +371,8 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 	// Everything that feeds SVGO is bundled and debounced together: typing or dragging the
 	// precision slider re-runs the optimizer once things settle, not on every event.
 	const job = useMemo(
-		() => ({ input, multipass, precision, removeDimensions, removeViewBox, prettify, removeScripts, pluginEnabled }),
-		[input, multipass, precision, removeDimensions, removeViewBox, prettify, removeScripts, pluginEnabled],
+		() => ({ input, multipass, precision, transformPrecision, removeDimensions, removeViewBox, prettify, removeScripts, pluginEnabled }),
+		[input, multipass, precision, transformPrecision, removeDimensions, removeViewBox, prettify, removeScripts, pluginEnabled],
 	);
 	const settledJob = useDebounced(job, input === '' ? 0 : 200);
 	const isPending = settledJob !== job;
@@ -244,21 +383,7 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 		if (!looksLikeSvg(trimmed)) return { output: '', error: messages.notSvgError };
 		if (new TextEncoder().encode(trimmed).length > SVG_MAX_BYTES) return { output: '', error: messages.tooLargeError };
 		try {
-			const overrides: Record<string, false> = {};
-			for (const id of PRESET_PLUGIN_IDS) {
-				if (!settledJob.pluginEnabled[id]) overrides[id] = false;
-			}
-			const result = optimize(trimmed, {
-				multipass: settledJob.multipass,
-				js2svg: settledJob.prettify ? { indent: 2, pretty: true } : undefined,
-				plugins: [
-					{ name: 'preset-default', params: { floatPrecision: settledJob.precision, overrides } },
-					...(settledJob.removeDimensions ? [{ name: 'removeDimensions' as const }] : []),
-					...(settledJob.removeViewBox ? [{ name: 'removeViewBox' as const }] : []),
-					...(settledJob.removeScripts ? [{ name: 'removeScripts' as const }] : []),
-				],
-			});
-			return { output: result.data, error: null as string | null };
+			return { output: runOptimize(trimmed, settledJob), error: null as string | null };
 		} catch (err) {
 			return { output: '', error: messages.invalidSvgError.replace('{{message}}', (err as Error).message) };
 		}
@@ -290,19 +415,130 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 	};
 	const hasLargeInput = originalSize > SVG_WARN_BYTES && originalSize <= SVG_MAX_BYTES;
 
-	const handleFile = (files: FileList | null, inputEl?: HTMLInputElement) => {
-		const file = files?.[0];
-		if (inputEl) inputEl.value = '';
-		if (!file) return;
-		setFileError(null);
-		if (file.size > SVG_MAX_BYTES) {
-			setFileError(messages.tooLargeError);
+	// gzip / brotli sizes (Compression Streams API; brotli is shown only when the browser supports it).
+	useEffect(() => {
+		if (!output) {
+			setGzipSizes(null);
 			return;
 		}
-		const reader = new FileReader();
-		reader.onload = () => setInput(String(reader.result ?? ''));
-		reader.onerror = () => setFileError(messages.fileReadError);
-		reader.readAsText(file);
+		let cancelled = false;
+		const source = settledJob.input.trim();
+		void Promise.all([
+			compressedSize(source, 'gzip'),
+			compressedSize(output, 'gzip'),
+			compressedSize(source, 'brotli'),
+			compressedSize(output, 'brotli'),
+		]).then(([original, optimized, brotliOriginal, brotliOptimized]) => {
+			if (!cancelled) setGzipSizes({ original, optimized, brotliOriginal, brotliOptimized });
+		});
+		return () => {
+			cancelled = true;
+		};
+	}, [output, settledJob.input]);
+
+	const dataUriBase64 = useMemo(() => (output ? svgToDataUri(output, 'base64') : ''), [output]);
+	const dataUriEncoded = useMemo(() => (output ? svgToDataUri(output, 'encoded') : ''), [output]);
+	const jsxComponent = useMemo(() => {
+		if (!output) return '';
+		try {
+			return svgToJsx(output);
+		} catch {
+			return '';
+		}
+	}, [output]);
+
+	// Batch mode: runs the same SVGO job over every loaded file.
+	const batchResults = useMemo(
+		() =>
+			batchFiles.map((file) => {
+				const originalBytes = new TextEncoder().encode(file.text).length;
+				if (!looksLikeSvg(file.text)) return { name: file.name, originalBytes, optimizedBytes: 0, output: '', error: messages.notSvgError };
+				try {
+					const out = runOptimize(file.text.trim(), settledJob);
+					return { name: file.name, originalBytes, optimizedBytes: new TextEncoder().encode(out).length, output: out, error: null as string | null };
+				} catch (err) {
+					return { name: file.name, originalBytes, optimizedBytes: 0, output: '', error: messages.invalidSvgError.replace('{{message}}', (err as Error).message) };
+				}
+			}),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[batchFiles, settledJob],
+	);
+	const batchOk = batchResults.filter((r) => r.error === null);
+	const batchTotalOriginal = batchOk.reduce((sum, r) => sum + r.originalBytes, 0);
+	const batchTotalOptimized = batchOk.reduce((sum, r) => sum + r.optimizedBytes, 0);
+
+	const readFileText = (file: File) =>
+		new Promise<string>((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = () => resolve(String(reader.result ?? ''));
+			reader.onerror = () => reject(new Error('read'));
+			reader.readAsText(file);
+		});
+
+	const handleFile = (files: FileList | null, inputEl?: HTMLInputElement) => {
+		const list = files ? Array.from(files) : [];
+		if (inputEl) inputEl.value = '';
+		if (list.length === 0) return;
+		setFileError(null);
+		setBatchNotice(null);
+		if (list.length === 1) {
+			const file = list[0];
+			setBatchFiles([]);
+			if (file.size > SVG_MAX_BYTES) {
+				setFileError(messages.tooLargeError);
+				return;
+			}
+			readFileText(file).then(setInput, () => setFileError(messages.fileReadError));
+			return;
+		}
+		// Several files: batch mode (capped by count and total size).
+		const notices: string[] = [];
+		if (list.length > BATCH_MAX_FILES) notices.push(messages.batchTooMany.replace('{{max}}', String(BATCH_MAX_FILES)));
+		let total = 0;
+		let skipped = 0;
+		const accepted: File[] = [];
+		for (const file of list.slice(0, BATCH_MAX_FILES)) {
+			if (file.size > SVG_MAX_BYTES || total + file.size > BATCH_MAX_TOTAL_BYTES) {
+				skipped += 1;
+				continue;
+			}
+			total += file.size;
+			accepted.push(file);
+		}
+		if (skipped > 0) notices.push(messages.batchSkipped.replace('{{count}}', String(skipped)));
+		void Promise.allSettled(accepted.map(readFileText)).then((results) => {
+			const loaded: Array<{ name: string; text: string }> = [];
+			let failed = 0;
+			results.forEach((res, i) => {
+				if (res.status === 'fulfilled') loaded.push({ name: accepted[i].name, text: res.value });
+				else failed += 1;
+			});
+			if (failed > 0) notices.push(messages.fileReadError);
+			setBatchNotice(notices.length ? notices.join(' ') : null);
+			setBatchFiles(loaded);
+		});
+	};
+
+	const saveBlob = (blob: Blob, name: string) => {
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = name;
+		link.click();
+		setTimeout(() => URL.revokeObjectURL(url), 10000);
+	};
+
+	const handleDownloadZip = async () => {
+		if (batchOk.length === 0) return;
+		try {
+			const { default: JSZip } = await import('jszip');
+			const zip = new JSZip();
+			const used = new Set<string>();
+			for (const r of batchOk) zip.file(uniqueFileName(r.name, used), r.output);
+			saveBlob(await zip.generateAsync({ type: 'blob' }), 'optimized-svgs.zip');
+		} catch {
+			setBatchNotice(messages.batchZipError);
+		}
 	};
 
 	const handleDownload = () => {
@@ -349,6 +585,7 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 							ref={fileInputRef}
 							type="file"
 							accept=".svg,image/svg+xml"
+							multiple
 							className="sr-only"
 							onChange={(e) => handleFile(e.currentTarget.files, e.currentTarget)}
 						/>
@@ -357,7 +594,7 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 						</Button>
 					</div>
 				</div>
-				<p className="text-xs text-muted-foreground">{messages.dropHint}</p>
+				<p className="text-xs text-muted-foreground">{messages.dropHint} {messages.batchDropHint}</p>
 				<textarea
 					id="svg-input"
 					value={input}
@@ -400,6 +637,18 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 					<label className="flex items-center gap-1.5 text-sm text-muted-foreground">
 						<input type="checkbox" checked={removeScripts} onChange={(e) => setRemoveScripts(e.target.checked)} />
 						{messages.optRemoveScripts}
+					</label>
+					<label className="flex items-center gap-1.5 text-sm text-muted-foreground">
+						{messages.optTransformPrecisionLabel.replace('{{value}}', String(transformPrecision))}
+						<input
+							type="range"
+							min={1}
+							max={8}
+							step={1}
+							value={transformPrecision}
+							onChange={(e) => setTransformPrecision(Number(e.target.value))}
+							className="w-24"
+						/>
 					</label>
 					<label className="flex items-center gap-1.5 text-sm text-muted-foreground">
 						{messages.optPrecisionLabel.replace('{{value}}', String(precision))}
@@ -447,33 +696,137 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 				<p role="status" className="text-xs text-muted-foreground">{messages.optimizing}</p>
 			)}
 
+			{batchNotice && <p role="status" className="text-xs text-muted-foreground">{batchNotice}</p>}
+
+			{batchFiles.length > 0 && (
+				<section className="flex flex-col gap-3 rounded-lg border border-border p-4" aria-labelledby="svg-batch-heading">
+					<div className="flex flex-wrap items-center justify-between gap-2">
+						<h2 id="svg-batch-heading" className="text-sm font-medium text-foreground">
+							{messages.batchHeading.replace('{{count}}', String(batchFiles.length))}
+						</h2>
+						<div className="flex gap-2">
+							<Button type="button" size="sm" onClick={() => void handleDownloadZip()} disabled={batchOk.length === 0 || isPending}>
+								{messages.batchDownloadZip}
+							</Button>
+							<Button type="button" size="sm" variant="outline" onClick={() => setBatchFiles([])}>
+								{messages.batchClear}
+							</Button>
+						</div>
+					</div>
+					<div className="overflow-x-auto">
+						<table className="w-full min-w-[420px] text-left text-xs">
+							<thead>
+								<tr className="text-muted-foreground">
+									<th scope="col" className="py-1 pr-2 font-medium">{messages.batchColName}</th>
+									<th scope="col" className="py-1 pr-2 font-medium">{messages.batchColOriginal}</th>
+									<th scope="col" className="py-1 pr-2 font-medium">{messages.batchColOptimized}</th>
+									<th scope="col" className="py-1 font-medium">{messages.batchColSaved}</th>
+								</tr>
+							</thead>
+							<tbody>
+								{batchResults.map((r, i) => (
+									<tr key={`${r.name}-${i}`} className="border-t border-border text-foreground">
+										<td className="max-w-[10rem] truncate py-1 pr-2" title={r.name}>{r.name}</td>
+										<td className="py-1 pr-2">{formatBytes(r.originalBytes)}</td>
+										{r.error ? (
+											<td colSpan={2} className="py-1 text-destructive">{messages.batchFailedRow.replace('{{message}}', r.error)}</td>
+										) : (
+											<>
+												<td className="py-1 pr-2">{formatBytes(r.optimizedBytes)}</td>
+												<td className="py-1">
+													{r.originalBytes > 0 ? `${Math.round((1 - r.optimizedBytes / r.originalBytes) * 100)}%` : '-'}
+												</td>
+											</>
+										)}
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+					{batchOk.length > 0 && (
+						<p className="text-xs text-muted-foreground">
+							{messages.batchTotal
+								.replace('{{original}}', formatBytes(batchTotalOriginal))
+								.replace('{{optimized}}', formatBytes(batchTotalOptimized))
+								.replace('{{percent}}', String(batchTotalOriginal > 0 ? Math.round((1 - batchTotalOptimized / batchTotalOriginal) * 100) : 0))}
+						</p>
+					)}
+				</section>
+			)}
+
 			{input !== '' && !error && (
 				<>
-					<div className="flex items-center gap-2">
+					<div className="flex flex-wrap items-center gap-2">
 						<Button type="button" size="sm" variant={view === 'preview' ? 'default' : 'outline'} aria-pressed={view === 'preview'} onClick={() => setView('preview')}>
 							{messages.previewTab}
+						</Button>
+						<Button type="button" size="sm" variant={view === 'compare' ? 'default' : 'outline'} aria-pressed={view === 'compare'} onClick={() => setView('compare')}>
+							{messages.compareTab}
 						</Button>
 						<Button type="button" size="sm" variant={view === 'code' ? 'default' : 'outline'} aria-pressed={view === 'code'} onClick={() => setView('code')}>
 							{messages.codeTab}
 						</Button>
+						{view !== 'code' && (
+							<div className="ml-auto flex items-center gap-2">
+								<label htmlFor="svg-preview-bg" className="text-xs text-muted-foreground">
+									{messages.previewBgLabel}
+								</label>
+								<select
+									id="svg-preview-bg"
+									value={previewBg}
+									onChange={(e) => setPreviewBg(e.target.value as PreviewBg)}
+									className="min-h-9 rounded-md border border-border bg-background px-2 text-xs text-foreground"
+								>
+									<option value="checker">{messages.bgChecker}</option>
+									<option value="white">{messages.bgWhite}</option>
+									<option value="black">{messages.bgBlack}</option>
+									<option value="custom">{messages.bgCustom}</option>
+								</select>
+								{previewBg === 'custom' && (
+									<input
+										type="color"
+										aria-label={messages.bgCustomColorLabel}
+										value={customBg}
+										onChange={(e) => setCustomBg(e.target.value)}
+										className="h-9 w-12 cursor-pointer rounded-md border border-border bg-background"
+									/>
+								)}
+							</div>
+						)}
 					</div>
 
-					<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+					{view === 'compare' && output && (
+						<CompareView
+							original={settledJob.input}
+							optimized={output}
+							bg={previewBg}
+							customBg={customBg}
+							sliderLabel={messages.compareSliderLabel}
+							beforeLabel={messages.compareBefore}
+							afterLabel={messages.compareAfter}
+						/>
+					)}
+
+					<div className={`grid grid-cols-1 gap-4 md:grid-cols-2 ${view === 'compare' ? 'hidden' : ''}`}>
 						<div className="flex flex-col gap-2">
-							<div className="flex items-center justify-between">
+							<div className="flex items-center justify-between gap-2">
 								<span className="text-sm font-medium text-foreground">{messages.originalHeading}</span>
-								<span className="text-xs text-muted-foreground">{messages.sizeLabel.replace('{{size}}', formatBytes(originalSize))}</span>
+								<span className="text-right text-xs text-muted-foreground">
+									{messages.sizeLabel.replace('{{size}}', formatBytes(originalSize))}
+									{gzipSizes?.original != null && ` · ${messages.gzipLabel.replace('{{size}}', formatBytes(gzipSizes.original))}`}
+									{gzipSizes?.brotliOriginal != null && ` · ${messages.brotliLabel.replace('{{size}}', formatBytes(gzipSizes.brotliOriginal))}`}
+								</span>
 							</div>
 							{view === 'preview' ? (
-								<SvgPreview svg={settledJob.input} title={messages.previewTitleOriginal} />
+								<SvgPreview svg={settledJob.input} title={messages.previewTitleOriginal} bg={previewBg} customBg={customBg} />
 							) : (
 								<textarea readOnly aria-label={messages.originalHeading} value={input} rows={10} className="w-full rounded-md border border-border bg-muted p-2 font-mono text-xs text-foreground" />
 							)}
 						</div>
 						<div className="flex flex-col gap-2">
-							<div className="flex items-center justify-between">
+							<div className="flex items-center justify-between gap-2">
 								<span className="text-sm font-medium text-foreground">{messages.optimizedHeading}</span>
-								<span className={`text-xs ${isLarger ? 'text-destructive' : 'text-muted-foreground'}`}>
+								<span className={`text-right text-xs ${isLarger ? 'text-destructive' : 'text-muted-foreground'}`}>
 									{messages.sizeLabel.replace('{{size}}', formatBytes(optimizedSize))}
 									{output &&
 										` — ${
@@ -481,25 +834,30 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 												? messages.increased.replace('{{percent}}', String(Math.abs(percentDelta)))
 												: messages.reduced.replace('{{percent}}', String(percentDelta))
 										}`}
+									{gzipSizes?.optimized != null && ` · ${messages.gzipLabel.replace('{{size}}', formatBytes(gzipSizes.optimized))}`}
+									{gzipSizes?.brotliOptimized != null && ` · ${messages.brotliLabel.replace('{{size}}', formatBytes(gzipSizes.brotliOptimized))}`}
 								</span>
 							</div>
 							{view === 'preview' ? (
-								<SvgPreview svg={output} title={messages.previewTitleOptimized} />
+								<SvgPreview svg={output} title={messages.previewTitleOptimized} bg={previewBg} customBg={customBg} />
 							) : (
 								<textarea readOnly aria-label={messages.optimizedHeading} value={output} rows={10} className="w-full rounded-md border border-border bg-muted p-2 font-mono text-xs text-foreground" />
 							)}
-							<div className="flex justify-end gap-2">
-								<CopyButton value={output} label={messages.copy} copiedLabel={messages.copied} failedLabel={messages.copyFailed} />
-								<Button type="button" size="sm" onClick={handleDownload} disabled={!output}>
-									{messages.download}
-								</Button>
-							</div>
 						</div>
+					</div>
+					<div className="flex flex-wrap justify-end gap-2">
+						<CopyButton value={output} label={messages.copy} copiedLabel={messages.copied} failedLabel={messages.copyFailed} />
+						<CopyButton value={dataUriBase64} label={messages.copyDataUriBase64} copiedLabel={messages.copied} failedLabel={messages.copyFailed} />
+						<CopyButton value={dataUriEncoded} label={messages.copyDataUriEncoded} copiedLabel={messages.copied} failedLabel={messages.copyFailed} />
+						<CopyButton value={jsxComponent} label={messages.copyJsx} copiedLabel={messages.copied} failedLabel={messages.copyFailed} />
+						<Button type="button" size="sm" onClick={handleDownload} disabled={!output}>
+							{messages.download}
+						</Button>
 					</div>
 				</>
 			)}
 
-			{input === '' && <p className="text-sm text-muted-foreground">{messages.noInput}</p>}
+			{input === '' && batchFiles.length === 0 && <p className="text-sm text-muted-foreground">{messages.noInput}</p>}
 		</div>
 	);
 }

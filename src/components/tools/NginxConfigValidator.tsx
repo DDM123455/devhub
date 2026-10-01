@@ -8,6 +8,7 @@ import {
 	type RewriteSimulationResult,
 } from '@/lib/nginx-parser';
 import type { NginxRegexRequest } from './nginxRegexWorker';
+import { buildNginxJsonReport } from '@/lib/nginx-checks';
 import { useCopyToClipboard } from './useCopyToClipboard';
 import { useWorkerRequest } from './useWorkerRequest';
 import { jumpTextareaToLine } from '@/lib/text-line-utils';
@@ -50,6 +51,7 @@ interface Messages {
 	capturesLabel: string;
 	fileReadError: string;
 	copyFailed: string;
+	exportReport: string;
 }
 
 function formatIssue(issue: NginxIssue, issueMessages: Record<string, string>): string {
@@ -138,6 +140,19 @@ export default function NginxConfigValidator({ messages }: { messages: Messages 
 		if (textareaRef.current) jumpTextareaToLine(textareaRef.current, issue.line);
 	};
 
+	const handleExportReport = () => {
+		const report = buildNginxJsonReport(result.issues, { fragment: result.isFragment });
+		const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'nginx-validation-report.json';
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+		setTimeout(() => URL.revokeObjectURL(url), 1000);
+	};
+
 	const handleCopyFixed = () => {
 		void copy(fixedConfig);
 	};
@@ -204,7 +219,12 @@ export default function NginxConfigValidator({ messages }: { messages: Messages 
 						<input type="checkbox" checked={forceFragment} onChange={(e) => setForceFragment(e.target.checked)} />
 						{messages.fragmentLabel}
 					</label>
-					{hasTrivialFix && (
+					{input.trim() !== '' && (
+							<Button type="button" size="sm" variant="outline" onClick={handleExportReport}>
+								{messages.exportReport}
+							</Button>
+						)}
+						{hasTrivialFix && (
 						<Button type="button" size="sm" variant="secondary" aria-live="polite" onClick={handleCopyFixed}>
 							{copied ? messages.copyFixedCopied : copyFailed ? messages.copyFailed : messages.copyFixed}
 						</Button>

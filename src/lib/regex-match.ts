@@ -5,6 +5,8 @@ export interface RegexMatchGroup {
 	index: number;
 	groups: (string | undefined)[];
 	namedGroups: Record<string, string | undefined> | null;
+	/** [start, end) of the full match and every group — only present when the `d` flag is set. */
+	indices?: Array<[number, number] | null>;
 }
 
 export interface RegexRunResult {
@@ -47,6 +49,13 @@ export function runRegex(
 				index: m.index,
 				groups: m.slice(1),
 				namedGroups: m.groups ? { ...m.groups } : null,
+				...((m as RegExpExecArray & { indices?: Array<[number, number] | undefined> }).indices
+					? {
+							indices: (m as RegExpExecArray & { indices: Array<[number, number] | undefined> }).indices.map((pair) =>
+								pair ? ([pair[0], pair[1]] as [number, number]) : null,
+							),
+						}
+					: {}),
 			});
 		}
 		if (!isGlobal) break;
@@ -70,4 +79,28 @@ export function runRegex(
 		replaceResult = null;
 	}
 	return { matches, totalCount, countCapped, replaceResult };
+}
+
+export interface RegexTestCase {
+	/** The text to test. */
+	text: string;
+	/** true = the pattern must match somewhere in the text; false = it must not. */
+	shouldMatch: boolean;
+}
+
+// Parses the unit-test textarea: "+ text" must match, "- text" must NOT match; other lines ignored.
+export function parseRegexTestCases(source: string): RegexTestCase[] {
+	const cases: RegexTestCase[] = [];
+	for (const line of source.replace(/\r\n?/g, '\n').split('\n')) {
+		const m = /^([+-])\s?(.*)$/.exec(line);
+		if (m) cases.push({ text: m[2], shouldMatch: m[1] === '+' });
+	}
+	return cases;
+}
+
+// Returns, per case, whether the pattern matched anywhere in the text (the g/y flags are
+// dropped so every case is evaluated independently). Throws on an invalid pattern.
+export function runRegexTests(pattern: string, flags: string, texts: string[]): boolean[] {
+	const regex = new RegExp(pattern, flags.replace(/[gy]/g, ''));
+	return texts.map((text) => regex.test(text));
 }

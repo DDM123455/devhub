@@ -7,6 +7,16 @@ import { BeforeAfterSlider } from '@/components/ui/before-after-slider';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ImageOff } from 'lucide-react';
 import { baseNameOf, computeReduction, dedupeName } from '@/lib/file-utils';
+import {
+	extensionFor,
+	inputMimeOf,
+	isAcceptedCompressInput,
+	isHeicLike,
+	isNativeInput,
+	resolveOutputFormat,
+	type OutputMime,
+} from '@/lib/image-compress-utils';
+import type { OptimizeRequest, OptimizeResponse } from './imageOptimizeWorker';
 
 interface Messages {
 	selectFiles: string;
@@ -35,7 +45,17 @@ interface Messages {
 	targetFormatOriginal: string;
 	errorAvifUnsupported: string;
 	processingQueue: string;
-	progressPercent: string;
+		progressPercent: string;
+	advancedHeading: string;
+	deepOptimize: string;
+	deepOptimizeHint: string;
+	losslessPng: string;
+	oxipngLevel: string;
+	levelFast: string;
+	levelBalanced: string;
+	levelMax: string;
+	metadataNote: string;
+	targetNotMet: string;
 }
 
 interface ImageItem {
@@ -58,7 +78,9 @@ interface ImageItem {
 	// Drag position (0-100) of the before/after compare slider — only set once
 	// a compressed result exists to compare against.
 	comparePosition?: number;
-	errorMessage?: string;
+		errorMessage?: string;
+	// Ghi chú không phải lỗi (vd không đạt dung lượng mục tiêu).
+	note?: string;
 }
 
 // Each compression spins up its own `browser-image-compression` Web Worker —
@@ -78,17 +100,8 @@ const DEFAULT_TARGET_SIZE_KB = 200;
 type CompressMode = 'quality' | 'targetSize';
 type TargetFormat = 'original' | 'image/jpeg' | 'image/webp' | 'image/avif' | 'image/png';
 
-const EXTENSION_BY_FORMAT: Record<Exclude<TargetFormat, 'original'>, string> = {
-	'image/jpeg': 'jpg',
-	'image/webp': 'webp',
-	'image/avif': 'avif',
-	'image/png': 'png',
-};
-
 class AvifUnsupportedError extends Error {}
 
-// Chỉ nhận đúng các định dạng mà input[accept] quảng cáo (kéo-thả không được lọt GIF/SVG/BMP...).
-const ACCEPTED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 interface CompressSettings {
 	compressMode: CompressMode;
@@ -96,12 +109,17 @@ interface CompressSettings {
 	targetSizeKb: number;
 	resizeEnabled: boolean;
 	maxDimension: number;
-	targetFormat: TargetFormat;
+		targetFormat: TargetFormat;
+	deepOptimize: boolean;
+	lossless: boolean;
+	oxipngLevel: number;
 }
 
+// "Giữ nguyên" với JPEG/PNG/WebP giữ nguyên tên file; HEIC/GIF/BMP/AVIF đổi đuôi theo định dạng ra thực tế.
 function buildDownloadName(file: File, targetFormat: TargetFormat): string {
-	if (targetFormat === 'original') return 'compressed-' + file.name;
-	return 'compressed-' + baseNameOf(file.name, 'image') + '.' + EXTENSION_BY_FORMAT[targetFormat];
+	if (targetFormat === 'original' && isNativeInput(file)) return 'compressed-' + file.name;
+	const out = resolveOutputFormat(file, targetFormat) as OutputMime;
+	return 'compressed-' + baseNameOf(file.name, 'image') + '.' + extensionFor(out);
 }
 
 function formatBytes(bytes: number): string {
@@ -118,13 +136,63 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 	const [resizeEnabled, setResizeEnabled] = useState(false);
 	const [maxDimension, setMaxDimension] = useState(DEFAULT_MAX_DIMENSION);
 	const [targetFormat, setTargetFormat] = useState<TargetFormat>('original');
+	const [deepOptimize, setDeepOptimize] = useState(false);
+	const [lossless, setLossless] = useState(false);
+	const [oxipngLevel, setOxipngLevel] = useState(3);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const runningRef = useRef(false);
 	const [isZipping, setIsZipping] = useState(false);
 	const [skippedCount, setSkippedCount] = useState(0);
 	const objectUrls = useRef<Set<string>>(new Set());
-	const itemsRef = useRef<ImageItem[]>([]);
+		const itemsRef = useRef<ImageItem[]>([]);
 	itemsRef.current = items;
+	// File đã giải mã (HEIC -> PNG) theo item id: dùng cho preview và để nén không phải giải mã lần 2.
+	const decodedFiles = useRef<Map<string, File>>(new Map());
+
+	// Worker nén sâu dùng chung (MozJPEG / OxiPNG): chỉ tạo khi cần, huỷ khi unmount.
+	const workerRef = useRef<Worker | null>(null);
+	const pendingJobs = useRef(
+		new Map<number, { resolve: (r: Extract<OptimizeResponse, { ok: true }>) => void; reject: (e: Error) => void }>(),
+	);
+	const jobIdRef = useRef(0);
+	useEffect(() => {
+		const jobs = pendingJobs.current;
+		return () => {
+			workerRef.current?.terminate();
+			workerRef.current = null;
+			for (const job of jobs.values()) job.reject(new Error('cancelled'));
+			jobs.clear();
+		};
+	}, []);
+
+	const callWorker = useCallback(
+		(request: OptimizeRequest extends infer R ? (R extends { id: number } ? Omit<R, 'id'> : never) : never, transfer: Transferable[]) =>
+			new Promise<Extract<OptimizeResponse, { ok: true }>>((resolve, reject) => {
+				if (!workerRef.current) {
+					const worker = new Worker(new URL('./imageOptimizeWorker.ts', import.meta.url), { type: 'module' });
+					worker.onmessage = (event: MessageEvent<OptimizeResponse>) => {
+						const response = event.data;
+						const job = pendingJobs.current.get(response.id);
+						if (!job) return;
+						pendingJobs.current.delete(response.id);
+						if (response.ok) job.resolve(response);
+						else job.reject(Object.assign(new Error(response.error), { unsupported: response.unsupported === true }));
+					};
+					worker.onerror = () => {
+						for (const job of pendingJobs.current.values()) job.reject(new Error('worker failed'));
+						pendingJobs.current.clear();
+						worker.terminate();
+						if (workerRef.current === worker) workerRef.current = null;
+					};
+					workerRef.current = worker;
+				}
+				const id = ++jobIdRef.current;
+				pendingJobs.current.set(id, { resolve, reject });
+				workerRef.current.postMessage({ ...request, id }, transfer);
+			}),
+		[],
+	);
+
 
 	// Every object URL created for a preview (original or compressed) is tracked
 	// here and revoked on unmount, since nothing else in this component's
@@ -148,10 +216,10 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 		}
 	};
 
-	const handleFiles = useCallback((fileList: FileList | null) => {
+	const handleFiles = useCallback((fileList: FileList | File[] | null) => {
 		if (!fileList) return;
 		const allFiles = Array.from(fileList);
-		const imageFiles = allFiles.filter((file) => ACCEPTED_TYPES.has(file.type));
+		const imageFiles = allFiles.filter((file) => isAcceptedCompressInput(file));
 		setSkippedCount(allFiles.length - imageFiles.length);
 		const newItems: ImageItem[] = imageFiles.map((file) => ({
 			id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
@@ -160,7 +228,62 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 			status: 'pending' as const,
 		}));
 		setItems((prev) => [...prev, ...newItems]);
+
+		// HEIC/HEIF: trình duyệt không hiển thị được -> giải mã tuần tự (heic2any nạp lazy) để có preview và
+		// để bước nén dùng luôn bản PNG đã giải mã.
+		void (async () => {
+			for (const item of newItems.filter((it) => isHeicLike(it.file))) {
+				try {
+					const { default: heic2any } = await import('heic2any');
+					const result = await heic2any({ blob: item.file, toType: 'image/png' });
+					const blob = Array.isArray(result) ? result[0] : result;
+					if (!itemsRef.current.some((it) => it.id === item.id)) continue;
+					const decoded = new File([blob], baseNameOf(item.file.name, 'image') + '.png', { type: 'image/png' });
+					decodedFiles.current.set(item.id, decoded);
+					const decodedUrl = trackUrl(URL.createObjectURL(decoded));
+					setItems((prev) =>
+						prev.map((it) => {
+							if (it.id !== item.id) return it;
+							URL.revokeObjectURL(it.previewUrl);
+							objectUrls.current.delete(it.previewUrl);
+							return { ...it, previewUrl: decodedUrl };
+						}),
+					);
+				} catch {
+					/* giữ preview gốc; lỗi sẽ báo khi nén */
+				}
+			}
+		})();
 	}, []);
+
+	// Ctrl+V: dán ảnh từ clipboard (ảnh chụp màn hình, ảnh copy từ web...). Bỏ qua khi đang gõ vào ô nhập.
+	useEffect(() => {
+		const onPaste = (event: ClipboardEvent) => {
+			const target = event.target as HTMLElement | null;
+			if (
+				target &&
+				(target.tagName === 'TEXTAREA' ||
+					target.isContentEditable ||
+					(target.tagName === 'INPUT' && (target as HTMLInputElement).type !== 'file'))
+			) {
+				return;
+			}
+			const pasted = Array.from(event.clipboardData?.files ?? []).filter((file) => file.type.startsWith('image/'));
+			if (pasted.length === 0) return;
+			event.preventDefault();
+			const stamp = Date.now();
+			handleFiles(
+				pasted.map(
+					(file, i) =>
+						new File([file], `pasted-${stamp}-${i + 1}.${file.type.split('/')[1]?.replace('jpeg', 'jpg') || 'png'}`, {
+							type: file.type,
+						}),
+				),
+			);
+		};
+		window.addEventListener('paste', onPaste);
+		return () => window.removeEventListener('paste', onPaste);
+	}, [handleFiles]);
 
 	const handleRemove = useCallback((id: string) => {
 		setItems((prev) => prev.map((item) => (item.id === id ? { ...item, removing: true } : item)));
@@ -183,57 +306,139 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 		targetSizeKb,
 		resizeEnabled,
 		maxDimension,
-		targetFormat,
+				targetFormat,
+		deepOptimize,
+		lossless,
+		oxipngLevel,
 	});
-	settingsRef.current = { compressMode, quality, targetSizeKb, resizeEnabled, maxDimension, targetFormat };
+	settingsRef.current = {
+		compressMode,
+		quality,
+		targetSizeKb,
+		resizeEnabled,
+		maxDimension,
+		targetFormat,
+		deepOptimize,
+		lossless,
+		oxipngLevel,
+	};
 
 	const compressOne = useCallback(
 		async (item: ImageItem, settings: CompressSettings) => {
 			const { compressMode, quality, targetSizeKb, resizeEnabled, maxDimension, targetFormat } = settings;
 			setItems((prev) =>
-				prev.map((it) => (it.id === item.id ? { ...it, status: 'processing', progress: 0 } : it)),
+				prev.map((it) => (it.id === item.id ? { ...it, status: 'processing', progress: 0, note: undefined } : it)),
 			);
 			try {
 				if (item.compressedPreviewUrl) {
 					URL.revokeObjectURL(item.compressedPreviewUrl);
 					objectUrls.current.delete(item.compressedPreviewUrl);
 				}
-				const compressedBlob = await imageCompression(item.file, {
-					// In target-size mode, the library's own iterative
-					// quality-reduction loop drives the result down to
-					// `maxSizeMB` instead of a fixed quality — no separate
-					// "compress to X KB" algorithm needed, this option already
-					// does exactly that.
-					maxSizeMB: compressMode === 'targetSize' ? Math.max(targetSizeKb / 1024, 0.01) : 10,
-					useWebWorker: true,
-					initialQuality: compressMode === 'quality' ? quality : undefined,
-					maxWidthOrHeight: resizeEnabled ? maxDimension : undefined,
-					fileType: targetFormat === 'original' ? undefined : targetFormat,
-					onProgress: (progress) => {
-						setItems((prev) =>
-							prev.map((it) => (it.id === item.id ? { ...it, progress } : it)),
-						);
-					},
-				});
-				// The library falls back silently (rather than rejecting) when the
-				// browser's canvas.toBlob can't actually produce the requested
-				// `fileType` — checking the result's own MIME type is the only way
-				// to tell a forced-format conversion actually happened, same
-				// AVIF-support detection already used in Image Format Converter.
-				if (targetFormat === 'image/avif' && compressedBlob.type !== 'image/avif') {
-					throw new AvifUnsupportedError();
+				const setProgress = (progress: number) =>
+					setItems((prev) => prev.map((it) => (it.id === item.id ? { ...it, progress } : it)));
+				// HEIC đã được giải mã sang PNG lúc thêm file; nếu chưa kịp thì giải mã ngay bây giờ.
+				let source: File = decodedFiles.current.get(item.id) ?? item.file;
+				if (isHeicLike(item.file) && source === item.file) {
+					const { default: heic2any } = await import('heic2any');
+					const result = await heic2any({ blob: item.file, toType: 'image/png' });
+					const blob = Array.isArray(result) ? result[0] : result;
+					source = new File([blob], baseNameOf(item.file.name, 'image') + '.png', { type: 'image/png' });
+					decodedFiles.current.set(item.id, source);
 				}
+				const outFormat = resolveOutputFormat(item.file, targetFormat);
+				let compressedBlob: Blob | null = null;
+				let note: string | undefined;
+
+				// Đường "tối ưu sâu": MozJPEG (JPEG) / OxiPNG (PNG) trong Web Worker. Lỗi "unsupported"
+				// (thiếu OffscreenCanvas) thì rơi về đường cũ bên dưới.
+				if (settings.deepOptimize && (outFormat === 'image/jpeg' || outFormat === 'image/png')) {
+					try {
+						setProgress(20);
+						if (outFormat === 'image/png') {
+							const pngInput = inputMimeOf(item.file) === 'image/png';
+							if (pngInput && settings.lossless && !resizeEnabled) {
+								// Lossless thật: OxiPNG trên chính byte của file gốc, không đổi pixel.
+								const bytes = await source.arrayBuffer();
+								const response = await callWorker({ kind: 'png-bytes', bytes, level: settings.oxipngLevel }, [bytes]);
+								compressedBlob =
+									response.bytes.byteLength >= source.size
+										? source
+										: new Blob([response.bytes], { type: 'image/png' });
+							} else {
+								const bitmap = await createImageBitmap(source);
+								const response = await callWorker(
+									{
+										kind: 'png-pixels',
+										bitmap,
+										maxDimension: resizeEnabled ? maxDimension : undefined,
+										level: settings.oxipngLevel,
+										quality: 1,
+									},
+									[bitmap],
+								);
+								compressedBlob = new Blob([response.bytes], { type: 'image/png' });
+							}
+						} else {
+							const bitmap = await createImageBitmap(source);
+							const response = await callWorker(
+								{
+									kind: 'jpeg',
+									bitmap,
+									maxDimension: resizeEnabled ? maxDimension : undefined,
+									level: settings.oxipngLevel,
+									quality,
+									targetBytes: compressMode === 'targetSize' ? Math.round(targetSizeKb * 1024) : undefined,
+								},
+								[bitmap],
+							);
+							compressedBlob = new Blob([response.bytes], { type: 'image/jpeg' });
+							if (response.targetMet === false) note = messages.targetNotMet.replace('{{size}}', String(targetSizeKb));
+						}
+					} catch (err) {
+						if (!(err as { unsupported?: boolean }).unsupported) throw err;
+						compressedBlob = null;
+					}
+				}
+
+				if (!compressedBlob) {
+					// Đường mặc định (browser-image-compression). Ảnh không phải JPEG/PNG/WebP gốc được ép sang
+					// định dạng ra đã suy ở trên để kết quả xác định.
+					const forcedType = targetFormat !== 'original' ? targetFormat : isNativeInput(item.file) ? undefined : outFormat;
+					compressedBlob = await imageCompression(source, {
+						// In target-size mode, the library's own iterative
+						// quality-reduction loop drives the result down to
+						// `maxSizeMB` instead of a fixed quality — no separate
+						// "compress to X KB" algorithm needed, this option already
+						// does exactly that.
+						maxSizeMB: compressMode === 'targetSize' ? Math.max(targetSizeKb / 1024, 0.01) : 10,
+						useWebWorker: true,
+						initialQuality: compressMode === 'quality' ? quality : undefined,
+						maxWidthOrHeight: resizeEnabled ? maxDimension : undefined,
+						fileType: forcedType,
+						onProgress: setProgress,
+					});
+					// The library falls back silently (rather than rejecting) when the
+					// browser's canvas.toBlob can't actually produce the requested
+					// `fileType` — checking the result's own MIME type is the only way
+					// to tell a forced-format conversion actually happened, same
+					// AVIF-support detection already used in Image Format Converter.
+					if (targetFormat === 'image/avif' && compressedBlob.type !== 'image/avif') {
+						throw new AvifUnsupportedError();
+					}
+				}
+				const finalBlob = compressedBlob;
 				setItems((prev) =>
 					prev.map((it) =>
 						it.id === item.id
 							? {
 									...it,
 									status: 'done',
-									compressedBlob,
-									compressedPreviewUrl: trackUrl(URL.createObjectURL(compressedBlob)),
-									compressedSize: compressedBlob.size,
+									compressedBlob: finalBlob,
+									compressedPreviewUrl: trackUrl(URL.createObjectURL(finalBlob)),
+									compressedSize: finalBlob.size,
 									downloadName: buildDownloadName(item.file, targetFormat),
 									comparePosition: 50,
+									note,
 								}
 							: it,
 					),
@@ -245,7 +450,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 				);
 			}
 		},
-		[messages.errorAvifUnsupported, messages.errorGeneric],
+		[callWorker, messages.errorAvifUnsupported, messages.errorGeneric, messages.targetNotMet],
 	);
 
 	// Chạy một hàng đợi item với đúng bộ cài đặt tại thời điểm bấm (snapshot), không bị ảnh hưởng nếu
@@ -325,7 +530,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 	// the old quality-mode result untouched). Reverting those items to
 	// 'pending' makes the UI honestly show nothing has been compressed with
 	// the current settings yet, instead of a stale result.
-	const settingsSignature = `${compressMode}|${quality}|${targetSizeKb}|${resizeEnabled}|${maxDimension}|${targetFormat}`;
+	const settingsSignature = `${compressMode}|${quality}|${targetSizeKb}|${resizeEnabled}|${maxDimension}|${targetFormat}|${deepOptimize}|${lossless}|${oxipngLevel}`;
 	const prevSettingsSignature = useRef(settingsSignature);
 	useEffect(() => {
 		if (prevSettingsSignature.current === settingsSignature) return;
@@ -389,7 +594,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 					<input
 						id="image-compressor-input"
 						type="file"
-						accept="image/jpeg,image/png,image/webp"
+						accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/avif,image/heic,image/heif,.heic,.heif"
 						multiple
 						className="sr-only"
 						onChange={(event) => {
@@ -515,6 +720,52 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 				</select>
 			</div>
 
+			<details className="rounded-md border border-border p-3">
+				<summary className="min-h-9 cursor-pointer text-sm font-medium text-foreground">{messages.advancedHeading}</summary>
+				<div className="mt-2 flex flex-col gap-3">
+					<label className="flex min-h-9 items-center gap-1.5 text-sm text-foreground">
+						<input
+							type="checkbox"
+							checked={deepOptimize}
+							disabled={isProcessing}
+							onChange={(event) => setDeepOptimize(event.target.checked)}
+						/>
+						{messages.deepOptimize}
+					</label>
+					<p className="text-xs text-muted-foreground">{messages.deepOptimizeHint}</p>
+					{deepOptimize && (
+						<div className="flex flex-col gap-3 pl-5">
+							<label className="flex min-h-9 items-center gap-1.5 text-sm text-foreground">
+								<input
+									type="checkbox"
+									checked={lossless}
+									disabled={isProcessing}
+									onChange={(event) => setLossless(event.target.checked)}
+								/>
+								{messages.losslessPng}
+							</label>
+							<div className="flex flex-wrap items-center gap-3">
+								<label htmlFor="image-compressor-oxipng-level" className="shrink-0 text-sm text-foreground">
+									{messages.oxipngLevel}
+								</label>
+								<select
+									id="image-compressor-oxipng-level"
+									value={oxipngLevel}
+									disabled={isProcessing}
+									onChange={(event) => setOxipngLevel(Number(event.target.value))}
+									className="min-h-9 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+								>
+									<option value={1}>{messages.levelFast}</option>
+									<option value={3}>{messages.levelBalanced}</option>
+									<option value={6}>{messages.levelMax}</option>
+								</select>
+							</div>
+						</div>
+					)}
+					<p className="text-xs text-muted-foreground">{messages.metadataNote}</p>
+				</div>
+			</details>
+
 			{isProcessing && items.length > 1 && (
 				<div role="status" className="flex flex-col gap-1.5">
 					<p className="text-xs text-muted-foreground">
@@ -584,6 +835,9 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 										)}
 										{item.status === 'error' && (
 											<span role="alert" className="text-destructive"> {item.errorMessage ?? messages.errorGeneric}</span>
+										)}
+										{item.status === 'done' && item.note && (
+											<span role="status" className="block text-amber-700 dark:text-amber-400">{item.note}</span>
 										)}
 									</span>
 								</div>

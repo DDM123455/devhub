@@ -61,7 +61,27 @@
     "sharedLoadedNotice": "Loaded from a share link. Your locally saved draft was left untouched.",
     "restoreDraft": "Restore my draft",
     "clipboardError": "Could not access the clipboard.",
-    "fileReadError": "Could not read the file or saved draft."
+    "fileReadError": "Could not read the file or saved draft.",
+    "x": {
+      "viewLabel": "View",
+      "viewSplit": "Side by side",
+      "viewUnified": "Unified",
+      "contextLabel": "Unchanged lines",
+      "contextAll": "Show all",
+      "contextN": "Hide, keep {{n}} lines of context",
+      "wrapLines": "Wrap long lines",
+      "ignoreRegexHeading": "Ignore rules (regex)",
+      "ignoreRegexHelp": "One regular expression per line. Text matching it is ignored when comparing lines (for example timestamps or build ids); the display still shows the original text.",
+      "ignoreRegexPlaceholder": "\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}\n\\bid=[0-9a-f]+",
+      "ignoreRegexInvalid": "Invalid regular expression - {{message}}",
+      "exportPatch": "Export .diff",
+      "exportHtml": "Export HTML",
+      "copyPatch": "Copy unified diff",
+      "patchCopied": "Unified diff copied to the clipboard.",
+      "collapsedLines": "{{count}} unchanged lines hidden",
+      "exportNothing": "There are no line differences to export.",
+      "unifiedAria": "Unified diff"
+    }
   },
   "related": "Related tools",
   "faq": {

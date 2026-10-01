@@ -8,12 +8,16 @@
 //    real AST with a `.range` per node, which is what makes "point at the
 //    exact line for `spec.replicas`" possible for SCHEMA errors too, not just
 //    syntax errors. js-yaml only gives good positions for syntax errors.
-//  - `ajv`: the standard JSON Schema validator; Kubernetes's own schemas are
+//  - `json-schema-validate`: our CSP-safe interpretive JSON Schema validator (no ajv); Kubernetes's own schemas are
 //    OpenAPI-derived JSON Schema, so this is the natural fit.
 // Both run as devDependency-free runtime deps (bundled into the client, same
 // as every other per-tool library already in this repo — svgo, pdf-lib, etc).
-import Ajv, { type ErrorObject } from 'ajv';
+import { validateJsonSchema, type SchemaError } from './json-schema-validate';
 import { LineCounter, isMap, isScalar, parseAllDocuments, type Document } from 'yaml';
+import { crossCheckManifests, type CrossCheckInput } from './k8s-crosscheck';
+import { evaluateWorkloadSecurity, type SecurityFinding, type SecurityReport } from './k8s-security';
+
+export type { SecurityFinding, SecurityReport } from './k8s-security';
 
 export type Severity = 'error' | 'warning';
 
@@ -34,6 +38,7 @@ export const K8S_ISSUE_KEYS = [
 	'yaml-syntax',
 	'yaml-warning',
 	'yaml-alias-limit',
+	'duplicate-key',
 	'empty-document',
 	'empty-document-trailing',
 	'not-a-mapping',
@@ -42,6 +47,11 @@ export const K8S_ISSUE_KEYS = [
 	'deprecated-api-version',
 	'deprecated-ingress-backend',
 	'unsupported-kind',
+	'crd-validated',
+	'xref-duplicate-name',
+	'xref-selector-template-mismatch',
+	'xref-service-no-match',
+	'xref-service-port-missing',
 	'schema-unavailable',
 	'schema-engine-error',
 	'schema-type',
@@ -70,10 +80,25 @@ export interface K8sDocumentResult {
 	// Present only when this document's `kind`+`apiVersion` has a known
 	// deprecated -> replacement mapping (see `DEPRECATED_API_VERSIONS`).
 	suggestedApiVersion: string | null;
+	/** Kubesec-style score for workloads (Pod/Deployment/...); null for other kinds or when disabled. */
+	security: SecurityReport | null;
+	/** How the schema was resolved: bundled Kubernetes schema, CRD catalog, or none. */
+	schemaSource: 'kubernetes' | 'crd' | 'none';
 }
 
 export interface K8sValidationResult {
 	documents: K8sDocumentResult[];
+}
+
+export interface ValidateOptions {
+	/** Look up kinds without a built-in schema in the Datree CRD catalog (default true). */
+	crdCatalog?: boolean;
+	/** Do not warn about kinds that have no schema at all (default false). */
+	skipUnknownKinds?: boolean;
+	/** Run the security / best-practice scorer on workloads (default true). */
+	security?: boolean;
+	/** Run cross-resource checks (Service selector, duplicate names...) (default true). */
+	crossCheck?: boolean;
 }
 
 // Schema filename suffix (after the lowercased kind) in yannh/kubernetes-json-schema's
@@ -173,9 +198,14 @@ function escapePointerSegment(segment: string): string {
 // Maps an ajv error to a translatable issue: the field path, and — crucially — the NAME of the
 // offending field for "additional properties" / "required" errors, which ajv only exposes in
 // `params`, not in `message`.
-function schemaIssueFromAjv(error: ErrorObject, doc: Document, lineCounter: LineCounter): K8sIssue {
+function schemaIssueFromError(schemaError: SchemaError, doc: Document, lineCounter: LineCounter): K8sIssue {
+	// Our interpretive validator reports '/' for the document root; ajv-style instancePath is ''.
+	let instancePath = schemaError.path === '/' ? '' : schemaError.path;
+	// For unknown fields our validator reports the offending child; ajv-style paths name the parent.
+	if (schemaError.keyword === 'additionalProperties') instancePath = instancePath.slice(0, instancePath.lastIndexOf('/'));
+	const error = { ...schemaError, instancePath };
 	const path = error.instancePath || '(root)';
-	const params = error.params as Record<string, unknown>;
+	const params = (error.params ?? {}) as Record<string, unknown>;
 	switch (error.keyword) {
 		case 'additionalProperties': {
 			const field = String(params.additionalProperty ?? '');
@@ -209,7 +239,7 @@ function schemaIssueFromAjv(error: ErrorObject, doc: Document, lineCounter: Line
 			return makeIssue('error', 'schema-validation', 'schema-enum', { path, allowed }, `${path}: must be one of: ${allowed}`, lineForInstancePath(doc, lineCounter, error.instancePath));
 		}
 		default: {
-			const detail = error.message ?? 'is invalid';
+			const detail = error.message || 'is invalid';
 			return makeIssue('error', 'schema-validation', 'schema-generic', { path, detail }, `${path}: ${detail}`, lineForInstancePath(doc, lineCounter, error.instancePath));
 		}
 	}
@@ -220,27 +250,62 @@ function schemaIssueFromAjv(error: ErrorObject, doc: Document, lineCounter: Line
 // UI's Retry button) tries the network again instead of showing "unavailable" until reload.
 const schemaCache = new Map<string, Promise<Record<string, unknown> | null>>();
 
-// The yannh mirror publishes no release tags — the only refs are the rolling `master` branch — so
-// the URL cannot be pinned to an immutable tag. See PROGRESS/report notes: pin to a commit SHA
-// here once one has been verified against the live repo.
-const SCHEMA_REPO_REF = 'master';
+// The yannh mirror publishes no release tags — only the rolling `master` branch — so the URL is
+// pinned to a commit SHA that was verified to serve every file listed in SCHEMA_FILENAME_BY_KIND for
+// every entry of K8S_VERSION_OPTIONS through jsDelivr (checked 2026-10-01). Bump deliberately.
+export const K8S_SCHEMA_REPO_REF = '8df8a883b68a24a104b4a9e43c1288090ae60b3b';
+// Datree CRD catalog (`group/kind_version.json`). Same idea: pinned to a verified commit.
+export const CRD_CATALOG_REPO_REF = 'd373c2da9702bc9509a004db83e57263fe3bdfc1';
 
 function schemaUrl(kind: string, version: string): string | null {
 	const filename = SCHEMA_FILENAME_BY_KIND[kind];
 	if (!filename) return null;
-	return `https://cdn.jsdelivr.net/gh/yannh/kubernetes-json-schema@${SCHEMA_REPO_REF}/${version}-standalone/${filename}`;
+	return `https://cdn.jsdelivr.net/gh/yannh/kubernetes-json-schema@${K8S_SCHEMA_REPO_REF}/${version}-standalone/${filename}`;
+}
+
+// Groups served by Kubernetes itself: never looked up in the CRD catalog.
+const BUILTIN_GROUPS = new Set([
+	'apps',
+	'batch',
+	'autoscaling',
+	'policy',
+	'extensions',
+	'storage.k8s.io',
+	'networking.k8s.io',
+	'rbac.authorization.k8s.io',
+	'admissionregistration.k8s.io',
+	'apiextensions.k8s.io',
+	'apiregistration.k8s.io',
+	'authentication.k8s.io',
+	'authorization.k8s.io',
+	'certificates.k8s.io',
+	'coordination.k8s.io',
+	'discovery.k8s.io',
+	'events.k8s.io',
+	'flowcontrol.apiserver.k8s.io',
+	'node.k8s.io',
+	'scheduling.k8s.io',
+	'resource.k8s.io',
+]);
+
+/** Catalog URL for a custom resource, or null when it cannot be one. Only group/kind/version are used. */
+export function crdSchemaUrl(kind: string, apiVersion: string): string | null {
+	const slash = apiVersion.indexOf('/');
+	if (slash <= 0) return null;
+	const group = apiVersion.slice(0, slash);
+	const version = apiVersion.slice(slash + 1);
+	if (BUILTIN_GROUPS.has(group) || !group.includes('.')) return null;
+	if (!/^[a-z0-9.-]+$/.test(group) || !/^[A-Za-z0-9]+$/.test(kind) || !/^[A-Za-z0-9.-]+$/.test(version)) return null;
+	return `https://cdn.jsdelivr.net/gh/datreeio/CRDs-catalog@${CRD_CATALOG_REPO_REF}/${group}/${kind.toLowerCase()}_${version}.json`;
 }
 
 export function clearSchemaCache() {
 	schemaCache.clear();
 }
 
-async function fetchSchema(kind: string, version: string): Promise<Record<string, unknown> | null> {
-	const cacheKey = `${version}:${kind}`;
+async function fetchJsonCached(cacheKey: string, url: string): Promise<Record<string, unknown> | null> {
 	const cached = schemaCache.get(cacheKey);
 	if (cached) return cached;
-	const url = schemaUrl(kind, version);
-	if (!url) return null;
 	const promise = (async () => {
 		try {
 			const res = await fetch(url);
@@ -257,26 +322,26 @@ async function fetchSchema(kind: string, version: string): Promise<Record<string
 	return promise;
 }
 
-// `strict: false` + `logger: false`: Kubernetes's OpenAPI-derived schemas use
-// vendor extension keywords ajv doesn't know (`x-kubernetes-*`) and formats
-// ajv doesn't ship (`int-or-string`, `int32`, `int64`, `date-time` is known
-// but the int/int32/int64 family isn't) — strict mode would throw on the
-// former, and without `logger: false` ajv prints a console warning for every
-// single unknown format field in every schema (checked against the real
-// Deployment schema: dozens of fields). Neither indicates an actual problem
-// with the user's YAML.
-const ajv = new Ajv({ strict: false, allErrors: true, logger: false });
-const compiledValidators = new Map<string, ReturnType<Ajv['compile']>>();
-
-function getValidator(kind: string, schema: Record<string, unknown>) {
-	const cacheKey = `${kind}:${schema.$id ?? ''}:${JSON.stringify(schema).length}`;
-	let validator = compiledValidators.get(cacheKey);
-	if (!validator) {
-		validator = ajv.compile(schema);
-		compiledValidators.set(cacheKey, validator);
-	}
-	return validator;
+async function fetchSchema(kind: string, version: string): Promise<Record<string, unknown> | null> {
+	const url = schemaUrl(kind, version);
+	if (!url) return null;
+	return fetchJsonCached(`${version}:${kind}`, url);
 }
+
+async function fetchCrdSchema(kind: string, apiVersion: string): Promise<Record<string, unknown> | null> {
+	const url = crdSchemaUrl(kind, apiVersion);
+	if (!url) return null;
+	const schema = await fetchJsonCached(`crd:${apiVersion}:${kind}`, url);
+	if (!schema) return null;
+	// Catalog files may declare a $schema draft we do not need; drop it.
+	const { $schema: _ignored, ...rest } = schema;
+	return rest;
+}
+
+// Validation uses our own interpretive JSON Schema validator (draft-07 vocabulary) instead of ajv:
+// ajv compiles schemas with `new Function`, which the site's Content-Security-Policy (`script-src`
+// without 'unsafe-eval') blocks in production. Kubernetes's vendor keywords (`x-kubernetes-*`) and
+// formats it does not know (`int-or-string`, `int32`, `int64`) are simply ignored.
 
 export function parseK8sManifests(input: string): {
 	documents: { doc: Document; lineCounter: LineCounter }[];
@@ -296,9 +361,30 @@ function stringField(doc: Document, name: string): string | null {
 	return typeof value === 'string' && value.trim() !== '' ? value : null;
 }
 
-export async function validateK8sManifests(input: string, k8sVersion: string): Promise<K8sValidationResult> {
+// Line of the deepest EXISTING node along `segments` (a finding about a missing field points at its parent).
+function lineForSegments(doc: Document, lineCounter: LineCounter, segments: (string | number)[]): number | null {
+	for (let n = segments.length; n >= 0; n--) {
+		try {
+			const node = n === 0 ? doc.contents : doc.getIn(segments.slice(0, n), true);
+			const range = (node as { range?: [number, number, number] } | null)?.range;
+			if (range) return lineCounter.linePos(range[0]).line;
+		} catch {
+			// try the parent
+		}
+	}
+	return null;
+}
+
+export async function validateK8sManifests(
+	input: string,
+	k8sVersion: string,
+	options: ValidateOptions = {},
+): Promise<K8sValidationResult> {
+	const { crdCatalog = true, skipUnknownKinds = false, security: runSecurity = true, crossCheck = true } = options;
 	const { documents } = parseK8sManifests(input);
 	const results: K8sDocumentResult[] = [];
+	const crossInputs: CrossCheckInput[] = [];
+	const docRefs: { doc: Document; lineCounter: LineCounter }[] = [];
 
 	// Comment-only input parses to zero documents — still tell the user there is nothing to validate.
 	if (documents.length === 0 && input.trim() !== '') {
@@ -309,7 +395,9 @@ export async function validateK8sManifests(input: string, k8sVersion: string): P
 					kind: null,
 					apiVersion: null,
 					suggestedApiVersion: null,
-					issues: [makeIssue('error', 'empty-document', 'empty-document', {}, 'This document is empty — a manifest needs at least apiVersion and kind.', null)],
+						security: null,
+						schemaSource: 'none',
+						issues: [makeIssue('error', 'empty-document', 'empty-document', {}, 'This document is empty — a manifest needs at least apiVersion and kind.', null)],
 				},
 			],
 		};
@@ -321,7 +409,9 @@ export async function validateK8sManifests(input: string, k8sVersion: string): P
 
 		for (const err of doc.errors) {
 			const message = err.message.split('\n')[0];
-			issues.push(makeIssue('error', 'yaml-syntax', 'yaml-syntax', { message }, message, err.linePos ? err.linePos[0].line : null));
+			const line = err.linePos ? err.linePos[0].line : null;
+				if (err.code === 'DUPLICATE_KEY') issues.push(makeIssue('error', 'duplicate-key', 'duplicate-key', { message }, message, line));
+				else issues.push(makeIssue('error', 'yaml-syntax', 'yaml-syntax', { message }, message, line));
 		}
 		for (const warn of doc.warnings) {
 			const message = warn.message.split('\n')[0];
@@ -401,65 +491,99 @@ export async function validateK8sManifests(input: string, k8sVersion: string): P
 			}
 		}
 
+		let schemaSource: K8sDocumentResult['schemaSource'] = 'none';
+		let security: SecurityReport | null = null;
+
 		if (validShape && kind && doc.errors.length === 0) {
-			if (!SUPPORTED_KINDS.includes(kind)) {
-				issues.push(
-					makeIssue(
-						'warning',
-						'unsupported-kind',
-						'unsupported-kind',
-						{ kind, supported: SUPPORTED_KINDS.join(', ') },
-						`"${kind}" is not one of the resource kinds this tool validates against a schema yet (${SUPPORTED_KINDS.join(', ')}). Syntax and deprecated-apiVersion checks above still apply.`,
-						lineForInstancePath(doc, lineCounter, '/kind'),
-					),
-				);
-			} else {
-				const schema = await fetchSchema(kind, k8sVersion);
-				if (!schema) {
+			// toJS() on an alias bomb ("billion laughs") raises "Excessive alias count"; it may not
+			// reject the whole validation run.
+			let value: unknown;
+			let converted = false;
+			try {
+				value = doc.toJS();
+				converted = true;
+			} catch (err) {
+				const message = err instanceof Error ? err.message : String(err);
+				issues.push(makeIssue('error', 'yaml-alias-limit', 'yaml-alias-limit', { message }, `YAML aliases expand too much to validate safely: ${message}`, null));
+			}
+
+			let schema: Record<string, unknown> | null = null;
+			let schemaCacheKey = kind;
+			const isBuiltin = SUPPORTED_KINDS.includes(kind);
+			if (isBuiltin) {
+				schema = await fetchSchema(kind, k8sVersion);
+				schemaSource = schema ? 'kubernetes' : 'none';
+			} else if (crdCatalog && apiVersion) {
+				schema = await fetchCrdSchema(kind, apiVersion);
+				if (schema) {
+					schemaSource = 'crd';
+					schemaCacheKey = `${apiVersion}/${kind}`;
+				}
+			}
+
+			if (!schema && !isBuiltin) {
+				if (!skipUnknownKinds) {
 					issues.push(
 						makeIssue(
 							'warning',
-							'schema-unavailable',
-							'schema-unavailable',
-							{ kind, version: k8sVersion },
-							`Could not load the ${kind} schema for Kubernetes ${k8sVersion} (network error or unavailable version) — schema validation skipped for this document.`,
-							null,
+							'unsupported-kind',
+							'unsupported-kind',
+							{ kind, supported: SUPPORTED_KINDS.join(', ') },
+							`"${kind}" is not one of the resource kinds this tool validates against a schema yet (${SUPPORTED_KINDS.join(', ')}). Syntax and deprecated-apiVersion checks above still apply.`,
+							lineForInstancePath(doc, lineCounter, '/kind'),
 						),
 					);
-				} else {
-					// Both steps can throw on hostile/odd input: toJS() on an alias bomb
-					// ("billion laughs") raises "Excessive alias count", and ajv can fail to compile
-					// a malformed schema. Neither may reject the whole validation run.
-					let value: unknown;
-					let converted = false;
-					try {
-						value = doc.toJS();
-						converted = true;
-					} catch (err) {
-						const message = err instanceof Error ? err.message : String(err);
-						issues.push(
-							makeIssue('error', 'yaml-alias-limit', 'yaml-alias-limit', { message }, `YAML aliases expand too much to validate safely: ${message}`, null),
-						);
-					}
-					if (converted) {
-						try {
-							const validate = getValidator(kind, schema);
-							if (!validate(value)) {
-								for (const err of validate.errors ?? []) issues.push(schemaIssueFromAjv(err, doc, lineCounter));
-							}
-						} catch (err) {
-							const message = err instanceof Error ? err.message : String(err);
-							issues.push(
-								makeIssue('error', 'schema-engine-error', 'schema-engine-error', { message }, `Schema validation could not run: ${message}`, null),
-							);
-						}
+				}
+			} else if (!schema) {
+				issues.push(
+					makeIssue(
+						'warning',
+						'schema-unavailable',
+						'schema-unavailable',
+						{ kind, version: k8sVersion },
+						`Could not load the ${kind} schema for Kubernetes ${k8sVersion} (network error or unavailable version) - schema validation skipped for this document.`,
+						null,
+					),
+				);
+			} else if (converted) {
+				if (schemaSource === 'crd') {
+					issues.push(
+						makeIssue('warning', 'crd-validated', 'crd-validated', { kind, apiVersion: apiVersion ?? '' }, `Validated "${kind}" against the community CRD catalog schema.`, lineForInstancePath(doc, lineCounter, '/kind')),
+					);
+				}
+				try {
+					for (const err of validateJsonSchema(value, schema)) issues.push(schemaIssueFromError(err, doc, lineCounter));
+				} catch (err) {
+					const message = err instanceof Error ? err.message : String(err);
+					issues.push(makeIssue('error', 'schema-engine-error', 'schema-engine-error', { message }, `Schema validation could not run: ${message}`, null));
+				}
+			}
+
+			if (converted) {
+				crossInputs.push({ documentIndex: i, kind, value });
+				if (runSecurity) {
+					security = evaluateWorkloadSecurity(kind, value);
+					if (security) {
+						for (const finding of security.findings) finding.line = lineForSegments(doc, lineCounter, finding.path);
 					}
 				}
 			}
 		}
+		docRefs[i] = { doc, lineCounter };
 
 		issues.sort((a, b) => (a.line ?? 0) - (b.line ?? 0));
-		results.push({ documentIndex: i, kind, apiVersion, issues, suggestedApiVersion });
+		results.push({ documentIndex: i, kind, apiVersion, issues, suggestedApiVersion, security, schemaSource });
+	}
+
+	if (crossCheck) {
+		for (const x of crossCheckManifests(crossInputs)) {
+			const ref = docRefs[x.documentIndex];
+			const target = results[x.documentIndex];
+			if (!ref || !target) continue;
+			const message = `${x.key}: ${Object.values(x.params).join(' / ')}`;
+			target.issues.push(makeIssue(x.severity, x.key, x.key, x.params, message, lineForSegments(ref.doc, ref.lineCounter, x.path)));
+			target.issues.sort((p, q) => (p.line ?? 0) - (q.line ?? 0));
+		}
 	}
 
 	return { documents: results };
@@ -550,4 +674,41 @@ export function autoFixDeprecatedApiVersions(input: string): string {
 		output = output.slice(0, start) + value + output.slice(end);
 	}
 	return output;
+}
+
+// --- JSON report export ---------------------------------------------------------------
+// Machine-readable report (for CI / sharing). Contains only what the tool computed - never the manifest text.
+export function buildK8sJsonReport(result: K8sValidationResult, k8sVersion: string): Record<string, unknown> {
+	const issueCount = (severity: Severity) =>
+		result.documents.reduce((n, d) => n + d.issues.filter((i) => i.severity === severity).length, 0);
+	return {
+		tool: 'kubernetes-yaml-validator',
+		kubernetesVersion: k8sVersion,
+		summary: {
+			documents: result.documents.length,
+			errors: issueCount('error'),
+			warnings: issueCount('warning'),
+		},
+		documents: result.documents.map((d) => ({
+			index: d.documentIndex + 1,
+			kind: d.kind,
+			apiVersion: d.apiVersion,
+			schemaSource: d.schemaSource,
+			issues: d.issues.map((i) => ({ severity: i.severity, rule: i.ruleId, line: i.line, message: i.message, params: i.params })),
+			security: d.security
+				? {
+						score: d.security.score,
+						passed: d.security.passed,
+						checked: d.security.checked,
+						findings: d.security.findings.map((f) => ({
+							id: f.id,
+							severity: f.severity,
+							penalty: f.penalty,
+							line: f.line ?? null,
+							params: f.params,
+						})),
+					}
+				: null,
+		})),
+	};
 }

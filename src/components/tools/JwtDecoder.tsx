@@ -1,14 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { decodeToken, formatTimestamp, stringToBase64Url, timeStatus, type DecodeErrorKind } from '@/lib/jwt';
 import {
-	base64UrlToBytes,
-	bytesToBase64Url,
-	decodeToken,
-	formatTimestamp,
-	stringToBase64Url,
-	timeStatus,
-	type DecodeErrorKind,
-} from '@/lib/jwt';
+	algFamily,
+	checkClaims,
+	CLAIM_KEYS,
+	formatClaimValue,
+	isJwtAlg,
+	JwtKeyError,
+	signJwtInput,
+	verifyJwtSignature,
+	type JwtAlg,
+} from '@/lib/jwt-crypto';
+import JwtEncoder, { type JwtEncoderMessages } from './JwtEncoder';
 import { formatJsonLossless } from '@/lib/text-format';
 import { useCopyToClipboard } from './useCopyToClipboard';
 
@@ -68,6 +72,22 @@ interface Messages {
 	copyHeaderAria: string;
 	copyPayloadAria: string;
 	copyNewTokenAria: string;
+	secretIsBase64Url: string;
+	privateKeyLabel: string;
+	privateKeyPlaceholder: string;
+	keyErr: Record<string, string>;
+	claimsDetailHeading: string;
+	claimDesc: Record<string, string>;
+	checkHeading: string;
+	expectedIssLabel: string;
+	expectedAudLabel: string;
+	clockSkewLabel: string;
+	checkExpired: string;
+	checkNotYetValid: string;
+	checkIssMismatch: string;
+	checkAudMismatch: string;
+	checkOk: string;
+	enc: JwtEncoderMessages;
 }
 
 function CopyButton({
@@ -92,79 +112,15 @@ function CopyButton({
 }
 
 type VerifyResult = 'valid' | 'invalid' | 'error' | null;
-type AlgKind = 'hmac' | 'rsa' | 'other';
-
-const HMAC_ALGS = new Set(['HS256', 'HS384', 'HS512']);
-const RSA_ALGS = new Set(['RS256', 'RS384', 'RS512']);
-const HASH_BY_ALG: Record<string, string> = {
-	HS256: 'SHA-256',
-	HS384: 'SHA-384',
-	HS512: 'SHA-512',
-	RS256: 'SHA-256',
-	RS384: 'SHA-384',
-	RS512: 'SHA-512',
-};
+type AlgKind = 'hmac' | 'asym' | 'other';
 
 const SAMPLE_TOKEN =
 	'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 const SAMPLE_SECRET = 'your-256-bit-secret';
 
 function algKind(alg: unknown): AlgKind {
-	if (typeof alg !== 'string') return 'other';
-	if (HMAC_ALGS.has(alg)) return 'hmac';
-	if (RSA_ALGS.has(alg)) return 'rsa';
-	return 'other';
-}
-
-function pemToArrayBuffer(pem: string): ArrayBuffer {
-	const base64 = pem
-		.replace(/-----BEGIN [^-]+-----/, '')
-		.replace(/-----END [^-]+-----/, '')
-		.replace(/\s+/g, '');
-	const binary = atob(base64);
-	const bytes = new Uint8Array(binary.length);
-	for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-	return bytes.buffer;
-}
-
-async function verifyHmac(signingInput: string, signatureB64: string, secret: string, alg: string): Promise<boolean> {
-	const key = await crypto.subtle.importKey(
-		'raw',
-		new TextEncoder().encode(secret),
-		{ name: 'HMAC', hash: HASH_BY_ALG[alg] },
-		false,
-		['verify'],
-	);
-	return crypto.subtle.verify('HMAC', key, base64UrlToBytes(signatureB64), new TextEncoder().encode(signingInput));
-}
-
-async function verifyRsa(signingInput: string, signatureB64: string, publicKeyPem: string, alg: string): Promise<boolean> {
-	const keyData = pemToArrayBuffer(publicKeyPem);
-	const key = await crypto.subtle.importKey(
-		'spki',
-		keyData,
-		{ name: 'RSASSA-PKCS1-v1_5', hash: HASH_BY_ALG[alg] },
-		false,
-		['verify'],
-	);
-	return crypto.subtle.verify(
-		'RSASSA-PKCS1-v1_5',
-		key,
-		base64UrlToBytes(signatureB64),
-		new TextEncoder().encode(signingInput),
-	);
-}
-
-async function signHmac(headerB64: string, payloadB64: string, secret: string, alg: string): Promise<string> {
-	const key = await crypto.subtle.importKey(
-		'raw',
-		new TextEncoder().encode(secret),
-		{ name: 'HMAC', hash: HASH_BY_ALG[alg] },
-		false,
-		['sign'],
-	);
-	const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${headerB64}.${payloadB64}`));
-	return `${headerB64}.${payloadB64}.${bytesToBase64Url(new Uint8Array(signature))}`;
+	if (!isJwtAlg(alg)) return 'other';
+	return algFamily(alg) === 'hmac' ? 'hmac' : 'asym';
 }
 
 // `aud` is the only standard claim the JWT spec allows as either a single
@@ -194,6 +150,11 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 	const [resignedToken, setResignedToken] = useState<string | null>(null);
 	const [resignError, setResignError] = useState<string | null>(null);
 	const [showSecret, setShowSecret] = useState(false);
+	const [secretIsBase64Url, setSecretIsBase64Url] = useState(false);
+	const [privateKeyPem, setPrivateKeyPem] = useState('');
+	const [expectedIss, setExpectedIss] = useState('');
+	const [expectedAud, setExpectedAud] = useState('');
+	const [clockSkew, setClockSkew] = useState(0);
 	// Every verify run gets an id; a result is only applied if it is still the latest one,
 	// so editing the token/secret/key while a verification is in flight can never show a
 	// stale "valid" next to the new input.
@@ -298,26 +259,32 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 		setShowSecret(false);
 		setSecret('');
 		setPublicKeyPem('');
+		setPrivateKeyPem('');
 	};
 
+	const keyErrorText = (err: unknown): string | null =>
+		err instanceof JwtKeyError ? (messages.keyErr[err.code] ?? null) : null;
+	const [verifyErrorText, setVerifyErrorText] = useState<string | null>(null);
+
 	const handleVerify = () => {
-		if (!decoded || !alg) return;
+		if (!decoded || !alg || !isJwtAlg(alg)) return;
 		const signingInput = `${decoded.headerB64}.${decoded.payloadB64}`;
 		const runId = ++verifyRunRef.current;
 		setVerifying(true);
 		setVerifyResult(null);
-		const run =
-			kind === 'hmac'
-				? verifyHmac(signingInput, decoded.signatureB64, secret, alg)
-				: kind === 'rsa'
-					? verifyRsa(signingInput, decoded.signatureB64, publicKeyPem, alg)
-					: Promise.resolve(null);
-		run
+		setVerifyErrorText(null);
+		const headerKid = getClaim(decoded.header, 'kid');
+		verifyJwtSignature(alg as JwtAlg, signingInput, decoded.signatureB64, kind === 'hmac' ? secret : publicKeyPem, {
+			secretIsBase64Url,
+			kid: typeof headerKid === 'string' ? headerKid : undefined,
+		})
 			.then((result) => {
-				if (runId === verifyRunRef.current) setVerifyResult(result === null ? null : result ? 'valid' : 'invalid');
+				if (runId === verifyRunRef.current) setVerifyResult(result ? 'valid' : 'invalid');
 			})
-			.catch(() => {
-				if (runId === verifyRunRef.current) setVerifyResult('error');
+			.catch((err) => {
+				if (runId !== verifyRunRef.current) return;
+				setVerifyErrorText(keyErrorText(err));
+				setVerifyResult('error');
 			})
 			.finally(() => {
 				if (runId === verifyRunRef.current) setVerifying(false);
@@ -342,21 +309,34 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 			return;
 		}
 		const editedAlg = getClaim(headerObj, 'alg');
-		if (typeof editedAlg !== 'string' || !HMAC_ALGS.has(editedAlg)) {
+		if (!isJwtAlg(editedAlg)) {
 			setResignError(messages.resignUnsupportedAlgorithm);
 			return;
 		}
-		if (secret.trim() === '') {
+		const editedKey = algFamily(editedAlg) === 'hmac' ? secret : privateKeyPem;
+		if (editedKey.trim() === '') {
 			setResignError(messages.resignMissingSecret);
 			return;
 		}
 		// Compact, order- and precision-preserving serialisation of what the user edited.
 		const headerB64 = stringToBase64Url(headerCompact.value);
 		const payloadB64 = stringToBase64Url(payloadCompact.value);
-		void signHmac(headerB64, payloadB64, secret, editedAlg)
-			.then((token) => setResignedToken(token))
-			.catch(() => setResignError(messages.resignInvalidJson));
+		const headerKid = getClaim(headerObj, 'kid');
+		void signJwtInput(editedAlg, `${headerB64}.${payloadB64}`, editedKey, {
+			secretIsBase64Url,
+			kid: typeof headerKid === 'string' ? headerKid : undefined,
+		})
+			.then((signature) => setResignedToken(`${headerB64}.${payloadB64}.${signature}`))
+			.catch((err) => setResignError(keyErrorText(err) ?? messages.resignInvalidJson));
 	};
+
+	const claimIssues = decoded
+		? checkClaims(decoded.payload, { nowMs: Date.now(), expectedIss, expectedAud, clockSkewSec: clockSkew })
+		: [];
+	const payloadEntries =
+		decoded && decoded.payload !== null && typeof decoded.payload === 'object' && !Array.isArray(decoded.payload)
+			? Object.entries(decoded.payload as Record<string, unknown>)
+			: [];
 
 	return (
 		<div className="flex flex-col gap-6">
@@ -491,6 +471,65 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 						)}
 					</div>
 
+					{payloadEntries.length > 0 && (
+						<div className="flex flex-col gap-3 rounded-lg border border-border p-4">
+							<span className="text-sm font-medium text-foreground">{messages.claimsDetailHeading}</span>
+							<dl className="flex flex-col gap-2 text-xs">
+								{payloadEntries.map(([name, value]) => (
+									<div key={name} className="flex flex-col gap-0.5 sm:flex-row sm:gap-3">
+										<dt className="font-mono font-semibold text-foreground sm:w-28 sm:shrink-0">{name}</dt>
+										<dd className="text-muted-foreground [overflow-wrap:anywhere]">
+											<code className="text-foreground">{formatClaimValue(value)}</code>
+											{(CLAIM_KEYS as readonly string[]).includes(name) && messages.claimDesc[name] && (
+												<span> - {messages.claimDesc[name]}</span>
+											)}
+										</dd>
+									</div>
+								))}
+							</dl>
+							<div className="flex flex-col gap-2 border-t border-border pt-3">
+								<span className="text-xs font-medium text-foreground">{messages.checkHeading}</span>
+								<div className="grid gap-2 sm:grid-cols-3">
+									<label className="flex flex-col gap-1 text-xs text-muted-foreground">
+										{messages.expectedIssLabel}
+										<input type="text" value={expectedIss} onChange={(e) => setExpectedIss(e.target.value)} spellCheck={false} className="min-h-9 rounded-md border border-border bg-background px-2 font-mono text-xs text-foreground" />
+									</label>
+									<label className="flex flex-col gap-1 text-xs text-muted-foreground">
+										{messages.expectedAudLabel}
+										<input type="text" value={expectedAud} onChange={(e) => setExpectedAud(e.target.value)} spellCheck={false} className="min-h-9 rounded-md border border-border bg-background px-2 font-mono text-xs text-foreground" />
+									</label>
+									<label className="flex flex-col gap-1 text-xs text-muted-foreground">
+										{messages.clockSkewLabel}
+										<input
+											type="number"
+											min={0}
+											value={clockSkew}
+											onChange={(e) => setClockSkew(Math.max(0, Number.isFinite(e.target.valueAsNumber) ? e.target.valueAsNumber : 0))}
+											className="min-h-9 rounded-md border border-border bg-background px-2 font-mono text-xs text-foreground"
+										/>
+									</label>
+								</div>
+								<ul role="status" className="flex flex-col gap-1 text-xs">
+									{claimIssues.length === 0 ? (
+										<li className="text-primary">{messages.checkOk}</li>
+									) : (
+										claimIssues.map((issue) => (
+											<li key={issue} className="text-destructive">
+												{issue === 'expired'
+													? messages.checkExpired
+													: issue === 'notYetValid'
+														? messages.checkNotYetValid
+														: issue === 'issMismatch'
+															? messages.checkIssMismatch
+															: messages.checkAudMismatch}
+											</li>
+										))
+									)}
+								</ul>
+							</div>
+						</div>
+					)}
+
 					<div className="flex flex-col gap-3 rounded-lg border border-border p-4">
 						<span className="text-sm font-medium text-foreground">{messages.verifyHeading}</span>
 						<p className="text-xs text-muted-foreground">{messages.localVerifyNotice}</p>
@@ -519,10 +558,23 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 												spellCheck={false}
 												className="min-w-0 flex-1 rounded-md border border-border bg-background p-2 font-mono text-xs text-foreground"
 											/>
-											<Button type="button" size="sm" variant="outline" aria-pressed={showSecret} onClick={() => setShowSecret((v) => !v)}>
+											<Button type="button" size="sm" variant="outline" className="min-h-9" aria-pressed={showSecret} onClick={() => setShowSecret((v) => !v)}>
 												{showSecret ? messages.hideSecret : messages.showSecret}
 											</Button>
 										</div>
+										<label className="flex min-h-9 items-center gap-2 text-xs text-muted-foreground">
+											<input
+												type="checkbox"
+												checked={secretIsBase64Url}
+												onChange={(e) => {
+													verifyRunRef.current += 1;
+													setVerifying(false);
+													setVerifyResult(null);
+													setSecretIsBase64Url(e.target.checked);
+												}}
+											/>
+											{messages.secretIsBase64Url}
+										</label>
 									</div>
 								) : (
 									<div className="flex flex-col gap-1">
@@ -570,7 +622,7 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 								)}
 								{verifyResult === 'error' && (
 									<p role="alert" className="text-sm font-medium text-destructive">
-										{kind === 'rsa' ? messages.verifyInvalidPublicKey : messages.signatureInvalid}
+										{verifyErrorText ?? (kind === 'asym' ? messages.verifyInvalidPublicKey : messages.signatureInvalid)}
 									</p>
 								)}
 							</>
@@ -607,6 +659,23 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 								/>
 							</div>
 						</div>
+						{kind === 'asym' && (
+							<div className="flex flex-col gap-1">
+								<label htmlFor="jwt-resign-private" className="text-xs text-muted-foreground">
+									{messages.privateKeyLabel}
+								</label>
+								<textarea
+									id="jwt-resign-private"
+									value={privateKeyPem}
+									onChange={(e) => setPrivateKeyPem(e.target.value)}
+									placeholder={messages.privateKeyPlaceholder}
+									rows={4}
+									spellCheck={false}
+									autoComplete="off"
+									className="w-full rounded-md border border-border bg-background p-2 font-mono text-xs text-foreground"
+								/>
+							</div>
+						)}
 						<div>
 							<Button type="button" size="sm" variant="outline" onClick={handleResign}>
 								{messages.resignButton}
@@ -630,6 +699,8 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 					</div>
 				</>
 			)}
+
+			<JwtEncoder messages={messages.enc} keyErrors={messages.keyErr} onUseToken={(token) => resetForNewToken(token)} />
 		</div>
 	);
 }

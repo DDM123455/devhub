@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { PDFDocument, degrees } from 'pdf-lib';
-import { renderPdfThumbnails } from '@/lib/pdf-thumbnails';
+import { getPdfOutline, renderPdfThumbnails, type PdfOutlineEntry } from '@/lib/pdf-thumbnails';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -11,7 +11,15 @@ import {
 	RangeParseError,
 	type PositionRange,
 } from '@/lib/pdf-utils';
-import { dedupeName } from '@/lib/file-utils';
+import { baseNameOf, dedupeName } from '@/lib/file-utils';
+import {
+	applyNameTemplate,
+	bookmarkGroups,
+	parityIndexes,
+	rangeLabel,
+	sanitizeFileName,
+	splitBySize,
+} from '@/lib/pdf-split-utils';
 
 interface Messages {
 	selectFile: string;
@@ -46,7 +54,23 @@ interface Messages {
 	errorInvalidEveryN: string;
 	errorNoPagesSelected: string;
 	selectPageAria: string;
-	processingQueue: string;
+		processingQueue: string;
+	modeMaxSize: string;
+	modeBookmarks: string;
+	maxSizeLabel: string;
+	maxSizeHint: string;
+	errorInvalidSize: string;
+	oversizeWarning: string;
+	bookmarksLoading: string;
+	bookmarksFound: string;
+	noBookmarks: string;
+	bookmarksHint: string;
+	selectOdd: string;
+	selectEven: string;
+	selectionOutputSingle: string;
+	selectionOutputEach: string;
+	nameTemplateLabel: string;
+	nameTemplateHint: string;
 }
 
 interface PageEntry {
@@ -66,9 +90,13 @@ interface ResultFile {
 interface SplitGroup {
 	entries: PageEntry[];
 	label: string;
+	// Dải trang hiển thị (vd "3-5") và tiêu đề bookmark — dùng cho mẫu tên file {range}/{title}.
+	rangeText: string;
+	title: string;
+	oversize?: boolean;
 }
 
-type SplitMode = 'ranges' | 'everyN' | 'checkbox';
+type SplitMode = 'ranges' | 'everyN' | 'checkbox' | 'maxSize' | 'bookmarks';
 
 // Splitting with pdf-lib is byte-level page copying, no ML inference or pixel
 // decoding involved, so it stays fast on the main thread — same reasoning as
@@ -88,7 +116,16 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 	const [error, setError] = useState<string | null>(null);
 	const [isZipping, setIsZipping] = useState(false);
 	const [selectedPageIds, setSelectedPageIds] = useState<Set<string>>(new Set());
-	const [dragPageId, setDragPageId] = useState<string | null>(null);
+		const [dragPageId, setDragPageId] = useState<string | null>(null);
+	const [maxSizeMb, setMaxSizeMb] = useState(5);
+	const [nameTemplate, setNameTemplate] = useState('');
+	const [selectionOutput, setSelectionOutput] = useState<'single' | 'each'>('single');
+	// undefined = chưa đọc; [] = PDF không có bookmark.
+	const [outline, setOutline] = useState<PdfOutlineEntry[] | undefined>(undefined);
+	const [isLoadingOutline, setIsLoadingOutline] = useState(false);
+	const [warning, setWarning] = useState<string | null>(null);
+	const originalPageCountRef = useRef(0);
+
 
 	// Minimal undo for rotate/delete/reorder (same pattern as PDF Merge): a
 	// stack of `{pages, selectedPageIds}` snapshots — both together, since
@@ -137,6 +174,8 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 		setFile(null);
 		setPages([]);
 		setSelectedPageIds(new Set());
+		setOutline(undefined);
+		setWarning(null);
 		setIsLoadingThumbnails(true);
 		try {
 			const bytes = await candidate.arrayBuffer();
@@ -144,6 +183,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 			// Người dùng đã chọn file khác trong lúc đang đọc file này: bỏ kết quả cũ.
 			if (token !== loadTokenRef.current) return;
 			setFile(candidate);
+			originalPageCountRef.current = thumbnails.length;
 			setPages(
 				thumbnails.map((thumb) => ({
 					id: `page-${thumb.pageIndex}`,
@@ -158,6 +198,33 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 		}
 		if (token === loadTokenRef.current) setIsLoadingThumbnails(false);
 	}, [messages.errorGeneric, messages.errorPassword]);
+
+		useEffect(() => {
+		if (splitMode !== 'bookmarks' || !file || outline !== undefined) return;
+		let cancelled = false;
+		setIsLoadingOutline(true);
+		void (async () => {
+			try {
+				const entries = await getPdfOutline(await file.arrayBuffer());
+				if (!cancelled) setOutline(entries);
+			} catch {
+				if (!cancelled) setOutline([]);
+			} finally {
+				if (!cancelled) setIsLoadingOutline(false);
+			}
+		})();
+		return () => {
+			cancelled = true;
+		};
+	}, [splitMode, file, outline]);
+
+	const handleSelectParity = useCallback(
+		(parity: 'odd' | 'even') => {
+			setResults([]);
+			setSelectedPageIds(new Set(parityIndexes(pages.length, parity).map((i) => pages[i].id)));
+		},
+		[pages],
+	);
 
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList || fileList.length === 0) return;
@@ -237,68 +304,131 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 		if (!file || pages.length === 0) return;
 		setIsProcessing(true);
 		setError(null);
+		setWarning(null);
 		setResults([]);
 		setSplitProgress(null);
 
 		try {
 			let splitGroups: SplitGroup[];
-			if (splitMode === 'everyN') {
-				if (!Number.isInteger(everyN) || everyN < 1) {
-					setError(messages.errorInvalidEveryN);
-					setIsProcessing(false);
-					return;
-				}
-				splitGroups = everyNRanges(everyN, pages.length).map((r) => ({
-					entries: pages.slice(r.start - 1, r.end),
-					label: r.start === r.end ? `page-${r.start}.pdf` : `pages-${r.start}-${r.end}.pdf`,
-				}));
-			} else if (splitMode === 'checkbox') {
-				// Preserves current on-screen order (not selection order) — matches
-				// the intuitive "extract these pages in document order" behavior of
-				// checkbox-based extraction in iLovePDF/Smallpdf.
-				const selected = pages.filter((page) => selectedPageIds.has(page.id));
-				if (selected.length === 0) {
-					setError(messages.errorNoPagesSelected);
-					setIsProcessing(false);
-					return;
-				}
-				splitGroups = [{ entries: selected, label: 'selected-pages.pdf' }];
-			} else {
-				const ranges: PositionRange[] = parseRanges(rangesInput, pages.length);
-				splitGroups = ranges.map((r) => ({
-					entries: pages.slice(r.start - 1, r.end),
-					label: r.start === r.end ? `page-${r.start}.pdf` : `pages-${r.start}-${r.end}.pdf`,
-				}));
-			}
-
-			// Tên file/nhãn trùng (vd "1,1") -> thêm hậu tố -1, -2 để không ghi đè nhau trong zip.
-			const usedLabels = new Set<string>();
-			splitGroups = splitGroups.map((group) => ({ ...group, label: dedupeName(group.label, usedLabels) }));
+			const fail = (message: string) => {
+				setError(message);
+				setIsProcessing(false);
+			};
+			const rangeGroup = (r: PositionRange): SplitGroup => ({
+				entries: pages.slice(r.start - 1, r.end),
+				label: r.start === r.end ? `page-${r.start}.pdf` : `pages-${r.start}-${r.end}.pdf`,
+				rangeText: rangeLabel(r.start, r.end),
+				title: '',
+			});
 
 			const bytes = await file.arrayBuffer();
 			const sourceDoc = await PDFDocument.load(bytes);
-
-			const newResults: ResultFile[] = [];
-			setSplitProgress({ current: 0, total: splitGroups.length });
-			for (const [groupIndex, group] of splitGroups.entries()) {
+			// Dựng 1 PDF từ các trang (giữ thứ tự màn hình + góc xoay người dùng chọn).
+			const buildDoc = async (entries: PageEntry[]) => {
 				const outDoc = await PDFDocument.create();
 				const copiedPages = await outDoc.copyPages(
 					sourceDoc,
-					group.entries.map((entry) => entry.pageIndex),
+					entries.map((entry) => entry.pageIndex),
 				);
 				copiedPages.forEach((copiedPage, i) => {
-					const rotation = group.entries[i].rotation;
+					const rotation = entries[i].rotation;
 					// Cộng với /Rotate gốc của trang (nếu không, trang gốc đã xoay sẽ bị đặt lại).
 					if (rotation !== 0) {
 						copiedPage.setRotation(degrees(combineRotation(copiedPage.getRotation().angle, rotation)));
 					}
 					outDoc.addPage(copiedPage);
 				});
-				const outBytes = await outDoc.save();
+				return outDoc.save();
+			};
+
+			if (splitMode === 'everyN') {
+				if (!Number.isInteger(everyN) || everyN < 1) return fail(messages.errorInvalidEveryN);
+				splitGroups = everyNRanges(everyN, pages.length).map(rangeGroup);
+			} else if (splitMode === 'checkbox') {
+				// Giữ thứ tự hiển thị hiện tại (không phải thứ tự bấm chọn) — giống cách trích trang
+				// theo checkbox của iLovePDF/Smallpdf.
+				const selected = pages.filter((page) => selectedPageIds.has(page.id));
+				if (selected.length === 0) return fail(messages.errorNoPagesSelected);
+				if (selectionOutput === 'each') {
+					splitGroups = selected.map((entry) => {
+						const position = pages.indexOf(entry) + 1;
+						return {
+							entries: [entry],
+							label: `page-${position}.pdf`,
+							rangeText: String(position),
+							title: '',
+						};
+					});
+				} else {
+					splitGroups = [{ entries: selected, label: 'selected-pages.pdf', rangeText: 'selected', title: '' }];
+				}
+			} else if (splitMode === 'maxSize') {
+				if (!Number.isFinite(maxSizeMb) || maxSizeMb <= 0) return fail(messages.errorInvalidSize);
+				const limitBytes = Math.floor(maxSizeMb * 1024 * 1024);
+				const sizeGroups = await splitBySize(
+					pages.length,
+					async (start, end) => (await buildDoc(pages.slice(start, end))).byteLength,
+					limitBytes,
+				);
+				splitGroups = sizeGroups.map((g) => ({
+					...rangeGroup({ start: g.start + 1, end: g.end }),
+					oversize: g.oversize,
+				}));
+				const oversized = sizeGroups.filter((g) => g.oversize).map((g) => g.start + 1);
+				if (oversized.length > 0) {
+					setWarning(
+						messages.oversizeWarning
+							.replace('{{pages}}', oversized.join(', '))
+							.replace('{{size}}', String(maxSizeMb)),
+					);
+				}
+			} else if (splitMode === 'bookmarks') {
+				if (!outline || outline.length === 0) return fail(messages.noBookmarks);
+				// Bookmark tham chiếu chỉ số trang GỐC; chiếu sang các trang còn lại trên màn hình
+				// (trang đã xoá bị bỏ, thứ tự đã sắp lại vẫn theo màn hình).
+				const groups = bookmarkGroups(outline, originalPageCountRef.current);
+				splitGroups = groups
+					.map((g, i) => {
+						const entries = pages.filter((page) => page.pageIndex >= g.start && page.pageIndex <= g.end);
+						const first = pages.indexOf(entries[0]) + 1;
+						const last = pages.indexOf(entries[entries.length - 1]) + 1;
+						return {
+							entries,
+							label: `${i + 1}-${sanitizeFileName(g.title, `part-${i + 1}`)}.pdf`,
+							rangeText: entries.length > 0 ? rangeLabel(first, last) : '',
+							title: g.title,
+						};
+					})
+					.filter((g) => g.entries.length > 0);
+				if (splitGroups.length === 0) return fail(messages.noBookmarks);
+			} else {
+				splitGroups = parseRanges(rangesInput, pages.length).map(rangeGroup);
+			}
+
+			// Mẫu tên file người dùng nhập (rỗng = tên mặc định ở trên).
+			const docName = baseNameOf(file.name, 'document');
+			splitGroups = splitGroups.map((group, index) => ({
+				...group,
+				label:
+					applyNameTemplate(nameTemplate, {
+						name: docName,
+						n: index + 1,
+						range: group.rangeText,
+						title: group.title,
+					}) ?? group.label,
+			}));
+			// Tên file/nhãn trùng (vd "1,1") -> thêm hậu tố -1, -2 để không ghi đè nhau trong zip.
+			const usedLabels = new Set<string>();
+			splitGroups = splitGroups.map((group) => ({ ...group, label: dedupeName(group.label, usedLabels) }));
+
+			const newResults: ResultFile[] = [];
+			setSplitProgress({ current: 0, total: splitGroups.length });
+			for (const [groupIndex, group] of splitGroups.entries()) {
+				const outBytes = await buildDoc(group.entries);
 				newResults.push({
 					id: `${group.label}-${Math.random().toString(36).slice(2)}`,
 					label: group.label,
-					blob: new Blob([outBytes], { type: 'application/pdf' }),
+					blob: new Blob([outBytes as BlobPart], { type: 'application/pdf' }),
 					// Reuses the thumbnails already rendered for the page picker —
 					// each output file's pages are a subset of the source file's, so
 					// there's nothing new to rasterize for the preview.
@@ -319,7 +449,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 			}
 		}
 		setIsProcessing(false);
-	}, [file, pages, splitMode, rangesInput, everyN, selectedPageIds, messages]);
+	}, [file, pages, splitMode, rangesInput, everyN, selectedPageIds, selectionOutput, maxSizeMb, outline, nameTemplate, messages]);
 
 	const handleDownload = useCallback((result: ResultFile) => {
 		const url = URL.createObjectURL(result.blob);
@@ -348,7 +478,11 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 		}
 	}, [results]);
 
-	const canSplit = !isProcessing && file !== null && pages.length > 0;
+	const canSplit =
+		!isProcessing &&
+		file !== null &&
+		pages.length > 0 &&
+		(splitMode !== 'bookmarks' || (!isLoadingOutline && !!outline && outline.length > 0));
 
 	return (
 		<div className="flex flex-col gap-4 rounded-lg border border-border p-4">
@@ -478,7 +612,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 								type="button"
 								onClick={() => { setResults([]); setSplitMode('ranges'); }}
 								aria-pressed={splitMode === 'ranges'}
-								className={`rounded-md border px-2.5 py-1 text-xs font-medium ${splitMode === 'ranges' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
+								className={`min-h-9 rounded-md border px-2.5 py-1 text-xs font-medium ${splitMode === 'ranges' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
 							>
 								{messages.modeRanges}
 							</button>
@@ -486,7 +620,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 								type="button"
 								onClick={() => { setResults([]); setSplitMode('everyN'); }}
 								aria-pressed={splitMode === 'everyN'}
-								className={`rounded-md border px-2.5 py-1 text-xs font-medium ${splitMode === 'everyN' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
+								className={`min-h-9 rounded-md border px-2.5 py-1 text-xs font-medium ${splitMode === 'everyN' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
 							>
 								{messages.modeEveryN}
 							</button>
@@ -494,10 +628,26 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 								type="button"
 								onClick={() => { setResults([]); setSplitMode('checkbox'); }}
 								aria-pressed={splitMode === 'checkbox'}
-								className={`rounded-md border px-2.5 py-1 text-xs font-medium ${splitMode === 'checkbox' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
+								className={`min-h-9 rounded-md border px-2.5 py-1 text-xs font-medium ${splitMode === 'checkbox' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
 							>
 								{messages.modeCheckbox}
-							</button>
+								</button>
+								<button
+									type="button"
+									onClick={() => { setResults([]); setSplitMode('maxSize'); }}
+									aria-pressed={splitMode === 'maxSize'}
+									className={`min-h-9 rounded-md border px-2.5 py-1 text-xs font-medium ${splitMode === 'maxSize' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
+								>
+									{messages.modeMaxSize}
+								</button>
+								<button
+									type="button"
+									onClick={() => { setResults([]); setSplitMode('bookmarks'); }}
+									aria-pressed={splitMode === 'bookmarks'}
+									className={`min-h-9 rounded-md border px-2.5 py-1 text-xs font-medium ${splitMode === 'bookmarks' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
+								>
+									{messages.modeBookmarks}
+								</button>
 						</div>
 
 						{splitMode === 'ranges' && (
@@ -551,13 +701,99 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 								<Button type="button" size="sm" variant="outline" onClick={handleClearSelection}>
 									{messages.clearSelection}
 								</Button>
+								<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={() => handleSelectParity('odd')}>
+									{messages.selectOdd}
+								</Button>
+								<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={() => handleSelectParity('even')}>
+									{messages.selectEven}
+								</Button>
 							</div>
 						)}
+						{splitMode === 'checkbox' && (
+							<div role="radiogroup" aria-label={messages.modeCheckbox} className="flex flex-col gap-1">
+								<label className="flex min-h-9 items-center gap-1.5 text-sm text-foreground">
+									<input
+										type="radio"
+										name="pdf-splitter-selection-output"
+										checked={selectionOutput === 'single'}
+										onChange={() => { setResults([]); setSelectionOutput('single'); }}
+									/>
+									{messages.selectionOutputSingle}
+								</label>
+								<label className="flex min-h-9 items-center gap-1.5 text-sm text-foreground">
+									<input
+										type="radio"
+										name="pdf-splitter-selection-output"
+										checked={selectionOutput === 'each'}
+										onChange={() => { setResults([]); setSelectionOutput('each'); }}
+									/>
+									{messages.selectionOutputEach}
+								</label>
+							</div>
+						)}
+						{splitMode === 'maxSize' && (
+							<div className="flex flex-col gap-1">
+								<div className="flex items-center gap-2">
+									<label htmlFor="pdf-splitter-max-size" className="text-sm font-medium text-foreground">
+										{messages.maxSizeLabel}
+									</label>
+									<input
+										id="pdf-splitter-max-size"
+										type="number"
+										min={0.1}
+										step={0.5}
+										value={maxSizeMb}
+										onChange={(event) => {
+											setResults([]);
+											setMaxSizeMb(Number(event.target.value));
+										}}
+										className="min-h-9 w-24 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+									/>
+								</div>
+								<p className="text-xs text-muted-foreground">{messages.maxSizeHint}</p>
+							</div>
+						)}
+						{splitMode === 'bookmarks' && (
+							<div className="flex flex-col gap-1" role="status">
+								{isLoadingOutline || outline === undefined ? (
+									<p className="text-sm text-muted-foreground">{messages.bookmarksLoading}</p>
+								) : outline.length === 0 ? (
+									<p className="text-sm text-destructive">{messages.noBookmarks}</p>
+								) : (
+									<p className="text-sm text-foreground">
+										{messages.bookmarksFound.replace('{{count}}', String(outline.length))}
+									</p>
+								)}
+								<p className="text-xs text-muted-foreground">{messages.bookmarksHint}</p>
+							</div>
+						)}
+						<div className="flex flex-col gap-1">
+							<label htmlFor="pdf-splitter-name-template" className="text-sm font-medium text-foreground">
+								{messages.nameTemplateLabel}
+							</label>
+							<input
+								id="pdf-splitter-name-template"
+								type="text"
+								value={nameTemplate}
+								onChange={(event) => {
+									setResults([]);
+									setNameTemplate(event.target.value);
+								}}
+								placeholder="{name}_{n}"
+								className="min-h-9 w-full max-w-sm rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground"
+							/>
+							<p className="text-xs text-muted-foreground">{messages.nameTemplateHint}</p>
+						</div>
 					</div>
 				</div>
 			)}
 
 			{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+			{warning && (
+				<p role="status" className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+					{warning}
+				</p>
+			)}
 
 			{isProcessing && splitProgress && splitProgress.total > 1 && (
 				<div role="status" className="flex flex-col gap-1.5">

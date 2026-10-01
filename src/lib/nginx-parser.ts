@@ -8,6 +8,8 @@
 // of nginx's parser or of Gixy's full rule set — see the rule list below for
 // exactly what is (and isn't) checked.
 
+import { EXTENDED_ISSUE_KEYS, runExtendedChecks } from './nginx-checks';
+
 export type Severity = 'error' | 'warning';
 
 export interface NginxIssue {
@@ -23,7 +25,7 @@ export interface NginxIssue {
 }
 
 /** Every `key` an issue can carry — the page builds one i18n message per entry. */
-export const NGINX_ISSUE_KEYS = [
+const BASE_ISSUE_KEYS = [
 	'missing-semicolon',
 	'missing-semicolon-eof',
 	'unexpected-close',
@@ -38,6 +40,8 @@ export const NGINX_ISSUE_KEYS = [
 	'unknown-directive-suggest',
 	'weak-ssl-protocol',
 ] as const;
+
+export const NGINX_ISSUE_KEYS = [...BASE_ISSUE_KEYS, ...EXTENDED_ISSUE_KEYS] as const;
 
 export interface NginxNode {
 	type: 'directive' | 'block';
@@ -161,6 +165,8 @@ upstream_conf health_check match status header body require
 map_hash_bucket_size map_hash_max_size quic_retry quic_gso quic_bpf quic_host_key max_errors session_log proxy_ssl_server_name
 ssl_certificate_cache
 log_by_lua_block
+quic_active_connection_id_limit http3_push http3_push_preload ssl_alpn proxy_half_close proxy_ssl_alpn proxy_ssl_certificate_cache
+proxy_cache_max_range_offset fastcgi_cache_max_range_offset keepalive_time ssl_session_ticket_key
 `
 		.split(/\s+/)
 		.filter(Boolean),
@@ -194,8 +200,12 @@ defineContexts('server location', 'location');
 defineContexts('server location', 'if');
 defineContexts('location', 'limit_except internal alias');
 defineContexts('http server location if', 'root gzip expires add_header add_trailer error_page');
+defineContexts('http server', 'http3 http3_hq http3_max_concurrent_streams http3_stream_buffer_size quic_retry quic_gso quic_bpf quic_host_key quic_active_connection_id_limit');
 defineContexts('http server location', 'index proxy_set_header proxy_redirect proxy_http_version proxy_connect_timeout proxy_read_timeout proxy_send_timeout proxy_buffering proxy_buffers proxy_buffer_size proxy_cache proxy_cache_valid proxy_hide_header proxy_pass_header proxy_ignore_headers proxy_intercept_errors proxy_next_upstream gzip_types gzip_vary gzip_min_length gzip_comp_level gzip_proxied client_max_body_size client_body_timeout autoindex server_tokens charset error_page keepalive_timeout sendfile tcp_nopush tcp_nodelay limit_req limit_conn fastcgi_param fastcgi_index');
 defineContexts('http server', 'ssl_certificate ssl_certificate_key ssl_protocols ssl_ciphers ssl_session_cache ssl_session_timeout ssl_prefer_server_ciphers ssl_dhparam ssl_stapling ssl_stapling_verify ssl_trusted_certificate ssl_session_tickets ssl_client_certificate ssl_verify_client');
+defineContexts('upstream', 'ip_hash least_conn hash random zone queue ntlm keepalive');
+defineContexts('http server location upstream', 'keepalive_requests keepalive_time');
+DIRECTIVE_CONTEXTS.keepalive_timeout.push('upstream');
 defineContexts('http server location limit_except', 'deny allow');
 defineContexts('http server location if limit_except', 'access_log');
 defineContexts('location if limit_except', 'proxy_pass');
@@ -670,7 +680,10 @@ export function parseNginxConfig(input: string, options: NginxParseOptions = {})
 	const { tokens, issues: tokenIssues } = tokenize(input);
 	const { root, issues, isFragment } = buildTree(tokens, options.fragment ?? 'auto');
 	issues.push(...tokenIssues);
-	if (input.trim() !== '') runSecurityChecks(root, issues, isFragment);
+	if (input.trim() !== '') {
+		runSecurityChecks(root, issues, isFragment);
+		issues.push(...runExtendedChecks(root, isFragment));
+	}
 	issues.sort((a, b) => a.line - b.line);
 	const lastTokenEnd = tokens.length > 0 ? tokens[tokens.length - 1].end : 0;
 	return { issues, root, lastTokenEnd, isFragment };

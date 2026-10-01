@@ -2,6 +2,32 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { baseNameOf } from '@/lib/file-utils';
 import { isVideoFile, safeVideoExt } from '@/lib/media-ext';
+import {
+	DEFAULT_CRF,
+	GIF_FPS_OPTIONS,
+	GIF_WIDTH_OPTIONS,
+	HEIGHT_OPTIONS,
+	MAX_SEGMENTS,
+	MIN_SEGMENT_GAP,
+	MP3_BITRATE_OPTIONS,
+	SPEED_OPTIONS,
+	buildConcatArgs,
+	buildConcatList,
+	buildGifArgs,
+	buildMp3Args,
+	buildSegmentArgs,
+	effectiveMode,
+	frameStepSeconds,
+	needsReencode,
+	nextSegment,
+	outputExtension,
+	segmentsValid,
+	thumbnailTimes,
+	totalSegmentsDuration,
+	type OutputKind,
+	type Segment,
+	type VideoOptions,
+} from '@/lib/video-ffmpeg';
 
 interface Messages {
 	dropLabel: string;
@@ -30,10 +56,40 @@ interface Messages {
 	manualDurationLabel: string;
 	notVideoError: string;
 	largeFileWarning: string;
+	outputFormatLabel: string;
+	outputVideo: string;
+	outputGif: string;
+	outputMp3: string;
+	gifFpsLabel: string;
+	gifWidthLabel: string;
+	mp3BitrateLabel: string;
+	mp3Note: string;
+	advancedLabel: string;
+	muteLabel: string;
+	speedLabel: string;
+	resolutionLabel: string;
+	resolutionOriginal: string;
+	crfLabel: string;
+	crfHint: string;
+	forcePreciseNote: string;
+	segmentsLabel: string;
+	addSegment: string;
+	removeSegment: string;
+	segmentButton: string;
+	segmentsTotal: string;
+	segmentsMax: string;
+	stepBackFrame: string;
+	stepForwardFrame: string;
+	frameStepHint: string;
+	makeGifButton: string;
+	extractMp3Button: string;
+	processingStepLabel: string;
+	resultGifAlt: string;
 }
 
 type Mode = 'fast' | 'precise';
 type EngineState = 'idle' | 'loading' | 'ready' | 'error';
+type SegmentTarget = Segment & { id: number };
 
 const CORE_BASE = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm';
 
@@ -44,7 +100,8 @@ function formatTime(seconds: number): string {
 	return `${m}:${s.toFixed(1).padStart(4, '0')}`;
 }
 
-const MIN_SELECTION_GAP = 0.1;
+const MIN_SELECTION_GAP = MIN_SEGMENT_GAP;
+const THUMB_COUNT = 12;
 // ffmpeg.wasm nạp toàn bộ file vào bộ nhớ WASM (giới hạn ~2GB, tab dễ crash sớm hơn): cảnh báo từ 1GB.
 const LARGE_FILE_WARNING_BYTES = 1024 * 1024 * 1024;
 
@@ -56,6 +113,8 @@ function TrimTimeline({
 	duration,
 	start,
 	end,
+	others,
+	thumbs,
 	onStartChange,
 	onEndChange,
 	startAriaLabel,
@@ -64,6 +123,8 @@ function TrimTimeline({
 	duration: number;
 	start: number;
 	end: number;
+	others: Segment[];
+	thumbs: string[];
 	onStartChange: (value: number) => void;
 	onEndChange: (value: number) => void;
 	startAriaLabel: string;
@@ -123,7 +184,22 @@ function TrimTimeline({
 	const endPct = duration > 0 ? (end / duration) * 100 : 100;
 
 	return (
-		<div ref={trackRef} className="relative h-10 w-full touch-none select-none rounded-md bg-muted">
+		<div ref={trackRef} className="relative h-12 w-full touch-none select-none overflow-visible rounded-md bg-muted">
+			{thumbs.length > 0 && (
+				<div className="absolute inset-0 flex overflow-hidden rounded-md opacity-70" aria-hidden="true">
+					{thumbs.map((src, i) => (
+						<img key={i} src={src} alt="" draggable={false} className="h-full min-w-0 flex-1 object-cover" />
+					))}
+				</div>
+			)}
+			{others.map((seg, i) => (
+				<div
+					key={i}
+					aria-hidden="true"
+					className="absolute inset-y-0 rounded-md border border-primary/40 bg-primary/10"
+					style={{ left: `${(seg.start / Math.max(duration, 0.001)) * 100}%`, width: `${((seg.end - seg.start) / Math.max(duration, 0.001)) * 100}%` }}
+				/>
+			))}
 			<div
 				className="absolute inset-y-0 rounded-md bg-primary/30"
 				style={{ left: `${startPct}%`, right: `${100 - endPct}%` }}
@@ -168,21 +244,35 @@ function formatBytes(bytes: number): string {
 	return `${value.toFixed(1)} ${units[unitIndex]}`;
 }
 
+const selectClass = 'min-h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground';
+
 export default function VideoTrim({ messages }: { messages: Messages }) {
 	const [videoFile, setVideoFile] = useState<File | null>(null);
 	const [videoUrl, setVideoUrl] = useState<string | null>(null);
 	const [duration, setDuration] = useState<number | null>(null);
 	const [metadataFailed, setMetadataFailed] = useState(false);
-	const [start, setStart] = useState(0);
-	const [end, setEnd] = useState(0);
+	// One or more clips to keep; the timeline edits the active one.
+	const [segments, setSegments] = useState<SegmentTarget[]>([{ id: 1, start: 0, end: 0 }]);
+	const [activeId, setActiveId] = useState(1);
 	const [mode, setMode] = useState<Mode>('fast');
+	const [outputKind, setOutputKind] = useState<OutputKind>('video');
+	const [mute, setMute] = useState(false);
+	const [speed, setSpeed] = useState(1);
+	const [height, setHeight] = useState(0);
+	const [crf, setCrf] = useState(DEFAULT_CRF);
+	const [gifFps, setGifFps] = useState(10);
+	const [gifWidth, setGifWidth] = useState(480);
+	const [mp3Bitrate, setMp3Bitrate] = useState(192);
+	const [thumbs, setThumbs] = useState<string[]>([]);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [engineState, setEngineState] = useState<EngineState>('idle');
 	const [processing, setProcessing] = useState(false);
 	const [progress, setProgress] = useState(0);
+	const [stepInfo, setStepInfo] = useState<{ current: number; total: number } | null>(null);
 	const [resultUrl, setResultUrl] = useState<string | null>(null);
 	const [resultSize, setResultSize] = useState<number | null>(null);
 	const [resultDuration, setResultDuration] = useState<number | null>(null);
+	const [resultKind, setResultKind] = useState<OutputKind>('video');
 	// Đuôi + tên tải về chốt lúc tạo kết quả (mode có thể đổi sau đó mà kết quả cũ không đổi).
 	const [resultFileName, setResultFileName] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -194,8 +284,26 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 	const runTokenRef = useRef(0);
 	const videoUrlRef = useRef<string | null>(null);
 	const resultUrlRef = useRef<string | null>(null);
+	const stepRef = useRef({ index: 0, total: 1 });
+	const nextIdRef = useRef(2);
 	videoUrlRef.current = videoUrl;
 	resultUrlRef.current = resultUrl;
+
+	const activeIndex = Math.max(
+		0,
+		segments.findIndex((s) => s.id === activeId),
+	);
+	const active = segments[activeIndex] ?? segments[0];
+	const start = active.start;
+	const end = active.end;
+
+	const updateActive = (patch: Partial<Segment>) =>
+		setSegments((prev) => prev.map((s, i) => (i === activeIndex ? { ...s, ...patch } : s)));
+	const setStart = (value: number) => updateActive({ start: value });
+	const setEnd = (value: number) => updateActive({ end: value });
+
+	const options: VideoOptions = { mode, mute, speed, height, crf };
+	const forcedPrecise = mode === 'fast' && needsReencode(options);
 
 	const terminateFfmpeg = () => {
 		try {
@@ -221,6 +329,60 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 		};
 	}, []);
 
+	// Thumbnail strip for the timeline: seek a hidden <video> to evenly spaced times and snapshot each frame.
+	useEffect(() => {
+		if (!videoUrl || !duration) {
+			setThumbs([]);
+			return;
+		}
+		let cancelled = false;
+		const video = document.createElement('video');
+		video.muted = true;
+		video.preload = 'auto';
+		video.playsInline = true;
+		video.src = videoUrl;
+		const canvas = document.createElement('canvas');
+		const frames: string[] = [];
+		const waitFor = (target: EventTarget, name: string) =>
+			new Promise<boolean>((resolve) => {
+				const timer = setTimeout(() => resolve(false), 2500);
+				target.addEventListener(
+					name,
+					() => {
+						clearTimeout(timer);
+						resolve(true);
+					},
+					{ once: true },
+				);
+			});
+		void (async () => {
+			try {
+				if (video.readyState < 1 && !(await waitFor(video, 'loadedmetadata'))) return;
+				const aspect = video.videoWidth > 0 && video.videoHeight > 0 ? video.videoWidth / video.videoHeight : 16 / 9;
+				canvas.height = 48;
+				canvas.width = Math.max(16, Math.round(48 * aspect));
+				const ctx = canvas.getContext('2d');
+				if (!ctx) return;
+				for (const t of thumbnailTimes(duration, THUMB_COUNT)) {
+					if (cancelled) return;
+					const seeked = waitFor(video, 'seeked');
+					video.currentTime = t;
+					if (!(await seeked)) return;
+					ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+					frames.push(canvas.toDataURL('image/jpeg', 0.55));
+				}
+				if (!cancelled) setThumbs(frames);
+			} catch {
+				/* thumbnails are decorative; ignore decode/seek failures */
+			}
+		})();
+		return () => {
+			cancelled = true;
+			video.removeAttribute('src');
+			video.load();
+		};
+	}, [videoUrl, duration]);
+
 	const loadFile = (file: File) => {
 		// File mới: huỷ tác vụ cũ (nếu có) để kết quả cũ không hiện cạnh file mới.
 		if (processing) terminateFfmpeg();
@@ -235,6 +397,9 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 		setError(null);
 		setMetadataFailed(false);
 		setDuration(null);
+		setThumbs([]);
+		setSegments([{ id: 1, start: 0, end: 0 }]);
+		setActiveId(1);
 		setVideoFile(file);
 		setVideoUrl(URL.createObjectURL(file));
 	};
@@ -249,6 +414,11 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 		loadFile(file);
 	};
 
+	const resetSegments = (total: number) => {
+		setSegments([{ id: 1, start: 0, end: total }]);
+		setActiveId(1);
+	};
+
 	const handleLoadedMetadata = () => {
 		const video = videoRef.current;
 		if (!video || !Number.isFinite(video.duration)) {
@@ -256,11 +426,34 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 			return;
 		}
 		setDuration(video.duration);
-		setStart(0);
-		setEnd(video.duration);
+		resetSegments(video.duration);
 	};
 
 	const selectionDuration = useMemo(() => Math.max(0, end - start), [start, end]);
+	const totalKept = useMemo(() => totalSegmentsDuration(segments), [segments]);
+
+	const handleAddSegment = () => {
+		if (!duration) return;
+		const next = nextSegment(segments, duration);
+		if (!next) return;
+		const id = nextIdRef.current++;
+		setSegments((prev) => [...prev, { id, ...next }]);
+		setActiveId(id);
+	};
+
+	const handleRemoveSegment = (id: number) => {
+		if (segments.length <= 1) return;
+		const remaining = segments.filter((s) => s.id !== id);
+		setSegments(remaining);
+		if (id === activeId) setActiveId(remaining[0].id);
+	};
+
+	const stepFrame = (direction: 1 | -1) => {
+		const video = videoRef.current;
+		if (!video) return;
+		video.pause();
+		video.currentTime = Math.min(Math.max(0, video.currentTime + direction * frameStepSeconds()), duration ?? video.duration);
+	};
 
 	const ensureFfmpeg = async () => {
 		if (ffmpegRef.current && engineState === 'ready') return ffmpegRef.current;
@@ -268,7 +461,11 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 		try {
 			const [{ FFmpeg }, { toBlobURL }] = await Promise.all([import('@ffmpeg/ffmpeg'), import('@ffmpeg/util')]);
 			const ffmpeg = new FFmpeg();
-			ffmpeg.on('progress', ({ progress: p }) => setProgress(Math.min(100, Math.max(0, Math.round(p * 100)))));
+			ffmpeg.on('progress', ({ progress: p }) => {
+				const { index, total } = stepRef.current;
+				const within = Math.min(1, Math.max(0, Number.isFinite(p) ? p : 0));
+				setProgress(Math.min(100, Math.round(((index + within) / total) * 100)));
+			});
 			// Note: intentionally not using toBlobURL's `progress` option here — it calls
 			// downloadWithProgress, which throws when a CDN serves the core .js gzip/br-compressed
 			// (declared Content-Length is the compressed size, so it never matches the decompressed
@@ -287,14 +484,16 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 		}
 	};
 
-	const handleTrim = async () => {
-		if (!videoFile) return;
-		if (end <= start) {
+	const handleProcess = async () => {
+		if (!videoFile || duration === null) return;
+		const segs: Segment[] = segments.map(({ start: s, end: e }) => ({ start: s, end: e }));
+		if (!segmentsValid(segs, duration)) {
 			setError(messages.invalidRangeError);
 			return;
 		}
 		const token = ++runTokenRef.current;
 		const isStale = () => token !== runTokenRef.current;
+		const kind = outputKind;
 		setError(null);
 		setProcessing(true);
 		setProgress(0);
@@ -304,8 +503,7 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 		setResultDuration(null);
 		setResultFileName(null);
 		let ffmpeg: import('@ffmpeg/ffmpeg').FFmpeg | null = null;
-		let inputName = '';
-		let outputName = '';
+		const created: string[] = [];
 		try {
 			ffmpeg = await ensureFfmpeg();
 			if (!ffmpeg || isStale()) return;
@@ -313,50 +511,99 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 			if (isStale()) return;
 			// Đuôi qua whitelist/mime: tên không có đuôi hoặc đuôi lạ không làm hỏng tên file ảo của ffmpeg.
 			const ext = safeVideoExt(videoFile);
-			const outExt = mode === 'fast' ? ext : 'mp4';
-			inputName = `input.${ext}`;
-			outputName = `output.${outExt}`;
+			const inputName = `input.${ext}`;
+			created.push(inputName);
 			await ffmpeg.writeFile(inputName, await fetchFile(videoFile));
 			if (isStale()) return;
-			const clipDuration = (end - start).toFixed(3);
-			const args =
-				mode === 'fast'
-					? ['-ss', start.toFixed(3), '-i', inputName, '-t', clipDuration, '-c', 'copy', '-avoid_negative_ts', 'make_zero', outputName]
-					: [
-							'-ss',
-							start.toFixed(3),
-							'-i',
-							inputName,
-							'-t',
-							clipDuration,
-							'-c:v',
-							'libx264',
-							'-preset',
-							'ultrafast',
-							'-c:a',
-							'aac',
-							outputName,
-						];
-			const exitCode = await ffmpeg.exec(args);
+
+			const multi = segs.length > 1;
+			const outExt = outputExtension(kind, ext, options);
+			const outputName = `output.${outExt}`;
+			created.push(outputName);
+
+			// Steps: [N segment cuts] + [concat if N>1] + [final GIF/MP3 conversion]. A single-segment GIF/MP3 is one step.
+			const needsFinal = kind !== 'video';
+			const segExt = kind === 'video' ? (effectiveMode(options) === 'fast' ? ext : 'mp4') : 'mp4';
+			const cutSteps = kind === 'video' || multi ? segs.length : 0;
+			const total = cutSteps + (multi ? 1 : 0) + (needsFinal ? 1 : 0) || 1;
+			stepRef.current = { index: 0, total };
+			let stepCounter = 0;
+			const run = async (args: string[]) => {
+				stepRef.current = { index: stepCounter, total };
+				setStepInfo({ current: stepCounter + 1, total });
+				const code = await ffmpeg!.exec(args);
+				if (isStale()) throw new Error('stale');
+				if (code !== 0) throw new Error('ffmpeg exec failed');
+				stepCounter++;
+			};
+
+			// Intermediate cuts. For GIF/MP3 these are always re-encoded so the final filter sees one clean clip.
+			const cutOptions: VideoOptions =
+				kind === 'video' ? options : { mode: 'precise', mute: false, speed: 1, height: 0, crf: 18 };
+			let mergedName: string | null = null;
+			if (cutSteps > 0) {
+				const names: string[] = [];
+				for (let i = 0; i < segs.length; i++) {
+					const name = `seg${i}.${segExt}`;
+					created.push(name);
+					names.push(name);
+					await run(buildSegmentArgs(inputName, name, segs[i], cutOptions));
+				}
+				if (multi) {
+					await ffmpeg.writeFile('list.txt', new TextEncoder().encode(buildConcatList(names)));
+					created.push('list.txt');
+					mergedName = kind === 'video' ? outputName : `merged.${segExt}`;
+					if (kind !== 'video') created.push(mergedName);
+					await run(buildConcatArgs('list.txt', mergedName));
+				} else {
+					mergedName = names[0];
+				}
+			}
+
+			if (kind === 'video') {
+				// mergedName is the final file; single segment keeps its own name, so read it directly.
+			} else {
+				const src = mergedName ? { input: mergedName } : { input: inputName, cut: segs[0] };
+				await run(
+					kind === 'gif'
+						? buildGifArgs(src, { fps: gifFps, width: gifWidth, speed }, outputName)
+						: buildMp3Args(src, { bitrate: mp3Bitrate, speed }, outputName),
+				);
+			}
+
+			const finalName = kind === 'video' ? (mergedName as string) : outputName;
+			const data = await ffmpeg.readFile(finalName);
 			if (isStale()) return;
-			if (exitCode !== 0) throw new Error('ffmpeg exec failed');
-			const data = await ffmpeg.readFile(outputName);
-			if (isStale()) return;
-			const blob = new Blob([data as Uint8Array], { type: mode === 'fast' ? videoFile.type || 'video/mp4' : 'video/mp4' });
+			const mime =
+				kind === 'gif'
+					? 'image/gif'
+					: kind === 'mp3'
+						? 'audio/mpeg'
+						: effectiveMode(options) === 'fast'
+							? videoFile.type || 'video/mp4'
+							: 'video/mp4';
+			const blob = new Blob([data as Uint8Array], { type: mime });
 			setResultUrl(URL.createObjectURL(blob));
 			setResultSize(blob.size);
-			setResultDuration(end - start);
-			setResultFileName(`${baseNameOf(videoFile.name, 'video')}-trimmed.${outExt}`);
+			setResultDuration(totalSegmentsDuration(segs) / speed);
+			setResultKind(kind);
+			setResultFileName(`${baseNameOf(videoFile.name, 'video')}-${kind === 'video' ? 'trimmed' : kind}.${outExt}`);
 		} catch {
 			// Clear/đổi file đã terminate ffmpeg nên exec bị reject: không hiện lỗi cho tác vụ đã bị huỷ.
-			if (!isStale()) setError(messages.trimError);
+			if (!isStale()) {
+				setError(messages.trimError);
+				// A failed/crashed wasm instance can stay corrupted: drop it so the next attempt loads a fresh engine.
+				terminateFfmpeg();
+			}
 		} finally {
 			// Dọn file ảo trong FS của ffmpeg dù thành công, lỗi hay bị huỷ (tránh rò rỉ bộ nhớ WASM).
 			if (ffmpeg && ffmpegRef.current === ffmpeg) {
-				if (inputName) await ffmpeg.deleteFile(inputName).catch(() => {});
-				if (outputName) await ffmpeg.deleteFile(outputName).catch(() => {});
+				for (const name of created) await ffmpeg.deleteFile(name).catch(() => {});
 			}
-			if (!isStale()) setProcessing(false);
+			if (!isStale()) {
+				setProcessing(false);
+				setStepInfo(null);
+			}
 		}
 	};
 
@@ -365,6 +612,7 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 		runTokenRef.current++;
 		if (processing) terminateFfmpeg();
 		setProcessing(false);
+		setStepInfo(null);
 		setResultFileName(null);
 		if (videoUrl) URL.revokeObjectURL(videoUrl);
 		if (resultUrl) URL.revokeObjectURL(resultUrl);
@@ -372,8 +620,9 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 		setVideoUrl(null);
 		setDuration(null);
 		setMetadataFailed(false);
-		setStart(0);
-		setEnd(0);
+		setThumbs([]);
+		setSegments([{ id: 1, start: 0, end: 0 }]);
+		setActiveId(1);
 		setResultUrl(null);
 		setResultSize(null);
 		setResultDuration(null);
@@ -389,6 +638,7 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 	};
 
 	const effectiveDuration = duration ?? 0;
+	const actionLabel = outputKind === 'gif' ? messages.makeGifButton : outputKind === 'mp3' ? messages.extractMp3Button : messages.trimButton;
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -443,6 +693,17 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 							onError={() => setMetadataFailed(true)}
 							className="w-full max-w-2xl rounded-md border border-border bg-black"
 						/>
+						{duration !== null && (
+							<div className="flex flex-wrap items-center gap-2">
+								<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={() => stepFrame(-1)}>
+									{messages.stepBackFrame}
+								</Button>
+								<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={() => stepFrame(1)}>
+									{messages.stepForwardFrame}
+								</Button>
+								<span className="text-xs text-muted-foreground">{messages.frameStepHint}</span>
+							</div>
+						)}
 					</div>
 
 					{metadataFailed && duration === null && (
@@ -461,8 +722,7 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 									const value = Number(e.target.value);
 									if (Number.isFinite(value) && value > 0) {
 										setDuration(value);
-										setStart(0);
-										setEnd(value);
+										resetSegments(value);
 									}
 								}}
 							/>
@@ -498,6 +758,8 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 								duration={effectiveDuration}
 								start={start}
 								end={end}
+								others={segments.filter((s) => s.id !== active.id)}
+								thumbs={thumbs}
 								onStartChange={setStart}
 								onEndChange={setEnd}
 								startAriaLabel={messages.startLabel}
@@ -510,26 +772,200 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 							<p className="text-xs text-muted-foreground">
 								{messages.selectionLabel.replace('{{duration}}', formatTime(selectionDuration))}
 							</p>
+
+							<div className="flex flex-col gap-2 border-t border-border pt-3">
+								<div className="flex flex-wrap items-center gap-2">
+									<span className="text-sm font-medium text-foreground">{messages.segmentsLabel}</span>
+									<Button
+										type="button"
+										size="sm"
+										variant="outline"
+										className="min-h-9"
+										onClick={handleAddSegment}
+										disabled={segments.length >= MAX_SEGMENTS}
+									>
+										{messages.addSegment}
+									</Button>
+									{segments.length >= MAX_SEGMENTS && (
+										<span className="text-xs text-muted-foreground">{messages.segmentsMax.replace('{{max}}', String(MAX_SEGMENTS))}</span>
+									)}
+								</div>
+								<ul className="flex flex-col gap-1.5">
+									{segments.map((seg, i) => (
+										<li key={seg.id} className="flex items-center gap-2">
+											<Button
+												type="button"
+												size="sm"
+												variant={seg.id === active.id ? 'default' : 'outline'}
+												aria-pressed={seg.id === active.id}
+												className="min-h-9 flex-1 justify-start"
+												onClick={() => setActiveId(seg.id)}
+											>
+												{messages.segmentButton
+													.replace('{{index}}', String(i + 1))
+													.replace('{{start}}', formatTime(seg.start))
+													.replace('{{end}}', formatTime(seg.end))}
+											</Button>
+											{segments.length > 1 && (
+												<Button
+													type="button"
+													size="sm"
+													variant="ghost"
+													className="min-h-9"
+													aria-label={`${messages.removeSegment} ${i + 1}`}
+													onClick={() => handleRemoveSegment(seg.id)}
+												>
+													{messages.removeSegment}
+												</Button>
+											)}
+										</li>
+									))}
+								</ul>
+								{segments.length > 1 && (
+									<p className="text-xs text-muted-foreground">{messages.segmentsTotal.replace('{{duration}}', formatTime(totalKept))}</p>
+								)}
+							</div>
 						</div>
 					)}
 
-					<div className="flex flex-col gap-2 rounded-lg border border-border p-4">
-						<div className="flex gap-2">
-							<Button type="button" size="sm" variant={mode === 'fast' ? 'default' : 'outline'} onClick={() => setMode('fast')}>
-								{messages.fastModeLabel}
-							</Button>
-							<Button type="button" size="sm" variant={mode === 'precise' ? 'default' : 'outline'} onClick={() => setMode('precise')}>
-								{messages.preciseModeLabel}
-							</Button>
+					<div className="flex flex-col gap-3 rounded-lg border border-border p-4">
+						<div className="flex flex-col gap-1.5">
+							<span className="text-sm font-medium text-foreground">{messages.outputFormatLabel}</span>
+							<div className="flex flex-wrap gap-2">
+								{(
+									[
+										['video', messages.outputVideo],
+										['gif', messages.outputGif],
+										['mp3', messages.outputMp3],
+									] as const
+								).map(([kind, label]) => (
+									<Button
+										key={kind}
+										type="button"
+										size="sm"
+										className="min-h-9"
+										variant={outputKind === kind ? 'default' : 'outline'}
+										aria-pressed={outputKind === kind}
+										onClick={() => setOutputKind(kind)}
+									>
+										{label}
+									</Button>
+								))}
+							</div>
 						</div>
-						<p className="text-xs text-muted-foreground">{messages.modeHint}</p>
+
+						{outputKind === 'video' && (
+							<div className="flex flex-col gap-2">
+								<div className="flex gap-2">
+									<Button type="button" size="sm" className="min-h-9" variant={mode === 'fast' ? 'default' : 'outline'} aria-pressed={mode === 'fast'} onClick={() => setMode('fast')}>
+										{messages.fastModeLabel}
+									</Button>
+									<Button type="button" size="sm" className="min-h-9" variant={mode === 'precise' ? 'default' : 'outline'} aria-pressed={mode === 'precise'} onClick={() => setMode('precise')}>
+										{messages.preciseModeLabel}
+									</Button>
+								</div>
+								<p className="text-xs text-muted-foreground">{messages.modeHint}</p>
+								{forcedPrecise && <p className="text-xs text-amber-700 dark:text-amber-400">{messages.forcePreciseNote}</p>}
+							</div>
+						)}
+
+						{outputKind === 'gif' && (
+							<div className="flex flex-wrap items-end gap-4">
+								<label className="flex flex-col gap-1 text-xs text-muted-foreground">
+									{messages.gifFpsLabel}
+									<select className={selectClass} value={gifFps} onChange={(e) => setGifFps(Number(e.target.value))}>
+										{GIF_FPS_OPTIONS.map((f) => (
+											<option key={f} value={f}>
+												{f} fps
+											</option>
+										))}
+									</select>
+								</label>
+								<label className="flex flex-col gap-1 text-xs text-muted-foreground">
+									{messages.gifWidthLabel}
+									<select className={selectClass} value={gifWidth} onChange={(e) => setGifWidth(Number(e.target.value))}>
+										{GIF_WIDTH_OPTIONS.map((w) => (
+											<option key={w} value={w}>
+												{w}px
+											</option>
+										))}
+									</select>
+								</label>
+							</div>
+						)}
+
+						{outputKind === 'mp3' && (
+							<div className="flex flex-col gap-1.5">
+								<label className="flex flex-col gap-1 text-xs text-muted-foreground">
+									{messages.mp3BitrateLabel}
+									<select className={`${selectClass} w-fit`} value={mp3Bitrate} onChange={(e) => setMp3Bitrate(Number(e.target.value))}>
+										{MP3_BITRATE_OPTIONS.map((b) => (
+											<option key={b} value={b}>
+												{b} kbps
+											</option>
+										))}
+									</select>
+								</label>
+								<p className="text-xs text-muted-foreground">{messages.mp3Note}</p>
+							</div>
+						)}
+
+						<details className="rounded-md border border-border p-3">
+							<summary className="min-h-9 cursor-pointer text-sm font-medium text-foreground">{messages.advancedLabel}</summary>
+							<div className="mt-3 flex flex-wrap items-end gap-4">
+								{outputKind === 'video' && (
+									<label className="flex min-h-9 items-center gap-2 text-sm text-foreground">
+										<input type="checkbox" className="size-4" checked={mute} onChange={(e) => setMute(e.target.checked)} />
+										{messages.muteLabel}
+									</label>
+								)}
+								<label className="flex flex-col gap-1 text-xs text-muted-foreground">
+									{messages.speedLabel}
+									<select className={selectClass} value={speed} onChange={(e) => setSpeed(Number(e.target.value))}>
+										{SPEED_OPTIONS.map((s) => (
+											<option key={s} value={s}>
+												{s}x
+											</option>
+										))}
+									</select>
+								</label>
+								{outputKind === 'video' && (
+									<>
+										<label className="flex flex-col gap-1 text-xs text-muted-foreground">
+											{messages.resolutionLabel}
+											<select className={selectClass} value={height} onChange={(e) => setHeight(Number(e.target.value))}>
+												{HEIGHT_OPTIONS.map((h) => (
+													<option key={h} value={h}>
+														{h === 0 ? messages.resolutionOriginal : `${h}p`}
+													</option>
+												))}
+											</select>
+										</label>
+										<label className="flex flex-col gap-1 text-xs text-muted-foreground">
+											{messages.crfLabel.replace('{{value}}', String(crf))}
+											<input
+												type="range"
+												min={18}
+												max={35}
+												step={1}
+												value={crf}
+												disabled={effectiveMode(options) === 'fast'}
+												onChange={(e) => setCrf(Number(e.target.value))}
+												className="h-9 w-40"
+											/>
+										</label>
+									</>
+								)}
+							</div>
+							{outputKind === 'video' && <p className="mt-2 text-xs text-muted-foreground">{messages.crfHint}</p>}
+						</details>
 					</div>
 
 					<div className="flex flex-wrap items-center gap-3">
-						<Button type="button" size="sm" onClick={handleTrim} disabled={processing || duration === null}>
-							{messages.trimButton}
+						<Button type="button" size="sm" className="min-h-9" onClick={handleProcess} disabled={processing || duration === null}>
+							{actionLabel}
 						</Button>
-						<Button type="button" size="sm" variant="ghost" onClick={handleClear}>
+						<Button type="button" size="sm" variant="ghost" className="min-h-9" onClick={handleClear}>
 							{messages.clear}
 						</Button>
 						{engineState === 'loading' && (
@@ -537,7 +973,12 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 						)}
 						{processing && engineState === 'ready' && (
 							<p role="status" className="text-xs text-muted-foreground">
-								{messages.processingLabel.replace('{{percent}}', String(progress))}
+								{stepInfo && stepInfo.total > 1
+									? messages.processingStepLabel
+											.replace('{{current}}', String(stepInfo.current))
+											.replace('{{total}}', String(stepInfo.total))
+											.replace('{{percent}}', String(progress))
+									: messages.processingLabel.replace('{{percent}}', String(progress))}
 							</p>
 						)}
 					</div>
@@ -556,7 +997,13 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 					{resultUrl && (
 						<div className="flex flex-col gap-3 rounded-lg border border-border p-4">
 							<label className="text-sm font-medium text-foreground">{messages.resultLabel}</label>
-							<video src={resultUrl} controls className="w-full max-w-2xl rounded-md border border-border bg-black" />
+							{resultKind === 'video' && (
+								<video src={resultUrl} controls className="w-full max-w-2xl rounded-md border border-border bg-black" />
+							)}
+							{resultKind === 'gif' && (
+								<img src={resultUrl} alt={messages.resultGifAlt} className="max-h-96 w-auto max-w-full rounded-md border border-border" />
+							)}
+							{resultKind === 'mp3' && <audio src={resultUrl} controls className="w-full max-w-2xl" />}
 							<div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
 								<span>
 									{messages.originalLabel}:{' '}
@@ -572,7 +1019,7 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 								</span>
 							</div>
 							<div>
-								<Button type="button" size="sm" onClick={handleDownload}>
+								<Button type="button" size="sm" className="min-h-9" onClick={handleDownload}>
 									{messages.download}
 								</Button>
 							</div>

@@ -1,10 +1,10 @@
 {
   "meta": {
     "title": "Trim Video Online Free — Video Trimmer — Web Tool Hub",
-    "description": "Cut a short clip out of a video right in your browser — pick a start and end point, choose fast or precise trimming, and download the result. No upload, no server."
+    "description": "Cut one or several clips from a video right in your browser, export as video, animated GIF or MP3, change speed, mute or shrink it. No upload, no server."
   },
   "heading": "Video Trimmer",
-  "tagline": "Cut a short clip from a video — pick start and end points, choose fast or precise trimming, and download the result, entirely in your browser.",
+  "tagline": "Cut one or more clips from a video, then export as video, GIF or MP3 with optional speed, mute and resolution changes, entirely in your browser.",
   "ui": {
     "dropLabel": "Drag and drop a video file here",
     "chooseFile": "Choose video",
@@ -31,7 +31,36 @@
     "metadataError": "This browser can't preview this video format directly, but it may still be trimmable — enter its total duration manually below.",
     "manualDurationLabel": "Total duration (seconds)",
     "notVideoError": "That file doesn't look like a video. Choose a video file (MP4, MOV, WebM, MKV...).",
-    "largeFileWarning": "This file is large ({{size}}). Trimming happens in your browser's memory and may fail or crash the tab above ~1 GB; try fast mode or a smaller file."
+    "largeFileWarning": "This file is large ({{size}}). Trimming happens in your browser's memory and may fail or crash the tab above ~1 GB; try fast mode or a smaller file.",
+    "outputFormatLabel": "Output",
+    "outputVideo": "Video clip",
+    "outputGif": "Animated GIF",
+    "outputMp3": "Audio only (MP3)",
+    "gifFpsLabel": "GIF frame rate",
+    "gifWidthLabel": "GIF width",
+    "mp3BitrateLabel": "MP3 bitrate",
+    "mp3Note": "The audio track is extracted and encoded to MP3. If the video has no audio track, extraction fails.",
+    "advancedLabel": "Advanced: speed, mute, resolution, quality",
+    "muteLabel": "Remove audio (mute)",
+    "speedLabel": "Playback speed",
+    "resolutionLabel": "Max height",
+    "resolutionOriginal": "Original",
+    "crfLabel": "Quality (CRF {{value}})",
+    "crfHint": "CRF applies when re-encoding: lower means better quality and bigger files (18-23 is high quality, 28-35 is small). Changing speed or resolution always re-encodes.",
+    "forcePreciseNote": "The selected speed or resolution needs re-encoding, so this export will use Precise mode.",
+    "segmentsLabel": "Clips to keep",
+    "addSegment": "Add a clip",
+    "removeSegment": "Remove",
+    "segmentButton": "Clip {{index}}: {{start}} - {{end}}",
+    "segmentsTotal": "Total length of all clips: {{duration}}",
+    "segmentsMax": "Maximum {{max}} clips.",
+    "stepBackFrame": "Back 1 frame",
+    "stepForwardFrame": "Forward 1 frame",
+    "frameStepHint": "Steps by about 1/30 s; then use \"Set to current time\".",
+    "makeGifButton": "Create GIF",
+    "extractMp3Button": "Extract MP3",
+    "processingStepLabel": "Step {{current}} of {{total}} - {{percent}}%",
+    "resultGifAlt": "Preview of the generated animated GIF"
   },
   "related": "Related tools",
   "faq": {
@@ -48,6 +77,6 @@
     "p1": "Cutting a short clip out of a longer recording — pulling a highlight from a screen recording, trimming dead air from the start of a phone video, grabbing a 10-second segment to share — is one of those tasks that feels like it should take ten seconds, but most online video tools want you to upload the entire file to their server first, wait for it to process, then download the result. For anything even moderately large, or anything you'd rather not hand to a stranger's server, that round trip is slow and, more importantly, forces you to give up your file's privacy for a trivial edit.",
     "p2": "This tool runs a real build of FFmpeg — the same engine that powers most video software — compiled to WebAssembly, so it executes entirely inside your browser tab. Your video file never leaves your device; it's decoded, cut, and re-packaged locally. The one exception is the FFmpeg engine itself: it's a roughly 30 MB program file loaded once from a public CDN the first time you use the tool (the same way a web font or an icon library gets loaded), cached by your browser afterward. That download contains no information about you or your files — it's just the software doing the trimming, running on your machine from that point on.",
     "p3": "Play the video and use \"Set to current time\" to mark your in and out points precisely, or drag the two sliders directly. Fast mode cuts the clip by copying the original video and audio streams without re-encoding them — it finishes almost instantly, but because video is stored as a sequence of keyframes with predicted frames in between, the actual cut point may land on the nearest keyframe rather than the exact millisecond you selected. Precise mode re-encodes the selected range from scratch, which takes longer (WebAssembly video encoding isn't as fast as native software) but gives you a frame-accurate cut at the point you chose.",
-    "p4": "Once trimming finishes, preview the result directly, compare its file size and duration against the original, and download it. If the source clip is itself a screen recording or needs further cleanup — extracting just the audio, for instance — the MP3 ↔ WAV Converter on this site handles the audio side, while the Image Compressor and Background Remover cover the most common companion editing needs for visual content."
+    "p4": "Once trimming finishes, preview the result directly, compare its file size and duration against the original, and download it. If the source clip is itself a screen recording or needs further cleanup — extracting just the audio, for instance — the Audio Converter on this site handles the audio side, while the Image Compressor and Background Remover cover the most common companion editing needs for visual content."
   }
 }

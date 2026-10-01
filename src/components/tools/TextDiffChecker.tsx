@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type RefObject, type UIEvent } from 'react';
 import {
+	buildDiffHtml,
+	buildUnifiedPatch,
+	buildUnifiedRows,
+	collapseContext,
+	compileIgnorePatterns,
 	countLineStats,
 	getHunkStartRows,
+	getUnifiedHunkStarts,
 	renderMergedColumn,
 	type DiffGranularity,
 	type DiffLineEntry,
@@ -11,6 +17,7 @@ import {
 import type { TextDiffRequest, TextDiffResponse } from './textDiffWorker';
 import { autoFormatText } from '@/lib/text-format';
 import { Button } from '@/components/ui/button';
+import UnifiedDiffView, { UNIFIED_ROW_HEIGHT, UNIFIED_VIEWPORT_HEIGHT, type TextDiffExtraMessages } from './TextDiffUnified';
 
 interface Messages {
 	originalLabel: string;
@@ -69,6 +76,7 @@ interface Messages {
 	restoreDraft: string;
 	clipboardError: string;
 	fileReadError: string;
+	x: TextDiffExtraMessages;
 }
 
 const DEBOUNCE_MS = 150;
@@ -289,9 +297,10 @@ interface DiffColumnProps {
 	scrollRef: RefObject<HTMLDivElement | null>;
 	onScroll: (event: UIEvent<HTMLDivElement>) => void;
 	activeRowIndex: number | null;
+	collapsedLabel: string;
 }
 
-function DiffColumn({ entries, lineNumbers, side, scrollRef, onScroll, activeRowIndex }: DiffColumnProps) {
+function DiffColumn({ entries, lineNumbers, side, scrollRef, onScroll, activeRowIndex, collapsedLabel }: DiffColumnProps) {
 	const [scrollTop, setScrollTop] = useState(0);
 	const handleScroll = (event: UIEvent<HTMLDivElement>) => {
 		setScrollTop(event.currentTarget.scrollTop);
@@ -314,7 +323,13 @@ function DiffColumn({ entries, lineNumbers, side, scrollRef, onScroll, activeRow
 								{lineNumbers[index] ?? ''}
 							</div>
 							<div className="min-w-0 flex-1">
-								<DiffRowContent entry={entry} side={side} />
+								{entry.collapsed !== undefined ? (
+									<div className="h-6 bg-muted px-2 text-xs leading-6 text-muted-foreground italic">
+										{collapsedLabel.replace('{{count}}', String(entry.collapsed))}
+									</div>
+								) : (
+									<DiffRowContent entry={entry} side={side} />
+								)}
 							</div>
 						</div>
 					);
@@ -442,6 +457,13 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	// modified. The difference is still surfaced as a note (see `notes` below).
 	const [normalizeLineEndings, setNormalizeLineEndings] = useState(true);
 	const [normalizeUnicode, setNormalizeUnicode] = useState(false);
+	const [viewMode, setViewMode] = useState<'split' | 'unified'>('split');
+	// null = show every unchanged line; a number = keep that many lines of context around changes.
+	const [contextLines, setContextLines] = useState<number | null>(null);
+	const [wrapLines, setWrapLines] = useState(false);
+	const [ignoreRegexText, setIgnoreRegexText] = useState('');
+	const ignoreSources = useMemo(() => ignoreRegexText.split('\n').filter((line) => line.trim() !== ''), [ignoreRegexText]);
+	const ignoreCompile = useMemo(() => compileIgnorePatterns(ignoreSources), [ignoreSources]);
 	const [activeHunk, setActiveHunk] = useState(0);
 	const [copiedSide, setCopiedSide] = useState<'left' | 'right' | null>(null);
 	const [hunkOverrides, setHunkOverrides] = useState<Map<number, HunkOverride>>(new Map());
@@ -636,6 +658,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 			ignoreEmptyLines,
 			normalizeLineEndings,
 			normalizeUnicode,
+			ignorePatterns: ignoreCompile.error ? [] : ignoreSources,
 		};
 		worker.postMessage(request);
 		return () => worker.terminate();
@@ -648,6 +671,8 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		ignoreEmptyLines,
 		normalizeLineEndings,
 		normalizeUnicode,
+		ignoreSources,
+		ignoreCompile.error,
 	]);
 
 	useEffect(() => {
@@ -658,7 +683,6 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 
 	const isLargeInput = originalText.length + changedText.length > LARGE_INPUT_CHARS;
 	const stats = useMemo(() => countLineStats(entries), [entries]);
-	const hunkStartRows = useMemo(() => getHunkStartRows(entries), [entries]);
 	const hasChanges = stats.added > 0 || stats.removed > 0 || stats.modified > 0;
 
 	// Reset per-hunk merge choices whenever the underlying comparison changes — stale
@@ -728,6 +752,63 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		return numbers;
 	}, [entries]);
 
+	// "Hide unchanged lines": display-only. The merge tool and exports always use the full `entries`.
+	const collapsedView = useMemo(
+		() => (contextLines === null ? { entries, sourceIndex: entries.map((_, i) => i) } : collapseContext(entries, contextLines)),
+		[entries, contextLines],
+	);
+	const viewEntries = collapsedView.entries;
+	const viewLeftNumbers = useMemo(
+		() => collapsedView.sourceIndex.map((i) => (i === -1 ? null : leftLineNumbers[i])),
+		[collapsedView, leftLineNumbers],
+	);
+	const viewRightNumbers = useMemo(
+		() => collapsedView.sourceIndex.map((i) => (i === -1 ? null : rightLineNumbers[i])),
+		[collapsedView, rightLineNumbers],
+	);
+	const hunkStartRows = useMemo(() => getHunkStartRows(viewEntries), [viewEntries]);
+	const unifiedRows = useMemo(() => (viewMode === 'unified' ? buildUnifiedRows(entries, contextLines) : []), [viewMode, entries, contextLines]);
+	const unifiedHunkStarts = useMemo(() => getUnifiedHunkStarts(unifiedRows), [unifiedRows]);
+	const unifiedScrollRef = useRef<HTMLDivElement>(null);
+	const [exportNote, setExportNote] = useState<string | null>(null);
+
+	const downloadText = (content: string, filename: string, mime: string) => {
+		const blob = new Blob([content], { type: mime });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = filename;
+		link.click();
+		URL.revokeObjectURL(url);
+	};
+	const handleExportPatch = () => {
+		const patch = buildUnifiedPatch(entries);
+		if (!patch) {
+			setExportNote(messages.x.exportNothing);
+			return;
+		}
+		setExportNote(null);
+		downloadText(patch, 'changes.diff', 'text/x-diff');
+	};
+	const handleCopyPatch = () => {
+		const patch = buildUnifiedPatch(entries);
+		if (!patch) {
+			setExportNote(messages.x.exportNothing);
+			return;
+		}
+		navigator.clipboard
+			.writeText(patch)
+			.then(() => setExportNote(messages.x.patchCopied))
+			.catch(() => setToolError(messages.clipboardError));
+	};
+	const handleExportHtml = () => {
+		downloadText(
+			buildDiffHtml(entries, { title: `${messages.originalLabel} / ${messages.changedLabel}`, left: messages.originalLabel, right: messages.changedLabel, lang: document.documentElement.lang || 'en' }),
+			'diff.html',
+			'text/html',
+		);
+	};
+
 	const handleUploadFile = (which: 'original' | 'changed') => (fileList: FileList | null) => {
 		const file = fileList?.[0];
 		if (!file) return;
@@ -781,6 +862,14 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		if (hunkStartRows.length === 0) return;
 		const clamped = ((hunkPosition % hunkStartRows.length) + hunkStartRows.length) % hunkStartRows.length;
 		setActiveHunk(clamped);
+		if (viewMode === 'unified') {
+			const unifiedRow = unifiedHunkStarts[clamped] ?? 0;
+			unifiedScrollRef.current?.scrollTo({
+				top: Math.max(0, unifiedRow * UNIFIED_ROW_HEIGHT - UNIFIED_VIEWPORT_HEIGHT / 2 + UNIFIED_ROW_HEIGHT / 2),
+				behavior: 'smooth',
+			});
+			return;
+		}
 		const rowIndex = hunkStartRows[clamped];
 		const targetScrollTop = Math.max(0, rowIndex * ROW_HEIGHT - DIFF_VIEWPORT_HEIGHT / 2 + ROW_HEIGHT / 2);
 		leftColumnRef.current?.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
@@ -960,6 +1049,67 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 						</Button>
 					)}
 				</div>
+				<div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-foreground">
+					<div className="flex items-center gap-1">
+						<span className="text-xs text-muted-foreground">{messages.x.viewLabel}</span>
+						{(['split', 'unified'] as const).map((mode) => (
+							<button
+								key={mode}
+								type="button"
+								onClick={() => setViewMode(mode)}
+								aria-pressed={viewMode === mode}
+								className={`min-h-9 rounded-md border px-2.5 py-1 text-xs font-medium ${
+									viewMode === mode ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'
+								}`}
+							>
+								{mode === 'split' ? messages.x.viewSplit : messages.x.viewUnified}
+							</button>
+						))}
+					</div>
+					<label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+						{messages.x.contextLabel}
+						<select
+							value={contextLines === null ? 'all' : String(contextLines)}
+							onChange={(event) => setContextLines(event.target.value === 'all' ? null : Number(event.target.value))}
+							className="min-h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+						>
+							<option value="all">{messages.x.contextAll}</option>
+							{[0, 1, 3, 5, 10].map((n) => (
+								<option key={n} value={String(n)}>
+									{messages.x.contextN.replace('{{n}}', String(n))}
+								</option>
+							))}
+						</select>
+					</label>
+					{viewMode === 'unified' && (
+						<label className="flex min-h-9 cursor-pointer items-center gap-1.5">
+							<input type="checkbox" checked={wrapLines} onChange={(event) => setWrapLines(event.target.checked)} />
+							{messages.x.wrapLines}
+						</label>
+					)}
+				</div>
+				<details className="rounded-md border border-border p-3">
+					<summary className="cursor-pointer text-sm font-medium text-foreground">{messages.x.ignoreRegexHeading}</summary>
+					<div className="mt-2 flex flex-col gap-1">
+						<label htmlFor="text-diff-ignore-regex" className="text-xs text-muted-foreground">
+							{messages.x.ignoreRegexHelp}
+						</label>
+						<textarea
+							id="text-diff-ignore-regex"
+							value={ignoreRegexText}
+							onChange={(event) => setIgnoreRegexText(event.target.value)}
+							placeholder={messages.x.ignoreRegexPlaceholder}
+							rows={3}
+							spellCheck={false}
+							className="w-full rounded-md border border-border bg-background p-2 font-mono text-xs text-foreground"
+						/>
+						{ignoreCompile.error && (
+							<p role="alert" className="text-xs text-destructive">
+								{messages.x.ignoreRegexInvalid.replace('{{message}}', ignoreCompile.error)}
+							</p>
+						)}
+					</div>
+				</details>
 				{isLargeInput && <p role="status" className="text-xs text-amber-700 dark:text-amber-400">{messages.largeInputWarning}</p>}
 				{isComputing && <p role="status" className="text-xs text-muted-foreground">{messages.computing}</p>}
 				{(diffError || toolError) && (
@@ -999,6 +1149,15 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							<Button type="button" size="icon-xs" variant="outline" aria-label={messages.nextChange} onClick={() => jumpToHunk(activeHunk + 1)}>
 								↓
 							</Button>
+							<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={handleExportPatch}>
+								{messages.x.exportPatch}
+							</Button>
+							<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={handleCopyPatch}>
+								{messages.x.copyPatch}
+							</Button>
+							<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={handleExportHtml}>
+								{messages.x.exportHtml}
+							</Button>
 							<Button type="button" size="sm" variant="outline" aria-label={`${isSideBySideFullscreen ? messages.exitFullscreen : messages.fullscreen} – ${messages.originalLabel} / ${messages.changedLabel}`} onClick={toggleSideBySideFullscreen}>
 								{isSideBySideFullscreen ? messages.exitFullscreen : messages.fullscreen}
 							</Button>
@@ -1008,14 +1167,30 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 					{/* Side by side on desktop; stacked (Original above Changed) below `md` — two
 					    ~180px-wide diff columns are too cramped to read comfortably on a phone,
 					    so each gets the full width and its own labeled block instead. */}
+					{exportNote && (
+						<p role="status" className="text-xs text-muted-foreground">
+							{exportNote}
+						</p>
+					)}
+					{viewMode === 'unified' ? (
+						<UnifiedDiffView
+							rows={unifiedRows}
+							wrap={wrapLines}
+							scrollRef={unifiedScrollRef}
+							activeRowIndex={unifiedHunkStarts[activeHunk] ?? null}
+							collapsedLabel={messages.x.collapsedLines}
+							ariaLabel={messages.x.unifiedAria}
+						/>
+					) : (
 					<div className="flex flex-col overflow-hidden rounded-md border border-border md:flex-row">
 						<div className="flex flex-col md:min-w-0 md:flex-1">
 							<span className="border-b border-border bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
 								{messages.originalLabel}
 							</span>
 							<DiffColumn
-								entries={entries}
-								lineNumbers={leftLineNumbers}
+								entries={viewEntries}
+								lineNumbers={viewLeftNumbers}
+								collapsedLabel={messages.x.collapsedLines}
 								side="left"
 								scrollRef={leftColumnRef}
 								onScroll={syncDiffScroll(0)}
@@ -1029,8 +1204,9 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 								{messages.changedLabel}
 							</span>
 							<DiffColumn
-								entries={entries}
-								lineNumbers={rightLineNumbers}
+								entries={viewEntries}
+								lineNumbers={viewRightNumbers}
+								collapsedLabel={messages.x.collapsedLines}
 								side="right"
 								scrollRef={rightColumnRef}
 								onScroll={syncDiffScroll(1)}
@@ -1038,6 +1214,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							/>
 						</div>
 					</div>
+					)}
 				</div>
 			) : (
 				(originalText !== '' || changedText !== '') &&

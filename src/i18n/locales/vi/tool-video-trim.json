@@ -1,10 +1,10 @@
 {
   "meta": {
     "title": "Cắt Video Ngắn Online Miễn phí — Web Tool Hub",
-    "description": "Cắt một đoạn ngắn từ video ngay trên trình duyệt — chọn điểm bắt đầu/kết thúc, chọn chế độ cắt nhanh hoặc chính xác, rồi tải kết quả về. Không tải lên server."
+    "description": "Cắt một hoặc nhiều đoạn từ video ngay trên trình duyệt, xuất ra video, ảnh GIF động hoặc MP3, đổi tốc độ, tắt tiếng hoặc giảm độ phân giải. Không tải lên server."
   },
   "heading": "Cắt video ngắn",
-  "tagline": "Cắt một đoạn ngắn từ video — chọn điểm bắt đầu và kết thúc, chọn chế độ cắt nhanh hoặc chính xác, rồi tải kết quả về, hoàn toàn trên trình duyệt của bạn.",
+  "tagline": "Cắt một hoặc nhiều đoạn từ video, rồi xuất ra video, GIF hoặc MP3 với tuỳ chọn đổi tốc độ, tắt tiếng, giảm độ phân giải, hoàn toàn trên trình duyệt.",
   "ui": {
     "dropLabel": "Kéo thả file video vào đây",
     "chooseFile": "Chọn video",
@@ -31,7 +31,36 @@
     "metadataError": "Trình duyệt này không xem trước trực tiếp được định dạng video này, nhưng vẫn có thể cắt được — nhập tổng thời lượng thủ công bên dưới.",
     "manualDurationLabel": "Tổng thời lượng (giây)",
     "notVideoError": "Tệp này không phải video. Hãy chọn tệp video (MP4, MOV, WebM, MKV...).",
-    "largeFileWarning": "Tệp này lớn ({{size}}). Việc cắt chạy trong bộ nhớ trình duyệt và có thể lỗi hoặc làm treo tab khi trên ~1 GB; hãy thử chế độ nhanh hoặc tệp nhỏ hơn."
+    "largeFileWarning": "Tệp này lớn ({{size}}). Việc cắt chạy trong bộ nhớ trình duyệt và có thể lỗi hoặc làm treo tab khi trên ~1 GB; hãy thử chế độ nhanh hoặc tệp nhỏ hơn.",
+    "outputFormatLabel": "Đầu ra",
+    "outputVideo": "Đoạn video",
+    "outputGif": "Ảnh GIF động",
+    "outputMp3": "Chỉ âm thanh (MP3)",
+    "gifFpsLabel": "Tốc độ khung hình GIF",
+    "gifWidthLabel": "Chiều rộng GIF",
+    "mp3BitrateLabel": "Bitrate MP3",
+    "mp3Note": "Tách âm thanh của video và mã hoá sang MP3. Nếu video không có âm thanh, việc tách sẽ thất bại.",
+    "advancedLabel": "Nâng cao: tốc độ, tắt tiếng, độ phân giải, chất lượng",
+    "muteLabel": "Xoá âm thanh (tắt tiếng)",
+    "speedLabel": "Tốc độ phát",
+    "resolutionLabel": "Chiều cao tối đa",
+    "resolutionOriginal": "Gốc",
+    "crfLabel": "Chất lượng (CRF {{value}})",
+    "crfHint": "CRF áp dụng khi mã hoá lại: số càng nhỏ chất lượng càng cao và file càng lớn (18-23 là chất lượng cao, 28-35 là nhẹ). Đổi tốc độ hoặc độ phân giải luôn phải mã hoá lại.",
+    "forcePreciseNote": "Tốc độ hoặc độ phân giải đã chọn cần mã hoá lại, nên lần xuất này sẽ dùng chế độ Chính xác.",
+    "segmentsLabel": "Các đoạn giữ lại",
+    "addSegment": "Thêm đoạn",
+    "removeSegment": "Xoá",
+    "segmentButton": "Đoạn {{index}}: {{start}} - {{end}}",
+    "segmentsTotal": "Tổng độ dài các đoạn: {{duration}}",
+    "segmentsMax": "Tối đa {{max}} đoạn.",
+    "stepBackFrame": "Lùi 1 khung hình",
+    "stepForwardFrame": "Tiến 1 khung hình",
+    "frameStepHint": "Mỗi lần nhảy khoảng 1/30 giây; sau đó dùng \"Lấy thời điểm hiện tại\".",
+    "makeGifButton": "Tạo GIF",
+    "extractMp3Button": "Tách MP3",
+    "processingStepLabel": "Bước {{current}}/{{total}} - {{percent}}%",
+    "resultGifAlt": "Xem trước ảnh GIF động vừa tạo"
   },
   "related": "Công cụ liên quan",
   "faq": {
@@ -48,6 +77,6 @@
     "p1": "Cắt một đoạn ngắn từ một video dài hơn — lấy ra khoảnh khắc hay từ một bản ghi màn hình, cắt bỏ đoạn thừa ở đầu một video quay bằng điện thoại, lấy đúng 10 giây để chia sẻ — là một trong những việc tưởng chừng chỉ mất mười giây, nhưng hầu hết công cụ video online lại bắt bạn tải nguyên file lên server của họ trước, chờ xử lý, rồi mới tải kết quả về. Với file có dung lượng kha khá, hoặc bất cứ nội dung nào bạn không muốn đưa cho server của người lạ, việc đi vòng đó vừa chậm, vừa quan trọng hơn là buộc bạn phải đánh đổi quyền riêng tư của file chỉ để thực hiện một chỉnh sửa nhỏ.",
     "p2": "Công cụ này chạy một bản FFmpeg thật — chính là engine đứng sau hầu hết phần mềm xử lý video — được biên dịch sang WebAssembly, nên nó thực thi hoàn toàn ngay trong tab trình duyệt của bạn. File video của bạn không bao giờ rời khỏi thiết bị; nó được giải mã, cắt, và đóng gói lại ngay tại chỗ. Ngoại lệ duy nhất là chính engine FFmpeg: đây là một file chương trình khoảng 30 MB được tải một lần từ một CDN công khai vào lần đầu bạn dùng công cụ (giống như cách một web font hay một thư viện icon được tải về), sau đó trình duyệt sẽ lưu cache lại. File tải về đó không chứa bất kỳ thông tin nào về bạn hay file của bạn — nó chỉ là phần mềm thực hiện việc cắt video, chạy trên máy bạn kể từ thời điểm đó.",
     "p3": "Phát video và dùng nút \"Lấy thời điểm hiện tại\" để đánh dấu chính xác điểm vào/ra, hoặc kéo trực tiếp hai thanh trượt. Chế độ Nhanh cắt đoạn video bằng cách sao chép nguyên luồng hình và tiếng gốc mà không mã hóa lại — gần như tức thì, nhưng vì video được lưu dưới dạng chuỗi các keyframe cùng các khung hình dự đoán xen giữa, điểm cắt thực tế có thể rơi vào keyframe gần nhất thay vì đúng mili-giây bạn chọn. Chế độ Chính xác mã hóa lại toàn bộ đoạn đã chọn từ đầu, mất nhiều thời gian hơn (mã hóa video bằng WebAssembly không nhanh bằng phần mềm gốc) nhưng cho kết quả cắt đúng từng khung hình tại điểm bạn chọn.",
-    "p4": "Khi cắt xong, xem trước kết quả trực tiếp, so sánh dung lượng và thời lượng với file gốc, rồi tải về. Nếu đoạn gốc là một bản ghi màn hình hoặc cần chỉnh sửa thêm — ví dụ tách riêng phần âm thanh — trình Chuyển đổi MP3 ↔ WAV trên trang này lo phần âm thanh, còn Nén ảnh và Xóa nền ảnh đáp ứng những nhu cầu chỉnh sửa hình ảnh đi kèm phổ biến nhất."
+    "p4": "Khi cắt xong, xem trước kết quả trực tiếp, so sánh dung lượng và thời lượng với file gốc, rồi tải về. Nếu đoạn gốc là một bản ghi màn hình hoặc cần chỉnh sửa thêm — ví dụ tách riêng phần âm thanh — trình Chuyển đổi âm thanh trên trang này lo phần âm thanh, còn Nén ảnh và Xóa nền ảnh đáp ứng những nhu cầu chỉnh sửa hình ảnh đi kèm phổ biến nhất."
   }
 }

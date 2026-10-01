@@ -42,7 +42,36 @@
     "draftSaved": "Đã lưu bản nháp trong trình duyệt này.",
     "draftSaveFailed": "Không lưu được bản nháp trong trình duyệt này (bộ nhớ đầy hoặc bị chặn).",
     "copyFailed": "Sao chép thất bại",
-    "fileReadError": "Không đọc được tệp này."
+    "fileReadError": "Không đọc được tệp này.",
+    "x": {
+      "tabsLabel": "Tài liệu",
+      "newDoc": "Tài liệu mới",
+      "closeDoc": "Đóng tài liệu {{name}}",
+      "closeConfirm": "Đóng tài liệu này? Nội dung sẽ bị xoá khỏi trình duyệt này.",
+      "untitled": "Chưa đặt tên",
+      "docLimit": "Đã đạt giới hạn tài liệu (10 tài liệu hoặc khoảng 2 MB văn bản).",
+      "outlineHeading": "Mục lục (outline)",
+      "outlineEmpty": "Thêm tiêu đề (# Tiêu đề) để tạo mục lục.",
+      "exportPdf": "Xuất PDF",
+      "exportPdfHint": "Mở hộp thoại in của trình duyệt - chọn \"Lưu dưới dạng PDF\" làm máy in.",
+      "findReplace": "Tìm và thay thế",
+      "zen": "Chế độ tập trung / toàn màn hình",
+      "exitZen": "Thoát toàn màn hình",
+      "fontSize": "Cỡ chữ",
+      "phrases": {
+        "Find": "Tìm",
+        "Replace": "Thay thế",
+        "next": "tiếp",
+        "previous": "trước",
+        "all": "tất cả",
+        "match case": "phân biệt hoa thường",
+        "by word": "nguyên từ",
+        "regexp": "regex",
+        "replace": "thay thế",
+        "replace all": "thay tất cả",
+        "close": "đóng"
+      }
+    }
   },
   "related": "Công cụ liên quan",
   "faq": {

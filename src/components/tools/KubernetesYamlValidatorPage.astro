@@ -7,6 +7,7 @@ import { getFixedT } from '@/i18n/i18next';
 import { tools } from '@/data/tools';
 import type { Locale } from '@/i18n/config';
 import { K8S_ISSUE_KEYS } from '@/lib/k8s-yaml-validator';
+import { SECURITY_CHECK_IDS } from '@/lib/k8s-security';
 
 interface Props {
 	lang: Locale;
@@ -46,6 +47,21 @@ const messages = {
 	validationFailed: t('ui.validationFailed'),
 	fileReadError: t('ui.fileReadError'),
 	copyFailed: t('ui.copyFailed'),
+	advanced: t('ui.advanced'),
+	optCrd: t('ui.optCrd'),
+	optSkipUnknown: t('ui.optSkipUnknown'),
+	optSecurity: t('ui.optSecurity'),
+	optCross: t('ui.optCross'),
+	securityHeading: t('ui.securityHeading'),
+	securityScore: t('ui.securityScore'),
+	securityCritical: t('ui.securityCritical'),
+	securityAdvisory: t('ui.securityAdvisory'),
+	securityFixLabel: t('ui.securityFixLabel'),
+	securityAllGood: t('ui.securityAllGood'),
+	exportReport: t('ui.exportReport'),
+	schemaSourceCrd: t('ui.schemaSourceCrd'),
+	securityChecks: Object.fromEntries(SECURITY_CHECK_IDS.map((id) => [id, t(`ui.security.checks.${id}`)])),
+	securityFixes: Object.fromEntries(SECURITY_CHECK_IDS.map((id) => [id, t(`ui.security.fixes.${id}`)])),
 };
 
 const faqItems = [

@@ -1,5 +1,9 @@
 # COMPETITOR_GAP.md — So sánh tính năng với đối thủ (2026-10-01)
 
+> **Trạng thái 2026-10-01 (Phase 3.14):** phần lớn mục trong bảng dưới đã được làm — xem PROGRESS.md. Còn lại:
+> nén PDF, brush đã xong nhưng model WebGPU chưa, flavor regex/debugger, Mermaid, TIFF, giữ EXIF, ID3 tag,
+> fetch JWKS, sync cloud, self-host ffmpeg (cần quyết định), diff Word/PDF/folder, X.509/JWE/EdDSA cho JWT.
+
 > Nguồn: 3 agent nghiên cứu (đọc code thật + WebSearch/WebFetch). Số liệu đối thủ lấy từ trang chủ/docs/
 > bài so sánh bên thứ ba, KHÔNG phải trang pricing chính thức; ô nào đánh "~" chưa kiểm chứng trực tiếp
 > (Coolors, nginxconfig.io, jsoneditoronline, Meld, Mergely, token.dev, HackMD... không fetch được).

@@ -508,6 +508,16 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 - [x] Tràn ngang 320px: `min-w-0` cho `main`, preset select, input số Color Picker
 - [ ] Còn treo: test tương tác thật 12 tool file/media/data, ghim schema K8s, 2 lỗ hổng moderate (exceljs→uuid)
 
+## Phase 3.14 — Xử lý thiếu sót so với đối thủ (theo yêu cầu trực tiếp người dùng 2026-10-01)
+
+- [x] Ảnh/PDF: SVG→ảnh, ảnh→PDF, Gộp/Tách PDF mở rộng, Nén ảnh MozJPEG/OxiPNG, brush xóa nền
+- [x] Media/design: QR, SVG, Color Picker, Video (GIF/MP3/nhiều đoạn), Audio (batch/định dạng)
+- [x] Text/dev: Case, JSON, Regex, JWT, Base64, Text Diff, Word Counter, Markdown
+- [x] Data/devops: K8s (bảo mật/CRD/ghim schema), Nginx (Gixy-style), CSV, JSON→Excel
+- [x] Sửa bug CSP: thay ajv bằng validator nội bộ cho K8s
+- [ ] Test tương tác thật bằng file/thiết bị thật: brush cảm ứng, xuất PDF Markdown, upload .docx/.pdf, HEIC dưới CSP
+- [ ] Các mục cần quyết định: xem COMPETITOR_GAP.md
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

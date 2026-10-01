@@ -7,7 +7,7 @@
   "tagline": "Giảm dung lượng ảnh trong vài giây, ngay trên trình duyệt.",
   "ui": {
     "selectFiles": "Chọn ảnh",
-    "dropHint": "hoặc kéo thả ảnh vào đây",
+    "dropHint": "hoặc kéo thả ảnh vào đây, hoặc dán bằng Ctrl+V (JPG, PNG, WebP, GIF, BMP, AVIF, HEIC)",
     "quality": "Chất lượng",
     "compress": "Nén ảnh",
     "compressing": "Đang nén…",
@@ -32,7 +32,17 @@
     "targetSizeLabel": "Dung lượng đích: {{size}} KB",
     "processingQueue": "Đang xử lý {{current}}/{{total}}",
     "progressPercent": "{{percent}}%",
-    "notReduced": "không giảm dung lượng"
+    "notReduced": "không giảm dung lượng",
+    "advancedHeading": "Nâng cao",
+    "deepOptimize": "Tối ưu sâu (MozJPEG cho JPEG, OxiPNG cho PNG)",
+    "deepOptimizeHint": "Chạy trong Web Worker và chỉ tải bộ mã hoá WebAssembly khi bạn dùng. Cho file nhỏ hơn bộ mã hoá mặc định nhưng chậm hơn. Xuất PNG luôn lossless; xuất WebP/AVIF vẫn dùng bộ mã hoá mặc định. GIF chỉ giữ khung hình đầu; HEIC/AVIF/GIF/BMP được lưu thành JPEG hoặc PNG khi chọn định dạng \"Giữ nguyên\".",
+    "losslessPng": "PNG lossless (tối ưu chính file gốc, không đổi pixel, bỏ qua thu nhỏ)",
+    "oxipngLevel": "Mức nỗ lực OxiPNG",
+    "levelFast": "Nhanh",
+    "levelBalanced": "Cân bằng",
+    "levelMax": "Tối đa (chậm)",
+    "metadataNote": "Mã hoá lại sẽ xoá metadata (EXIF, GPS, thông tin máy ảnh, hồ sơ màu) — tốt cho quyền riêng tư, nhưng chưa hỗ trợ giữ lại metadata.",
+    "targetNotMet": "Không thể đạt {{size}} KB dù đã hạ chất lượng thấp nhất; đây là kết quả nhỏ nhất. Hãy thử bật thu nhỏ ảnh."
   },
   "related": "Công cụ liên quan",
   "faq": {

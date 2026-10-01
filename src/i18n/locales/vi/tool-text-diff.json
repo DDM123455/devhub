@@ -61,7 +61,27 @@
     "sharedLoadedNotice": "Đã mở từ link chia sẻ. Bản nháp lưu trên máy của bạn được giữ nguyên.",
     "restoreDraft": "Khôi phục bản nháp của tôi",
     "clipboardError": "Không truy cập được bộ nhớ tạm.",
-    "fileReadError": "Không đọc được tệp hoặc bản nháp đã lưu."
+    "fileReadError": "Không đọc được tệp hoặc bản nháp đã lưu.",
+    "x": {
+      "viewLabel": "Chế độ xem",
+      "viewSplit": "Song song",
+      "viewUnified": "Hợp nhất (unified)",
+      "contextLabel": "Dòng không đổi",
+      "contextAll": "Hiện tất cả",
+      "contextN": "Ẩn, giữ {{n}} dòng ngữ cảnh",
+      "wrapLines": "Ngắt dòng dài",
+      "ignoreRegexHeading": "Quy tắc bỏ qua (regex)",
+      "ignoreRegexHelp": "Mỗi dòng một biểu thức chính quy. Phần văn bản khớp sẽ bị bỏ qua khi so sánh dòng (ví dụ timestamp, build id); phần hiển thị vẫn giữ văn bản gốc.",
+      "ignoreRegexPlaceholder": "\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}\n\\bid=[0-9a-f]+",
+      "ignoreRegexInvalid": "Biểu thức chính quy không hợp lệ - {{message}}",
+      "exportPatch": "Xuất .diff",
+      "exportHtml": "Xuất HTML",
+      "copyPatch": "Sao chép unified diff",
+      "patchCopied": "Đã sao chép unified diff vào clipboard.",
+      "collapsedLines": "Đã ẩn {{count}} dòng không đổi",
+      "exportNothing": "Không có khác biệt theo dòng để xuất.",
+      "unifiedAria": "Diff dạng hợp nhất"
+    }
   },
   "related": "Công cụ liên quan",
   "faq": {

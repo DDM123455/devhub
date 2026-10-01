@@ -86,3 +86,46 @@ export async function getPdfPageCount(bytes: ArrayBuffer): Promise<number> {
 		}
 	}
 }
+
+export interface PdfOutlineEntry {
+	title: string;
+	/** Chỉ số trang 0-based của đích bookmark. */
+	pageIndex: number;
+}
+
+/**
+ * Bookmark (outline) cấp cao nhất của PDF, đã giải đích (kể cả named destination) sang chỉ số trang.
+ * Mục không có đích trang (link ngoài, action...) bị bỏ. Mảng rỗng nếu PDF không có outline.
+ */
+export async function getPdfOutline(bytes: ArrayBuffer): Promise<PdfOutlineEntry[]> {
+	const pdfjsLib = await loadPdfJs();
+	const loadingTask = pdfjsLib.getDocument({ data: bytes });
+	try {
+		const pdf = await loadingTask.promise;
+		const outline = await pdf.getOutline();
+		if (!outline) return [];
+		const entries: PdfOutlineEntry[] = [];
+		for (const item of outline) {
+			try {
+				let dest: unknown = item.dest;
+				if (typeof dest === 'string') dest = await pdf.getDestination(dest);
+				if (!Array.isArray(dest) || dest.length === 0) continue;
+				const target = dest[0];
+				let pageIndex: number;
+				if (typeof target === 'number') pageIndex = target;
+				else if (target && typeof target === 'object') pageIndex = await pdf.getPageIndex(target as never);
+				else continue;
+				entries.push({ title: String(item.title ?? '').trim(), pageIndex });
+			} catch {
+				/* bỏ qua bookmark hỏng */
+			}
+		}
+		return entries;
+	} finally {
+		try {
+			await loadingTask.destroy();
+		} catch {
+			/* bỏ qua */
+		}
+	}
+}

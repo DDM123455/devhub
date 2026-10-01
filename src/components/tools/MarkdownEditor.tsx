@@ -14,13 +14,31 @@ import {
 	Columns2,
 	Pencil,
 	Eye,
+	Search,
+	Printer,
+	Maximize2,
+	Minimize2,
+	Plus,
+	X,
 } from 'lucide-react';
 import { EditorView, basicSetup } from 'codemirror';
 import { keymap, placeholder } from '@codemirror/view';
 import { EditorState, Prec, type StateCommand } from '@codemirror/state';
 import { markdown } from '@codemirror/lang-markdown';
+import { openSearchPanel } from '@codemirror/search';
 import { Button } from '@/components/ui/button';
-import { buildExportHtml, createSlugger, MAX_MARKDOWN_RENDER_CHARS } from '@/lib/markdown-utils';
+import { buildExportHtml, createSlugger, escapeHtml, MAX_MARKDOWN_RENDER_CHARS } from '@/lib/markdown-utils';
+import {
+	canAddDoc,
+	deriveDocTitle,
+	extractMath,
+	extractOutline,
+	newDocId,
+	parseDocsState,
+	restoreMath,
+	type MarkdownDoc,
+	type OutlineItem,
+} from '@/lib/markdown-extra';
 import { useCopyToClipboard } from './useCopyToClipboard';
 
 function CopyButton({
@@ -85,6 +103,23 @@ interface Messages {
 	draftSaveFailed: string;
 	copyFailed: string;
 	fileReadError: string;
+	x: {
+		tabsLabel: string;
+		newDoc: string;
+		closeDoc: string;
+		closeConfirm: string;
+		untitled: string;
+		docLimit: string;
+		outlineHeading: string;
+		outlineEmpty: string;
+		exportPdf: string;
+		exportPdfHint: string;
+		findReplace: string;
+		zen: string;
+		exitZen: string;
+		fontSize: string;
+		phrases: Record<string, string>;
+	};
 }
 
 type ViewMode = 'split' | 'editor' | 'preview';
@@ -220,6 +255,8 @@ const PREVIEW_CLASSES =
 	'[&_th]:px-2 [&_th]:py-1 [&_td]:border [&_td]:border-border [&_td]:px-2 [&_td]:py-1 [&_strong]:font-semibold [&_em]:italic';
 
 const DRAFT_STORAGE_KEY = 'markdown-editor-draft';
+const DOCS_STORAGE_KEY = 'markdown-editor-docs';
+const FONT_SIZES = [12, 14, 16, 18, 20];
 const AUTOSAVE_DEBOUNCE_MS = 500;
 
 // Colors reference the site's own CSS custom properties (defined in
@@ -230,8 +267,8 @@ const editorTheme = EditorView.theme({
 	'&': {
 		backgroundColor: 'var(--background)',
 		color: 'var(--foreground)',
-		fontSize: '0.75rem',
-		height: '27.5rem',
+		fontSize: 'var(--md-font-size, 12px)',
+		height: 'var(--md-editor-height, 27.5rem)',
 	},
 	'.cm-scroller': {
 		fontFamily: 'var(--font-mono), ui-monospace, monospace',
@@ -270,6 +307,16 @@ export default function MarkdownEditor({ messages, lang = 'en' }: { messages: Me
 	const [undoSnapshot, setUndoSnapshot] = useState<string | null>(null);
 	const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const [fileError, setFileError] = useState(false);
+	const [docs, setDocs] = useState<MarkdownDoc[]>(() => [{ id: 'doc-initial', content: '' }]);
+	const [activeId, setActiveId] = useState('doc-initial');
+	const [docsReady, setDocsReady] = useState(false);
+	const [outline, setOutline] = useState<OutlineItem[]>([]);
+	const [hljsCss, setHljsCss] = useState('');
+	const [fontSize, setFontSize] = useState(12);
+	const [isFullscreen, setIsFullscreen] = useState(false);
+	const rootRef = useRef<HTMLDivElement>(null);
+	const hljsRef = useRef<typeof import('@/lib/hljs-lazy') | null>(null);
+	const katexRef = useRef<typeof import('katex').default | null>(null);
 	const isTooLarge = content.length > MAX_MARKDOWN_RENDER_CHARS;
 
 	// Replacing the whole document (Clear / Load sample / file drop) is destructive, so the
@@ -296,39 +343,93 @@ export default function MarkdownEditor({ messages, lang = 'en' }: { messages: Me
 	);
 	const syncingRef = useRef<'editor' | 'preview' | null>(null);
 
-	// Restore an autosaved draft after mount — localStorage isn't available during Astro's
-	// build-time SSR pass, so this must run client-side only, same pattern as the
-	// hydration-safe randomization used elsewhere on the site (see ColorPicker).
+	// Restore the saved documents after mount - localStorage isn't available during Astro's
+	// build-time SSR pass, so this must run client-side only. Falls back to the single-draft key
+	// used before multi-document support existed.
 	useEffect(() => {
 		try {
-			const saved = localStorage.getItem(DRAFT_STORAGE_KEY);
-			if (saved) setContent(saved);
+			const stored = parseDocsState(localStorage.getItem(DOCS_STORAGE_KEY));
+			if (stored) {
+				setDocs(stored.docs);
+				setActiveId(stored.activeId);
+				setContent(stored.docs.find((d) => d.id === stored.activeId)?.content ?? '');
+			} else {
+				const legacy = localStorage.getItem(DRAFT_STORAGE_KEY);
+				if (legacy) setContent(legacy);
+			}
 		} catch {
-			// localStorage unavailable (private browsing, quota, etc.) — autosave is a
-			// convenience, not a requirement, so fail silently.
+			// localStorage unavailable (private browsing, quota, etc.) - autosave is a convenience.
 		}
+		setDocsReady(true);
 	}, []);
 
-	// Debounced autosave: an empty editor clears the saved draft instead of persisting an
-	// empty string, so clicking "Clear" doesn't leave a stale draft to resurrect later.
+	// The stored copy of the active document is always the live `content`.
+	const snapshotDocs = useCallback(
+		() => docs.map((d) => (d.id === activeId ? { ...d, content } : d)),
+		[docs, activeId, content],
+	);
+
+	// Debounced autosave of every document. A single empty document removes the saved state
+	// instead of persisting an empty string, so "Clear" doesn't leave a stale draft behind.
 	useEffect(() => {
+		if (!docsReady) return;
 		const timer = setTimeout(() => {
-							try {
-					if (content) {
-						localStorage.setItem(DRAFT_STORAGE_KEY, content);
-						setDraftStatus('saved');
-					} else {
-						localStorage.removeItem(DRAFT_STORAGE_KEY);
-						setDraftStatus(null);
-					}
-				} catch {
-					// Quota exceeded / storage unavailable — autosave is non-fatal, but tell the user the
-					// draft is NOT being kept so they don't rely on it.
-					setDraftStatus('failed');
+			try {
+				const snapshot = snapshotDocs();
+				if (snapshot.length === 1 && snapshot[0].content === '') {
+					localStorage.removeItem(DOCS_STORAGE_KEY);
+					localStorage.removeItem(DRAFT_STORAGE_KEY);
+					setDraftStatus(null);
+				} else {
+					localStorage.setItem(DOCS_STORAGE_KEY, JSON.stringify({ docs: snapshot, activeId }));
+					localStorage.removeItem(DRAFT_STORAGE_KEY);
+					setDraftStatus('saved');
 				}
+			} catch {
+				// Quota exceeded / storage unavailable - tell the user the draft is NOT being kept.
+				setDraftStatus('failed');
+			}
 		}, AUTOSAVE_DEBOUNCE_MS);
 		return () => clearTimeout(timer);
-	}, [content]);
+	}, [docsReady, snapshotDocs, activeId]);
+
+	const switchToDoc = (id: string) => {
+		if (id === activeId) return;
+		const snapshot = snapshotDocs();
+		const target = snapshot.find((d) => d.id === id);
+		if (!target) return;
+		setDocs(snapshot);
+		setActiveId(id);
+		setContent(target.content);
+		setUndoSnapshot(null);
+	};
+
+	const addDoc = () => {
+		const snapshot = snapshotDocs();
+		if (!canAddDoc(snapshot)) return;
+		const doc: MarkdownDoc = { id: newDocId(), content: '' };
+		setDocs([...snapshot, doc]);
+		setActiveId(doc.id);
+		setContent('');
+		setUndoSnapshot(null);
+	};
+
+	const closeDoc = (id: string) => {
+		const snapshot = snapshotDocs();
+		if (snapshot.length <= 1) return;
+		const doc = snapshot.find((d) => d.id === id);
+		if (!doc) return;
+		if (doc.content.trim() !== '' && !window.confirm(messages.x.closeConfirm)) return;
+		const index = snapshot.findIndex((d) => d.id === id);
+		const remaining = snapshot.filter((d) => d.id !== id);
+		setDocs(remaining);
+		if (id === activeId) {
+			const next = remaining[Math.min(index, remaining.length - 1)];
+			setActiveId(next.id);
+			setContent(next.content);
+			setUndoSnapshot(null);
+		}
+	};
 
 	// Parsing + sanitising run after a short debounce (not on every keystroke) and are skipped
 	// entirely for very large documents: marked can take pathological time on some inputs, and
@@ -359,6 +460,12 @@ export default function MarkdownEditor({ messages, lang = 'en' }: { messages: Me
 							async: false,
 							renderer: (() => {
 								const renderer = new markedMod.Renderer();
+								renderer.code = function (token) {
+									const lang = (token.lang ?? '').match(/^\S*/)?.[0] ?? '';
+									const highlighted = hljsRef.current?.highlightCode(token.text, lang) ?? null;
+									const classes = highlighted !== null ? `hljs language-${escapeHtml(lang)}` : lang ? `language-${escapeHtml(lang)}` : '';
+									return `<pre><code${classes ? ` class="${classes}"` : ''}>${highlighted ?? escapeHtml(token.text)}</code></pre>\n`;
+								};
 								const base = renderer.heading.bind(renderer);
 								renderer.heading = function (token) {
 									const html = base(token);
@@ -373,8 +480,51 @@ export default function MarkdownEditor({ messages, lang = 'en' }: { messages: Me
 				};
 			}
 			if (cancelled || !modulesRef.current) return;
-			const html = modulesRef.current.sanitize(modulesRef.current.parse(content));
-			if (!cancelled) setRenderedHtml(html);
+			// Syntax highlighting: load highlight.js (common languages only) the first time a
+			// fenced block with a language tag appears.
+			if (!hljsRef.current && /^\s*(?:```|~~~)\s*[\w+#.-]+/m.test(content)) {
+				try {
+					hljsRef.current = await import('@/lib/hljs-lazy');
+					setHljsCss(hljsRef.current.HLJS_CSS);
+				} catch {
+					// highlighting is optional - fall back to plain code blocks
+				}
+			}
+			// Math: formulas are swapped for placeholders before parsing, sanitized with the rest of
+			// the document, and replaced with KaTeX output (trust disabled) afterwards. KaTeX itself is
+			// only loaded when the text really contains a formula.
+			const math = content.includes('$') ? extractMath(content) : { text: content, segments: [] };
+			let html = modulesRef.current.sanitize(modulesRef.current.parse(math.text));
+			if (math.segments.length > 0) {
+				try {
+					if (!katexRef.current) {
+						const [katexMod] = await Promise.all([import('katex'), import('katex/dist/katex.min.css')]);
+						katexRef.current = katexMod.default;
+					}
+					const katex = katexRef.current;
+					html = restoreMath(
+						html,
+						math.segments.map((segment) =>
+							katex.renderToString(segment.tex, {
+								displayMode: segment.display,
+								throwOnError: false,
+								trust: false,
+								strict: 'ignore',
+								maxExpand: 1000,
+								maxSize: 50,
+							}),
+						),
+					);
+				} catch {
+					html = restoreMath(
+						html,
+						math.segments.map((segment) => escapeHtml(segment.display ? `$$${segment.tex}$$` : `$${segment.tex}$`)),
+					);
+				}
+			}
+			if (cancelled) return;
+			setRenderedHtml(html);
+			setOutline(extractOutline(html));
 		}, RENDER_DEBOUNCE_MS);
 		return () => {
 			cancelled = true;
@@ -425,6 +575,7 @@ export default function MarkdownEditor({ messages, lang = 'en' }: { messages: Me
 				doc: content,
 				extensions: [
 					basicSetup,
+					EditorState.phrases.of(messagesRef.current.x.phrases),
 					markdown(),
 					// Must outrank markdown()'s own `Prec.high` Enter binding, or that
 					// binding intercepts Enter first and this fallback never runs.
@@ -539,6 +690,87 @@ export default function MarkdownEditor({ messages, lang = 'en' }: { messages: Me
 		scroller.scrollTop = ratio * (scroller.scrollHeight - scroller.clientHeight);
 	};
 
+	useEffect(() => {
+		const handler = () => setIsFullscreen(document.fullscreenElement === rootRef.current);
+		document.addEventListener('fullscreenchange', handler);
+		return () => document.removeEventListener('fullscreenchange', handler);
+	}, []);
+
+	// CodeMirror caches its measurements; re-measure after the size or font changed.
+	useEffect(() => {
+		editorViewRef.current?.requestMeasure();
+	}, [isFullscreen, fontSize]);
+
+	const toggleFullscreen = () => {
+		if (document.fullscreenElement === rootRef.current) void document.exitFullscreen();
+		else void rootRef.current?.requestFullscreen();
+	};
+
+	const openFindReplace = () => {
+		const view = editorViewRef.current;
+		if (!view) return;
+		openSearchPanel(view);
+		view.focus();
+	};
+
+	const scrollToHeading = (item: OutlineItem) => {
+		const headings = previewRef.current?.querySelectorAll('h1, h2, h3, h4, h5, h6');
+		const target = headings?.[item.index] ?? (item.id ? previewRef.current?.querySelector(`[id="${CSS.escape(item.id)}"]`) : null);
+		target?.scrollIntoView({ block: 'start' });
+	};
+
+	// PDF export: the browser's own "Save as PDF" print dialog, fed by a hidden iframe that holds
+	// only the rendered document (site styles are copied in so code colours and KaTeX look the
+	// same). Nothing is uploaded; the iframe is removed afterwards.
+	const exportPdf = async () => {
+		if (renderedHtml === '') return;
+		const iframe = document.createElement('iframe');
+		iframe.setAttribute('aria-hidden', 'true');
+		iframe.tabIndex = -1;
+		iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+		document.body.appendChild(iframe);
+		const frameDoc = iframe.contentDocument;
+		const frameWin = iframe.contentWindow;
+		if (!frameDoc || !frameWin) {
+			iframe.remove();
+			return;
+		}
+		const styleNodes = Array.from(document.head.querySelectorAll('link[rel="stylesheet"], style'));
+		frameDoc.open();
+		frameDoc.write(
+			`<!doctype html><html lang="${escapeHtml(lang)}"><head><meta charset="utf-8"><title>${escapeHtml(messages.exportTitle)}</title></head><body></body></html>`,
+		);
+		frameDoc.close();
+		const waits: Array<Promise<void>> = [];
+		for (const node of styleNodes) {
+			const copy = node.cloneNode(true) as HTMLElement;
+			if (copy.tagName === 'LINK') {
+				waits.push(new Promise<void>((resolve) => {
+					copy.addEventListener('load', () => resolve());
+					copy.addEventListener('error', () => resolve());
+				}));
+			}
+			frameDoc.head.appendChild(copy);
+		}
+		const printStyle = frameDoc.createElement('style');
+		printStyle.textContent =
+			'html,body{background:#fff!important;color:#111!important}body{margin:0;padding:0}' +
+			'.md-print{max-width:none;padding:0;font-size:12pt;line-height:1.55;color:#111;background:#fff}' +
+			'.md-print pre,.md-print blockquote,.md-print table,.md-print img{break-inside:avoid}' +
+			'.md-print a{color:#0969da}@page{margin:16mm}' + hljsCss.replace(/\.dark \.md-preview[^}]*\}/g, '');
+		frameDoc.head.appendChild(printStyle);
+		const article = frameDoc.createElement('article');
+		article.className = `md-print md-preview ${PREVIEW_CLASSES}`;
+		article.innerHTML = renderedHtml;
+		frameDoc.body.appendChild(article);
+		await Promise.race([Promise.all(waits), new Promise((resolve) => setTimeout(resolve, 2500))]);
+		const cleanup = () => setTimeout(() => iframe.remove(), 500);
+		frameWin.addEventListener('afterprint', cleanup);
+		frameWin.focus();
+		frameWin.print();
+		setTimeout(() => iframe.remove(), 120000);
+	};
+
 	const toolbarButtons: Array<{ title: string; icon: React.ReactNode; onClick: () => void }> = [
 		{ title: `${messages.boldTitle} (Ctrl+B)`, icon: <Bold className="h-4 w-4" />, onClick: () => applyEdit(wrapInline('**', '**', messages.boldTitle)) },
 		{ title: `${messages.italicTitle} (Ctrl+I)`, icon: <Italic className="h-4 w-4" />, onClick: () => applyEdit(wrapInline('_', '_', messages.italicTitle)) },
@@ -555,10 +787,53 @@ export default function MarkdownEditor({ messages, lang = 'en' }: { messages: Me
 		},
 		{ title: messages.tableTitle, icon: <Table className="h-4 w-4" />, onClick: () => applyEdit(tableTransform) },
 		{ title: messages.hrTitle, icon: <Minus className="h-4 w-4" />, onClick: () => applyEdit(hrTransform) },
+		{ title: messages.x.findReplace + ' (Ctrl+F)', icon: <Search className="h-4 w-4" />, onClick: openFindReplace },
 	];
 
 	return (
-		<div className="flex flex-col gap-3">
+		<div
+			ref={rootRef}
+			className={`flex flex-col gap-3 ${isFullscreen ? 'overflow-auto bg-background p-4' : ''}`}
+			style={
+				{
+					'--md-font-size': `${fontSize}px`,
+					'--md-editor-height': isFullscreen ? 'calc(100vh - 17rem)' : '27.5rem',
+				} as React.CSSProperties
+			}
+		>
+			{hljsCss && <style>{hljsCss}</style>}
+			<div role="tablist" aria-label={messages.x.tabsLabel} className="flex flex-wrap items-center gap-1">
+				{docs.map((doc, index) => {
+					const isActive = doc.id === activeId;
+					const docContent = isActive ? content : doc.content;
+					return (
+						<span key={doc.id} className={`inline-flex items-center rounded-md border ${isActive ? 'border-primary bg-primary/10' : 'border-border'}`}>
+							<button
+								type="button"
+								role="tab"
+								aria-selected={isActive}
+								onClick={() => switchToDoc(doc.id)}
+								className="min-h-9 max-w-40 truncate px-2.5 text-xs font-medium text-foreground"
+							>
+								{deriveDocTitle(docContent, `${messages.x.untitled} ${index + 1}`)}
+							</button>
+							{docs.length > 1 && (
+								<button
+									type="button"
+									onClick={() => closeDoc(doc.id)}
+									aria-label={messages.x.closeDoc.replace('{{name}}', deriveDocTitle(docContent, `${messages.x.untitled} ${index + 1}`))}
+									className="inline-flex min-h-9 min-w-9 items-center justify-center text-muted-foreground hover:text-foreground"
+								>
+									<X className="h-3.5 w-3.5" />
+								</button>
+							)}
+						</span>
+					);
+				})}
+				<Button type="button" size="sm" variant="ghost" className="min-h-9" onClick={addDoc} disabled={!canAddDoc(snapshotDocs())} aria-label={messages.x.newDoc} title={canAddDoc(snapshotDocs()) ? messages.x.newDoc : messages.x.docLimit}>
+					<Plus className="h-4 w-4" />
+				</Button>
+			</div>
 			<div className="flex flex-wrap items-center justify-between gap-2">
 				<div className="flex flex-wrap gap-2">
 					<Button type="button" size="sm" variant={viewMode === 'split' ? 'default' : 'outline'} aria-pressed={viewMode === 'split'} onClick={() => setViewMode('split')}>
@@ -574,9 +849,29 @@ export default function MarkdownEditor({ messages, lang = 'en' }: { messages: Me
 						{messages.viewPreview}
 					</Button>
 				</div>
-				<p className="text-xs text-muted-foreground">
-					{messages.wordCount.replace('{{words}}', String(words)).replace('{{chars}}', String(chars))}
-				</p>
+				<div className="flex flex-wrap items-center gap-2">
+					<label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+						{messages.x.fontSize}
+						<select
+							value={fontSize}
+							onChange={(e) => setFontSize(Number(e.target.value))}
+							className="min-h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+						>
+							{FONT_SIZES.map((size) => (
+								<option key={size} value={size}>
+									{size}px
+								</option>
+							))}
+						</select>
+					</label>
+					<Button type="button" size="sm" variant="outline" className="min-h-9" aria-pressed={isFullscreen} onClick={toggleFullscreen}>
+						{isFullscreen ? <Minimize2 className="mr-1.5 h-4 w-4" /> : <Maximize2 className="mr-1.5 h-4 w-4" />}
+						{isFullscreen ? messages.x.exitZen : messages.x.zen}
+					</Button>
+					<p className="text-xs text-muted-foreground">
+						{messages.wordCount.replace('{{words}}', String(words)).replace('{{chars}}', String(chars))}
+					</p>
+				</div>
 			</div>
 
 			{viewMode !== 'preview' && (
@@ -645,7 +940,35 @@ export default function MarkdownEditor({ messages, lang = 'en' }: { messages: Me
 
 				{viewMode !== 'editor' && (
 					<div className="flex flex-col gap-1">
-						<span id="markdown-preview-label" className="text-sm font-medium text-foreground">{messages.previewLabel}</span>
+						<div className="flex flex-wrap items-center justify-between gap-2">
+							<span id="markdown-preview-label" className="text-sm font-medium text-foreground">{messages.previewLabel}</span>
+							<Button type="button" size="sm" variant="outline" className="min-h-9" disabled={renderedHtml === ''} title={messages.x.exportPdfHint} onClick={() => void exportPdf()}>
+								<Printer className="mr-1.5 h-4 w-4" />
+								{messages.x.exportPdf}
+							</Button>
+						</div>
+						<details className="rounded-md border border-border px-3 py-1.5">
+							<summary className="min-h-9 cursor-pointer text-xs font-medium text-foreground leading-9">{messages.x.outlineHeading}</summary>
+							{outline.length === 0 ? (
+								<p className="pb-2 text-xs text-muted-foreground">{messages.x.outlineEmpty}</p>
+							) : (
+								<nav aria-label={messages.x.outlineHeading} className="max-h-48 overflow-auto pb-2">
+									<ul className="flex flex-col">
+										{outline.map((item, index) => (
+											<li key={`${item.index}-${index}`} style={{ paddingInlineStart: `${(item.level - 1) * 12}px` }}>
+												<button
+													type="button"
+													onClick={() => scrollToHeading(item)}
+													className="min-h-9 w-full truncate text-left text-xs text-primary hover:underline"
+												>
+													{item.text}
+												</button>
+											</li>
+										))}
+									</ul>
+								</nav>
+							)}
+						</details>
 						<div
 															id="markdown-preview"
 							role="region"
@@ -661,7 +984,8 @@ export default function MarkdownEditor({ messages, lang = 'en' }: { messages: Me
 								target?.scrollIntoView({ block: 'start' });
 							}}
 							onScroll={viewMode === 'split' ? handlePreviewScroll : undefined}
-							className={`h-[27.5rem] overflow-y-auto rounded-md border border-border bg-muted/40 p-3 text-sm text-foreground ${PREVIEW_CLASSES}`}
+							style={{ fontSize: `${(fontSize * 14) / 12}px` }}
+							className={`md-preview h-[var(--md-editor-height,27.5rem)] overflow-y-auto rounded-md border border-border bg-muted/40 p-3 text-sm text-foreground ${PREVIEW_CLASSES}`}
 							// eslint-disable-next-line react/no-danger
 							dangerouslySetInnerHTML={{ __html: renderedHtml }}
 						/>

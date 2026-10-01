@@ -3,6 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { BeforeAfterSlider } from '@/components/ui/before-after-slider';
 import { baseNameOf, dedupeName } from '@/lib/file-utils';
+import {
+	computePdfPlacement,
+	isHexColor,
+	isSvgFile,
+	prepareSvgForRaster,
+	type PdfPageMode,
+} from '@/lib/image-pdf';
 
 interface Messages {
 	retry: string;
@@ -27,6 +34,15 @@ interface Messages {
 	resizeToggleLabel: string;
 	maxDimensionLabel: string;
 	processingQueue: string;
+	backgroundLabel: string;
+	backgroundAuto: string;
+	backgroundCustom: string;
+	svgScaleLabel: string;
+	errorSvg: string;
+	pdfPageSizeLabel: string;
+	pdfPageFit: string;
+	pdfMarginLabel: string;
+	downloadCombinedPdf: string;
 }
 
 type TargetFormat =
@@ -36,7 +52,8 @@ type TargetFormat =
 	| 'image/avif'
 	| 'image/bmp'
 	| 'image/x-icon'
-	| 'image/gif';
+	| 'image/gif'
+	| 'application/pdf';
 
 const EXTENSION_BY_FORMAT: Record<TargetFormat, string> = {
 	'image/png': 'png',
@@ -46,9 +63,10 @@ const EXTENSION_BY_FORMAT: Record<TargetFormat, string> = {
 	'image/bmp': 'bmp',
 	'image/x-icon': 'ico',
 	'image/gif': 'gif',
+	'application/pdf': 'pdf',
 };
 
-const LOSSY_FORMATS = new Set<TargetFormat>(['image/jpeg', 'image/webp', 'image/avif']);
+const LOSSY_FORMATS = new Set<TargetFormat>(['image/jpeg', 'image/webp', 'image/avif', 'application/pdf']);
 const WHITE_BACKGROUND_FORMATS = new Set<TargetFormat>(['image/jpeg', 'image/bmp']);
 const MIN_MAX_DIMENSION = 320;
 const MAX_MAX_DIMENSION = 4096;
@@ -84,6 +102,7 @@ interface ImageItem {
 
 class AvifUnsupportedError extends Error {}
 class CanvasTooLargeError extends Error {}
+class SvgRasterError extends Error {}
 
 // Giới hạn an toàn cho canvas: Safari/iOS ~16.7M px, Chrome/Firefox ~268M px / cạnh 32767.
 // Dùng ngưỡng bảo thủ chung; vượt thì báo lỗi gợi ý thu nhỏ thay vì lỗi mơ hồ.
@@ -103,12 +122,18 @@ const ACCEPTED_TYPES = new Set([
 	'image/gif',
 	'image/bmp',
 	'image/avif',
+	'image/svg+xml',
 ]);
 
 interface ConvertSettings {
 	targetFormat: TargetFormat;
 	quality: number;
 	maxDimension?: number;
+	// null = tự động (JPG/BMP -> trắng, định dạng có alpha -> giữ trong suốt).
+	backgroundColor: string | null;
+	svgScale: number;
+	pdfPageMode: PdfPageMode;
+	pdfMarginMm: number;
 }
 
 function formatBytes(bytes: number): string {
@@ -132,11 +157,74 @@ function isHeic(file: File): boolean {
 // with heic2any before entering the normal canvas pipeline below. Loaded via
 // dynamic import (not a top-level import) so its WASM decoder is only ever
 // fetched in the browser, never touched during Astro's build-time SSR pass.
-async function toDecodableBlob(file: File): Promise<Blob> {
+async function toDecodableBlob(file: File, svgScale = 1): Promise<Blob> {
+	if (isSvgFile(file)) return rasterizeSvg(file, svgScale);
 	if (!isHeic(file)) return file;
 	const { default: heic2any } = await import('heic2any');
 	const result = await heic2any({ blob: file, toType: 'image/png' });
 	return Array.isArray(result) ? result[0] : result;
+}
+
+// SVG -> PNG trong suốt ở kích thước nội tại × scale. createImageBitmap không nhận SVG ổn định
+// ở mọi trình duyệt nên dùng <img> + canvas. <img> không chạy script / không tải tài nguyên ngoài.
+async function rasterizeSvg(file: File, scale: number): Promise<Blob> {
+	const text = await file.text();
+	const prepared = prepareSvgForRaster(text, scale);
+	assertCanvasSize(prepared.width, prepared.height);
+	const url = URL.createObjectURL(new Blob([prepared.text], { type: 'image/svg+xml' }));
+	try {
+		const img = new Image();
+		img.decoding = 'async';
+		await new Promise<void>((resolve, reject) => {
+			img.onload = () => resolve();
+			img.onerror = () => reject(new SvgRasterError());
+			img.src = url;
+		});
+		const canvas = document.createElement('canvas');
+		canvas.width = prepared.width;
+		canvas.height = prepared.height;
+		const ctx = canvas.getContext('2d');
+		if (!ctx) throw new SvgRasterError();
+		ctx.drawImage(img, 0, 0, prepared.width, prepared.height);
+		return await canvasToBlob(canvas, 'image/png');
+	} finally {
+		URL.revokeObjectURL(url);
+	}
+}
+
+function hasTransparentPixels(imageData: ImageData): boolean {
+	const data = imageData.data;
+	for (let i = 3; i < data.length; i += 4) if (data[i] < 255) return true;
+	return false;
+}
+
+// Ảnh -> PDF 1 trang bằng pdf-lib (nạp động). Ảnh có alpha nhúng PNG, còn lại nhúng JPEG theo quality.
+async function encodePdf(canvas: HTMLCanvasElement, settings: ConvertSettings): Promise<Blob> {
+	const { PDFDocument } = await import('pdf-lib');
+	const ctx = canvas.getContext('2d')!;
+	const alpha = hasTransparentPixels(ctx.getImageData(0, 0, canvas.width, canvas.height));
+	const imgBlob = alpha
+		? await canvasToBlob(canvas, 'image/png')
+		: await canvasToBlob(canvas, 'image/jpeg', settings.quality);
+	const bytes = new Uint8Array(await imgBlob.arrayBuffer());
+	const doc = await PDFDocument.create();
+	const image = alpha ? await doc.embedPng(bytes) : await doc.embedJpg(bytes);
+	const place = computePdfPlacement(canvas.width, canvas.height, settings.pdfPageMode, settings.pdfMarginMm);
+	const page = doc.addPage([place.pageWidth, place.pageHeight]);
+	page.drawImage(image, { x: place.x, y: place.y, width: place.width, height: place.height });
+	const out = await doc.save();
+	return new Blob([out as BlobPart], { type: 'application/pdf' });
+}
+
+async function mergePdfBlobs(blobs: Blob[]): Promise<Blob> {
+	const { PDFDocument } = await import('pdf-lib');
+	const merged = await PDFDocument.create();
+	for (const blob of blobs) {
+		const src = await PDFDocument.load(await blob.arrayBuffer());
+		const pages = await merged.copyPages(src, src.getPageIndices());
+		for (const page of pages) merged.addPage(page);
+	}
+	return new Blob([(await merged.save()) as BlobPart], { type: 'application/pdf' });
 }
 
 function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality?: number): Promise<Blob> {
@@ -290,7 +378,7 @@ async function convertImage(
 	decoded?: Blob,
 ): Promise<Blob> {
 	const { targetFormat, quality, maxDimension } = settings;
-	const decodableBlob = decoded ?? (await toDecodableBlob(file));
+	const decodableBlob = decoded ?? (await toDecodableBlob(file, settings.svgScale));
 	const bitmap = await createImageBitmap(decodableBlob);
 
 	// ICO always bundles the fixed `ICO_SIZES` set regardless of the user's
@@ -324,8 +412,12 @@ async function convertImage(
 		throw new CanvasTooLargeError();
 	}
 
-	if (WHITE_BACKGROUND_FORMATS.has(targetFormat)) {
-		ctx.fillStyle = '#ffffff';
+	// Nền: màu người dùng chọn; nếu "tự động" thì JPG/BMP phải đổ nền trắng (không có alpha),
+	// còn PNG/WebP/AVIF/GIF giữ trong suốt. PDF: trắng nếu dùng JPEG, nên alpha được kiểm tra trong encodePdf.
+	const fill =
+		settings.backgroundColor ?? (WHITE_BACKGROUND_FORMATS.has(targetFormat) ? '#ffffff' : null);
+	if (fill) {
+		ctx.fillStyle = fill;
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 	}
 	ctx.drawImage(bitmap, 0, 0, width, height);
@@ -345,6 +437,8 @@ async function convertImage(
 			return encodeBmp(ctx.getImageData(0, 0, canvas.width, canvas.height));
 		case 'image/gif':
 			return encodeGif(ctx.getImageData(0, 0, canvas.width, canvas.height));
+		case 'application/pdf':
+			return encodePdf(canvas, settings);
 	}
 }
 
@@ -358,6 +452,11 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 	const [quality, setQuality] = useState(0.8);
 	const [resizeEnabled, setResizeEnabled] = useState(false);
 	const [maxDimension, setMaxDimension] = useState(DEFAULT_MAX_DIMENSION);
+	const [bgMode, setBgMode] = useState<'auto' | 'custom'>('auto');
+	const [bgColor, setBgColor] = useState('#ffffff');
+	const [svgScale, setSvgScale] = useState(2);
+	const [pdfPageMode, setPdfPageMode] = useState<PdfPageMode>('a4');
+	const [pdfMarginMm, setPdfMarginMm] = useState(10);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isZipping, setIsZipping] = useState(false);
 	const [isDragOver, setIsDragOver] = useState(false);
@@ -395,7 +494,7 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList) return;
 		const allFiles = Array.from(fileList);
-		const acceptedFiles = allFiles.filter((file) => ACCEPTED_TYPES.has(file.type) || isHeic(file));
+		const acceptedFiles = allFiles.filter((file) => ACCEPTED_TYPES.has(file.type) || isHeic(file) || isSvgFile(file));
 		setSkippedCount(allFiles.length - acceptedFiles.length);
 		const newItems: ImageItem[] = acceptedFiles.map((file) => ({
 			id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
@@ -441,8 +540,23 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 		setSkippedCount(0);
 	}, []);
 
-	const settingsRef = useRef<ConvertSettings>({ targetFormat, quality });
-	settingsRef.current = { targetFormat, quality, maxDimension: resizeEnabled ? maxDimension : undefined };
+	const settingsRef = useRef<ConvertSettings>({
+		targetFormat,
+		quality,
+		backgroundColor: null,
+		svgScale,
+		pdfPageMode,
+		pdfMarginMm,
+	});
+	settingsRef.current = {
+		targetFormat,
+		quality,
+		maxDimension: resizeEnabled ? maxDimension : undefined,
+		backgroundColor: bgMode === 'custom' && isHexColor(bgColor) ? bgColor : null,
+		svgScale,
+		pdfPageMode,
+		pdfMarginMm,
+	};
 
 	const convertOne = useCallback(
 		async (item: ImageItem, settings: ConvertSettings) => {
@@ -477,13 +591,15 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 						? messages.errorAvifUnsupported
 						: err instanceof CanvasTooLargeError
 							? messages.errorTooLarge
-							: messages.errorGeneric;
+							: err instanceof SvgRasterError
+								? messages.errorSvg
+								: messages.errorGeneric;
 				setItems((prev) =>
 					prev.map((it) => (it.id === item.id ? { ...it, status: 'error', errorMessage } : it)),
 				);
 			}
 		},
-		[messages.errorAvifUnsupported, messages.errorTooLarge, messages.errorGeneric],
+		[messages.errorAvifUnsupported, messages.errorTooLarge, messages.errorSvg, messages.errorGeneric],
 	);
 
 	const runQueue = useCallback(async (queue: ImageItem[]) => {
@@ -554,13 +670,30 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 		}
 	}, [items]);
 
+	const handleDownloadCombinedPdf = useCallback(async () => {
+		const pdfs = items.filter((item) => item.status === 'done' && item.resultFormat === 'application/pdf' && item.resultBlob);
+		if (pdfs.length === 0) return;
+		setIsZipping(true);
+		try {
+			const merged = await mergePdfBlobs(pdfs.map((item) => item.resultBlob!));
+			const url = URL.createObjectURL(merged);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = 'images.pdf';
+			link.click();
+			URL.revokeObjectURL(url);
+		} finally {
+			setIsZipping(false);
+		}
+	}, [items]);
+
 	// A previously converted/failed result no longer reflects the current
 	// settings once format/quality/resize change — leaving it displayed as
 	// "done" would show the before/after slider comparing against a stale
 	// conversion (same bug fixed in Image Compressor for its "By quality" ->
 	// "By target size" switch). Reverting those items to 'pending' keeps the
 	// UI honest that nothing has been converted with the current settings yet.
-	const settingsSignature = `${targetFormat}|${quality}|${resizeEnabled}|${maxDimension}`;
+	const settingsSignature = `${targetFormat}|${quality}|${resizeEnabled}|${maxDimension}|${bgMode}|${bgColor}|${svgScale}|${pdfPageMode}|${pdfMarginMm}`;
 	const prevSettingsSignature = useRef(settingsSignature);
 	useEffect(() => {
 		if (prevSettingsSignature.current === settingsSignature) return;
@@ -615,7 +748,7 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 					<input
 						id="image-converter-input"
 						type="file"
-						accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/avif,image/heic,image/heif,.heic,.heif"
+						accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/avif,image/svg+xml,.svg,image/heic,image/heif,.heic,.heif"
 						multiple
 						className="sr-only"
 						onChange={(event) => {
@@ -651,6 +784,7 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 					<option value="image/gif">GIF</option>
 					<option value="image/bmp">BMP</option>
 					<option value="image/x-icon">ICO</option>
+					<option value="application/pdf">PDF</option>
 				</select>
 
 				{LOSSY_FORMATS.has(targetFormat) && (
@@ -702,6 +836,86 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 					</div>
 				)}
 			</div>
+
+			<div className="flex flex-wrap items-center gap-3">
+				<label htmlFor="image-converter-bg" className="shrink-0 text-sm text-foreground">
+					{messages.backgroundLabel}
+				</label>
+				<select
+					id="image-converter-bg"
+					value={bgMode}
+					disabled={isProcessing}
+					onChange={(event) => setBgMode(event.target.value as 'auto' | 'custom')}
+					className="min-h-9 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+				>
+					<option value="auto">{messages.backgroundAuto}</option>
+					<option value="custom">{messages.backgroundCustom}</option>
+				</select>
+				{bgMode === 'custom' && (
+					<input
+						type="color"
+						aria-label={messages.backgroundCustom}
+						value={bgColor}
+						disabled={isProcessing}
+						onChange={(event) => setBgColor(event.target.value)}
+						className="h-9 w-12 cursor-pointer rounded-md border border-border bg-background"
+					/>
+				)}
+			</div>
+
+			{items.some((item) => isSvgFile(item.file)) && (
+				<div className="flex flex-wrap items-center gap-3">
+					<label htmlFor="image-converter-svg-scale" className="shrink-0 text-sm text-foreground">
+						{messages.svgScaleLabel}
+					</label>
+					<select
+						id="image-converter-svg-scale"
+						value={svgScale}
+						disabled={isProcessing}
+						onChange={(event) => setSvgScale(Number(event.target.value))}
+						className="min-h-9 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+					>
+						{[1, 2, 3, 4, 8].map((n) => (
+							<option key={n} value={n}>
+								{n}×
+							</option>
+						))}
+					</select>
+				</div>
+			)}
+
+			{targetFormat === 'application/pdf' && (
+				<div className="flex flex-wrap items-center gap-3">
+					<label htmlFor="image-converter-pdf-size" className="shrink-0 text-sm text-foreground">
+						{messages.pdfPageSizeLabel}
+					</label>
+					<select
+						id="image-converter-pdf-size"
+						value={pdfPageMode}
+						disabled={isProcessing}
+						onChange={(event) => setPdfPageMode(event.target.value as PdfPageMode)}
+						className="min-h-9 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+					>
+						<option value="a4">A4</option>
+						<option value="letter">Letter</option>
+						<option value="fit">{messages.pdfPageFit}</option>
+					</select>
+					<label htmlFor="image-converter-pdf-margin" className="shrink-0 text-sm text-foreground">
+						{messages.pdfMarginLabel.replace('{{mm}}', String(pdfMarginMm))}
+					</label>
+					<input
+						id="image-converter-pdf-margin"
+						type="range"
+						min={0}
+						max={30}
+						step={5}
+						value={pdfMarginMm}
+						disabled={isProcessing}
+						onChange={(event) => setPdfMarginMm(Number(event.target.value))}
+						className="w-40"
+					/>
+				</div>
+			)}
 
 			<p className="text-xs text-muted-foreground">{messages.formatsNote}</p>
 
@@ -802,6 +1016,11 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 				{doneCount > 1 && (
 					<Button type="button" variant="secondary" onClick={handleDownloadAll} disabled={isZipping}>
 						{messages.downloadAll}
+					</Button>
+				)}
+				{doneCount > 1 && targetFormat === 'application/pdf' && (
+					<Button type="button" variant="secondary" onClick={handleDownloadCombinedPdf} disabled={isZipping}>
+						{messages.downloadCombinedPdf}
 					</Button>
 				)}
 				{items.length > 0 && (

@@ -4,11 +4,16 @@ import {
 	EXCEL_MAX_CELL_CHARS,
 	EXCEL_MAX_COLS,
 	EXCEL_MAX_ROWS,
+	applySheetLayout,
 	buildSheets,
 	sanitizeFileName,
+	sheetToCsv,
+	type ArrayMode,
 	type BuildStats,
+	type EpochMode,
 	type Sheet,
 } from '@/lib/json-excel';
+import { mergeColumnSpec, type ColumnSpec } from '@/lib/csv-json';
 
 interface Messages {
 	sheetNameLabel: string;
@@ -43,6 +48,29 @@ interface Messages {
 	warnColLimit: string;
 	warnUnsafeIntegers: string;
 	warnRenamedSheets: string;
+	advancedHeading: string;
+	arrayModeLabel: string;
+	arrayModeJson: string;
+	arrayModeDetail: string;
+	arrayModeJoin: string;
+	arrayModeDetailInfo: string;
+	joinSeparatorLabel: string;
+	isoDatesLabel: string;
+	epochLabel: string;
+	epochOff: string;
+	epochSeconds: string;
+	epochMilliseconds: string;
+	datesHint: string;
+	freezeLabel: string;
+	autoFilterLabel: string;
+	tableStyleLabel: string;
+	columnsHeading: string;
+	columnInclude: string;
+	columnRename: string;
+	columnMoveUp: string;
+	columnMoveDown: string;
+	columnsReset: string;
+	downloadCsv: string;
 }
 
 const SAMPLE_JSON = JSON.stringify(
@@ -61,6 +89,7 @@ const PREVIEW_ROW_LIMIT = 20;
 const PREVIEW_CELL_CHARS = 200;
 
 function previewText(value: unknown): string {
+	if (value instanceof Date) return value.toISOString();
 	const text = String(value ?? '');
 	return text.length > PREVIEW_CELL_CHARS ? `${text.slice(0, PREVIEW_CELL_CHARS)}…` : text;
 }
@@ -108,14 +137,23 @@ export default function JsonExcelConverter({ messages }: { messages: Messages })
 	const [downloadError, setDownloadError] = useState<string | null>(null);
 	const [fileError, setFileError] = useState<string | null>(null);
 	const [activeSheet, setActiveSheet] = useState(0);
+	const [arrayMode, setArrayMode] = useState<ArrayMode>('json');
+	const [joinSeparator, setJoinSeparator] = useState(', ');
+	const [isoDates, setIsoDates] = useState(false);
+	const [epoch, setEpoch] = useState<EpochMode>('off');
+	const [freezeHeader, setFreezeHeader] = useState(false);
+	const [autoFilter, setAutoFilter] = useState(false);
+	const [tableStyle, setTableStyle] = useState(false);
+	// Column layout per sheet name (select / reorder / rename); only applied once customised.
+	const [layouts, setLayouts] = useState<Record<string, ColumnSpec[]>>({});
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const loadToken = useRef(0);
 
-	const { sheets, stats, error } = useMemo(() => {
+	const built = useMemo(() => {
 		if (input.trim() === '') return { sheets: null as Sheet[] | null, stats: null as BuildStats | null, error: null as string | null };
 		try {
 			const parsed: unknown = JSON.parse(input);
-			const result = buildSheets(parsed, { sheetName: sheetName || 'Sheet1', flatten, unwrap });
+			const result = buildSheets(parsed, { sheetName: sheetName || 'Sheet1', flatten, unwrap, arrayMode, joinSeparator, isoDates, epoch });
 			if (result === null) return { sheets: null, stats: null, error: messages.jsonRootError };
 			return { sheets: result.sheets, stats: result.stats, error: null as string | null };
 		} catch (e) {
@@ -125,14 +163,39 @@ export default function JsonExcelConverter({ messages }: { messages: Messages })
 				error: messages.jsonParseError.replace('{{message}}', e instanceof Error ? e.message : ''),
 			};
 		}
-	}, [input, sheetName, flatten, unwrap, messages]);
+	}, [input, sheetName, flatten, unwrap, arrayMode, joinSeparator, isoDates, epoch, messages]);
+	const { stats, error } = built;
+	const builtSheets = built.sheets;
 
-	// A different set of sheets (new input / options) must not leave a stale tab selected.
+	const sheets = useMemo(
+		() => (builtSheets ? builtSheets.map((sheet) => applySheetLayout(sheet, layouts[sheet.name])) : null),
+		[builtSheets, layouts],
+	);
+
+	// A different set of built sheets (new input / options) must not leave a stale tab selected.
 	useEffect(() => {
 		setActiveSheet(0);
-	}, [sheets]);
+	}, [builtSheets]);
 
 	const currentSheet = sheets ? sheets[Math.min(activeSheet, sheets.length - 1)] : null;
+	const currentRaw = builtSheets ? builtSheets[Math.min(activeSheet, builtSheets.length - 1)] : null;
+	const currentSpec = currentRaw ? mergeColumnSpec(layouts[currentRaw.name] ?? [], currentRaw.headers) : [];
+
+	const setCurrentSpec = (update: (prev: ColumnSpec[]) => ColumnSpec[]) => {
+		if (!currentRaw) return;
+		const name = currentRaw.name;
+		setLayouts((prev) => ({ ...prev, [name]: update(mergeColumnSpec(prev[name] ?? [], currentRaw.headers)) }));
+	};
+	const moveColumn = (index: number, delta: number) =>
+		setCurrentSpec((prev) => {
+			const target = index + delta;
+			if (target < 0 || target >= prev.length) return prev;
+			const next = [...prev];
+			[next[index], next[target]] = [next[target], next[index]];
+			return next;
+		});
+	const updateColumn = (index: number, patch: Partial<ColumnSpec>) =>
+		setCurrentSpec((prev) => prev.map((c, i) => (i === index ? { ...c, ...patch } : c)));
 	const totalRows = sheets ? sheets.reduce((sum, s) => sum + s.rows.length, 0) : 0;
 	const warnings = stats ? warningsFor(stats, messages) : [];
 	const unwrappedKey = sheets && sheets.length === 1 ? sheets[0].sourceKey : undefined;
@@ -174,16 +237,34 @@ export default function JsonExcelConverter({ messages }: { messages: Messages })
 				if (sheet.headers.length === 0) continue;
 				// Positional arrays (not keyed objects) so empty-string and "__proto__" headers keep their data.
 				worksheet.addRow(sheet.headers);
-				worksheet.getRow(1).font = { bold: true };
+				const headerRow = worksheet.getRow(1);
+				headerRow.font = tableStyle ? { bold: true, color: { argb: 'FFFFFFFF' } } : { bold: true };
+				if (tableStyle) {
+					headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F4E78' } };
+					headerRow.alignment = { vertical: 'middle' };
+				}
+				const formats = sheet.columnFormats ?? [];
 				sheet.headers.forEach((header, i) => {
-					worksheet.getColumn(i + 1).width = Math.min(40, Math.max(10, header.length + 2));
+					const column = worksheet.getColumn(i + 1);
+					column.width = Math.min(40, Math.max(formats[i] ? 20 : 10, header.length + 2));
 				});
 				let added = 0;
 				for (const row of sheet.rows) {
-					worksheet.addRow(row);
+					const excelRow = worksheet.addRow(row);
+					// Dates need an explicit number format or Excel shows the serial number.
+					formats.forEach((format, c) => {
+						if (format && row[c] instanceof Date) excelRow.getCell(c + 1).numFmt = format;
+					});
+					if (tableStyle && added % 2 === 1 && sheet.rows.length <= 50000) {
+						excelRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F6FA' } };
+					}
 					// Yield periodically so very large sheets do not freeze the page.
 					added += 1;
 					if (added % 5000 === 0) await tick();
+				}
+				if (freezeHeader) worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1 }];
+				if (autoFilter) {
+					worksheet.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: sheet.headers.length } };
 				}
 				await tick();
 			}
@@ -205,7 +286,21 @@ export default function JsonExcelConverter({ messages }: { messages: Messages })
 		}
 	};
 
+	const handleDownloadCsv = () => {
+		if (!currentSheet) return;
+		// UTF-8 BOM so Excel on Windows detects the encoding.
+		const blob = new Blob(['﻿', sheetToCsv(currentSheet)], { type: 'text/csv;charset=utf-8' });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		const name = sanitizeFileName(fileName.trim() || 'output').replace(/\.xlsx$/i, '');
+		link.download = sheets && sheets.length > 1 ? `${name}-${sanitizeFileName(currentSheet.name)}.csv` : `${name}.csv`;
+		link.click();
+		setTimeout(() => URL.revokeObjectURL(url), 10000);
+	};
+
 	const checkboxLabel = 'flex min-h-9 items-center gap-2 text-sm text-muted-foreground';
+	const fieldClass = 'rounded-md border border-border bg-background p-2 text-sm text-foreground';
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -249,6 +344,135 @@ export default function JsonExcelConverter({ messages }: { messages: Messages })
 					</label>
 				</div>
 				<p className="text-xs text-muted-foreground">{messages.flattenHint}</p>
+
+				<details className="rounded-md border border-border px-3 py-2">
+					<summary className="min-h-9 cursor-pointer text-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-ring">
+						{messages.advancedHeading}
+					</summary>
+					<div className="mt-2 flex flex-col gap-3">
+						<div className="flex flex-wrap items-end gap-x-4 gap-y-2">
+							<div className="flex flex-col gap-1">
+								<label htmlFor="json-excel-array-mode" className="text-xs text-muted-foreground">
+									{messages.arrayModeLabel}
+								</label>
+								<select
+									id="json-excel-array-mode"
+									value={arrayMode}
+									onChange={(e) => setArrayMode(e.target.value as ArrayMode)}
+									className={`${fieldClass} max-w-full`}
+								>
+									<option value="json">{messages.arrayModeJson}</option>
+									<option value="detail">{messages.arrayModeDetail}</option>
+									<option value="join">{messages.arrayModeJoin}</option>
+								</select>
+							</div>
+							{arrayMode === 'join' && (
+								<div className="flex flex-col gap-1">
+									<label htmlFor="json-excel-join" className="text-xs text-muted-foreground">
+										{messages.joinSeparatorLabel}
+									</label>
+									<input
+										id="json-excel-join"
+										type="text"
+										value={joinSeparator}
+										maxLength={10}
+										onChange={(e) => setJoinSeparator(e.target.value)}
+										className={`${fieldClass} w-24 font-mono`}
+									/>
+								</div>
+							)}
+							<div className="flex flex-col gap-1">
+								<label htmlFor="json-excel-epoch" className="text-xs text-muted-foreground">
+									{messages.epochLabel}
+								</label>
+								<select id="json-excel-epoch" value={epoch} onChange={(e) => setEpoch(e.target.value as EpochMode)} className={fieldClass}>
+									<option value="off">{messages.epochOff}</option>
+									<option value="seconds">{messages.epochSeconds}</option>
+									<option value="milliseconds">{messages.epochMilliseconds}</option>
+								</select>
+							</div>
+						</div>
+						{arrayMode === 'detail' && <p className="text-xs text-muted-foreground">{messages.arrayModeDetailInfo}</p>}
+						<div className="flex flex-wrap items-center gap-x-4">
+							<label className={checkboxLabel}>
+								<input type="checkbox" className="size-4" checked={isoDates} onChange={(e) => setIsoDates(e.target.checked)} />
+								{messages.isoDatesLabel}
+							</label>
+							<label className={checkboxLabel}>
+								<input type="checkbox" className="size-4" checked={freezeHeader} onChange={(e) => setFreezeHeader(e.target.checked)} />
+								{messages.freezeLabel}
+							</label>
+							<label className={checkboxLabel}>
+								<input type="checkbox" className="size-4" checked={autoFilter} onChange={(e) => setAutoFilter(e.target.checked)} />
+								{messages.autoFilterLabel}
+							</label>
+							<label className={checkboxLabel}>
+								<input type="checkbox" className="size-4" checked={tableStyle} onChange={(e) => setTableStyle(e.target.checked)} />
+								{messages.tableStyleLabel}
+							</label>
+						</div>
+						<p className="text-xs text-muted-foreground">{messages.datesHint}</p>
+
+						{currentRaw && currentSpec.length > 0 && (
+							<div className="flex flex-col gap-2">
+								<div className="flex flex-wrap items-center justify-between gap-2">
+									<span className="text-sm font-medium text-foreground">{messages.columnsHeading.replace('{{sheet}}', currentRaw.name)}</span>
+									<Button
+										type="button"
+										size="sm"
+										variant="ghost"
+										onClick={() => setLayouts((prev) => ({ ...prev, [currentRaw.name]: mergeColumnSpec([], currentRaw.headers) }))}
+									>
+										{messages.columnsReset}
+									</Button>
+								</div>
+								<ul className="flex max-h-80 flex-col gap-1 overflow-y-auto">
+									{currentSpec.map((col, i) => (
+										<li key={col.source} className="flex min-w-0 flex-wrap items-center gap-2">
+											<input
+												type="checkbox"
+												className="size-5"
+												checked={col.include}
+												aria-label={messages.columnInclude.replace('{{name}}', col.source === '' ? messages.emptyKey : col.source)}
+												onChange={(e) => updateColumn(i, { include: e.target.checked })}
+											/>
+											<input
+												type="text"
+												value={col.name}
+												spellCheck={false}
+												aria-label={messages.columnRename.replace('{{name}}', col.source === '' ? messages.emptyKey : col.source)}
+												onChange={(e) => updateColumn(i, { name: e.target.value })}
+												className={`${fieldClass} min-h-9 min-w-0 flex-1 basis-32 font-mono`}
+											/>
+											<Button
+												type="button"
+												size="sm"
+												variant="outline"
+												className="min-h-9 min-w-9"
+												disabled={i === 0}
+												aria-label={messages.columnMoveUp.replace('{{name}}', col.source === '' ? messages.emptyKey : col.source)}
+												onClick={() => moveColumn(i, -1)}
+											>
+												↑
+											</Button>
+											<Button
+												type="button"
+												size="sm"
+												variant="outline"
+												className="min-h-9 min-w-9"
+												disabled={i === currentSpec.length - 1}
+												aria-label={messages.columnMoveDown.replace('{{name}}', col.source === '' ? messages.emptyKey : col.source)}
+												onClick={() => moveColumn(i, 1)}
+											>
+												↓
+											</Button>
+										</li>
+									))}
+								</ul>
+							</div>
+						)}
+					</div>
+				</details>
 			</div>
 
 			<div
@@ -329,9 +553,14 @@ export default function JsonExcelConverter({ messages }: { messages: Messages })
 				<div className="flex flex-col gap-3 rounded-lg border border-border p-4">
 					<div className="flex flex-wrap items-center justify-between gap-2">
 						<h3 className="text-sm font-medium text-foreground">{messages.previewHeading}</h3>
-						<Button type="button" size="sm" onClick={handleDownload} disabled={isGenerating || totalRows === 0}>
-							{isGenerating ? messages.generating : messages.download}
-						</Button>
+						<div className="flex flex-wrap items-center gap-2">
+							<Button type="button" size="sm" variant="outline" onClick={handleDownloadCsv} disabled={totalRows === 0}>
+								{messages.downloadCsv}
+							</Button>
+							<Button type="button" size="sm" onClick={handleDownload} disabled={isGenerating || totalRows === 0}>
+								{isGenerating ? messages.generating : messages.download}
+							</Button>
+						</div>
 					</div>
 
 					{unwrappedKey !== undefined && (

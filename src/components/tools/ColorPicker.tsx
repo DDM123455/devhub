@@ -20,8 +20,10 @@ import {
 	type SavedPalette,
 } from '@/lib/color-utils';
 import { copyTextSafe } from '@/lib/safe-clipboard';
+import { decodePaletteHash } from '@/lib/color-extra';
+import ColorPickerExtras, { type ExtraMessages } from './ColorPickerExtras';
 
-interface Messages {
+interface Messages extends ExtraMessages {
 	pickerHeading: string;
 	hexLabel: string;
 	rLabel: string;
@@ -292,7 +294,14 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 	const paletteCardRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		setPalette(Array.from({ length: 5 }, randomHsl));
+		// A palette share link (#p=hex-hex-...) takes precedence over a random palette.
+		const shared = decodePaletteHash(window.location.hash);
+		if (shared) {
+			setPalette(shared.map((h) => rgbToHsl(hexToRgb(h) ?? { r: 0, g: 0, b: 0 })));
+			setLocked(Array(shared.length).fill(false));
+		} else {
+			setPalette(Array.from({ length: 5 }, randomHsl));
+		}
 		setSavedPalettes(readSavedPalettes());
 		const onStorage = (e: StorageEvent) => {
 			if (e.key === SAVED_PALETTES_STORAGE_KEY || e.key === null) setSavedPalettes(readSavedPalettes());
@@ -789,6 +798,14 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 					))}
 				</div>
 			</div>
+
+			<ColorPickerExtras
+				hex={hex}
+				rgb={rgb}
+				paletteHexes={paletteHexes}
+				onPickColor={(picked) => applyRgb(hexToRgb(picked)!)}
+				messages={messages}
+			/>
 		</div>
 	);
 }

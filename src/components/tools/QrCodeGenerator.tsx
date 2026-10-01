@@ -2,24 +2,42 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import type QRCodeStyling from 'qr-code-styling';
-import type { DotType, GradientType, Options } from 'qr-code-styling';
+import type { CornerDotType, CornerSquareType, DotType, GradientType, Options } from 'qr-code-styling';
 import {
 	BATCH_MAX_LINES,
+	DEFAULT_QR_DESIGN,
 	batchBaseName,
+	buildBitcoinPayload,
 	buildEmailPayload,
+	buildEventPayload,
+	buildGeoPayload,
+	buildMeCardPayload,
+	buildPhonePayload,
 	buildSmsPayload,
 	buildVCardPayload,
+	buildWhatsAppPayload,
 	buildWifiPayload,
+	isValidBitcoinAmount,
 	normalizeUrlInput,
 	parseBatchLines,
+	parseQrDesignJson,
+	pdfPlacement,
 	qrAriaLabel,
 	qrContrastWarning,
 	quietZoneMargin,
+	sanitizeQrDesign,
 	uniqueName,
 	utf8ToBinaryString,
+	type BitcoinFields,
 	type EmailFields,
+	type EventFields,
+	type GeoFields,
+	type MeCardFields,
+	type PhoneFields,
+	type QrDesign,
 	type SmsFields,
 	type VCardFields,
+	type WhatsAppFields,
 	type WifiEncryption,
 	type WifiFields,
 } from '@/lib/qr-encode';
@@ -114,9 +132,77 @@ interface Messages {
 	batchCancel: string;
 	batchCancelled: string;
 	qrAriaLabel: string;
+	typePhone: string;
+	typeMecard: string;
+	typeGeo: string;
+	typeEvent: string;
+	typeBitcoin: string;
+	typeWhatsapp: string;
+	phoneLabel: string;
+	mecardAddressLabel: string;
+	mecardNoteLabel: string;
+	geoLatLabel: string;
+	geoLngLabel: string;
+	geoInvalid: string;
+	eventTitleLabel: string;
+	eventStartLabel: string;
+	eventEndLabel: string;
+	eventAllDayLabel: string;
+	eventLocationLabel: string;
+	eventDescriptionLabel: string;
+	bitcoinAddressLabel: string;
+	bitcoinAmountLabel: string;
+	bitcoinLabelLabel: string;
+	bitcoinMessageLabel: string;
+	bitcoinAmountInvalid: string;
+	whatsappPhoneLabel: string;
+	whatsappMessageLabel: string;
+	advancedHeading: string;
+	eyesHeading: string;
+	eyeSquareStyleLabel: string;
+	eyeDotStyleLabel: string;
+	eyeSameAsBody: string;
+	eyeSquareStyleSquare: string;
+	eyeSquareStyleDot: string;
+	eyeSquareStyleExtraRounded: string;
+	eyeDotStyleSquare: string;
+	eyeDotStyleDot: string;
+	eyeColorOverrideLabel: string;
+	eyeSquareColorLabel: string;
+	eyeDotColorLabel: string;
+	downloadJpeg: string;
+	downloadPdf: string;
+	pdfLayoutLabel: string;
+	pdfLayoutA4: string;
+	pdfLayoutFit: string;
+	designHeading: string;
+	designSave: string;
+	designLoad: string;
+	designExport: string;
+	designImport: string;
+	designSaved: string;
+	designLoaded: string;
+	designNoneSaved: string;
+	designImportError: string;
+	designLogoNote: string;
 }
 
-type ContentType = 'url' | 'text' | 'wifi' | 'vcard' | 'email' | 'sms';
+type ContentType =
+	| 'url'
+	| 'text'
+	| 'wifi'
+	| 'vcard'
+	| 'email'
+	| 'sms'
+	| 'phone'
+	| 'mecard'
+	| 'geo'
+	| 'event'
+	| 'bitcoin'
+	| 'whatsapp';
+type ExportFormat = 'png' | 'jpeg' | 'pdf';
+
+const DESIGN_STORAGE_KEY = 'webtoolhub.qr.design.v1';
 type ErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
 
 const MIN_SIZE = 128;
@@ -167,6 +253,121 @@ async function composeFramedPng(qrPngBlob: Blob, frameText: string): Promise<Blo
 	return canvasToPngBlob(canvas);
 }
 
+const FIELD_CLASS = 'min-h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground';
+
+function TextField({
+	id,
+	label,
+	value,
+	onChange,
+	type = 'text',
+	multiline = false,
+	inputMode,
+	describedBy,
+	invalid = false,
+}: {
+	id: string;
+	label: string;
+	value: string;
+	onChange: (value: string) => void;
+	type?: string;
+	multiline?: boolean;
+	inputMode?: 'text' | 'decimal' | 'tel' | 'numeric';
+	describedBy?: string;
+	invalid?: boolean;
+}) {
+	return (
+		<div className="flex flex-col gap-1">
+			<label htmlFor={id} className="text-sm font-medium text-foreground">
+				{label}
+			</label>
+			{multiline ? (
+				<textarea
+					id={id}
+					value={value}
+					onChange={(event) => onChange(event.target.value)}
+					rows={3}
+					aria-describedby={describedBy}
+					aria-invalid={invalid || undefined}
+					className={FIELD_CLASS}
+				/>
+			) : (
+				<input
+					id={id}
+					type={type}
+					inputMode={inputMode}
+					value={value}
+					onChange={(event) => onChange(event.target.value)}
+					aria-describedby={describedBy}
+					aria-invalid={invalid || undefined}
+					className={FIELD_CLASS}
+				/>
+			)}
+		</div>
+	);
+}
+
+function escapeXml(text: string): string {
+	return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// SVG counterpart of composeFramedPng: wraps the generated <svg> in a larger
+// one with a border and an optional <text> caption. The caption uses the
+// generic sans-serif family, so its exact glyphs depend on the viewer's fonts.
+async function composeFramedSvg(qrSvgBlob: Blob, frameText: string, size: number): Promise<Blob> {
+	const raw = await qrSvgBlob.text();
+	const inner = new DOMParser().parseFromString(raw, 'image/svg+xml').documentElement;
+	if (!inner || inner.nodeName.toLowerCase() !== 'svg') throw new Error('invalid svg');
+	const padding = Math.round(size * 0.08);
+	const textArea = frameText.trim() ? Math.round(size * 0.16) : 0;
+	const border = Math.max(2, Math.round(size * 0.008));
+	const width = size + padding * 2;
+	const height = size + padding * 2 + textArea;
+	inner.setAttribute('x', String(padding));
+	inner.setAttribute('y', String(padding));
+	inner.setAttribute('width', String(size));
+	inner.setAttribute('height', String(size));
+	const innerMarkup = new XMLSerializer().serializeToString(inner);
+	const caption = frameText.trim()
+		? `<text x="${width / 2}" y="${size + padding * 2 + textArea / 2}" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-weight="bold" font-size="${Math.round(textArea * 0.45)}" fill="#000000">${escapeXml(frameText.trim())}</text>`
+		: '';
+	const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="${width}" height="${height}" fill="#ffffff"/><rect x="${border / 2}" y="${border / 2}" width="${width - border}" height="${height - border}" fill="none" stroke="#000000" stroke-width="${border}"/>${innerMarkup}${caption}</svg>`;
+	return new Blob([svg], { type: 'image/svg+xml' });
+}
+
+async function pngBlobToJpegBlob(png: Blob): Promise<Blob> {
+	const bitmap = await createImageBitmap(png);
+	const canvas = document.createElement('canvas');
+	canvas.width = bitmap.width;
+	canvas.height = bitmap.height;
+	const ctx = canvas.getContext('2d');
+	if (!ctx) throw new Error('Canvas 2D context unavailable');
+	ctx.fillStyle = '#ffffff';
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.drawImage(bitmap, 0, 0);
+	bitmap.close();
+	return new Promise((resolve, reject) => {
+		canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('jpeg toBlob null'))), 'image/jpeg', 0.95);
+	});
+}
+
+async function pngBlobToPdfBlob(png: Blob, layout: 'a4' | 'fit'): Promise<Blob> {
+	const { PDFDocument } = await import('pdf-lib');
+	const bitmap = await createImageBitmap(png);
+	const px = Math.max(bitmap.width, bitmap.height);
+	const aspect = bitmap.height / bitmap.width;
+	bitmap.close();
+	const place = pdfPlacement(px, layout);
+	const doc = await PDFDocument.create();
+	const page = doc.addPage([place.pageW, place.pageH]);
+	const image = await doc.embedPng(new Uint8Array(await png.arrayBuffer()));
+	const w = place.size;
+	const h = place.size * aspect;
+	page.drawImage(image, { x: (place.pageW - w) / 2, y: (place.pageH - h) / 2, width: w, height: h });
+	const bytes = await doc.save();
+	return new Blob([bytes as BlobPart], { type: 'application/pdf' });
+}
+
 export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	const [contentType, setContentType] = useState<ContentType>('url');
 	const [urlValue, setUrlValue] = useState('https://web-tool-hub.example');
@@ -175,6 +376,21 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	const [vcard, setVcard] = useState<VCardFields>({ firstName: '', lastName: '', phone: '', email: '', org: '', url: '' });
 	const [email, setEmail] = useState<EmailFields>({ to: '', subject: '', body: '' });
 	const [sms, setSms] = useState<SmsFields>({ phone: '', message: '' });
+	const [phone, setPhone] = useState<PhoneFields>({ phone: '' });
+	const [mecard, setMecard] = useState<MeCardFields>({ firstName: '', lastName: '', phone: '', email: '', url: '', address: '', note: '' });
+	const [geo, setGeo] = useState<GeoFields>({ lat: '', lng: '' });
+	const [eventFields, setEventFields] = useState<EventFields>({ title: '', start: '', end: '', allDay: false, location: '', description: '' });
+	const [bitcoin, setBitcoin] = useState<BitcoinFields>({ address: '', amount: '', label: '', message: '' });
+	const [whatsapp, setWhatsapp] = useState<WhatsAppFields>({ phone: '', message: '' });
+
+	// Finder-pattern ("eye") overrides; '' = follow the body dot style / colour.
+	const [cornerSquareType, setCornerSquareType] = useState<CornerSquareType | ''>('');
+	const [cornerDotType, setCornerDotType] = useState<CornerDotType | ''>('');
+	const [eyeColorEnabled, setEyeColorEnabled] = useState(false);
+	const [cornerSquareColor, setCornerSquareColor] = useState('#000000');
+	const [cornerDotColor, setCornerDotColor] = useState('#000000');
+	const [pdfLayout, setPdfLayout] = useState<'a4' | 'fit'>('a4');
+	const [designNotice, setDesignNotice] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
 
 	const [fgColor, setFgColor] = useState('#000000');
 	const [bgColor, setBgColor] = useState('#ffffff');
@@ -236,8 +452,40 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 				return { qrValue: buildEmailPayload(email), isEmpty: email.to.trim() === '', summary: email.to.trim() };
 			case 'sms':
 				return { qrValue: buildSmsPayload(sms), isEmpty: sms.phone.trim() === '', summary: sms.phone.trim() };
+			case 'phone': {
+				const v = buildPhonePayload(phone);
+				return { qrValue: v, isEmpty: v === '', summary: v };
+			}
+			case 'mecard': {
+				const v = buildMeCardPayload(mecard);
+				return {
+					qrValue: v,
+					isEmpty: v === '',
+					summary: [mecard.firstName, mecard.lastName].filter(Boolean).join(' ') || mecard.phone || mecard.email,
+				};
+			}
+			case 'geo': {
+				const v = buildGeoPayload(geo);
+				return { qrValue: v, isEmpty: v === '', summary: v };
+			}
+			case 'event': {
+				const v = buildEventPayload(eventFields);
+				return { qrValue: v, isEmpty: v === '', summary: eventFields.title.trim() };
+			}
+			case 'bitcoin': {
+				const v = buildBitcoinPayload(bitcoin);
+				return { qrValue: v, isEmpty: v === '', summary: bitcoin.address.trim() };
+			}
+			case 'whatsapp': {
+				const v = buildWhatsAppPayload(whatsapp);
+				return { qrValue: v, isEmpty: v === '', summary: whatsapp.phone.trim() };
+			}
 		}
-	}, [contentType, urlNormalized, textValue, wifi, vcard, email, sms]);
+	}, [contentType, urlNormalized, textValue, wifi, vcard, email, sms, phone, mecard, geo, eventFields, bitcoin, whatsapp]);
+
+	const geoInvalid = contentType === 'geo' && (geo.lat.trim() !== '' || geo.lng.trim() !== '') && isEmpty;
+	const bitcoinAmountInvalid =
+		contentType === 'bitcoin' && bitcoin.amount.trim() !== '' && !isValidBitcoinAmount(bitcoin.amount.trim().replace(',', '.'));
 
 	const renderKey = `${qrValue}-${level}-${size}`;
 	// Derived (not stored via a separate reset effect) so there's no race between
@@ -283,8 +531,14 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 			margin: quietZoneMargin(overrides.width ?? size),
 			qrOptions: { errorCorrectionLevel: level },
 			dotsOptions: { type: dotsType, ...dotsStyle },
-			cornersSquareOptions: { type: dotsType, ...dotsStyle },
-			cornersDotOptions: { type: dotsType, ...dotsStyle },
+			cornersSquareOptions: {
+				type: cornerSquareType || dotsType,
+				...(eyeColorEnabled ? { color: cornerSquareColor } : dotsStyle),
+			},
+			cornersDotOptions: {
+				type: cornerDotType || dotsType,
+				...(eyeColorEnabled ? { color: cornerDotColor } : dotsStyle),
+			},
 			backgroundOptions: { color: bgColor },
 			image: logoUrl ?? undefined,
 			// qr-code-styling reads `imageOptions.hideBackgroundDots` unconditionally
@@ -332,7 +586,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 			cancelled = true;
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [effectiveBatchMode, isEmpty, renderKey, level, fgColor, bgColor, size, logoUrl, dotsType, gradientEnabled, gradientType, gradientColorStart, gradientColorEnd]);
+	}, [effectiveBatchMode, isEmpty, renderKey, level, fgColor, bgColor, size, logoUrl, dotsType, gradientEnabled, gradientType, gradientColorStart, gradientColorEnd, cornerSquareType, cornerDotType, eyeColorEnabled, cornerSquareColor, cornerDotColor]);
 
 	const handleLogoChange = (input: HTMLInputElement) => {
 		const file = input.files?.[0];
@@ -391,24 +645,35 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 		setTimeout(() => URL.revokeObjectURL(url), 10000);
 	};
 
-	const handleDownloadPng = async () => {
+	const handleExport = async (format: ExportFormat) => {
 		if (downloadDisabled) return;
 		setActionError(null);
 		try {
 			const { default: QRCodeStylingCtor } = await import('qr-code-styling');
 			const exportQr = new QRCodeStylingCtor(buildQrOptions({ width: pngResolution, height: pngResolution, type: 'canvas' }));
+			let png: Blob;
 			if (frameEnabled) {
 				const raw = await exportQr.getRawData('png');
 				if (!raw) throw new Error('empty png');
-				saveBlob(await composeFramedPng(raw as Blob, effectiveFrameText), 'qrcode.png');
-			} else {
+				png = await composeFramedPng(raw as Blob, effectiveFrameText);
+			} else if (format === 'png') {
 				await exportQr.download({ name: 'qrcode', extension: 'png' });
+				return;
+			} else {
+				const raw = await exportQr.getRawData('png');
+				if (!raw) throw new Error('empty png');
+				png = raw as Blob;
 			}
+			if (format === 'png') saveBlob(png, 'qrcode.png');
+			else if (format === 'jpeg') saveBlob(await pngBlobToJpegBlob(png), 'qrcode.jpg');
+			else saveBlob(await pngBlobToPdfBlob(png, pdfLayout), 'qrcode.pdf');
 		} catch (err) {
-			console.error('QR PNG export failed:', err);
+			console.error('QR export failed:', err);
 			setActionError(typeof err === 'string' && /too small/i.test(err) ? messages.errorCanvasSmall : messages.downloadError);
 		}
 	};
+
+	const handleDownloadPng = () => handleExport('png');
 
 	const handleDownloadSvg = async () => {
 		if (downloadDisabled) return;
@@ -416,11 +681,102 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 		try {
 			const { default: QRCodeStylingCtor } = await import('qr-code-styling');
 			const exportQr = new QRCodeStylingCtor(buildQrOptions({ width: SVG_EXPORT_SIZE, height: SVG_EXPORT_SIZE, type: 'svg' }));
-			await exportQr.download({ name: 'qrcode', extension: 'svg' });
+			if (frameEnabled) {
+				const raw = await exportQr.getRawData('svg');
+				if (!raw) throw new Error('empty svg');
+				saveBlob(await composeFramedSvg(raw as Blob, effectiveFrameText, SVG_EXPORT_SIZE), 'qrcode.svg');
+			} else {
+				await exportQr.download({ name: 'qrcode', extension: 'svg' });
+			}
 		} catch (err) {
 			console.error('QR SVG export failed:', err);
 			setActionError(messages.downloadError);
 		}
+	};
+
+	// ---- Design templates (colours/styles only; the logo and content are not stored) ----
+	const currentDesign = (): QrDesign => ({
+		...DEFAULT_QR_DESIGN,
+		fgColor,
+		bgColor,
+		dotsType,
+		level,
+		size,
+		gradientEnabled,
+		gradientType: gradientType === 'radial' ? 'radial' : 'linear',
+		gradientColorStart,
+		gradientColorEnd,
+		cornerSquareType,
+		cornerDotType,
+		cornerSquareColor: eyeColorEnabled ? cornerSquareColor : '',
+		cornerDotColor: eyeColorEnabled ? cornerDotColor : '',
+	});
+
+	const applyDesign = (d: QrDesign) => {
+		setFgColor(d.fgColor);
+		setBgColor(d.bgColor);
+		setDotsType(d.dotsType as DotType);
+		setLevel(d.level as ErrorCorrectionLevel);
+		setSize(d.size);
+		setGradientEnabled(d.gradientEnabled);
+		setGradientType(d.gradientType);
+		setGradientColorStart(d.gradientColorStart);
+		setGradientColorEnd(d.gradientColorEnd);
+		setCornerSquareType(d.cornerSquareType as CornerSquareType | '');
+		setCornerDotType(d.cornerDotType as CornerDotType | '');
+		const hasEyeColor = d.cornerSquareColor !== '' || d.cornerDotColor !== '';
+		setEyeColorEnabled(hasEyeColor);
+		setCornerSquareColor(d.cornerSquareColor || d.fgColor);
+		setCornerDotColor(d.cornerDotColor || d.fgColor);
+		levelBeforeLogoRef.current = null;
+	};
+
+	const handleSaveDesign = () => {
+		try {
+			localStorage.setItem(DESIGN_STORAGE_KEY, JSON.stringify(currentDesign()));
+			setDesignNotice({ kind: 'ok', text: messages.designSaved });
+		} catch {
+			setDesignNotice({ kind: 'error', text: messages.downloadError });
+		}
+	};
+
+	const handleLoadDesign = () => {
+		let design: QrDesign | null = null;
+		try {
+			const raw = localStorage.getItem(DESIGN_STORAGE_KEY);
+			design = raw ? parseQrDesignJson(raw) : null;
+		} catch {
+			design = null;
+		}
+		if (!design) {
+			setDesignNotice({ kind: 'error', text: messages.designNoneSaved });
+			return;
+		}
+		applyDesign(design);
+		setDesignNotice({ kind: 'ok', text: messages.designLoaded });
+	};
+
+	const handleExportDesign = () => {
+		saveBlob(new Blob([JSON.stringify(currentDesign(), null, 2)], { type: 'application/json' }), 'qr-design.json');
+	};
+
+	const handleImportDesign = (input: HTMLInputElement) => {
+		const file = input.files?.[0];
+		input.value = '';
+		if (!file) return;
+		if (file.size > 100_000) {
+			setDesignNotice({ kind: 'error', text: messages.designImportError });
+			return;
+		}
+		void file.text().then((text) => {
+			const design = parseQrDesignJson(text);
+			if (!design) {
+				setDesignNotice({ kind: 'error', text: messages.designImportError });
+				return;
+			}
+			applyDesign(sanitizeQrDesign(design) ?? design);
+			setDesignNotice({ kind: 'ok', text: messages.designLoaded });
+		});
 	};
 
 	const batchParsed = useMemo(() => parseBatchLines(batchInput), [batchInput]);
@@ -494,6 +850,12 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 		{ value: 'vcard', label: messages.typeVcard },
 		{ value: 'email', label: messages.typeEmail },
 		{ value: 'sms', label: messages.typeSms },
+		{ value: 'phone', label: messages.typePhone },
+		{ value: 'mecard', label: messages.typeMecard },
+		{ value: 'geo', label: messages.typeGeo },
+		{ value: 'event', label: messages.typeEvent },
+		{ value: 'bitcoin', label: messages.typeBitcoin },
+		{ value: 'whatsapp', label: messages.typeWhatsapp },
 	];
 
 	const dotStyleLabels: Record<DotType, string> = {
@@ -863,6 +1225,85 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 					</div>
 				)}
 
+				{contentType === 'phone' && (
+					<TextField
+						id="qr-phone"
+						label={messages.phoneLabel}
+						type="tel"
+						inputMode="tel"
+						value={phone.phone}
+						onChange={(v) => setPhone({ phone: v })}
+					/>
+				)}
+
+				{contentType === 'mecard' && (
+					<div className="flex flex-col gap-3">
+						<div className="grid grid-cols-2 gap-2">
+							<TextField id="qr-mecard-first" label={messages.vcardFirstNameLabel} value={mecard.firstName} onChange={(v) => setMecard((p) => ({ ...p, firstName: v }))} />
+							<TextField id="qr-mecard-last" label={messages.vcardLastNameLabel} value={mecard.lastName} onChange={(v) => setMecard((p) => ({ ...p, lastName: v }))} />
+						</div>
+						<TextField id="qr-mecard-phone" label={messages.vcardPhoneLabel} type="tel" inputMode="tel" value={mecard.phone} onChange={(v) => setMecard((p) => ({ ...p, phone: v }))} />
+						<TextField id="qr-mecard-email" label={messages.vcardEmailLabel} value={mecard.email} onChange={(v) => setMecard((p) => ({ ...p, email: v }))} />
+						<TextField id="qr-mecard-url" label={messages.vcardUrlLabel} value={mecard.url} onChange={(v) => setMecard((p) => ({ ...p, url: v }))} />
+						<TextField id="qr-mecard-address" label={messages.mecardAddressLabel} value={mecard.address} onChange={(v) => setMecard((p) => ({ ...p, address: v }))} />
+						<TextField id="qr-mecard-note" label={messages.mecardNoteLabel} value={mecard.note} onChange={(v) => setMecard((p) => ({ ...p, note: v }))} />
+					</div>
+				)}
+
+				{contentType === 'geo' && (
+					<div className="flex flex-col gap-2">
+						<div className="grid grid-cols-2 gap-2">
+							<TextField id="qr-geo-lat" label={messages.geoLatLabel} inputMode="decimal" value={geo.lat} invalid={geoInvalid} describedBy={geoInvalid ? 'qr-geo-error' : undefined} onChange={(v) => setGeo((p) => ({ ...p, lat: v }))} />
+							<TextField id="qr-geo-lng" label={messages.geoLngLabel} inputMode="decimal" value={geo.lng} invalid={geoInvalid} describedBy={geoInvalid ? 'qr-geo-error' : undefined} onChange={(v) => setGeo((p) => ({ ...p, lng: v }))} />
+						</div>
+						{geoInvalid && (
+							<p id="qr-geo-error" role="alert" className="text-xs text-destructive">
+								{messages.geoInvalid}
+							</p>
+						)}
+					</div>
+				)}
+
+				{contentType === 'event' && (
+					<div className="flex flex-col gap-3">
+						<TextField id="qr-event-title" label={messages.eventTitleLabel} value={eventFields.title} onChange={(v) => setEventFields((p) => ({ ...p, title: v }))} />
+						<label className="flex min-h-9 cursor-pointer items-center gap-2 text-sm text-foreground">
+							<input
+								type="checkbox"
+								className="size-4"
+								checked={eventFields.allDay}
+								onChange={(event) => setEventFields((p) => ({ ...p, allDay: event.target.checked, start: '', end: '' }))}
+							/>
+							{messages.eventAllDayLabel}
+						</label>
+						<TextField id="qr-event-start" label={messages.eventStartLabel} type={eventFields.allDay ? 'date' : 'datetime-local'} value={eventFields.start} onChange={(v) => setEventFields((p) => ({ ...p, start: v }))} />
+						<TextField id="qr-event-end" label={messages.eventEndLabel} type={eventFields.allDay ? 'date' : 'datetime-local'} value={eventFields.end} onChange={(v) => setEventFields((p) => ({ ...p, end: v }))} />
+						<TextField id="qr-event-location" label={messages.eventLocationLabel} value={eventFields.location} onChange={(v) => setEventFields((p) => ({ ...p, location: v }))} />
+						<TextField id="qr-event-description" label={messages.eventDescriptionLabel} multiline value={eventFields.description} onChange={(v) => setEventFields((p) => ({ ...p, description: v }))} />
+					</div>
+				)}
+
+				{contentType === 'bitcoin' && (
+					<div className="flex flex-col gap-3">
+						<TextField id="qr-btc-address" label={messages.bitcoinAddressLabel} value={bitcoin.address} onChange={(v) => setBitcoin((p) => ({ ...p, address: v }))} />
+						<TextField id="qr-btc-amount" label={messages.bitcoinAmountLabel} inputMode="decimal" value={bitcoin.amount} invalid={bitcoinAmountInvalid} describedBy={bitcoinAmountInvalid ? 'qr-btc-amount-error' : undefined} onChange={(v) => setBitcoin((p) => ({ ...p, amount: v }))} />
+						{bitcoinAmountInvalid && (
+							<p id="qr-btc-amount-error" role="alert" className="text-xs text-destructive">
+								{messages.bitcoinAmountInvalid}
+							</p>
+						)}
+						<TextField id="qr-btc-label" label={messages.bitcoinLabelLabel} value={bitcoin.label} onChange={(v) => setBitcoin((p) => ({ ...p, label: v }))} />
+						<TextField id="qr-btc-message" label={messages.bitcoinMessageLabel} value={bitcoin.message} onChange={(v) => setBitcoin((p) => ({ ...p, message: v }))} />
+					</div>
+				)}
+
+				{contentType === 'whatsapp' && (
+					<div className="flex flex-col gap-3">
+						<TextField id="qr-wa-phone" label={messages.whatsappPhoneLabel} type="tel" inputMode="tel" value={whatsapp.phone} onChange={(v) => setWhatsapp((p) => ({ ...p, phone: v }))} />
+						<TextField id="qr-wa-message" label={messages.whatsappMessageLabel} multiline value={whatsapp.message} onChange={(v) => setWhatsapp((p) => ({ ...p, message: v }))} />
+					</div>
+				)}
+
 				<div className="flex flex-col gap-1">
 					<label htmlFor="qr-dot-style" className="text-sm font-medium text-foreground">
 						{messages.dotStyleLabel}
@@ -1083,6 +1524,137 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 					</select>
 				</div>
 
+				<details className="rounded-md border border-border p-3">
+					<summary className="min-h-9 cursor-pointer text-sm font-medium text-foreground">{messages.advancedHeading}</summary>
+					<div className="mt-3 flex flex-col gap-4">
+						<fieldset className="flex flex-col gap-2">
+							<legend className="text-sm font-medium text-foreground">{messages.eyesHeading}</legend>
+							<div className="flex flex-col gap-1">
+								<label htmlFor="qr-eye-square-style" className="text-xs text-muted-foreground">
+									{messages.eyeSquareStyleLabel}
+								</label>
+								<select
+									id="qr-eye-square-style"
+									value={cornerSquareType}
+									onChange={(event) => setCornerSquareType(event.target.value as CornerSquareType | '')}
+									className={inputClass}
+								>
+									<option value="">{messages.eyeSameAsBody}</option>
+									<option value="square">{messages.eyeSquareStyleSquare}</option>
+									<option value="dot">{messages.eyeSquareStyleDot}</option>
+									<option value="extra-rounded">{messages.eyeSquareStyleExtraRounded}</option>
+								</select>
+							</div>
+							<div className="flex flex-col gap-1">
+								<label htmlFor="qr-eye-dot-style" className="text-xs text-muted-foreground">
+									{messages.eyeDotStyleLabel}
+								</label>
+								<select
+									id="qr-eye-dot-style"
+									value={cornerDotType}
+									onChange={(event) => setCornerDotType(event.target.value as CornerDotType | '')}
+									className={inputClass}
+								>
+									<option value="">{messages.eyeSameAsBody}</option>
+									<option value="square">{messages.eyeDotStyleSquare}</option>
+									<option value="dot">{messages.eyeDotStyleDot}</option>
+								</select>
+							</div>
+							<label className="flex min-h-9 items-center gap-2 text-sm text-foreground">
+								<input
+									type="checkbox"
+									className="size-4"
+									checked={eyeColorEnabled}
+									onChange={(event) => {
+										setEyeColorEnabled(event.target.checked);
+										if (event.target.checked) {
+											setCornerSquareColor(fgColor);
+											setCornerDotColor(fgColor);
+										}
+									}}
+								/>
+								{messages.eyeColorOverrideLabel}
+							</label>
+							{eyeColorEnabled && (
+								<div className="flex gap-4">
+									<div className="flex flex-col gap-1">
+										<label htmlFor="qr-eye-square-color" className="text-xs text-muted-foreground">
+											{messages.eyeSquareColorLabel}
+										</label>
+										<input
+											id="qr-eye-square-color"
+											type="color"
+											value={cornerSquareColor}
+											onChange={(event) => setCornerSquareColor(event.target.value)}
+											className="h-11 w-16 cursor-pointer rounded-md border border-border bg-background"
+										/>
+									</div>
+									<div className="flex flex-col gap-1">
+										<label htmlFor="qr-eye-dot-color" className="text-xs text-muted-foreground">
+											{messages.eyeDotColorLabel}
+										</label>
+										<input
+											id="qr-eye-dot-color"
+											type="color"
+											value={cornerDotColor}
+											onChange={(event) => setCornerDotColor(event.target.value)}
+											className="h-11 w-16 cursor-pointer rounded-md border border-border bg-background"
+										/>
+									</div>
+								</div>
+							)}
+						</fieldset>
+
+						<div className="flex flex-col gap-1">
+							<label htmlFor="qr-pdf-layout" className="text-sm font-medium text-foreground">
+								{messages.pdfLayoutLabel}
+							</label>
+							<select
+								id="qr-pdf-layout"
+								value={pdfLayout}
+								onChange={(event) => setPdfLayout(event.target.value as 'a4' | 'fit')}
+								className={inputClass}
+							>
+								<option value="a4">{messages.pdfLayoutA4}</option>
+								<option value="fit">{messages.pdfLayoutFit}</option>
+							</select>
+						</div>
+
+						<fieldset className="flex flex-col gap-2">
+							<legend className="text-sm font-medium text-foreground">{messages.designHeading}</legend>
+							<div className="flex flex-wrap gap-2">
+								<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={handleSaveDesign}>
+									{messages.designSave}
+								</Button>
+								<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={handleLoadDesign}>
+									{messages.designLoad}
+								</Button>
+								<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={handleExportDesign}>
+									{messages.designExport}
+								</Button>
+							</div>
+							<div className="flex flex-col gap-1">
+								<label htmlFor="qr-design-import" className="text-xs text-muted-foreground">
+									{messages.designImport}
+								</label>
+								<input
+									id="qr-design-import"
+									type="file"
+									accept="application/json,.json"
+									onChange={(event) => handleImportDesign(event.currentTarget)}
+									className="text-sm text-foreground"
+								/>
+							</div>
+							<p className="text-xs text-muted-foreground">{messages.designLogoNote}</p>
+							{designNotice && (
+								<p role={designNotice.kind === 'error' ? 'alert' : 'status'} className={designNotice.kind === 'error' ? 'text-xs text-destructive' : 'text-xs text-muted-foreground'}>
+									{designNotice.text}
+								</p>
+							)}
+						</fieldset>
+					</div>
+				</details>
+
 				{!effectiveBatchMode && (
 					<div className="flex flex-col gap-2">
 						<div className="flex flex-wrap gap-2">
@@ -1100,10 +1672,30 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 								variant="secondary"
 								className="min-h-10"
 								onClick={handleDownloadSvg}
-								disabled={downloadDisabled || frameEnabled}
-								aria-describedby={isEmpty ? 'qr-download-reason' : frameEnabled ? 'qr-frame-notice' : undefined}
+								disabled={downloadDisabled}
+								aria-describedby={isEmpty ? 'qr-download-reason' : undefined}
 							>
 								{messages.downloadSvg}
+							</Button>
+							<Button
+								type="button"
+								variant="secondary"
+								className="min-h-10"
+								onClick={() => void handleExport('jpeg')}
+								disabled={downloadDisabled}
+								aria-describedby={isEmpty ? 'qr-download-reason' : undefined}
+							>
+								{messages.downloadJpeg}
+							</Button>
+							<Button
+								type="button"
+								variant="secondary"
+								className="min-h-10"
+								onClick={() => void handleExport('pdf')}
+								disabled={downloadDisabled}
+								aria-describedby={isEmpty ? 'qr-download-reason' : undefined}
+							>
+								{messages.downloadPdf}
 							</Button>
 						</div>
 						{isEmpty && (
