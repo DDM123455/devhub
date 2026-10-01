@@ -75,6 +75,7 @@
     "riskForeignObject": "<foreignObject>",
     "riskExternalUse": "<use> pointing to an external URL",
     "riskExternalImage": "<image> loading an external URL",
+    "riskExternalStyle": "CSS (@import or url()) loading an external resource",
     "previewTitleOriginal": "Preview of the original SVG",
     "previewTitleOptimized": "Preview of the optimized SVG",
     "optimizing": "Optimizing…",

@@ -74,6 +74,7 @@ interface Messages {
 	riskForeignObject: string;
 	riskExternalUse: string;
 	riskExternalImage: string;
+	riskExternalStyle: string;
 	previewTitleOriginal: string;
 	previewTitleOptimized: string;
 	optimizing: string;
@@ -285,6 +286,7 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 		foreignObject: messages.riskForeignObject,
 		externalUse: messages.riskExternalUse,
 		externalImage: messages.riskExternalImage,
+		externalStyle: messages.riskExternalStyle,
 	};
 	const hasLargeInput = originalSize > SVG_WARN_BYTES && originalSize <= SVG_MAX_BYTES;
 

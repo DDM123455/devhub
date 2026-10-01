@@ -5,6 +5,7 @@ import { BeforeAfterSlider } from '@/components/ui/before-after-slider';
 import { baseNameOf, dedupeName } from '@/lib/file-utils';
 
 interface Messages {
+	retry: string;
 	selectFiles: string;
 	dropHint: string;
 	targetFormat: string;
@@ -485,10 +486,9 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 		[messages.errorAvifUnsupported, messages.errorTooLarge, messages.errorGeneric],
 	);
 
-	const handleConvert = useCallback(async () => {
-		// Chỉ xử lý item đang chờ hoặc lỗi; snapshot setting tại thời điểm bấm.
-		const queue = items.filter((item) => item.status === 'pending' || item.status === 'error');
+	const runQueue = useCallback(async (queue: ImageItem[]) => {
 		if (queue.length === 0) return;
+		// Snapshot setting tại thời điểm bấm.
 		const settings = settingsRef.current;
 		setIsProcessing(true);
 		try {
@@ -506,7 +506,13 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 		} finally {
 			setIsProcessing(false);
 		}
-	}, [items, convertOne]);
+	}, [convertOne]);
+
+	// Chỉ xử lý item đang chờ hoặc lỗi.
+	const handleConvert = useCallback(
+		() => runQueue(items.filter((item) => item.status === 'pending' || item.status === 'error')),
+		[items, runQueue],
+	);
 
 	const handleDownload = useCallback(
 		(item: ImageItem) => {
@@ -760,6 +766,17 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 								{item.status === 'done' && item.resultBlob && (
 									<Button type="button" size="sm" onClick={() => handleDownload(item)}>
 										{messages.download}
+									</Button>
+								)}
+								{item.status === 'error' && (
+									<Button
+										type="button"
+										size="sm"
+										variant="outline"
+										onClick={() => void runQueue([item])}
+										disabled={isProcessing}
+									>
+										{messages.retry}
 									</Button>
 								)}
 								<Button

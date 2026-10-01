@@ -22,6 +22,8 @@ export interface BuildStats {
 	rowLimitSheets: string[];
 	/** Names of sheets that exceeded the Excel column limit (columns beyond it are dropped). */
 	colLimitSheets: string[];
+	/** Sheets whose name had to change for Excel ("original → final"). */
+	renamedSheets: string[];
 }
 
 export interface BuildResult {
@@ -60,6 +62,12 @@ export function uniqueSheetName(base: string, used: Set<string>): string {
 	}
 	used.add(candidate.toLowerCase());
 	return candidate;
+}
+
+function nameSheet(base: string, used: Set<string>, stats: BuildStats): string {
+	const name = uniqueSheetName(base, used);
+	if (name !== base.trim() && base !== '') stats.renamedSheets.push(`${base} → ${name}`);
+	return name;
 }
 
 function toCell(value: unknown, stats: BuildStats): unknown {
@@ -131,13 +139,13 @@ export interface BuildOptions {
 }
 
 export function buildSheets(json: unknown, options: BuildOptions): BuildResult | null {
-	const stats: BuildStats = { truncatedCells: 0, unsafeIntegers: 0, rowLimitSheets: [], colLimitSheets: [] };
+	const stats: BuildStats = { truncatedCells: 0, unsafeIntegers: 0, rowLimitSheets: [], colLimitSheets: [], renamedSheets: [] };
 	const used = new Set<string>();
 	const { sheetName, flatten, unwrap } = options;
 
 	if (Array.isArray(json)) {
 		const { headers, rows } = rowsFromArray(json, flatten, stats);
-		return { sheets: [finalizeSheet(uniqueSheetName(sheetName, used), headers, rows, stats)], stats };
+		return { sheets: [finalizeSheet(nameSheet(sheetName, used, stats), headers, rows, stats)], stats };
 	}
 
 	if (isPlainObject(json)) {
@@ -148,7 +156,7 @@ export function buildSheets(json: unknown, options: BuildOptions): BuildResult |
 			return {
 				sheets: entries.map(([key, value]) => {
 					const { headers, rows } = rowsFromArray(value as unknown[], flatten, stats);
-					return finalizeSheet(uniqueSheetName(key, used), headers, rows, stats);
+					return finalizeSheet(nameSheet(key, used, stats), headers, rows, stats);
 				}),
 				stats,
 			};
@@ -158,11 +166,11 @@ export function buildSheets(json: unknown, options: BuildOptions): BuildResult |
 			const items = value as unknown[];
 			if (entries.length === 1 || (items.length > 0 && items.every(isPlainObject))) {
 				const { headers, rows } = rowsFromArray(items, flatten, stats);
-				return { sheets: [finalizeSheet(uniqueSheetName(key, used), headers, rows, stats, key)], stats };
+				return { sheets: [finalizeSheet(nameSheet(key, used, stats), headers, rows, stats, key)], stats };
 			}
 		}
 		const { headers, rows } = rowsFromArray([json], flatten, stats);
-		return { sheets: [finalizeSheet(uniqueSheetName(sheetName, used), headers, rows, stats)], stats };
+		return { sheets: [finalizeSheet(nameSheet(sheetName, used, stats), headers, rows, stats)], stats };
 	}
 
 	return null;

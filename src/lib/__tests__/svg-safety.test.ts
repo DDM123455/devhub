@@ -39,3 +39,11 @@ describe('svgo removeScripts plugin', () => {
 		expect(out).not.toContain('onclick');
 	});
 });
+
+describe('external style references', () => {
+	it('flags @import and remote url() in CSS but not data: or local url(#id)', () => {
+		expect(detectSvgRisks('<svg><style>@import url(http://evil.test/a.css);</style></svg>')).toContain('externalStyle');
+		expect(detectSvgRisks('<svg><rect style="fill:url(https://evil.test/x)"/></svg>')).toContain('externalStyle');
+		expect(detectSvgRisks('<svg><rect style="fill:url(#g)"/></svg>')).toEqual([]);
+	});
+});

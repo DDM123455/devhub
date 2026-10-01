@@ -36,6 +36,7 @@
     "warnTruncatedCells": "{{count}} cell(s) were longer than {{max}} characters (the Excel limit) and will be truncated.",
     "warnRowLimit": "Sheet(s) {{sheets}} exceed the Excel limit of {{max}} data rows; extra rows will be dropped.",
     "warnColLimit": "Sheet(s) {{sheets}} exceed the Excel limit of {{max}} columns; extra columns will be dropped.",
+    "warnRenamedSheets": "Some sheet names were changed to follow Excel rules (reserved name, invalid characters, length or duplicates): {{names}}.",
     "warnUnsafeIntegers": "{{count}} integer(s) are larger than 2^53 and may already have lost precision while parsing JSON. Store such IDs as strings."
   },
   "related": "Related tools",

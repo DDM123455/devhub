@@ -180,6 +180,11 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-10-01 (Phase 3.13c — nốt nhóm LOW sau test tương tác)** — Image Converter: nút Retry
+  riêng cho item lỗi + thông báo AVIF rõ hơn (en+vi); JSON→Excel: cảnh báo khi tên sheet bị
+  đổi ("History → History_"); SVG Optimizer: cảnh báo `@import`/`url(http…)` trong CSS. Thêm
+  test. Cố ý bỏ: debounce slider Edge softness (độ trễ do tính toán canvas, không treo), QR
+  email có dấu cách giữa địa chỉ (chưa có validate địa chỉ email chung). 207/207 test.
 - **2026-10-01 (Phase 3.13b — test tương tác thật 12 tool file/media/data + sửa lỗi nhỏ)** —
   2 agent QA test trên trình duyệt (build production): không có lỗi CRITICAL/HIGH; xác nhận
   QR decode UTF-8 đúng bằng jsQR, `__proto__` CSV không pollution, BOM/escape công thức,

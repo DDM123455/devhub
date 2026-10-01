@@ -75,6 +75,7 @@
     "riskForeignObject": "<foreignObject>",
     "riskExternalUse": "<use> trỏ tới URL bên ngoài",
     "riskExternalImage": "<image> tải URL bên ngoài",
+    "riskExternalStyle": "CSS (@import hoặc url()) tải tài nguyên bên ngoài",
     "previewTitleOriginal": "Xem trước SVG gốc",
     "previewTitleOptimized": "Xem trước SVG đã tối ưu",
     "optimizing": "Đang tối ưu…",

@@ -42,6 +42,7 @@ interface Messages {
 	warnRowLimit: string;
 	warnColLimit: string;
 	warnUnsafeIntegers: string;
+	warnRenamedSheets: string;
 }
 
 const SAMPLE_JSON = JSON.stringify(
@@ -86,6 +87,9 @@ function warningsFor(stats: BuildStats, messages: Messages): string[] {
 				.replace('{{sheets}}', stats.colLimitSheets.join(', '))
 				.replace('{{max}}', EXCEL_MAX_COLS.toLocaleString('en-US')),
 		);
+	}
+	if (stats.renamedSheets.length > 0) {
+		out.push(messages.warnRenamedSheets.replace('{{names}}', stats.renamedSheets.join(', ')));
 	}
 	if (stats.unsafeIntegers > 0) {
 		out.push(messages.warnUnsafeIntegers.replace('{{count}}', String(stats.unsafeIntegers)));

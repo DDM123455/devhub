@@ -101,3 +101,15 @@ describe('sanitizeFileName', () => {
 		expect(sanitizeFileName('report. ')).toBe('report');
 	});
 });
+
+describe('renamed sheet reporting', () => {
+	it('reports when History is renamed', () => {
+		const r = buildSheets({ History: [{ a: 1 }], Other: [{ b: 2 }] }, opts)!;
+		expect(r.sheets.map((x) => x.name)).toContain('History_');
+		expect(r.stats.renamedSheets).toEqual(['History → History_']);
+	});
+	it('reports nothing when names are already valid', () => {
+		const r = buildSheets({ A: [{ a: 1 }], B: [{ b: 2 }] }, opts)!;
+		expect(r.stats.renamedSheets).toEqual([]);
+	});
+});

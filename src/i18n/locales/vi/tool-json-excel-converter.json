@@ -36,6 +36,7 @@
     "warnTruncatedCells": "{{count}} ô dài hơn {{max}} ký tự (giới hạn của Excel) và sẽ bị cắt bớt.",
     "warnRowLimit": "Sheet {{sheets}} vượt giới hạn {{max}} dòng dữ liệu của Excel; các dòng dư sẽ bị bỏ.",
     "warnColLimit": "Sheet {{sheets}} vượt giới hạn {{max}} cột của Excel; các cột dư sẽ bị bỏ.",
+    "warnRenamedSheets": "Một số tên sheet đã được đổi để đúng quy tắc của Excel (tên dành riêng, ký tự không hợp lệ, độ dài hoặc trùng): {{names}}.",
     "warnUnsafeIntegers": "{{count}} số nguyên lớn hơn 2^53 và có thể đã mất độ chính xác khi phân tích JSON. Hãy lưu các ID như vậy dưới dạng chuỗi."
   },
   "related": "Công cụ liên quan",

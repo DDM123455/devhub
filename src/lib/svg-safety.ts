@@ -2,7 +2,7 @@
 // when the SVG is embedded inline in an HTML page. Detection only — the actual
 // removal is done by SVGO's `removeScripts` plugin.
 
-export type SvgRisk = 'script' | 'eventHandler' | 'javascriptUrl' | 'foreignObject' | 'externalUse' | 'externalImage';
+export type SvgRisk = 'script' | 'eventHandler' | 'javascriptUrl' | 'foreignObject' | 'externalUse' | 'externalImage' | 'externalStyle';
 
 export const SVG_MAX_BYTES = 5 * 1024 * 1024;
 export const SVG_WARN_BYTES = 1024 * 1024;
@@ -14,6 +14,8 @@ const RISK_PATTERNS: Array<[SvgRisk, RegExp]> = [
 	['javascriptUrl', /(?:xlink:)?href\s*=\s*["']?\s*(?:javascript|vbscript)\s*:/i],
 	['foreignObject', /<foreignObject[\s>/]/i],
 	['externalUse', /<use\b[^>]*?\b(?:xlink:)?href\s*=\s*["']\s*(?:https?:)?\/\//i],
+	// CSS in <style> or style="" that pulls a remote resource (@import, url(http...)).
+	['externalStyle', /@import|url\(\s*["']?\s*(?:https?:)?\/\//i],
 	['externalImage', /<image\b[^>]*?\b(?:xlink:)?href\s*=\s*["']\s*(?:https?:)?\/\//i],
 ];
 
