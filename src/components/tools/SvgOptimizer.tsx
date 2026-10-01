@@ -1,6 +1,8 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { optimize } from 'svgo/browser';
 import { Button } from '@/components/ui/button';
+import { copyTextSafe } from '@/lib/safe-clipboard';
+import { SVG_MAX_BYTES, SVG_WARN_BYTES, buildPreviewDoc, detectSvgRisks, type SvgRisk } from '@/lib/svg-safety';
 
 interface Messages {
 	inputLabel: string;
@@ -64,6 +66,21 @@ interface Messages {
 	pluginSortDefsChildren: string;
 	pluginRemoveDesc: string;
 	pluginRemoveViewBox: string;
+	optRemoveScripts: string;
+	risksFound: string;
+	riskScript: string;
+	riskEventHandler: string;
+	riskJavascriptUrl: string;
+	riskForeignObject: string;
+	riskExternalUse: string;
+	riskExternalImage: string;
+	previewTitleOriginal: string;
+	previewTitleOptimized: string;
+	optimizing: string;
+	tooLargeError: string;
+	largeWarning: string;
+	fileReadError: string;
+	copyFailed: string;
 }
 
 type View = 'preview' | 'code';
@@ -143,8 +160,15 @@ function formatBytes(bytes: number): string {
 	return `${bytes.toLocaleString()} B`;
 }
 
-function CopyButton({ value, label, copiedLabel }: { value: string; label: string; copiedLabel: string }) {
-	const [copied, setCopied] = useState(false);
+function CopyButton({ value, label, copiedLabel, failedLabel }: { value: string; label: string; copiedLabel: string; failedLabel: string }) {
+	const [status, setStatus] = useState<'idle' | 'copied' | 'failed'>('idle');
+	const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+	useEffect(
+		() => () => {
+			if (timer.current) clearTimeout(timer.current);
+		},
+		[],
+	);
 	return (
 		<Button
 			aria-live="polite"
@@ -153,23 +177,35 @@ function CopyButton({ value, label, copiedLabel }: { value: string; label: strin
 			variant="ghost"
 			disabled={value === ''}
 			onClick={() => {
-				void navigator.clipboard.writeText(value).then(() => {
-					setCopied(true);
-					setTimeout(() => setCopied(false), 1500);
+				void copyTextSafe(value).then((ok) => {
+					setStatus(ok ? 'copied' : 'failed');
+					if (timer.current) clearTimeout(timer.current);
+					timer.current = setTimeout(() => setStatus('idle'), 1500);
 				});
 			}}
 		>
-			{copied ? copiedLabel : label}
+			{status === 'copied' ? copiedLabel : status === 'failed' ? failedLabel : label}
 		</Button>
 	);
 }
 
-function SvgPreview({ svg }: { svg: string }) {
-	const srcDoc = `<!doctype html><html><head><style>html,body{margin:0;height:100%;display:flex;align-items:center;justify-content:center}svg{max-width:100%;max-height:100%}</style></head><body>${svg}</body></html>`;
+// Debounces rapidly changing values (typing, slider drags) so SVGO is not re-run on every keystroke.
+function useDebounced<T>(value: T, ms: number): T {
+	const [debounced, setDebounced] = useState(value);
+	useEffect(() => {
+		const id = setTimeout(() => setDebounced(value), ms);
+		return () => clearTimeout(id);
+	}, [value, ms]);
+	return debounced;
+}
+
+function SvgPreview({ svg, title }: { svg: string; title: string }) {
+	// sandbox="" blocks scripts; the CSP meta additionally blocks any network access from the SVG.
+	const srcDoc = buildPreviewDoc(svg);
 	return (
 		<div className="relative h-56 w-full overflow-hidden rounded-md border border-border">
 			<div className="absolute inset-0 bg-[repeating-conic-gradient(#d4d4d4_0%_25%,#fff_0%_50%)] bg-[length:14px_14px]" />
-			<iframe title="svg-preview" sandbox="" srcDoc={srcDoc} className="relative h-full w-full" />
+			<iframe title={title} sandbox="" srcDoc={srcDoc} className="relative h-full w-full" />
 		</div>
 	);
 }
@@ -181,6 +217,8 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 	const [removeDimensions, setRemoveDimensions] = useState(false);
 	const [removeViewBox, setRemoveViewBox] = useState(false);
 	const [prettify, setPrettify] = useState(false);
+	const [removeScripts, setRemoveScripts] = useState(false);
+	const [fileError, setFileError] = useState<string | null>(null);
 	const [pluginEnabled, setPluginEnabled] = useState<Record<PresetPluginId, boolean>>(defaultPluginState);
 	const [view, setView] = useState<View>('preview');
 	const [isDragOver, setIsDragOver] = useState(false);
@@ -190,39 +228,40 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 		setPluginEnabled((prev) => ({ ...prev, [id]: !prev[id] }));
 	};
 
+	// Everything that feeds SVGO is bundled and debounced together: typing or dragging the
+	// precision slider re-runs the optimizer once things settle, not on every event.
+	const job = useMemo(
+		() => ({ input, multipass, precision, removeDimensions, removeViewBox, prettify, removeScripts, pluginEnabled }),
+		[input, multipass, precision, removeDimensions, removeViewBox, prettify, removeScripts, pluginEnabled],
+	);
+	const settledJob = useDebounced(job, input === '' ? 0 : 200);
+	const isPending = settledJob !== job;
+
 	const { output, error } = useMemo(() => {
-		const trimmed = input.trim();
+		const trimmed = settledJob.input.trim();
 		if (trimmed === '') return { output: '', error: null as string | null };
 		if (!looksLikeSvg(trimmed)) return { output: '', error: messages.notSvgError };
+		if (new TextEncoder().encode(trimmed).length > SVG_MAX_BYTES) return { output: '', error: messages.tooLargeError };
 		try {
 			const overrides: Record<string, false> = {};
 			for (const id of PRESET_PLUGIN_IDS) {
-				if (!pluginEnabled[id]) overrides[id] = false;
+				if (!settledJob.pluginEnabled[id]) overrides[id] = false;
 			}
 			const result = optimize(trimmed, {
-				multipass,
-				js2svg: prettify ? { indent: 2, pretty: true } : undefined,
+				multipass: settledJob.multipass,
+				js2svg: settledJob.prettify ? { indent: 2, pretty: true } : undefined,
 				plugins: [
-					{ name: 'preset-default', params: { floatPrecision: precision, overrides } },
-					...(removeDimensions ? [{ name: 'removeDimensions' }] : []),
-					...(removeViewBox ? [{ name: 'removeViewBox' }] : []),
+					{ name: 'preset-default', params: { floatPrecision: settledJob.precision, overrides } },
+					...(settledJob.removeDimensions ? [{ name: 'removeDimensions' as const }] : []),
+					...(settledJob.removeViewBox ? [{ name: 'removeViewBox' as const }] : []),
+					...(settledJob.removeScripts ? [{ name: 'removeScripts' as const }] : []),
 				],
 			});
 			return { output: result.data, error: null as string | null };
 		} catch (err) {
 			return { output: '', error: messages.invalidSvgError.replace('{{message}}', (err as Error).message) };
 		}
-	}, [
-		input,
-		multipass,
-		precision,
-		removeDimensions,
-		removeViewBox,
-		prettify,
-		pluginEnabled,
-		messages.invalidSvgError,
-		messages.notSvgError,
-	]);
+	}, [settledJob, messages.invalidSvgError, messages.notSvgError, messages.tooLargeError]);
 
 	const originalSize = new TextEncoder().encode(input).length;
 	const optimizedSize = new TextEncoder().encode(output).length;
@@ -238,13 +277,29 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 	// "optimized" output inline in an HTML page: an inline <svg> runs its
 	// <script> in the host page's context. Not a bug to fix, just something
 	// worth surfacing since it's easy to assume "optimized" implies "sanitized".
-	const hasScriptTag = /<script[\s>]/i.test(output);
+	const risks = useMemo(() => detectSvgRisks(output), [output]);
+	const riskLabels: Record<SvgRisk, string> = {
+		script: messages.riskScript,
+		eventHandler: messages.riskEventHandler,
+		javascriptUrl: messages.riskJavascriptUrl,
+		foreignObject: messages.riskForeignObject,
+		externalUse: messages.riskExternalUse,
+		externalImage: messages.riskExternalImage,
+	};
+	const hasLargeInput = originalSize > SVG_WARN_BYTES && originalSize <= SVG_MAX_BYTES;
 
-	const handleFile = (files: FileList | null) => {
+	const handleFile = (files: FileList | null, inputEl?: HTMLInputElement) => {
 		const file = files?.[0];
+		if (inputEl) inputEl.value = '';
 		if (!file) return;
+		setFileError(null);
+		if (file.size > SVG_MAX_BYTES) {
+			setFileError(messages.tooLargeError);
+			return;
+		}
 		const reader = new FileReader();
 		reader.onload = () => setInput(String(reader.result ?? ''));
+		reader.onerror = () => setFileError(messages.fileReadError);
 		reader.readAsText(file);
 	};
 
@@ -256,7 +311,7 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 		link.href = url;
 		link.download = 'optimized.svg';
 		link.click();
-		URL.revokeObjectURL(url);
+		setTimeout(() => URL.revokeObjectURL(url), 10000);
 	};
 
 	return (
@@ -283,7 +338,7 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 					<div className="flex gap-2">
 						<label
 							htmlFor="svg-file-input"
-							className="inline-flex cursor-pointer items-center rounded-md border border-border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent"
+							className="inline-flex min-h-8 cursor-pointer items-center rounded-md border border-border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent focus-within:ring-2 focus-within:ring-ring"
 						>
 							{messages.chooseFile}
 						</label>
@@ -292,8 +347,8 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 							ref={fileInputRef}
 							type="file"
 							accept=".svg,image/svg+xml"
-							className="hidden"
-							onChange={(e) => handleFile(e.target.files)}
+							className="sr-only"
+							onChange={(e) => handleFile(e.currentTarget.files, e.currentTarget)}
 						/>
 						<Button type="button" size="sm" variant="outline" onClick={() => setInput(SAMPLE_SVG)}>
 							{messages.loadSample}
@@ -341,6 +396,10 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 						{messages.optPrettify}
 					</label>
 					<label className="flex items-center gap-1.5 text-sm text-muted-foreground">
+						<input type="checkbox" checked={removeScripts} onChange={(e) => setRemoveScripts(e.target.checked)} />
+						{messages.optRemoveScripts}
+					</label>
+					<label className="flex items-center gap-1.5 text-sm text-muted-foreground">
 						{messages.optPrecisionLabel.replace('{{value}}', String(precision))}
 						<input
 							type="range"
@@ -369,19 +428,30 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 
 			{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
 
-			{hasScriptTag && !error && (
+			{fileError && <p role="alert" className="text-sm text-destructive">{fileError}</p>}
+
+			{hasLargeInput && !error && (
+				<p role="status" className="text-xs text-muted-foreground">{messages.largeWarning}</p>
+			)}
+
+			{risks.length > 0 && !error && (
 				<p role="status" className="rounded-md border border-amber-500/40 bg-amber-500/10 p-2 text-sm text-amber-700 dark:text-amber-300">
-					{messages.scriptTagWarning}
+					{risks.includes('script') ? `${messages.scriptTagWarning} ` : ''}
+					{messages.risksFound.replace('{{list}}', risks.map((r) => riskLabels[r]).join(', '))}
 				</p>
+			)}
+
+			{isPending && input !== '' && (
+				<p role="status" className="text-xs text-muted-foreground">{messages.optimizing}</p>
 			)}
 
 			{input !== '' && !error && (
 				<>
 					<div className="flex items-center gap-2">
-						<Button type="button" size="sm" variant={view === 'preview' ? 'default' : 'outline'} onClick={() => setView('preview')}>
+						<Button type="button" size="sm" variant={view === 'preview' ? 'default' : 'outline'} aria-pressed={view === 'preview'} onClick={() => setView('preview')}>
 							{messages.previewTab}
 						</Button>
-						<Button type="button" size="sm" variant={view === 'code' ? 'default' : 'outline'} onClick={() => setView('code')}>
+						<Button type="button" size="sm" variant={view === 'code' ? 'default' : 'outline'} aria-pressed={view === 'code'} onClick={() => setView('code')}>
 							{messages.codeTab}
 						</Button>
 					</div>
@@ -393,9 +463,9 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 								<span className="text-xs text-muted-foreground">{messages.sizeLabel.replace('{{size}}', formatBytes(originalSize))}</span>
 							</div>
 							{view === 'preview' ? (
-								<SvgPreview svg={input} />
+								<SvgPreview svg={settledJob.input} title={messages.previewTitleOriginal} />
 							) : (
-								<textarea readOnly value={input} rows={10} className="w-full rounded-md border border-border bg-muted p-2 font-mono text-xs text-foreground" />
+								<textarea readOnly aria-label={messages.originalHeading} value={input} rows={10} className="w-full rounded-md border border-border bg-muted p-2 font-mono text-xs text-foreground" />
 							)}
 						</div>
 						<div className="flex flex-col gap-2">
@@ -412,12 +482,12 @@ export default function SvgOptimizer({ messages }: { messages: Messages }) {
 								</span>
 							</div>
 							{view === 'preview' ? (
-								<SvgPreview svg={output} />
+								<SvgPreview svg={output} title={messages.previewTitleOptimized} />
 							) : (
-								<textarea readOnly value={output} rows={10} className="w-full rounded-md border border-border bg-muted p-2 font-mono text-xs text-foreground" />
+								<textarea readOnly aria-label={messages.optimizedHeading} value={output} rows={10} className="w-full rounded-md border border-border bg-muted p-2 font-mono text-xs text-foreground" />
 							)}
 							<div className="flex justify-end gap-2">
-								<CopyButton value={output} label={messages.copy} copiedLabel={messages.copied} />
+								<CopyButton value={output} label={messages.copy} copiedLabel={messages.copied} failedLabel={messages.copyFailed} />
 								<Button type="button" size="sm" onClick={handleDownload} disabled={!output}>
 									{messages.download}
 								</Button>

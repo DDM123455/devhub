@@ -17,7 +17,11 @@
     },
     {
       "heading": "Local storage",
-      "body": "A few tools save small pieces of state directly in your browser's local storage — for example, your last theme choice (light/dark), a Markdown draft you were editing, or a regex pattern history. This data is stored only on your device, is never sent to us, and you can clear it at any time by clearing your browser's site data for this domain."
+      "body": "Some tools save small pieces of state in your browser's local storage so you don't lose work: your theme choice (theme), the Text Diff draft (text-diff-draft), the Markdown Editor draft (markdown-editor-draft), your Regex Tester pattern history (regex-tester-history) and saved Color Picker palettes (color-picker-saved-palettes). This data stays only on your device, is never sent to us, and you can remove it any time by clearing this site's data in your browser."
+    },
+    {
+      "heading": "Assets downloaded from third-party CDNs",
+      "body": "Your files are never uploaded, but some tools download their own code or data (not your content) when you use them: Trim Video and Audio Converter fetch the ffmpeg WebAssembly core from cdn.jsdelivr.net; Remove Background fetches its AI model and WebAssembly runtime from staticimgly.com; Kubernetes YAML Validator fetches public Kubernetes JSON Schema files from cdn.jsdelivr.net. These requests are plain downloads of public files, so those CDN providers may see your IP address and the file requested, like any website resource. The Markdown preview can also display images referenced in your text; if you reference an image from an external host, your browser will request it from that host (the site's content security policy normally blocks this)."
     },
     {
       "heading": "Hosting and technical logs",

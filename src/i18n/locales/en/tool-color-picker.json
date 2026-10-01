@@ -25,9 +25,9 @@
     "harmonyMonochromatic": "Monochromatic",
     "randomHeading": "Random palette",
     "generate": "Generate",
-    "generateHint": "Press space to generate a new palette. Click the lock icon to keep a color.",
-    "lockAria": "Unlock this color",
-    "unlockAria": "Lock this color",
+    "generateHint": "Press Space or G to generate a new palette. Click the lock icon to keep a color.",
+    "lockAria": "Lock this color",
+    "unlockAria": "Unlock this color",
     "copyPaletteCss": "Copy as CSS",
     "copyPaletteJson": "Copy as JSON",
     "contrastHeading": "Contrast checker",
@@ -44,7 +44,15 @@
     "copyPaletteScss": "Copy as SCSS",
     "copyPaletteTailwind": "Copy as Tailwind config",
     "exportPaletteAse": "Export .ase",
-    "extractFromImageLabel": "Extract palette from image"
+    "extractFromImageLabel": "Extract palette from image",
+    "copyFailed": "Copy failed",
+    "savedFeedback": "Palette saved",
+    "alreadySaved": "This palette is already saved",
+    "paletteDeleted": "Palette deleted.",
+    "undo": "Undo",
+    "extractError": "Could not read this image. Try a PNG, JPG or WebP file.",
+    "extractEmpty": "This image has no visible pixels to extract colors from.",
+    "colorInputAria": "Pick a color"
   },
   "related": "Related tools",
   "faq": {
@@ -54,13 +62,13 @@
     "q2": "Does it check color contrast for accessibility?",
     "a2": "Yes — a built-in contrast checker shows the WCAG AA/AAA pass/fail ratio against white and black.",
     "q3": "Can I export a palette to use in code?",
-    "a3": "Yes — copy any palette as CSS custom properties or as a JSON array of hex codes."
+    "a3": "Yes — copy any palette as CSS custom properties, SCSS variables, a Tailwind config snippet or a JSON array of hex codes, or export it as an Adobe .ase swatch file. You can also extract a palette from an image and save palettes in your browser."
   },
   "article": {
     "heading": "How do color harmony and contrast work?",
     "p1": "Every color on screen can be described three different ways, and this tool keeps them all in sync: HEX is the shorthand used in CSS and design tools, RGB describes how much red, green, and blue light combine to produce the color, and HSL — hue, saturation, lightness — describes it the way a person actually thinks about color: what shade it is, how vivid, and how light or dark. Drag the native color swatch, type a HEX code, or adjust any R/G/B or H/S/L field directly, and every other field updates instantly, so you can move between however you're used to thinking about color without doing the math yourself.",
     "p2": "The color wheel is the basis for six classic harmony rules, all generated automatically from whatever base color you pick. Complementary pairs a color with its opposite for maximum contrast; analogous picks neighbors on the wheel for a calm, cohesive look; triadic and tetradic space three or four colors evenly around the wheel for a lively but still balanced palette; split-complementary softens a complementary pair by using the two colors next to the opposite instead of the opposite itself; and monochromatic sticks to a single hue while varying only lightness, often the safest choice for a UI that needs one consistent brand color at several shades.",
-    "p3": "Not every good palette starts from color theory — sometimes you just want to see what turns up. The random palette generator (press spacebar, or click Generate) produces five colors at once with hues and lightness tuned to avoid muddy or overly pastel results. Click the lock icon on any swatch you want to keep, then generate again: only the unlocked colors change, so you can build a palette incrementally the same way tools like Coolors work. Click any swatch to copy its HEX code, or use the buttons below the palette to copy the whole set as CSS custom properties or a JSON array, ready to paste into a stylesheet or design token file.",
+    "p3": "Not every good palette starts from color theory — sometimes you just want to see what turns up. The random palette generator (press spacebar, or click Generate) produces five colors at once with hues and lightness tuned to avoid muddy or overly pastel results. Click the lock icon on any swatch you want to keep, then generate again: only the unlocked colors change, so you can build a palette incrementally the same way tools like Coolors work. Click any swatch to copy its HEX code, or use the buttons below the palette to copy the whole set as CSS custom properties, SCSS variables, a Tailwind config snippet or a JSON array, or export an Adobe .ase swatch file for Illustrator and Photoshop. You can also extract a palette from any image (processed locally, never uploaded) and save palettes you like in your browser for later.",
     "p4": "Picking a nice-looking color isn't the same as picking a usable one — text set in a color too close in lightness to its background can be unreadable, and the Web Content Accessibility Guidelines (WCAG) set specific thresholds for this: a contrast ratio of at least 4.5:1 for normal text to pass level AA, and 7:1 to pass the stricter level AAA. The contrast checker computes the exact ratio between your chosen color and both white and black text using the same relative-luminance formula the WCAG spec defines, and flags whether each combination passes, so you can catch a low-contrast button or heading before it ships instead of after."
   }
 }

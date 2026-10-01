@@ -25,7 +25,8 @@
     "skippedFiles": "{{count}} file(s) were skipped because they're not a supported image format.",
     "resizeToggleLabel": "Resize before converting",
     "maxDimensionLabel": "Max width/height: {{size}}px",
-    "processingQueue": "Processing {{current}}/{{total}}"
+    "processingQueue": "Processing {{current}}/{{total}}",
+    "errorTooLarge": "This image is too large for your browser to convert. Enable the resize option (or use a smaller image) and try again."
   },
   "related": "Related tools",
   "faq": {

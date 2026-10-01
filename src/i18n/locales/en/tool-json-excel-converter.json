@@ -26,7 +26,17 @@
     "moreRows": "+{{count}} more rows in the downloaded file",
     "download": "Download .xlsx",
     "generating": "Generating…",
-    "downloadError": "Could not generate the .xlsx file: {{message}}"
+    "downloadError": "Could not generate the .xlsx file: {{message}}",
+    "unwrapLabel": "Use the array inside a single key (e.g. { \"users\": [...] })",
+    "unwrappedInfo": "Using the array in the \"{{key}}\" key as the sheet data.",
+    "emptyState": "This JSON contains no rows to export. Add at least one item to the array.",
+    "emptyKey": "(empty key)",
+    "previewCaption": "Preview of sheet {{sheet}}",
+    "fileReadError": "Could not read this file.",
+    "warnTruncatedCells": "{{count}} cell(s) were longer than {{max}} characters (the Excel limit) and will be truncated.",
+    "warnRowLimit": "Sheet(s) {{sheets}} exceed the Excel limit of {{max}} data rows; extra rows will be dropped.",
+    "warnColLimit": "Sheet(s) {{sheets}} exceed the Excel limit of {{max}} columns; extra columns will be dropped.",
+    "warnUnsafeIntegers": "{{count}} integer(s) are larger than 2^53 and may already have lost precision while parsing JSON. Store such IDs as strings."
   },
   "related": "Related tools",
   "faq": {
@@ -34,7 +44,7 @@
     "q1": "Does it produce a real Excel file, not just a renamed CSV?",
     "a1": "Yes — a genuine .xlsx workbook with a bold header row, typed numeric/boolean cells, and sized columns.",
     "q2": "Can one JSON file produce multiple sheets?",
-    "a2": "Yes — if your JSON is an object whose top-level keys each hold an array, each key automatically becomes its own sheet.",
+    "a2": "Yes — if your JSON is an object whose top-level keys each hold an array, each key automatically becomes its own sheet. An object with a single array (for example { \"users\": [...] }) is unwrapped into one sheet named after the key.",
     "q3": "Can I preview the spreadsheet before downloading?",
     "a3": "Yes — a preview table shows the first rows of each sheet before you download the .xlsx file."
   },

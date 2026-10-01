@@ -1,19 +1,27 @@
-import { diffChars, diffWords, diffLines, type Change, type DiffLinesOptionsNonabortable } from 'diff';
+import { diffArrays } from 'diff';
 
 export type DiffGranularity = 'char' | 'word' | 'line';
 export type DiffLineType = 'unchanged' | 'added' | 'removed' | 'modified';
+
+export interface DiffSegment {
+	value: string;
+	added?: boolean;
+	removed?: boolean;
+}
 
 export interface DiffLineEntry {
 	type: DiffLineType;
 	leftText?: string;
 	rightText?: string;
-	leftSegments?: Change[];
-	rightSegments?: Change[];
+	leftSegments?: DiffSegment[];
+	rightSegments?: DiffSegment[];
 	hunkIndex: number | null;
 }
 
 export interface DiffOptions {
 	ignoreCase?: boolean;
+	// Collapses every run of whitespace (spaces, tabs, NBSP...) to one space and trims
+	// the ends before comparing, so only *extra/different* whitespace is ignored.
 	ignoreWhitespace?: boolean;
 }
 
@@ -28,11 +36,8 @@ export interface PreprocessOptions {
 // never report as a change:
 // - normalizeLineEndings: CRLF/CR → LF, so a file saved on Windows vs. Unix doesn't
 //   show every single line as modified.
-// - normalizeUnicode: NFC-normalizes both sides, so visually-identical text encoded
-//   with different combining-character sequences (e.g. "é" as one codepoint vs. "e" +
-//   combining acute) doesn't register as a difference.
-// - ignoreEmptyLines: drops blank/whitespace-only lines from both sides entirely, so
-//   blank-line-count differences don't appear as added/removed rows.
+// - normalizeUnicode: NFC-normalizes both sides.
+// - ignoreEmptyLines: drops blank/whitespace-only lines from both sides entirely.
 export function preprocessDiffInput(text: string, options: PreprocessOptions): string {
 	let result = text;
 	if (options.normalizeLineEndings) result = result.replace(/\r\n?/g, '\n');
@@ -41,98 +46,204 @@ export function preprocessDiffInput(text: string, options: PreprocessOptions): s
 	return result;
 }
 
-// diffLines' Change.value contains one or more complete lines, each (except
-// possibly the very last line in the whole document) ending with '\n'.
-function splitIntoLines(value: string): string[] {
-	const withoutTrailingNewline = value.endsWith('\n') ? value.slice(0, -1) : value;
-	return withoutTrailingNewline === '' ? [] : withoutTrailingNewline.split('\n');
+// Splits a whole document into logical lines. A single trailing '\n' is a line
+// *terminator*, not an extra empty line; any other empty line (including the empty
+// line in "a\n\nb") is a real line and must survive — a previous version dropped
+// them, which reported "a\nb" vs "a\n\nb" as identical and lost blank lines on merge.
+export function splitDocumentLines(value: string): string[] {
+	if (value === '') return [];
+	const withoutTerminator = value.endsWith('\n') ? value.slice(0, -1) : value;
+	return withoutTerminator.split('\n');
 }
 
-// A modified word/token is never highlighted as a solid block. Wherever diffWords
-// produces a removed chunk immediately followed by an added chunk (i.e. one or more
-// words were replaced, not purely inserted or deleted), that pair is re-diffed at the
-// character level and the coarse word-level pair is replaced with the fine-grained
-// result — this is the "Line → Word → Character" layering DiffChecker/GitHub use, so
-// "hahah" → "hahahahah" highlights only the appended "ahah", not the whole word.
-// Above CHAR_REFINE_MAX_LEN, characters diffing degrades to O(n*d) on long modified
-// spans, so very long replaced chunks fall back to the coarse word-level pair instead
-// of risking a multi-second stall on pathological input.
-const CHAR_REFINE_MAX_LEN = 2000;
+export type LineEndingStyle = 'crlf' | 'lf' | 'cr' | 'mixed' | 'none';
 
-function refineModifiedWordPairs(changes: Change[], ignoreCase: boolean | undefined): Change[] {
-	const result: Change[] = [];
-	let i = 0;
-	while (i < changes.length) {
-		const current = changes[i];
-		const next = changes[i + 1];
+export function detectLineEnding(text: string): LineEndingStyle {
+	const crlf = (text.match(/\r\n/g) ?? []).length;
+	const lf = (text.match(/\n/g) ?? []).length - crlf;
+	const cr = (text.match(/\r/g) ?? []).length - crlf;
+	const kinds = [crlf > 0, lf > 0, cr > 0].filter(Boolean).length;
+	if (kinds === 0) return 'none';
+	if (kinds > 1) return 'mixed';
+	return crlf > 0 ? 'crlf' : lf > 0 ? 'lf' : 'cr';
+}
+
+export interface DiffInputNotes {
+	lineEndingsDiffer: boolean;
+	trailingNewlineDiffers: boolean;
+}
+
+// Differences that are invisible in a per-line diff but still real: a CRLF file vs.
+// an LF file, or one side ending with a final newline and the other not. `left`/`right`
+// are the PREPROCESSED texts, `rawLeft`/`rawRight` the originals.
+export function analyzeDiffInput(rawLeft: string, rawRight: string, left: string, right: string): DiffInputNotes {
+	const a = detectLineEnding(rawLeft);
+	const b = detectLineEnding(rawRight);
+	return {
+		lineEndingsDiffer: a !== 'none' && b !== 'none' && a !== b,
+		trailingNewlineDiffers: (left !== '' || right !== '') && left.endsWith('\n') !== right.endsWith('\n'),
+	};
+}
+
+interface SegmenterLike {
+	segment(input: string): Iterable<{ segment: string }>;
+}
+
+// Grapheme clusters (Intl.Segmenter where available) so a ZWJ emoji or a base letter
+// plus combining marks is one unit instead of being split into broken halves.
+export function segmentGraphemes(text: string): string[] {
+	const Segmenter = (Intl as unknown as { Segmenter?: new (locale?: string, options?: { granularity: string }) => SegmenterLike })
+		.Segmenter;
+	if (Segmenter) {
+		return Array.from(new Segmenter(undefined, { granularity: 'grapheme' }).segment(text), (s) => s.segment);
+	}
+	return Array.from(text);
+}
+
+function tokenizeWords(text: string): string[] {
+	return text.match(/\s+|[\p{L}\p{M}\p{N}_]+|[^\s\p{L}\p{M}\p{N}_]/gu) ?? [];
+}
+
+type Op = { kind: 'common'; left: string; right: string } | { kind: 'removed'; text: string } | { kind: 'added'; text: string };
+
+function tokenKey(token: string, options: DiffOptions): string {
+	let key = token;
+	if (options.ignoreCase) key = key.toLowerCase();
+	if (options.ignoreWhitespace && /^\s+$/.test(key)) key = ' ';
+	return key;
+}
+
+function diffTokenOps(leftTokens: string[], rightTokens: string[], options: DiffOptions): Op[] {
+	const parts = diffArrays(
+		leftTokens.map((t) => tokenKey(t, options)),
+		rightTokens.map((t) => tokenKey(t, options)),
+	);
+	const ops: Op[] = [];
+	let li = 0;
+	let ri = 0;
+	for (const part of parts) {
+		const n = part.value.length;
+		if (part.added) {
+			ops.push({ kind: 'added', text: rightTokens.slice(ri, ri + n).join('') });
+			ri += n;
+		} else if (part.removed) {
+			ops.push({ kind: 'removed', text: leftTokens.slice(li, li + n).join('') });
+			li += n;
+		} else {
+			// Keep each side's ORIGINAL text — a diff library's "common" value comes from one
+			// side only, which silently rewrote the left column under ignoreCase/whitespace.
+			ops.push({ kind: 'common', left: leftTokens.slice(li, li + n).join(''), right: rightTokens.slice(ri, ri + n).join('') });
+			li += n;
+			ri += n;
+		}
+	}
+	return ops;
+}
+
+// A modified word/token is never highlighted as a solid block: wherever the word-level
+// diff yields a removed chunk immediately followed by an added chunk, that pair is
+// re-diffed per grapheme, so "hahah" → "hahahahah" highlights only the appended "ahah".
+// Above CHAR_REFINE_MAX_LEN the refinement is skipped to bound the O(n*d) cost.
+const CHAR_REFINE_MAX_LEN = 2000;
+const CHAR_DIFF_MAX_LEN = 20000;
+
+function refineOps(ops: Op[], options: DiffOptions): Op[] {
+	const result: Op[] = [];
+	for (let i = 0; i < ops.length; i++) {
+		const current = ops[i];
+		const next = ops[i + 1];
 		if (
-			current.removed &&
-			next?.added &&
-			current.value.length <= CHAR_REFINE_MAX_LEN &&
-			next.value.length <= CHAR_REFINE_MAX_LEN
+			current.kind === 'removed' &&
+			next?.kind === 'added' &&
+			current.text.length <= CHAR_REFINE_MAX_LEN &&
+			next.text.length <= CHAR_REFINE_MAX_LEN
 		) {
-			result.push(...diffChars(current.value, next.value, { ignoreCase }));
-			i += 2;
+			result.push(...diffTokenOps(segmentGraphemes(current.text), segmentGraphemes(next.text), options));
+			i += 1;
 			continue;
 		}
 		result.push(current);
-		i += 1;
 	}
 	return result;
 }
 
+function opsToSegments(ops: Op[]): { leftSegments: DiffSegment[]; rightSegments: DiffSegment[] } {
+	const leftSegments: DiffSegment[] = [];
+	const rightSegments: DiffSegment[] = [];
+	const push = (list: DiffSegment[], seg: DiffSegment) => {
+		if (seg.value === '') return;
+		const last = list[list.length - 1];
+		if (last && !!last.added === !!seg.added && !!last.removed === !!seg.removed) last.value += seg.value;
+		else list.push(seg);
+	};
+	for (const op of ops) {
+		if (op.kind === 'common') {
+			push(leftSegments, { value: op.left });
+			push(rightSegments, { value: op.right });
+		} else if (op.kind === 'removed') push(leftSegments, { value: op.text, removed: true });
+		else push(rightSegments, { value: op.text, added: true });
+	}
+	return { leftSegments, rightSegments };
+}
+
 function diffLinePair(leftLine: string, rightLine: string, granularity: DiffGranularity, options: DiffOptions) {
 	if (granularity === 'line') return undefined;
-	const rawSegments =
+	if (leftLine.length + rightLine.length > CHAR_DIFF_MAX_LEN) return undefined;
+	const ops =
 		granularity === 'char'
-			? diffChars(leftLine, rightLine, { ignoreCase: options.ignoreCase })
-			: diffWords(leftLine, rightLine, { ignoreCase: options.ignoreCase });
-	const segments = granularity === 'word' ? refineModifiedWordPairs(rawSegments, options.ignoreCase) : rawSegments;
-	return {
-		leftSegments: segments.filter((s) => !s.added),
-		rightSegments: segments.filter((s) => !s.removed),
-	};
+			? diffTokenOps(segmentGraphemes(leftLine), segmentGraphemes(rightLine), options)
+			: refineOps(diffTokenOps(tokenizeWords(leftLine), tokenizeWords(rightLine), options), options);
+	return opsToSegments(ops);
+}
+
+export function lineKey(line: string, options: DiffOptions): string {
+	let key = line;
+	if (options.ignoreWhitespace) key = key.replace(/\s+/g, ' ').trim();
+	if (options.ignoreCase) key = key.toLowerCase();
+	return key;
 }
 
 // Builds a unified, line-by-line model of the diff: each source line becomes exactly
 // one entry (unchanged / added / removed), except a removed block immediately followed
 // by an added block, where lines are paired index-for-index into "modified" entries
 // (with an intra-line sub-diff for highlighting) — any leftover lines on the longer
-// side fall back to plain added/removed. This mirrors how most side-by-side diff tools
-// (GitHub split view, Beyond Compare, WinMerge) distinguish "replaced" lines from pure
-// insertions/deletions.
+// side fall back to plain added/removed. Lines are compared via a normalised key
+// (ignoreCase / ignoreWhitespace) but entries always carry each side's original text.
 export function buildLineDiff(left: string, right: string, granularity: DiffGranularity, options: DiffOptions = {}): DiffLineEntry[] {
-	const lineOptions: DiffLinesOptionsNonabortable & { ignoreCase?: boolean } = {
-		ignoreWhitespace: options.ignoreWhitespace,
-		ignoreCase: options.ignoreCase,
-	};
-	const lineParts = diffLines(left, right, lineOptions);
+	const leftLines = splitDocumentLines(left);
+	const rightLines = splitDocumentLines(right);
+	const lineParts = diffArrays(
+		leftLines.map((l) => lineKey(l, options)),
+		rightLines.map((l) => lineKey(l, options)),
+	);
 	const entries: DiffLineEntry[] = [];
+	let li = 0;
+	let ri = 0;
 
 	let i = 0;
 	while (i < lineParts.length) {
 		const part = lineParts[i];
+		const count = part.value.length;
 
 		if (!part.added && !part.removed) {
-			for (const line of splitIntoLines(part.value)) {
-				entries.push({ type: 'unchanged', leftText: line, rightText: line, hunkIndex: null });
+			for (let k = 0; k < count; k++) {
+				entries.push({ type: 'unchanged', leftText: leftLines[li++], rightText: rightLines[ri++], hunkIndex: null });
 			}
 			i += 1;
 			continue;
 		}
 
 		if (part.removed && lineParts[i + 1]?.added) {
-			const removedLines = splitIntoLines(part.value);
-			const addedLines = splitIntoLines(lineParts[i + 1].value);
+			const addedCount = lineParts[i + 1].value.length;
+			const removedLines = leftLines.slice(li, li + count);
+			const addedLines = rightLines.slice(ri, ri + addedCount);
+			li += count;
+			ri += addedCount;
 			const pairCount = Math.min(removedLines.length, addedLines.length);
 			for (let j = 0; j < pairCount; j++) {
-				// jsdiff's diffLines picks *a* minimal alignment, not necessarily the one that
-				// maximizes recognized unchanged lines — when several equally-minimal alignments
-				// exist, it can end up grouping two byte-identical lines into a removed+added
-				// pair instead of recognizing them as unchanged. Re-check equality here so that
-				// case doesn't render as a spurious "modified" (orange) row for text that's
-				// actually identical.
-				if (removedLines[j] === addedLines[j]) {
+				// Re-check equality: several equally-minimal alignments can pair two
+				// equivalent lines as removed+added instead of unchanged.
+				if (lineKey(removedLines[j], options) === lineKey(addedLines[j], options)) {
 					entries.push({ type: 'unchanged', leftText: removedLines[j], rightText: addedLines[j], hunkIndex: null });
 					continue;
 				}
@@ -157,12 +268,12 @@ export function buildLineDiff(left: string, right: string, granularity: DiffGran
 		}
 
 		if (part.removed) {
-			for (const line of splitIntoLines(part.value)) entries.push({ type: 'removed', leftText: line, hunkIndex: null });
+			for (let k = 0; k < count; k++) entries.push({ type: 'removed', leftText: leftLines[li++], hunkIndex: null });
 			i += 1;
 			continue;
 		}
 
-		for (const line of splitIntoLines(part.value)) entries.push({ type: 'added', rightText: line, hunkIndex: null });
+		for (let k = 0; k < count; k++) entries.push({ type: 'added', rightText: rightLines[ri++], hunkIndex: null });
 		i += 1;
 	}
 

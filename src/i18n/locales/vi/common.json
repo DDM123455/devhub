@@ -31,7 +31,9 @@
       "text": "Văn bản",
       "dev": "Công cụ Dev",
       "media": "Đa phương tiện"
-    }
+    },
+    "mainNav": "Điều hướng chính",
+    "language": "Ngôn ngữ"
   },
   "footer": {
     "copyright": "© {{year}} Web Tool Hub",

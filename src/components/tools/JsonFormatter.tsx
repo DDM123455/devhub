@@ -4,6 +4,16 @@ import type { JSONEditorMode, ParseError, SchemaValidationError } from 'jsonedit
 import 'jsoneditor/dist/jsoneditor.min.css';
 import './jsoneditor-a11y.css';
 import { Button } from '@/components/ui/button';
+import {
+	analyzeJsonText,
+	convertJsonToCsvDetailed,
+	convertJsonToXml,
+	convertJsonToYaml,
+	diffJson,
+	type DiffEntry,
+	type JsonTextWarnings,
+} from '@/lib/json-convert';
+import { useCopyToClipboard } from './useCopyToClipboard';
 
 interface Messages {
 	heading: string;
@@ -33,6 +43,12 @@ interface Messages {
 	compareAdded: string;
 	compareRemoved: string;
 	compareChanged: string;
+	warnUnsafeNumbers: string;
+	warnDuplicateKeys: string;
+	warnCsvCollisions: string;
+	copyFailed: string;
+	copyExportAria: string;
+	downloadExportAria: string;
 }
 
 type ExportFormat = 'xml' | 'yaml' | 'csv';
@@ -56,159 +72,10 @@ function lineToCharRange(text: string, oneIndexedLine: number): { start: number;
 	return { start, end: start + lines[index].length };
 }
 
-function xmlEscape(value: string): string {
-	return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-function xmlTagName(key: string): string {
-	const cleaned = key.replace(/[^a-zA-Z0-9_.-]/g, '_');
-	return /^[a-zA-Z_]/.test(cleaned) ? cleaned : `_${cleaned}`;
-}
-
-function jsonToXml(value: unknown, tagName: string, depth: number): string {
-	const indent = '  '.repeat(depth);
-	if (value === null || value === undefined) return `${indent}<${tagName} />`;
-	if (Array.isArray(value)) {
-		if (value.length === 0) return `${indent}<${tagName} />`;
-		const items = value.map((item) => jsonToXml(item, 'item', depth + 1)).join('\n');
-		return `${indent}<${tagName}>\n${items}\n${indent}</${tagName}>`;
-	}
-	if (typeof value === 'object') {
-		const entries = Object.entries(value as Record<string, unknown>);
-		if (entries.length === 0) return `${indent}<${tagName} />`;
-		const children = entries.map(([key, val]) => jsonToXml(val, xmlTagName(key), depth + 1)).join('\n');
-		return `${indent}<${tagName}>\n${children}\n${indent}</${tagName}>`;
-	}
-	return `${indent}<${tagName}>${xmlEscape(String(value))}</${tagName}>`;
-}
-
-function convertJsonToXml(json: unknown): string {
-	return `<?xml version="1.0" encoding="UTF-8"?>\n${jsonToXml(json, 'root', 0)}`;
-}
-
-function yamlScalar(value: unknown): string {
-	if (value === null || value === undefined) return 'null';
-	if (typeof value === 'boolean' || typeof value === 'number') return String(value);
-	const str = String(value);
-	if (str === '') return "''";
-	const needsQuoting =
-		/^\s|\s$/.test(str) ||
-		/^(true|false|null|yes|no|on|off|~)$/i.test(str) ||
-		/^[-?:,[\]{}#&*!|>'"%@`]/.test(str) ||
-		/: |:$/.test(str) ||
-		/^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(str) ||
-		/\n/.test(str);
-	if (!needsQuoting) return str;
-	return `"${str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`;
-}
-
-function yamlScalarOrEmptyContainer(value: unknown): string {
-	if (Array.isArray(value)) return '[]';
-	if (value !== null && typeof value === 'object') return '{}';
-	return yamlScalar(value);
-}
-
-function jsonToYamlLines(value: unknown, depth: number): string[] {
-	const indent = '  '.repeat(depth);
-	if (Array.isArray(value)) {
-		if (value.length === 0) return [`${indent}[]`];
-		const lines: string[] = [];
-		for (const item of value) {
-			const isNestedNonEmpty =
-				(Array.isArray(item) && item.length > 0) ||
-				(item !== null && typeof item === 'object' && !Array.isArray(item) && Object.keys(item).length > 0);
-			if (isNestedNonEmpty) {
-				const childLines = jsonToYamlLines(item, depth + 1);
-				childLines[0] = `${indent}- ${childLines[0].slice(indent.length + 2)}`;
-				lines.push(...childLines);
-			} else {
-				lines.push(`${indent}- ${yamlScalarOrEmptyContainer(item)}`);
-			}
-		}
-		return lines;
-	}
-	if (value !== null && typeof value === 'object') {
-		const entries = Object.entries(value as Record<string, unknown>);
-		if (entries.length === 0) return [`${indent}{}`];
-		const lines: string[] = [];
-		for (const [key, val] of entries) {
-			const keyStr = /^[A-Za-z_][A-Za-z0-9_]*$/.test(key) ? key : yamlScalar(key);
-			const isNestedNonEmpty =
-				(Array.isArray(val) && val.length > 0) ||
-				(val !== null && typeof val === 'object' && !Array.isArray(val) && Object.keys(val).length > 0);
-			if (isNestedNonEmpty) {
-				lines.push(`${indent}${keyStr}:`);
-				lines.push(...jsonToYamlLines(val, depth + 1));
-			} else {
-				lines.push(`${indent}${keyStr}: ${yamlScalarOrEmptyContainer(val)}`);
-			}
-		}
-		return lines;
-	}
-	return [`${indent}${yamlScalar(value)}`];
-}
-
-function convertJsonToYaml(json: unknown): string {
-	if (json !== null && typeof json === 'object' && Object.keys(json as object).length === 0) {
-		return Array.isArray(json) ? '[]' : '{}';
-	}
-	return jsonToYamlLines(json, 0).join('\n');
-}
-
-function flattenObject(obj: Record<string, unknown>, prefix = ''): Record<string, unknown> {
-	const result: Record<string, unknown> = {};
-	for (const [key, value] of Object.entries(obj)) {
-		const fullKey = prefix ? `${prefix}.${key}` : key;
-		if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
-			Object.assign(result, flattenObject(value as Record<string, unknown>, fullKey));
-		} else {
-			result[fullKey] = value;
-		}
-	}
-	return result;
-}
-
-function csvCell(value: unknown): string {
-	if (value === undefined || value === null) return '';
-	const str = Array.isArray(value) || typeof value === 'object' ? JSON.stringify(value) : String(value);
-	return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
-}
-
-// CSV is inherently tabular, so a JSON array of objects becomes one row per object
-// (nested objects flattened with dot-notation keys, arrays kept as a stringified cell
-// since a single CSV cell can't represent a list); a single object becomes one row; any
-// other JSON becomes a single "value" column.
-function convertJsonToCsv(json: unknown): string {
-	let rows: Record<string, unknown>[];
-	if (Array.isArray(json)) {
-		rows = json.map((item) =>
-			item !== null && typeof item === 'object' && !Array.isArray(item)
-				? flattenObject(item as Record<string, unknown>)
-				: { value: item },
-		);
-	} else if (json !== null && typeof json === 'object') {
-		rows = [flattenObject(json as Record<string, unknown>)];
-	} else {
-		rows = [{ value: json }];
-	}
-
-	const headers: string[] = [];
-	for (const row of rows) {
-		for (const key of Object.keys(row)) {
-			if (!headers.includes(key)) headers.push(key);
-		}
-	}
-	if (headers.length === 0) return '';
-
-	const lines = [headers.map(csvCell).join(',')];
-	for (const row of rows) lines.push(headers.map((h) => csvCell(row[h])).join(','));
-	return lines.join('\n');
-}
-
-const CONVERTERS: Record<ExportFormat, (json: unknown) => string> = {
-	xml: convertJsonToXml,
-	yaml: convertJsonToYaml,
-	csv: convertJsonToCsv,
+const CONVERTERS: Record<ExportFormat, (json: unknown) => { text: string; collisions: string[] }> = {
+	xml: (json) => ({ text: convertJsonToXml(json), collisions: [] }),
+	yaml: (json) => ({ text: convertJsonToYaml(json), collisions: [] }),
+	csv: convertJsonToCsvDetailed,
 };
 
 const EXPORT_MIME: Record<ExportFormat, string> = {
@@ -216,61 +83,6 @@ const EXPORT_MIME: Record<ExportFormat, string> = {
 	yaml: 'application/x-yaml',
 	csv: 'text/csv',
 };
-
-interface DiffEntry {
-	path: string;
-	type: 'added' | 'removed' | 'changed';
-	leftValue?: unknown;
-	rightValue?: unknown;
-}
-
-function valuesEqual(a: unknown, b: unknown): boolean {
-	if (a === b) return true;
-	// Cheap deep-equality: fine here since diffJson already recurses into every
-	// object/array itself — this only ever runs on values BOTH sides agree are
-	// primitives (or one/both aren't objects), never on a full nested tree.
-	return JSON.stringify(a) === JSON.stringify(b);
-}
-
-// Structural diff between two parsed JSON values — walks both trees in
-// parallel, reporting one entry per key/index that was added, removed, or
-// whose value changed. Deliberately not a full LCS-style array diff (no
-// reordering detection): index-by-index comparison is what every "compare
-// two JSON" tool actually shows, since JSON arrays are rarely reordered
-// on purpose the way text lines are.
-function diffJson(a: unknown, b: unknown, path = '$'): DiffEntry[] {
-	if (valuesEqual(a, b)) return [];
-	const aIsObj = a !== null && typeof a === 'object';
-	const bIsObj = b !== null && typeof b === 'object';
-	if (!aIsObj || !bIsObj) return [{ path, type: 'changed', leftValue: a, rightValue: b }];
-
-	const aIsArr = Array.isArray(a);
-	const bIsArr = Array.isArray(b);
-	if (aIsArr !== bIsArr) return [{ path, type: 'changed', leftValue: a, rightValue: b }];
-
-	const entries: DiffEntry[] = [];
-	if (aIsArr) {
-		const aArr = a as unknown[];
-		const bArr = b as unknown[];
-		const maxLen = Math.max(aArr.length, bArr.length);
-		for (let i = 0; i < maxLen; i++) {
-			const childPath = `${path}[${i}]`;
-			if (i >= aArr.length) entries.push({ path: childPath, type: 'added', rightValue: bArr[i] });
-			else if (i >= bArr.length) entries.push({ path: childPath, type: 'removed', leftValue: aArr[i] });
-			else entries.push(...diffJson(aArr[i], bArr[i], childPath));
-		}
-	} else {
-		const aObj = a as Record<string, unknown>;
-		const bObj = b as Record<string, unknown>;
-		for (const key of new Set([...Object.keys(aObj), ...Object.keys(bObj)])) {
-			const childPath = `${path}.${key}`;
-			if (!(key in aObj)) entries.push({ path: childPath, type: 'added', rightValue: bObj[key] });
-			else if (!(key in bObj)) entries.push({ path: childPath, type: 'removed', leftValue: aObj[key] });
-			else entries.push(...diffJson(aObj[key], bObj[key], childPath));
-		}
-	}
-	return entries;
-}
 
 function diffValueLabel(value: unknown): string {
 	if (value === undefined) return '—';
@@ -292,7 +104,13 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 	const [exportFormat, setExportFormat] = useState<ExportFormat | null>(null);
 	const [exportResult, setExportResult] = useState<string | null>(null);
 	const [exportError, setExportError] = useState<string | null>(null);
-	const [copied, setCopied] = useState(false);
+	const { copied, failed: copyFailed, copy } = useCopyToClipboard();
+	const [exportWarnings, setExportWarnings] = useState<JsonTextWarnings & { collisions: string[] }>({
+		unsafeNumbers: false,
+		duplicateKeys: false,
+		collisions: [],
+	});
+	const [compareWarnings, setCompareWarnings] = useState<JsonTextWarnings | null>(null);
 	const [validationStatus, setValidationStatus] = useState<'valid' | 'invalid' | null>(null);
 	const [showCompare, setShowCompare] = useState(false);
 	const [compareInput, setCompareInput] = useState('');
@@ -390,12 +208,15 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 			setExportError(messages.exportInvalidJson);
 			return;
 		}
-		setExportResult(CONVERTERS[format](json));
+		const converted = CONVERTERS[format](json);
+		setExportWarnings({ ...analyzeJsonText(editorRef.current.getText()), collisions: converted.collisions });
+		setExportResult(converted.text);
 	};
 
 	const handleCompare = () => {
 		setCompareError(null);
 		setDiffResult(null);
+		setCompareWarnings(null);
 		if (!editorRef.current) return;
 		let leftJson: unknown;
 		try {
@@ -411,15 +232,18 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 			setCompareError(messages.compareInvalidRight);
 			return;
 		}
+		const left = analyzeJsonText(editorRef.current.getText());
+		const right = analyzeJsonText(compareInput);
+		setCompareWarnings({
+			unsafeNumbers: left.unsafeNumbers || right.unsafeNumbers,
+			duplicateKeys: left.duplicateKeys || right.duplicateKeys,
+		});
 		setDiffResult(diffJson(leftJson, rightJson));
 	};
 
 	const handleCopy = () => {
 		if (exportResult === null) return;
-		void navigator.clipboard.writeText(exportResult).then(() => {
-			setCopied(true);
-			setTimeout(() => setCopied(false), 1500);
-		});
+		void copy(exportResult);
 	};
 
 	const handleDownload = () => {
@@ -484,14 +308,23 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 				{exportError && <p role="alert" className="text-sm text-destructive">{exportError}</p>}
 
 				{exportResult !== null && exportFormat && (
-					<div className="flex flex-col gap-2">
-						<div className="flex items-center justify-between">
-							<span className="text-xs uppercase text-muted-foreground">{exportFormat}</span>
+											<div className="flex flex-col gap-2">
+							{(exportWarnings.unsafeNumbers || exportWarnings.duplicateKeys || exportWarnings.collisions.length > 0) && (
+								<ul role="status" className="list-disc rounded-md border border-amber-500/40 bg-amber-500/10 p-2 pl-6 text-xs text-amber-800 dark:text-amber-300">
+									{exportWarnings.unsafeNumbers && <li>{messages.warnUnsafeNumbers}</li>}
+									{exportWarnings.duplicateKeys && <li>{messages.warnDuplicateKeys}</li>}
+									{exportWarnings.collisions.length > 0 && (
+										<li>{messages.warnCsvCollisions.replace('{{keys}}', exportWarnings.collisions.slice(0, 5).join(', '))}</li>
+									)}
+								</ul>
+							)}
+							<div className="flex items-center justify-between">
+								<span className="text-xs uppercase text-muted-foreground">{exportFormat}</span>
 							<div className="flex gap-2">
-								<Button type="button" size="sm" variant="ghost" aria-live="polite" onClick={handleCopy}>
-									{copied ? messages.copied : messages.copy}
+								<Button type="button" size="sm" variant="ghost" aria-live="polite" aria-label={messages.copyExportAria.replace('{{format}}', exportFormat.toUpperCase())} onClick={handleCopy}>
+									{copied ? messages.copied : copyFailed ? messages.copyFailed : messages.copy}
 								</Button>
-								<Button type="button" size="sm" variant="ghost" onClick={handleDownload}>
+								<Button type="button" size="sm" variant="ghost" aria-label={messages.downloadExportAria.replace('{{format}}', exportFormat.toUpperCase())} onClick={handleDownload}>
 									{messages.download}
 								</Button>
 							</div>
@@ -535,7 +368,13 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 							</Button>
 						</div>
 						{compareError && <p role="alert" className="text-sm text-destructive">{compareError}</p>}
-						{diffResult && diffResult.length === 0 && (
+													{diffResult && compareWarnings && (compareWarnings.unsafeNumbers || compareWarnings.duplicateKeys) && (
+								<ul role="status" className="list-disc rounded-md border border-amber-500/40 bg-amber-500/10 p-2 pl-6 text-xs text-amber-800 dark:text-amber-300">
+									{compareWarnings.unsafeNumbers && <li>{messages.warnUnsafeNumbers}</li>}
+									{compareWarnings.duplicateKeys && <li>{messages.warnDuplicateKeys}</li>}
+								</ul>
+							)}
+							{diffResult && diffResult.length === 0 && (
 							<p role="status" className="text-sm text-primary">{messages.compareIdentical}</p>
 						)}
 						{diffResult && diffResult.length > 0 && (

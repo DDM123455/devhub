@@ -31,7 +31,9 @@
       "text": "Text",
       "dev": "Dev Tools",
       "media": "Media"
-    }
+    },
+    "mainNav": "Main navigation",
+    "language": "Language"
   },
   "footer": {
     "copyright": "© {{year}} Web Tool Hub",

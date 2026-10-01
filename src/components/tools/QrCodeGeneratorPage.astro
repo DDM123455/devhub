@@ -1,4 +1,5 @@
 ---
+import { jsonLd } from '@/lib/json-ld';
 import Layout from '../../layouts/Layout.astro';
 import FaqSection from '@/components/layout/FaqSection.astro';
 import QrCodeGenerator from './QrCodeGenerator';
@@ -86,6 +87,27 @@ const messages = {
 	frameTextLabel: t('ui.frameTextLabel'),
 	frameTextPlaceholder: t('ui.frameTextPlaceholder'),
 	frameNotice: t('ui.frameNotice'),
+	emptyState: t('ui.emptyState'),
+	downloadDisabledEmpty: t('ui.downloadDisabledEmpty'),
+	urlAutoHttps: t('ui.urlAutoHttps'),
+	contrastInverted: t('ui.contrastInverted'),
+	contrastLow: t('ui.contrastLow'),
+	logoRaisedLevel: t('ui.logoRaisedLevel'),
+	logoRestoredLevel: t('ui.logoRestoredLevel'),
+	logoLoadError: t('ui.logoLoadError'),
+	logoSelected: t('ui.logoSelected'),
+	logoPreviewAlt: t('ui.logoPreviewAlt'),
+	errorRender: t('ui.errorRender'),
+	errorCanvasSmall: t('ui.errorCanvasSmall'),
+	downloadError: t('ui.downloadError'),
+	batchSummary: t('ui.batchSummary'),
+	batchFailedHeading: t('ui.batchFailedHeading'),
+	batchFailedLine: t('ui.batchFailedLine'),
+	batchNoneSucceeded: t('ui.batchNoneSucceeded'),
+	batchTruncated: t('ui.batchTruncated'),
+	batchCancel: t('ui.batchCancel'),
+	batchCancelled: t('ui.batchCancelled'),
+	qrAriaLabel: t('ui.qrAriaLabel'),
 };
 
 const faqItems = [
@@ -111,7 +133,7 @@ const schema = {
 ---
 
 <Layout title={t('meta.title')} description={t('meta.description')} lang={lang} ogImage={`/og/${tool.category}.png`}>
-	<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+	<script type="application/ld+json" set:html={jsonLd(schema)} />
 	<section class="px-4 py-10">
 		<h1 class="text-heading-1 text-foreground">{t('heading')}</h1>
 		<p class="mt-2 text-muted-foreground">{t('tagline')}</p>

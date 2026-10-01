@@ -32,7 +32,17 @@
     "copied": "Đã sao chép!",
     "downloadMd": "Tải file .md",
     "downloadHtml": "Tải file .html",
-    "wordCount": "{{words}} từ · {{chars}} ký tự"
+    "wordCount": "{{words}} từ · {{chars}} ký tự",
+    "exportTitle": "Bản xuất Markdown",
+    "previewAria": "Bản xem trước đã render",
+    "largeInputWarning": "Tài liệu này rất lớn nên bản xem trước trực tiếp được tắt để trang không bị chậm. Bạn vẫn có thể chỉnh sửa, sao chép và tải xuống.",
+    "remoteImagesNote": "Lưu ý: ảnh tải từ website khác bị chính sách bảo mật (CSP) của trang chặn nên sẽ không hiện trong bản xem trước — hãy dùng data: URI hoặc tệp cục bộ.",
+    "replacedNotice": "Đã thay nội dung.",
+    "undo": "Hoàn tác",
+    "draftSaved": "Đã lưu bản nháp trong trình duyệt này.",
+    "draftSaveFailed": "Không lưu được bản nháp trong trình duyệt này (bộ nhớ đầy hoặc bị chặn).",
+    "copyFailed": "Sao chép thất bại",
+    "fileReadError": "Không đọc được tệp này."
   },
   "related": "Công cụ liên quan",
   "faq": {
@@ -42,7 +52,9 @@
     "q2": "Đóng nhầm tab có mất nội dung đang soạn không?",
     "a2": "Không — bản nháp được tự động lưu vào bộ nhớ cục bộ của trình duyệt và khôi phục lại lần sau mở công cụ.",
     "q3": "Có thể xuất ra HTML, không chỉ Markdown không?",
-    "a3": "Có — tải về file .md gốc hoặc file .html độc lập chứa nội dung đã render."
+    "a3": "Có — tải về file .md gốc hoặc file .html độc lập chứa nội dung đã render.",
+    "q4": "Ảnh từ website khác có hiện trong bản xem trước không?",
+    "a4": "Không — Chính sách bảo mật nội dung (CSP) của trang chặn ảnh tải từ tên miền khác để bảo vệ quyền riêng tư của bạn, nên ảnh từ xa sẽ không hiện trong bản xem trước. Hãy dùng data: URI hoặc cách nhúng ảnh khác; Markdown bạn xuất ra vẫn giữ nguyên liên kết gốc."
   },
   "article": {
     "heading": "Soạn thảo Markdown với xem trước trực tiếp mà không cần server",

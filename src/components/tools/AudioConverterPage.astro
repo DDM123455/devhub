@@ -1,4 +1,5 @@
 ---
+import { jsonLd } from '@/lib/json-ld';
 import Layout from '../../layouts/Layout.astro';
 import FaqSection from '@/components/layout/FaqSection.astro';
 import AudioConverter from './AudioConverter';
@@ -37,6 +38,9 @@ const messages = {
 	decodeError: t('ui.decodeError'),
 	encodeError: t('ui.encodeError'),
 	channelDownmixWarning: t('ui.channelDownmixWarning'),
+	resampleError: t('ui.resampleError'),
+	bitrateAdjusted: t('ui.bitrateAdjusted'),
+	sampleRateAdjusted: t('ui.sampleRateAdjusted'),
 	resampleToggleLabel: t('ui.resampleToggleLabel'),
 	sampleRateLabel: t('ui.sampleRateLabel'),
 	normalizeToggleLabel: t('ui.normalizeToggleLabel'),
@@ -67,7 +71,7 @@ const schema = {
 ---
 
 <Layout title={t('meta.title')} description={t('meta.description')} lang={lang} ogImage={`/og/${tool.category}.png`}>
-	<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+	<script type="application/ld+json" set:html={jsonLd(schema)} />
 	<section class="px-4 py-10">
 		<h1 class="text-heading-1 text-foreground">{t('heading')}</h1>
 		<p class="mt-2 text-muted-foreground">{t('tagline')}</p>

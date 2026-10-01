@@ -17,7 +17,11 @@
     },
     {
       "heading": "Lưu trữ cục bộ (local storage)",
-      "body": "Một vài công cụ lưu lại vài mẩu trạng thái nhỏ trực tiếp trong local storage của trình duyệt — ví dụ: giao diện sáng/tối bạn chọn lần cuối, bản nháp Markdown bạn đang soạn, hay lịch sử pattern regex. Dữ liệu này chỉ lưu trên thiết bị của bạn, không bao giờ được gửi cho chúng tôi, và bạn có thể xóa bất cứ lúc nào bằng cách xóa dữ liệu trang web của tên miền này trong trình duyệt."
+      "body": "Một số công cụ lưu trạng thái nhỏ trong local storage của trình duyệt để bạn không mất dữ liệu: lựa chọn giao diện (theme), bản nháp Text Diff (text-diff-draft), bản nháp Markdown Editor (markdown-editor-draft), lịch sử biểu thức của Regex Tester (regex-tester-history) và bảng màu đã lưu của Color Picker (color-picker-saved-palettes). Dữ liệu này chỉ nằm trên thiết bị của bạn, không bao giờ gửi cho chúng tôi, và bạn có thể xoá bất cứ lúc nào bằng cách xoá dữ liệu trang web này trong trình duyệt."
+    },
+    {
+      "heading": "Tài nguyên tải từ CDN bên thứ ba",
+      "body": "Tệp của bạn không bao giờ được tải lên, nhưng một số công cụ tải mã hoặc dữ liệu của chính công cụ (không phải nội dung của bạn) khi sử dụng: Cắt video và Chuyển đổi âm thanh tải lõi WebAssembly của ffmpeg từ cdn.jsdelivr.net; Xoá nền tải mô hình AI và runtime WebAssembly từ staticimgly.com; Kubernetes YAML Validator tải các tệp JSON Schema công khai của Kubernetes từ cdn.jsdelivr.net. Đây chỉ là các yêu cầu tải tệp công khai, nên nhà cung cấp CDN có thể thấy địa chỉ IP và tệp được yêu cầu như mọi tài nguyên website khác. Phần xem trước Markdown cũng có thể hiển thị ảnh được tham chiếu trong văn bản; nếu bạn dẫn tới ảnh ở máy chủ ngoài, trình duyệt sẽ yêu cầu ảnh từ máy chủ đó (chính sách bảo mật nội dung của trang thường chặn việc này)."
     },
     {
       "heading": "Hosting và log kỹ thuật",

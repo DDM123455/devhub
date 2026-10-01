@@ -1,4 +1,5 @@
 ---
+import { jsonLd } from '@/lib/json-ld';
 interface FaqItem {
 	question: string;
 	answer: string;
@@ -44,7 +45,7 @@ const schema = {
 		}
 	</div>
 </section>
-<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+<script type="application/ld+json" set:html={jsonLd(schema)} />
 <style>
 	/* Browsers hide every non-`summary` child of a closed `<details>` via a
 	   UA-stylesheet `details:not([open]) > :not(summary) { display: none }`

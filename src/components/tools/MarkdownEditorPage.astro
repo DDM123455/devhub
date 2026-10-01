@@ -1,4 +1,5 @@
 ---
+import { jsonLd } from '@/lib/json-ld';
 import Layout from '../../layouts/Layout.astro';
 import FaqSection from '@/components/layout/FaqSection.astro';
 import MarkdownEditor from './MarkdownEditor';
@@ -45,12 +46,23 @@ const messages = {
 	downloadMd: t('ui.downloadMd'),
 	downloadHtml: t('ui.downloadHtml'),
 	wordCount: t('ui.wordCount'),
+	exportTitle: t('ui.exportTitle'),
+	previewAria: t('ui.previewAria'),
+	largeInputWarning: t('ui.largeInputWarning'),
+	remoteImagesNote: t('ui.remoteImagesNote'),
+	replacedNotice: t('ui.replacedNotice'),
+	undo: t('ui.undo'),
+	draftSaved: t('ui.draftSaved'),
+	draftSaveFailed: t('ui.draftSaveFailed'),
+	copyFailed: t('ui.copyFailed'),
+	fileReadError: t('ui.fileReadError'),
 };
 
 const faqItems = [
 	{ question: t('faq.q1'), answer: t('faq.a1') },
 	{ question: t('faq.q2'), answer: t('faq.a2') },
 	{ question: t('faq.q3'), answer: t('faq.a3') },
+	{ question: t('faq.q4'), answer: t('faq.a4') },
 ];
 
 const schema = {
@@ -70,17 +82,17 @@ const schema = {
 ---
 
 <Layout title={t('meta.title')} description={t('meta.description')} lang={lang} ogImage={`/og/${tool.category}.png`}>
-	<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+	<script type="application/ld+json" set:html={jsonLd(schema)} />
 	<section class="px-4 py-10">
 		<h1 class="text-heading-1 text-foreground">{t('heading')}</h1>
 		<p class="mt-2 text-muted-foreground">{t('tagline')}</p>
 		<div class="mt-6">
-			<MarkdownEditor client:load messages={messages} />
+			<MarkdownEditor client:load messages={messages} lang={lang} />
 		</div>
 	</section>
 	<section class="border-t border-border px-4 py-10">
 		<h2 class="text-heading-2 text-foreground">{t('article.heading')}</h2>
-		<div class="mt-4 flex max-w-3xl flex-col gap-4 mx-auto text-muted-foreground">
+		<div class="mt-4 flex max-w-3xl flex-col gap-4 mx-auto [overflow-wrap:anywhere] text-muted-foreground">
 			<p>{t('article.p1')}</p>
 			<p>{t('article.p2')}</p>
 			<p>{t('article.p3')}</p>

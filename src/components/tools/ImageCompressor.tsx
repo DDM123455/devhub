@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { BeforeAfterSlider } from '@/components/ui/before-after-slider';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ImageOff } from 'lucide-react';
+import { baseNameOf, computeReduction, dedupeName } from '@/lib/file-utils';
 
 interface Messages {
 	selectFiles: string;
@@ -18,6 +19,7 @@ interface Messages {
 	original: string;
 	compressed: string;
 	reduced: string;
+	notReduced: string;
 	noFiles: string;
 	errorGeneric: string;
 	remove: string;
@@ -51,6 +53,8 @@ interface ImageItem {
 	compressedBlob?: Blob;
 	compressedPreviewUrl?: string;
 	compressedSize?: number;
+	// Tên file tải về, chốt lúc nén xong (không phụ thuộc cài đặt format hiện tại).
+	downloadName?: string;
 	// Drag position (0-100) of the before/after compare slider — only set once
 	// a compressed result exists to compare against.
 	comparePosition?: number;
@@ -83,6 +87,23 @@ const EXTENSION_BY_FORMAT: Record<Exclude<TargetFormat, 'original'>, string> = {
 
 class AvifUnsupportedError extends Error {}
 
+// Chỉ nhận đúng các định dạng mà input[accept] quảng cáo (kéo-thả không được lọt GIF/SVG/BMP...).
+const ACCEPTED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+interface CompressSettings {
+	compressMode: CompressMode;
+	quality: number;
+	targetSizeKb: number;
+	resizeEnabled: boolean;
+	maxDimension: number;
+	targetFormat: TargetFormat;
+}
+
+function buildDownloadName(file: File, targetFormat: TargetFormat): string {
+	if (targetFormat === 'original') return 'compressed-' + file.name;
+	return 'compressed-' + baseNameOf(file.name, 'image') + '.' + EXTENSION_BY_FORMAT[targetFormat];
+}
+
 function formatBytes(bytes: number): string {
 	if (bytes < 1024) return `${bytes} B`;
 	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -101,6 +122,8 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 	const [isZipping, setIsZipping] = useState(false);
 	const [skippedCount, setSkippedCount] = useState(0);
 	const objectUrls = useRef<Set<string>>(new Set());
+	const itemsRef = useRef<ImageItem[]>([]);
+	itemsRef.current = items;
 
 	// Every object URL created for a preview (original or compressed) is tracked
 	// here and revoked on unmount, since nothing else in this component's
@@ -116,10 +139,18 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 		return url;
 	};
 
+	const revokeItemUrls = (item: ImageItem) => {
+		for (const url of [item.previewUrl, item.compressedPreviewUrl]) {
+			if (!url) continue;
+			URL.revokeObjectURL(url);
+			objectUrls.current.delete(url);
+		}
+	};
+
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList) return;
 		const allFiles = Array.from(fileList);
-		const imageFiles = allFiles.filter((file) => file.type.startsWith('image/'));
+		const imageFiles = allFiles.filter((file) => ACCEPTED_TYPES.has(file.type));
 		setSkippedCount(allFiles.length - imageFiles.length);
 		const newItems: ImageItem[] = imageFiles.map((file) => ({
 			id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
@@ -133,17 +164,31 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 	const handleRemove = useCallback((id: string) => {
 		setItems((prev) => prev.map((item) => (item.id === id ? { ...item, removing: true } : item)));
 		setTimeout(() => {
+			const removed = itemsRef.current.find((item) => item.id === id);
+			if (removed) revokeItemUrls(removed);
 			setItems((prev) => prev.filter((item) => item.id !== id));
 		}, REMOVE_ANIMATION_MS);
 	}, []);
 
 	const handleClearAll = useCallback(() => {
+		for (const item of itemsRef.current) revokeItemUrls(item);
 		setItems([]);
 		setSkippedCount(0);
 	}, []);
 
+	const settingsRef = useRef<CompressSettings>({
+		compressMode,
+		quality,
+		targetSizeKb,
+		resizeEnabled,
+		maxDimension,
+		targetFormat,
+	});
+	settingsRef.current = { compressMode, quality, targetSizeKb, resizeEnabled, maxDimension, targetFormat };
+
 	const compressOne = useCallback(
-		async (item: ImageItem) => {
+		async (item: ImageItem, settings: CompressSettings) => {
+			const { compressMode, quality, targetSizeKb, resizeEnabled, maxDimension, targetFormat } = settings;
 			setItems((prev) =>
 				prev.map((it) => (it.id === item.id ? { ...it, status: 'processing', progress: 0 } : it)),
 			);
@@ -186,6 +231,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 									compressedBlob,
 									compressedPreviewUrl: trackUrl(URL.createObjectURL(compressedBlob)),
 									compressedSize: compressedBlob.size,
+									downloadName: buildDownloadName(item.file, targetFormat),
 									comparePosition: 50,
 								}
 							: it,
@@ -198,34 +244,40 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 				);
 			}
 		},
-		[compressMode, quality, targetSizeKb, resizeEnabled, maxDimension, targetFormat, messages.errorAvifUnsupported, messages.errorGeneric],
+		[messages.errorAvifUnsupported, messages.errorGeneric],
+	);
+
+	// Chạy một hàng đợi item với đúng bộ cài đặt tại thời điểm bấm (snapshot), không bị ảnh hưởng nếu
+	// người dùng đổi setting trong lúc đang nén.
+	const runQueue = useCallback(
+		async (queue: ImageItem[]) => {
+			if (queue.length === 0) return;
+			const settings = settingsRef.current;
+			setIsProcessing(true);
+			try {
+				// Worker-pool pattern: a fixed number of "lanes" each pull the next
+				// pending item off the shared queue as soon as they finish their
+				// current one, instead of waiting for the whole batch to finish
+				// before starting the next `CONCURRENCY` items.
+				let cursor = 0;
+				const runLane = async (): Promise<void> => {
+					const index = cursor++;
+					if (index >= queue.length) return;
+					await compressOne(queue[index], settings);
+					return runLane();
+				};
+				await Promise.all(Array.from({ length: Math.min(CONCURRENCY, queue.length) }, runLane));
+			} finally {
+				setIsProcessing(false);
+			}
+		},
+		[compressOne],
 	);
 
 	const handleCompress = useCallback(async () => {
-		setIsProcessing(true);
-		// Worker-pool pattern: a fixed number of "lanes" each pull the next
-		// pending item off the shared queue as soon as they finish their
-		// current one, instead of waiting for the whole batch to finish
-		// before starting the next `CONCURRENCY` items.
-		let cursor = 0;
-		const runLane = async (): Promise<void> => {
-			const index = cursor++;
-			if (index >= items.length) return;
-			await compressOne(items[index]);
-			return runLane();
-		};
-		await Promise.all(Array.from({ length: Math.min(CONCURRENCY, items.length) }, runLane));
-		setIsProcessing(false);
-	}, [items, compressOne]);
-
-	const compressedFileName = useCallback(
-		(file: File) => {
-			if (targetFormat === 'original') return `compressed-${file.name}`;
-			const base = file.name.replace(/\.[^./\\]+$/, '');
-			return `compressed-${base}.${EXTENSION_BY_FORMAT[targetFormat]}`;
-		},
-		[targetFormat],
-	);
+		// Chỉ nén item đang chờ hoặc lỗi; item đã xong giữ nguyên kết quả.
+		await runQueue(items.filter((item) => (item.status === 'pending' || item.status === 'error') && !item.removing));
+	}, [items, runQueue]);
 
 	const handleDownload = useCallback(
 		(item: ImageItem) => {
@@ -233,11 +285,11 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 			const url = URL.createObjectURL(item.compressedBlob);
 			const link = document.createElement('a');
 			link.href = url;
-			link.download = compressedFileName(item.file);
+			link.download = item.downloadName ?? buildDownloadName(item.file, 'original');
 			link.click();
 			URL.revokeObjectURL(url);
 		},
-		[compressedFileName],
+		[],
 	);
 
 	const handleDownloadAll = useCallback(async () => {
@@ -246,8 +298,10 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 		setIsZipping(true);
 		try {
 			const zip = new JSZip();
+			const usedNames = new Set<string>();
 			for (const item of doneItems) {
-				zip.file(compressedFileName(item.file), item.compressedBlob!);
+				const name = dedupeName(item.downloadName ?? buildDownloadName(item.file, 'original'), usedNames);
+				zip.file(name, item.compressedBlob!);
 			}
 			const zipBlob = await zip.generateAsync({ type: 'blob' });
 			const url = URL.createObjectURL(zipBlob);
@@ -259,7 +313,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 		} finally {
 			setIsZipping(false);
 		}
-	}, [items, compressedFileName]);
+	}, [items]);
 
 	// A previously compressed/failed result no longer reflects the current
 	// settings once mode/quality/target size/resize/format change — leaving it
@@ -293,7 +347,8 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 		);
 	}, [settingsSignature]);
 
-	const canCompress = !isProcessing && items.length > 0;
+	const canCompress =
+		!isProcessing && items.some((item) => (item.status === 'pending' || item.status === 'error') && !item.removing);
 	const doneCount = items.filter((item) => item.status === 'done').length;
 	// Aggregate progress across the whole batch: finished/errored items count as
 	// a full 100 units, an in-flight item contributes its own real 0-100 value —
@@ -326,20 +381,20 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 					handleFiles(event.dataTransfer.files);
 				}}
 			>
-				<label
-					htmlFor="image-compressor-input"
-					className="inline-flex min-h-11 cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80 sm:min-h-0"
-				>
+				<label className="inline-flex min-h-11 cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80 focus-within:ring-3 focus-within:ring-ring/50 sm:min-h-0">
 					{messages.selectFiles}
+					<input
+						id="image-compressor-input"
+						type="file"
+						accept="image/jpeg,image/png,image/webp"
+						multiple
+						className="sr-only"
+						onChange={(event) => {
+							handleFiles(event.target.files);
+							event.target.value = '';
+						}}
+					/>
 				</label>
-				<input
-					id="image-compressor-input"
-					type="file"
-					accept="image/jpeg,image/png,image/webp"
-					multiple
-					className="hidden"
-					onChange={(event) => handleFiles(event.target.files)}
-				/>
 				<p className="text-xs text-muted-foreground">{messages.dropHint}</p>
 			</div>
 
@@ -355,6 +410,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 						type="radio"
 						name="image-compressor-mode"
 						checked={compressMode === 'quality'}
+						disabled={isProcessing}
 						onChange={() => setCompressMode('quality')}
 					/>
 					{messages.compressModeQuality}
@@ -364,6 +420,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 						type="radio"
 						name="image-compressor-mode"
 						checked={compressMode === 'targetSize'}
+						disabled={isProcessing}
 						onChange={() => setCompressMode('targetSize')}
 					/>
 					{messages.compressModeTargetSize}
@@ -382,6 +439,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 						max={1}
 						step={0.05}
 						value={quality}
+						disabled={isProcessing}
 						onChange={(event) => setQuality(Number(event.target.value))}
 						className="w-full sm:w-48"
 					/>
@@ -398,6 +456,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 						max={MAX_TARGET_SIZE_KB}
 						step={10}
 						value={targetSizeKb}
+						disabled={isProcessing}
 						onChange={(event) => setTargetSizeKb(Number(event.target.value))}
 						className="w-full sm:w-48"
 					/>
@@ -409,6 +468,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 					<input
 						type="checkbox"
 						checked={resizeEnabled}
+						disabled={isProcessing}
 						onChange={(event) => setResizeEnabled(event.target.checked)}
 					/>
 					{messages.resizeToggleLabel}
@@ -425,6 +485,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 							max={MAX_MAX_DIMENSION}
 							step={32}
 							value={maxDimension}
+							disabled={isProcessing}
 							onChange={(event) => setMaxDimension(Number(event.target.value))}
 							className="w-full sm:w-48"
 						/>
@@ -439,6 +500,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 				<select
 					id="image-compressor-target-format"
 					value={targetFormat}
+					disabled={isProcessing}
 					onChange={(event) => setTargetFormat(event.target.value as TargetFormat)}
 					className="min-h-11 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground sm:min-h-0"
 				>
@@ -508,10 +570,12 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 											<>
 												{' '}
 												→ {messages.compressed}: {formatBytes(item.compressedSize)} (
-												{messages.reduced.replace(
-													'{{percent}}',
-													String(Math.round((1 - item.compressedSize / item.file.size) * 100)),
-												)}
+												{item.compressedSize < item.file.size
+													? messages.reduced.replace(
+															'{{percent}}',
+															String(computeReduction(item.file.size, item.compressedSize).percent),
+														)
+													: messages.notReduced}
 												)
 											</>
 										)}
@@ -526,7 +590,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 									</Button>
 								)}
 								{item.status === 'error' && (
-									<Button type="button" size="sm" variant="outline" onClick={() => void compressOne(item)}>
+									<Button type="button" size="sm" variant="outline" onClick={() => void runQueue([item])} disabled={isProcessing}>
 										{messages.retry}
 									</Button>
 								)}
@@ -536,7 +600,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 									variant="ghost"
 									onClick={() => handleRemove(item.id)}
 									disabled={item.status === 'processing' || item.removing}
-									aria-label={messages.remove}
+									aria-label={`${messages.remove} ${item.file.name}`}
 								>
 									✕
 								</Button>

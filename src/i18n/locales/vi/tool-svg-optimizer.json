@@ -66,7 +66,22 @@
     "pluginSortDefsChildren": "Sắp xếp các phần tử con trong <defs>",
     "pluginRemoveDesc": "Xóa thẻ <desc> rỗng",
     "pluginRemoveViewBox": "Xóa viewBox (chỉ khi đã có width/height)",
-    "scriptTagWarning": "SVG đã tối ưu vẫn còn thẻ <script>. Đây là bình thường (SVGO không xoá script), nhưng sẽ là rủi ro XSS thật nếu bạn nhúng SVG này inline vào trang HTML."
+    "scriptTagWarning": "SVG đã tối ưu vẫn còn thẻ <script>. Đây là bình thường (SVGO không xoá script), nhưng sẽ là rủi ro XSS thật nếu bạn nhúng SVG này inline vào trang HTML.",
+    "optRemoveScripts": "Loại bỏ script và trình xử lý sự kiện (onclick, onload…)",
+    "risksFound": "Phát hiện nội dung có thể không an toàn: {{list}}. Đừng nhúng SVG này trực tiếp vào trang web nếu bạn không tin tưởng nó; hãy bật \"Loại bỏ script và trình xử lý sự kiện\" để gỡ chúng.",
+    "riskScript": "thẻ <script>",
+    "riskEventHandler": "thuộc tính xử lý sự kiện (on…=)",
+    "riskJavascriptUrl": "liên kết javascript:",
+    "riskForeignObject": "<foreignObject>",
+    "riskExternalUse": "<use> trỏ tới URL bên ngoài",
+    "riskExternalImage": "<image> tải URL bên ngoài",
+    "previewTitleOriginal": "Xem trước SVG gốc",
+    "previewTitleOptimized": "Xem trước SVG đã tối ưu",
+    "optimizing": "Đang tối ưu…",
+    "tooLargeError": "SVG này lớn hơn 5 MB, quá lớn để tối ưu an toàn trong trình duyệt.",
+    "largeWarning": "Đây là SVG lớn (trên 1 MB). Việc tối ưu có thể mất vài giây.",
+    "fileReadError": "Không đọc được tệp này.",
+    "copyFailed": "Sao chép thất bại"
   },
   "related": "Công cụ liên quan",
   "faq": {

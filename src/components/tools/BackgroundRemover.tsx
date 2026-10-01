@@ -3,6 +3,7 @@ import { removeBackground } from '@imgly/background-removal';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { BeforeAfterSlider } from '@/components/ui/before-after-slider';
+import { baseNameOf, dedupeName } from '@/lib/file-utils';
 
 interface Messages {
 	selectFiles: string;
@@ -24,6 +25,7 @@ interface Messages {
 	backgroundImageClear: string;
 	edgeSoftnessLabel: string;
 	removeItem: string;
+	retryItem: string;
 	clearAll: string;
 	skippedFiles: string;
 	overallProgress: string;
@@ -53,6 +55,8 @@ interface ImageItem {
 	resultBlob?: Blob;
 	displayUrl?: string;
 	comparePosition: number;
+	// Lý do kỹ thuật của lỗi (message gốc từ thư viện), hiện kèm thông báo i18n để dễ chẩn đoán.
+	errorDetail?: string;
 	progress?: number;
 	// @imgly/background-removal's progress callback reports two very different
 	// phases under the same 0-100 number: downloading the AI model/wasm runtime
@@ -63,6 +67,10 @@ interface ImageItem {
 	// avoids that.
 	stage?: 'loading-model' | 'processing';
 }
+
+// Chỉ nhận đúng các định dạng mà input[accept] liệt kê.
+const ACCEPTED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const DISPLAY_DEBOUNCE_MS = 200;
 
 const MIN_MAX_DIMENSION = 320;
 const MAX_MAX_DIMENSION = 4096;
@@ -317,6 +325,10 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 	const [skippedCount, setSkippedCount] = useState(0);
 	const [isZipping, setIsZipping] = useState(false);
 	const objectUrls = useRef<Set<string>>(new Set());
+	const itemsRef = useRef<ImageItem[]>([]);
+	itemsRef.current = items;
+	// Khoá chống chạy song song 2 vòng xử lý (effect auto-start + nút bấm).
+	const runningRef = useRef(false);
 
 	useEffect(() => {
 		return () => {
@@ -327,6 +339,12 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 	const trackUrl = (url: string) => {
 		objectUrls.current.add(url);
 		return url;
+	};
+
+	const untrackAndRevoke = (url: string | undefined) => {
+		if (!url) return;
+		URL.revokeObjectURL(url);
+		objectUrls.current.delete(url);
 	};
 
 	// Recompute every finished item's display image whenever the background
@@ -345,26 +363,42 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 				}
 			: undefined;
 		let cancelled = false;
-		(async () => {
-			for (const item of items) {
-				if (item.status !== 'done' || !item.resultBlob) continue;
-				const displayBlob = await buildDisplayBlob(
-					item.resultBlob,
-					edgeSoftness,
-					background,
-					trimTransparentEdges,
-					photoSize ? undefined : resizeEnabled ? maxDimension : undefined,
-					photoSize,
-				);
-				if (cancelled) return;
-				const displayUrl = trackUrl(URL.createObjectURL(displayBlob));
-				setItems((prev) =>
-					prev.map((it) => (it.id === item.id ? { ...it, displayUrl } : it)),
-				);
-			}
-		})();
+		// Debounce: kéo slider (độ mềm viền, DPI, vị trí...) bắn rất nhiều lần; chỉ dựng lại ảnh khi dừng tay.
+		const timer = window.setTimeout(() => {
+			void (async () => {
+				for (const snapshotItem of itemsRef.current) {
+					if (cancelled) return;
+					if (snapshotItem.status !== 'done' || !snapshotItem.resultBlob) continue;
+					try {
+						const displayBlob = await buildDisplayBlob(
+							snapshotItem.resultBlob,
+							edgeSoftness,
+							background,
+							// Preset ảnh thẻ tự cắt đúng tỉ lệ/kích thước nên bỏ qua trim để khung không bị lệch.
+							trimTransparentEdges && !photoSize,
+							photoSize ? undefined : resizeEnabled ? maxDimension : undefined,
+							photoSize,
+						);
+						if (cancelled) return;
+						// Item có thể đã bị xoá trong lúc dựng ảnh: không tạo URL mồ côi.
+						if (!itemsRef.current.some((it) => it.id === snapshotItem.id)) continue;
+						const displayUrl = trackUrl(URL.createObjectURL(displayBlob));
+						setItems((prev) =>
+							prev.map((it) => {
+								if (it.id !== snapshotItem.id) return it;
+								untrackAndRevoke(it.displayUrl);
+								return { ...it, displayUrl };
+							}),
+						);
+					} catch {
+						// Một item lỗi dựng ảnh không được làm hỏng các item còn lại; giữ displayUrl cũ.
+					}
+				}
+			})();
+		}, DISPLAY_DEBOUNCE_MS);
 		return () => {
 			cancelled = true;
+			window.clearTimeout(timer);
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
@@ -384,7 +418,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList) return;
 		const allFiles = Array.from(fileList);
-		const imageFiles = allFiles.filter((file) => file.type.startsWith('image/'));
+		const imageFiles = allFiles.filter((file) => ACCEPTED_TYPES.has(file.type));
 		setSkippedCount(allFiles.length - imageFiles.length);
 		const newItems: ImageItem[] = imageFiles.map((file) => ({
 			id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
@@ -397,10 +431,25 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 	}, []);
 
 	const handleRemoveItem = useCallback((id: string) => {
+		const removed = itemsRef.current.find((item) => item.id === id);
+		if (removed) {
+			untrackAndRevoke(removed.previewUrl);
+			untrackAndRevoke(removed.displayUrl);
+		}
 		setItems((prev) => prev.filter((item) => item.id !== id));
 	}, []);
 
+	const handleRetryItem = useCallback((id: string) => {
+		setItems((prev) =>
+			prev.map((it) => (it.id === id && it.status === 'error' ? { ...it, status: 'pending', errorDetail: undefined } : it)),
+		);
+	}, []);
+
 	const handleClearAll = useCallback(() => {
+		for (const item of itemsRef.current) {
+			untrackAndRevoke(item.previewUrl);
+			untrackAndRevoke(item.displayUrl);
+		}
 		setItems([]);
 		setSkippedCount(0);
 	}, []);
@@ -408,40 +457,62 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 	const handleBackgroundImageFile = useCallback((fileList: FileList | null) => {
 		const file = fileList?.[0];
 		if (!file) return;
-		setBackgroundImageUrl(trackUrl(URL.createObjectURL(file)));
+		setBackgroundImageUrl((previous) => {
+			untrackAndRevoke(previous ?? undefined);
+			return trackUrl(URL.createObjectURL(file));
+		});
 		setBackgroundMode('image');
 	}, []);
 
-	const handleRemove = useCallback(async () => {
+	// includeErrors=false (auto-start): chỉ xử lý item 'pending' — item lỗi KHÔNG bị thử lại mỗi lần thêm file.
+	// includeErrors=true (người dùng bấm nút chính): thử lại cả item lỗi.
+	const handleRemove = useCallback(async (includeErrors = false) => {
+		if (runningRef.current) return;
+		runningRef.current = true;
 		setIsProcessing(true);
-		for (const item of items) {
-			if (item.status === 'done') continue;
-			setItems((prev) =>
-				prev.map((it) => (it.id === item.id ? { ...it, status: 'processing', progress: 0 } : it)),
-			);
-			try {
-				const resultBlob = await removeBackground(item.file, {
-					output: { format: 'image/png' },
-					// `key` is namespaced by the library itself: "fetch:*" while
-					// downloading the model/wasm runtime, "compute:*" while actually
-					// running inference on this image — see note on `ImageItem.stage`.
-					progress: (key, current, total) => {
-						const percent = total > 0 ? Math.round((current / total) * 100) : 0;
-						const stage = key.startsWith('fetch:') ? 'loading-model' : 'processing';
-						setItems((prev) =>
-							prev.map((it) => (it.id === item.id ? { ...it, progress: percent, stage } : it)),
-						);
-					},
-				});
-				setItems((prev) =>
-					prev.map((it) => (it.id === item.id ? { ...it, status: 'done', resultBlob } : it)),
+		const attempted = new Set<string>();
+		try {
+			// Luôn đọc danh sách mới nhất: bỏ qua item đã bị xoá, và nhặt luôn item thêm vào giữa chừng.
+			for (;;) {
+				const item = itemsRef.current.find(
+					(it) => !attempted.has(it.id) && (it.status === 'pending' || (includeErrors && it.status === 'error')),
 				);
-			} catch {
-				setItems((prev) => prev.map((it) => (it.id === item.id ? { ...it, status: 'error' } : it)));
+				if (!item) break;
+				attempted.add(item.id);
+				setItems((prev) =>
+					prev.map((it) =>
+						it.id === item.id ? { ...it, status: 'processing', progress: 0, errorDetail: undefined } : it,
+					),
+				);
+				try {
+					const resultBlob = await removeBackground(item.file, {
+						output: { format: 'image/png' },
+						// `key` is namespaced by the library itself: "fetch:*" while
+						// downloading the model/wasm runtime, "compute:*" while actually
+						// running inference on this image — see note on `ImageItem.stage`.
+						progress: (key, current, total) => {
+							const percent = total > 0 ? Math.round((current / total) * 100) : 0;
+							const stage = key.startsWith('fetch:') ? 'loading-model' : 'processing';
+							setItems((prev) =>
+								prev.map((it) => (it.id === item.id ? { ...it, progress: percent, stage } : it)),
+							);
+						},
+					});
+					setItems((prev) =>
+						prev.map((it) => (it.id === item.id ? { ...it, status: 'done', resultBlob } : it)),
+					);
+				} catch (err) {
+					const errorDetail = err instanceof Error ? err.message : String(err);
+					setItems((prev) =>
+						prev.map((it) => (it.id === item.id ? { ...it, status: 'error', errorDetail } : it)),
+					);
+				}
 			}
+		} finally {
+			runningRef.current = false;
+			setIsProcessing(false);
 		}
-		setIsProcessing(false);
-	}, [items]);
+	}, []);
 
 	// Auto-starts removal as soon as file(s) are added — selecting a photo and then having
 	// to notice and click a *separate* "Remove Background" button read as "nothing
@@ -452,7 +523,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 	useEffect(() => {
 		if (isProcessing) return;
 		if (items.some((item) => item.status === 'pending')) {
-			void handleRemove();
+			void handleRemove(false);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [items, isProcessing]);
@@ -462,7 +533,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 		const url = item.displayUrl ?? URL.createObjectURL(item.resultBlob);
 		const link = document.createElement('a');
 		link.href = url;
-		link.download = `${item.file.name.replace(/\.[^./\\]+$/, '')}-no-bg.png`;
+		link.download = `${baseNameOf(item.file.name, 'image')}-no-bg.png`;
 		link.click();
 		if (!item.displayUrl) URL.revokeObjectURL(url);
 	}, []);
@@ -474,12 +545,13 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 		try {
 			const { default: JSZip } = await import('jszip');
 			const zip = new JSZip();
+			const usedNames = new Set<string>();
 			for (const item of doneItems) {
 				// Prefer the rendered display version (chosen background mode + edge
 				// softness applied) over the raw AI cutout, matching what the
 				// single-item Download button already does.
 				const blob = item.displayUrl ? await (await fetch(item.displayUrl)).blob() : item.resultBlob!;
-				zip.file(`${item.file.name.replace(/\.[^./\\]+$/, '')}-no-bg.png`, blob);
+				zip.file(dedupeName(`${baseNameOf(item.file.name, 'image')}-no-bg.png`, usedNames), blob);
 			}
 			const zipBlob = await zip.generateAsync({ type: 'blob' });
 			const url = URL.createObjectURL(zipBlob);
@@ -523,20 +595,20 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 					handleFiles(event.dataTransfer.files);
 				}}
 			>
-				<label
-					htmlFor="background-remover-input"
-					className="inline-flex cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80"
-				>
+				<label className="inline-flex min-h-11 cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80 focus-within:ring-3 focus-within:ring-ring/50 sm:min-h-0">
 					{messages.selectFiles}
+					<input
+						id="background-remover-input"
+						type="file"
+						accept="image/jpeg,image/png,image/webp"
+						multiple
+						className="sr-only"
+						onChange={(event) => {
+							handleFiles(event.target.files);
+							event.target.value = '';
+						}}
+					/>
 				</label>
-				<input
-					id="background-remover-input"
-					type="file"
-					accept="image/jpeg,image/png,image/webp"
-					multiple
-					className="hidden"
-					onChange={(event) => handleFiles(event.target.files)}
-				/>
 				<p className="text-xs text-muted-foreground">{messages.dropHint}</p>
 			</div>
 
@@ -566,14 +638,16 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 					<button
 						type="button"
 						onClick={() => setBackgroundMode('transparent')}
-						className={`rounded-md border px-2.5 py-1 text-xs font-medium ${backgroundMode === 'transparent' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
+						aria-pressed={backgroundMode === 'transparent'}
+						className={`min-h-11 rounded-md border px-2.5 py-1 text-xs sm:min-h-0 font-medium ${backgroundMode === 'transparent' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
 					>
 						{messages.backgroundTransparent}
 					</button>
 					<button
 						type="button"
 						onClick={() => setBackgroundMode('color')}
-						className={`rounded-md border px-2.5 py-1 text-xs font-medium ${backgroundMode === 'color' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
+						aria-pressed={backgroundMode === 'color'}
+						className={`min-h-11 rounded-md border px-2.5 py-1 text-xs sm:min-h-0 font-medium ${backgroundMode === 'color' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
 					>
 						{messages.backgroundColor}
 					</button>
@@ -581,30 +655,36 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 						<input
 							type="color"
 							value={backgroundColor}
+							aria-label={messages.backgroundColor}
 							onChange={(event) => setBackgroundColor(event.target.value)}
-							className="h-7 w-10 cursor-pointer rounded border border-border bg-background"
+							className="h-11 w-11 cursor-pointer sm:h-7 sm:w-10 rounded border border-border bg-background"
 						/>
 					)}
 					<label
-						htmlFor="background-image-input"
-						className={`cursor-pointer rounded-md border px-2.5 py-1 text-xs font-medium ${backgroundMode === 'image' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
+						className={`inline-flex min-h-11 cursor-pointer items-center rounded-md border px-2.5 py-1 text-xs font-medium focus-within:ring-3 focus-within:ring-ring/50 sm:min-h-0 ${backgroundMode === 'image' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
 					>
 						{backgroundImageUrl ? messages.backgroundImage : messages.backgroundImageSelect}
+						<input
+							id="background-image-input"
+							type="file"
+							accept="image/jpeg,image/png,image/webp"
+							className="sr-only"
+							onChange={(event) => {
+								handleBackgroundImageFile(event.target.files);
+								event.target.value = '';
+							}}
+						/>
 					</label>
-					<input
-						id="background-image-input"
-						type="file"
-						accept="image/jpeg,image/png,image/webp"
-						className="hidden"
-						onChange={(event) => handleBackgroundImageFile(event.target.files)}
-					/>
 					{backgroundImageUrl && (
 						<Button
 							type="button"
 							size="sm"
 							variant="outline"
 							onClick={() => {
-								setBackgroundImageUrl(null);
+								setBackgroundImageUrl((previous) => {
+									untrackAndRevoke(previous ?? undefined);
+									return null;
+								});
 								setBackgroundMode('transparent');
 							}}
 						>
@@ -629,7 +709,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 					/>
 				</div>
 
-				{backgroundMode === 'transparent' && (
+				{backgroundMode === 'transparent' && !activePhotoSizePreset && (
 					<label className="flex items-center gap-1.5 text-sm text-foreground">
 						<input
 							type="checkbox"
@@ -648,7 +728,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 						id="background-remover-photo-size"
 						value={photoSizePresetId}
 						onChange={(event) => setPhotoSizePresetId(event.target.value)}
-						className="w-fit rounded-md border border-border bg-background px-2.5 py-1.5 text-sm text-foreground"
+						className="w-fit max-w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-sm text-foreground"
 					>
 						<option value="none">{messages.photoSizeNone}</option>
 						{PHOTO_SIZE_PRESETS.map((preset) => (
@@ -771,7 +851,10 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 									</span>
 								)}
 								{item.status === 'error' && (
-									<span role="alert" className="text-destructive">{messages.errorGeneric}</span>
+									<span role="alert" className="text-destructive">
+										{messages.errorGeneric}
+										{item.errorDetail && <span className="block text-xs opacity-80">({item.errorDetail})</span>}
+									</span>
 								)}
 							</div>
 							<div className="flex shrink-0 items-center gap-2">
@@ -780,13 +863,18 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 										{messages.download}
 									</Button>
 								)}
+								{item.status === 'error' && (
+									<Button type="button" size="sm" variant="outline" onClick={() => handleRetryItem(item.id)}>
+										{messages.retryItem}
+									</Button>
+								)}
 								<Button
 									type="button"
 									size="sm"
 									variant="ghost"
 									onClick={() => handleRemoveItem(item.id)}
 									disabled={item.status === 'processing'}
-									aria-label={messages.removeItem}
+									aria-label={`${messages.removeItem} ${item.file.name}`}
 								>
 									✕
 								</Button>
@@ -797,7 +885,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 			)}
 
 			<div className="flex flex-wrap items-center gap-3">
-				<Button type="button" onClick={handleRemove} disabled={!canRemove}>
+				<Button type="button" onClick={() => void handleRemove(true)} disabled={!canRemove}>
 					{isProcessing
 						? (() => {
 								const active = items.find((item) => item.status === 'processing');

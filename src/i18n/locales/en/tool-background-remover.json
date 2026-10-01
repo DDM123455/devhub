@@ -41,7 +41,8 @@
     "photoSizePreset2x2in": "2×2 in (US passport/visa)",
     "dpiLabel": "Print quality: {{value}} DPI",
     "verticalPositionLabel": "Vertical position",
-    "outputSizeHint": "Output: {{width}}×{{height}}px — tip: pick a solid background color (e.g. white) for printing"
+    "outputSizeHint": "Output: {{width}}×{{height}}px — tip: pick a solid background color (e.g. white) for printing",
+    "retryItem": "Retry"
   },
   "related": "Related tools",
   "faq": {

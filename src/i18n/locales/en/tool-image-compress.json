@@ -31,7 +31,8 @@
     "compressModeTargetSize": "By target size",
     "targetSizeLabel": "Target size: {{size}} KB",
     "processingQueue": "Processing {{current}}/{{total}}",
-    "progressPercent": "{{percent}}%"
+    "progressPercent": "{{percent}}%",
+    "notReduced": "no size reduction"
   },
   "related": "Related tools",
   "faq": {

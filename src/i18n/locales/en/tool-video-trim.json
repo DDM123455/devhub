@@ -29,7 +29,9 @@
     "engineLoadError": "Couldn't load the video engine — check your connection and try again.",
     "trimError": "Trimming failed. Try a different start/end point, or switch to the other mode.",
     "metadataError": "This browser can't preview this video format directly, but it may still be trimmable — enter its total duration manually below.",
-    "manualDurationLabel": "Total duration (seconds)"
+    "manualDurationLabel": "Total duration (seconds)",
+    "notVideoError": "That file doesn't look like a video. Choose a video file (MP4, MOV, WebM, MKV...).",
+    "largeFileWarning": "This file is large ({{size}}). Trimming happens in your browser's memory and may fail or crash the tab above ~1 GB; try fast mode or a smaller file."
   },
   "related": "Related tools",
   "faq": {

@@ -3,6 +3,7 @@ import { PDFDocument, degrees } from 'pdf-lib';
 import { renderPdfThumbnails, type PdfPageThumbnail } from '@/lib/pdf-thumbnails';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { combineRotation, isPasswordError } from '@/lib/pdf-utils';
 
 interface Messages {
 	selectFiles: string;
@@ -74,22 +75,31 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 	// bytes) and there's no need for anything fancier than "go back one step".
 	// `canUndo` is a separate bit of state purely to make the Undo button's
 	// disabled state re-render — the ref itself doesn't trigger React updates.
-	const undoStackRef = useRef<PageItem[][]>([]);
+	//
+	// Mỗi snapshot nhớ thêm tập fileId đã có trang tại thời điểm chụp (known): khi Undo, trang của
+	// các file được thêm SAU snapshot (đọc xong bất đồng bộ) được giữ lại, không bị Undo làm mất.
+	const undoStackRef = useRef<{ pages: PageItem[]; known: Set<string> }[]>([]);
+	const knownFileIdsRef = useRef<Set<string>>(new Set());
 	const [canUndo, setCanUndo] = useState(false);
+	// Tăng mỗi khi danh sách trang đổi; handleMerge chỉ lưu kết quả nếu version không đổi trong lúc xử lý.
+	const versionRef = useRef(0);
+	const isProcessingRef = useRef(false);
 
 	const pushUndoSnapshot = useCallback((snapshot: PageItem[]) => {
-		undoStackRef.current.push(snapshot);
+		undoStackRef.current.push({ pages: snapshot, known: new Set(knownFileIdsRef.current) });
 		if (undoStackRef.current.length > 50) undoStackRef.current.shift();
 		setCanUndo(true);
 	}, []);
 
 	const handleUndo = useCallback(() => {
+		if (isProcessingRef.current) return;
 		const previous = undoStackRef.current.pop();
 		if (!previous) return;
+		versionRef.current++;
 		setCanUndo(undoStackRef.current.length > 0);
 		setMergedBlob(null);
 		setPreviewThumbnails(null);
-		setPages(previous);
+		setPages((current) => [...previous.pages, ...current.filter((page) => !previous.known.has(page.fileId))]);
 	}, []);
 
 	// Ctrl+Z / Cmd+Z anywhere on the tool undoes the last rotate/remove/reorder —
@@ -98,6 +108,8 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 		const onKeyDown = (event: KeyboardEvent) => {
 			const isUndoShortcut = (event.ctrlKey || event.metaKey) && !event.shiftKey && event.key.toLowerCase() === 'z';
 			if (!isUndoShortcut) return;
+			const target = event.target as HTMLElement | null;
+			if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
 			event.preventDefault();
 			handleUndo();
 		};
@@ -113,6 +125,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 		);
 		setSkippedCount(allFiles.length - newFiles.length);
 		if (newFiles.length === 0) return;
+		versionRef.current++;
 		setMergedBlob(null);
 		setPreviewThumbnails(null);
 		setMergeError(null);
@@ -131,6 +144,10 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 				try {
 					const bytes = await file.arrayBuffer();
 					const thumbnails = await renderPdfThumbnails(bytes);
+					versionRef.current++;
+					knownFileIdsRef.current.add(fileId);
+					setMergedBlob(null);
+					setPreviewThumbnails(null);
 					setPages((prev) => [
 						...prev,
 						...thumbnails.map(
@@ -151,7 +168,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 					// password to open — worth telling apart from a generically
 					// corrupt/unsupported file, since the fix ("enter the password
 					// somewhere else first") is completely different advice.
-					const isPasswordProtected = err instanceof Error && err.name === 'PasswordException';
+					const isPasswordProtected = isPasswordError(err);
 					setFiles((prev) =>
 						prev.map((f) =>
 							f.id === fileId
@@ -166,9 +183,11 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 				}
 			}
 		})();
-	}, []);
+	}, [messages.passwordProtectedError, messages.errorGeneric]);
 
 	const handleRemovePage = useCallback((id: string) => {
+		if (isProcessingRef.current) return;
+		versionRef.current++;
 		setMergedBlob(null);
 		setPreviewThumbnails(null);
 		setPages((prev) => {
@@ -178,6 +197,8 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 	}, [pushUndoSnapshot]);
 
 	const handleRotatePage = useCallback((id: string) => {
+		if (isProcessingRef.current) return;
+		versionRef.current++;
 		setMergedBlob(null);
 		setPreviewThumbnails(null);
 		setPages((prev) => {
@@ -189,6 +210,8 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 	}, [pushUndoSnapshot]);
 
 	const handleMove = useCallback((id: string, direction: -1 | 1) => {
+		if (isProcessingRef.current) return;
+		versionRef.current++;
 		setMergedBlob(null);
 		setPreviewThumbnails(null);
 		setPages((prev) => {
@@ -203,6 +226,8 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 	}, [pushUndoSnapshot]);
 
 	const handleDrop = useCallback((targetId: string) => {
+		if (isProcessingRef.current) return;
+		versionRef.current++;
 		setMergedBlob(null);
 		setPreviewThumbnails(null);
 		setPages((prev) => {
@@ -220,6 +245,10 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 	}, [dragPageId, pushUndoSnapshot]);
 
 	const handleMerge = useCallback(async () => {
+		if (isProcessingRef.current) return;
+		isProcessingRef.current = true;
+		const version = versionRef.current;
+		const snapshotPages = pages;
 		setIsProcessing(true);
 		setMergeError(null);
 		setMergedBlob(null);
@@ -227,23 +256,34 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 
 		try {
 			const mergedDoc = await PDFDocument.create();
-			const sourceDocCache = new Map<string, PDFDocument>();
 
-			for (const pageItem of pages) {
-				let sourceDoc = sourceDocCache.get(pageItem.fileId);
-				if (!sourceDoc) {
-					const bytes = await pageItem.file.arrayBuffer();
-					sourceDoc = await PDFDocument.load(bytes);
-					sourceDocCache.set(pageItem.fileId, sourceDoc);
-				}
-				const [copiedPage] = await mergedDoc.copyPages(sourceDoc, [pageItem.pageIndex]);
+			// Gom theo file: mỗi file chỉ load 1 lần và copyPages 1 lần cho tất cả trang cần dùng.
+			const indexesByFile = new Map<string, { file: File; indexes: number[] }>();
+			for (const pageItem of snapshotPages) {
+				const entry = indexesByFile.get(pageItem.fileId) ?? { file: pageItem.file, indexes: [] };
+				entry.indexes.push(pageItem.pageIndex);
+				indexesByFile.set(pageItem.fileId, entry);
+			}
+			const copiedByKey = new Map<string, Awaited<ReturnType<PDFDocument['copyPages']>>[number]>();
+			for (const [fileId, { file, indexes }] of indexesByFile) {
+				const bytes = await file.arrayBuffer();
+				const sourceDoc = await PDFDocument.load(bytes);
+				const copied = await mergedDoc.copyPages(sourceDoc, indexes);
+				copied.forEach((page, i) => copiedByKey.set(fileId + ':' + indexes[i], page));
+			}
+
+			for (const pageItem of snapshotPages) {
+				const copiedPage = copiedByKey.get(pageItem.fileId + ':' + pageItem.pageIndex)!;
 				if (pageItem.rotation !== 0) {
-					copiedPage.setRotation(degrees(pageItem.rotation));
+					// Cộng với /Rotate gốc của trang thay vì ghi đè.
+					copiedPage.setRotation(degrees(combineRotation(copiedPage.getRotation().angle, pageItem.rotation)));
 				}
 				mergedDoc.addPage(copiedPage);
 			}
 
 			const mergedBytes = await mergedDoc.save();
+			// Người dùng đã đổi danh sách trang trong lúc đang gộp -> kết quả đã cũ, bỏ.
+			if (version !== versionRef.current) return;
 			setMergedBlob(new Blob([mergedBytes], { type: 'application/pdf' }));
 
 			setIsGeneratingPreview(true);
@@ -257,17 +297,21 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 					mergedBytes.byteOffset + mergedBytes.byteLength,
 				) as ArrayBuffer;
 				const thumbnails = await renderPdfThumbnails(mergedArrayBuffer, 0.3);
-				setPreviewThumbnails(thumbnails);
+				if (version === versionRef.current) setPreviewThumbnails(thumbnails);
 			} catch {
 				setPreviewThumbnails(null);
 			} finally {
 				setIsGeneratingPreview(false);
 			}
-		} catch {
-			setMergeError(messages.errorGeneric);
+		} catch (err) {
+			if (version === versionRef.current) {
+				setMergeError(isPasswordError(err) ? messages.passwordProtectedError : messages.errorGeneric);
+			}
+		} finally {
+			isProcessingRef.current = false;
+			setIsProcessing(false);
 		}
-		setIsProcessing(false);
-	}, [pages, messages.errorGeneric]);
+	}, [pages, messages.errorGeneric, messages.passwordProtectedError]);
 
 	const handleDownload = useCallback(() => {
 		if (!mergedBlob) return;
@@ -300,20 +344,20 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 					handleFiles(event.dataTransfer.files);
 				}}
 			>
-				<label
-					htmlFor="pdf-merger-input"
-					className="inline-flex min-h-11 cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80 sm:min-h-0"
-				>
+				<label className="inline-flex min-h-11 cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80 focus-within:ring-3 focus-within:ring-ring/50 sm:min-h-0">
 					{messages.selectFiles}
+					<input
+						id="pdf-merger-input"
+						type="file"
+						accept="application/pdf"
+						multiple
+						className="sr-only"
+						onChange={(event) => {
+							handleFiles(event.target.files);
+							event.target.value = '';
+						}}
+					/>
 				</label>
-				<input
-					id="pdf-merger-input"
-					type="file"
-					accept="application/pdf"
-					multiple
-					className="hidden"
-					onChange={(event) => handleFiles(event.target.files)}
-				/>
 				<p className="text-xs text-muted-foreground">{messages.dropHint}</p>
 			</div>
 
@@ -372,7 +416,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 				<>
 					<div className="flex items-center justify-between gap-2">
 						<p className="text-xs text-muted-foreground">{messages.dragHint}</p>
-						<Button type="button" size="sm" variant="ghost" onClick={handleUndo} disabled={!canUndo} title={`${messages.undo} (Ctrl+Z)`}>
+						<Button type="button" size="sm" variant="ghost" onClick={handleUndo} disabled={!canUndo || isProcessing} title={`${messages.undo} (Ctrl+Z)`}>
 							{messages.undo}
 						</Button>
 					</div>
@@ -380,7 +424,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 						{pages.map((page, index) => (
 							<li
 								key={page.id}
-								draggable
+								draggable={!isProcessing}
 								onDragStart={() => setDragPageId(page.id)}
 								onDragOver={(event) => event.preventDefault()}
 								onDrop={(event) => {
@@ -398,7 +442,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 										className="w-full"
 										style={{ transform: `rotate(${page.rotation}deg)` }}
 									/>
-									<span className="absolute bottom-1 right-1 rounded bg-black/60 px-1 text-[10px] font-medium text-white">
+									<span className="absolute bottom-1 right-1 rounded bg-black/60 px-1 text-[11px] font-medium text-white">
 										{index + 1}
 									</span>
 								</div>
@@ -407,8 +451,8 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 										type="button"
 										size="icon-xs"
 										variant="outline"
-										aria-label={messages.moveUp}
-										disabled={index === 0}
+										aria-label={`${messages.moveUp} ${index + 1}`}
+										disabled={index === 0 || isProcessing}
 										onClick={() => handleMove(page.id, -1)}
 									>
 										←
@@ -417,7 +461,8 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 										type="button"
 										size="icon-xs"
 										variant="outline"
-										aria-label={messages.rotate}
+										aria-label={`${messages.rotate} ${index + 1}`}
+										disabled={isProcessing}
 										onClick={() => handleRotatePage(page.id)}
 									>
 										⟳
@@ -426,8 +471,8 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 										type="button"
 										size="icon-xs"
 										variant="outline"
-										aria-label={messages.moveDown}
-										disabled={index === pages.length - 1}
+										aria-label={`${messages.moveDown} ${index + 1}`}
+										disabled={index === pages.length - 1 || isProcessing}
 										onClick={() => handleMove(page.id, 1)}
 									>
 										→
@@ -436,7 +481,8 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 										type="button"
 										size="icon-xs"
 										variant="destructive"
-										aria-label={messages.remove}
+										aria-label={`${messages.remove} ${index + 1}`}
+										disabled={isProcessing}
 										onClick={() => handleRemovePage(page.id)}
 									>
 										×

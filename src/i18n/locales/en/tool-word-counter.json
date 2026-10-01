@@ -43,7 +43,14 @@
     "keywordDensityHeading": "Keyword density",
     "keywordDensityWordColumn": "Word",
     "keywordDensityCountColumn": "Count",
-    "keywordDensityPercentColumn": "% of text"
+    "keywordDensityPercentColumn": "% of text",
+    "textareaLabel": "Text to count",
+    "readingTimeHoursValue": "{{hours}} h {{minutes}} min read",
+    "speakingTimeHoursValue": "{{hours}} h {{minutes}} min speech",
+    "readabilityEnglishOnly": "The Flesch Reading Ease score is only calibrated for English text, so it is not shown for this text.",
+    "readabilityCalibrationNote": "Note: the Flesch score is calibrated for English only.",
+    "fileReadError": "Could not read that file.",
+    "copyFailed": "Copy failed"
   },
   "related": "Related tools",
   "faq": {

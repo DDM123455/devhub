@@ -38,7 +38,15 @@
     "imagePreviewLabel": "Xem trước",
     "decodeEncodingLabel": "Bảng mã văn bản:",
     "remove": "Xóa",
-    "clearAll": "Xóa tất cả"
+    "clearAll": "Xóa tất cả",
+    "decodeNotText": "Đây là Base64 hợp lệ nhưng dữ liệu giải mã không phải văn bản theo bảng mã đã chọn (có thể là ảnh hoặc tệp nhị phân). Hãy thử bảng mã khác, hoặc dùng tab Tệp để tải xuống.",
+    "fileTooLarge": "\"{{name}}\" lớn hơn {{max}} MB nên đã bị bỏ qua để trình duyệt không bị treo.",
+    "fileReadError": "Không đọc được \"{{name}}\".",
+    "copyFailed": "Sao chép thất bại",
+    "copyOutputAria": "Sao chép kết quả",
+    "copyFieldAria": "Sao chép {{field}} của {{name}}",
+    "removeFileAria": "Xóa {{name}}",
+    "downloadAria": "Tải xuống tệp đã giải mã"
   },
   "related": "Công cụ liên quan",
   "faq": {

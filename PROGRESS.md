@@ -40,6 +40,8 @@
   resource cho cả 2 tool, theo đúng kế hoạch trong prompt gốc — bước 5-6).
 - **Phase 3.10 — Text Diff Checker: nút Format JSON/XML: HOÀN TẤT** (theo yêu cầu trực tiếp
   người dùng 2026-09-12, xem log chi tiết bên dưới).
+- **Phase 3.13 — Audit toàn diện + sửa lỗi: đã sửa phần lớn, còn treo test tương tác 12 tool
+  file/media/data** (xem log 2026-10-01).
 - **Quy ước i18n hiện hành (từ 2026-07-27, theo yêu cầu trực tiếp người dùng)**: các tool
   MỚI trong Phase 3 chỉ cần file dịch `en` + `vi`. Vẫn khai báo đủ slug/tên cho cả 20 ngôn
   ngữ trong `tools.ts` (để routing sẵn sàng), 18 ngôn ngữ còn lại người dùng tự bổ sung sau —
@@ -178,6 +180,22 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-10-01 (Phase 3.13 — Audit toàn diện + sửa lỗi, theo yêu cầu trực tiếp người dùng)** —
+  Chạy 6 agent audit song song (hạ tầng/SEO, 3 nhóm source, 2 nhóm runtime trên trình duyệt;
+  1 agent runtime bị dừng do lỗi classifier nên 12 tool file/media/data CHƯA test tương tác
+  thật), rồi 3 agent sửa theo vùng file tách biệt. Lỗi lớn đã sửa: bộ chuyển ngôn ngữ dẫn tới
+  404 (880 link kiểm chứng đều 200), thiếu hreflang (nay đủ 20 locale + x-default), sitemap lẫn
+  URL 404; QR sai với tiếng Việt/CJK (UTF-8), prototype pollution + CSV injection + thiếu BOM
+  ở CSV; Text Diff nuốt dòng trống/đổi hoa-thường bản gốc/worker xếp hàng; PdfSplitter
+  checkbox toggle 2 lần, undo sai file, mất /Rotate gốc; Nginx false-positive context/`#`;
+  K8s thiếu kind vẫn "No issues"/cache lỗi mạng; JWT share-link đưa token vào query (nay `#`);
+  YAML export hỏng dữ liệu; file picker `display:none` không dùng được bàn phím (22 tool nay
+  OK, TextDiff dùng nút); ColorPicker Space/aria Lock; tên file/đuôi tải về sai ở
+  Video/Audio/Image; tràn ngang 320px (`main` thiếu `min-w-0`). Verify: build 522 trang sạch,
+  203/203 test Vitest (thêm ~20 file test), 26 trang không tràn ở 320px, 880 link ngôn ngữ
+  200, hreflang/sitemap/noindex kiểm trên dist, file input focusable. Chưa làm: ghim schema
+  K8s (repo yannh không có tag), 2 lỗ hổng moderate (exceljs→uuid cần --force), `tsc` thật
+  (repo chưa cài typescript), test tương tác 12 tool file/media/data.
 - **2026-09-12 (Phase 3.12b — Xóa nền ảnh: bug thật "chọn ảnh xong không thấy làm gì", theo
   báo cáo trực tiếp người dùng)** — Người dùng báo chọn ảnh xong không thấy xử lý gì. Điều
   tra bằng Puppeteer trên trang thật: kỹ thuật thì KHÔNG lỗi — chọn ảnh vẫn hiện thumbnail +

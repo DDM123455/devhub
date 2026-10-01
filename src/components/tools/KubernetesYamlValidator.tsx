@@ -2,11 +2,22 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
 	autoFixDeprecatedApiVersions,
+	clearSchemaCache,
 	validateK8sManifests,
 	K8S_VERSION_OPTIONS,
 	DEFAULT_K8S_VERSION,
 	type K8sDocumentResult,
+	type K8sIssue,
 } from '@/lib/k8s-yaml-validator';
+import { useCopyToClipboard } from './useCopyToClipboard';
+
+const VALIDATE_DEBOUNCE_MS = 400;
+
+function formatIssue(issue: K8sIssue, issueMessages: Record<string, string>): string {
+	const template = issueMessages[issue.key];
+	if (!template) return issue.message;
+	return template.replace(/\{\{(\w+)\}\}/g, (whole, name: string) => String(issue.params[name] ?? whole));
+}
 import { jumpTextareaToLine } from '@/lib/text-line-utils';
 
 interface Messages {
@@ -30,6 +41,12 @@ interface Messages {
 	fixApiVersion: string;
 	fixApiVersionCopied: string;
 	multiDocHint: string;
+	issueMessages: Record<string, string>;
+	emptyState: string;
+	retry: string;
+	validationFailed: string;
+	fileReadError: string;
+	copyFailed: string;
 }
 
 const SAMPLE_MANIFEST = `apiVersion: apps/v1
@@ -72,7 +89,10 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [isValidating, setIsValidating] = useState(false);
 	const [documents, setDocuments] = useState<K8sDocumentResult[]>([]);
-	const [copied, setCopied] = useState(false);
+	const { copied, failed: copyFailed, copy } = useCopyToClipboard();
+	const [retryCount, setRetryCount] = useState(0);
+	const [validationFailed, setValidationFailed] = useState(false);
+	const [fileError, setFileError] = useState(false);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const requestIdRef = useRef(0);
 
@@ -81,20 +101,36 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 	// synchronous useMemo — a request counter guards against an in-flight
 	// validation from a stale keystroke overwriting a newer one that
 	// resolved first (same pattern as RegexTester's Web Worker requestId).
+	// Debounced (typing in a large manifest must not re-validate on every keystroke) and
+	// guarded on every path: a rejected validation clears the spinner instead of leaving it
+	// spinning forever (.catch + .finally).
 	useEffect(() => {
 		const requestId = ++requestIdRef.current;
 		if (input.trim() === '') {
 			setDocuments([]);
 			setIsValidating(false);
+			setValidationFailed(false);
 			return;
 		}
 		setIsValidating(true);
-		void validateK8sManifests(input, k8sVersion).then((result) => {
-			if (requestId !== requestIdRef.current) return;
-			setDocuments(result.documents);
-			setIsValidating(false);
-		});
-	}, [input, k8sVersion]);
+		const timer = setTimeout(() => {
+			validateK8sManifests(input, k8sVersion)
+				.then((result) => {
+					if (requestId !== requestIdRef.current) return;
+					setDocuments(result.documents);
+					setValidationFailed(false);
+				})
+				.catch(() => {
+					if (requestId !== requestIdRef.current) return;
+					setDocuments([]);
+					setValidationFailed(true);
+				})
+				.finally(() => {
+					if (requestId === requestIdRef.current) setIsValidating(false);
+				});
+		}, VALIDATE_DEBOUNCE_MS);
+		return () => clearTimeout(timer);
+	}, [input, k8sVersion, retryCount]);
 
 	const hasAutoFixableApiVersion = documents.some((doc) => doc.suggestedApiVersion !== null);
 	const fixedManifest = hasAutoFixableApiVersion ? autoFixDeprecatedApiVersions(input) : input;
@@ -102,8 +138,10 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 	const handleFile = (files: FileList | null) => {
 		const file = files?.[0];
 		if (!file) return;
+		setFileError(false);
 		const reader = new FileReader();
 		reader.onload = () => setInput(String(reader.result ?? ''));
+		reader.onerror = () => setFileError(true);
 		reader.readAsText(file);
 	};
 
@@ -113,10 +151,7 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 	};
 
 	const handleCopyFixed = () => {
-		void navigator.clipboard.writeText(fixedManifest).then(() => {
-			setCopied(true);
-			setTimeout(() => setCopied(false), 1500);
-		});
+		void copy(fixedManifest);
 	};
 
 	return (
@@ -136,11 +171,11 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 					handleFile(e.dataTransfer.files);
 				}}
 			>
-				<div className="flex flex-wrap items-center justify-between gap-2">
+				<div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
 					<label htmlFor="k8s-yaml-input" className="text-sm font-medium text-foreground">
 						{messages.inputLabel}
 					</label>
-					<div className="flex flex-wrap items-center gap-2">
+					<div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
 						<label htmlFor="k8s-version-select" className="text-xs text-muted-foreground">
 							{messages.versionLabel}
 						</label>
@@ -148,7 +183,7 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 							id="k8s-version-select"
 							value={k8sVersion}
 							onChange={(e) => setK8sVersion(e.target.value)}
-							className="rounded-md border border-border bg-background px-2 py-1 text-xs text-foreground"
+							className="min-w-0 max-w-full rounded-md border border-border bg-background px-2 py-1 text-xs text-foreground"
 						>
 							{K8S_VERSION_OPTIONS.map((version) => (
 								<option key={version} value={version}>
@@ -158,7 +193,7 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 						</select>
 						<label
 							htmlFor="k8s-file-input"
-							className="inline-flex cursor-pointer items-center rounded-md border border-border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent"
+							className="has-[+input:focus-visible]:ring-2 has-[+input:focus-visible]:ring-ring inline-flex cursor-pointer items-center rounded-md border border-border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent"
 						>
 							{messages.chooseFile}
 						</label>
@@ -166,8 +201,11 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 							id="k8s-file-input"
 							type="file"
 							accept=".yaml,.yml,.txt,text/yaml,text/plain"
-							className="hidden"
-							onChange={(e) => handleFile(e.target.files)}
+							className="sr-only"
+							onChange={(e) => {
+								handleFile(e.target.files);
+								e.target.value = '';
+							}}
 						/>
 						<Button type="button" size="sm" variant="outline" onClick={() => setInput(SAMPLE_MANIFEST)}>
 							{messages.loadSample}
@@ -184,7 +222,7 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 					placeholder={messages.inputPlaceholder}
 					rows={18}
 					spellCheck={false}
-					className="w-full rounded-md border border-border bg-background p-3 font-mono text-xs text-foreground"
+					className="box-border w-full min-w-0 max-w-full rounded-md border border-border bg-background p-3 font-mono text-xs text-foreground"
 				/>
 				<div className="flex flex-wrap items-center gap-2">
 					<Button type="button" size="sm" variant="ghost" onClick={() => setInput('')}>
@@ -192,15 +230,21 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 					</Button>
 					{hasAutoFixableApiVersion && (
 						<Button type="button" size="sm" variant="secondary" aria-live="polite" onClick={handleCopyFixed}>
-							{copied ? messages.fixApiVersionCopied : messages.fixApiVersion}
+							{copied ? messages.fixApiVersionCopied : copyFailed ? messages.copyFailed : messages.fixApiVersion}
 						</Button>
 					)}
 					{isValidating && <span role="status" className="text-xs text-muted-foreground">{messages.validating}</span>}
+					{fileError && <span role="alert" className="text-xs text-destructive">{messages.fileReadError}</span>}
+					{validationFailed && <span role="alert" className="text-xs text-destructive">{messages.validationFailed}</span>}
 				</div>
 				<p className="rounded-md bg-emerald-500/10 px-3 py-2 text-xs text-emerald-700 dark:text-emerald-400">
 					{messages.privacyNote}
 				</p>
 			</div>
+
+			{input.trim() === '' && (
+				<p className="rounded-lg border border-border p-4 text-sm text-muted-foreground">{messages.emptyState}</p>
+			)}
 
 			{documents.map((doc, docIndex) => {
 				const errorCount = doc.issues.filter((i) => i.severity === 'error').length;
@@ -221,7 +265,7 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 							</span>
 						</div>
 						{doc.issues.length === 0 ? (
-							<p className="text-sm text-muted-foreground">{messages.noIssues}</p>
+							<p className="text-sm text-emerald-700 dark:text-emerald-400">{messages.noIssues}</p>
 						) : (
 							<ul className="flex flex-col gap-2">
 								{doc.issues.map((issue, i) => (
@@ -248,8 +292,22 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 													</span>
 												)}
 											</div>
-											<span className="text-foreground">{issue.message}</span>
+											<span className="break-words text-foreground">{formatIssue(issue, messages.issueMessages)}</span>
 										</button>
+										{issue.ruleId === 'schema-unavailable' && (
+											<Button
+												type="button"
+												size="xs"
+												variant="outline"
+												className="mt-1.5"
+												onClick={() => {
+													clearSchemaCache();
+													setRetryCount((n) => n + 1);
+												}}
+											>
+												{messages.retry}
+											</Button>
+										)}
 									</li>
 								))}
 							</ul>

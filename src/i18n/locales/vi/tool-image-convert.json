@@ -25,7 +25,8 @@
     "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ.",
     "resizeToggleLabel": "Thay đổi kích thước trước khi chuyển đổi",
     "maxDimensionLabel": "Kích thước tối đa: {{size}}px",
-    "processingQueue": "Đang xử lý {{current}}/{{total}}"
+    "processingQueue": "Đang xử lý {{current}}/{{total}}",
+    "errorTooLarge": "Ảnh này quá lớn để trình duyệt chuyển đổi. Hãy bật tuỳ chọn thu nhỏ (hoặc dùng ảnh nhỏ hơn) rồi thử lại."
   },
   "related": "Công cụ liên quan",
   "faq": {

@@ -3,6 +3,26 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import type QRCodeStyling from 'qr-code-styling';
 import type { DotType, GradientType, Options } from 'qr-code-styling';
+import {
+	BATCH_MAX_LINES,
+	batchBaseName,
+	buildEmailPayload,
+	buildSmsPayload,
+	buildVCardPayload,
+	buildWifiPayload,
+	normalizeUrlInput,
+	parseBatchLines,
+	qrAriaLabel,
+	qrContrastWarning,
+	quietZoneMargin,
+	uniqueName,
+	utf8ToBinaryString,
+	type EmailFields,
+	type SmsFields,
+	type VCardFields,
+	type WifiEncryption,
+	type WifiFields,
+} from '@/lib/qr-encode';
 
 interface Messages {
 	contentTypeLabel: string;
@@ -73,38 +93,31 @@ interface Messages {
 	frameTextLabel: string;
 	frameTextPlaceholder: string;
 	frameNotice: string;
+	emptyState: string;
+	downloadDisabledEmpty: string;
+	urlAutoHttps: string;
+	contrastInverted: string;
+	contrastLow: string;
+	logoRaisedLevel: string;
+	logoRestoredLevel: string;
+	logoLoadError: string;
+	logoSelected: string;
+	logoPreviewAlt: string;
+	errorRender: string;
+	errorCanvasSmall: string;
+	downloadError: string;
+	batchSummary: string;
+	batchFailedHeading: string;
+	batchFailedLine: string;
+	batchNoneSucceeded: string;
+	batchTruncated: string;
+	batchCancel: string;
+	batchCancelled: string;
+	qrAriaLabel: string;
 }
 
 type ContentType = 'url' | 'text' | 'wifi' | 'vcard' | 'email' | 'sms';
 type ErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
-type WifiEncryption = 'WPA' | 'WEP' | 'nopass';
-
-interface WifiFields {
-	ssid: string;
-	password: string;
-	encryption: WifiEncryption;
-	hidden: boolean;
-}
-
-interface VCardFields {
-	firstName: string;
-	lastName: string;
-	phone: string;
-	email: string;
-	org: string;
-	url: string;
-}
-
-interface EmailFields {
-	to: string;
-	subject: string;
-	body: string;
-}
-
-interface SmsFields {
-	phone: string;
-	message: string;
-}
 
 const MIN_SIZE = 128;
 const MAX_SIZE = 512;
@@ -112,48 +125,6 @@ const PNG_RESOLUTIONS = [256, 512, 1024, 2048];
 const SVG_EXPORT_SIZE = 1024;
 
 const DOT_TYPES: DotType[] = ['square', 'dots', 'rounded', 'classy', 'classy-rounded', 'extra-rounded'];
-
-// Special characters in a WIFI: payload must be backslash-escaped per the format
-// most scanners (Android, iOS, Zebra Crossing) agree on informally — there's no
-// official spec, this is the de facto convention every QR generator follows.
-function escapeWifiField(value: string): string {
-	return value.replace(/([\\;,":])/g, '\\$1');
-}
-
-function buildWifiPayload(w: WifiFields): string {
-	const parts = [`T:${w.encryption}`, `S:${escapeWifiField(w.ssid)}`];
-	if (w.encryption !== 'nopass') parts.push(`P:${escapeWifiField(w.password)}`);
-	if (w.hidden) parts.push('H:true');
-	return `WIFI:${parts.join(';')};;`;
-}
-
-function buildVCardPayload(v: VCardFields): string {
-	const lines = ['BEGIN:VCARD', 'VERSION:3.0'];
-	if (v.firstName || v.lastName) {
-		lines.push(`N:${v.lastName};${v.firstName};;;`);
-		lines.push(`FN:${[v.firstName, v.lastName].filter(Boolean).join(' ')}`);
-	}
-	if (v.org) lines.push(`ORG:${v.org}`);
-	if (v.phone) lines.push(`TEL:${v.phone}`);
-	if (v.email) lines.push(`EMAIL:${v.email}`);
-	if (v.url) lines.push(`URL:${v.url}`);
-	lines.push('END:VCARD');
-	return lines.join('\n');
-}
-
-function buildEmailPayload(e: EmailFields): string {
-	const params = new URLSearchParams();
-	if (e.subject) params.set('subject', e.subject);
-	if (e.body) params.set('body', e.body);
-	const query = params.toString();
-	return `mailto:${e.to}${query ? `?${query}` : ''}`;
-}
-
-// SMSTO:<phone>:<message> is the format nearly every QR scanner recognizes,
-// predating (and more broadly supported than) the sms: URI scheme.
-function buildSmsPayload(s: SmsFields): string {
-	return `SMSTO:${s.phone}:${s.message}`;
-}
 
 function canvasToPngBlob(canvas: HTMLCanvasElement): Promise<Blob> {
 	return new Promise((resolve, reject) => {
@@ -168,16 +139,19 @@ function canvasToPngBlob(canvas: HTMLCanvasElement): Promise<Blob> {
 // export would need real font-metrics handling this doesn't attempt.
 async function composeFramedPng(qrPngBlob: Blob, frameText: string): Promise<Blob> {
 	const bitmap = await createImageBitmap(qrPngBlob);
-	const padding = Math.round(bitmap.width * 0.08);
-	const textAreaHeight = frameText.trim() ? Math.round(bitmap.width * 0.16) : 0;
+	// Read dimensions BEFORE bitmap.close() — a closed bitmap reports 0x0, which used to push the caption to the wrong place.
+	const bmpWidth = bitmap.width;
+	const bmpHeight = bitmap.height;
+	const padding = Math.round(bmpWidth * 0.08);
+	const textAreaHeight = frameText.trim() ? Math.round(bmpWidth * 0.16) : 0;
 	const canvas = document.createElement('canvas');
-	canvas.width = bitmap.width + padding * 2;
-	canvas.height = bitmap.height + padding * 2 + textAreaHeight;
+	canvas.width = bmpWidth + padding * 2;
+	canvas.height = bmpHeight + padding * 2 + textAreaHeight;
 	const ctx = canvas.getContext('2d');
 	if (!ctx) throw new Error('Canvas 2D context unavailable');
 	ctx.fillStyle = '#ffffff';
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
-	const borderWidth = Math.max(2, Math.round(bitmap.width * 0.008));
+	const borderWidth = Math.max(2, Math.round(bmpWidth * 0.008));
 	ctx.strokeStyle = '#000000';
 	ctx.lineWidth = borderWidth;
 	ctx.strokeRect(borderWidth / 2, borderWidth / 2, canvas.width - borderWidth, canvas.height - borderWidth);
@@ -188,7 +162,7 @@ async function composeFramedPng(qrPngBlob: Blob, frameText: string): Promise<Blo
 		ctx.font = `bold ${Math.round(textAreaHeight * 0.45)}px sans-serif`;
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
-		ctx.fillText(frameText.trim(), canvas.width / 2, bitmap.height + padding * 2 + textAreaHeight / 2);
+		ctx.fillText(frameText.trim(), canvas.width / 2, bmpHeight + padding * 2 + textAreaHeight / 2);
 	}
 	return canvasToPngBlob(canvas);
 }
@@ -207,8 +181,14 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	const [size, setSize] = useState(256);
 	const [level, setLevel] = useState<ErrorCorrectionLevel>('M');
 	const [logoUrl, setLogoUrl] = useState<string | null>(null);
+	const [logoName, setLogoName] = useState<string | null>(null);
+	const [logoNotice, setLogoNotice] = useState<string | null>(null);
+	const [logoError, setLogoError] = useState<string | null>(null);
+	// Level in effect before a logo auto-raised it to H, so removing the logo can put it back.
+	const levelBeforeLogoRef = useRef<ErrorCorrectionLevel | null>(null);
 	const [pngResolution, setPngResolution] = useState(1024);
-	const [erroredRenderKey, setErroredRenderKey] = useState<string | null>(null);
+	const [renderError, setRenderError] = useState<{ key: string; kind: 'capacity' | 'canvas' | 'other' } | null>(null);
+	const [actionError, setActionError] = useState<string | null>(null);
 
 	const [dotsType, setDotsType] = useState<DotType>('square');
 	const [gradientEnabled, setGradientEnabled] = useState(false);
@@ -220,43 +200,61 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	const [batchInput, setBatchInput] = useState('');
 	const [isBatchGenerating, setIsBatchGenerating] = useState(false);
 	const [batchProgress, setBatchProgress] = useState<{ current: number; total: number } | null>(null);
+	const [batchResult, setBatchResult] = useState<{
+		ok: number;
+		total: number;
+		failed: Array<{ line: number; text: string }>;
+		cancelled: boolean;
+	} | null>(null);
+	const batchAbortRef = useRef<AbortController | null>(null);
 	const canBatch = contentType === 'url' || contentType === 'text';
 	const effectiveBatchMode = canBatch && batchMode;
 
 	const [frameEnabled, setFrameEnabled] = useState(false);
-	const [frameText, setFrameText] = useState('SCAN ME');
+	const [frameText, setFrameText] = useState(messages.frameTextPlaceholder);
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const qrRef = useRef<QRCodeStyling | null>(null);
 
-	const { qrValue, isEmpty } = useMemo(() => {
+	const urlNormalized = useMemo(() => normalizeUrlInput(urlValue), [urlValue]);
+
+	const { qrValue, isEmpty, summary } = useMemo(() => {
 		switch (contentType) {
 			case 'url':
-				return { qrValue: urlValue.trim(), isEmpty: urlValue.trim() === '' };
+				return { qrValue: urlNormalized.value, isEmpty: urlNormalized.value === '', summary: urlNormalized.value };
 			case 'text':
-				return { qrValue: textValue.trim(), isEmpty: textValue.trim() === '' };
+				return { qrValue: textValue.trim(), isEmpty: textValue.trim() === '', summary: textValue.trim() };
 			case 'wifi':
-				return { qrValue: buildWifiPayload(wifi), isEmpty: wifi.ssid.trim() === '' };
+				return { qrValue: buildWifiPayload(wifi), isEmpty: wifi.ssid.trim() === '', summary: wifi.ssid.trim() };
 			case 'vcard':
 				return {
 					qrValue: buildVCardPayload(vcard),
 					isEmpty: !vcard.firstName.trim() && !vcard.lastName.trim() && !vcard.phone.trim() && !vcard.email.trim(),
+					summary: [vcard.firstName, vcard.lastName].filter(Boolean).join(' ') || vcard.phone || vcard.email,
 				};
 			case 'email':
-				return { qrValue: buildEmailPayload(email), isEmpty: email.to.trim() === '' };
+				return { qrValue: buildEmailPayload(email), isEmpty: email.to.trim() === '', summary: email.to.trim() };
 			case 'sms':
-				return { qrValue: buildSmsPayload(sms), isEmpty: sms.phone.trim() === '' };
+				return { qrValue: buildSmsPayload(sms), isEmpty: sms.phone.trim() === '', summary: sms.phone.trim() };
 		}
-	}, [contentType, urlValue, textValue, wifi, vcard, email, sms]);
+	}, [contentType, urlNormalized, textValue, wifi, vcard, email, sms]);
 
-	const renderValue = isEmpty ? ' ' : qrValue;
-	const renderKey = `${renderValue}-${level}`;
+	const renderKey = `${qrValue}-${level}-${size}`;
 	// Derived (not stored via a separate reset effect) so there's no race between
 	// "a new value should optimistically retry" and "onError just marked this
 	// value as failing" — whichever runs, this always reflects the current attempt.
-	const tooLong = erroredRenderKey === renderKey;
+	const activeError = renderError && renderError.key === renderKey ? renderError.kind : null;
+	const hasRenderError = activeError !== null;
+	const downloadDisabled = isEmpty || hasRenderError;
+	const contrastWarning = useMemo(
+		() =>
+			gradientEnabled
+				? (qrContrastWarning(gradientColorStart, bgColor) ?? qrContrastWarning(gradientColorEnd, bgColor))
+				: qrContrastWarning(fgColor, bgColor),
+		[gradientEnabled, gradientColorStart, gradientColorEnd, fgColor, bgColor],
+	);
 
-	const logoSize = Math.round(size * 0.2);
+	const effectiveFrameText = frameText.trim() || messages.frameTextPlaceholder;
 
 	// Shared style/content options used for the live preview, the two single
 	// export paths, and batch generation — only width/height/type (canvas vs
@@ -278,8 +276,11 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 			: { color: fgColor };
 		return {
 			...overrides,
-			data: overrides.data ?? renderValue,
-			margin: 8,
+			// UTF-8 bytes, not ISO-8859-1 (see utf8ToBinaryString) — otherwise
+			// accented/CJK text scans back as garbage.
+			data: utf8ToBinaryString(overrides.data ?? qrValue),
+			// Quiet zone scales with the export size (preview, PNG and SVG alike).
+			margin: quietZoneMargin(overrides.width ?? size),
 			qrOptions: { errorCorrectionLevel: level },
 			dotsOptions: { type: dotsType, ...dotsStyle },
 			cornersSquareOptions: { type: dotsType, ...dotsStyle },
@@ -287,11 +288,8 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 			backgroundOptions: { color: bgColor },
 			image: logoUrl ?? undefined,
 			// qr-code-styling reads `imageOptions.hideBackgroundDots` unconditionally
-			// while laying out dots, even when there's no `image` — passing `undefined`
-			// here (when no logo is set) throws "Cannot read properties of undefined
-			// (reading 'hideBackgroundDots')" on every single render regardless of
-			// content length, which the effect below used to mislabel as "too long".
-			// Always supplying the object (it's inert without an `image`) avoids that.
+			// while laying out dots, even when there's no `image` — always supplying
+			// the object (inert without an `image`) avoids a throw on every render.
 			imageOptions: { imageSize: 0.2, hideBackgroundDots: true, margin: 2 },
 		};
 	};
@@ -299,10 +297,9 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	// qr-code-styling touches `document` inside its constructor, so it's loaded
 	// dynamically inside this client-only effect rather than imported statically
 	// at the top of the file — a static import would run during Astro's
-	// build-time SSR pass (no `document` there), the same class of bug already
-	// documented in PROGRESS.md for `jsoneditor`.
+	// build-time SSR pass (no `document` there).
 	useEffect(() => {
-		if (effectiveBatchMode) return;
+		if (effectiveBatchMode || isEmpty) return;
 		let cancelled = false;
 		void import('qr-code-styling').then(({ default: QRCodeStylingCtor }) => {
 			if (cancelled) return;
@@ -311,89 +308,133 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 			const options = buildQrOptions({ width: size, height: size, type: 'canvas' });
 			try {
 				if (!qrRef.current) {
+					// Clear first so a second instance (e.g. after a failed one) never stacks two canvases.
+					container.replaceChildren();
 					qrRef.current = new QRCodeStylingCtor(options);
 					qrRef.current.append(container);
 				} else {
 					qrRef.current.update(options);
 				}
-				setErroredRenderKey(null);
+				setRenderError(null);
 			} catch (err) {
-				// qr-code-styling throws a plain string ("code length overflow...")
-				// when the payload doesn't fit the QR capacity at this error
-				// correction level — caught here instead of a React error boundary
-				// since rendering is now imperative (append/update), not JSX. Any OTHER
-				// exception (a real bug, e.g. a bad option) must NOT be mislabeled as
-				// "too long" — that hid a real crash behind a misleading message before
-				// (see PROGRESS.md). Unexpected errors are logged and `qrRef` is reset so
-				// the next render attempts a fresh instance instead of calling `.update()`
-				// forever on one that may never have mounted correctly.
-				const isCapacityError = typeof err === 'string' && err.includes('code length overflow');
-				if (isCapacityError) {
-					setErroredRenderKey(renderKey);
-				} else {
-					console.error('QR code render failed unexpectedly:', err);
-					qrRef.current = null;
-				}
+				// qr-code-styling throws plain strings ("code length overflow...",
+				// "Canvas is too small."). Every failure is surfaced to the user; the
+				// instance is dropped so the next attempt starts from a clean container.
+				const text = typeof err === 'string' ? err : err instanceof Error ? err.message : '';
+				const kind = text.includes('code length overflow') ? 'capacity' : /too small/i.test(text) ? 'canvas' : 'other';
+				if (kind === 'other') console.error('QR code render failed unexpectedly:', err);
+				qrRef.current = null;
+				container.replaceChildren();
+				setRenderError({ key: renderKey, kind });
 			}
 		});
 		return () => {
 			cancelled = true;
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [effectiveBatchMode, renderKey, level, fgColor, bgColor, size, logoUrl, dotsType, gradientEnabled, gradientType, gradientColorStart, gradientColorEnd]);
+	}, [effectiveBatchMode, isEmpty, renderKey, level, fgColor, bgColor, size, logoUrl, dotsType, gradientEnabled, gradientType, gradientColorStart, gradientColorEnd]);
 
-	const handleLogoChange = (fileList: FileList | null) => {
-		const file = fileList?.[0];
+	const handleLogoChange = (input: HTMLInputElement) => {
+		const file = input.files?.[0];
+		input.value = ''; // allow picking the same file again after removing it
 		if (!file) return;
+		setLogoError(null);
 		const reader = new FileReader();
+		reader.onerror = () => setLogoError(messages.logoLoadError);
 		reader.onload = () => {
-			setLogoUrl(typeof reader.result === 'string' ? reader.result : null);
-			// A logo covers part of the pattern, so give it more redundancy to stay
-			// scannable — but don't fight a level the user already raised themselves.
-			setLevel((prev) => (prev === 'L' || prev === 'M' ? 'H' : prev));
+			const dataUrl = typeof reader.result === 'string' ? reader.result : null;
+			if (!dataUrl) {
+				setLogoError(messages.logoLoadError);
+				return;
+			}
+			// Make sure it really decodes as an image before handing it to the QR renderer.
+			const probe = new Image();
+			probe.onerror = () => setLogoError(messages.logoLoadError);
+			probe.onload = () => {
+				setLogoUrl(dataUrl);
+				setLogoName(file.name);
+				// A logo covers part of the pattern, so give it more redundancy to stay
+				// scannable — but don't fight a level the user already raised themselves.
+				if (level === 'L' || level === 'M') {
+					levelBeforeLogoRef.current = level;
+					setLevel('H');
+					setLogoNotice(messages.logoRaisedLevel);
+				} else {
+					setLogoNotice(null);
+				}
+			};
+			probe.src = dataUrl;
 		};
 		reader.readAsDataURL(file);
 	};
 
+	const handleRemoveLogo = () => {
+		setLogoUrl(null);
+		setLogoName(null);
+		setLogoError(null);
+		if (levelBeforeLogoRef.current && level === 'H') {
+			setLevel(levelBeforeLogoRef.current);
+			setLogoNotice(messages.logoRestoredLevel);
+		} else {
+			setLogoNotice(null);
+		}
+		levelBeforeLogoRef.current = null;
+	};
+
+	const saveBlob = (blob: Blob, filename: string) => {
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = filename;
+		link.click();
+		// Revoking synchronously can cancel the download in some browsers.
+		setTimeout(() => URL.revokeObjectURL(url), 10000);
+	};
+
 	const handleDownloadPng = async () => {
-		if (isEmpty || tooLong) return;
-		const { default: QRCodeStylingCtor } = await import('qr-code-styling');
-		const exportQr = new QRCodeStylingCtor(buildQrOptions({ width: pngResolution, height: pngResolution, type: 'canvas' }));
+		if (downloadDisabled) return;
+		setActionError(null);
 		try {
+			const { default: QRCodeStylingCtor } = await import('qr-code-styling');
+			const exportQr = new QRCodeStylingCtor(buildQrOptions({ width: pngResolution, height: pngResolution, type: 'canvas' }));
 			if (frameEnabled) {
 				const raw = await exportQr.getRawData('png');
-				if (!raw) return;
-				const framedBlob = await composeFramedPng(raw as Blob, frameText);
-				const url = URL.createObjectURL(framedBlob);
-				const link = document.createElement('a');
-				link.href = url;
-				link.download = 'qrcode.png';
-				link.click();
-				URL.revokeObjectURL(url);
+				if (!raw) throw new Error('empty png');
+				saveBlob(await composeFramedPng(raw as Blob, effectiveFrameText), 'qrcode.png');
 			} else {
 				await exportQr.download({ name: 'qrcode', extension: 'png' });
 			}
-		} catch {
-			// Already guarded by `tooLong` above under normal use; nothing more to do.
+		} catch (err) {
+			console.error('QR PNG export failed:', err);
+			setActionError(typeof err === 'string' && /too small/i.test(err) ? messages.errorCanvasSmall : messages.downloadError);
 		}
 	};
 
 	const handleDownloadSvg = async () => {
-		if (isEmpty || tooLong) return;
-		const { default: QRCodeStylingCtor } = await import('qr-code-styling');
-		const exportQr = new QRCodeStylingCtor(buildQrOptions({ width: SVG_EXPORT_SIZE, height: SVG_EXPORT_SIZE, type: 'svg' }));
+		if (downloadDisabled) return;
+		setActionError(null);
 		try {
+			const { default: QRCodeStylingCtor } = await import('qr-code-styling');
+			const exportQr = new QRCodeStylingCtor(buildQrOptions({ width: SVG_EXPORT_SIZE, height: SVG_EXPORT_SIZE, type: 'svg' }));
 			await exportQr.download({ name: 'qrcode', extension: 'svg' });
-		} catch {
-			// Already guarded by `tooLong` above under normal use; nothing more to do.
+		} catch (err) {
+			console.error('QR SVG export failed:', err);
+			setActionError(messages.downloadError);
 		}
 	};
 
+	const batchParsed = useMemo(() => parseBatchLines(batchInput), [batchInput]);
+
 	const handleGenerateBatch = async () => {
-		const lines = batchInput.split('\n').map((line) => line.trim()).filter(Boolean);
+		const { lines } = batchParsed;
 		if (lines.length === 0) return;
+		const controller = new AbortController();
+		batchAbortRef.current = controller;
 		setIsBatchGenerating(true);
+		setBatchResult(null);
 		setBatchProgress({ current: 0, total: lines.length });
+		const failed: Array<{ line: number; text: string }> = [];
+		let ok = 0;
 		try {
 			const [{ default: QRCodeStylingCtor }, { default: JSZip }] = await Promise.all([
 				import('qr-code-styling'),
@@ -402,43 +443,49 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 			const zip = new JSZip();
 			const usedNames = new Set<string>();
 			for (let i = 0; i < lines.length; i++) {
-				const data = lines[i];
+				if (controller.signal.aborted) break;
+				// Yield to the event loop every few items so the progress bar paints and the page stays responsive.
+				if (i % 3 === 0) await new Promise<void>((resolve) => setTimeout(resolve, 0));
+				if (controller.signal.aborted) break;
+				const entry = lines[i];
 				setBatchProgress({ current: i + 1, total: lines.length });
+				const data = contentType === 'url' ? normalizeUrlInput(entry.text).value : entry.text;
 				let blob: Blob | null = null;
 				try {
 					const qr = new QRCodeStylingCtor(
 						buildQrOptions({ width: pngResolution, height: pngResolution, type: 'canvas', data }),
 					);
 					const raw = (await qr.getRawData('png')) as Blob | null;
-					blob = raw && frameEnabled ? await composeFramedPng(raw, frameText) : raw;
+					blob = raw && frameEnabled ? await composeFramedPng(raw, effectiveFrameText) : raw;
 				} catch {
-					// Skips a line whose content doesn't fit the QR capacity at the
-					// current error correction level, rather than failing the whole batch.
+					blob = null;
+				}
+				if (!blob) {
+					failed.push({ line: entry.line, text: entry.text });
 					continue;
 				}
-				if (!blob) continue;
-				let name =
-					data
-						.replace(/^https?:\/\//, '')
-						.replace(/[^a-zA-Z0-9-_]+/g, '-')
-						.replace(/^-+|-+$/g, '')
-						.slice(0, 40) || `qrcode-${i + 1}`;
-				while (usedNames.has(name)) name = `${name}-${i + 1}`;
-				usedNames.add(name);
+				const name = uniqueName(batchBaseName(data, i), usedNames, i);
 				zip.file(`${name}.png`, blob);
+				ok += 1;
 			}
-			const zipBlob = await zip.generateAsync({ type: 'blob' });
-			const url = URL.createObjectURL(zipBlob);
-			const link = document.createElement('a');
-			link.href = url;
-			link.download = 'qrcodes.zip';
-			link.click();
-			URL.revokeObjectURL(url);
+			const cancelled = controller.signal.aborted;
+			if (ok > 0 && !cancelled) {
+				const zipBlob = await zip.generateAsync({ type: 'blob' });
+				saveBlob(zipBlob, 'qrcodes.zip');
+			}
+			setBatchResult({ ok, total: lines.length, failed, cancelled });
+		} catch (err) {
+			console.error('QR batch failed:', err);
+			setBatchResult({ ok, total: lines.length, failed, cancelled: false });
+			setActionError(messages.downloadError);
 		} finally {
+			batchAbortRef.current = null;
 			setIsBatchGenerating(false);
 			setBatchProgress(null);
 		}
 	};
+
+	const ariaLabel = qrAriaLabel(messages.qrAriaLabel, summary);
 
 	const contentTypeOptions: Array<{ value: ContentType; label: string }> = [
 		{ value: 'url', label: messages.typeUrl },
@@ -459,7 +506,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	};
 
 	const inputClass =
-		'w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground';
+		'min-h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground';
 
 	return (
 		<div className="flex flex-col gap-6 rounded-lg border border-border p-4 md:flex-row">
@@ -483,8 +530,8 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 				</div>
 
 				{canBatch && (
-					<label className="flex items-center gap-1.5 text-sm text-muted-foreground">
-						<input type="checkbox" checked={batchMode} onChange={(event) => setBatchMode(event.target.checked)} />
+					<label className="flex min-h-9 items-center gap-2 text-sm text-muted-foreground">
+						<input type="checkbox" className="size-4" checked={batchMode} onChange={(event) => setBatchMode(event.target.checked)} />
 						{messages.batchModeToggle}
 					</label>
 				)}
@@ -502,6 +549,9 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 							placeholder={messages.urlPlaceholder}
 							className={inputClass}
 						/>
+						{urlNormalized.added && (
+							<p className="text-xs text-muted-foreground">{messages.urlAutoHttps.replace('{{url}}', urlNormalized.value)}</p>
+						)}
 					</div>
 				)}
 
@@ -536,20 +586,37 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 							className={inputClass}
 						/>
 						<p className="text-xs text-muted-foreground">
-							{messages.batchLineCount.replace(
-								'{{count}}',
-								String(batchInput.split('\n').map((line) => line.trim()).filter(Boolean).length),
-							)}
+							{messages.batchLineCount.replace('{{count}}', String(batchParsed.lines.length))}
 						</p>
-						<Button
-							type="button"
-							size="sm"
-							className="w-fit"
-							onClick={() => void handleGenerateBatch()}
-							disabled={isBatchGenerating || batchInput.trim() === ''}
-						>
-							{isBatchGenerating ? messages.batchGenerating : messages.batchGenerateButton}
-						</Button>
+						{batchParsed.truncated && (
+							<p role="alert" className="text-xs text-destructive">
+								{messages.batchTruncated
+									.replace('{{max}}', String(BATCH_MAX_LINES))
+									.replace('{{total}}', String(batchParsed.total))}
+							</p>
+						)}
+						<div className="flex flex-wrap gap-2">
+							<Button
+								type="button"
+								size="sm"
+								className="min-h-9 w-fit"
+								onClick={() => void handleGenerateBatch()}
+								disabled={isBatchGenerating || batchParsed.lines.length === 0}
+							>
+								{isBatchGenerating ? messages.batchGenerating : messages.batchGenerateButton}
+							</Button>
+							{isBatchGenerating && (
+								<Button
+									type="button"
+									size="sm"
+									variant="outline"
+									className="min-h-9 w-fit"
+									onClick={() => batchAbortRef.current?.abort()}
+								>
+									{messages.batchCancel}
+								</Button>
+							)}
+						</div>
 						{batchProgress && batchProgress.total > 1 && (
 							<div role="status" className="flex flex-col gap-1.5">
 								<p className="text-xs text-muted-foreground">
@@ -558,6 +625,33 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 										.replace('{{total}}', String(batchProgress.total))}
 								</p>
 								<Progress value={Math.round((batchProgress.current / batchProgress.total) * 100)} />
+							</div>
+						)}
+						{batchResult && (
+							<div role="status" className="flex flex-col gap-1 text-xs">
+								<p className={batchResult.ok === 0 || batchResult.failed.length > 0 ? 'text-destructive' : 'text-foreground'}>
+									{batchResult.cancelled
+										? messages.batchCancelled
+										: batchResult.ok === 0
+											? messages.batchNoneSucceeded
+											: messages.batchSummary
+													.replace('{{ok}}', String(batchResult.ok))
+													.replace('{{total}}', String(batchResult.total))}
+								</p>
+								{batchResult.failed.length > 0 && (
+									<>
+										<p className="font-medium text-foreground">{messages.batchFailedHeading}</p>
+										<ul className="max-h-28 list-disc overflow-auto pl-4 text-muted-foreground">
+											{batchResult.failed.map((item) => (
+												<li key={item.line} className="break-all">
+													{messages.batchFailedLine
+														.replace('{{line}}', String(item.line))
+														.replace('{{text}}', item.text.length > 60 ? item.text.slice(0, 57) + '...' : item.text)}
+												</li>
+											))}
+										</ul>
+									</>
+								)}
 							</div>
 						)}
 					</div>
@@ -608,9 +702,10 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 								/>
 							</div>
 						)}
-						<label className="flex cursor-pointer items-center gap-1.5 text-sm text-foreground">
+						<label className="flex min-h-9 cursor-pointer items-center gap-2 text-sm text-foreground">
 							<input
 								type="checkbox"
+								className="size-4"
 								checked={wifi.hidden}
 								onChange={(event) => setWifi((prev) => ({ ...prev, hidden: event.target.checked }))}
 							/>
@@ -787,9 +882,10 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 				</div>
 
 				<div className="flex flex-col gap-2">
-					<label className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+					<label className="flex min-h-9 items-center gap-2 text-sm font-medium text-foreground">
 						<input
 							type="checkbox"
+							className="size-4"
 							checked={gradientEnabled}
 							onChange={(event) => setGradientEnabled(event.target.checked)}
 						/>
@@ -821,7 +917,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 										type="color"
 										value={gradientColorStart}
 										onChange={(event) => setGradientColorStart(event.target.value)}
-										className="h-9 w-16 cursor-pointer rounded-md border border-border bg-background"
+										className="h-11 w-16 cursor-pointer rounded-md border border-border bg-background"
 									/>
 								</div>
 								<div className="flex flex-col gap-1">
@@ -833,7 +929,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 										type="color"
 										value={gradientColorEnd}
 										onChange={(event) => setGradientColorEnd(event.target.value)}
-										className="h-9 w-16 cursor-pointer rounded-md border border-border bg-background"
+										className="h-11 w-16 cursor-pointer rounded-md border border-border bg-background"
 									/>
 								</div>
 							</div>
@@ -842,9 +938,10 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 				</div>
 
 				<div className="flex flex-col gap-2">
-					<label className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+					<label className="flex min-h-9 items-center gap-2 text-sm font-medium text-foreground">
 						<input
 							type="checkbox"
+							className="size-4"
 							checked={frameEnabled}
 							onChange={(event) => setFrameEnabled(event.target.checked)}
 						/>
@@ -863,7 +960,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 								placeholder={messages.frameTextPlaceholder}
 								className={inputClass}
 							/>
-							<p className="text-xs text-muted-foreground">{messages.frameNotice}</p>
+							<p id="qr-frame-notice" className="text-xs text-muted-foreground">{messages.frameNotice}</p>
 						</div>
 					)}
 				</div>
@@ -879,7 +976,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 							value={fgColor}
 							onChange={(event) => setFgColor(event.target.value)}
 							disabled={gradientEnabled}
-							className="h-9 w-16 cursor-pointer rounded-md border border-border bg-background disabled:cursor-not-allowed disabled:opacity-50"
+							className="h-11 w-16 cursor-pointer rounded-md border border-border bg-background disabled:cursor-not-allowed disabled:opacity-50"
 						/>
 					</div>
 					<div className="flex flex-col gap-1">
@@ -891,10 +988,15 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 							type="color"
 							value={bgColor}
 							onChange={(event) => setBgColor(event.target.value)}
-							className="h-9 w-16 cursor-pointer rounded-md border border-border bg-background"
+							className="h-11 w-16 cursor-pointer rounded-md border border-border bg-background"
 						/>
 					</div>
 				</div>
+				{contrastWarning && (
+					<p role="status" className="w-fit rounded-md bg-amber-500/15 px-2 py-1 text-xs font-medium text-amber-700 dark:text-amber-400">
+						{contrastWarning === 'inverted' ? messages.contrastInverted : messages.contrastLow}
+					</p>
+				)}
 
 				<div className="flex flex-col gap-1">
 					<label htmlFor="qr-level" className="text-sm font-medium text-foreground">
@@ -925,6 +1027,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 						step={8}
 						value={size}
 						onChange={(event) => setSize(Number(event.target.value))}
+						className="h-9 w-full cursor-pointer"
 					/>
 				</div>
 
@@ -936,13 +1039,29 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 						id="qr-logo"
 						type="file"
 						accept="image/*"
-						onChange={(event) => handleLogoChange(event.target.files)}
+						onChange={(event) => handleLogoChange(event.currentTarget)}
 						className="text-sm text-foreground"
 					/>
 					{logoUrl && (
-						<Button type="button" size="sm" variant="outline" className="mt-1 w-fit" onClick={() => setLogoUrl(null)}>
-							{messages.removeLogo}
-						</Button>
+						<div className="mt-1 flex items-center gap-2">
+							<img src={logoUrl} alt={messages.logoPreviewAlt} className="size-10 rounded border border-border object-contain" />
+							<span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+								{messages.logoSelected.replace('{{name}}', logoName ?? '')}
+							</span>
+							<Button type="button" size="sm" variant="outline" className="min-h-9 w-fit" onClick={handleRemoveLogo}>
+								{messages.removeLogo}
+							</Button>
+						</div>
+					)}
+					{logoError && (
+						<p role="alert" className="text-xs text-destructive">
+							{logoError}
+						</p>
+					)}
+					{logoNotice && (
+						<p role="status" className="text-xs text-muted-foreground">
+							{logoNotice}
+						</p>
 					)}
 				</div>
 
@@ -965,38 +1084,68 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 				</div>
 
 				{!effectiveBatchMode && (
-					<div className="flex flex-wrap gap-2">
-						<Button type="button" onClick={handleDownloadPng} disabled={isEmpty || tooLong}>
-							{messages.downloadPng}
-						</Button>
-						<Button
-							type="button"
-							variant="secondary"
-							onClick={handleDownloadSvg}
-							disabled={isEmpty || tooLong || frameEnabled}
-						>
-							{messages.downloadSvg}
-						</Button>
+					<div className="flex flex-col gap-2">
+						<div className="flex flex-wrap gap-2">
+							<Button
+								type="button"
+								className="min-h-10"
+								onClick={handleDownloadPng}
+								disabled={downloadDisabled}
+								aria-describedby={isEmpty ? 'qr-download-reason' : undefined}
+							>
+								{messages.downloadPng}
+							</Button>
+							<Button
+								type="button"
+								variant="secondary"
+								className="min-h-10"
+								onClick={handleDownloadSvg}
+								disabled={downloadDisabled || frameEnabled}
+								aria-describedby={isEmpty ? 'qr-download-reason' : frameEnabled ? 'qr-frame-notice' : undefined}
+							>
+								{messages.downloadSvg}
+							</Button>
+						</div>
+						{isEmpty && (
+							<p id="qr-download-reason" className="text-xs text-muted-foreground">
+								{messages.downloadDisabledEmpty}
+							</p>
+						)}
+						{actionError && (
+							<p role="alert" className="text-xs text-destructive">
+								{actionError}
+							</p>
+						)}
 					</div>
 				)}
 			</div>
 
-			<div className="flex flex-1 items-center justify-center rounded-md border border-border p-6">
-				{tooLong && !effectiveBatchMode && (
-					<p role="alert" className="max-w-xs text-center text-sm text-destructive">{messages.errorTooLong}</p>
+			<div className="flex min-w-0 flex-1 flex-col items-center justify-center gap-3 rounded-md border border-border p-6">
+				{!effectiveBatchMode && isEmpty && (
+					<p className="max-w-xs text-center text-sm text-muted-foreground">{messages.emptyState}</p>
+				)}
+				{!effectiveBatchMode && !isEmpty && hasRenderError && (
+					<p role="alert" className="max-w-xs text-center text-sm text-destructive">
+						{activeError === 'capacity'
+							? messages.errorTooLong
+							: activeError === 'canvas'
+								? messages.errorCanvasSmall
+								: messages.errorRender}
+					</p>
 				)}
 				{effectiveBatchMode && (
 					<p className="max-w-xs text-center text-sm text-muted-foreground">{messages.batchPreviewNotice}</p>
 				)}
-				{/* Kept mounted (never removed from the JSX tree) even while `tooLong` is
-				    true, just visually hidden — qr-code-styling's instance holds a
-				    reference to this exact DOM node via `.append()`, and removing it from
-				    the tree would leave `.update()` writing into a detached element that
-				    never becomes visible again once the input is valid. */}
+				{/* Kept mounted (never removed from the JSX tree), just visually hidden:
+				    qr-code-styling's instance holds a reference to this exact DOM node via
+				    .append(), and removing it from the tree would leave .update() writing
+				    into a detached element. */}
 				<div
 					ref={containerRef}
-					style={{ width: size, height: size }}
-					className={tooLong || effectiveBatchMode ? 'hidden' : undefined}
+					role="img"
+					aria-label={ariaLabel}
+					style={{ width: size, height: size, maxWidth: '100%' }}
+					className={hasRenderError || effectiveBatchMode || isEmpty ? 'hidden' : '[&>canvas]:h-auto [&>canvas]:max-w-full'}
 				/>
 			</div>
 		</div>

@@ -1,5 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useCopyToClipboard } from './useCopyToClipboard';
+import { computeTextStats, computeTopWords, fleschReadingEase, looksEnglish, type Duration } from '@/lib/word-count';
 
 interface Messages {
 	placeholder: string;
@@ -40,6 +42,13 @@ interface Messages {
 	keywordDensityCountColumn: string;
 	keywordDensityPercentColumn: string;
 	uploadFile: string;
+	textareaLabel: string;
+	readingTimeHoursValue: string;
+	speakingTimeHoursValue: string;
+	readabilityEnglishOnly: string;
+	readabilityCalibrationNote: string;
+	fileReadError: string;
+	copyFailed: string;
 }
 
 type CharLimitPreset = 'none' | 'twitter' | 'meta-description' | 'instagram' | 'youtube-title' | 'sms';
@@ -52,76 +61,7 @@ const CHAR_LIMITS: Record<Exclude<CharLimitPreset, 'none'>, number> = {
 	sms: 160,
 };
 
-interface TopWord {
-	word: string;
-	count: number;
-	percent: number;
-}
-
-// Average reading speed (~200 wpm) and speaking/presenting speed (~130 wpm) are the
-// two figures most word-count tools (WordCounter.net included) settle on.
-const READING_WORDS_PER_MINUTE = 200;
-const SPEAKING_WORDS_PER_MINUTE = 130;
 const TOP_WORDS_LIMIT = 10;
-
-function countStats(text: string) {
-	const characters = text.length;
-	const charactersNoSpaces = text.replace(/\s/g, '').length;
-	const trimmed = text.trim();
-	const words = trimmed === '' ? 0 : trimmed.split(/\s+/).length;
-	const sentences =
-		trimmed === '' ? 0 : (trimmed.match(/[^.!?]*[.!?]+|[^.!?]+$/g) ?? []).filter((s) => s.trim() !== '').length;
-	const paragraphs =
-		trimmed === '' ? 0 : trimmed.split(/\n\s*\n/).filter((p) => p.trim() !== '').length;
-	const readingMinutes = words === 0 ? 0 : Math.max(1, Math.round(words / READING_WORDS_PER_MINUTE));
-	const speakingMinutes = words === 0 ? 0 : Math.max(1, Math.round(words / SPEAKING_WORDS_PER_MINUTE));
-
-	return { characters, charactersNoSpaces, words, sentences, paragraphs, readingMinutes, speakingMinutes };
-}
-
-// Keyword density: how often each distinct word occurs, as a share of total word
-// count — deliberately NOT filtering out common words ("the", "and", ...), matching
-// how WordCounter.net's own keyword density table works, since SEO users specifically
-// want to see if a word (including a stop word used as a keyword) is over-repeated.
-function computeTopWords(text: string, limit: number): TopWord[] {
-	const trimmed = text.trim();
-	if (trimmed === '') return [];
-	const matches = trimmed.toLowerCase().match(/[\p{L}\p{N}']+/gu) ?? [];
-	if (matches.length === 0) return [];
-
-	const counts = new Map<string, number>();
-	for (const word of matches) {
-		counts.set(word, (counts.get(word) ?? 0) + 1);
-	}
-
-	const total = matches.length;
-	return Array.from(counts.entries())
-		.sort((a, b) => b[1] - a[1])
-		.slice(0, limit)
-		.map(([word, count]) => ({ word, count, percent: (count / total) * 100 }));
-}
-
-// Approximate English syllable counter (vowel-group heuristic with common English
-// suffix adjustments) — the standard trick used by most lightweight readability tools,
-// since browsers have no dictionary-based syllabifier built in. Meaningful for English
-// text specifically; other languages will still get a number, just not a calibrated one.
-function countSyllables(word: string): number {
-	const w = word.toLowerCase().replace(/[^a-z]/g, '');
-	if (w.length === 0) return 0;
-	if (w.length <= 3) return 1;
-	const trimmed = w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '').replace(/^y/, '');
-	const groups = trimmed.match(/[aeiouy]{1,2}/g);
-	return groups ? Math.max(1, groups.length) : 1;
-}
-
-function fleschReadingEase(words: number, sentences: number, text: string): number | null {
-	if (words === 0 || sentences === 0) return null;
-	const wordList = text.trim().toLowerCase().match(/[a-z']+/g) ?? [];
-	if (wordList.length === 0) return null;
-	const syllables = wordList.reduce((sum, w) => sum + countSyllables(w), 0);
-	const score = 206.835 - 1.015 * (words / sentences) - 84.6 * (syllables / wordList.length);
-	return Math.max(0, Math.min(100, score));
-}
 
 function readabilityLevel(score: number, messages: Messages): string {
 	if (score >= 90) return messages.readabilityVeryEasy;
@@ -133,8 +73,18 @@ function readabilityLevel(score: number, messages: Messages): string {
 	return messages.readabilityVeryConfusing;
 }
 
-function CopyButton({ value, label, copiedLabel }: { value: string; label: string; copiedLabel: string }) {
-	const [copied, setCopied] = useState(false);
+function CopyButton({
+	value,
+	label,
+	copiedLabel,
+	failedLabel,
+}: {
+	value: string;
+	label: string;
+	copiedLabel: string;
+	failedLabel: string;
+}) {
+	const { copied, failed, copy } = useCopyToClipboard();
 	return (
 		<Button
 			aria-live="polite"
@@ -142,36 +92,46 @@ function CopyButton({ value, label, copiedLabel }: { value: string; label: strin
 			variant="outline"
 			size="sm"
 			disabled={value === ''}
-			onClick={() => {
-				void navigator.clipboard.writeText(value).then(() => {
-					setCopied(true);
-					setTimeout(() => setCopied(false), 1500);
-				});
-			}}
+			onClick={() => void copy(value)}
 		>
-			{copied ? copiedLabel : label}
+			{copied ? copiedLabel : failed ? failedLabel : label}
 		</Button>
 	);
 }
 
-export default function WordCounter({ messages }: { messages: Messages }) {
+function formatDuration(duration: Duration, minutesTemplate: string, hoursTemplate: string): string {
+	if (duration.hours > 0) {
+		return hoursTemplate.replace('{{hours}}', String(duration.hours)).replace('{{minutes}}', String(duration.minutes));
+	}
+	return minutesTemplate.replace('{{minutes}}', String(duration.minutes));
+}
+
+export default function WordCounter({ messages, lang = 'en' }: { messages: Messages; lang?: string }) {
 	const [text, setText] = useState('');
 	const [charLimitPreset, setCharLimitPreset] = useState<CharLimitPreset>('none');
-	const stats = useMemo(() => countStats(text), [text]);
-	const topWords = useMemo(() => computeTopWords(text, TOP_WORDS_LIMIT), [text]);
+	const [uploadError, setUploadError] = useState(false);
+	const fileInputRef = useRef<HTMLInputElement>(null);
+	const { stats, wordList } = useMemo(() => computeTextStats(text, lang), [text, lang]);
+	const topWords = useMemo(() => computeTopWords(wordList, TOP_WORDS_LIMIT), [wordList]);
+	const isEnglishText = useMemo(() => looksEnglish(text), [text]);
 	const readabilityScore = useMemo(
-		() => fleschReadingEase(stats.words, stats.sentences, text),
-		[stats.words, stats.sentences, text],
+		() => (isEnglishText ? fleschReadingEase(text, stats.sentences) : null),
+		[isEnglishText, text, stats.sentences],
 	);
 
-	const handleFileUpload = (fileList: FileList | null) => {
-		const file = fileList?.[0];
+	const handleFileUpload = (input: HTMLInputElement) => {
+		const file = input.files?.[0];
 		if (!file) return;
+		setUploadError(false);
 		const reader = new FileReader();
 		reader.onload = () => {
-			if (typeof reader.result === 'string') setText(reader.result);
+			// CRLF -> LF so Windows files don't differ from pasted text in any count.
+			if (typeof reader.result === 'string') setText(reader.result.replace(/\r\n?/g, '\n'));
 		};
+		reader.onerror = () => setUploadError(true);
 		reader.readAsText(file);
+		// Allow re-selecting the same file afterwards.
+		input.value = '';
 	};
 
 	const download = () => {
@@ -195,11 +155,11 @@ export default function WordCounter({ messages }: { messages: Messages }) {
 		{ label: messages.paragraphsLabel, value: stats.paragraphs },
 		{
 			label: messages.readingTimeLabel,
-			value: messages.readingTimeValue.replace('{{minutes}}', String(stats.readingMinutes)),
+			value: formatDuration(stats.reading, messages.readingTimeValue, messages.readingTimeHoursValue),
 		},
 		{
 			label: messages.speakingTimeLabel,
-			value: messages.speakingTimeValue.replace('{{minutes}}', String(stats.speakingMinutes)),
+			value: formatDuration(stats.speaking, messages.speakingTimeValue, messages.speakingTimeHoursValue),
 		},
 	];
 
@@ -209,6 +169,7 @@ export default function WordCounter({ messages }: { messages: Messages }) {
 				value={text}
 				onChange={(event) => setText(event.target.value)}
 				placeholder={messages.placeholder}
+				aria-label={messages.textareaLabel}
 				rows={14}
 				className="w-full resize-y rounded-md border border-border bg-background p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
 			/>
@@ -218,25 +179,26 @@ export default function WordCounter({ messages }: { messages: Messages }) {
 					<Button type="button" variant="outline" size="sm" onClick={() => setText('')} disabled={text === ''}>
 						{messages.clear}
 					</Button>
-					<CopyButton value={text} label={messages.copy} copiedLabel={messages.copied} />
+					<CopyButton value={text} label={messages.copy} copiedLabel={messages.copied} failedLabel={messages.copyFailed} />
 					<Button type="button" variant="outline" size="sm" onClick={download} disabled={text === ''}>
 						{messages.download}
 					</Button>
 					<label
 						htmlFor="word-counter-file-input"
-						className="inline-flex h-7 cursor-pointer items-center rounded-md border border-border px-2.5 text-[0.8rem] font-medium text-foreground hover:bg-muted"
+						className="has-[+input:focus-visible]:ring-2 has-[+input:focus-visible]:ring-ring inline-flex h-7 cursor-pointer items-center rounded-md border border-border px-2.5 text-[0.8rem] font-medium text-foreground hover:bg-muted"
 					>
 						{messages.uploadFile}
 					</label>
 					<input
 						id="word-counter-file-input"
+						ref={fileInputRef}
 						type="file"
 						accept=".txt,text/plain"
-						className="hidden"
-						onChange={(event) => handleFileUpload(event.target.files)}
+						className="sr-only"
+						onChange={(event) => handleFileUpload(event.target)}
 					/>
 				</div>
-				<div className="flex items-center gap-2">
+				<div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
 					<label htmlFor="word-counter-char-limit" className="text-xs text-muted-foreground">
 						{messages.charLimitLabel}
 					</label>
@@ -244,7 +206,7 @@ export default function WordCounter({ messages }: { messages: Messages }) {
 						id="word-counter-char-limit"
 						value={charLimitPreset}
 						onChange={(event) => setCharLimitPreset(event.target.value as CharLimitPreset)}
-						className="rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+						className="min-w-0 max-w-full rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
 					>
 						<option value="none">{messages.charLimitNone}</option>
 						<option value="twitter">{messages.charLimitTwitter}</option>
@@ -255,6 +217,12 @@ export default function WordCounter({ messages }: { messages: Messages }) {
 					</select>
 				</div>
 			</div>
+
+			{uploadError && (
+				<p role="alert" className="text-sm text-destructive">
+					{messages.fileReadError}
+				</p>
+			)}
 
 			{charLimitRemaining !== null && (
 				<p
@@ -278,7 +246,9 @@ export default function WordCounter({ messages }: { messages: Messages }) {
 
 			<div className="flex flex-col gap-2 rounded-md border border-border p-3">
 				<h2 className="text-sm font-semibold text-foreground">{messages.readabilityHeading}</h2>
-				{readabilityScore === null ? (
+				{text.trim() !== '' && !isEnglishText ? (
+					<p className="text-sm text-muted-foreground">{messages.readabilityEnglishOnly}</p>
+				) : readabilityScore === null ? (
 					<p className="text-sm text-muted-foreground">{messages.readabilityNotEnoughText}</p>
 				) : (
 					<div className="flex items-center gap-3">
@@ -288,6 +258,9 @@ export default function WordCounter({ messages }: { messages: Messages }) {
 							<span className="text-sm font-medium text-foreground">{readabilityLevel(readabilityScore, messages)}</span>
 						</div>
 					</div>
+				)}
+				{readabilityScore !== null && lang !== 'en' && (
+					<p className="text-xs text-muted-foreground">{messages.readabilityCalibrationNote}</p>
 				)}
 			</div>
 

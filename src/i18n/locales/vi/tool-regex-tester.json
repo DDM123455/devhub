@@ -51,7 +51,14 @@
     "cheat12": "\\b — ranh giới từ (word boundary), | — phép OR (một trong hai)",
     "historyHeading": "Pattern gần đây",
     "historyClear": "Xóa lịch sử",
-    "copyShareLink": "Sao chép link chia sẻ"
+    "copyShareLink": "Sao chép link chia sẻ",
+    "matchCountOne": "1 kết quả khớp",
+    "matchCountTruncated": "hiển thị {{shown}} kết quả đầu tiên trong tổng số {{total}}",
+    "matchCountTruncatedMore": "hiển thị {{shown}} kết quả đầu tiên trong hơn {{total}} kết quả",
+    "unicodeHint": "Gợi ý: \\p{...} / \\P{...} chỉ hoạt động như thuộc tính Unicode khi bật cờ u. Nếu không, chúng khớp với đúng chuỗi ký tự đó.",
+    "copyFailed": "Sao chép thất bại",
+    "copyResultAria": "Sao chép kết quả thay thế",
+    "clearAria": "Xóa mẫu, chuỗi kiểm tra và chuỗi thay thế"
   },
   "related": "Công cụ liên quan",
   "faq": {

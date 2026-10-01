@@ -1,6 +1,28 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import type { RegexMatchGroup, RegexMatchRequest, RegexMatchResponse } from './regexMatchWorker';
+import type { RegexMatchGroup, RegexMatchRequest, RegexMatchResponse, RegexWorkerReady } from './regexMatchWorker';
+import { useCopyToClipboard } from './useCopyToClipboard';
+
+function CopyButton({
+	value,
+	label,
+	copiedLabel,
+	failedLabel,
+	ariaLabel,
+}: {
+	value: string;
+	label: string;
+	copiedLabel: string;
+	failedLabel: string;
+	ariaLabel?: string;
+}) {
+	const { copied, failed, copy } = useCopyToClipboard();
+	return (
+		<Button aria-live="polite" aria-label={ariaLabel} type="button" size="sm" variant="ghost" disabled={value === ''} onClick={() => void copy(value)}>
+			{copied ? copiedLabel : failed ? failedLabel : label}
+		</Button>
+	);
+}
 
 interface Messages {
 	patternLabel: string;
@@ -49,6 +71,13 @@ interface Messages {
 	historyHeading: string;
 	historyClear: string;
 	copyShareLink: string;
+	matchCountOne: string;
+	matchCountTruncated: string;
+	matchCountTruncatedMore: string;
+	unicodeHint: string;
+	copyFailed: string;
+	copyResultAria: string;
+	clearAria: string;
 }
 
 interface FlagState {
@@ -109,27 +138,6 @@ function useDebouncedValue<T>(value: T, delayMs: number): T {
 	return debounced;
 }
 
-function CopyButton({ value, label, copiedLabel }: { value: string; label: string; copiedLabel: string }) {
-	const [copied, setCopied] = useState(false);
-	return (
-		<Button
-			aria-live="polite"
-			type="button"
-			size="sm"
-			variant="ghost"
-			disabled={value === ''}
-			onClick={() => {
-				void navigator.clipboard.writeText(value).then(() => {
-					setCopied(true);
-					setTimeout(() => setCopied(false), 1500);
-				});
-			}}
-		>
-			{copied ? copiedLabel : label}
-		</Button>
-	);
-}
-
 export default function RegexTester({ messages }: { messages: Messages }) {
 	const [pattern, setPattern] = useState('');
 	const [flags, setFlags] = useState<FlagState>(DEFAULT_FLAGS);
@@ -143,7 +151,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 	// (same guard used in JwtDecoder.tsx's share-link feature).
 	const shareLink =
 		typeof window !== 'undefined' && pattern.trim() !== ''
-			? `${window.location.origin}${window.location.pathname}?${new URLSearchParams({
+			? `${window.location.origin}${window.location.pathname}#${new URLSearchParams({
 					pattern,
 					flags: selectedFlags,
 					test: testString,
@@ -157,6 +165,9 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 	const debouncedReplacement = useDebouncedValue(replacement, DEBOUNCE_MS);
 
 	const [matches, setMatches] = useState<RegexMatchGroup[]>([]);
+	const [totalCount, setTotalCount] = useState(0);
+	const [countCapped, setCountCapped] = useState(false);
+	const [resultText, setResultText] = useState('');
 	const [error, setError] = useState<string | null>(null);
 	const [replaceResult, setReplaceResult] = useState<string | null>(null);
 	const [isRunning, setIsRunning] = useState(false);
@@ -171,7 +182,9 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 	// test string once on mount. One-way import, not a synced URL — typing
 	// doesn't rewrite the address bar (same reasoning as JWT Decoder's `?token=`).
 	useEffect(() => {
-		const params = new URLSearchParams(window.location.search);
+		// Hash first (current share links; never sent to a server); legacy ?query links still load.
+		const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+		const params = hashParams.has('pattern') ? hashParams : new URLSearchParams(window.location.search);
 		const urlPattern = params.get('pattern');
 		if (urlPattern === null) return;
 		setPattern(urlPattern);
@@ -181,21 +194,33 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	// History only records a pattern the user has settled on (pattern field blurred) AND that
+	// compiled without error — not every intermediate keystroke state. The state update and the
+	// localStorage write are separate steps (no side effects inside the setState updater).
 	const saveToHistory = (patternValue: string, flagsValue: string) => {
 		if (patternValue.trim() === '') return;
-		setHistory((prev) => {
-			const next = [
-				{ pattern: patternValue, flags: flagsValue },
-				...prev.filter((entry) => !(entry.pattern === patternValue && entry.flags === flagsValue)),
-			].slice(0, HISTORY_LIMIT);
-			try {
-				localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(next));
-			} catch {
-				// Ignore quota/private-mode errors — history is a convenience, not core functionality.
-			}
-			return next;
-		});
+		const next = [
+			{ pattern: patternValue, flags: flagsValue },
+			...history.filter((entry) => !(entry.pattern === patternValue && entry.flags === flagsValue)),
+		].slice(0, HISTORY_LIMIT);
+		setHistory(next);
+		try {
+			localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(next));
+		} catch {
+			// Ignore quota/private-mode errors — history is a convenience, not core functionality.
+		}
 	};
+
+	const visibleError = pattern === '' ? null : error;
+	const needsUnicodeHint = !flags.u && /\\[pP]\{/.test(pattern);
+	const matchCountText =
+		totalCount === 1
+			? messages.matchCountOne
+			: matches.length < totalCount || countCapped
+				? (countCapped ? messages.matchCountTruncatedMore : messages.matchCountTruncated)
+						.replace('{{shown}}', String(matches.length))
+						.replace('{{total}}', String(totalCount))
+				: messages.matchCount.replace('{{count}}', String(totalCount));
 
 	const handleLoadHistoryEntry = (entry: HistoryEntry) => {
 		setPattern(entry.pattern);
@@ -224,12 +249,16 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 
 	// Runs matching in a dedicated Web Worker with a hard timeout: a pattern with
 	// catastrophic backtracking runs synchronously forever, and only terminating the
-	// worker thread can actually stop it — a main-thread try/catch cannot.
+	// worker thread can actually stop it — a main-thread try/catch cannot. The timeout is
+	// armed only AFTER the worker reports `ready`, so slow worker start-up (cold cache,
+	// busy machine) is never mistaken for a runaway pattern.
 	useEffect(() => {
 		stopWorker();
 
 		if (debouncedPattern === '') {
 			setMatches([]);
+			setTotalCount(0);
+			setCountCapped(false);
 			setError(null);
 			setReplaceResult(null);
 			setIsRunning(false);
@@ -242,19 +271,45 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 		const worker = new Worker(new URL('./regexMatchWorker.ts', import.meta.url), { type: 'module' });
 		workerRef.current = worker;
 
-		worker.onmessage = (event: MessageEvent<RegexMatchResponse>) => {
+		const request: RegexMatchRequest = {
+			requestId,
+			pattern: debouncedPattern,
+			flags: debouncedFlags,
+			testString: debouncedTestString,
+			replacement: debouncedReplacement,
+		};
+
+		worker.onmessage = (event: MessageEvent<RegexMatchResponse | RegexWorkerReady>) => {
+			if ('ready' in event.data) {
+				if (requestId !== requestIdRef.current) return;
+				worker.postMessage(request);
+				timeoutRef.current = setTimeout(() => {
+					if (requestId !== requestIdRef.current) return;
+					stopWorker();
+					setIsRunning(false);
+					setError(messages.timeoutError);
+					setMatches([]);
+					setTotalCount(0);
+					setReplaceResult(null);
+				}, WORKER_TIMEOUT_MS);
+				return;
+			}
 			if (event.data.requestId !== requestIdRef.current) return;
 			stopWorker();
 			setIsRunning(false);
 			if (event.data.error) {
 				setError(messages.invalidPatternError.replace('{{message}}', event.data.error));
 				setMatches([]);
+				setTotalCount(0);
 				setReplaceResult(null);
 			} else {
 				setError(null);
 				setMatches(event.data.matches);
+				setTotalCount(event.data.totalCount);
+				setCountCapped(event.data.countCapped);
 				setReplaceResult(event.data.replaceResult);
-				saveToHistory(debouncedPattern, debouncedFlags);
+				// The matches belong to THIS text — highlighting must not pair them with newer text.
+				setResultText(request.testString);
 			}
 		};
 		worker.onerror = () => {
@@ -263,26 +318,9 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 			setIsRunning(false);
 			setError(messages.invalidPatternError.replace('{{message}}', 'worker error'));
 			setMatches([]);
+			setTotalCount(0);
 			setReplaceResult(null);
 		};
-
-		const request: RegexMatchRequest = {
-			requestId,
-			pattern: debouncedPattern,
-			flags: debouncedFlags,
-			testString: debouncedTestString,
-			replacement: debouncedReplacement,
-		};
-		worker.postMessage(request);
-
-		timeoutRef.current = setTimeout(() => {
-			if (requestId !== requestIdRef.current) return;
-			stopWorker();
-			setIsRunning(false);
-			setError(messages.timeoutError);
-			setMatches([]);
-			setReplaceResult(null);
-		}, WORKER_TIMEOUT_MS);
 
 		return stopWorker;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -293,7 +331,8 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 		const parts: { text: string; isMatch: boolean }[] = [];
 		let lastIndex = 0;
 		for (const m of matches) {
-			if (m.index > lastIndex) parts.push({ text: debouncedTestString.slice(lastIndex, m.index), isMatch: false });
+			if (m.index < lastIndex || m.index > resultText.length) continue;
+			if (m.index > lastIndex) parts.push({ text: resultText.slice(lastIndex, m.index), isMatch: false });
 			if (m.fullMatch.length > 0) {
 				parts.push({ text: m.fullMatch, isMatch: true });
 				lastIndex = m.index + m.fullMatch.length;
@@ -301,9 +340,9 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 				lastIndex = m.index;
 			}
 		}
-		if (lastIndex < debouncedTestString.length) parts.push({ text: debouncedTestString.slice(lastIndex), isMatch: false });
+		if (lastIndex < resultText.length) parts.push({ text: resultText.slice(lastIndex), isMatch: false });
 		return parts;
-	}, [matches, debouncedTestString, debouncedPattern, error]);
+	}, [matches, resultText, debouncedPattern, error]);
 
 	const flagCheckbox = (key: keyof FlagState, label: string) => (
 		<label className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -345,6 +384,11 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 							type="text"
 							value={pattern}
 							onChange={(e) => setPattern(e.target.value)}
+							onBlur={() => {
+								if (!error && pattern === debouncedPattern) saveToHistory(pattern, selectedFlags);
+							}}
+							aria-invalid={visibleError ? true : undefined}
+							aria-describedby={visibleError ? 'regex-error' : undefined}
 							placeholder={messages.patternPlaceholder}
 							spellCheck={false}
 							className="w-full bg-transparent py-2 outline-none"
@@ -380,7 +424,12 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 					/>
 				</div>
 
-				{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+				{visibleError && (
+					<p id="regex-error" role="alert" className="text-sm text-destructive">
+						{visibleError}
+					</p>
+				)}
+				{needsUnicodeHint && <p className="text-xs text-amber-700 dark:text-amber-400">{messages.unicodeHint}</p>}
 				{isRunning && <p role="status" className="text-xs text-muted-foreground">{messages.computingLabel}</p>}
 
 				<div className="flex flex-wrap items-center gap-2">
@@ -388,6 +437,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 						type="button"
 						size="sm"
 						variant="ghost"
+						aria-label={messages.clearAria}
 						onClick={() => {
 							setPattern('');
 							setTestString('');
@@ -397,7 +447,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 						{messages.clear}
 					</Button>
 					{pattern.trim() !== '' && (
-						<CopyButton value={shareLink} label={messages.copyShareLink} copiedLabel={messages.copied} />
+						<CopyButton value={shareLink} label={messages.copyShareLink} copiedLabel={messages.copied} failedLabel={messages.copyFailed} />
 					)}
 				</div>
 
@@ -426,7 +476,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 				)}
 			</div>
 
-			{segments && debouncedTestString !== '' && (
+			{segments && resultText !== '' && (
 				<div className="flex flex-col gap-2 rounded-lg border border-border p-4">
 					<span className="text-sm font-medium text-foreground">{messages.highlightedHeading}</span>
 					<pre className="max-h-64 overflow-auto rounded-md bg-muted p-3 font-mono text-xs whitespace-pre-wrap text-foreground">
@@ -447,12 +497,10 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 				<div className="flex flex-col gap-3 rounded-lg border border-border p-4">
 					<span className="text-sm font-medium text-foreground">
 						{messages.matchesHeading} —{' '}
-						{matches.length > 0
-							? messages.matchCount.replace('{{count}}', String(matches.length))
-							: messages.noMatches}
+						{totalCount > 0 ? matchCountText : messages.noMatches}
 					</span>
 					{matches.length > 0 && (
-						<ul className="flex flex-col gap-3">
+						<ul className="flex max-h-[32rem] flex-col gap-3 overflow-auto">
 							{matches.map((m, i) => (
 								<li key={i} className="rounded-md border border-border p-3 text-xs">
 									<div className="font-medium text-foreground">
@@ -507,7 +555,7 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 						<div className="flex flex-col gap-1">
 							<div className="flex items-center justify-between">
 								<span className="text-xs text-muted-foreground">{messages.resultLabel}</span>
-								<CopyButton value={replaceResult} label={messages.copy} copiedLabel={messages.copied} />
+								<CopyButton value={replaceResult} label={messages.copy} copiedLabel={messages.copied} failedLabel={messages.copyFailed} ariaLabel={messages.copyResultAria} />
 							</div>
 							<textarea
 								readOnly

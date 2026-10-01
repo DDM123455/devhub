@@ -37,7 +37,8 @@
     "errorInvalidEveryN": "Nhập một số nguyên từ 1 trở lên.",
     "errorNoPagesSelected": "Chọn ít nhất một trang để trích xuất.",
     "selectPageAria": "Chọn trang {{number}}",
-    "processingQueue": "Đang xử lý {{current}}/{{total}}"
+    "processingQueue": "Đang xử lý {{current}}/{{total}}",
+    "errorPassword": "PDF này được bảo vệ bằng mật khẩu. Hãy gỡ mật khẩu trước (mở bằng trình đọc PDF và lưu bản không mật khẩu) rồi thử lại."
   },
   "related": "Công cụ liên quan",
   "faq": {

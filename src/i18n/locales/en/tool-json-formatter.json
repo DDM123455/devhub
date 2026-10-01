@@ -31,7 +31,13 @@
     "compareDiffCount": "{{count}} difference(s) found:",
     "compareAdded": "added",
     "compareRemoved": "removed",
-    "compareChanged": "changed"
+    "compareChanged": "changed",
+    "warnUnsafeNumbers": "The JSON contains numbers beyond JavaScript's safe precision (more than 15-17 significant digits). They were rounded in this result — keep such values as strings.",
+    "warnDuplicateKeys": "The JSON contains duplicate keys. Only the last value of each duplicated key is kept in this result.",
+    "warnCsvCollisions": "Some flattened column names collided and were overwritten: {{keys}}",
+    "copyFailed": "Copy failed",
+    "copyExportAria": "Copy {{format}} export",
+    "downloadExportAria": "Download {{format}} export"
   },
   "related": "Related tools",
   "faq": {

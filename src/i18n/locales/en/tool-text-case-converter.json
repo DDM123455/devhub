@@ -26,7 +26,11 @@
     "clear": "Clear",
     "outputStats": "{{chars}} characters · {{words}} words",
     "uploadFile": "Upload .txt file",
-    "downloadFile": "Download .txt"
+    "downloadFile": "Download .txt",
+    "inputLabel": "Text to convert",
+    "naturalSort": "Natural sort (compare numbers by value: file2 before file10)",
+    "copyFailed": "Copy failed",
+    "fileReadError": "Could not read that file."
   },
   "related": "Related tools",
   "faq": {

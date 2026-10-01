@@ -1,0 +1,11 @@
+---
+import { locales } from '@/i18n/config';
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({ params: { locale } }));
+}
+
+// /{locale}/tools/ không có trang riêng: chuyển về danh sách công cụ ở trang chủ locale.
+const { locale } = Astro.params;
+return Astro.redirect(`/${locale}/`);
+---

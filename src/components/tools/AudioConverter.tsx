@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { baseNameOf } from '@/lib/file-utils';
+import { clampMp3Bitrate, downmixToStereo, nearestMp3SampleRate } from '@/lib/audio-utils';
 import type { EncodeRequest, EncodeResponseMessage } from './audioEncodeWorker';
 
 interface Messages {
@@ -27,6 +29,9 @@ interface Messages {
 	normalizeToggleLabel: string;
 	fadeInLabel: string;
 	fadeOutLabel: string;
+	resampleError: string;
+	bitrateAdjusted: string;
+	sampleRateAdjusted: string;
 }
 
 type OutputFormat = 'mp3' | 'wav';
@@ -138,6 +143,10 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 	const [resultUrl, setResultUrl] = useState<string | null>(null);
 	const [resultSize, setResultSize] = useState<number | null>(null);
 	const [resultDuration, setResultDuration] = useState<number | null>(null);
+	// Định dạng + tên tải về chốt lúc tạo kết quả: đổi dropdown sau đó không làm tên/đuôi sai với blob.
+	const [resultFileName, setResultFileName] = useState<string | null>(null);
+	const [adjustedBitrate, setAdjustedBitrate] = useState<number | null>(null);
+	const [adjustedRate, setAdjustedRate] = useState<number | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [channelCount, setChannelCount] = useState<number | null>(null);
 	const [resampleEnabled, setResampleEnabled] = useState(false);
@@ -148,17 +157,37 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const workerRef = useRef<Worker | null>(null);
+	// Tăng mỗi lần Clear / đổi file / unmount: tác vụ convert đang chạy so sánh token để bỏ kết quả cũ.
+	const runTokenRef = useRef(0);
+	const audioUrlRef = useRef<string | null>(null);
+	const resultUrlRef = useRef<string | null>(null);
+	audioUrlRef.current = audioUrl;
+	resultUrlRef.current = resultUrl;
+
+	const terminateWorker = () => {
+		workerRef.current?.terminate();
+		workerRef.current = null;
+	};
 
 	useEffect(() => {
 		return () => {
-			if (audioUrl) URL.revokeObjectURL(audioUrl);
-			if (resultUrl) URL.revokeObjectURL(resultUrl);
+			runTokenRef.current++;
 			workerRef.current?.terminate();
+			workerRef.current = null;
+			if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
+			if (resultUrlRef.current) URL.revokeObjectURL(resultUrlRef.current);
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const loadFile = (file: File) => {
+		// File mới: huỷ tác vụ cũ để kết quả cũ không hiện cạnh file mới.
+		runTokenRef.current++;
+		terminateWorker();
+		setProcessing(false);
+		setStage('idle');
+		setResultFileName(null);
+		setAdjustedBitrate(null);
+		setAdjustedRate(null);
 		if (audioUrl) URL.revokeObjectURL(audioUrl);
 		if (resultUrl) URL.revokeObjectURL(resultUrl);
 		setResultUrl(null);
@@ -178,15 +207,20 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 		if (file) loadFile(file);
 	};
 
-	const getWorker = () => {
-		if (!workerRef.current) {
-			workerRef.current = new Worker(new URL('./audioEncodeWorker.ts', import.meta.url), { type: 'module' });
-		}
+	// Mỗi lần encode dùng worker mới và terminate ngay khi xong (không giữ worker + lamejs trong bộ nhớ).
+	const createWorker = () => {
+		terminateWorker();
+		workerRef.current = new Worker(new URL('./audioEncodeWorker.ts', import.meta.url), { type: 'module' });
 		return workerRef.current;
 	};
 
 	const handleConvert = async () => {
 		if (!audioFile) return;
+		const token = ++runTokenRef.current;
+		const isStale = () => token !== runTokenRef.current;
+		// Chốt toàn bộ cài đặt tại thời điểm bấm.
+		const format = outputFormat;
+		const requestedBitrate = bitrate;
 		setError(null);
 		setProcessing(true);
 		setProgress(0);
@@ -194,18 +228,24 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 		setResultUrl(null);
 		setResultSize(null);
 		setResultDuration(null);
+		setResultFileName(null);
+		setAdjustedBitrate(null);
+		setAdjustedRate(null);
 
 		let audioCtx: AudioContext | null = null;
-		let currentStage: 'decoding' | 'encoding' = 'decoding';
+		let currentStage: 'decoding' | 'resampling' | 'encoding' = 'decoding';
 		try {
 			setStage('decoding');
 			const arrayBuffer = await audioFile.arrayBuffer();
 			const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
 			audioCtx = new AudioCtx();
 			const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+			if (isStale()) return;
 			setChannelCount(audioBuffer.numberOfChannels > 2 ? audioBuffer.numberOfChannels : null);
 			let channels: Float32Array[] = [];
 			for (let i = 0; i < audioBuffer.numberOfChannels; i++) channels.push(audioBuffer.getChannelData(i).slice());
+			// Downmix thật (ITU-R BS.775) thay vì bỏ kênh thừa.
+			channels = downmixToStereo(channels);
 			let sampleRate = audioBuffer.sampleRate;
 			const duration = audioBuffer.duration;
 
@@ -213,44 +253,84 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 			// encode worker — cheap per-sample math (or, for resample, a native
 			// OfflineAudioContext render), so there's no need to push this work
 			// into the worker too.
-			if (resampleEnabled && targetSampleRate !== sampleRate) {
-				channels = await resampleChannels(channels, sampleRate, targetSampleRate);
-				sampleRate = targetSampleRate;
+			currentStage = 'resampling';
+			let desiredRate = resampleEnabled ? targetSampleRate : sampleRate;
+			// MP3 chỉ hỗ trợ một số sample rate nhất định (vd 96 kHz thì không): tự đưa về giá trị hợp lệ gần nhất.
+			if (format === 'mp3') {
+				const valid = nearestMp3SampleRate(desiredRate);
+				if (valid !== desiredRate) setAdjustedRate(valid);
+				desiredRate = valid;
 			}
+			if (desiredRate !== sampleRate) {
+				channels = await resampleChannels(channels, sampleRate, desiredRate);
+				sampleRate = desiredRate;
+			}
+			if (isStale()) return;
 			if (normalizeEnabled) channels = normalizeChannels(channels);
 			if (fadeInSeconds > 0 || fadeOutSeconds > 0) {
 				channels = applyFade(channels, sampleRate, fadeInSeconds, fadeOutSeconds);
 			}
 
+			// Tổ hợp bitrate/sample rate không hợp lệ cho MP3 (vd 320 kbps ở 16 kHz) -> hạ bitrate.
+			let effectiveBitrate = requestedBitrate;
+			if (format === 'mp3') {
+				effectiveBitrate = clampMp3Bitrate(sampleRate, requestedBitrate);
+				if (effectiveBitrate !== requestedBitrate) setAdjustedBitrate(effectiveBitrate);
+			}
+
 			currentStage = 'encoding';
 			setStage('encoding');
-			const worker = getWorker();
+			const worker = createWorker();
 			const { data, mimeType } = await new Promise<{ data: Uint8Array; mimeType: string }>((resolve, reject) => {
 				worker.onmessage = (event: MessageEvent<EncodeResponseMessage>) => {
 					const msg = event.data;
+					if (isStale()) return;
 					if (msg.type === 'progress') setProgress(msg.percent);
 					else if (msg.type === 'done') resolve({ data: msg.data, mimeType: msg.mimeType });
 					else if (msg.type === 'error') reject(new Error(msg.message));
 				};
 				worker.onerror = (e) => reject(new Error(e.message));
-				const request: EncodeRequest = { format: outputFormat, bitrate, sampleRate, channels };
+				const request: EncodeRequest = { format, bitrate: effectiveBitrate, sampleRate, channels };
 				worker.postMessage(request, channels.map((c) => c.buffer));
 			});
+			if (isStale()) return;
 
-			const blob = new Blob([data], { type: mimeType });
+			const blob = new Blob([data as BlobPart], { type: mimeType });
 			setResultUrl(URL.createObjectURL(blob));
 			setResultSize(blob.size);
 			setResultDuration(duration);
+			const originalBase = baseNameOf(audioFile.name, 'audio');
+			const sameExt = audioFile.name.toLowerCase().endsWith('.' + format);
+			setResultFileName(originalBase + (sameExt ? '-converted' : '') + '.' + format);
 		} catch {
-			setError(currentStage === 'decoding' ? messages.decodeError : messages.encodeError);
+			if (!isStale()) {
+				setError(
+					currentStage === 'decoding'
+						? messages.decodeError
+						: currentStage === 'resampling'
+							? messages.resampleError
+							: messages.encodeError,
+				);
+			}
 		} finally {
-			setProcessing(false);
-			setStage('idle');
+			if (!isStale()) {
+				setProcessing(false);
+				setStage('idle');
+				terminateWorker();
+			}
 			void audioCtx?.close();
 		}
 	};
 
 	const handleClear = () => {
+		// Huỷ tác vụ đang chạy + dừng worker encode thật sự.
+		runTokenRef.current++;
+		terminateWorker();
+		setProcessing(false);
+		setStage('idle');
+		setResultFileName(null);
+		setAdjustedBitrate(null);
+		setAdjustedRate(null);
 		if (audioUrl) URL.revokeObjectURL(audioUrl);
 		if (resultUrl) URL.revokeObjectURL(resultUrl);
 		setAudioFile(null);
@@ -266,7 +346,7 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 		if (!resultUrl) return;
 		const link = document.createElement('a');
 		link.href = resultUrl;
-		link.download = outputFormat === 'mp3' ? 'converted.mp3' : 'converted.wav';
+		link.download = resultFileName ?? 'converted.mp3';
 		link.click();
 	};
 
@@ -289,20 +369,20 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 					}}
 				>
 					<p className="text-xs text-muted-foreground">{messages.dropLabel}</p>
-					<label
-						htmlFor="audio-converter-file-input"
-						className="inline-flex cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80"
-					>
+					<label className="inline-flex min-h-11 cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80 focus-within:ring-3 focus-within:ring-ring/50 sm:min-h-0">
 						{messages.chooseFile}
+						<input
+							id="audio-converter-file-input"
+							ref={fileInputRef}
+							type="file"
+							accept="audio/*"
+							className="sr-only"
+							onChange={(e) => {
+								handleFile(e.target.files);
+								e.target.value = '';
+							}}
+						/>
 					</label>
-					<input
-						id="audio-converter-file-input"
-						ref={fileInputRef}
-						type="file"
-						accept="audio/*"
-						className="hidden"
-						onChange={(e) => handleFile(e.target.files)}
-					/>
 				</div>
 			)}
 
@@ -440,6 +520,16 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 					</div>
 
 					{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+					{adjustedBitrate !== null && (
+						<p role="status" className="rounded-md border border-amber-500/40 bg-amber-500/10 p-2 text-sm text-amber-700 dark:text-amber-300">
+							{messages.bitrateAdjusted.replace('{{bitrate}}', String(adjustedBitrate))}
+						</p>
+					)}
+					{adjustedRate !== null && (
+						<p role="status" className="rounded-md border border-amber-500/40 bg-amber-500/10 p-2 text-sm text-amber-700 dark:text-amber-300">
+							{messages.sampleRateAdjusted.replace('{{rate}}', String(adjustedRate))}
+						</p>
+					)}
 					{channelCount !== null && (
 						<p role="status" className="rounded-md border border-amber-500/40 bg-amber-500/10 p-2 text-sm text-amber-700 dark:text-amber-300">
 							{messages.channelDownmixWarning.replace('{{count}}', String(channelCount))}

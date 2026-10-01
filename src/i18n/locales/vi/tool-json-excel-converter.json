@@ -26,7 +26,17 @@
     "moreRows": "còn +{{count}} dòng nữa trong file tải về",
     "download": "Tải file .xlsx",
     "generating": "Đang tạo file…",
-    "downloadError": "Không thể tạo file .xlsx: {{message}}"
+    "downloadError": "Không thể tạo file .xlsx: {{message}}",
+    "unwrapLabel": "Dùng mảng nằm trong một khóa duy nhất (ví dụ { \"users\": [...] })",
+    "unwrappedInfo": "Đang dùng mảng trong khóa \"{{key}}\" làm dữ liệu của sheet.",
+    "emptyState": "JSON này không có dòng nào để xuất. Hãy thêm ít nhất một phần tử vào mảng.",
+    "emptyKey": "(khóa rỗng)",
+    "previewCaption": "Xem trước sheet {{sheet}}",
+    "fileReadError": "Không đọc được tệp này.",
+    "warnTruncatedCells": "{{count}} ô dài hơn {{max}} ký tự (giới hạn của Excel) và sẽ bị cắt bớt.",
+    "warnRowLimit": "Sheet {{sheets}} vượt giới hạn {{max}} dòng dữ liệu của Excel; các dòng dư sẽ bị bỏ.",
+    "warnColLimit": "Sheet {{sheets}} vượt giới hạn {{max}} cột của Excel; các cột dư sẽ bị bỏ.",
+    "warnUnsafeIntegers": "{{count}} số nguyên lớn hơn 2^53 và có thể đã mất độ chính xác khi phân tích JSON. Hãy lưu các ID như vậy dưới dạng chuỗi."
   },
   "related": "Công cụ liên quan",
   "faq": {
@@ -34,7 +44,7 @@
     "q1": "File tạo ra có phải Excel thật, không phải CSV đổi tên không?",
     "a1": "Đúng vậy — một file .xlsx thật với dòng tiêu đề in đậm, ô số/boolean đúng kiểu dữ liệu, và cột được tính độ rộng sẵn.",
     "q2": "Một file JSON có thể tạo ra nhiều sheet không?",
-    "a2": "Có — nếu JSON gốc là object mà mỗi khóa cấp cao đều chứa một mảng, mỗi khóa sẽ tự động thành một sheet riêng.",
+    "a2": "Có — nếu JSON gốc là object mà mỗi khóa cấp cao đều chứa một mảng, mỗi khóa sẽ tự động thành một sheet riêng. Object chỉ chứa một mảng (ví dụ { \"users\": [...] }) sẽ được mở ra thành một sheet mang tên khóa đó.",
     "q3": "Có thể xem trước bảng tính trước khi tải về không?",
     "a3": "Có — bảng xem trước hiện các dòng đầu của mỗi sheet trước khi bạn tải file .xlsx."
   },

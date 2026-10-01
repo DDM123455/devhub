@@ -32,7 +32,17 @@
     "copied": "Copied!",
     "downloadMd": "Download .md",
     "downloadHtml": "Download .html",
-    "wordCount": "{{words}} words · {{chars}} characters"
+    "wordCount": "{{words}} words · {{chars}} characters",
+    "exportTitle": "Markdown export",
+    "previewAria": "Rendered preview",
+    "largeInputWarning": "This document is very large, so the live preview is turned off to keep the page responsive. You can still edit, copy and download it.",
+    "remoteImagesNote": "Note: images loaded from other websites are blocked by this site's security policy (CSP) and will not appear in the preview — use data: URIs or local files instead.",
+    "replacedNotice": "Content replaced.",
+    "undo": "Undo",
+    "draftSaved": "Draft saved in this browser.",
+    "draftSaveFailed": "Could not save the draft in this browser (storage full or blocked).",
+    "copyFailed": "Copy failed",
+    "fileReadError": "Could not read that file."
   },
   "related": "Related tools",
   "faq": {
@@ -42,7 +52,9 @@
     "q2": "Will I lose my work if I accidentally close the tab?",
     "a2": "No — your draft is automatically saved to your browser's local storage and restored the next time you open the tool.",
     "q3": "Can I export the result as HTML, not just Markdown?",
-    "a3": "Yes — download either the raw .md file or a standalone .html file with the rendered content."
+    "a3": "Yes — download either the raw .md file or a standalone .html file with the rendered content.",
+    "q4": "Do images from other websites show in the preview?",
+    "a4": "No — this site's Content Security Policy blocks images loaded from other domains to protect your privacy, so remote images will not render in the live preview. Use a data: URI or embed the image another way; the Markdown you export still contains the original link."
   },
   "article": {
     "heading": "Writing Markdown with a live preview, without a server",

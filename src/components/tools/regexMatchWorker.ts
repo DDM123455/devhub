@@ -1,5 +1,9 @@
 /// <reference lib="webworker" />
 
+import { runRegex, type RegexMatchGroup } from '@/lib/regex-match';
+
+export type { RegexMatchGroup };
+
 export interface RegexMatchRequest {
 	requestId: number;
 	pattern: string;
@@ -8,48 +12,37 @@ export interface RegexMatchRequest {
 	replacement: string;
 }
 
-export interface RegexMatchGroup {
-	fullMatch: string;
-	index: number;
-	groups: (string | undefined)[];
-	namedGroups: Record<string, string | undefined> | null;
-}
-
 export interface RegexMatchResponse {
 	requestId: number;
 	error: string | null;
+	/** At most MAX_RETURNED_MATCHES entries — enough to display; see totalCount for the real number. */
 	matches: RegexMatchGroup[];
+	/** Number of matches found (counting stops at MAX_COUNTED_MATCHES; see countCapped). */
+	totalCount: number;
+	countCapped: boolean;
 	replaceResult: string | null;
+}
+
+/** Sent once when the worker script has been loaded, so the caller's timeout excludes startup time. */
+export interface RegexWorkerReady {
+	ready: true;
 }
 
 self.onmessage = (event: MessageEvent<RegexMatchRequest>) => {
 	const { requestId, pattern, flags, testString, replacement } = event.data;
 	try {
-		const displayFlags = flags.includes('g') ? flags : `${flags}g`;
-		const displayRegex = new RegExp(pattern, displayFlags);
-		const found = [...testString.matchAll(displayRegex)];
-		const matches: RegexMatchGroup[] = found.map((m) => ({
-			fullMatch: m[0],
-			index: m.index ?? 0,
-			groups: m.slice(1),
-			namedGroups: m.groups ? { ...m.groups } : null,
-		}));
-
-		let replaceResult: string | null = null;
-		try {
-			const replaceRegex = new RegExp(pattern, flags);
-			replaceResult = testString.replace(replaceRegex, replacement);
-		} catch {
-			replaceResult = null;
-		}
-
-		postMessage({ requestId, error: null, matches, replaceResult } satisfies RegexMatchResponse);
+		const result = runRegex(pattern, flags, testString, replacement);
+		postMessage({ requestId, error: null, ...result } satisfies RegexMatchResponse);
 	} catch (err) {
 		postMessage({
 			requestId,
 			error: err instanceof Error ? err.message : 'invalid pattern',
 			matches: [],
+			totalCount: 0,
+			countCapped: false,
 			replaceResult: null,
 		} satisfies RegexMatchResponse);
 	}
 };
+
+postMessage({ ready: true } satisfies RegexWorkerReady);

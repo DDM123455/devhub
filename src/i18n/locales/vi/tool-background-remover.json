@@ -41,7 +41,8 @@
     "photoSizePreset2x2in": "2×2 in (hộ chiếu/visa Mỹ)",
     "dpiLabel": "Chất lượng in: {{value}} DPI",
     "verticalPositionLabel": "Vị trí theo chiều dọc",
-    "outputSizeHint": "Kích thước xuất: {{width}}×{{height}}px — mẹo: chọn nền màu đặc (vd: trắng) để in ảnh"
+    "outputSizeHint": "Kích thước xuất: {{width}}×{{height}}px — mẹo: chọn nền màu đặc (vd: trắng) để in ảnh",
+    "retryItem": "Thử lại"
   },
   "related": "Công cụ liên quan",
   "faq": {

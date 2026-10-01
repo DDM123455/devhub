@@ -5,6 +5,7 @@ import {
 	renderMergedColumn,
 	type DiffGranularity,
 	type DiffLineEntry,
+	type DiffInputNotes,
 	type HunkOverride,
 } from '@/lib/text-diff';
 import type { TextDiffRequest, TextDiffResponse } from './textDiffWorker';
@@ -51,12 +52,30 @@ interface Messages {
 	formatError: string;
 	clearedNotice: string;
 	undo: string;
+	replacedNotice: string;
+	clearAria: string;
+	swapAria: string;
+	uploadAria: string;
+	formatAria: string;
+	copyMergedAria: string;
+	saveMergedAria: string;
+	formatDuplicateKeys: string;
+	largeInputWarning: string;
+	workerError: string;
+	trailingNewlineNote: string;
+	lineEndingsNote: string;
+	noLineChangesButNotes: string;
+	sharedLoadedNotice: string;
+	restoreDraft: string;
+	clipboardError: string;
+	fileReadError: string;
 }
 
 const DEBOUNCE_MS = 150;
 const DRAFT_STORAGE_KEY = 'text-diff-draft';
 const AUTOSAVE_DEBOUNCE_MS = 500;
 const CLEAR_UNDO_TIMEOUT_MS = 6000;
+const LARGE_INPUT_CHARS = 2_000_000;
 
 // Uses the native Compression Streams API (supported in every evergreen
 // browser, no library needed) to gzip each text before base64-encoding it
@@ -108,27 +127,30 @@ function useFullscreen(ref: RefObject<HTMLElement | null>) {
 	return [isFullscreen, toggle] as const;
 }
 
-// Generalizes the old 2-way scroll sync to N panes (used for 2 panes — the
-// raw input textareas, the side-by-side diff columns — and 3 panes — the
-// Merge Tool's left/accept-buttons/right columns). Setting `suppressRef` true
-// for the whole synchronous burst of cross-assignments (rather than relying
-// on exactly one nested re-entrant call to reset it, which only happens to
-// work for exactly 2 panes) is what makes this safe for 3+ panes: every
-// `scroll` event fired by our OWN assignments below re-enters this same
-// handler and bails immediately since the guard is still true, and nothing
-// resets it until the whole burst for THIS source event has finished.
+// Synced scrolling for N panes. Assigning scrollTop on a sibling fires that sibling's own
+// asynchronous `scroll` event (next frame), so a synchronous "suppress" flag cannot
+// stop the echo — the echo re-synced the source to a stale position and made scrolling
+// jitter backwards. Instead, remember the exact scrollTop we programmatically assigned
+// to each pane and swallow the one echo event that reports that same value.
 function useSyncedScrollGroup(refs: Array<RefObject<HTMLElement | null>>) {
-	const suppressRef = useRef(false);
+	const expectedRef = useRef<Array<number | null>>([]);
 	return (sourceIndex: number) => (event: UIEvent<HTMLElement>) => {
-		if (suppressRef.current) return;
-		suppressRef.current = true;
 		const scrollTop = event.currentTarget.scrollTop;
+		if (expectedRef.current[sourceIndex] === scrollTop) {
+			expectedRef.current[sourceIndex] = null;
+			return;
+		}
 		refs.forEach((ref, i) => {
-			if (i !== sourceIndex && ref.current && ref.current.scrollTop !== scrollTop) {
-				ref.current.scrollTop = scrollTop;
-			}
+			const el = ref.current;
+			if (i === sourceIndex || !el || el.scrollTop === scrollTop) return;
+			el.scrollTop = scrollTop;
+			expectedRef.current[i] = el.scrollTop; // the browser may clamp the value
+			requestAnimationFrame(() =>
+				requestAnimationFrame(() => {
+					expectedRef.current[i] = null;
+				}),
+			);
 		});
-		suppressRef.current = false;
 	};
 }
 
@@ -161,12 +183,13 @@ interface LineNumberedTextareaProps {
 	value: string;
 	onChange: (value: string) => void;
 	placeholder: string;
+	ariaLabel: string;
 	onScrollSync: (event: UIEvent<HTMLTextAreaElement>) => void;
 	textareaRef: RefObject<HTMLTextAreaElement | null>;
 	gutterRef: RefObject<HTMLDivElement | null>;
 }
 
-function LineNumberedTextarea({ id, value, onChange, placeholder, onScrollSync, textareaRef, gutterRef }: LineNumberedTextareaProps) {
+function LineNumberedTextarea({ id, value, onChange, placeholder, ariaLabel, onScrollSync, textareaRef, gutterRef }: LineNumberedTextareaProps) {
 	const lines = lineNumbersFor(value);
 	const [scrollTop, setScrollTop] = useState(0);
 	const handleScroll = (event: UIEvent<HTMLTextAreaElement>) => {
@@ -197,8 +220,10 @@ function LineNumberedTextarea({ id, value, onChange, placeholder, onScrollSync, 
 				onChange={(event: ChangeEvent<HTMLTextAreaElement>) => onChange(event.target.value)}
 				onScroll={handleScroll}
 				placeholder={placeholder}
+				aria-label={ariaLabel}
+				wrap="off"
 				spellCheck={false}
-				className="flex-1 resize-none overflow-auto bg-transparent p-3 font-mono text-sm leading-6 text-foreground focus:outline-none"
+				className="flex-1 resize-none overflow-auto whitespace-pre bg-transparent p-3 font-mono text-sm leading-6 text-foreground focus:outline-none"
 			/>
 		</div>
 	);
@@ -413,15 +438,34 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	const [ignoreWhitespace, setIgnoreWhitespace] = useState(false);
 	const [ignoreCase, setIgnoreCase] = useState(false);
 	const [ignoreEmptyLines, setIgnoreEmptyLines] = useState(false);
-	const [normalizeLineEndings, setNormalizeLineEndings] = useState(false);
+	// On by default: a CRLF file vs. an LF file would otherwise flag every single line as
+	// modified. The difference is still surfaced as a note (see `notes` below).
+	const [normalizeLineEndings, setNormalizeLineEndings] = useState(true);
 	const [normalizeUnicode, setNormalizeUnicode] = useState(false);
 	const [activeHunk, setActiveHunk] = useState(0);
 	const [copiedSide, setCopiedSide] = useState<'left' | 'right' | null>(null);
 	const [hunkOverrides, setHunkOverrides] = useState<Map<number, HunkOverride>>(new Map());
 	const [shareLinkCopied, setShareLinkCopied] = useState(false);
 	const [formatFeedback, setFormatFeedback] = useState<{ side: 'original' | 'changed'; message: string } | null>(null);
-	const [clearUndo, setClearUndo] = useState<{ side: 'original' | 'changed'; previousText: string } | null>(null);
-	const clearUndoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	// Stack of snapshots (not a single slot) so clearing/replacing twice in a row can
+	// still be undone one step at a time.
+	const [undoStack, setUndoStack] = useState<Array<{ side: 'original' | 'changed'; previousText: string; kind: 'clear' | 'replace' }>>([]);
+	const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const [sharedLoaded, setSharedLoaded] = useState(false);
+	const [hasSavedDraft, setHasSavedDraft] = useState(false);
+	const [toolError, setToolError] = useState<string | null>(null);
+	// While a share link has been opened, the autosave must NOT overwrite the user's own
+	// previously saved draft — it only resumes once the user actually edits something.
+	const autosaveSuspendedRef = useRef(false);
+
+	const editOriginal = (value: string) => {
+		autosaveSuspendedRef.current = false;
+		setOriginalText(value);
+	};
+	const editChanged = (value: string) => {
+		autosaveSuspendedRef.current = false;
+		setChangedText(value);
+	};
 
 	// Mirrors the `?token=`/`?pattern=` deep-link pattern used elsewhere on the
 	// site (JWT Decoder, Regex Tester), but via the URL *hash* instead of query
@@ -434,10 +478,17 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		const original = params.get('original');
 		const changed = params.get('changed');
 		if (!original || !changed) return;
+		autosaveSuspendedRef.current = true;
+		try {
+			setHasSavedDraft(!!localStorage.getItem(DRAFT_STORAGE_KEY));
+		} catch {
+			// storage unavailable
+		}
 		Promise.all([decompressFromUrlSafeBase64(original), decompressFromUrlSafeBase64(changed)])
 			.then(([o, c]) => {
 				setOriginalText(o);
 				setChangedText(c);
+				setSharedLoaded(true);
 			})
 			.catch(() => {
 				// Corrupt or truncated share link (e.g. cut off by a chat app) — leave
@@ -448,10 +499,9 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	}, []);
 
 	// Restores an autosaved draft after mount — localStorage isn't available during Astro's
-	// build-time SSR pass, so this must run client-side only (same pattern as Markdown
-	// Editor's autosave). Skipped entirely when a share-link hash is present: a link the
-	// user explicitly opened should win over whatever was left in this browser before,
-	// not get silently replaced once the hash effect above finishes decompressing.
+	// build-time SSR pass, so this must run client-side only. Skipped entirely when a
+	// share-link hash is present: a link the user explicitly opened wins, and the saved
+	// draft stays untouched (offered back via the "Restore my draft" button).
 	useEffect(() => {
 		if (window.location.hash) return;
 		try {
@@ -467,11 +517,26 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	const handleRestoreDraft = () => {
+		try {
+			const saved = localStorage.getItem(DRAFT_STORAGE_KEY);
+			if (!saved) return;
+			const draft = JSON.parse(saved) as { original?: string; changed?: string };
+			autosaveSuspendedRef.current = false;
+			setOriginalText(typeof draft.original === 'string' ? draft.original : '');
+			setChangedText(typeof draft.changed === 'string' ? draft.changed : '');
+			setSharedLoaded(false);
+		} catch {
+			setToolError(messages.fileReadError);
+		}
+	};
+
 	// Debounced autosave: clearing both boxes removes the saved draft instead of persisting
 	// two empty strings, so hitting Clear (or its Undo) doesn't leave a stale draft to
 	// resurrect on the next visit.
 	useEffect(() => {
 		const timer = setTimeout(() => {
+			if (autosaveSuspendedRef.current) return;
 			try {
 				if (originalText || changedText) {
 					localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({ original: originalText, changed: changedText }));
@@ -479,73 +544,90 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 					localStorage.removeItem(DRAFT_STORAGE_KEY);
 				}
 			} catch {
-				// See note above — autosave failures are non-fatal.
+				// See note above — autosave failures (quota, private mode) are non-fatal.
 			}
 		}, AUTOSAVE_DEBOUNCE_MS);
 		return () => clearTimeout(timer);
 	}, [originalText, changedText]);
 
+	const pushUndo = (side: 'original' | 'changed', previousText: string, kind: 'clear' | 'replace') => {
+		if (previousText === '') return;
+		setUndoStack((stack) => [...stack.slice(-9), { side, previousText, kind }]);
+		if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+		undoTimerRef.current = setTimeout(() => setUndoStack([]), CLEAR_UNDO_TIMEOUT_MS);
+	};
+
 	// Clearing a box is a one-click, full-content-loss action with no confirmation prompt
-	// (a modal would add friction for the common case of clearing to start fresh) — instead
-	// the previous text is kept in memory for a few seconds and offered back via an inline
-	// Undo, the same "clear now, offer to undo" pattern as most mail/notes apps.
+	// — instead the previous text is kept in memory for a few seconds and offered back via
+	// an inline Undo (replacing content via Upload/Format is undoable the same way).
 	const handleClear = (which: 'original' | 'changed') => {
 		const previousText = which === 'original' ? originalText : changedText;
 		if (previousText === '') return;
-		if (which === 'original') setOriginalText('');
-		else setChangedText('');
-		setClearUndo({ side: which, previousText });
-		if (clearUndoTimerRef.current) clearTimeout(clearUndoTimerRef.current);
-		clearUndoTimerRef.current = setTimeout(() => setClearUndo(null), CLEAR_UNDO_TIMEOUT_MS);
+		if (which === 'original') editOriginal('');
+		else editChanged('');
+		pushUndo(which, previousText, 'clear');
 	};
 
-	const handleUndoClear = () => {
-		if (!clearUndo) return;
-		if (clearUndo.side === 'original') setOriginalText(clearUndo.previousText);
-		else setChangedText(clearUndo.previousText);
-		setClearUndo(null);
-		if (clearUndoTimerRef.current) clearTimeout(clearUndoTimerRef.current);
+	const handleUndo = () => {
+		const top = undoStack[undoStack.length - 1];
+		if (!top) return;
+		if (top.side === 'original') editOriginal(top.previousText);
+		else editChanged(top.previousText);
+		setUndoStack((stack) => stack.slice(0, -1));
+		if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+		undoTimerRef.current = setTimeout(() => setUndoStack([]), CLEAR_UNDO_TIMEOUT_MS);
 	};
 
 	const handleCopyShareLink = async () => {
-		const [originalCompressed, changedCompressed] = await Promise.all([
-			compressToUrlSafeBase64(originalText),
-			compressToUrlSafeBase64(changedText),
-		]);
-		const hash = new URLSearchParams({ original: originalCompressed, changed: changedCompressed }).toString();
-		const link = `${window.location.origin}${window.location.pathname}#${hash}`;
-		await navigator.clipboard.writeText(link);
-		setShareLinkCopied(true);
-		setTimeout(() => setShareLinkCopied(false), 1500);
+		try {
+			const [originalCompressed, changedCompressed] = await Promise.all([
+				compressToUrlSafeBase64(originalText),
+				compressToUrlSafeBase64(changedText),
+			]);
+			const hash = new URLSearchParams({ original: originalCompressed, changed: changedCompressed }).toString();
+			const link = `${window.location.origin}${window.location.pathname}#${hash}`;
+			await navigator.clipboard.writeText(link);
+			setShareLinkCopied(true);
+			setTimeout(() => setShareLinkCopied(false), 1500);
+		} catch {
+			setToolError(messages.clipboardError);
+		}
 	};
 
 	const debouncedOriginal = useDebouncedValue(originalText, DEBOUNCE_MS);
 	const debouncedChanged = useDebouncedValue(changedText, DEBOUNCE_MS);
 
 	const [entries, setEntries] = useState<DiffLineEntry[]>([]);
+	const [notes, setNotes] = useState<DiffInputNotes>({ lineEndingsDiffer: false, trailingNewlineDiffers: false });
 	const [isComputing, setIsComputing] = useState(false);
-	const diffWorkerRef = useRef<Worker | null>(null);
-	const diffRequestIdRef = useRef(0);
+	const [diffError, setDiffError] = useState(false);
 
-	// Diffing runs in a dedicated Web Worker, not on the main thread: jsdiff's Myers-based
-	// algorithms are O(N·D) and a large paste (or a very large uploaded file) can take long
-	// enough to freeze the tab if run synchronously. A single worker is reused across
-	// requests (unlike the hard-timeout pattern used for user-authored regexes elsewhere on
-	// this site) since jsdiff's own algorithm is bounded, not adversarial user input.
+	// Diffing runs in a dedicated Web Worker, not on the main thread: a large paste can take
+	// long enough to freeze the tab if run synchronously. Each new request TERMINATES the
+	// previous worker (cancelling a stale, possibly very slow computation instead of
+	// queueing behind it) and starts a fresh one; onerror clears the spinner so a crashed
+	// worker can never leave "Computing…" stuck forever.
 	useEffect(() => {
-		const requestId = ++diffRequestIdRef.current;
-		if (!diffWorkerRef.current) {
-			diffWorkerRef.current = new Worker(new URL('./textDiffWorker.ts', import.meta.url), { type: 'module' });
-		}
-		const worker = diffWorkerRef.current;
+		const worker = new Worker(new URL('./textDiffWorker.ts', import.meta.url), { type: 'module' });
 		setIsComputing(true);
+		setDiffError(false);
 		worker.onmessage = (event: MessageEvent<TextDiffResponse>) => {
-			if (event.data.requestId !== diffRequestIdRef.current) return;
-			setEntries(event.data.entries);
+			if (event.data.error) {
+				setDiffError(true);
+			} else {
+				setEntries(event.data.entries);
+				setNotes(event.data.notes);
+			}
 			setIsComputing(false);
+			worker.terminate();
+		};
+		worker.onerror = () => {
+			setDiffError(true);
+			setIsComputing(false);
+			worker.terminate();
 		};
 		const request: TextDiffRequest = {
-			requestId,
+			requestId: 0,
 			original: debouncedOriginal,
 			changed: debouncedChanged,
 			granularity,
@@ -556,6 +638,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 			normalizeUnicode,
 		};
 		worker.postMessage(request);
+		return () => worker.terminate();
 	}, [
 		debouncedOriginal,
 		debouncedChanged,
@@ -569,11 +652,11 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 
 	useEffect(() => {
 		return () => {
-			diffWorkerRef.current?.terminate();
-			if (clearUndoTimerRef.current) clearTimeout(clearUndoTimerRef.current);
+			if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
 		};
 	}, []);
 
+	const isLargeInput = originalText.length + changedText.length > LARGE_INPUT_CHARS;
 	const stats = useMemo(() => countLineStats(entries), [entries]);
 	const hunkStartRows = useMemo(() => getHunkStartRows(entries), [entries]);
 	const hasChanges = stats.added > 0 || stats.removed > 0 || stats.modified > 0;
@@ -651,15 +734,17 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		const reader = new FileReader();
 		reader.onload = () => {
 			const text = typeof reader.result === 'string' ? reader.result : '';
-			if (which === 'original') setOriginalText(text);
-			else setChangedText(text);
+			pushUndo(which, which === 'original' ? originalText : changedText, 'replace');
+			if (which === 'original') editOriginal(text);
+			else editChanged(text);
 		};
+		reader.onerror = () => setToolError(messages.fileReadError);
 		reader.readAsText(file);
 	};
 
 	const handleSwap = () => {
-		setOriginalText(changedText);
-		setChangedText(originalText);
+		editOriginal(changedText);
+		editChanged(originalText);
 	};
 
 	// Beautifies whichever of JSON/XML the pasted text auto-detects as, so two payloads
@@ -674,13 +759,15 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 			setTimeout(() => setFormatFeedback(null), 2500);
 			return;
 		}
-		if (which === 'original') setOriginalText(result.value);
-		else setChangedText(result.value);
+		pushUndo(which, text, 'replace');
+		if (which === 'original') editOriginal(result.value);
+		else editChanged(result.value);
+		const base = result.detected === 'json' ? messages.formatDetectedJson : messages.formatDetectedXml;
 		setFormatFeedback({
 			side: which,
-			message: result.detected === 'json' ? messages.formatDetectedJson : messages.formatDetectedXml,
+			message: result.warnings.includes('duplicateKeys') ? `${base} ${messages.formatDuplicateKeys}` : base,
 		});
-		setTimeout(() => setFormatFeedback(null), 2000);
+		setTimeout(() => setFormatFeedback(null), 4000);
 	};
 
 	// Rows outside the current window aren't in the DOM under virtualization,
@@ -712,10 +799,13 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	const mergedRightText = useMemo(() => renderMergedColumn(entries, hunkOverrides, 'right'), [entries, hunkOverrides]);
 
 	const handleCopy = (side: 'left' | 'right', text: string) => {
-		void navigator.clipboard.writeText(text).then(() => {
-			setCopiedSide(side);
-			setTimeout(() => setCopiedSide(null), 1500);
-		});
+		navigator.clipboard
+			.writeText(text)
+			.then(() => {
+				setCopiedSide(side);
+				setTimeout(() => setCopiedSide(null), 1500);
+			})
+			.catch(() => setToolError(messages.clipboardError));
 	};
 
 	const handleSave = (side: 'left' | 'right', text: string) => {
@@ -728,112 +818,99 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		URL.revokeObjectURL(url);
 	};
 
+	const renderNotes = () =>
+		(notes.trailingNewlineDiffers || notes.lineEndingsDiffer) && (
+			<ul className="list-disc pl-5 text-xs text-amber-700 dark:text-amber-400">
+				{notes.trailingNewlineDiffers && <li>{messages.trailingNewlineNote}</li>}
+				{notes.lineEndingsDiffer && <li>{messages.lineEndingsNote}</li>}
+			</ul>
+		);
+
+	const renderPanel = (which: 'original' | 'changed') => {
+		const isOriginal = which === 'original';
+		const label = isOriginal ? messages.originalLabel : messages.changedLabel;
+		const fileRef = isOriginal ? originalFileInputRef : changedFileInputRef;
+		const topUndo = undoStack[undoStack.length - 1];
+		return (
+			<div className="flex flex-col gap-2">
+				<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+					<label htmlFor={`text-diff-${which}`} className="text-sm font-medium text-foreground">
+						{label}
+					</label>
+					<div className="flex flex-wrap gap-1">
+						<Button type="button" size="sm" variant="ghost" aria-label={messages.clearAria.replace('{{side}}', label)} onClick={() => handleClear(which)}>
+							{messages.clear}
+						</Button>
+						<Button type="button" size="sm" variant="ghost" aria-label={messages.swapAria} onClick={handleSwap}>
+							{messages.swap}
+						</Button>
+						<Button
+							type="button"
+							size="sm"
+							variant="ghost"
+							aria-label={messages.uploadAria.replace('{{side}}', label)}
+							onClick={() => fileRef.current?.click()}
+						>
+							{messages.uploadFile}
+						</Button>
+						<Button type="button" size="sm" variant="ghost" aria-label={messages.formatAria.replace('{{side}}', label)} onClick={() => handleFormat(which)}>
+							{messages.formatButton}
+						</Button>
+						<input
+							ref={fileRef}
+							type="file"
+							accept=".txt,text/plain"
+							className="hidden"
+							tabIndex={-1}
+							aria-hidden="true"
+							onChange={(event) => {
+								handleUploadFile(which)(event.target.files);
+								event.target.value = '';
+							}}
+						/>
+					</div>
+				</div>
+				<LineNumberedTextarea
+					id={`text-diff-${which}`}
+					value={isOriginal ? originalText : changedText}
+					onChange={isOriginal ? editOriginal : editChanged}
+					placeholder={messages.placeholder}
+					ariaLabel={label}
+					textareaRef={isOriginal ? originalInputRef : changedInputRef}
+					gutterRef={isOriginal ? originalGutterRef : changedGutterRef}
+					onScrollSync={syncInputScroll(isOriginal ? 0 : 1)}
+				/>
+				<p role="status" aria-live="polite" className="flex min-h-4 flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
+					{formatFeedback?.side === which && <span>{formatFeedback.message}</span>}
+					{topUndo?.side === which && (
+						<>
+							<span>{topUndo.kind === 'clear' ? messages.clearedNotice : messages.replacedNotice}</span>
+							<button type="button" onClick={handleUndo} className="font-medium text-primary underline-offset-2 hover:underline">
+								{messages.undo}
+							</button>
+						</>
+					)}
+				</p>
+			</div>
+		);
+	};
+
 	return (
 		<div className="flex flex-col gap-6">
 			<div className="flex flex-col gap-4 rounded-lg border border-border p-4">
+				{sharedLoaded && (
+					<p role="status" className="flex flex-wrap items-center gap-2 rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
+						{messages.sharedLoadedNotice}
+						{hasSavedDraft && (
+							<button type="button" onClick={handleRestoreDraft} className="font-medium text-primary underline-offset-2 hover:underline">
+								{messages.restoreDraft}
+							</button>
+						)}
+					</p>
+				)}
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-					<div className="flex flex-col gap-2">
-						<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
-							<label htmlFor="text-diff-original" className="text-sm font-medium text-foreground">
-								{messages.originalLabel}
-							</label>
-							<div className="flex gap-1">
-								<Button type="button" size="sm" variant="ghost" onClick={() => handleClear('original')}>
-									{messages.clear}
-								</Button>
-								<Button type="button" size="sm" variant="ghost" onClick={handleSwap}>
-									{messages.swap}
-								</Button>
-								<Button type="button" size="sm" variant="ghost" onClick={() => originalFileInputRef.current?.click()}>
-									{messages.uploadFile}
-								</Button>
-								<Button type="button" size="sm" variant="ghost" onClick={() => handleFormat('original')}>
-									{messages.formatButton}
-								</Button>
-								<input
-									ref={originalFileInputRef}
-									type="file"
-									accept=".txt,text/plain"
-									className="hidden"
-									onChange={(event) => handleUploadFile('original')(event.target.files)}
-								/>
-							</div>
-						</div>
-						<LineNumberedTextarea
-							id="text-diff-original"
-							value={originalText}
-							onChange={setOriginalText}
-							placeholder={messages.placeholder}
-							textareaRef={originalInputRef}
-							gutterRef={originalGutterRef}
-							onScrollSync={syncInputScroll(0)}
-						/>
-						<p role="status" aria-live="polite" className="flex min-h-4 items-center gap-1.5 text-xs text-muted-foreground">
-							{clearUndo?.side === 'original' ? (
-								<>
-									{messages.clearedNotice}
-									<button type="button" onClick={handleUndoClear} className="font-medium text-primary underline-offset-2 hover:underline">
-										{messages.undo}
-									</button>
-								</>
-							) : formatFeedback?.side === 'original' ? (
-								formatFeedback.message
-							) : (
-								''
-							)}
-						</p>
-					</div>
-					<div className="flex flex-col gap-2">
-						<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
-							<label htmlFor="text-diff-changed" className="text-sm font-medium text-foreground">
-								{messages.changedLabel}
-							</label>
-							<div className="flex gap-1">
-								<Button type="button" size="sm" variant="ghost" onClick={() => handleClear('changed')}>
-									{messages.clear}
-								</Button>
-								<Button type="button" size="sm" variant="ghost" onClick={handleSwap}>
-									{messages.swap}
-								</Button>
-								<Button type="button" size="sm" variant="ghost" onClick={() => changedFileInputRef.current?.click()}>
-									{messages.uploadFile}
-								</Button>
-								<Button type="button" size="sm" variant="ghost" onClick={() => handleFormat('changed')}>
-									{messages.formatButton}
-								</Button>
-								<input
-									ref={changedFileInputRef}
-									type="file"
-									accept=".txt,text/plain"
-									className="hidden"
-									onChange={(event) => handleUploadFile('changed')(event.target.files)}
-								/>
-							</div>
-						</div>
-						<LineNumberedTextarea
-							id="text-diff-changed"
-							value={changedText}
-							onChange={setChangedText}
-							placeholder={messages.placeholder}
-							textareaRef={changedInputRef}
-							gutterRef={changedGutterRef}
-							onScrollSync={syncInputScroll(1)}
-						/>
-						<p role="status" aria-live="polite" className="flex min-h-4 items-center gap-1.5 text-xs text-muted-foreground">
-							{clearUndo?.side === 'changed' ? (
-								<>
-									{messages.clearedNotice}
-									<button type="button" onClick={handleUndoClear} className="font-medium text-primary underline-offset-2 hover:underline">
-										{messages.undo}
-									</button>
-								</>
-							) : formatFeedback?.side === 'changed' ? (
-								formatFeedback.message
-							) : (
-								''
-							)}
-						</p>
-					</div>
+					{renderPanel('original')}
+					{renderPanel('changed')}
 				</div>
 
 				<div className="flex flex-wrap items-center gap-4">
@@ -842,7 +919,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							<button
 								key={g}
 								type="button"
-								onClick={() => setGranularity(g)}
+								onClick={() => setGranularity(g)} aria-pressed={granularity === g}
 								className={`rounded-md border px-2.5 py-1 text-xs font-medium ${
 									granularity === g ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'
 								}`}
@@ -883,7 +960,13 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 						</Button>
 					)}
 				</div>
+				{isLargeInput && <p role="status" className="text-xs text-amber-700 dark:text-amber-400">{messages.largeInputWarning}</p>}
 				{isComputing && <p role="status" className="text-xs text-muted-foreground">{messages.computing}</p>}
+				{(diffError || toolError) && (
+					<p role="alert" className="text-xs text-destructive">
+						{diffError ? messages.workerError : toolError}
+					</p>
+				)}
 			</div>
 
 			{hasChanges ? (
@@ -891,8 +974,9 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 					ref={sideBySideContainerRef}
 					className={`flex flex-col gap-3 rounded-lg border border-border p-4 ${isSideBySideFullscreen ? 'bg-background' : ''}`}
 				>
-					<div className="flex flex-wrap items-center justify-between gap-2">
-						<div className="flex flex-wrap gap-2 text-xs font-medium">
+											{renderNotes()}
+						<div className="flex flex-wrap items-center justify-between gap-2">
+							<div className="flex flex-wrap gap-2 text-xs font-medium">
 							<span className="rounded bg-green-500/15 px-2 py-1 text-green-700 dark:text-green-300">
 								{messages.statsAdded.replace('{{count}}', String(stats.added))}
 							</span>
@@ -915,7 +999,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							<Button type="button" size="icon-xs" variant="outline" aria-label={messages.nextChange} onClick={() => jumpToHunk(activeHunk + 1)}>
 								↓
 							</Button>
-							<Button type="button" size="sm" variant="outline" onClick={toggleSideBySideFullscreen}>
+							<Button type="button" size="sm" variant="outline" aria-label={`${isSideBySideFullscreen ? messages.exitFullscreen : messages.fullscreen} – ${messages.originalLabel} / ${messages.changedLabel}`} onClick={toggleSideBySideFullscreen}>
 								{isSideBySideFullscreen ? messages.exitFullscreen : messages.fullscreen}
 							</Button>
 						</div>
@@ -956,7 +1040,13 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 					</div>
 				</div>
 			) : (
-				(originalText !== '' || changedText !== '') && <p className="text-sm text-muted-foreground">{messages.noChanges}</p>
+				(originalText !== '' || changedText !== '') &&
+				!isComputing && (
+					<div className="text-sm text-muted-foreground">
+						{notes.trailingNewlineDiffers || notes.lineEndingsDiffer ? messages.noLineChangesButNotes : messages.noChanges}
+						{renderNotes()}
+					</div>
+				)
 			)}
 
 			{hasChanges && (
@@ -967,13 +1057,13 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
 								<span className="text-sm font-medium text-foreground">{messages.mergeLeftHeading}</span>
 								<div className="flex gap-1">
-									<Button type="button" size="sm" variant="ghost" aria-live="polite" onClick={() => handleCopy('left', mergedLeftText)}>
+									<Button type="button" size="sm" variant="ghost" aria-live="polite" aria-label={messages.copyMergedAria.replace('{{side}}', messages.mergeLeftHeading)} onClick={() => handleCopy('left', mergedLeftText)}>
 										{copiedSide === 'left' ? messages.copied : messages.copy}
 									</Button>
-									<Button type="button" size="sm" variant="ghost" onClick={() => handleSave('left', mergedLeftText)}>
+									<Button type="button" size="sm" variant="ghost" aria-label={messages.saveMergedAria.replace('{{side}}', messages.mergeLeftHeading)} onClick={() => handleSave('left', mergedLeftText)}>
 										{messages.save}
 									</Button>
-									<Button type="button" size="sm" variant="ghost" onClick={toggleMergeLeftFullscreen}>
+									<Button type="button" size="sm" variant="ghost" aria-label={`${isMergeLeftFullscreen ? messages.exitFullscreen : messages.fullscreen} – ${messages.mergeLeftHeading}`} onClick={toggleMergeLeftFullscreen}>
 										{isMergeLeftFullscreen ? messages.exitFullscreen : messages.fullscreen}
 									</Button>
 								</div>
@@ -1003,13 +1093,13 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
 								<span className="text-sm font-medium text-foreground">{messages.mergeRightHeading}</span>
 								<div className="flex gap-1">
-									<Button type="button" size="sm" variant="ghost" aria-live="polite" onClick={() => handleCopy('right', mergedRightText)}>
+									<Button type="button" size="sm" variant="ghost" aria-live="polite" aria-label={messages.copyMergedAria.replace('{{side}}', messages.mergeRightHeading)} onClick={() => handleCopy('right', mergedRightText)}>
 										{copiedSide === 'right' ? messages.copied : messages.copy}
 									</Button>
-									<Button type="button" size="sm" variant="ghost" onClick={() => handleSave('right', mergedRightText)}>
+									<Button type="button" size="sm" variant="ghost" aria-label={messages.saveMergedAria.replace('{{side}}', messages.mergeRightHeading)} onClick={() => handleSave('right', mergedRightText)}>
 										{messages.save}
 									</Button>
-									<Button type="button" size="sm" variant="ghost" onClick={toggleMergeRightFullscreen}>
+									<Button type="button" size="sm" variant="ghost" aria-label={`${isMergeRightFullscreen ? messages.exitFullscreen : messages.fullscreen} – ${messages.mergeRightHeading}`} onClick={toggleMergeRightFullscreen}>
 										{isMergeRightFullscreen ? messages.exitFullscreen : messages.fullscreen}
 									</Button>
 								</div>

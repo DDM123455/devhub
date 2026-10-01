@@ -26,7 +26,11 @@
     "clear": "Xóa hết",
     "outputStats": "{{chars}} ký tự · {{words}} từ",
     "uploadFile": "Tải lên file .txt",
-    "downloadFile": "Tải xuống .txt"
+    "downloadFile": "Tải xuống .txt",
+    "inputLabel": "Văn bản cần chuyển đổi",
+    "naturalSort": "Sắp xếp tự nhiên (so sánh số theo giá trị: file2 trước file10)",
+    "copyFailed": "Sao chép thất bại",
+    "fileReadError": "Không đọc được tệp này."
   },
   "related": "Công cụ liên quan",
   "faq": {

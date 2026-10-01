@@ -3,10 +3,13 @@ import { Button } from '@/components/ui/button';
 import {
 	autoFixTrivialIssues,
 	parseNginxConfig,
-	simulateRewrite,
-	testNginxLocationRegex,
 	type NginxIssue,
+	type RegexTestResult,
+	type RewriteSimulationResult,
 } from '@/lib/nginx-parser';
+import type { NginxRegexRequest } from './nginxRegexWorker';
+import { useCopyToClipboard } from './useCopyToClipboard';
+import { useWorkerRequest } from './useWorkerRequest';
 import { jumpTextareaToLine } from '@/lib/text-line-utils';
 
 interface Messages {
@@ -38,6 +41,21 @@ interface Messages {
 	rewriteTestUrlLabel: string;
 	rewriteResultLabel: string;
 	rewriteNoMatch: string;
+	issueMessages: Record<string, string>;
+	emptyState: string;
+	fragmentLabel: string;
+	fragmentAutoNote: string;
+	regexTimeout: string;
+	regexWorkerError: string;
+	capturesLabel: string;
+	fileReadError: string;
+	copyFailed: string;
+}
+
+function formatIssue(issue: NginxIssue, issueMessages: Record<string, string>): string {
+	const template = issueMessages[issue.key];
+	if (!template) return issue.message;
+	return template.replace(/\{\{(\w+)\}\}/g, (whole, name: string) => String(issue.params[name] ?? whole));
 }
 
 const SAMPLE_CONFIG = `# Example reverse proxy in front of a Node.js app
@@ -68,7 +86,9 @@ http {
 export default function NginxConfigValidator({ messages }: { messages: Messages }) {
 	const [input, setInput] = useState('');
 	const [isDragOver, setIsDragOver] = useState(false);
-	const [copied, setCopied] = useState(false);
+	const { copied, failed: copyFailed, copy } = useCopyToClipboard();
+	const [forceFragment, setForceFragment] = useState(false);
+	const [fileError, setFileError] = useState(false);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	const [regexPattern, setRegexPattern] = useState('\\.(jpg|jpeg|png|gif|ico|css|js)$');
@@ -79,27 +99,38 @@ export default function NginxConfigValidator({ messages }: { messages: Messages 
 	const [rewriteReplacement, setRewriteReplacement] = useState('/new/$1');
 	const [rewriteTestUrl, setRewriteTestUrl] = useState('/old/page.html');
 
-	const result = useMemo(() => parseNginxConfig(input), [input]);
+	const result = useMemo(() => parseNginxConfig(input, { fragment: forceFragment ? true : 'auto' }), [input, forceFragment]);
 	const errorCount = result.issues.filter((issue) => issue.severity === 'error').length;
 	const warningCount = result.issues.filter((issue) => issue.severity === 'warning').length;
 
 	const fixedConfig = useMemo(() => autoFixTrivialIssues(input, result), [input, result]);
 	const hasTrivialFix = input.trim() !== '' && fixedConfig !== input.trimEnd();
 
-	const regexResult = useMemo(
-		() => (regexPattern ? testNginxLocationRegex(regexPattern, regexCaseInsensitive, regexTestUrl) : null),
+	// Both simulators evaluate USER-WRITTEN regexes, which can backtrack catastrophically, so they
+	// run in a Web Worker that is terminated after a timeout instead of on the main thread.
+	const regexRequest = useMemo<NginxRegexRequest | null>(
+		() =>
+			regexPattern ? { kind: 'location', pattern: regexPattern, caseInsensitive: regexCaseInsensitive, testUrl: regexTestUrl } : null,
 		[regexPattern, regexCaseInsensitive, regexTestUrl],
 	);
-	const rewriteResult = useMemo(
-		() => (rewritePattern ? simulateRewrite(rewritePattern, rewriteReplacement, rewriteTestUrl) : null),
+	const rewriteRequest = useMemo<NginxRegexRequest | null>(
+		() =>
+			rewritePattern ? { kind: 'rewrite', pattern: rewritePattern, replacement: rewriteReplacement, testUrl: rewriteTestUrl } : null,
 		[rewritePattern, rewriteReplacement, rewriteTestUrl],
 	);
+	const createRegexWorker = () => new Worker(new URL('./nginxRegexWorker.ts', import.meta.url), { type: 'module' });
+	const regexTask = useWorkerRequest<NginxRegexRequest, RegexTestResult>({ createWorker: createRegexWorker, request: regexRequest });
+	const rewriteTask = useWorkerRequest<NginxRegexRequest, RewriteSimulationResult>({ createWorker: createRegexWorker, request: rewriteRequest });
+	const regexResult = regexTask.result;
+	const rewriteResult = rewriteTask.result;
 
 	const handleFile = (files: FileList | null) => {
 		const file = files?.[0];
 		if (!file) return;
+		setFileError(false);
 		const reader = new FileReader();
 		reader.onload = () => setInput(String(reader.result ?? ''));
+		reader.onerror = () => setFileError(true);
 		reader.readAsText(file);
 	};
 
@@ -108,10 +139,7 @@ export default function NginxConfigValidator({ messages }: { messages: Messages 
 	};
 
 	const handleCopyFixed = () => {
-		void navigator.clipboard.writeText(fixedConfig).then(() => {
-			setCopied(true);
-			setTimeout(() => setCopied(false), 1500);
-		});
+		void copy(fixedConfig);
 	};
 
 	return (
@@ -138,7 +166,7 @@ export default function NginxConfigValidator({ messages }: { messages: Messages 
 					<div className="flex gap-2">
 						<label
 							htmlFor="nginx-file-input"
-							className="inline-flex cursor-pointer items-center rounded-md border border-border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent"
+							className="has-[+input:focus-visible]:ring-2 has-[+input:focus-visible]:ring-ring inline-flex cursor-pointer items-center rounded-md border border-border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent"
 						>
 							{messages.chooseFile}
 						</label>
@@ -146,8 +174,11 @@ export default function NginxConfigValidator({ messages }: { messages: Messages 
 							id="nginx-file-input"
 							type="file"
 							accept=".conf,.txt,text/plain"
-							className="hidden"
-							onChange={(e) => handleFile(e.target.files)}
+							className="sr-only"
+							onChange={(e) => {
+								handleFile(e.target.files);
+								e.target.value = '';
+							}}
 						/>
 						<Button type="button" size="sm" variant="outline" onClick={() => setInput(SAMPLE_CONFIG)}>
 							{messages.loadSample}
@@ -169,12 +200,17 @@ export default function NginxConfigValidator({ messages }: { messages: Messages 
 					<Button type="button" size="sm" variant="ghost" onClick={() => setInput('')}>
 						{messages.clear}
 					</Button>
+					<label className="flex items-center gap-1.5 text-xs text-muted-foreground" title={messages.fragmentAutoNote}>
+						<input type="checkbox" checked={forceFragment} onChange={(e) => setForceFragment(e.target.checked)} />
+						{messages.fragmentLabel}
+					</label>
 					{hasTrivialFix && (
 						<Button type="button" size="sm" variant="secondary" aria-live="polite" onClick={handleCopyFixed}>
-							{copied ? messages.copyFixedCopied : messages.copyFixed}
+							{copied ? messages.copyFixedCopied : copyFailed ? messages.copyFailed : messages.copyFixed}
 						</Button>
 					)}
 				</div>
+				{fileError && <p role="alert" className="text-xs text-destructive">{messages.fileReadError}</p>}
 				<p className="rounded-md bg-emerald-500/10 px-3 py-2 text-xs text-emerald-700 dark:text-emerald-400">
 					{messages.privacyNote}
 				</p>
@@ -191,8 +227,10 @@ export default function NginxConfigValidator({ messages }: { messages: Messages 
 						</span>
 					)}
 				</div>
-				{input.trim() === '' || result.issues.length === 0 ? (
-					<p className="text-sm text-muted-foreground">{messages.noIssues}</p>
+				{input.trim() === '' ? (
+					<p className="text-sm text-muted-foreground">{messages.emptyState}</p>
+				) : result.issues.length === 0 ? (
+					<p className="text-sm text-emerald-700 dark:text-emerald-400">{messages.noIssues}</p>
 				) : (
 					<ul className="flex flex-col gap-2">
 						{result.issues.map((issue, i) => (
@@ -216,7 +254,7 @@ export default function NginxConfigValidator({ messages }: { messages: Messages 
 											{messages.jumpToLine.replace('{{line}}', String(issue.line))}
 										</span>
 									</div>
-									<span className="text-foreground">{issue.message}</span>
+									<span className="text-foreground">{formatIssue(issue, messages.issueMessages)}</span>
 								</button>
 							</li>
 						))}
@@ -260,10 +298,28 @@ export default function NginxConfigValidator({ messages }: { messages: Messages 
 						className="w-full rounded-md border border-border bg-background px-2 py-1.5 font-mono text-xs text-foreground"
 					/>
 				</div>
+				{regexTask.status === 'timeout' && <p role="alert" className="text-xs text-destructive">{messages.regexTimeout}</p>}
+				{regexTask.status === 'error' && <p role="alert" className="text-xs text-destructive">{messages.regexWorkerError}</p>}
 				{regexResult && (
-					<p role="status" className={`text-xs ${regexResult.error ? 'text-destructive' : regexResult.matched ? 'text-emerald-700 dark:text-emerald-400' : 'text-muted-foreground'}`}>
-						{regexResult.error ?? (regexResult.matched ? messages.regexMatched : messages.regexNoMatch)}
-					</p>
+					<div role="status" className="flex flex-col gap-1">
+						<p className={`text-xs ${regexResult.error ? 'text-destructive' : regexResult.matched ? 'text-emerald-700 dark:text-emerald-400' : 'text-muted-foreground'}`}>
+							{regexResult.error ?? (regexResult.matched ? messages.regexMatched : messages.regexNoMatch)}
+						</p>
+						{regexResult.matched && regexResult.groups.length > 1 && (
+							<ul className="font-mono text-xs text-muted-foreground">
+								{regexResult.groups.slice(1).map((g, i) => (
+									<li key={i}>
+										{messages.capturesLabel.replace('{{name}}', `$${i + 1}`)}: <span className="text-foreground">{g}</span>
+									</li>
+								))}
+								{Object.entries(regexResult.named).map(([name, value]) => (
+									<li key={name}>
+										{messages.capturesLabel.replace('{{name}}', `$${name}`)}: <span className="text-foreground">{value}</span>
+									</li>
+								))}
+							</ul>
+						)}
+					</div>
 				)}
 				<p className="text-xs text-muted-foreground">{messages.regexPcreNote}</p>
 			</div>
@@ -309,17 +365,32 @@ export default function NginxConfigValidator({ messages }: { messages: Messages 
 						className="w-full rounded-md border border-border bg-background px-2 py-1.5 font-mono text-xs text-foreground"
 					/>
 				</div>
+				{rewriteTask.status === 'timeout' && <p role="alert" className="text-xs text-destructive">{messages.regexTimeout}</p>}
+				{rewriteTask.status === 'error' && <p role="alert" className="text-xs text-destructive">{messages.regexWorkerError}</p>}
 				{rewriteResult && (
-					<p role="status" className="text-xs">
-						{rewriteResult.error ? (
-							<span className="text-muted-foreground">{rewriteResult.error}</span>
+					<div role="status" className="flex flex-col gap-1 text-xs">
+						{rewriteResult.noMatch ? (
+							<span className="text-muted-foreground">{messages.rewriteNoMatch}</span>
+						) : rewriteResult.error ? (
+							<span className="text-destructive">{rewriteResult.error}</span>
 						) : (
 							<>
-								<span className="text-muted-foreground">{messages.rewriteResultLabel} </span>
-								<span className="font-mono text-emerald-700 dark:text-emerald-400">{rewriteResult.outputUrl}</span>
+								<p>
+									<span className="text-muted-foreground">{messages.rewriteResultLabel} </span>
+									<span className="font-mono break-all text-emerald-700 dark:text-emerald-400">{rewriteResult.outputUrl}</span>
+								</p>
+								{rewriteResult.captures.length > 1 && (
+									<ul className="font-mono text-muted-foreground">
+										{rewriteResult.captures.slice(1).map((g, i) => (
+											<li key={i}>
+												{messages.capturesLabel.replace('{{name}}', `$${i + 1}`)}: <span className="text-foreground">{g}</span>
+											</li>
+										))}
+									</ul>
+								)}
 							</>
 						)}
-					</p>
+					</div>
 				)}
 			</div>
 		</div>

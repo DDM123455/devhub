@@ -37,7 +37,8 @@
     "errorInvalidEveryN": "Enter a whole number of 1 or more.",
     "errorNoPagesSelected": "Select at least one page to extract.",
     "selectPageAria": "Select page {{number}}",
-    "processingQueue": "Processing {{current}}/{{total}}"
+    "processingQueue": "Processing {{current}}/{{total}}",
+    "errorPassword": "This PDF is password-protected. Remove the password first (open it in a PDF reader and save an unprotected copy), then try again."
   },
   "related": "Related tools",
   "faq": {

@@ -1,5 +1,7 @@
 ---
 import { locales, type Locale } from '@/i18n/config';
+import { getFixedT } from '@/i18n/i18next';
+import { localizePath, toHreflang } from '@/lib/locale-paths';
 
 interface Props {
 	lang: Locale;
@@ -31,19 +33,50 @@ const nativeNames: Record<Locale, string> = {
 };
 
 const currentPath = Astro.url.pathname;
-const pathWithoutLocale = currentPath.replace(new RegExp(`^/${lang}(?=/|$)`), '') || '/';
+const t = getFixedT(lang);
 ---
 
-<select
-	aria-label="Language"
-	class="rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground"
-	onchange="window.location.href=this.value"
->
-	{
-		locales.map((loc) => (
-			<option value={`/${loc}${pathWithoutLocale}`} selected={loc === lang}>
-				{nativeNames[loc]}
-			</option>
-		))
-	}
-</select>
+<details id="lang-switcher" class="relative">
+	<summary
+		aria-label={t('nav.language')}
+		class="flex min-h-8 cursor-pointer list-none items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground [&::-webkit-details-marker]:hidden"
+	>
+		<span aria-hidden="true">🌐</span>
+		<span>{nativeNames[lang]}</span>
+	</summary>
+	<ul
+		class="absolute end-0 top-full z-50 mt-1 max-h-72 w-44 overflow-y-auto rounded-lg border border-border bg-card p-1 shadow-lg"
+	>
+		{
+			locales.map((loc) => (
+				<li>
+					<a
+						href={localizePath(currentPath, lang, loc)}
+						hreflang={toHreflang(loc)}
+						lang={toHreflang(loc)}
+						aria-current={loc === lang ? 'true' : undefined}
+						class:list={[
+							'block rounded-md px-2.5 py-1.5 text-xs hover:bg-accent hover:text-foreground',
+							loc === lang ? 'bg-accent font-semibold text-foreground' : 'text-muted-foreground',
+						]}
+					>
+						{nativeNames[loc]}
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</details>
+
+<script>
+	const switcher = document.getElementById('lang-switcher') as HTMLDetailsElement | null;
+	document.addEventListener('click', (event) => {
+		if (switcher?.open && !switcher.contains(event.target as Node)) switcher.open = false;
+	});
+	document.addEventListener('keydown', (event) => {
+		if (event.key === 'Escape' && switcher?.open) {
+			switcher.open = false;
+			switcher.querySelector('summary')?.focus();
+		}
+	});
+</script>

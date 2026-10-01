@@ -20,9 +20,11 @@ const t = getFixedT(lang);
 
 <aside
 	id="sidebar"
-	class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col gap-0.5 overflow-y-auto border-r border-border bg-background p-4 shadow-2xl transition-transform duration-200 ease-out md:sticky md:top-[57px] md:z-auto md:h-[calc(100vh-57px)] md:w-56 md:translate-x-0 md:shadow-none"
+	data-open="false"
+	aria-label={t('nav.mainNav')}
+	class="fixed inset-y-0 start-0 z-40 flex w-64 flex-col gap-0.5 overflow-y-auto border-e border-border bg-background p-4 transition-[transform,visibility] duration-200 ease-out max-md:data-[open=false]:invisible max-md:data-[open=false]:ltr:-translate-x-full max-md:data-[open=false]:rtl:translate-x-full max-md:data-[open=true]:shadow-2xl md:sticky md:top-[57px] md:z-auto md:h-[calc(100vh-57px)] md:w-56"
 >
-	<nav class="flex flex-col gap-0.5">
+	<nav aria-label={t('nav.mainNav')} class="flex flex-col gap-0.5">
 		{
 			categories.map((category) => {
 				const count = tools.filter((tool) => tool.category === category.slug).length;
@@ -32,13 +34,13 @@ const t = getFixedT(lang);
 						class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
 					>
 						<span
-							class="flex size-[22px] shrink-0 items-center justify-center rounded-md font-mono text-[7.5px] font-semibold text-white"
+							class="flex size-[22px] shrink-0 items-center justify-center rounded-md font-mono text-[11px] font-semibold text-white"
 							style={`background: var(--color-primary); filter: hue-rotate(${category.hue}deg);`}
 						>
 							{category.letter}
 						</span>
 						<span class="flex-1">{t(`nav.categories.${category.slug}`)}</span>
-						<span class="font-mono text-[10.5px] text-muted-foreground">{count}</span>
+						<span class="font-mono text-[11px] text-muted-foreground">{count}</span>
 					</a>
 				);
 			})
@@ -46,5 +48,5 @@ const t = getFixedT(lang);
 	</nav>
 
 	<div class="my-4 h-px bg-border"></div>
-	<p class="px-2.5 text-[11.5px] leading-relaxed text-muted-foreground">{t('sidebar.note')}</p>
+	<p class="px-2.5 text-xs leading-relaxed text-muted-foreground">{t('sidebar.note')}</p>
 </aside>

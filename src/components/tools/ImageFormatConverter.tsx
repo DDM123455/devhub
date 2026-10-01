@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { BeforeAfterSlider } from '@/components/ui/before-after-slider';
+import { baseNameOf, dedupeName } from '@/lib/file-utils';
 
 interface Messages {
 	selectFiles: string;
@@ -17,6 +18,7 @@ interface Messages {
 	noFiles: string;
 	errorGeneric: string;
 	errorAvifUnsupported: string;
+	errorTooLarge: string;
 	formatsNote: string;
 	remove: string;
 	clearAll: string;
@@ -68,6 +70,9 @@ interface ImageItem {
 	previewUrl: string;
 	status: 'pending' | 'processing' | 'done' | 'error';
 	resultBlob?: Blob;
+	// Chốt lúc chuyển đổi xong: tên tải về luôn khớp định dạng thật của blob, kể cả khi dropdown đổi sau đó.
+	downloadName?: string;
+	resultFormat?: TargetFormat;
 	resultPreviewUrl?: string;
 	// Drag position (0-100) of the before/after compare slider — only set once
 	// a converted result exists to compare against (same pattern as Image
@@ -77,6 +82,33 @@ interface ImageItem {
 }
 
 class AvifUnsupportedError extends Error {}
+class CanvasTooLargeError extends Error {}
+
+// Giới hạn an toàn cho canvas: Safari/iOS ~16.7M px, Chrome/Firefox ~268M px / cạnh 32767.
+// Dùng ngưỡng bảo thủ chung; vượt thì báo lỗi gợi ý thu nhỏ thay vì lỗi mơ hồ.
+const MAX_CANVAS_PIXELS = 100_000_000;
+const MAX_CANVAS_SIDE = 16384;
+function assertCanvasSize(width: number, height: number) {
+	if (width > MAX_CANVAS_SIDE || height > MAX_CANVAS_SIDE || width * height > MAX_CANVAS_PIXELS) {
+		throw new CanvasTooLargeError();
+	}
+}
+
+// Chỉ nhận các định dạng mà input[accept] liệt kê (kéo-thả không được lọt SVG/TIFF/...).
+const ACCEPTED_TYPES = new Set([
+	'image/jpeg',
+	'image/png',
+	'image/webp',
+	'image/gif',
+	'image/bmp',
+	'image/avif',
+]);
+
+interface ConvertSettings {
+	targetFormat: TargetFormat;
+	quality: number;
+	maxDimension?: number;
+}
 
 function formatBytes(bytes: number): string {
 	if (bytes < 1024) return `${bytes} B`;
@@ -168,13 +200,22 @@ function encodeBmp(imageData: ImageData): Blob {
 // whichever resolution actually fits (taskbar vs. tab favicon vs. shortcut).
 async function encodeIcoMultiSize(bitmap: ImageBitmap): Promise<Blob> {
 	const images: { size: number; bytes: Uint8Array }[] = [];
-	for (const size of ICO_SIZES) {
+	// Không phóng to vô lý: chỉ giữ các cỡ <= cạnh dài nhất của ảnh gốc (tối thiểu cỡ nhỏ nhất).
+	const maxSide = Math.max(bitmap.width, bitmap.height);
+	const sizes = ICO_SIZES.filter((size) => size <= maxSide);
+	if (sizes.length === 0) sizes.push(ICO_SIZES[0]);
+	for (const size of sizes) {
 		const canvas = document.createElement('canvas');
 		canvas.width = size;
 		canvas.height = size;
 		const ctx = canvas.getContext('2d');
 		if (!ctx) throw new Error('Canvas 2D context unavailable');
-		ctx.drawImage(bitmap, 0, 0, size, size);
+		// Giữ tỉ lệ (fit, letterbox trong suốt) thay vì kéo giãn ảnh chữ nhật thành hình vuông.
+		const scale = Math.min(size / bitmap.width, size / bitmap.height);
+		const drawW = Math.max(1, Math.round(bitmap.width * scale));
+		const drawH = Math.max(1, Math.round(bitmap.height * scale));
+		ctx.imageSmoothingQuality = 'high';
+		ctx.drawImage(bitmap, Math.round((size - drawW) / 2), Math.round((size - drawH) / 2), drawW, drawH);
 		const pngBlob = await canvasToBlob(canvas, 'image/png');
 		images.push({ size, bytes: new Uint8Array(await pngBlob.arrayBuffer()) });
 	}
@@ -213,21 +254,42 @@ async function encodeIcoMultiSize(bitmap: ImageBitmap): Promise<Blob> {
 // keeps it out of the main bundle until a user actually picks GIF.
 async function encodeGif(imageData: ImageData): Promise<Blob> {
 	const { quantize, applyPalette, GIFEncoder } = await import('gifenc');
-	const palette = quantize(imageData.data, 256);
-	const index = applyPalette(imageData.data, palette);
+	// GIF chỉ hỗ trợ trong suốt 1-bit: nếu ảnh có pixel trong suốt thì lượng tử hoá kiểu rgba4444 với
+	// oneBitAlpha và đánh dấu màu trong suốt; ảnh đặc thì giữ đường rgb565 cũ (chính xác màu hơn).
+	const data = imageData.data;
+	let hasAlpha = false;
+	for (let i = 3; i < data.length; i += 4) {
+		if (data[i] < 128) {
+			hasAlpha = true;
+			break;
+		}
+	}
 	const gif = GIFEncoder();
-	gif.writeFrame(index, imageData.width, imageData.height, { palette });
+	if (hasAlpha) {
+		const palette = quantize(data, 256, { format: 'rgba4444', oneBitAlpha: true });
+		const index = applyPalette(data, palette, 'rgba4444');
+		const transparentIndex = palette.findIndex((c: number[]) => c.length === 4 && c[3] === 0);
+		gif.writeFrame(index, imageData.width, imageData.height, {
+			palette,
+			transparent: transparentIndex >= 0,
+			transparentIndex: Math.max(0, transparentIndex),
+		});
+	} else {
+		const palette = quantize(data, 256);
+		const index = applyPalette(data, palette);
+		gif.writeFrame(index, imageData.width, imageData.height, { palette });
+	}
 	gif.finish();
 	return new Blob([gif.bytes()], { type: 'image/gif' });
 }
 
 async function convertImage(
 	file: File,
-	targetFormat: TargetFormat,
-	quality: number,
-	maxDimension?: number,
+	settings: ConvertSettings,
+	decoded?: Blob,
 ): Promise<Blob> {
-	const decodableBlob = await toDecodableBlob(file);
+	const { targetFormat, quality, maxDimension } = settings;
+	const decodableBlob = decoded ?? (await toDecodableBlob(file));
 	const bitmap = await createImageBitmap(decodableBlob);
 
 	// ICO always bundles the fixed `ICO_SIZES` set regardless of the user's
@@ -246,11 +308,20 @@ async function convertImage(
 		height = Math.round(height * scale);
 	}
 
+	try {
+		assertCanvasSize(width, height);
+	} catch (err) {
+		bitmap.close();
+		throw err;
+	}
 	const canvas = document.createElement('canvas');
 	canvas.width = width;
 	canvas.height = height;
 	const ctx = canvas.getContext('2d');
-	if (!ctx) throw new Error('Canvas 2D context unavailable');
+	if (!ctx) {
+		bitmap.close();
+		throw new CanvasTooLargeError();
+	}
 
 	if (WHITE_BACKGROUND_FORMATS.has(targetFormat)) {
 		ctx.fillStyle = '#ffffff';
@@ -271,17 +342,13 @@ async function convertImage(
 		}
 		case 'image/bmp':
 			return encodeBmp(ctx.getImageData(0, 0, canvas.width, canvas.height));
-		case 'image/x-icon':
-			// Unreachable — handled by the early `encodeIcoMultiSize` branch above,
-			// kept only so this switch stays exhaustive over `TargetFormat`.
-			throw new Error('unreachable');
 		case 'image/gif':
 			return encodeGif(ctx.getImageData(0, 0, canvas.width, canvas.height));
 	}
 }
 
 function replaceExtension(fileName: string, targetFormat: TargetFormat): string {
-	return `${fileName.replace(/\.[^./\\]+$/, '')}.${EXTENSION_BY_FORMAT[targetFormat]}`;
+	return baseNameOf(fileName, 'image') + '.' + EXTENSION_BY_FORMAT[targetFormat];
 }
 
 export default function ImageFormatConverter({ messages }: { messages: Messages }) {
@@ -295,6 +362,10 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [skippedCount, setSkippedCount] = useState(0);
 	const objectUrls = useRef<Set<string>>(new Set());
+	const itemsRef = useRef<ImageItem[]>([]);
+	itemsRef.current = items;
+	// Blob HEIC đã giải mã (PNG) theo item id: dùng cho preview và để lúc convert không giải mã lần 2.
+	const decodedBlobs = useRef<Map<string, Blob>>(new Map());
 
 	// Every object URL created for a preview (original or converted) is tracked
 	// here and revoked on unmount, since nothing else in this component's
@@ -311,10 +382,19 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 		return url;
 	};
 
+	const revokeItemUrls = (item: ImageItem) => {
+		for (const url of [item.previewUrl, item.resultPreviewUrl]) {
+			if (!url) continue;
+			URL.revokeObjectURL(url);
+			objectUrls.current.delete(url);
+		}
+		decodedBlobs.current.delete(item.id);
+	};
+
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList) return;
 		const allFiles = Array.from(fileList);
-		const acceptedFiles = allFiles.filter((file) => file.type.startsWith('image/') || isHeic(file));
+		const acceptedFiles = allFiles.filter((file) => ACCEPTED_TYPES.has(file.type) || isHeic(file));
 		setSkippedCount(allFiles.length - acceptedFiles.length);
 		const newItems: ImageItem[] = acceptedFiles.map((file) => ({
 			id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`,
@@ -323,19 +403,48 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 			status: 'pending' as const,
 		}));
 		setItems((prev) => [...prev, ...newItems]);
+
+		// HEIC/HEIF: trình duyệt không hiển thị được <img> trực tiếp -> giải mã (tuần tự) để có preview thật.
+		void (async () => {
+			for (const item of newItems.filter((it) => isHeic(it.file))) {
+				try {
+					const decoded = await toDecodableBlob(item.file);
+					// Item đã bị xoá trong lúc giải mã: bỏ.
+					if (!itemsRef.current.some((it) => it.id === item.id)) continue;
+					decodedBlobs.current.set(item.id, decoded);
+					const decodedUrl = trackUrl(URL.createObjectURL(decoded));
+					setItems((prev) =>
+						prev.map((it) => {
+							if (it.id !== item.id) return it;
+							URL.revokeObjectURL(it.previewUrl);
+							objectUrls.current.delete(it.previewUrl);
+							return { ...it, previewUrl: decodedUrl };
+						}),
+					);
+				} catch {
+					/* giữ preview gốc; lỗi sẽ báo khi bấm Convert */
+				}
+			}
+		})();
 	}, []);
 
 	const handleRemove = useCallback((id: string) => {
+		const removed = itemsRef.current.find((item) => item.id === id);
+		if (removed) revokeItemUrls(removed);
 		setItems((prev) => prev.filter((item) => item.id !== id));
 	}, []);
 
 	const handleClearAll = useCallback(() => {
+		for (const item of itemsRef.current) revokeItemUrls(item);
 		setItems([]);
 		setSkippedCount(0);
 	}, []);
 
+	const settingsRef = useRef<ConvertSettings>({ targetFormat, quality });
+	settingsRef.current = { targetFormat, quality, maxDimension: resizeEnabled ? maxDimension : undefined };
+
 	const convertOne = useCallback(
-		async (item: ImageItem) => {
+		async (item: ImageItem, settings: ConvertSettings) => {
 			setItems((prev) =>
 				prev.map((it) => (it.id === item.id ? { ...it, status: 'processing' } : it)),
 			);
@@ -344,45 +453,59 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 					URL.revokeObjectURL(item.resultPreviewUrl);
 					objectUrls.current.delete(item.resultPreviewUrl);
 				}
-				const resultBlob = await convertImage(
-					item.file,
-					targetFormat,
-					quality,
-					resizeEnabled ? maxDimension : undefined,
-				);
+				const resultBlob = await convertImage(item.file, settings, decodedBlobs.current.get(item.id));
 				const resultPreviewUrl = trackUrl(URL.createObjectURL(resultBlob));
 				setItems((prev) =>
 					prev.map((it) =>
 						it.id === item.id
-							? { ...it, status: 'done', resultBlob, resultPreviewUrl, comparePosition: 50 }
+							? {
+									...it,
+									status: 'done',
+									resultBlob,
+									resultPreviewUrl,
+									comparePosition: 50,
+									resultFormat: settings.targetFormat,
+									downloadName: replaceExtension(item.file.name, settings.targetFormat),
+								}
 							: it,
 					),
 				);
 			} catch (err) {
 				const errorMessage =
-					err instanceof AvifUnsupportedError ? messages.errorAvifUnsupported : messages.errorGeneric;
+					err instanceof AvifUnsupportedError
+						? messages.errorAvifUnsupported
+						: err instanceof CanvasTooLargeError
+							? messages.errorTooLarge
+							: messages.errorGeneric;
 				setItems((prev) =>
 					prev.map((it) => (it.id === item.id ? { ...it, status: 'error', errorMessage } : it)),
 				);
 			}
 		},
-		[targetFormat, quality, resizeEnabled, maxDimension, messages.errorAvifUnsupported, messages.errorGeneric],
+		[messages.errorAvifUnsupported, messages.errorTooLarge, messages.errorGeneric],
 	);
 
 	const handleConvert = useCallback(async () => {
+		// Chỉ xử lý item đang chờ hoặc lỗi; snapshot setting tại thời điểm bấm.
+		const queue = items.filter((item) => item.status === 'pending' || item.status === 'error');
+		if (queue.length === 0) return;
+		const settings = settingsRef.current;
 		setIsProcessing(true);
-		// Worker-pool pattern (same as Image Compressor's batch processing): a
-		// fixed number of lanes each pull the next pending item off the shared
-		// queue as soon as they finish their current one.
-		let cursor = 0;
-		const runLane = async (): Promise<void> => {
-			const index = cursor++;
-			if (index >= items.length) return;
-			await convertOne(items[index]);
-			return runLane();
-		};
-		await Promise.all(Array.from({ length: Math.min(CONCURRENCY, items.length) }, runLane));
-		setIsProcessing(false);
+		try {
+			// Worker-pool pattern (same as Image Compressor's batch processing): a
+			// fixed number of lanes each pull the next pending item off the shared
+			// queue as soon as they finish their current one.
+			let cursor = 0;
+			const runLane = async (): Promise<void> => {
+				const index = cursor++;
+				if (index >= queue.length) return;
+				await convertOne(queue[index], settings);
+				return runLane();
+			};
+			await Promise.all(Array.from({ length: Math.min(CONCURRENCY, queue.length) }, runLane));
+		} finally {
+			setIsProcessing(false);
+		}
 	}, [items, convertOne]);
 
 	const handleDownload = useCallback(
@@ -391,11 +514,11 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 			const url = URL.createObjectURL(item.resultBlob);
 			const link = document.createElement('a');
 			link.href = url;
-			link.download = replaceExtension(item.file.name, targetFormat);
+			link.download = item.downloadName ?? replaceExtension(item.file.name, item.resultFormat ?? 'image/png');
 			link.click();
 			URL.revokeObjectURL(url);
 		},
-		[targetFormat],
+		[],
 	);
 
 	const handleDownloadAll = useCallback(async () => {
@@ -405,8 +528,13 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 		try {
 			const { default: JSZip } = await import('jszip');
 			const zip = new JSZip();
+			const usedNames = new Set<string>();
 			for (const item of doneItems) {
-				zip.file(replaceExtension(item.file.name, targetFormat), item.resultBlob!);
+				const name = dedupeName(
+					item.downloadName ?? replaceExtension(item.file.name, item.resultFormat ?? 'image/png'),
+					usedNames,
+				);
+				zip.file(name, item.resultBlob!);
 			}
 			const zipBlob = await zip.generateAsync({ type: 'blob' });
 			const url = URL.createObjectURL(zipBlob);
@@ -418,7 +546,7 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 		} finally {
 			setIsZipping(false);
 		}
-	}, [items, targetFormat]);
+	}, [items]);
 
 	// A previously converted/failed result no longer reflects the current
 	// settings once format/quality/resize change — leaving it displayed as
@@ -450,7 +578,8 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 		);
 	}, [settingsSignature]);
 
-	const canConvert = !isProcessing && items.length > 0;
+	const canConvert =
+		!isProcessing && items.some((item) => item.status === 'pending' || item.status === 'error');
 	const doneCount = items.filter((item) => item.status === 'done').length;
 	// No byte-level progress source exists for canvas-based encoding (unlike
 	// Image Compressor's onProgress hook), so the aggregate here only counts
@@ -475,20 +604,20 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 					handleFiles(event.dataTransfer.files);
 				}}
 			>
-				<label
-					htmlFor="image-converter-input"
-					className="inline-flex cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80"
-				>
+				<label className="inline-flex min-h-11 cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80 focus-within:ring-3 focus-within:ring-ring/50 sm:min-h-0">
 					{messages.selectFiles}
+					<input
+						id="image-converter-input"
+						type="file"
+						accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/avif,image/heic,image/heif,.heic,.heif"
+						multiple
+						className="sr-only"
+						onChange={(event) => {
+							handleFiles(event.target.files);
+							event.target.value = '';
+						}}
+					/>
 				</label>
-				<input
-					id="image-converter-input"
-					type="file"
-					accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/avif,image/heic,image/heif,.heic,.heif"
-					multiple
-					className="hidden"
-					onChange={(event) => handleFiles(event.target.files)}
-				/>
 				<p className="text-xs text-muted-foreground">{messages.dropHint}</p>
 			</div>
 
@@ -505,6 +634,7 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 				<select
 					id="image-converter-format"
 					value={targetFormat}
+					disabled={isProcessing}
 					onChange={(event) => setTargetFormat(event.target.value as TargetFormat)}
 					className="rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
 				>
@@ -529,6 +659,7 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 							max={1}
 							step={0.05}
 							value={quality}
+							disabled={isProcessing}
 							onChange={(event) => setQuality(Number(event.target.value))}
 							className="w-48"
 						/>
@@ -541,6 +672,7 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 					<input
 						type="checkbox"
 						checked={resizeEnabled}
+						disabled={isProcessing}
 						onChange={(event) => setResizeEnabled(event.target.checked)}
 					/>
 					{messages.resizeToggleLabel}
@@ -557,6 +689,7 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 							max={MAX_MAX_DIMENSION}
 							step={32}
 							value={maxDimension}
+							disabled={isProcessing}
 							onChange={(event) => setMaxDimension(Number(event.target.value))}
 							className="w-48"
 						/>
@@ -615,7 +748,7 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 									{item.status === 'done' && item.resultBlob && (
 										<>
 											{' '}
-											→ {messages.converted}: {formatBytes(item.resultBlob.size)} ({targetFormat})
+											→ {messages.converted}: {formatBytes(item.resultBlob.size)} ({item.resultFormat ?? targetFormat})
 										</>
 									)}
 									{item.status === 'error' && (
@@ -634,8 +767,8 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 									size="sm"
 									variant="ghost"
 									onClick={() => handleRemove(item.id)}
-									disabled={item.status === 'processing'}
-									aria-label={messages.remove}
+									disabled={item.status === 'processing' || isProcessing}
+									aria-label={`${messages.remove} ${item.file.name}`}
 								>
 									✕
 								</Button>

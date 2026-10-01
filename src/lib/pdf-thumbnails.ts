@@ -34,35 +34,55 @@ async function loadPdfJs() {
 
 export async function renderPdfThumbnails(bytes: ArrayBuffer, scale = 0.25): Promise<PdfPageThumbnail[]> {
 	const pdfjsLib = await loadPdfJs();
-	const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
-	const thumbnails: PdfPageThumbnail[] = [];
-
-	for (let i = 1; i <= pdf.numPages; i++) {
-		const page = await pdf.getPage(i);
-		const viewport = page.getViewport({ scale });
-		const canvas = document.createElement('canvas');
-		canvas.width = viewport.width;
-		canvas.height = viewport.height;
-		const canvasContext = canvas.getContext('2d');
-		if (!canvasContext) throw new Error('2D canvas context unavailable');
-		await page.render({ canvasContext, viewport }).promise;
-		thumbnails.push({
-			pageIndex: i - 1,
-			dataUrl: canvas.toDataURL('image/jpeg', 0.7),
-			width: viewport.width,
-			height: viewport.height,
-		});
-		page.cleanup();
+	const loadingTask = pdfjsLib.getDocument({ data: bytes });
+	try {
+		const pdf = await loadingTask.promise;
+		const thumbnails: PdfPageThumbnail[] = [];
+		for (let i = 1; i <= pdf.numPages; i++) {
+			const page = await pdf.getPage(i);
+			const viewport = page.getViewport({ scale });
+			const canvas = document.createElement('canvas');
+			canvas.width = viewport.width;
+			canvas.height = viewport.height;
+			try {
+				const canvasContext = canvas.getContext('2d');
+				if (!canvasContext) throw new Error('2D canvas context unavailable');
+				await page.render({ canvasContext, viewport }).promise;
+				thumbnails.push({
+					pageIndex: i - 1,
+					dataUrl: canvas.toDataURL('image/jpeg', 0.7),
+					width: viewport.width,
+					height: viewport.height,
+				});
+			} finally {
+				page.cleanup();
+				// Giải phóng bộ nhớ bitmap của canvas ngay (đặc biệt trên Safari/iOS).
+				canvas.width = 0;
+				canvas.height = 0;
+			}
+		}
+		return thumbnails;
+	} finally {
+		// Luôn huỷ task + worker dù thành công hay lỗi, tránh rò rỉ worker/bộ nhớ.
+		try {
+			await loadingTask.destroy();
+		} catch {
+			/* bỏ qua */
+		}
 	}
-
-	await pdf.destroy();
-	return thumbnails;
 }
 
 export async function getPdfPageCount(bytes: ArrayBuffer): Promise<number> {
 	const pdfjsLib = await loadPdfJs();
-	const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
-	const count = pdf.numPages;
-	await pdf.destroy();
-	return count;
+	const loadingTask = pdfjsLib.getDocument({ data: bytes });
+	try {
+		const pdf = await loadingTask.promise;
+		return pdf.numPages;
+	} finally {
+		try {
+			await loadingTask.destroy();
+		} catch {
+			/* bỏ qua */
+		}
+	}
 }

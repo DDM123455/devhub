@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { baseNameOf } from '@/lib/file-utils';
+import { isVideoFile, safeVideoExt } from '@/lib/media-ext';
 
 interface Messages {
 	dropLabel: string;
@@ -26,6 +28,8 @@ interface Messages {
 	trimError: string;
 	metadataError: string;
 	manualDurationLabel: string;
+	notVideoError: string;
+	largeFileWarning: string;
 }
 
 type Mode = 'fast' | 'precise';
@@ -41,6 +45,8 @@ function formatTime(seconds: number): string {
 }
 
 const MIN_SELECTION_GAP = 0.1;
+// ffmpeg.wasm nạp toàn bộ file vào bộ nhớ WASM (giới hạn ~2GB, tab dễ crash sớm hơn): cảnh báo từ 1GB.
+const LARGE_FILE_WARNING_BYTES = 1024 * 1024 * 1024;
 
 // A Clideo-style dual-handle scrubber: drag either handle to set the trim start/end
 // directly on a visual timeline instead of two separate, disconnected range inputs.
@@ -83,12 +89,18 @@ function TrimTimeline({
 			if (which === 'start') onStartChange(Math.min(time, end - MIN_SELECTION_GAP));
 			else onEndChange(Math.max(time, start + MIN_SELECTION_GAP));
 		};
+		// Kết thúc kéo cả khi pointer bị huỷ (cuộc gọi đến, cử chỉ hệ thống) hoặc mất capture,
+		// nếu không listener mồ côi sẽ tiếp tục đổi start/end.
 		const onUp = () => {
 			handle.removeEventListener('pointermove', onMove);
 			handle.removeEventListener('pointerup', onUp);
+			handle.removeEventListener('pointercancel', onUp);
+			handle.removeEventListener('lostpointercapture', onUp);
 		};
 		handle.addEventListener('pointermove', onMove);
 		handle.addEventListener('pointerup', onUp);
+		handle.addEventListener('pointercancel', onUp);
+		handle.addEventListener('lostpointercapture', onUp);
 	};
 
 	const handleKeyDown = (which: 'start' | 'end') => (event: React.KeyboardEvent) => {
@@ -171,21 +183,50 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 	const [resultUrl, setResultUrl] = useState<string | null>(null);
 	const [resultSize, setResultSize] = useState<number | null>(null);
 	const [resultDuration, setResultDuration] = useState<number | null>(null);
+	// Đuôi + tên tải về chốt lúc tạo kết quả (mode có thể đổi sau đó mà kết quả cũ không đổi).
+	const [resultFileName, setResultFileName] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const ffmpegRef = useRef<import('@ffmpeg/ffmpeg').FFmpeg | null>(null);
+	// Tăng mỗi lần Clear / đổi file / unmount: tác vụ trim đang chạy so sánh token để biết kết quả đã cũ.
+	const runTokenRef = useRef(0);
+	const videoUrlRef = useRef<string | null>(null);
+	const resultUrlRef = useRef<string | null>(null);
+	videoUrlRef.current = videoUrl;
+	resultUrlRef.current = resultUrl;
+
+	const terminateFfmpeg = () => {
+		try {
+			ffmpegRef.current?.terminate();
+		} catch {
+			/* đã dừng */
+		}
+		ffmpegRef.current = null;
+		setEngineState('idle');
+	};
 
 	useEffect(() => {
 		return () => {
-			if (videoUrl) URL.revokeObjectURL(videoUrl);
-			if (resultUrl) URL.revokeObjectURL(resultUrl);
+			runTokenRef.current++;
+			try {
+				ffmpegRef.current?.terminate();
+			} catch {
+				/* đã dừng */
+			}
+			ffmpegRef.current = null;
+			if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current);
+			if (resultUrlRef.current) URL.revokeObjectURL(resultUrlRef.current);
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const loadFile = (file: File) => {
+		// File mới: huỷ tác vụ cũ (nếu có) để kết quả cũ không hiện cạnh file mới.
+		if (processing) terminateFfmpeg();
+		runTokenRef.current++;
+		setProcessing(false);
+		setResultFileName(null);
 		if (videoUrl) URL.revokeObjectURL(videoUrl);
 		if (resultUrl) URL.revokeObjectURL(resultUrl);
 		setResultUrl(null);
@@ -200,7 +241,12 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 
 	const handleFile = (files: FileList | null) => {
 		const file = files?.[0];
-		if (file) loadFile(file);
+		if (!file) return;
+		if (!isVideoFile(file)) {
+			setError(messages.notVideoError);
+			return;
+		}
+		loadFile(file);
 	};
 
 	const handleLoadedMetadata = () => {
@@ -247,6 +293,8 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 			setError(messages.invalidRangeError);
 			return;
 		}
+		const token = ++runTokenRef.current;
+		const isStale = () => token !== runTokenRef.current;
 		setError(null);
 		setProcessing(true);
 		setProgress(0);
@@ -254,14 +302,22 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 		setResultUrl(null);
 		setResultSize(null);
 		setResultDuration(null);
+		setResultFileName(null);
+		let ffmpeg: import('@ffmpeg/ffmpeg').FFmpeg | null = null;
+		let inputName = '';
+		let outputName = '';
 		try {
-			const ffmpeg = await ensureFfmpeg();
-			if (!ffmpeg) return;
+			ffmpeg = await ensureFfmpeg();
+			if (!ffmpeg || isStale()) return;
 			const { fetchFile } = await import('@ffmpeg/util');
-			const ext = videoFile.name.split('.').pop()?.toLowerCase() || 'mp4';
-			const inputName = `input.${ext}`;
-			const outputName = mode === 'fast' ? `output.${ext}` : 'output.mp4';
+			if (isStale()) return;
+			// Đuôi qua whitelist/mime: tên không có đuôi hoặc đuôi lạ không làm hỏng tên file ảo của ffmpeg.
+			const ext = safeVideoExt(videoFile);
+			const outExt = mode === 'fast' ? ext : 'mp4';
+			inputName = `input.${ext}`;
+			outputName = `output.${outExt}`;
 			await ffmpeg.writeFile(inputName, await fetchFile(videoFile));
+			if (isStale()) return;
 			const clipDuration = (end - start).toFixed(3);
 			const args =
 				mode === 'fast'
@@ -282,22 +338,34 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 							outputName,
 						];
 			const exitCode = await ffmpeg.exec(args);
+			if (isStale()) return;
 			if (exitCode !== 0) throw new Error('ffmpeg exec failed');
 			const data = await ffmpeg.readFile(outputName);
+			if (isStale()) return;
 			const blob = new Blob([data as Uint8Array], { type: mode === 'fast' ? videoFile.type || 'video/mp4' : 'video/mp4' });
 			setResultUrl(URL.createObjectURL(blob));
 			setResultSize(blob.size);
 			setResultDuration(end - start);
-			await ffmpeg.deleteFile(inputName).catch(() => {});
-			await ffmpeg.deleteFile(outputName).catch(() => {});
+			setResultFileName(`${baseNameOf(videoFile.name, 'video')}-trimmed.${outExt}`);
 		} catch {
-			setError(messages.trimError);
+			// Clear/đổi file đã terminate ffmpeg nên exec bị reject: không hiện lỗi cho tác vụ đã bị huỷ.
+			if (!isStale()) setError(messages.trimError);
 		} finally {
-			setProcessing(false);
+			// Dọn file ảo trong FS của ffmpeg dù thành công, lỗi hay bị huỷ (tránh rò rỉ bộ nhớ WASM).
+			if (ffmpeg && ffmpegRef.current === ffmpeg) {
+				if (inputName) await ffmpeg.deleteFile(inputName).catch(() => {});
+				if (outputName) await ffmpeg.deleteFile(outputName).catch(() => {});
+			}
+			if (!isStale()) setProcessing(false);
 		}
 	};
 
 	const handleClear = () => {
+		// Huỷ tác vụ đang chạy + dừng worker ffmpeg thật sự (không chỉ ẩn kết quả).
+		runTokenRef.current++;
+		if (processing) terminateFfmpeg();
+		setProcessing(false);
+		setResultFileName(null);
 		if (videoUrl) URL.revokeObjectURL(videoUrl);
 		if (resultUrl) URL.revokeObjectURL(resultUrl);
 		setVideoFile(null);
@@ -314,10 +382,9 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 
 	const handleDownload = () => {
 		if (!resultUrl || !videoFile) return;
-		const ext = mode === 'fast' ? videoFile.name.split('.').pop()?.toLowerCase() || 'mp4' : 'mp4';
 		const link = document.createElement('a');
 		link.href = resultUrl;
-		link.download = `trimmed.${ext}`;
+		link.download = resultFileName ?? 'trimmed.mp4';
 		link.click();
 	};
 
@@ -342,20 +409,25 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 					}}
 				>
 					<p className="text-xs text-muted-foreground">{messages.dropLabel}</p>
-					<label
-						htmlFor="video-trim-file-input"
-						className="inline-flex cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80"
-					>
+					<label className="inline-flex min-h-11 cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80 focus-within:ring-3 focus-within:ring-ring/50 sm:min-h-0">
 						{messages.chooseFile}
+						<input
+							id="video-trim-file-input"
+							ref={fileInputRef}
+							type="file"
+							accept="video/*"
+							className="sr-only"
+							onChange={(e) => {
+								handleFile(e.target.files);
+								e.target.value = '';
+							}}
+						/>
 					</label>
-					<input
-						id="video-trim-file-input"
-						ref={fileInputRef}
-						type="file"
-						accept="video/*"
-						className="hidden"
-						onChange={(e) => handleFile(e.target.files)}
-					/>
+					{error && (
+						<p role="alert" className="text-sm text-destructive">
+							{error}
+						</p>
+					)}
 				</div>
 			)}
 
@@ -469,6 +541,15 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 							</p>
 						)}
 					</div>
+
+					{videoFile.size > LARGE_FILE_WARNING_BYTES && (
+						<p
+							role="alert"
+							className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400"
+						>
+							{messages.largeFileWarning.replace('{{size}}', formatBytes(videoFile.size))}
+						</p>
+					)}
 
 					{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
 

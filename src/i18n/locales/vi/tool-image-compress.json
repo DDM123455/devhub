@@ -31,7 +31,8 @@
     "compressModeTargetSize": "Theo dung lượng đích",
     "targetSizeLabel": "Dung lượng đích: {{size}} KB",
     "processingQueue": "Đang xử lý {{current}}/{{total}}",
-    "progressPercent": "{{percent}}%"
+    "progressPercent": "{{percent}}%",
+    "notReduced": "không giảm dung lượng"
   },
   "related": "Công cụ liên quan",
   "faq": {

@@ -499,6 +499,15 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
       retry item lỗi. Verify Puppeteer: trạng thái tự chuyển "Removing background… 0%" trong
       <500ms sau khi chọn file, không cần click gì thêm, 0 console error.
 
+## Phase 3.13 — Audit toàn diện (source + runtime) và sửa lỗi (theo yêu cầu trực tiếp người dùng 2026-10-01)
+
+- [x] Hạ tầng: bộ chuyển ngôn ngữ map slug, hreflang 20 locale, sitemap bỏ 404, noindex 404, sidebar a11y/RTL, `npm audit fix`, privacy, JSON-LD escape
+- [x] Tool file/media: file picker bàn phím, PdfSplitter/PdfMerger, Image, BackgroundRemover, VideoTrim, AudioConverter
+- [x] Tool text/dev: Text Diff, Word Counter, Case, JSON, JWT, Base64, Regex, Markdown, Nginx, K8s
+- [x] Tool data/design: QR (UTF-8), CSV/JSON, JSON→Excel, SVG, Color Picker
+- [x] Tràn ngang 320px: `min-w-0` cho `main`, preset select, input số Color Picker
+- [ ] Còn treo: test tương tác thật 12 tool file/media/data, ghim schema K8s, 2 lỗ hổng moderate (exceljs→uuid)
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

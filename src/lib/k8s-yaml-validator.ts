@@ -13,15 +13,53 @@
 // Both run as devDependency-free runtime deps (bundled into the client, same
 // as every other per-tool library already in this repo — svgo, pdf-lib, etc).
 import Ajv, { type ErrorObject } from 'ajv';
-import { LineCounter, parseAllDocuments, type Document } from 'yaml';
+import { LineCounter, isMap, isScalar, parseAllDocuments, type Document } from 'yaml';
 
 export type Severity = 'error' | 'warning';
 
 export interface K8sIssue {
 	severity: Severity;
 	ruleId: string;
+	/** English fallback text. */
 	message: string;
+	/** i18n key suffix for this message variant (see K8S_ISSUE_KEYS). */
+	key: string;
+	/** Values for the `{{placeholders}}` of the i18n message. */
+	params: Record<string, string | number>;
 	line: number | null;
+}
+
+/** Every `key` an issue can carry — the page builds one i18n message per entry. */
+export const K8S_ISSUE_KEYS = [
+	'yaml-syntax',
+	'yaml-warning',
+	'yaml-alias-limit',
+	'empty-document',
+	'empty-document-trailing',
+	'not-a-mapping',
+	'missing-kind',
+	'missing-api-version',
+	'deprecated-api-version',
+	'deprecated-ingress-backend',
+	'unsupported-kind',
+	'schema-unavailable',
+	'schema-engine-error',
+	'schema-type',
+	'schema-required',
+	'schema-additional',
+	'schema-enum',
+	'schema-generic',
+] as const;
+
+function makeIssue(
+	severity: Severity,
+	ruleId: string,
+	key: string,
+	params: Record<string, string | number>,
+	message: string,
+	line: number | null,
+): K8sIssue {
+	return { severity, ruleId, key, params, message, line };
 }
 
 export interface K8sDocumentResult {
@@ -128,20 +166,73 @@ function lineForInstancePath(doc: Document, lineCounter: LineCounter, instancePa
 	}
 }
 
-function formatAjvError(error: ErrorObject): string {
-	const path = error.instancePath || '(root)';
-	return `${path}: ${error.message ?? 'is invalid'}`;
+function escapePointerSegment(segment: string): string {
+	return segment.replace(/~/g, '~0').replace(/\//g, '~1');
 }
 
-// Session-lifetime cache — the same Kubernetes version's schema for a given
-// kind never changes while the tab is open, so there's no reason to refetch
-// it every time the user tweaks their YAML. Cleared on page reload only.
+// Maps an ajv error to a translatable issue: the field path, and — crucially — the NAME of the
+// offending field for "additional properties" / "required" errors, which ajv only exposes in
+// `params`, not in `message`.
+function schemaIssueFromAjv(error: ErrorObject, doc: Document, lineCounter: LineCounter): K8sIssue {
+	const path = error.instancePath || '(root)';
+	const params = error.params as Record<string, unknown>;
+	switch (error.keyword) {
+		case 'additionalProperties': {
+			const field = String(params.additionalProperty ?? '');
+			return makeIssue(
+				'error',
+				'schema-validation',
+				'schema-additional',
+				{ path, field },
+				`${path}: unknown field "${field}" (must NOT have additional properties)`,
+				lineForInstancePath(doc, lineCounter, `${error.instancePath}/${escapePointerSegment(field)}`) ??
+					lineForInstancePath(doc, lineCounter, error.instancePath),
+			);
+		}
+		case 'required': {
+			const field = String(params.missingProperty ?? '');
+			return makeIssue(
+				'error',
+				'schema-validation',
+				'schema-required',
+				{ path, field },
+				`${path}: must have required property "${field}"`,
+				lineForInstancePath(doc, lineCounter, error.instancePath),
+			);
+		}
+		case 'type': {
+			const expected = Array.isArray(params.type) ? params.type.join(' | ') : String(params.type ?? '');
+			return makeIssue('error', 'schema-validation', 'schema-type', { path, expected }, `${path}: must be ${expected}`, lineForInstancePath(doc, lineCounter, error.instancePath));
+		}
+		case 'enum': {
+			const allowed = Array.isArray(params.allowedValues) ? params.allowedValues.join(', ') : '';
+			return makeIssue('error', 'schema-validation', 'schema-enum', { path, allowed }, `${path}: must be one of: ${allowed}`, lineForInstancePath(doc, lineCounter, error.instancePath));
+		}
+		default: {
+			const detail = error.message ?? 'is invalid';
+			return makeIssue('error', 'schema-validation', 'schema-generic', { path, detail }, `${path}: ${detail}`, lineForInstancePath(doc, lineCounter, error.instancePath));
+		}
+	}
+}
+
+// Session-lifetime cache of schemas that were fetched SUCCESSFULLY. A failed fetch (network
+// error, 404, bad JSON) is never cached — the entry is removed so the next validation (or the
+// UI's Retry button) tries the network again instead of showing "unavailable" until reload.
 const schemaCache = new Map<string, Promise<Record<string, unknown> | null>>();
+
+// The yannh mirror publishes no release tags — the only refs are the rolling `master` branch — so
+// the URL cannot be pinned to an immutable tag. See PROGRESS/report notes: pin to a commit SHA
+// here once one has been verified against the live repo.
+const SCHEMA_REPO_REF = 'master';
 
 function schemaUrl(kind: string, version: string): string | null {
 	const filename = SCHEMA_FILENAME_BY_KIND[kind];
 	if (!filename) return null;
-	return `https://cdn.jsdelivr.net/gh/yannh/kubernetes-json-schema@master/${version}-standalone/${filename}`;
+	return `https://cdn.jsdelivr.net/gh/yannh/kubernetes-json-schema@${SCHEMA_REPO_REF}/${version}-standalone/${filename}`;
+}
+
+export function clearSchemaCache() {
+	schemaCache.clear();
 }
 
 async function fetchSchema(kind: string, version: string): Promise<Record<string, unknown> | null> {
@@ -160,6 +251,9 @@ async function fetchSchema(kind: string, version: string): Promise<Record<string
 		}
 	})();
 	schemaCache.set(cacheKey, promise);
+	void promise.then((schema) => {
+		if (schema === null && schemaCache.get(cacheKey) === promise) schemaCache.delete(cacheKey);
+	});
 	return promise;
 }
 
@@ -197,73 +291,167 @@ export function parseK8sManifests(input: string): {
 	return { documents, globalIssues };
 }
 
+function stringField(doc: Document, name: string): string | null {
+	const value = doc.get(name);
+	return typeof value === 'string' && value.trim() !== '' ? value : null;
+}
+
 export async function validateK8sManifests(input: string, k8sVersion: string): Promise<K8sValidationResult> {
 	const { documents } = parseK8sManifests(input);
 	const results: K8sDocumentResult[] = [];
+
+	// Comment-only input parses to zero documents — still tell the user there is nothing to validate.
+	if (documents.length === 0 && input.trim() !== '') {
+		return {
+			documents: [
+				{
+					documentIndex: 0,
+					kind: null,
+					apiVersion: null,
+					suggestedApiVersion: null,
+					issues: [makeIssue('error', 'empty-document', 'empty-document', {}, 'This document is empty — a manifest needs at least apiVersion and kind.', null)],
+				},
+			],
+		};
+	}
 
 	for (let i = 0; i < documents.length; i++) {
 		const { doc, lineCounter } = documents[i];
 		const issues: K8sIssue[] = [];
 
 		for (const err of doc.errors) {
-			issues.push({
-				severity: 'error',
-				ruleId: 'yaml-syntax',
-				message: err.message.split('\n')[0],
-				line: err.linePos ? err.linePos[0].line : null,
-			});
+			const message = err.message.split('\n')[0];
+			issues.push(makeIssue('error', 'yaml-syntax', 'yaml-syntax', { message }, message, err.linePos ? err.linePos[0].line : null));
 		}
 		for (const warn of doc.warnings) {
-			issues.push({
-				severity: 'warning',
-				ruleId: 'yaml-warning',
-				message: warn.message.split('\n')[0],
-				line: warn.linePos ? warn.linePos[0].line : null,
-			});
+			const message = warn.message.split('\n')[0];
+			issues.push(makeIssue('warning', 'yaml-warning', 'yaml-warning', { message }, message, warn.linePos ? warn.linePos[0].line : null));
 		}
 
-		const kind = typeof doc.get('kind') === 'string' ? (doc.get('kind') as string) : null;
-		const apiVersion = typeof doc.get('apiVersion') === 'string' ? (doc.get('apiVersion') as string) : null;
+		let kind: string | null = null;
+		let apiVersion: string | null = null;
+		let validShape = false;
+
+		if (doc.errors.length === 0) {
+			const contents = doc.contents;
+			const isEmpty = contents === null || (isScalar(contents) && (contents.value === null || contents.value === ''));
+			if (isEmpty) {
+				// A trailing "---" after the last manifest produces one harmless empty document.
+				const trailing = i === documents.length - 1 && documents.length > 1;
+				issues.push(
+					makeIssue(
+						trailing ? 'warning' : 'error',
+						'empty-document',
+						trailing ? 'empty-document-trailing' : 'empty-document',
+						{},
+						trailing ? 'Empty document after the last "---".' : 'This document is empty — a manifest needs at least apiVersion and kind.',
+						null,
+					),
+				);
+			} else if (!isMap(contents)) {
+				issues.push(
+					makeIssue(
+						'error',
+						'not-a-mapping',
+						'not-a-mapping',
+						{},
+						'A Kubernetes manifest must be a YAML mapping (key: value pairs) at the top level, not a list or a plain value.',
+						lineForInstancePath(doc, lineCounter, ''),
+					),
+				);
+			} else {
+				validShape = true;
+				kind = stringField(doc, 'kind');
+				apiVersion = stringField(doc, 'apiVersion');
+				if (!kind) {
+					issues.push(makeIssue('error', 'missing-kind', 'missing-kind', {}, 'Missing required field "kind".', lineForInstancePath(doc, lineCounter, '')));
+				}
+				if (!apiVersion) {
+					issues.push(
+						makeIssue('error', 'missing-api-version', 'missing-api-version', {}, 'Missing required field "apiVersion".', lineForInstancePath(doc, lineCounter, '')),
+					);
+				}
+			}
+		}
+
 		const suggestedApiVersion = checkDeprecatedApiVersion(kind, apiVersion);
 
 		if (suggestedApiVersion) {
-			issues.push({
-				severity: 'warning',
-				ruleId: 'deprecated-api-version',
-				message: `"${apiVersion}" is deprecated for kind "${kind}" — use "${suggestedApiVersion}" instead.`,
-				line: lineForInstancePath(doc, lineCounter, '/apiVersion'),
-			});
+			issues.push(
+				makeIssue(
+					'warning',
+					'deprecated-api-version',
+					'deprecated-api-version',
+					{ apiVersion: apiVersion ?? '', kind: kind ?? '', suggested: suggestedApiVersion },
+					`"${apiVersion}" is deprecated for kind "${kind}" — use "${suggestedApiVersion}" instead.`,
+					lineForInstancePath(doc, lineCounter, '/apiVersion'),
+				),
+			);
+			if (kind === 'Ingress') {
+				issues.push(
+					makeIssue(
+						'warning',
+						'deprecated-api-version',
+						'deprecated-ingress-backend',
+						{},
+						'Changing only apiVersion is not enough for Ingress: networking.k8s.io/v1 also needs spec.rules[].http.paths[].pathType and backend.service.name/port (instead of serviceName/servicePort).',
+						lineForInstancePath(doc, lineCounter, '/apiVersion'),
+					),
+				);
+			}
 		}
 
-		if (doc.errors.length === 0 && kind) {
+		if (validShape && kind && doc.errors.length === 0) {
 			if (!SUPPORTED_KINDS.includes(kind)) {
-				issues.push({
-					severity: 'warning',
-					ruleId: 'unsupported-kind',
-					message: `"${kind}" is not one of the resource kinds this tool validates against a schema yet (${SUPPORTED_KINDS.join(', ')}). Syntax and deprecated-apiVersion checks above still apply.`,
-					line: lineForInstancePath(doc, lineCounter, '/kind'),
-				});
+				issues.push(
+					makeIssue(
+						'warning',
+						'unsupported-kind',
+						'unsupported-kind',
+						{ kind, supported: SUPPORTED_KINDS.join(', ') },
+						`"${kind}" is not one of the resource kinds this tool validates against a schema yet (${SUPPORTED_KINDS.join(', ')}). Syntax and deprecated-apiVersion checks above still apply.`,
+						lineForInstancePath(doc, lineCounter, '/kind'),
+					),
+				);
 			} else {
 				const schema = await fetchSchema(kind, k8sVersion);
 				if (!schema) {
-					issues.push({
-						severity: 'warning',
-						ruleId: 'schema-unavailable',
-						message: `Could not load the ${kind} schema for Kubernetes ${k8sVersion} (network error or unavailable version) — schema validation skipped for this document.`,
-						line: null,
-					});
+					issues.push(
+						makeIssue(
+							'warning',
+							'schema-unavailable',
+							'schema-unavailable',
+							{ kind, version: k8sVersion },
+							`Could not load the ${kind} schema for Kubernetes ${k8sVersion} (network error or unavailable version) — schema validation skipped for this document.`,
+							null,
+						),
+					);
 				} else {
-					const validate = getValidator(kind, schema);
-					const value = doc.toJS();
-					const valid = validate(value);
-					if (!valid) {
-						for (const err of validate.errors ?? []) {
-							issues.push({
-								severity: 'error',
-								ruleId: 'schema-validation',
-								message: formatAjvError(err),
-								line: lineForInstancePath(doc, lineCounter, err.instancePath),
-							});
+					// Both steps can throw on hostile/odd input: toJS() on an alias bomb
+					// ("billion laughs") raises "Excessive alias count", and ajv can fail to compile
+					// a malformed schema. Neither may reject the whole validation run.
+					let value: unknown;
+					let converted = false;
+					try {
+						value = doc.toJS();
+						converted = true;
+					} catch (err) {
+						const message = err instanceof Error ? err.message : String(err);
+						issues.push(
+							makeIssue('error', 'yaml-alias-limit', 'yaml-alias-limit', { message }, `YAML aliases expand too much to validate safely: ${message}`, null),
+						);
+					}
+					if (converted) {
+						try {
+							const validate = getValidator(kind, schema);
+							if (!validate(value)) {
+								for (const err of validate.errors ?? []) issues.push(schemaIssueFromAjv(err, doc, lineCounter));
+							}
+						} catch (err) {
+							const message = err instanceof Error ? err.message : String(err);
+							issues.push(
+								makeIssue('error', 'schema-engine-error', 'schema-engine-error', { message }, `Schema validation could not run: ${message}`, null),
+							);
 						}
 					}
 				}
@@ -277,19 +465,80 @@ export async function validateK8sManifests(input: string, k8sVersion: string): P
 	return { documents: results };
 }
 
+// --- Ingress v1beta1 -> v1 conversion -------------------------------------------------
+// networking.k8s.io/v1 renamed the backend fields and made pathType mandatory, so changing the
+// apiVersion alone yields a manifest the API server rejects. This rewrites the YAML AST in
+// place (comments elsewhere in the document are preserved).
+function convertBackend(doc: Document, backend: unknown): unknown | null {
+	if (!isMap(backend)) return null;
+	const serviceName = backend.get('serviceName');
+	const servicePort = backend.get('servicePort');
+	if (typeof serviceName !== 'string') return null;
+	const port: Record<string, unknown> = {};
+	if (typeof servicePort === 'number') port.number = servicePort;
+	else if (typeof servicePort === 'string') {
+		if (/^\d+$/.test(servicePort)) port.number = Number(servicePort);
+		else port.name = servicePort;
+	}
+	return doc.createNode({ service: { name: serviceName, port } });
+}
+
+function convertIngressToV1(doc: Document) {
+	const rules = doc.getIn(['spec', 'rules']);
+	const ruleItems = (rules as { items?: unknown[] } | null)?.items ?? [];
+	ruleItems.forEach((_rule, ruleIndex) => {
+		const paths = doc.getIn(['spec', 'rules', ruleIndex, 'http', 'paths']);
+		const pathItems = (paths as { items?: unknown[] } | null)?.items ?? [];
+		pathItems.forEach((_p, pathIndex) => {
+			const base = ['spec', 'rules', ruleIndex, 'http', 'paths', pathIndex];
+			const converted = convertBackend(doc, doc.getIn([...base, 'backend'], true));
+			if (converted) doc.setIn([...base, 'backend'], converted);
+			if (!doc.hasIn([...base, 'pathType'])) doc.setIn([...base, 'pathType'], 'ImplementationSpecific');
+		});
+	});
+	const defaultBackend = convertBackend(doc, doc.getIn(['spec', 'backend'], true));
+	if (defaultBackend) {
+		doc.deleteIn(['spec', 'backend']);
+		doc.setIn(['spec', 'defaultBackend'], defaultBackend);
+	}
+	doc.setIn(['apiVersion'], 'networking.k8s.io/v1');
+}
+
 // Auto-fix: rewrite every document's apiVersion in place to the suggested
 // replacement, using each node's exact character range so nothing else in
-// the document is touched. Applied back-to-front so earlier offsets stay
-// valid as later ones are replaced.
+// the document is touched. Ingress documents additionally get their backend
+// format and pathType converted (see convertIngressToV1). Applied back-to-front
+// so earlier offsets stay valid as later ones are replaced.
 export function autoFixDeprecatedApiVersions(input: string): string {
 	const { documents } = parseK8sManifests(input);
 	const replacements: { start: number; end: number; value: string }[] = [];
 
 	for (const { doc } of documents) {
-		const kind = typeof doc.get('kind') === 'string' ? (doc.get('kind') as string) : null;
-		const apiVersion = typeof doc.get('apiVersion') === 'string' ? (doc.get('apiVersion') as string) : null;
+		if (doc.errors.length > 0) continue;
+		const kind = stringField(doc, 'kind');
+		const apiVersion = stringField(doc, 'apiVersion');
 		const suggested = checkDeprecatedApiVersion(kind, apiVersion);
 		if (!suggested) continue;
+
+		if (kind === 'Ingress') {
+			const contentsRange = (doc.contents as { range?: [number, number, number] } | null)?.range;
+			if (contentsRange) {
+				const original = input.slice(contentsRange[0], contentsRange[1]);
+				convertIngressToV1(doc);
+				// Leading comments live on the document, outside the replaced range — drop them here
+				// or they would be duplicated.
+				doc.commentBefore = null;
+				(doc.contents as { commentBefore?: string | null }).commentBefore = null;
+				// ...and the comment block above the first key is attached to that key, not the map.
+				const firstKey = (doc.contents as { items?: Array<{ key?: { commentBefore?: string | null } }> }).items?.[0]?.key;
+				if (firstKey && typeof firstKey === 'object') firstKey.commentBefore = null;
+				let text = doc.toString({ lineWidth: 0 });
+				if (!original.endsWith('\n')) text = text.replace(/\n$/, '');
+				replacements.push({ start: contentsRange[0], end: contentsRange[1], value: text });
+				continue;
+			}
+		}
+
 		const node = doc.get('apiVersion', true) as { range?: [number, number, number] } | undefined;
 		if (!node?.range) continue;
 		replacements.push({ start: node.range[0], end: node.range[1], value: suggested });

@@ -13,9 +13,9 @@
     "sentencesLabel": "Số câu",
     "paragraphsLabel": "Số đoạn văn",
     "readingTimeLabel": "Thời gian đọc",
-    "readingTimeValue": "{{minutes}} phút đọc",
+    "readingTimeValue": "Đọc {{minutes}} phút",
     "speakingTimeLabel": "Thời gian nói",
-    "speakingTimeValue": "{{minutes}} phút nói",
+    "speakingTimeValue": "Nói {{minutes}} phút",
     "clear": "Xóa hết",
     "copy": "Sao chép",
     "copied": "Đã sao chép!",
@@ -43,7 +43,14 @@
     "keywordDensityHeading": "Tần suất từ khóa",
     "keywordDensityWordColumn": "Từ",
     "keywordDensityCountColumn": "Số lần",
-    "keywordDensityPercentColumn": "% văn bản"
+    "keywordDensityPercentColumn": "% văn bản",
+    "textareaLabel": "Văn bản cần đếm",
+    "readingTimeHoursValue": "Đọc {{hours}} giờ {{minutes}} phút",
+    "speakingTimeHoursValue": "Nói {{hours}} giờ {{minutes}} phút",
+    "readabilityEnglishOnly": "Điểm Flesch Reading Ease chỉ được hiệu chỉnh cho tiếng Anh nên không hiển thị cho văn bản này.",
+    "readabilityCalibrationNote": "Lưu ý: điểm Flesch chỉ hiệu chỉnh cho tiếng Anh.",
+    "fileReadError": "Không đọc được tệp này.",
+    "copyFailed": "Sao chép thất bại"
   },
   "related": "Công cụ liên quan",
   "faq": {

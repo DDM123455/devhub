@@ -3,6 +3,15 @@ import { PDFDocument, degrees } from 'pdf-lib';
 import { renderPdfThumbnails } from '@/lib/pdf-thumbnails';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import {
+	combineRotation,
+	everyNRanges,
+	isPasswordError,
+	parseRanges,
+	RangeParseError,
+	type PositionRange,
+} from '@/lib/pdf-utils';
+import { dedupeName } from '@/lib/file-utils';
 
 interface Messages {
 	selectFile: string;
@@ -32,6 +41,7 @@ interface Messages {
 	download: string;
 	downloadAll: string;
 	errorGeneric: string;
+	errorPassword: string;
 	errorInvalidRange: string;
 	errorInvalidEveryN: string;
 	errorNoPagesSelected: string;
@@ -53,60 +63,12 @@ interface ResultFile {
 	previewThumbnails: string[];
 }
 
-interface PositionRange {
-	start: number;
-	end: number;
-}
-
 interface SplitGroup {
 	entries: PageEntry[];
 	label: string;
 }
 
 type SplitMode = 'ranges' | 'everyN' | 'checkbox';
-
-class RangeParseError extends Error {
-	constructor(public token: string) {
-		super(`Invalid page range: ${token}`);
-	}
-}
-
-function parseRanges(input: string, pageCount: number): PositionRange[] {
-	const trimmed = input.trim();
-	if (trimmed === '') {
-		return Array.from({ length: pageCount }, (_, index) => ({ start: index + 1, end: index + 1 }));
-	}
-
-	return trimmed.split(',').map((token) => {
-		const part = token.trim();
-		const singleMatch = /^(\d+)$/.exec(part);
-		const rangeMatch = /^(\d+)-(\d+)$/.exec(part);
-
-		let start: number;
-		let end: number;
-		if (singleMatch) {
-			start = end = Number(singleMatch[1]);
-		} else if (rangeMatch) {
-			start = Number(rangeMatch[1]);
-			end = Number(rangeMatch[2]);
-		} else {
-			throw new RangeParseError(part);
-		}
-
-		if (start < 1 || end < start || end > pageCount) {
-			throw new RangeParseError(part);
-		}
-		return { start, end };
-	});
-}
-
-function everyNRanges(n: number, pageCount: number): PositionRange[] {
-	const chunks: PositionRange[] = [];
-	for (let start = 1; start <= pageCount; start += n) {
-		chunks.push({ start, end: Math.min(start + n - 1, pageCount) });
-	}
-	return chunks;
-}
 
 // Splitting with pdf-lib is byte-level page copying, no ML inference or pixel
 // decoding involved, so it stays fast on the main thread — same reasoning as
@@ -154,6 +116,9 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 		const onKeyDown = (event: KeyboardEvent) => {
 			const isUndoShortcut = (event.ctrlKey || event.metaKey) && !event.shiftKey && event.key.toLowerCase() === 'z';
 			if (!isUndoShortcut) return;
+			// Để input/textarea tự undo văn bản của chúng.
+			const target = event.target as HTMLElement | null;
+			if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
 			event.preventDefault();
 			handleUndo();
 		};
@@ -161,7 +126,12 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 		return () => window.removeEventListener('keydown', onKeyDown);
 	}, [handleUndo]);
 
+	const loadTokenRef = useRef(0);
+
 	const loadFile = useCallback(async (candidate: File) => {
+		const token = ++loadTokenRef.current;
+		undoStackRef.current = [];
+		setCanUndo(false);
 		setError(null);
 		setResults([]);
 		setFile(null);
@@ -171,6 +141,8 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 		try {
 			const bytes = await candidate.arrayBuffer();
 			const thumbnails = await renderPdfThumbnails(bytes);
+			// Người dùng đã chọn file khác trong lúc đang đọc file này: bỏ kết quả cũ.
+			if (token !== loadTokenRef.current) return;
 			setFile(candidate);
 			setPages(
 				thumbnails.map((thumb) => ({
@@ -180,11 +152,12 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 					rotation: 0,
 				})),
 			);
-		} catch {
-			setError(messages.errorGeneric);
+		} catch (err) {
+			if (token !== loadTokenRef.current) return;
+			setError(isPasswordError(err) ? messages.errorPassword : messages.errorGeneric);
 		}
-		setIsLoadingThumbnails(false);
-	}, [messages.errorGeneric]);
+		if (token === loadTokenRef.current) setIsLoadingThumbnails(false);
+	}, [messages.errorGeneric, messages.errorPassword]);
 
 	const handleFiles = useCallback((fileList: FileList | null) => {
 		if (!fileList || fileList.length === 0) return;
@@ -297,6 +270,10 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 				}));
 			}
 
+			// Tên file/nhãn trùng (vd "1,1") -> thêm hậu tố -1, -2 để không ghi đè nhau trong zip.
+			const usedLabels = new Set<string>();
+			splitGroups = splitGroups.map((group) => ({ ...group, label: dedupeName(group.label, usedLabels) }));
+
 			const bytes = await file.arrayBuffer();
 			const sourceDoc = await PDFDocument.load(bytes);
 
@@ -310,7 +287,10 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 				);
 				copiedPages.forEach((copiedPage, i) => {
 					const rotation = group.entries[i].rotation;
-					if (rotation !== 0) copiedPage.setRotation(degrees(rotation));
+					// Cộng với /Rotate gốc của trang (nếu không, trang gốc đã xoay sẽ bị đặt lại).
+					if (rotation !== 0) {
+						copiedPage.setRotation(degrees(combineRotation(copiedPage.getRotation().angle, rotation)));
+					}
 					outDoc.addPage(copiedPage);
 				});
 				const outBytes = await outDoc.save();
@@ -334,7 +314,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 						.replace('{{max}}', String(pages.length)),
 				);
 			} else {
-				setError(messages.errorGeneric);
+				setError(isPasswordError(err) ? messages.errorPassword : messages.errorGeneric);
 			}
 		}
 		setIsProcessing(false);
@@ -386,19 +366,20 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 					handleFiles(event.dataTransfer.files);
 				}}
 			>
-				<label
-					htmlFor="pdf-splitter-input"
-					className="inline-flex cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80"
-				>
+				<label className="inline-flex cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80 focus-within:ring-3 focus-within:ring-ring/50">
 					{file ? messages.changeFile : messages.selectFile}
+					<input
+						id="pdf-splitter-input"
+						type="file"
+						accept="application/pdf"
+						className="sr-only"
+						onChange={(event) => {
+							handleFiles(event.target.files);
+							// Cho phép chọn lại đúng file đó lần nữa.
+							event.target.value = '';
+						}}
+					/>
 				</label>
-				<input
-					id="pdf-splitter-input"
-					type="file"
-					accept="application/pdf"
-					className="hidden"
-					onChange={(event) => handleFiles(event.target.files)}
-				/>
 				<p className="text-xs text-muted-foreground">{messages.dropHint}</p>
 			</div>
 
@@ -435,9 +416,16 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 							>
 								<div
 									className="relative overflow-hidden rounded bg-muted"
-									onClick={splitMode === 'checkbox' ? () => handleTogglePageSelected(page.id) : undefined}
-									role={splitMode === 'checkbox' ? 'button' : undefined}
-									tabIndex={splitMode === 'checkbox' ? 0 : undefined}
+									// Click vào ảnh cũng chọn trang (tiện cho chuột). Điều khiển bàn phím/AT là checkbox bên trong,
+									// nên không bọc role=button và bỏ qua click đến từ chính checkbox (tránh toggle 2 lần).
+									onClick={
+										splitMode === 'checkbox'
+											? (event) => {
+													if ((event.target as HTMLElement).tagName === 'INPUT') return;
+													handleTogglePageSelected(page.id);
+												}
+											: undefined
+									}
 								>
 									<img
 										src={page.dataUrl}
@@ -445,7 +433,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 										className="w-full"
 										style={{ transform: `rotate(${page.rotation}deg)` }}
 									/>
-									<span className="absolute bottom-1 right-1 rounded bg-black/60 px-1 text-[10px] font-medium text-white">
+									<span className="absolute bottom-1 right-1 rounded bg-black/60 px-1 text-[11px] font-medium text-white">
 										{index + 1}
 									</span>
 									{splitMode === 'checkbox' && (
@@ -463,7 +451,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 										type="button"
 										size="icon-xs"
 										variant="outline"
-										aria-label={messages.rotate}
+										aria-label={`${messages.rotate} ${index + 1}`}
 										onClick={() => handleRotatePage(page.id)}
 									>
 										⟳
@@ -472,7 +460,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 										type="button"
 										size="icon-xs"
 										variant="destructive"
-										aria-label={messages.deletePage}
+										aria-label={`${messages.deletePage} ${index + 1}`}
 										onClick={() => handleDeletePage(page.id)}
 									>
 										×
@@ -487,21 +475,24 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 						<div className="flex flex-wrap gap-2">
 							<button
 								type="button"
-								onClick={() => setSplitMode('ranges')}
+								onClick={() => { setResults([]); setSplitMode('ranges'); }}
+								aria-pressed={splitMode === 'ranges'}
 								className={`rounded-md border px-2.5 py-1 text-xs font-medium ${splitMode === 'ranges' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
 							>
 								{messages.modeRanges}
 							</button>
 							<button
 								type="button"
-								onClick={() => setSplitMode('everyN')}
+								onClick={() => { setResults([]); setSplitMode('everyN'); }}
+								aria-pressed={splitMode === 'everyN'}
 								className={`rounded-md border px-2.5 py-1 text-xs font-medium ${splitMode === 'everyN' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
 							>
 								{messages.modeEveryN}
 							</button>
 							<button
 								type="button"
-								onClick={() => setSplitMode('checkbox')}
+								onClick={() => { setResults([]); setSplitMode('checkbox'); }}
+								aria-pressed={splitMode === 'checkbox'}
 								className={`rounded-md border px-2.5 py-1 text-xs font-medium ${splitMode === 'checkbox' ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'}`}
 							>
 								{messages.modeCheckbox}
@@ -517,7 +508,10 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 									id="pdf-splitter-ranges"
 									type="text"
 									value={rangesInput}
-									onChange={(event) => setRangesInput(event.target.value)}
+									onChange={(event) => {
+										setResults([]);
+										setRangesInput(event.target.value);
+									}}
 									placeholder={messages.rangesPlaceholder}
 									className="w-full max-w-sm rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground"
 								/>
@@ -535,7 +529,10 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 									min={1}
 									max={pages.length}
 									value={everyN}
-									onChange={(event) => setEveryN(Number(event.target.value))}
+									onChange={(event) => {
+										setResults([]);
+										setEveryN(Number(event.target.value));
+									}}
 									className="w-20 rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
 								/>
 							</div>

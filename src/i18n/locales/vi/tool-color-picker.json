@@ -25,9 +25,9 @@
     "harmonyMonochromatic": "Đơn sắc",
     "randomHeading": "Bảng màu ngẫu nhiên",
     "generate": "Tạo mới",
-    "generateHint": "Nhấn phím cách để tạo bảng màu mới. Bấm biểu tượng khóa để giữ lại một màu.",
-    "lockAria": "Mở khóa màu này",
-    "unlockAria": "Khóa màu này",
+    "generateHint": "Nhấn phím cách hoặc phím G để tạo bảng màu mới. Bấm biểu tượng khóa để giữ lại một màu.",
+    "lockAria": "Khóa màu này",
+    "unlockAria": "Mở khóa màu này",
     "copyPaletteCss": "Sao chép dạng CSS",
     "copyPaletteJson": "Sao chép dạng JSON",
     "contrastHeading": "Kiểm tra độ tương phản",
@@ -44,7 +44,15 @@
     "copyPaletteScss": "Sao chép dạng SCSS",
     "copyPaletteTailwind": "Sao chép dạng Tailwind config",
     "exportPaletteAse": "Xuất file .ase",
-    "extractFromImageLabel": "Trích xuất bảng màu từ ảnh"
+    "extractFromImageLabel": "Trích xuất bảng màu từ ảnh",
+    "copyFailed": "Sao chép thất bại",
+    "savedFeedback": "Đã lưu bảng màu",
+    "alreadySaved": "Bảng màu này đã được lưu",
+    "paletteDeleted": "Đã xóa bảng màu.",
+    "undo": "Hoàn tác",
+    "extractError": "Không đọc được ảnh này. Hãy thử file PNG, JPG hoặc WebP.",
+    "extractEmpty": "Ảnh này không có điểm ảnh nhìn thấy được để trích màu.",
+    "colorInputAria": "Chọn màu"
   },
   "related": "Công cụ liên quan",
   "faq": {
@@ -54,13 +62,13 @@
     "q2": "Công cụ có kiểm tra độ tương phản màu cho khả năng tiếp cận không?",
     "a2": "Có — bộ kiểm tra tương phản tích hợp hiện tỷ lệ đạt/không đạt WCAG AA/AAA so với nền trắng và đen.",
     "q3": "Có thể xuất bảng màu để dùng trong code không?",
-    "a3": "Có — sao chép bất kỳ bảng màu nào dưới dạng biến CSS hoặc mảng JSON các mã hex."
+    "a3": "Có — sao chép bất kỳ bảng màu nào dưới dạng biến CSS, biến SCSS, đoạn cấu hình Tailwind hoặc mảng JSON các mã hex, hoặc xuất file mẫu màu .ase của Adobe. Bạn cũng có thể trích bảng màu từ ảnh và lưu bảng màu ngay trong trình duyệt."
   },
   "article": {
     "heading": "Phối màu hài hòa và độ tương phản hoạt động thế nào?",
     "p1": "Mỗi màu sắc trên màn hình đều có thể mô tả theo ba cách khác nhau, và công cụ này luôn đồng bộ cả ba: HEX là ký hiệu rút gọn dùng trong CSS và các phần mềm thiết kế, RGB mô tả lượng ánh sáng đỏ, xanh lá, xanh dương pha trộn để tạo ra màu đó, còn HSL — sắc độ (hue), độ bão hòa (saturation), độ sáng (lightness) — mô tả màu theo cách con người thực sự cảm nhận: đó là màu gì, rực rỡ ra sao, và sáng hay tối đến mức nào. Kéo ô màu gốc, gõ mã HEX, hoặc chỉnh trực tiếp từng ô R/G/B hay H/S/L, mọi ô còn lại sẽ tự cập nhật ngay lập tức, giúp bạn chuyển đổi giữa các cách hình dung màu sắc khác nhau mà không cần tự tính toán.",
     "p2": "Bánh xe màu sắc là nền tảng cho sáu quy tắc phối màu kinh điển, tất cả đều được tạo tự động từ màu gốc bạn chọn. Bổ túc (complementary) ghép một màu với màu đối diện để đạt độ tương phản cao nhất; tương đồng (analogous) chọn các màu liền kề trên bánh xe để tạo cảm giác nhẹ nhàng, gắn kết; bộ ba và bộ bốn (triadic/tetradic) chia đều ba hoặc bốn màu quanh bánh xe cho bảng màu sống động nhưng vẫn cân bằng; bổ túc phân chia (split-complementary) làm dịu bớt một cặp bổ túc bằng cách dùng hai màu cạnh màu đối diện thay vì chính màu đối diện; còn đơn sắc (monochromatic) chỉ giữ nguyên một sắc độ và thay đổi độ sáng, thường là lựa chọn an toàn nhất khi giao diện cần một màu thương hiệu nhất quán ở nhiều cấp độ sáng khác nhau.",
-    "p3": "Không phải bảng màu đẹp nào cũng phải bắt đầu từ lý thuyết màu sắc — đôi khi bạn chỉ muốn xem thử điều gì xuất hiện. Bộ tạo bảng màu ngẫu nhiên (nhấn phím cách, hoặc bấm nút Tạo mới) cho ra năm màu cùng lúc, với sắc độ và độ sáng được cân chỉnh để tránh những màu xỉn hoặc quá nhạt. Bấm biểu tượng khóa trên bất kỳ ô màu nào bạn muốn giữ lại, rồi tạo lại lần nữa: chỉ những màu chưa khóa mới thay đổi, nhờ vậy bạn có thể xây dựng bảng màu dần dần, giống cách các công cụ như Coolors hoạt động. Bấm vào bất kỳ ô màu nào để sao chép mã HEX của nó, hoặc dùng các nút bên dưới bảng màu để sao chép toàn bộ dưới dạng biến CSS hoặc mảng JSON, sẵn sàng dán vào file stylesheet hay design token.",
+    "p3": "Không phải bảng màu đẹp nào cũng phải bắt đầu từ lý thuyết màu sắc — đôi khi bạn chỉ muốn xem thử điều gì xuất hiện. Bộ tạo bảng màu ngẫu nhiên (nhấn phím cách, hoặc bấm nút Tạo mới) cho ra năm màu cùng lúc, với sắc độ và độ sáng được cân chỉnh để tránh những màu xỉn hoặc quá nhạt. Bấm biểu tượng khóa trên bất kỳ ô màu nào bạn muốn giữ lại, rồi tạo lại lần nữa: chỉ những màu chưa khóa mới thay đổi, nhờ vậy bạn có thể xây dựng bảng màu dần dần, giống cách các công cụ như Coolors hoạt động. Bấm vào bất kỳ ô màu nào để sao chép mã HEX của nó, hoặc dùng các nút bên dưới bảng màu để sao chép toàn bộ dưới dạng biến CSS, biến SCSS, đoạn cấu hình Tailwind hoặc mảng JSON, hoặc xuất file mẫu màu .ase của Adobe cho Illustrator và Photoshop. Bạn cũng có thể trích bảng màu từ một ảnh bất kỳ (xử lý ngay trên máy, không upload) và lưu những bảng màu ưng ý ngay trong trình duyệt để dùng lại sau.",
     "p4": "Chọn được một màu đẹp mắt không đồng nghĩa với việc nó dùng được — chữ đặt trên nền có độ sáng quá gần nhau sẽ khó đọc, và tiêu chuẩn Web Content Accessibility Guidelines (WCAG) đặt ra ngưỡng cụ thể cho việc này: tỷ lệ tương phản tối thiểu 4.5:1 với chữ thường để đạt mức AA, và 7:1 để đạt mức AAA nghiêm ngặt hơn. Công cụ kiểm tra độ tương phản tính chính xác tỷ lệ giữa màu bạn chọn với cả chữ trắng lẫn chữ đen, dùng đúng công thức độ chói tương đối (relative luminance) mà chuẩn WCAG quy định, và báo rõ từng cặp có đạt chuẩn hay không — giúp bạn phát hiện một nút bấm hay tiêu đề có độ tương phản thấp trước khi đưa lên sản phẩm, thay vì sau đó."
   }
 }

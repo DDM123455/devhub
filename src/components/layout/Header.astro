@@ -27,8 +27,9 @@ const t = getFixedT(lang);
 			class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground md:hidden"
 			aria-label={t('nav.toggleMenu')}
 			aria-controls="sidebar"
+			aria-expanded="false"
 		>
-			☰
+			<span aria-hidden="true">☰</span>
 		</button>
 	</div>
 </header>

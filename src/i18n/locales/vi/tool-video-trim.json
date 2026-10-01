@@ -29,7 +29,9 @@
     "engineLoadError": "Không tải được engine xử lý video — kiểm tra kết nối mạng rồi thử lại.",
     "trimError": "Cắt video thất bại. Thử điểm bắt đầu/kết thúc khác, hoặc đổi sang chế độ còn lại.",
     "metadataError": "Trình duyệt này không xem trước trực tiếp được định dạng video này, nhưng vẫn có thể cắt được — nhập tổng thời lượng thủ công bên dưới.",
-    "manualDurationLabel": "Tổng thời lượng (giây)"
+    "manualDurationLabel": "Tổng thời lượng (giây)",
+    "notVideoError": "Tệp này không phải video. Hãy chọn tệp video (MP4, MOV, WebM, MKV...).",
+    "largeFileWarning": "Tệp này lớn ({{size}}). Việc cắt chạy trong bộ nhớ trình duyệt và có thể lỗi hoặc làm treo tab khi trên ~1 GB; hãy thử chế độ nhanh hoặc tệp nhỏ hơn."
   },
   "related": "Công cụ liên quan",
   "faq": {

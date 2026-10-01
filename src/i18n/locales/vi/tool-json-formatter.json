@@ -31,7 +31,13 @@
     "compareDiffCount": "Tìm thấy {{count}} khác biệt:",
     "compareAdded": "thêm mới",
     "compareRemoved": "đã xóa",
-    "compareChanged": "thay đổi"
+    "compareChanged": "thay đổi",
+    "warnUnsafeNumbers": "JSON có số vượt quá độ chính xác an toàn của JavaScript (hơn 15-17 chữ số có nghĩa). Chúng đã bị làm tròn trong kết quả này — hãy giữ các giá trị như vậy dạng chuỗi.",
+    "warnDuplicateKeys": "JSON có khóa trùng lặp. Kết quả này chỉ giữ giá trị cuối của mỗi khóa trùng.",
+    "warnCsvCollisions": "Một số tên cột sau khi làm phẳng bị trùng và bị ghi đè: {{keys}}",
+    "copyFailed": "Sao chép thất bại",
+    "copyExportAria": "Sao chép bản xuất {{format}}",
+    "downloadExportAria": "Tải bản xuất {{format}}"
   },
   "related": "Công cụ liên quan",
   "faq": {

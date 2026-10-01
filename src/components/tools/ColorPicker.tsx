@@ -1,6 +1,25 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Lock, Unlock, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+	bestTextColor,
+	clamp,
+	contrastRatio,
+	hexToRgb,
+	hslToRgb,
+	isHex3,
+	isHex6,
+	isPartialHex,
+	medianCutQuantize,
+	rgbToHex,
+	rgbToHsl,
+	samePalette,
+	sanitizeSavedPalettes,
+	type Hsl,
+	type Rgb,
+	type SavedPalette,
+} from '@/lib/color-utils';
+import { copyTextSafe } from '@/lib/safe-clipboard';
 
 interface Messages {
 	pickerHeading: string;
@@ -42,109 +61,16 @@ interface Messages {
 	loadPaletteAria: string;
 	deletePaletteAria: string;
 	extractFromImageLabel: string;
+	copyFailed: string;
+	savedFeedback: string;
+	alreadySaved: string;
+	paletteDeleted: string;
+	undo: string;
+	extractError: string;
+	extractEmpty: string;
+	colorInputAria: string;
 }
 
-interface Rgb {
-	r: number;
-	g: number;
-	b: number;
-}
-
-interface Hsl {
-	h: number;
-	s: number;
-	l: number;
-}
-
-function clamp(value: number, min: number, max: number): number {
-	return Math.min(max, Math.max(min, value));
-}
-
-function hexToRgb(hex: string): Rgb | null {
-	const trimmed = hex.trim();
-	const match6 = /^#?([0-9a-f]{6})$/i.exec(trimmed);
-	if (match6) {
-		const int = parseInt(match6[1], 16);
-		return { r: (int >> 16) & 255, g: (int >> 8) & 255, b: int & 255 };
-	}
-	// 3-digit shorthand (#abc → #aabbcc) — the same convention CSS itself
-	// accepts, so pasting a shorthand hex from another tool just works here too.
-	const match3 = /^#?([0-9a-f]{3})$/i.exec(trimmed);
-	if (match3) {
-		const expanded = match3[1]
-			.split('')
-			.map((c) => c + c)
-			.join('');
-		const int = parseInt(expanded, 16);
-		return { r: (int >> 16) & 255, g: (int >> 8) & 255, b: int & 255 };
-	}
-	return null;
-}
-
-function rgbToHex({ r, g, b }: Rgb): string {
-	const toHex = (n: number) => clamp(Math.round(n), 0, 255).toString(16).padStart(2, '0');
-	return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-}
-
-function rgbToHsl({ r, g, b }: Rgb): Hsl {
-	const rn = r / 255;
-	const gn = g / 255;
-	const bn = b / 255;
-	const max = Math.max(rn, gn, bn);
-	const min = Math.min(rn, gn, bn);
-	const l = (max + min) / 2;
-	if (max === min) return { h: 0, s: 0, l: Math.round(l * 100) };
-	const d = max - min;
-	const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-	let h: number;
-	if (max === rn) h = ((gn - bn) / d + (gn < bn ? 6 : 0)) * 60;
-	else if (max === gn) h = ((bn - rn) / d + 2) * 60;
-	else h = ((rn - gn) / d + 4) * 60;
-	return { h: Math.round(h), s: Math.round(s * 100), l: Math.round(l * 100) };
-}
-
-function hslToRgb({ h, s, l }: Hsl): Rgb {
-	const hn = ((h % 360) + 360) % 360;
-	const sn = clamp(s, 0, 100) / 100;
-	const ln = clamp(l, 0, 100) / 100;
-	if (sn === 0) {
-		const v = Math.round(ln * 255);
-		return { r: v, g: v, b: v };
-	}
-	const q = ln < 0.5 ? ln * (1 + sn) : ln + sn - ln * sn;
-	const p = 2 * ln - q;
-	const hueToRgb = (t: number) => {
-		let tt = t;
-		if (tt < 0) tt += 1;
-		if (tt > 1) tt -= 1;
-		if (tt < 1 / 6) return p + (q - p) * 6 * tt;
-		if (tt < 1 / 2) return q;
-		if (tt < 2 / 3) return p + (q - p) * (2 / 3 - tt) * 6;
-		return p;
-	};
-	const hk = hn / 360;
-	return {
-		r: Math.round(hueToRgb(hk + 1 / 3) * 255),
-		g: Math.round(hueToRgb(hk) * 255),
-		b: Math.round(hueToRgb(hk - 1 / 3) * 255),
-	};
-}
-
-function relativeLuminance({ r, g, b }: Rgb): number {
-	const channel = (c: number) => {
-		const cs = c / 255;
-		return cs <= 0.03928 ? cs / 12.92 : Math.pow((cs + 0.055) / 1.055, 2.4);
-	};
-	return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
-}
-
-function contrastRatio(a: Rgb, b: Rgb): number {
-	const la = relativeLuminance(a);
-	const lb = relativeLuminance(b);
-	const lighter = Math.max(la, lb);
-	const darker = Math.min(la, lb);
-	return (lighter + 0.05) / (darker + 0.05);
-}
 
 type HarmonyType = 'complementary' | 'analogous' | 'triadic' | 'tetradic' | 'split' | 'monochromatic';
 
@@ -233,83 +159,25 @@ function buildAseBlob(hexColors: string[]): Blob {
 	return new Blob([new Uint8Array([...header, ...bytes])], { type: 'application/octet-stream' });
 }
 
-interface ColorBox {
-	pixels: Rgb[];
-}
-
-function boxChannelRange(box: ColorBox): { channel: keyof Rgb; range: number } {
-	let minR = 255, maxR = 0, minG = 255, maxG = 0, minB = 255, maxB = 0;
-	for (const p of box.pixels) {
-		if (p.r < minR) minR = p.r;
-		if (p.r > maxR) maxR = p.r;
-		if (p.g < minG) minG = p.g;
-		if (p.g > maxG) maxG = p.g;
-		if (p.b < minB) minB = p.b;
-		if (p.b > maxB) maxB = p.b;
-	}
-	const rangeR = maxR - minR;
-	const rangeG = maxG - minG;
-	const rangeB = maxB - minB;
-	if (rangeR >= rangeG && rangeR >= rangeB) return { channel: 'r', range: rangeR };
-	if (rangeG >= rangeB) return { channel: 'g', range: rangeG };
-	return { channel: 'b', range: rangeB };
-}
-
-function splitBox(box: ColorBox): [ColorBox, ColorBox] {
-	const { channel } = boxChannelRange(box);
-	const sorted = [...box.pixels].sort((a, b) => a[channel] - b[channel]);
-	const mid = Math.floor(sorted.length / 2);
-	return [{ pixels: sorted.slice(0, mid) }, { pixels: sorted.slice(mid) }];
-}
-
-// Median-cut color quantization — the same classic algorithm behind GIF
-// palette generation, adapted here to pick N "dominant colors" instead of a
-// full 256-color palette: repeatedly split the pixel population in half along
-// whichever RGB channel has the widest spread, then average each final group.
-function medianCutQuantize(pixels: Rgb[], colorCount: number): Rgb[] {
-	const boxes: ColorBox[] = [{ pixels }];
-	while (boxes.length < colorCount) {
-		let splitIndex = -1;
-		let largestRange = -1;
-		boxes.forEach((box, i) => {
-			if (box.pixels.length < 2) return;
-			const { range } = boxChannelRange(box);
-			if (range > largestRange) {
-				largestRange = range;
-				splitIndex = i;
-			}
-		});
-		if (splitIndex === -1) break;
-		const [a, b] = splitBox(boxes[splitIndex]);
-		boxes.splice(splitIndex, 1, a, b);
-	}
-	return boxes.map((box) => {
-		const n = box.pixels.length;
-		const sum = box.pixels.reduce((acc, p) => ({ r: acc.r + p.r, g: acc.g + p.g, b: acc.b + p.b }), { r: 0, g: 0, b: 0 });
-		return { r: Math.round(sum.r / n), g: Math.round(sum.g / n), b: Math.round(sum.b / n) };
-	});
-}
-
-interface SavedPalette {
-	id: string;
-	colors: string[];
-}
 
 const SAVED_PALETTES_STORAGE_KEY = 'color-picker-saved-palettes';
 const SAVED_PALETTES_LIMIT = 20;
 
-function loadSavedPalettes(): SavedPalette[] {
+function readSavedPalettes(): SavedPalette[] {
 	try {
 		const raw = localStorage.getItem(SAVED_PALETTES_STORAGE_KEY);
 		if (!raw) return [];
-		const parsed = JSON.parse(raw);
-		if (!Array.isArray(parsed)) return [];
-		return parsed.filter(
-			(entry): entry is SavedPalette =>
-				typeof entry?.id === 'string' && Array.isArray(entry?.colors) && entry.colors.every((c: unknown) => typeof c === 'string'),
-		);
+		return sanitizeSavedPalettes(JSON.parse(raw));
 	} catch {
 		return [];
+	}
+}
+
+function writeSavedPalettes(next: SavedPalette[]): void {
+	try {
+		localStorage.setItem(SAVED_PALETTES_STORAGE_KEY, JSON.stringify(next));
+	} catch {
+		// Ignore quota/private-mode errors — saved palettes are a convenience, not core functionality.
 	}
 }
 
@@ -318,6 +186,7 @@ function Swatch({
 	label,
 	copyLabel,
 	copiedLabel,
+	failedLabel,
 	locked,
 	onToggleLock,
 	lockAria,
@@ -327,42 +196,56 @@ function Swatch({
 	label?: string;
 	copyLabel: string;
 	copiedLabel: string;
+	failedLabel: string;
 	locked?: boolean;
 	onToggleLock?: () => void;
 	lockAria?: string;
 	unlockAria?: string;
 }) {
-	const [copied, setCopied] = useState(false);
+	const [status, setStatus] = useState<'idle' | 'copied' | 'failed'>('idle');
+	const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const rgb = hexToRgb(hex);
-	const textColor = rgb && relativeLuminance(rgb) > 0.4 ? '#111827' : '#ffffff';
+	const textColor = rgb ? bestTextColor(rgb) : '#ffffff';
+
+	useEffect(
+		() => () => {
+			if (timer.current) clearTimeout(timer.current);
+		},
+		[],
+	);
 
 	return (
-		<div className="flex flex-1 flex-col overflow-hidden rounded-lg border border-border">
+		<div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-border">
 			<button
 				type="button"
-				aria-live="polite"
+				aria-label={`${copyLabel} ${hex.toUpperCase()}`}
 				className="flex h-24 w-full flex-col items-center justify-center gap-1 text-xs font-medium"
 				style={{ backgroundColor: hex, color: textColor }}
-				title={copyLabel}
+				title={`${copyLabel} ${hex.toUpperCase()}`}
 				onClick={() => {
-					void navigator.clipboard.writeText(hex).then(() => {
-						setCopied(true);
-						setTimeout(() => setCopied(false), 1200);
+					void copyTextSafe(hex).then((ok) => {
+						setStatus(ok ? 'copied' : 'failed');
+						if (timer.current) clearTimeout(timer.current);
+						timer.current = setTimeout(() => setStatus('idle'), 1200);
 					});
 				}}
 			>
-				<span>{copied ? copiedLabel : hex.toUpperCase()}</span>
+				<span aria-hidden="true">{status === 'copied' ? copiedLabel : status === 'failed' ? failedLabel : hex.toUpperCase()}</span>
 			</button>
+			<span role="status" className="sr-only">
+				{status === 'copied' ? copiedLabel : status === 'failed' ? failedLabel : ''}
+			</span>
 			<div className="flex items-center justify-between gap-1 bg-muted px-2 py-1">
 				<span className="truncate text-xs text-muted-foreground">{label ?? ''}</span>
 				{onToggleLock && (
 					<button
 						type="button"
 						aria-label={locked ? unlockAria : lockAria}
+						aria-pressed={!!locked}
 						onClick={onToggleLock}
-						className="text-muted-foreground hover:text-foreground"
+						className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground hover:text-foreground"
 					>
-						{locked ? <Lock className="size-3.5" /> : <Unlock className="size-3.5" />}
+						{locked ? <Lock className="size-4" /> : <Unlock className="size-4" />}
 					</button>
 				)}
 			</div>
@@ -370,126 +253,269 @@ function Swatch({
 	);
 }
 
+type Channel = 'r' | 'g' | 'b' | 'h' | 's' | 'l';
+
+interface ColorState {
+	rgb: Rgb;
+	hsl: Hsl;
+}
+
+const INITIAL_RGB: Rgb = { r: 59, g: 130, b: 246 };
+
+function isInteractiveTarget(target: HTMLElement | null): boolean {
+	if (!target) return false;
+	if (target.isContentEditable) return true;
+	return !!target.closest('input, textarea, select, button, a, summary, [role="button"], [role="link"], [contenteditable="true"]');
+}
+
 export default function ColorPicker({ messages }: { messages: Messages }) {
-	const [hex, setHex] = useState('#3b82f6');
-	const [hexInput, setHexInput] = useState('#3b82f6');
+	// HSL and RGB are both kept in state: editing one side derives the other, but
+	// the side being edited is never re-derived from its lossy counterpart — so
+	// hue/saturation survive passing through black, white and gray.
+	const [color, setColor] = useState<ColorState>(() => ({ rgb: INITIAL_RGB, hsl: rgbToHsl(INITIAL_RGB) }));
+	const [hexInput, setHexInput] = useState(() => rgbToHex(INITIAL_RGB));
 	const [hexError, setHexError] = useState(false);
+	const [drafts, setDrafts] = useState<Partial<Record<Channel, string>>>({});
 	const [harmonyType, setHarmonyType] = useState<HarmonyType>('complementary');
 	// Deterministic placeholder so server-rendered and hydrated markup match; randomized on mount below.
 	const [palette, setPalette] = useState<Hsl[]>(() => Array(5).fill({ h: 217, s: 91, l: 60 }));
 	const [locked, setLocked] = useState<boolean[]>(() => Array(5).fill(false));
-	const [cssCopied, setCssCopied] = useState(false);
-	const [jsonCopied, setJsonCopied] = useState(false);
-	const [scssCopied, setScssCopied] = useState(false);
-	const [tailwindCopied, setTailwindCopied] = useState(false);
-	const [savedPalettes, setSavedPalettes] = useState<SavedPalette[]>(() => loadSavedPalettes());
+	const [copiedKind, setCopiedKind] = useState<string | null>(null);
+	const [copyFailed, setCopyFailed] = useState(false);
+	// Read from localStorage in an effect (not the useState initializer) so the
+	// server-rendered markup and first client render are identical — no hydration mismatch.
+	const [savedPalettes, setSavedPalettes] = useState<SavedPalette[]>([]);
+	const [notice, setNotice] = useState<string | null>(null);
+	const [extractMessage, setExtractMessage] = useState<string | null>(null);
+	const [undoDelete, setUndoDelete] = useState<{ palette: SavedPalette; index: number } | null>(null);
+	const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const paletteCardRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		setPalette(Array.from({ length: 5 }, randomHsl));
+		setSavedPalettes(readSavedPalettes());
+		const onStorage = (e: StorageEvent) => {
+			if (e.key === SAVED_PALETTES_STORAGE_KEY || e.key === null) setSavedPalettes(readSavedPalettes());
+		};
+		window.addEventListener('storage', onStorage);
+		return () => {
+			window.removeEventListener('storage', onStorage);
+			if (copyTimer.current) clearTimeout(copyTimer.current);
+		};
 	}, []);
 
-	const rgb = useMemo(() => hexToRgb(hex) ?? { r: 0, g: 0, b: 0 }, [hex]);
-	const hsl = useMemo(() => rgbToHsl(rgb), [rgb]);
+	const { rgb, hsl } = color;
+	const hex = useMemo(() => rgbToHex(rgb), [rgb]);
 
 	const applyRgb = useCallback((next: Rgb) => {
-		const nextHex = rgbToHex(next);
-		setHex(nextHex);
-		setHexInput(nextHex);
+		setColor((prev) => ({ rgb: next, hsl: rgbToHsl(next, prev.hsl) }));
+		setHexInput(rgbToHex(next));
 		setHexError(false);
 	}, []);
 
-	const applyHsl = useCallback(
-		(next: Hsl) => {
-			applyRgb(hslToRgb(next));
-		},
-		[applyRgb],
-	);
+	const applyHsl = useCallback((next: Hsl) => {
+		const nextRgb = hslToRgb(next);
+		setColor({ rgb: nextRgb, hsl: next });
+		setHexInput(rgbToHex(nextRgb));
+		setHexError(false);
+	}, []);
 
 	const handleHexInputChange = (value: string) => {
 		setHexInput(value);
-		const parsed = hexToRgb(value);
-		if (parsed) {
-			setHex(rgbToHex(parsed));
+		if (isHex6(value)) {
+			const parsed = hexToRgb(value)!;
+			setColor((prev) => ({ rgb: parsed, hsl: rgbToHsl(parsed, prev.hsl) }));
+			setHexError(false);
+		} else if (isPartialHex(value)) {
+			// Still being typed (including a 3-digit prefix of a longer hex) — don't
+			// apply or flag anything yet; blur/Enter commits the 3-digit shorthand.
 			setHexError(false);
 		} else {
 			setHexError(true);
 		}
 	};
 
-	const handleExtractPaletteFromImage = (fileList: FileList | null) => {
-		const file = fileList?.[0];
+	const commitHexInput = () => {
+		if (isHex3(hexInput)) {
+			applyRgb(hexToRgb(hexInput)!);
+		} else if (isHex6(hexInput)) {
+			setHexInput(hex);
+		} else if (hexInput.trim() === '') {
+			setHexInput(hex);
+			setHexError(false);
+		} else {
+			setHexError(true);
+		}
+	};
+
+	const channelValue = (channel: Channel): number =>
+		channel === 'h' || channel === 's' || channel === 'l' ? hsl[channel] : rgb[channel];
+
+	const handleChannelChange = (channel: Channel, raw: string) => {
+		setDrafts((prev) => ({ ...prev, [channel]: raw }));
+		if (raw.trim() === '' || Number.isNaN(Number(raw))) return; // allow clearing while typing
+		const num = Number(raw);
+		if (channel === 'r' || channel === 'g' || channel === 'b') {
+			applyRgb({ ...rgb, [channel]: clamp(Math.round(num), 0, 255) });
+		} else {
+			applyHsl({ ...hsl, [channel]: clamp(Math.round(num), 0, channel === 'h' ? 360 : 100) });
+		}
+	};
+
+	const clearDraft = (channel: Channel) =>
+		setDrafts((prev) => {
+			const next = { ...prev };
+			delete next[channel];
+			return next;
+		});
+
+	const showCopied = (kind: string, ok: boolean) => {
+		setCopiedKind(kind);
+		setCopyFailed(!ok);
+		if (copyTimer.current) clearTimeout(copyTimer.current);
+		copyTimer.current = setTimeout(() => {
+			setCopiedKind(null);
+			setCopyFailed(false);
+		}, 1400);
+	};
+
+	const paletteHexes = palette.map((c) => rgbToHex(hslToRgb(c)));
+
+	const copyPalette = (kind: 'css' | 'json' | 'scss' | 'tailwind') => {
+		let text: string;
+		if (kind === 'css') {
+			text = [':root {', ...paletteHexes.map((h, i) => `  --color-${i + 1}: ${h};`), '}'].join('\n');
+		} else if (kind === 'json') {
+			text = JSON.stringify(paletteHexes, null, 2);
+		} else if (kind === 'scss') {
+			text = paletteHexes.map((h, i) => `$color-${i + 1}: ${h};`).join('\n');
+		} else {
+			text = ['colors: {', ...paletteHexes.map((h, i) => `  'palette-${i + 1}': '${h}',`), '}'].join('\n');
+		}
+		void copyTextSafe(text).then((ok) => showCopied(kind, ok));
+	};
+
+	const handleExtractPaletteFromImage = (input: HTMLInputElement) => {
+		const file = input.files?.[0];
+		input.value = '';
 		if (!file) return;
+		setExtractMessage(null);
 		const url = URL.createObjectURL(file);
 		const img = new Image();
 		img.onload = () => {
+			URL.revokeObjectURL(url);
 			// Downscaled before sampling — palette extraction only cares about the
-			// overall color distribution, not per-pixel precision, so this keeps a
-			// 12MP photo from taking noticeably longer than a thumbnail.
+			// overall color distribution, not per-pixel precision.
 			const maxDim = 150;
-			const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+			const scale = Math.min(1, maxDim / Math.max(img.width, img.height, 1));
 			const canvas = document.createElement('canvas');
 			canvas.width = Math.max(1, Math.round(img.width * scale));
 			canvas.height = Math.max(1, Math.round(img.height * scale));
-			const ctx = canvas.getContext('2d');
-			URL.revokeObjectURL(url);
-			if (!ctx) return;
+			const ctx = canvas.getContext('2d', { willReadFrequently: true });
+			if (!ctx) {
+				setExtractMessage(messages.extractError);
+				return;
+			}
 			ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-			const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+			let data: Uint8ClampedArray;
+			try {
+				data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+			} catch {
+				setExtractMessage(messages.extractError);
+				return;
+			}
 			const pixels: Rgb[] = [];
 			for (let i = 0; i < data.length; i += 4) {
 				if (data[i + 3] < 128) continue; // skip mostly-transparent pixels
 				pixels.push({ r: data[i], g: data[i + 1], b: data[i + 2] });
 			}
-			if (pixels.length === 0) return;
-			const extracted = medianCutQuantize(pixels, 5).map((rgb) => rgbToHsl(rgb));
+			if (pixels.length === 0) {
+				setExtractMessage(messages.extractEmpty);
+				return;
+			}
+			const extracted = medianCutQuantize(pixels, 5).map((c) => rgbToHsl(c));
 			setPalette(extracted);
 			setLocked(Array(extracted.length).fill(false));
+		};
+		img.onerror = () => {
+			URL.revokeObjectURL(url);
+			setExtractMessage(messages.extractError);
 		};
 		img.src = url;
 	};
 
 	const regenerate = useCallback(() => {
-		setPalette((prev) => prev.map((color, i) => (locked[i] ? color : randomHsl())));
+		setPalette((prev) => prev.map((c, i) => (locked[i] ? c : randomHsl())));
 	}, [locked]);
 
-	const persistSavedPalettes = (next: SavedPalette[]) => {
-		try {
-			localStorage.setItem(SAVED_PALETTES_STORAGE_KEY, JSON.stringify(next));
-		} catch {
-			// Ignore quota/private-mode errors — saved palettes are a convenience, not core functionality.
-		}
+	const flashNotice = (text: string) => {
+		setNotice(text);
+		setTimeout(() => setNotice((cur) => (cur === text ? null : cur)), 2500);
 	};
 
 	const handleSavePalette = () => {
-		const colors = palette.map((c) => rgbToHex(hslToRgb(c)));
-		setSavedPalettes((prev) => {
-			const next = [{ id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, colors }, ...prev].slice(
-				0,
-				SAVED_PALETTES_LIMIT,
-			);
-			persistSavedPalettes(next);
-			return next;
-		});
+		if (paletteHexes.length === 0) return;
+		// Re-read storage first so a save made in another tab is merged, not overwritten.
+		const current = readSavedPalettes();
+		if (current.some((p) => samePalette(p.colors, paletteHexes))) {
+			setSavedPalettes(current);
+			flashNotice(messages.alreadySaved);
+			return;
+		}
+		const next = [{ id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, colors: paletteHexes }, ...current].slice(
+			0,
+			SAVED_PALETTES_LIMIT,
+		);
+		writeSavedPalettes(next);
+		setSavedPalettes(next);
+		flashNotice(messages.savedFeedback);
 	};
 
 	const handleLoadSavedPalette = (saved: SavedPalette) => {
-		setPalette(saved.colors.map((hex) => rgbToHsl(hexToRgb(hex) ?? { r: 0, g: 0, b: 0 })));
+		setPalette(saved.colors.map((h) => rgbToHsl(hexToRgb(h) ?? { r: 0, g: 0, b: 0 })));
 		setLocked(Array(saved.colors.length).fill(false));
 	};
 
 	const handleDeleteSavedPalette = (id: string) => {
-		setSavedPalettes((prev) => {
-			const next = prev.filter((entry) => entry.id !== id);
-			persistSavedPalettes(next);
-			return next;
-		});
+		const current = readSavedPalettes();
+		const index = current.findIndex((entry) => entry.id === id);
+		if (index === -1) {
+			setSavedPalettes(current);
+			return;
+		}
+		const next = current.filter((entry) => entry.id !== id);
+		writeSavedPalettes(next);
+		setSavedPalettes(next);
+		setUndoDelete({ palette: current[index], index });
+	};
+
+	const handleUndoDelete = () => {
+		if (!undoDelete) return;
+		const current = readSavedPalettes();
+		if (!current.some((p) => p.id === undoDelete.palette.id)) {
+			current.splice(Math.min(undoDelete.index, current.length), 0, undoDelete.palette);
+		}
+		const next = current.slice(0, SAVED_PALETTES_LIMIT);
+		writeSavedPalettes(next);
+		setSavedPalettes(next);
+		setUndoDelete(null);
 	};
 
 	useEffect(() => {
 		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
 			const target = e.target as HTMLElement | null;
-			const isFormField = target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
-			if (e.code === 'Space' && !isFormField) {
+			if (isInteractiveTarget(target)) return;
+			if (e.code === 'KeyG') {
+				regenerate();
+				return;
+			}
+			if (e.code === 'Space' && (target === document.body || target === document.documentElement)) {
+				// Only hijack Space while the palette is actually on screen; elsewhere
+				// it keeps its normal job of scrolling the page.
+				const rect = paletteCardRef.current?.getBoundingClientRect();
+				const visible = !!rect && rect.top < window.innerHeight * 0.8 && rect.bottom > window.innerHeight * 0.2;
+				if (!visible) return;
 				e.preventDefault();
 				regenerate();
 			}
@@ -518,6 +544,38 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 		{ value: 'monochromatic', label: messages.harmonyMonochromatic },
 	];
 
+	const copyButtons: { kind: 'css' | 'json' | 'scss' | 'tailwind'; label: string }[] = [
+		{ kind: 'css', label: messages.copyPaletteCss },
+		{ kind: 'json', label: messages.copyPaletteJson },
+		{ kind: 'scss', label: messages.copyPaletteScss },
+		{ kind: 'tailwind', label: messages.copyPaletteTailwind },
+	];
+
+	const numberInputClass = 'w-full min-w-0 rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground';
+	const channelLabel: Record<Channel, string> = {
+		r: messages.rLabel,
+		g: messages.gLabel,
+		b: messages.bLabel,
+		h: messages.hLabel,
+		s: messages.sLabel,
+		l: messages.lLabel,
+	};
+	const renderChannel = (channel: Channel) => (
+		<label key={channel} className="flex flex-col gap-1 text-xs text-muted-foreground">
+			{channelLabel[channel]}
+			<input
+				type="number"
+				inputMode="numeric"
+				min={0}
+				max={channel === 'h' ? 360 : channel === 's' || channel === 'l' ? 100 : 255}
+				value={drafts[channel] ?? String(channelValue(channel))}
+				onChange={(e) => handleChannelChange(channel, e.target.value)}
+				onBlur={() => clearDraft(channel)}
+				className={numberInputClass}
+			/>
+		</label>
+	);
+
 	return (
 		<div className="flex flex-col gap-6">
 			<div className="rounded-lg border border-border p-4">
@@ -527,6 +585,7 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 						<input
 							type="color"
 							value={hex}
+							aria-label={messages.colorInputAria}
 							onChange={(e) => applyRgb(hexToRgb(e.target.value)!)}
 							className="h-24 w-24 cursor-pointer rounded-lg border border-border bg-transparent p-1"
 						/>
@@ -537,42 +596,17 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 							<input
 								value={hexInput}
 								onChange={(e) => handleHexInputChange(e.target.value)}
+								onBlur={commitHexInput}
+								onKeyDown={(e) => {
+									if (e.key === 'Enter') commitHexInput();
+								}}
 								spellCheck={false}
-								className="rounded-md border border-border bg-background px-2 py-1 font-mono text-sm text-foreground"
+								aria-invalid={hexError}
+								className="rounded-md border border-border bg-background px-2 py-1.5 font-mono text-sm text-foreground"
 							/>
 						</label>
-						<div className="col-span-2 grid grid-cols-3 gap-2 sm:col-span-1">
-							{(['r', 'g', 'b'] as const).map((channel) => (
-								<label key={channel} className="flex flex-col gap-1 text-xs text-muted-foreground">
-									{channel === 'r' ? messages.rLabel : channel === 'g' ? messages.gLabel : messages.bLabel}
-									<input
-										type="number"
-										min={0}
-										max={255}
-										value={rgb[channel]}
-										onChange={(e) => applyRgb({ ...rgb, [channel]: clamp(Number(e.target.value), 0, 255) })}
-										className="rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
-									/>
-								</label>
-							))}
-						</div>
-						<div className="col-span-2 grid grid-cols-3 gap-2 sm:col-span-3">
-							{(['h', 's', 'l'] as const).map((channel) => (
-								<label key={channel} className="flex flex-col gap-1 text-xs text-muted-foreground">
-									{channel === 'h' ? messages.hLabel : channel === 's' ? messages.sLabel : messages.lLabel}
-									<input
-										type="number"
-										min={0}
-										max={channel === 'h' ? 360 : 100}
-										value={hsl[channel]}
-										onChange={(e) =>
-											applyHsl({ ...hsl, [channel]: clamp(Number(e.target.value), 0, channel === 'h' ? 360 : 100) })
-										}
-										className="rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
-									/>
-								</label>
-							))}
-						</div>
+						<div className="col-span-2 grid grid-cols-3 gap-2 sm:col-span-1">{(['r', 'g', 'b'] as const).map(renderChannel)}</div>
+						<div className="col-span-2 grid grid-cols-3 gap-2 sm:col-span-3">{(['h', 's', 'l'] as const).map(renderChannel)}</div>
 					</div>
 				</div>
 				{hexError && <p role="alert" className="mt-2 text-sm text-destructive">{messages.invalidHexError}</p>}
@@ -588,6 +622,7 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 								type="button"
 								size="sm"
 								variant={harmonyType === opt.value ? 'default' : 'outline'}
+								aria-pressed={harmonyType === opt.value}
 								onClick={() => setHarmonyType(opt.value)}
 							>
 								{opt.label}
@@ -596,16 +631,22 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 					</div>
 				</div>
 				<div className="mt-3 flex gap-2">
-					{harmonyColors.map((color, i) => (
-						<Swatch key={i} hex={rgbToHex(hslToRgb(color))} copyLabel={messages.copy} copiedLabel={messages.copied} />
+					{harmonyColors.map((c, i) => (
+						<Swatch
+							key={i}
+							hex={rgbToHex(hslToRgb(c))}
+							copyLabel={messages.copy}
+							copiedLabel={messages.copied}
+							failedLabel={messages.copyFailed}
+						/>
 					))}
 				</div>
 			</div>
 
-			<div className="rounded-lg border border-border p-4">
+			<div ref={paletteCardRef} className="rounded-lg border border-border p-4">
 				<div className="flex flex-wrap items-center justify-between gap-2">
 					<span className="text-sm font-medium text-foreground">{messages.randomHeading}</span>
-					<div className="flex items-center gap-2">
+					<div className="flex flex-wrap items-center gap-2">
 						<Button type="button" size="sm" variant="outline" onClick={regenerate}>
 							<RefreshCw />
 							{messages.generate}
@@ -615,7 +656,7 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 						</Button>
 						<label
 							htmlFor="color-picker-extract-image"
-							className="inline-flex h-7 cursor-pointer items-center rounded-md border border-border px-2.5 text-[0.8rem] font-medium text-foreground hover:bg-muted"
+							className="inline-flex h-8 cursor-pointer items-center rounded-md border border-border px-2.5 text-[0.8rem] font-medium text-foreground hover:bg-muted focus-within:ring-2 focus-within:ring-ring"
 						>
 							{messages.extractFromImageLabel}
 						</label>
@@ -623,107 +664,56 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 							id="color-picker-extract-image"
 							type="file"
 							accept="image/*"
-							className="hidden"
-							onChange={(event) => handleExtractPaletteFromImage(event.target.files)}
+							className="sr-only"
+							onChange={(event) => handleExtractPaletteFromImage(event.currentTarget)}
 						/>
 					</div>
 				</div>
 				<p className="mt-1 text-xs text-muted-foreground">{messages.generateHint}</p>
+				<p role="status" className="mt-1 min-h-4 text-xs text-emerald-700 dark:text-emerald-400">
+					{notice}
+				</p>
+				{extractMessage && (
+					<p role="alert" className="mt-1 text-sm text-destructive">
+						{extractMessage}
+					</p>
+				)}
 				<div className="mt-3 flex gap-2">
-					{palette.map((color, i) => (
+					{palette.map((c, i) => (
 						<Swatch
 							key={i}
-							hex={rgbToHex(hslToRgb(color))}
+							hex={rgbToHex(hslToRgb(c))}
 							copyLabel={messages.copy}
 							copiedLabel={messages.copied}
-							locked={locked[i]}
+							failedLabel={messages.copyFailed}
+							locked={locked[i] ?? false}
 							lockAria={messages.lockAria}
 							unlockAria={messages.unlockAria}
-							onToggleLock={() => setLocked((prev) => prev.map((v, idx) => (idx === i ? !v : v)))}
+							onToggleLock={() => setLocked((prev) => palette.map((_, idx) => (idx === i ? !prev[idx] : !!prev[idx])))}
 						/>
 					))}
 				</div>
 				<div className="mt-3 flex flex-wrap gap-2">
-					<Button
-						type="button"
-						aria-live="polite"
-						size="sm"
-						variant="ghost"
-						onClick={() => {
-							const css = [
-								':root {',
-								...palette.map((c, i) => `  --color-${i + 1}: ${rgbToHex(hslToRgb(c))};`),
-								'}',
-							].join('\n');
-							void navigator.clipboard.writeText(css).then(() => {
-								setCssCopied(true);
-								setTimeout(() => setCssCopied(false), 1200);
-							});
-						}}
-					>
-						{cssCopied ? messages.copied : messages.copyPaletteCss}
-					</Button>
-					<Button
-						type="button"
-						aria-live="polite"
-						size="sm"
-						variant="ghost"
-						onClick={() => {
-							const json = JSON.stringify(palette.map((c) => rgbToHex(hslToRgb(c))), null, 2);
-							void navigator.clipboard.writeText(json).then(() => {
-								setJsonCopied(true);
-								setTimeout(() => setJsonCopied(false), 1200);
-							});
-						}}
-					>
-						{jsonCopied ? messages.copied : messages.copyPaletteJson}
-					</Button>
-					<Button
-						type="button"
-						aria-live="polite"
-						size="sm"
-						variant="ghost"
-						onClick={() => {
-							const scss = palette.map((c, i) => `$color-${i + 1}: ${rgbToHex(hslToRgb(c))};`).join('\n');
-							void navigator.clipboard.writeText(scss).then(() => {
-								setScssCopied(true);
-								setTimeout(() => setScssCopied(false), 1200);
-							});
-						}}
-					>
-						{scssCopied ? messages.copied : messages.copyPaletteScss}
-					</Button>
-					<Button
-						type="button"
-						aria-live="polite"
-						size="sm"
-						variant="ghost"
-						onClick={() => {
-							const tailwind = [
-								'colors: {',
-								...palette.map((c, i) => `  'palette-${i + 1}': '${rgbToHex(hslToRgb(c))}',`),
-								'}',
-							].join('\n');
-							void navigator.clipboard.writeText(tailwind).then(() => {
-								setTailwindCopied(true);
-								setTimeout(() => setTailwindCopied(false), 1200);
-							});
-						}}
-					>
-						{tailwindCopied ? messages.copied : messages.copyPaletteTailwind}
-					</Button>
+					{copyButtons.map((btn) => (
+						<Button key={btn.kind} type="button" size="sm" variant="ghost" onClick={() => copyPalette(btn.kind)}>
+							{copiedKind === btn.kind ? (copyFailed ? messages.copyFailed : messages.copied) : btn.label}
+						</Button>
+					))}
+					<span role="status" className="sr-only">
+						{copiedKind ? (copyFailed ? messages.copyFailed : messages.copied) : ''}
+					</span>
 					<Button
 						type="button"
 						size="sm"
 						variant="ghost"
 						onClick={() => {
-							const blob = buildAseBlob(palette.map((c) => rgbToHex(hslToRgb(c))));
+							const blob = buildAseBlob(paletteHexes);
 							const url = URL.createObjectURL(blob);
 							const link = document.createElement('a');
 							link.href = url;
 							link.download = 'palette.ase';
 							link.click();
-							URL.revokeObjectURL(url);
+							setTimeout(() => URL.revokeObjectURL(url), 10000);
 						}}
 					>
 						{messages.exportPaletteAse}
@@ -731,27 +721,35 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 				</div>
 			</div>
 
-			{savedPalettes.length > 0 && (
+			{(savedPalettes.length > 0 || undoDelete) && (
 				<div className="rounded-lg border border-border p-4">
 					<span className="text-sm font-medium text-foreground">{messages.savedPalettesHeading}</span>
+					{undoDelete && (
+						<p role="status" className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+							{messages.paletteDeleted}
+							<Button type="button" size="sm" variant="outline" onClick={handleUndoDelete}>
+								{messages.undo}
+							</Button>
+						</p>
+					)}
 					<ul className="mt-3 flex flex-col gap-2">
-						{savedPalettes.map((saved) => (
+						{savedPalettes.map((saved, idx) => (
 							<li key={saved.id} className="flex items-center gap-2">
 								<button
 									type="button"
 									onClick={() => handleLoadSavedPalette(saved)}
-									aria-label={messages.loadPaletteAria}
-									className="flex flex-1 overflow-hidden rounded-md border border-border"
+									aria-label={`${messages.loadPaletteAria} (${idx + 1}): ${saved.colors.join(', ')}`}
+									className="flex min-h-10 flex-1 overflow-hidden rounded-md border border-border"
 								>
-									{saved.colors.map((hex, i) => (
-										<span key={i} className="h-8 flex-1" style={{ backgroundColor: hex }} />
+									{saved.colors.map((h, i) => (
+										<span key={i} className="h-10 flex-1" style={{ backgroundColor: h }} />
 									))}
 								</button>
 								<Button
 									type="button"
 									size="icon-sm"
 									variant="ghost"
-									aria-label={messages.deletePaletteAria}
+									aria-label={`${messages.deletePaletteAria} (${idx + 1})`}
 									onClick={() => handleDeleteSavedPalette(saved.id)}
 								>
 									✕
@@ -765,22 +763,30 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 			<div className="rounded-lg border border-border p-4">
 				<span className="text-sm font-medium text-foreground">{messages.contrastHeading}</span>
 				<div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-					<div className="flex items-center justify-between rounded-md border border-border p-3" style={{ backgroundColor: hex }}>
-						<span style={{ color: '#ffffff' }} className="text-sm font-medium">
-							{messages.contrastVsWhite} — {contrastWhite.toFixed(2)}:1
-						</span>
-						<span className={`rounded-full px-2 py-0.5 text-xs font-medium ${contrastBadge(contrastWhite).className}`}>
-							{contrastBadge(contrastWhite).label}
-						</span>
-					</div>
-					<div className="flex items-center justify-between rounded-md border border-border p-3" style={{ backgroundColor: hex }}>
-						<span style={{ color: '#000000' }} className="text-sm font-medium">
-							{messages.contrastVsBlack} — {contrastBlack.toFixed(2)}:1
-						</span>
-						<span className={`rounded-full px-2 py-0.5 text-xs font-medium ${contrastBadge(contrastBlack).className}`}>
-							{contrastBadge(contrastBlack).label}
-						</span>
-					</div>
+					{(
+						[
+							{ label: messages.contrastVsWhite, ratio: contrastWhite, sample: '#ffffff' },
+							{ label: messages.contrastVsBlack, ratio: contrastBlack, sample: '#000000' },
+						] as const
+					).map((row) => (
+						<div key={row.sample} className="flex flex-col gap-2 rounded-md border border-border p-3">
+							<div className="flex items-center justify-between gap-2">
+								<span className="text-sm font-medium text-foreground">
+									{row.label} — {row.ratio.toFixed(2)}:1
+								</span>
+								<span className={`rounded-full px-2 py-0.5 text-xs font-medium ${contrastBadge(row.ratio).className}`}>
+									{contrastBadge(row.ratio).label}
+								</span>
+							</div>
+							<div
+								aria-hidden="true"
+								className="rounded-md px-3 py-2 text-lg font-semibold"
+								style={{ backgroundColor: hex, color: row.sample }}
+							>
+								Aa {hex.toUpperCase()}
+							</div>
+						</div>
+					))}
 				</div>
 			</div>
 		</div>

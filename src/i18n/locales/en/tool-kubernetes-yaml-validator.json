@@ -26,7 +26,32 @@
     "jumpToLine": "Line {{line}}",
     "fixApiVersion": "Copy with apiVersion fixed",
     "fixApiVersionCopied": "Copied!",
-    "multiDocHint": "Multiple manifests separated by \"---\" are validated as separate documents."
+    "multiDocHint": "Multiple manifests separated by \"---\" are validated as separate documents.",
+    "emptyState": "Paste a Kubernetes manifest above (or load the sample) and the validation results will appear here.",
+    "retry": "Retry",
+    "validationFailed": "Validation failed unexpectedly. Try again or simplify the input.",
+    "fileReadError": "Could not read that file.",
+    "copyFailed": "Copy failed",
+    "issues": {
+      "yaml-syntax": "YAML syntax error: {{message}}",
+      "yaml-warning": "YAML warning: {{message}}",
+      "yaml-alias-limit": "This document uses YAML aliases that expand too much to validate safely ({{message}}).",
+      "empty-document": "This document is empty — a manifest needs at least apiVersion and kind.",
+      "empty-document-trailing": "Empty document after the last \"---\" (harmless, but you can delete the trailing separator).",
+      "not-a-mapping": "A Kubernetes manifest must be a YAML mapping (key: value pairs) at the top level, not a list or a plain value.",
+      "missing-kind": "Missing required field \"kind\".",
+      "missing-api-version": "Missing required field \"apiVersion\".",
+      "deprecated-api-version": "\"{{apiVersion}}\" is deprecated for kind \"{{kind}}\" — use \"{{suggested}}\" instead.",
+      "deprecated-ingress-backend": "Changing only apiVersion is not enough for Ingress: networking.k8s.io/v1 also needs spec.rules[].http.paths[].pathType and backend.service.name/port instead of serviceName/servicePort. The \"Copy with apiVersion fixed\" button converts these too — review the result.",
+      "unsupported-kind": "\"{{kind}}\" is not one of the resource kinds this tool validates against a schema yet ({{supported}}). Syntax and deprecated-apiVersion checks still apply.",
+      "schema-unavailable": "Could not load the {{kind}} schema for Kubernetes {{version}} (network error or unavailable version) — schema validation was skipped for this document.",
+      "schema-engine-error": "Schema validation could not run: {{message}}",
+      "schema-type": "{{path}}: must be {{expected}}",
+      "schema-required": "{{path}}: missing required field \"{{field}}\"",
+      "schema-additional": "{{path}}: unknown field \"{{field}}\" (not allowed by the schema)",
+      "schema-enum": "{{path}}: must be one of: {{allowed}}",
+      "schema-generic": "{{path}}: {{detail}}"
+    }
   },
   "faq": {
     "heading": "Frequently asked questions",

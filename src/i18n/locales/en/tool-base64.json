@@ -38,7 +38,15 @@
     "imagePreviewLabel": "Preview",
     "decodeEncodingLabel": "Text encoding:",
     "remove": "Remove",
-    "clearAll": "Clear all"
+    "clearAll": "Clear all",
+    "decodeNotText": "This is valid Base64, but the decoded bytes are not text in the selected encoding (it may be an image or another binary file). Try another encoding, or use the File tab to download it.",
+    "fileTooLarge": "\"{{name}}\" is larger than {{max}} MB and was skipped to keep the browser responsive.",
+    "fileReadError": "Could not read \"{{name}}\".",
+    "copyFailed": "Copy failed",
+    "copyOutputAria": "Copy output",
+    "copyFieldAria": "Copy {{field}} of {{name}}",
+    "removeFileAria": "Remove {{name}}",
+    "downloadAria": "Download the decoded file"
   },
   "related": "Related tools",
   "faq": {

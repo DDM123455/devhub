@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { convertCase, type CaseMode } from '@/lib/text-case';
+import { useCopyToClipboard } from './useCopyToClipboard';
 
 interface Messages {
 	placeholder: string;
@@ -23,138 +25,34 @@ interface Messages {
 	outputStats: string;
 	uploadFile: string;
 	downloadFile: string;
-}
-
-type CaseMode =
-	| 'upper'
-	| 'lower'
-	| 'title'
-	| 'camel'
-	| 'snake'
-	| 'sentence'
-	| 'alternating'
-	| 'inverse'
-	| 'removeSpaces'
-	| 'removeLineBreaks'
-	| 'sortLines';
-
-// Normalizes any mix of spaces, hyphens, underscores, punctuation, and
-// existing camelCase/PascalCase boundaries into a flat list of lowercase-able
-// word tokens, so camelCase/snake_case conversion works whether the input is
-// "hello world", "hello-world", or already "helloWorld".
-// Short articles/conjunctions/prepositions that AP/Chicago-style title case
-// convention (and ConvertCase.net, the benchmark for this tool) leaves
-// lowercase — except when one starts or ends the title, which always stays
-// capitalized regardless of this list.
-const TITLE_CASE_MINOR_WORDS = new Set([
-	'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'in', 'nor', 'of', 'on', 'or', 'so', 'the', 'to', 'up', 'yet',
-]);
-
-// `\w` only covers ASCII, so a plain `/\w\S*/` (or `[a-zA-Z0-9]` split below)
-// silently treats every accented letter (Vietnamese, French, ...) as a word
-// separator — `\p{L}`/`\p{N}` (Unicode letter/number property escapes) match
-// any script instead, which is what's needed to keep those words intact.
-function titleCase(text: string): string {
-	const matchCount = (text.match(/[\p{L}\p{N}]\S*/gu) ?? []).length;
-	if (matchCount === 0) return text;
-	const lastWordIndex = matchCount - 1;
-	let wordIndex = -1;
-	return text.replace(/[\p{L}\p{N}]\S*/gu, (word) => {
-		wordIndex++;
-		const bareWord = word.toLowerCase().replace(/[^\p{L}']/gu, '');
-		const isMinorWord = TITLE_CASE_MINOR_WORDS.has(bareWord);
-		if (isMinorWord && wordIndex !== 0 && wordIndex !== lastWordIndex) {
-			return word.toLowerCase();
-		}
-		return word[0].toUpperCase() + word.slice(1).toLowerCase();
-	});
-}
-
-function splitWords(text: string): string[] {
-	const withSpaces = text
-		.replace(/(\p{Ll}|\p{N})(\p{Lu})/gu, '$1 $2')
-		.replace(/(\p{Lu}+)(\p{Lu}\p{Ll})/gu, '$1 $2');
-	return withSpaces.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
-}
-
-function convertCase(text: string, mode: CaseMode): string {
-	switch (mode) {
-		case 'upper':
-			return text.toUpperCase();
-		case 'lower':
-			return text.toLowerCase();
-		case 'title':
-			return titleCase(text);
-		case 'camel':
-			return splitWords(text)
-				.map((word, index) =>
-					index === 0 ? word.toLowerCase() : word[0].toUpperCase() + word.slice(1).toLowerCase(),
-				)
-				.join('');
-		case 'snake':
-			return splitWords(text)
-				.map((word) => word.toLowerCase())
-				.join('_');
-		case 'sentence': {
-			const lower = text.toLowerCase();
-			return lower.replace(/(^\s*[a-z])|([.!?]\s+[a-z])/g, (match) => match.toUpperCase());
-		}
-		case 'alternating': {
-			let letterIndex = 0;
-			return text
-				.split('')
-				.map((char) => {
-					const upper = char.toUpperCase();
-					const lower = char.toLowerCase();
-					if (upper === lower) return char; // not a cased letter, don't advance the counter
-					const result = letterIndex % 2 === 0 ? lower : upper;
-					letterIndex++;
-					return result;
-				})
-				.join('');
-		}
-		case 'inverse':
-			return text
-				.split('')
-				.map((char) => {
-					const upper = char.toUpperCase();
-					const lower = char.toLowerCase();
-					if (upper === lower) return char;
-					return char === upper ? lower : upper;
-				})
-				.join('');
-		case 'removeSpaces':
-			return text
-				.replace(/\r\n/g, '\n')
-				.replace(/[ \t]+/g, ' ')
-				.replace(/^ +| +$/gm, '');
-		case 'removeLineBreaks': {
-			const normalized = text.replace(/\r\n/g, '\n');
-			const collapsed = normalized.replace(/[ \t]*\n(?:[ \t]*\n)+/g, '\n');
-			return collapsed.replace(/^[ \t]*\n+/, '').replace(/\n+[ \t]*$/, '');
-		}
-		case 'sortLines':
-			return text.split('\n').sort((a, b) => a.localeCompare(b)).join('\n');
-	}
+	inputLabel: string;
+	naturalSort: string;
+	copyFailed: string;
+	fileReadError: string;
 }
 
 export default function TextCaseConverter({ messages }: { messages: Messages }) {
 	const [text, setText] = useState('');
 	const [mode, setMode] = useState<CaseMode>('upper');
-	const [copied, setCopied] = useState(false);
+	const [naturalSort, setNaturalSort] = useState(false);
+	const [uploadError, setUploadError] = useState(false);
+	const { copied, failed, copy } = useCopyToClipboard();
 
-	const output = useMemo(() => convertCase(text, mode), [text, mode]);
+	const output = useMemo(() => convertCase(text, mode, { naturalSort }), [text, mode, naturalSort]);
 	const charCount = output.length;
 	const wordCount = output.trim() === '' ? 0 : output.trim().split(/\s+/).length;
 
-	const handleFileUpload = (fileList: FileList | null) => {
-		const file = fileList?.[0];
+	const handleFileUpload = (input: HTMLInputElement) => {
+		const file = input.files?.[0];
 		if (!file) return;
+		setUploadError(false);
 		const reader = new FileReader();
 		reader.onload = () => {
-			if (typeof reader.result === 'string') setText(reader.result);
+			if (typeof reader.result === 'string') setText(reader.result.replace(/\r\n?/g, '\n'));
 		};
+		reader.onerror = () => setUploadError(true);
 		reader.readAsText(file);
+		input.value = '';
 	};
 
 	const handleFileDownload = () => {
@@ -185,11 +83,9 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 		{ value: 'sortLines', label: messages.utilSortLines },
 	];
 
-	const handleCopy = async () => {
+	const handleCopy = () => {
 		if (!output) return;
-		await navigator.clipboard.writeText(output);
-		setCopied(true);
-		setTimeout(() => setCopied(false), 1500);
+		void copy(output);
 	};
 
 	return (
@@ -198,6 +94,7 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 				value={text}
 				onChange={(event) => setText(event.target.value)}
 				placeholder={messages.placeholder}
+				aria-label={messages.inputLabel}
 				rows={8}
 				className="w-full resize-y rounded-md border border-border bg-background p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
 			/>
@@ -205,7 +102,7 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 			<div>
 				<label
 					htmlFor="text-case-file-input"
-					className="inline-flex cursor-pointer items-center rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted"
+					className="has-[+input:focus-visible]:ring-2 has-[+input:focus-visible]:ring-ring inline-flex cursor-pointer items-center rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted"
 				>
 					{messages.uploadFile}
 				</label>
@@ -213,8 +110,8 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 					id="text-case-file-input"
 					type="file"
 					accept=".txt,text/plain"
-					className="hidden"
-					onChange={(event) => handleFileUpload(event.target.files)}
+					className="sr-only"
+					onChange={(event) => handleFileUpload(event.target)}
 				/>
 			</div>
 
@@ -226,6 +123,7 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 							key={item.value}
 							type="button"
 							onClick={() => setMode(item.value)}
+							aria-pressed={mode === item.value}
 							className={`rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${
 								mode === item.value
 									? 'border-primary bg-primary text-primary-foreground'
@@ -246,6 +144,7 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 							key={item.value}
 							type="button"
 							onClick={() => setMode(item.value)}
+							aria-pressed={mode === item.value}
 							className={`rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${
 								mode === item.value
 									? 'border-primary bg-primary text-primary-foreground'
@@ -257,6 +156,18 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 					))}
 				</div>
 			</div>
+
+			{mode === 'sortLines' && (
+				<label className="flex cursor-pointer items-center gap-2 text-sm text-foreground">
+					<input type="checkbox" checked={naturalSort} onChange={(event) => setNaturalSort(event.target.checked)} />
+					{messages.naturalSort}
+				</label>
+			)}
+			{uploadError && (
+				<p role="alert" className="text-sm text-destructive">
+					{messages.fileReadError}
+				</p>
+			)}
 
 			<div className="flex flex-col gap-2">
 				<label htmlFor="case-output" className="text-sm font-medium text-foreground">
@@ -276,7 +187,7 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 
 			<div className="flex flex-wrap items-center gap-3">
 				<Button type="button" aria-live="polite" onClick={handleCopy} disabled={output === ''}>
-					{copied ? messages.copied : messages.copy}
+					{copied ? messages.copied : failed ? messages.copyFailed : messages.copy}
 				</Button>
 				<Button type="button" variant="outline" onClick={handleFileDownload} disabled={output === ''}>
 					{messages.downloadFile}

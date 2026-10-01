@@ -2,6 +2,7 @@
 import { getFixedT } from '@/i18n/i18next';
 import { locales, type Locale } from '@/i18n/config';
 import { categories } from '@/data/categories';
+import { localizePath, toHreflang } from '@/lib/locale-paths';
 
 interface Props {
 	lang: Locale;
@@ -35,7 +36,6 @@ const nativeNames: Record<Locale, string> = {
 };
 
 const currentPath = Astro.url.pathname;
-const pathWithoutLocale = currentPath.replace(new RegExp(`^/${lang}(?=/|$)`), '') || '/';
 ---
 
 <footer class="border-t border-border px-4 py-10 sm:px-8">
@@ -73,7 +73,9 @@ const pathWithoutLocale = currentPath.replace(new RegExp(`^/${lang}(?=/|$)`), ''
 					locales.map((loc) => (
 						<li>
 							<a
-								href={`/${loc}${pathWithoutLocale}`}
+								href={localizePath(currentPath, lang, loc)}
+								hreflang={toHreflang(loc)}
+								lang={toHreflang(loc)}
 								class:list={[
 									'text-muted-foreground hover:text-foreground hover:underline',
 									{ 'font-medium text-foreground': loc === lang },

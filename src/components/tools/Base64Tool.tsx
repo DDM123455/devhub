@@ -1,5 +1,37 @@
 import { useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import {
+	base64ToBytes,
+	cleanBase64Input,
+	decodeText,
+	encodeText,
+	extractDataUri,
+	fromUrlSafeOrStandard,
+} from '@/lib/base64';
+import { useCopyToClipboard } from './useCopyToClipboard';
+
+const MAX_FILE_BYTES = 20 * 1024 * 1024;
+
+function CopyButton({
+	value,
+	label,
+	copiedLabel,
+	failedLabel,
+	ariaLabel,
+}: {
+	value: string;
+	label: string;
+	copiedLabel: string;
+	failedLabel: string;
+	ariaLabel?: string;
+}) {
+	const { copied, failed, copy } = useCopyToClipboard();
+	return (
+		<Button aria-live="polite" aria-label={ariaLabel} type="button" size="sm" variant="ghost" disabled={value === ''} onClick={() => void copy(value)}>
+			{copied ? copiedLabel : failed ? failedLabel : label}
+		</Button>
+	);
+}
 
 interface Messages {
 	textTabLabel: string;
@@ -35,6 +67,14 @@ interface Messages {
 	decodeEncodingLabel: string;
 	remove: string;
 	clearAll: string;
+	decodeNotText: string;
+	fileTooLarge: string;
+	fileReadError: string;
+	copyFailed: string;
+	copyOutputAria: string;
+	copyFieldAria: string;
+	removeFileAria: string;
+	downloadAria: string;
 }
 
 type Mode = 'encode' | 'decode';
@@ -87,40 +127,6 @@ const EXTENSION_BY_MIME: Record<string, string> = {
 	'text/markdown': 'md',
 };
 
-function bytesToBase64(bytes: Uint8Array): string {
-	let binary = '';
-	for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-	return btoa(binary);
-}
-
-function base64ToBytes(base64: string): Uint8Array {
-	const binary = atob(base64);
-	const bytes = new Uint8Array(binary.length);
-	for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-	return bytes;
-}
-
-function toUrlSafe(base64: string): string {
-	return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
-function fromUrlSafeOrStandard(input: string): string {
-	const base64 = input.replace(/-/g, '+').replace(/_/g, '/');
-	return base64 + '='.repeat((4 - (base64.length % 4)) % 4);
-}
-
-function wrapLines(base64: string): string {
-	return base64.replace(/(.{76})/g, '$1\n');
-}
-
-function encodeText(text: string, urlSafe: boolean, lineWrap: boolean): string {
-	const bytes = new TextEncoder().encode(text);
-	let base64 = bytesToBase64(bytes);
-	if (urlSafe) base64 = toUrlSafe(base64);
-	else if (lineWrap) base64 = wrapLines(base64);
-	return base64;
-}
-
 // `TextEncoder` (used for the encode direction) is UTF-8-only per the Web
 // platform spec — there's no browser API to encode into legacy encodings
 // client-side, so only the decode direction offers a choice of encodings.
@@ -138,40 +144,6 @@ const TEXT_DECODE_ENCODINGS = [
 ] as const;
 type TextDecodeEncoding = (typeof TEXT_DECODE_ENCODINGS)[number];
 
-function decodeText(input: string, encoding: TextDecodeEncoding): string {
-	const cleaned = input.trim().replace(/\s+/g, '');
-	const base64 = fromUrlSafeOrStandard(cleaned);
-	const bytes = base64ToBytes(base64);
-	return new TextDecoder(encoding, { fatal: true }).decode(bytes);
-}
-
-function extractDataUri(input: string): { mime: string; base64: string } | null {
-	const match = input.trim().match(/^data:([^;,]+)(?:;charset=[^;,]*)?;base64,([\s\S]+)$/);
-	if (!match) return null;
-	return { mime: match[1], base64: match[2] };
-}
-
-function CopyButton({ value, label, copiedLabel }: { value: string; label: string; copiedLabel: string }) {
-	const [copied, setCopied] = useState(false);
-	return (
-		<Button
-			aria-live="polite"
-			type="button"
-			size="sm"
-			variant="ghost"
-			disabled={value === ''}
-			onClick={() => {
-				void navigator.clipboard.writeText(value).then(() => {
-					setCopied(true);
-					setTimeout(() => setCopied(false), 1500);
-				});
-			}}
-		>
-			{copied ? copiedLabel : label}
-		</Button>
-	);
-}
-
 export default function Base64Tool({ messages }: { messages: Messages }) {
 	const [tab, setTab] = useState<Tab>('text');
 
@@ -184,16 +156,13 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 
 	const { textOutput, textError } = useMemo(() => {
 		if (textInput === '') return { textOutput: '', textError: null as string | null };
-		try {
-			return {
-				textOutput:
-					mode === 'encode' ? encodeText(textInput, urlSafe, lineWrap) : decodeText(textInput, decodeEncoding),
-				textError: null as string | null,
-			};
-		} catch {
-			return { textOutput: '', textError: mode === 'decode' ? messages.decodeError : null };
+		if (mode === 'encode') {
+			return { textOutput: encodeText(textInput, urlSafe, lineWrap), textError: null as string | null };
 		}
-	}, [textInput, mode, urlSafe, lineWrap, decodeEncoding, messages.decodeError]);
+		const result = decodeText(textInput, decodeEncoding);
+		if (result.ok) return { textOutput: result.text, textError: null as string | null };
+		return { textOutput: '', textError: result.reason === 'notText' ? messages.decodeNotText : messages.decodeError };
+	}, [textInput, mode, urlSafe, lineWrap, decodeEncoding, messages.decodeError, messages.decodeNotText]);
 
 	const handleSwap = () => {
 		setMode((m) => (m === 'encode' ? 'decode' : 'encode'));
@@ -214,10 +183,18 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 	const [isDragOver, setIsDragOver] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
+	const [fileEncodeError, setFileEncodeError] = useState<string | null>(null);
+
 	const handleFileEncode = (files: FileList | null) => {
 		if (!files) return;
+		setFileEncodeError(null);
 		for (const file of Array.from(files)) {
+			if (file.size > MAX_FILE_BYTES) {
+				setFileEncodeError(messages.fileTooLarge.replace('{{name}}', file.name).replace('{{max}}', String(MAX_FILE_BYTES / 1024 / 1024)));
+				continue;
+			}
 			const reader = new FileReader();
+			reader.onerror = () => setFileEncodeError(messages.fileReadError.replace('{{name}}', file.name));
 			reader.onload = () => {
 				const dataUri = reader.result as string;
 				const parsed = extractDataUri(dataUri);
@@ -256,11 +233,13 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 	const decodedPreviewUri = useMemo(() => {
 		if (fileDecodeInput.trim() === '') return null;
 		const parsed = extractDataUri(fileDecodeInput);
-		const base64 = parsed ? parsed.base64 : fileDecodeInput.trim().replace(/\s+/g, '');
+		const base64 = cleanBase64Input(fileDecodeInput);
 		const mime = parsed ? parsed.mime : fileDecodeMime;
 		try {
-			base64ToBytes(fromUrlSafeOrStandard(base64));
-			return `data:${mime};base64,${base64}`;
+			// Normalise URL-safe / unpadded input to standard padded Base64 so the data: URI loads.
+			const normalized = fromUrlSafeOrStandard(base64);
+			base64ToBytes(normalized);
+			return `data:${mime};base64,${normalized}`;
 		} catch {
 			return null;
 		}
@@ -269,7 +248,7 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 	const handleDownloadDecodedFile = () => {
 		setFileDecodeError(null);
 		const parsed = extractDataUri(fileDecodeInput);
-		const base64 = parsed ? parsed.base64 : fileDecodeInput.trim().replace(/\s+/g, '');
+		const base64 = cleanBase64Input(fileDecodeInput);
 		const mime = parsed ? parsed.mime : fileDecodeMime;
 		let bytes: Uint8Array;
 		try {
@@ -291,10 +270,10 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 	return (
 		<div className="flex flex-col gap-4">
 			<div className="flex gap-2">
-				<Button type="button" size="sm" variant={tab === 'text' ? 'default' : 'outline'} onClick={() => setTab('text')}>
+				<Button type="button" size="sm" variant={tab === 'text' ? 'default' : 'outline'} aria-pressed={tab === 'text'} onClick={() => setTab('text')}>
 					{messages.textTabLabel}
 				</Button>
-				<Button type="button" size="sm" variant={tab === 'file' ? 'default' : 'outline'} onClick={() => setTab('file')}>
+				<Button type="button" size="sm" variant={tab === 'file' ? 'default' : 'outline'} aria-pressed={tab === 'file'} onClick={() => setTab('file')}>
 					{messages.fileTabLabel}
 				</Button>
 			</div>
@@ -306,16 +285,18 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 							<Button
 								type="button"
 								size="sm"
-								variant={mode === 'encode' ? 'default' : 'outline'}
-								onClick={() => setMode('encode')}
+																variant={mode === 'encode' ? 'default' : 'outline'}
+							aria-pressed={mode === 'encode'}
+							onClick={() => setMode('encode')}
 							>
 								{messages.encodeOption}
 							</Button>
 							<Button
 								type="button"
 								size="sm"
-								variant={mode === 'decode' ? 'default' : 'outline'}
-								onClick={() => setMode('decode')}
+																variant={mode === 'decode' ? 'default' : 'outline'}
+							aria-pressed={mode === 'decode'}
+							onClick={() => setMode('decode')}
 							>
 								{messages.decodeOption}
 							</Button>
@@ -346,7 +327,7 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 								<select
 									value={decodeEncoding}
 									onChange={(e) => setDecodeEncoding(e.target.value as TextDecodeEncoding)}
-									className="rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+									className="min-w-0 max-w-full rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
 								>
 									{TEXT_DECODE_ENCODINGS.map((enc) => (
 										<option key={enc} value={enc}>
@@ -374,7 +355,7 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 					</div>
 
 					<div className="flex justify-center">
-						<Button type="button" size="sm" variant="outline" onClick={handleSwap} disabled={textOutput === ''}>
+						<Button type="button" size="sm" variant="outline" className="h-auto max-w-full whitespace-normal py-1 text-center" onClick={handleSwap} disabled={textOutput === ''}>
 							{messages.swap}
 						</Button>
 					</div>
@@ -384,7 +365,7 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 							<label htmlFor="base64-text-output" className="text-sm font-medium text-foreground">
 								{messages.textOutputLabel}
 							</label>
-							<CopyButton value={textOutput} label={messages.copy} copiedLabel={messages.copied} />
+							<CopyButton value={textOutput} label={messages.copy} copiedLabel={messages.copied} failedLabel={messages.copyFailed} ariaLabel={messages.copyOutputAria} />
 						</div>
 						<textarea
 							id="base64-text-output"
@@ -432,7 +413,7 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 							<p className="text-xs text-muted-foreground">{messages.fileDropLabel}</p>
 							<label
 								htmlFor="base64-file-input"
-								className="inline-flex cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80"
+								className="has-[+input:focus-visible]:ring-2 has-[+input:focus-visible]:ring-ring inline-flex cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80"
 							>
 								{messages.fileChoose}
 							</label>
@@ -441,13 +422,17 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 								ref={fileInputRef}
 								type="file"
 								multiple
-								className="hidden"
-								onChange={(e) => handleFileEncode(e.target.files)}
+								className="sr-only"
+								onChange={(e) => {
+									handleFileEncode(e.target.files);
+									e.target.value = '';
+								}}
 							/>
 						</div>
 
+												{fileEncodeError && <p role="alert" className="text-sm text-destructive">{fileEncodeError}</p>}
 						{encodedFiles.length > 0 && (
-							<div className="flex flex-col gap-4">
+						<div className="flex flex-col gap-4">
 								{encodedFiles.length > 1 && (
 									<div>
 										<Button type="button" size="sm" variant="ghost" onClick={handleClearEncoded}>
@@ -464,7 +449,7 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 												size="sm"
 												variant="ghost"
 												onClick={() => handleRemoveEncoded(item.id)}
-												aria-label={messages.remove}
+												aria-label={messages.removeFileAria.replace('{{name}}', item.name)}
 											>
 												✕
 											</Button>
@@ -478,7 +463,7 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 										<div className="flex flex-col gap-1">
 											<div className="flex items-center justify-between">
 												<span className="text-xs text-muted-foreground">{messages.fileBase64Label}</span>
-												<CopyButton value={item.base64} label={messages.copy} copiedLabel={messages.copied} />
+												<CopyButton value={item.base64} label={messages.copy} copiedLabel={messages.copied} failedLabel={messages.copyFailed} ariaLabel={messages.copyFieldAria.replace('{{field}}', messages.fileBase64Label).replace('{{name}}', item.name)} />
 											</div>
 											<textarea
 												readOnly
@@ -490,7 +475,7 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 										<div className="flex flex-col gap-1">
 											<div className="flex items-center justify-between">
 												<span className="text-xs text-muted-foreground">{messages.fileDataUriLabel}</span>
-												<CopyButton value={item.dataUri} label={messages.copy} copiedLabel={messages.copied} />
+												<CopyButton value={item.dataUri} label={messages.copy} copiedLabel={messages.copied} failedLabel={messages.copyFailed} ariaLabel={messages.copyFieldAria.replace('{{field}}', messages.fileDataUriLabel).replace('{{name}}', item.name)} />
 											</div>
 											<textarea
 												readOnly
@@ -559,7 +544,7 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 							</div>
 						)}
 						<div>
-							<Button type="button" size="sm" onClick={handleDownloadDecodedFile} disabled={fileDecodeInput.trim() === ''}>
+							<Button type="button" size="sm" aria-label={messages.downloadAria} onClick={handleDownloadDecodedFile} disabled={fileDecodeInput.trim() === ''}>
 								{messages.downloadFile}
 							</Button>
 						</div>

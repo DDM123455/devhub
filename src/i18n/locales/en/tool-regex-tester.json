@@ -22,7 +22,7 @@
     "computingLabel": "Computing matches…",
     "highlightedHeading": "Highlighted matches",
     "matchesHeading": "Matches",
-    "matchCount": "{{count}} match(es)",
+    "matchCount": "{{count}} matches",
     "noMatches": "no matches",
     "matchLabel": "Match {{index}}",
     "fullMatchLabel": "Full match",
@@ -51,7 +51,14 @@
     "cheat12": "\\b — word boundary, | — alternation (OR)",
     "historyHeading": "Recent patterns",
     "historyClear": "Clear history",
-    "copyShareLink": "Copy share link"
+    "copyShareLink": "Copy share link",
+    "matchCountOne": "1 match",
+    "matchCountTruncated": "showing the first {{shown}} of {{total}} matches",
+    "matchCountTruncatedMore": "showing the first {{shown}} of more than {{total}} matches",
+    "unicodeHint": "Hint: \\p{...} / \\P{...} only work as Unicode property escapes when the u flag is on. Without it they match the literal text.",
+    "copyFailed": "Copy failed",
+    "copyResultAria": "Copy replacement result",
+    "clearAria": "Clear pattern, test string and replacement"
   },
   "related": "Related tools",
   "faq": {

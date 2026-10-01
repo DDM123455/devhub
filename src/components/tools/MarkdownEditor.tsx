@@ -20,6 +20,32 @@ import { keymap, placeholder } from '@codemirror/view';
 import { EditorState, Prec, type StateCommand } from '@codemirror/state';
 import { markdown } from '@codemirror/lang-markdown';
 import { Button } from '@/components/ui/button';
+import { buildExportHtml, createSlugger, MAX_MARKDOWN_RENDER_CHARS } from '@/lib/markdown-utils';
+import { useCopyToClipboard } from './useCopyToClipboard';
+
+function CopyButton({
+	value,
+	label,
+	copiedLabel,
+	failedLabel,
+}: {
+	value: string;
+	label: string;
+	copiedLabel: string;
+	failedLabel: string;
+}) {
+	const { copied, failed, copy } = useCopyToClipboard();
+	return (
+		<Button aria-live="polite" type="button" size="sm" variant="ghost" disabled={value === ''} onClick={() => void copy(value)}>
+			{copied ? copiedLabel : failed ? failedLabel : label}
+		</Button>
+	);
+}
+
+const RENDER_DEBOUNCE_MS = 150;
+const UNDO_TIMEOUT_MS = 8000;
+// Remote content a Markdown document can pull in is not something the preview should load or style.
+const FORBIDDEN_TAGS = ['style', 'form', 'input', 'button', 'textarea', 'select', 'option'];
 
 interface Messages {
 	viewSplit: string;
@@ -49,6 +75,16 @@ interface Messages {
 	downloadMd: string;
 	downloadHtml: string;
 	wordCount: string;
+	exportTitle: string;
+	previewAria: string;
+	largeInputWarning: string;
+	remoteImagesNote: string;
+	replacedNotice: string;
+	undo: string;
+	draftSaved: string;
+	draftSaveFailed: string;
+	copyFailed: string;
+	fileReadError: string;
 }
 
 type ViewMode = 'split' | 'editor' | 'preview';
@@ -220,28 +256,7 @@ const editorTheme = EditorView.theme({
 	},
 });
 
-function CopyButton({ value, label, copiedLabel }: { value: string; label: string; copiedLabel: string }) {
-	const [copied, setCopied] = useState(false);
-	return (
-		<Button
-			aria-live="polite"
-			type="button"
-			size="sm"
-			variant="ghost"
-			disabled={value === ''}
-			onClick={() => {
-				void navigator.clipboard.writeText(value).then(() => {
-					setCopied(true);
-					setTimeout(() => setCopied(false), 1500);
-				});
-			}}
-		>
-			{copied ? copiedLabel : label}
-		</Button>
-	);
-}
-
-export default function MarkdownEditor({ messages }: { messages: Messages }) {
+export default function MarkdownEditor({ messages, lang = 'en' }: { messages: Messages; lang?: string }) {
 	const [content, setContent] = useState('');
 	const [renderedHtml, setRenderedHtml] = useState('');
 	const [viewMode, setViewMode] = useState<ViewMode>('split');
@@ -251,6 +266,34 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 	const previewRef = useRef<HTMLDivElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const modulesRef = useRef<{ parse: (md: string) => string; sanitize: (html: string) => string } | null>(null);
+	const [draftStatus, setDraftStatus] = useState<'saved' | 'failed' | null>(null);
+	const [undoSnapshot, setUndoSnapshot] = useState<string | null>(null);
+	const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const [fileError, setFileError] = useState(false);
+	const isTooLarge = content.length > MAX_MARKDOWN_RENDER_CHARS;
+
+	// Replacing the whole document (Clear / Load sample / file drop) is destructive, so the
+	// previous text is kept for a few seconds and offered back through an Undo button.
+	const replaceContent = (next: string) => {
+		if (content !== '' && content !== next) {
+			setUndoSnapshot(content);
+			if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+			undoTimerRef.current = setTimeout(() => setUndoSnapshot(null), UNDO_TIMEOUT_MS);
+		}
+		setContent(next);
+	};
+	const handleUndo = () => {
+		if (undoSnapshot === null) return;
+		setContent(undoSnapshot);
+		setUndoSnapshot(null);
+		if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+	};
+	useEffect(
+		() => () => {
+			if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+		},
+		[],
+	);
 	const syncingRef = useRef<'editor' | 'preview' | null>(null);
 
 	// Restore an autosaved draft after mount — localStorage isn't available during Astro's
@@ -270,33 +313,72 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 	// empty string, so clicking "Clear" doesn't leave a stale draft to resurrect later.
 	useEffect(() => {
 		const timer = setTimeout(() => {
-			try {
-				if (content) localStorage.setItem(DRAFT_STORAGE_KEY, content);
-				else localStorage.removeItem(DRAFT_STORAGE_KEY);
-			} catch {
-				// See note above — autosave failures are non-fatal.
-			}
+							try {
+					if (content) {
+						localStorage.setItem(DRAFT_STORAGE_KEY, content);
+						setDraftStatus('saved');
+					} else {
+						localStorage.removeItem(DRAFT_STORAGE_KEY);
+						setDraftStatus(null);
+					}
+				} catch {
+					// Quota exceeded / storage unavailable — autosave is non-fatal, but tell the user the
+					// draft is NOT being kept so they don't rely on it.
+					setDraftStatus('failed');
+				}
 		}, AUTOSAVE_DEBOUNCE_MS);
 		return () => clearTimeout(timer);
 	}, [content]);
 
+	// Parsing + sanitising run after a short debounce (not on every keystroke) and are skipped
+	// entirely for very large documents: marked can take pathological time on some inputs, and
+	// it runs on the main thread (DOMPurify needs the DOM, so it cannot move to a worker).
 	useEffect(() => {
 		let cancelled = false;
-		(async () => {
+		if (content.length > MAX_MARKDOWN_RENDER_CHARS) {
+			setRenderedHtml('');
+			return;
+		}
+		const timer = setTimeout(async () => {
 			if (!modulesRef.current) {
 				const [markedMod, dompurifyMod] = await Promise.all([import('marked'), import('dompurify')]);
 				const DOMPurify = dompurifyMod.default;
+				// Links open in a new tab without leaking window.opener (pure #anchors stay in-page).
+				DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+					if (node.tagName === 'A' && node.getAttribute('href') && !node.getAttribute('href')!.startsWith('#')) {
+						node.setAttribute('target', '_blank');
+						node.setAttribute('rel', 'noopener noreferrer');
+					}
+				});
 				modulesRef.current = {
-					parse: (md: string) => markedMod.marked.parse(md, { gfm: true, breaks: false, async: false }) as string,
-					sanitize: (html: string) => DOMPurify.sanitize(html),
+					parse: (md: string) => {
+						const nextSlug = createSlugger();
+						return markedMod.marked.parse(md, {
+							gfm: true,
+							breaks: false,
+							async: false,
+							renderer: (() => {
+								const renderer = new markedMod.Renderer();
+								const base = renderer.heading.bind(renderer);
+								renderer.heading = function (token) {
+									const html = base(token);
+									const id = nextSlug(token.text);
+									return html.replace(/^<h([1-6])/, `<h$1 id="${id}"`);
+								};
+								return renderer;
+							})(),
+						}) as string;
+					},
+					sanitize: (html: string) => DOMPurify.sanitize(html, { FORBID_TAGS: FORBIDDEN_TAGS }),
 				};
 			}
 			if (cancelled || !modulesRef.current) return;
 			const html = modulesRef.current.sanitize(modulesRef.current.parse(content));
 			if (!cancelled) setRenderedHtml(html);
-		})();
+		}, RENDER_DEBOUNCE_MS);
 		return () => {
 			cancelled = true;
+			clearTimeout(timer);
 		};
 	}, [content]);
 
@@ -348,7 +430,8 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 					// binding intercepts Enter first and this fallback never runs.
 					Prec.highest(keymap.of([{ key: 'Enter', run: exitEmptyListItem }])),
 					EditorView.lineWrapping,
-					placeholder(messagesRef.current.inputPlaceholder),
+											placeholder(messagesRef.current.inputPlaceholder),
+						EditorView.contentAttributes.of({ 'aria-label': messagesRef.current.editorLabel }),
 					editorTheme,
 					EditorView.updateListener.of((update) => {
 						if (update.docChanged) setContent(update.state.doc.toString());
@@ -404,8 +487,10 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 	const handleFile = (files: FileList | null) => {
 		const file = files?.[0];
 		if (!file) return;
+		setFileError(false);
 		const reader = new FileReader();
-		reader.onload = () => setContent(String(reader.result ?? ''));
+		reader.onload = () => replaceContent(String(reader.result ?? ''));
+		reader.onerror = () => setFileError(true);
 		reader.readAsText(file);
 	};
 
@@ -475,16 +560,16 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 	return (
 		<div className="flex flex-col gap-3">
 			<div className="flex flex-wrap items-center justify-between gap-2">
-				<div className="flex gap-2">
-					<Button type="button" size="sm" variant={viewMode === 'split' ? 'default' : 'outline'} onClick={() => setViewMode('split')}>
+				<div className="flex flex-wrap gap-2">
+					<Button type="button" size="sm" variant={viewMode === 'split' ? 'default' : 'outline'} aria-pressed={viewMode === 'split'} onClick={() => setViewMode('split')}>
 						<Columns2 className="mr-1.5 h-4 w-4" />
 						{messages.viewSplit}
 					</Button>
-					<Button type="button" size="sm" variant={viewMode === 'editor' ? 'default' : 'outline'} onClick={() => setViewMode('editor')}>
+					<Button type="button" size="sm" variant={viewMode === 'editor' ? 'default' : 'outline'} aria-pressed={viewMode === 'editor'} onClick={() => setViewMode('editor')}>
 						<Pencil className="mr-1.5 h-4 w-4" />
 						{messages.viewEditor}
 					</Button>
-					<Button type="button" size="sm" variant={viewMode === 'preview' ? 'default' : 'outline'} onClick={() => setViewMode('preview')}>
+					<Button type="button" size="sm" variant={viewMode === 'preview' ? 'default' : 'outline'} aria-pressed={viewMode === 'preview'} onClick={() => setViewMode('preview')}>
 						<Eye className="mr-1.5 h-4 w-4" />
 						{messages.viewPreview}
 					</Button>
@@ -523,7 +608,7 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 					<p className="text-xs text-muted-foreground">{messages.dropLabel}</p>
 					<label
 						htmlFor="markdown-file-input"
-						className="inline-flex cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80"
+						className="has-[+input:focus-visible]:ring-2 has-[+input:focus-visible]:ring-ring inline-flex cursor-pointer items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80"
 					>
 						{messages.chooseFile}
 					</label>
@@ -532,8 +617,11 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 						ref={fileInputRef}
 						type="file"
 						accept=".md,.markdown,.txt"
-						className="hidden"
-						onChange={(e) => handleFile(e.target.files)}
+						className="sr-only"
+						onChange={(e) => {
+								handleFile(e.target.files);
+								e.target.value = '';
+							}}
 					/>
 				</div>
 			)}
@@ -557,28 +645,54 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 
 				{viewMode !== 'editor' && (
 					<div className="flex flex-col gap-1">
-						<label className="text-sm font-medium text-foreground">{messages.previewLabel}</label>
+						<span id="markdown-preview-label" className="text-sm font-medium text-foreground">{messages.previewLabel}</span>
 						<div
-							id="markdown-preview"
+															id="markdown-preview"
+							role="region"
+							aria-labelledby="markdown-preview-label"
 							ref={previewRef}
+							onClick={(event) => {
+								// #anchor links scroll inside the preview instead of navigating the page.
+								const anchor = (event.target as HTMLElement).closest('a');
+								const href = anchor?.getAttribute('href');
+								if (!anchor || !href || !href.startsWith('#')) return;
+								event.preventDefault();
+								const target = previewRef.current?.querySelector(`[id="${CSS.escape(decodeURIComponent(href.slice(1)))}"]`);
+								target?.scrollIntoView({ block: 'start' });
+							}}
 							onScroll={viewMode === 'split' ? handlePreviewScroll : undefined}
 							className={`h-[27.5rem] overflow-y-auto rounded-md border border-border bg-muted/40 p-3 text-sm text-foreground ${PREVIEW_CLASSES}`}
 							// eslint-disable-next-line react/no-danger
 							dangerouslySetInnerHTML={{ __html: renderedHtml }}
 						/>
+						<p className="text-xs text-muted-foreground">{messages.remoteImagesNote}</p>
 					</div>
 				)}
 			</div>
 
-			<div className="flex flex-wrap gap-2">
-				<Button type="button" size="sm" variant="ghost" onClick={() => setContent(SAMPLE_MARKDOWN)}>
-					{messages.loadSample}
-				</Button>
-				<Button type="button" size="sm" variant="ghost" onClick={() => setContent('')}>
-					{messages.clear}
-				</Button>
-				<CopyButton value={content} label={messages.copyMarkdown} copiedLabel={messages.copied} />
-				<CopyButton value={renderedHtml} label={messages.copyHtml} copiedLabel={messages.copied} />
+							{isTooLarge && <p role="status" className="text-xs text-amber-700 dark:text-amber-400">{messages.largeInputWarning}</p>}
+				{fileError && <p role="alert" className="text-xs text-destructive">{messages.fileReadError}</p>}
+				<div className="flex min-h-5 flex-wrap items-center gap-2 text-xs text-muted-foreground" role="status" aria-live="polite">
+					{undoSnapshot !== null && (
+						<>
+							{messages.replacedNotice}
+							<button type="button" onClick={handleUndo} className="font-medium text-primary underline-offset-2 hover:underline">
+								{messages.undo}
+							</button>
+						</>
+					)}
+					{undoSnapshot === null && draftStatus === 'saved' && messages.draftSaved}
+					{undoSnapshot === null && draftStatus === 'failed' && <span className="text-destructive">{messages.draftSaveFailed}</span>}
+				</div>
+				<div className="flex flex-wrap gap-2">
+					<Button type="button" size="sm" variant="ghost" onClick={() => replaceContent(SAMPLE_MARKDOWN)}>
+						{messages.loadSample}
+					</Button>
+					<Button type="button" size="sm" variant="ghost" onClick={() => replaceContent('')}>
+						{messages.clear}
+					</Button>
+					<CopyButton value={content} label={messages.copyMarkdown} copiedLabel={messages.copied} failedLabel={messages.copyFailed} />
+					<CopyButton value={renderedHtml} label={messages.copyHtml} copiedLabel={messages.copied} failedLabel={messages.copyFailed} />
 				<Button type="button" size="sm" variant="outline" disabled={content === ''} onClick={() => download(content, 'document.md', 'text/markdown')}>
 					{messages.downloadMd}
 				</Button>
@@ -589,7 +703,7 @@ export default function MarkdownEditor({ messages }: { messages: Messages }) {
 					disabled={renderedHtml === ''}
 					onClick={() =>
 						download(
-							`<!doctype html>\n<html><head><meta charset="utf-8"><title>Markdown export</title></head><body>${renderedHtml}</body></html>`,
+							buildExportHtml(messages.exportTitle, lang, renderedHtml),
 							'document.html',
 							'text/html',
 						)
