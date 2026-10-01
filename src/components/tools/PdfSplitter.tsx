@@ -165,7 +165,8 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 			(item) => item.type === 'application/pdf' || item.name.toLowerCase().endsWith('.pdf'),
 		);
 		if (candidate) void loadFile(candidate);
-	}, [loadFile]);
+		else setError(messages.errorGeneric);
+	}, [loadFile, messages.errorGeneric]);
 
 	const handleDeletePage = useCallback((id: string) => {
 		pushUndoSnapshot({ pages, selectedPageIds });

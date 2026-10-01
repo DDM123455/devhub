@@ -127,3 +127,11 @@ describe('dedupeFileNames', () => {
 		expect(dedupeFileNames(['a.json', 'A.json', 'b.json', 'a.json'])).toEqual(['a.json', 'A (2).json', 'b.json', 'a (3).json']);
 	});
 });
+
+describe('csvToJson extra fields', () => {
+	it('does not leak Papa internal __parsed_extra key', () => {
+		const r = csvToJson('a,b,c\n3,4,5,6', baseCsv);
+		expect(r.output).not.toContain('__parsed_extra');
+		expect(JSON.parse(r.output)[0]._extra).toEqual(['6']);
+	});
+});

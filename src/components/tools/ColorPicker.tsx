@@ -240,7 +240,7 @@ function Swatch({
 				{onToggleLock && (
 					<button
 						type="button"
-						aria-label={locked ? unlockAria : lockAria}
+						aria-label={lockAria}
 						aria-pressed={!!locked}
 						onClick={onToggleLock}
 						className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground hover:text-foreground"
@@ -263,8 +263,8 @@ interface ColorState {
 const INITIAL_RGB: Rgb = { r: 59, g: 130, b: 246 };
 
 function isInteractiveTarget(target: HTMLElement | null): boolean {
-	if (!target) return false;
-	if (target.isContentEditable) return true;
+	if (!target || !(target instanceof Element)) return false;
+	if ((target as HTMLElement).isContentEditable) return true;
 	return !!target.closest('input, textarea, select, button, a, summary, [role="button"], [role="link"], [contenteditable="true"]');
 }
 

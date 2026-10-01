@@ -119,6 +119,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 	const [maxDimension, setMaxDimension] = useState(DEFAULT_MAX_DIMENSION);
 	const [targetFormat, setTargetFormat] = useState<TargetFormat>('original');
 	const [isProcessing, setIsProcessing] = useState(false);
+	const runningRef = useRef(false);
 	const [isZipping, setIsZipping] = useState(false);
 	const [skippedCount, setSkippedCount] = useState(0);
 	const objectUrls = useRef<Set<string>>(new Set());
@@ -251,7 +252,8 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 	// người dùng đổi setting trong lúc đang nén.
 	const runQueue = useCallback(
 		async (queue: ImageItem[]) => {
-			if (queue.length === 0) return;
+			if (queue.length === 0 || runningRef.current) return;
+			runningRef.current = true;
 			const settings = settingsRef.current;
 			setIsProcessing(true);
 			try {
@@ -268,6 +270,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 				};
 				await Promise.all(Array.from({ length: Math.min(CONCURRENCY, queue.length) }, runLane));
 			} finally {
+				runningRef.current = false;
 				setIsProcessing(false);
 			}
 		},

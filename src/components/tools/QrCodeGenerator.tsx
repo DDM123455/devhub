@@ -993,7 +993,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 					</div>
 				</div>
 				{contrastWarning && (
-					<p role="status" className="w-fit rounded-md bg-amber-500/15 px-2 py-1 text-xs font-medium text-amber-700 dark:text-amber-400">
+					<p role="status" className="w-fit rounded-md bg-amber-500/15 px-2 py-1 text-xs font-medium text-amber-800 dark:text-amber-400">
 						{contrastWarning === 'inverted' ? messages.contrastInverted : messages.contrastLow}
 					</p>
 				)}

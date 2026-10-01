@@ -226,6 +226,16 @@ export function csvToJson(csv: string, options: CsvToJsonOptions): CsvToJsonResu
 		dynamicTyping: false,
 	});
 
+	if (header) {
+		// Papa stores overflow fields under an internal key; expose a clear name instead.
+		for (const row of result.data as Record<string, unknown>[]) {
+			if (row && Object.prototype.hasOwnProperty.call(row, '__parsed_extra')) {
+				row['_extra'] = row['__parsed_extra'];
+				delete row['__parsed_extra'];
+			}
+		}
+	}
+
 	const warnings: CsvWarning[] = [];
 	let error: { line: number; message: string } | null = null;
 	for (const e of result.errors) {

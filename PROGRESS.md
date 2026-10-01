@@ -180,6 +180,17 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-10-01 (Phase 3.13b — test tương tác thật 12 tool file/media/data + sửa lỗi nhỏ)** —
+  2 agent QA test trên trình duyệt (build production): không có lỗi CRITICAL/HIGH; xác nhận
+  QR decode UTF-8 đúng bằng jsQR, `__proto__` CSV không pollution, BOM/escape công thức,
+  `.xlsx` hợp lệ, rotate PDF cộng đúng /Rotate gốc, checkbox PdfSplitter chọn 1 lần, ZIP không
+  mất file trùng tên, GIF giữ trong suốt, ICO không méo, không request upload ra ngoài, không
+  tràn ngang 320px. Sửa thêm: ImageCompressor `runningRef` chống xử lý trùng khi click đồng
+  bộ, CSV không lộ `__parsed_extra` (đổi `_extra`), ColorPicker aria-label cố định + guard
+  target, badge QR amber-800, PdfSplitter báo lỗi khi chọn file không phải PDF, copy SEO Video
+  Trimmer. Chưa làm: Retry riêng ở Image Converter, thông báo AVIF, báo đổi tên sheet
+  "History", debounce slider Edge softness, `@import url()` trong SVG warning, HEIC thật/
+  By-target-size chưa test.
 - **2026-10-01 (Phase 3.13 — Audit toàn diện + sửa lỗi, theo yêu cầu trực tiếp người dùng)** —
   Chạy 6 agent audit song song (hạ tầng/SEO, 3 nhóm source, 2 nhóm runtime trên trình duyệt;
   1 agent runtime bị dừng do lỗi classifier nên 12 tool file/media/data CHƯA test tương tác
