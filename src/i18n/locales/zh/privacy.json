@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "title": "隐私政策 — Web Tool Hub",
+    "description": "了解 Web Tool Hub 如何处理你的数据：文件绝不上传，无需注册账号，没有任何追踪。查看完整的隐私政策。"
+  },
+  "heading": "隐私政策",
+  "updated": "最后更新：2026 年 8 月",
+  "intro": "Web Tool Hub 只遵循一条原则：你的文件永远不会离开你的设备。本站的每个工具——压缩图片、合并 PDF、格式化 JSON——都借助 JavaScript 和 Web API 完全在浏览器中运行。这里没有上传环节，因为根本没有处理你文件的服务器。",
+  "sections": [
+    {
+      "heading": "我们不收集什么",
+      "body": "我们不要求你注册账号，不收集你的文件、文件内容或文件名，也不在本站运行任何统计或广告追踪代码——没有 Google Analytics，没有 Facebook Pixel，也没有任何第三方脚本在监视你在这里做什么。"
+    },
+    {
+      "heading": "各个工具的实际工作方式",
+      "body": "当你把文件“上传”到这里的任意工具时，它会通过 File API 直接读入浏览器内存，再用 JavaScript、WebAssembly 或 Canvas/Web Audio API 处理，具体取决于工具的需要。较重的任务（如图片压缩、视频裁剪）会放在 Web Worker 中运行，避免页面卡死，但计算依然发生在你自己的设备、你的浏览器标签页里。任何内容都不会被传输到别处进行处理。"
+    },
+    {
+      "heading": "本地存储",
+      "body": "部分工具会在浏览器的本地存储中保存少量状态，以免你丢失进度：主题选择（theme）、文本对比草稿（text-diff-draft）、Markdown 编辑器草稿（markdown-editor-draft）、正则测试器的表达式历史（regex-tester-history）以及取色器中保存的调色板（color-picker-saved-palettes）。这些数据只保存在你的设备上，不会发送给我们，你可以随时通过清除浏览器中本站的数据将其删除。"
+    },
+    {
+      "heading": "从第三方 CDN 下载的资源",
+      "body": "你的文件不会被上传，但部分工具在使用时会下载自身所需的代码或数据（不是你的内容）：视频裁剪和音频转换器会从 cdn.jsdelivr.net 获取 ffmpeg WebAssembly 核心；背景移除会从 staticimgly.com 获取 AI 模型和 WebAssembly 运行时；Kubernetes YAML 校验器会从 cdn.jsdelivr.net 获取公开的 Kubernetes JSON Schema 文件。这些请求只是对公开文件的普通下载，因此与访问任何网站资源一样，这些 CDN 服务商可能会看到你的 IP 地址和所请求的文件。Markdown 预览也可以显示文本中引用的图片；如果你引用了外部站点的图片，浏览器会向该站点请求它（本站的内容安全策略通常会阻止这种请求）。"
+    },
+    {
+      "heading": "托管与技术日志",
+      "body": "本站托管在 Cloudflare 的基础设施上。与几乎所有网站一样，Cloudflare 的边缘网络可能会出于安全和运维目的记录标准的技术性请求数据（如 IP 地址、User-Agent 和请求时间）——这是所有网站托管都存在的基础设施层面的日志，并非 Web Tool Hub 自己收集，我们也无权用它来追踪个人。"
+    },
+    {
+      "heading": "Cookie",
+      "body": "我们不会设置任何用于追踪或广告的 Cookie。如果将来使用 Cookie（例如引入广告），我们会在此说明，并在法律要求时通过同意横幅征得你的许可。"
+    },
+    {
+      "heading": "本政策的变更",
+      "body": "如果本政策有变更，上方的“最后更新”日期也会随之更新。由于本站是没有账号体系的静态站点，我们无法单独通知你——如果想了解最新条款，请随时回来查看。"
+    }
+  ]
+}

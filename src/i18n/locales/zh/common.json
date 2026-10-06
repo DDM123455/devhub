@@ -15,7 +15,8 @@
   },
   "search": {
     "placeholder": "搜索工具…",
-    "noResults": "没有匹配的工具"
+    "noResults": "没有匹配的工具",
+    "noResultsHint": "换个关键词试试，或在下方按分类浏览工具。"
   },
   "sidebar": {
     "note": "我们会持续添加新工具。你在这里做的任何操作都不会传到服务器。"
@@ -30,11 +31,17 @@
       "text": "文本",
       "dev": "开发工具",
       "media": "媒体"
-    }
+    },
+    "mainNav": "主导航",
+    "language": "语言"
   },
   "footer": {
     "copyright": "© {{year}} Web Tool Hub",
-    "tagline": "为在乎自己文件归属的人打造。"
+    "tagline": "为在乎自己文件归属的人打造。",
+    "toolsByCategory": "工具",
+    "legal": "法律信息",
+    "language": "语言",
+    "privacyPolicy": "隐私政策"
   },
   "banner": {
     "privacy": "100% 隐私保护 — 文件永远留在你的设备上"

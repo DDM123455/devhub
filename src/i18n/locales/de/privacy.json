@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "title": "Datenschutzerklärung — Web Tool Hub",
+    "description": "Wie Web Tool Hub mit deinen Daten umgeht: keine Uploads, keine Konten, kein Tracking. Hier findest du die vollständige Datenschutzerklärung."
+  },
+  "heading": "Datenschutzerklärung",
+  "updated": "Zuletzt aktualisiert: August 2026",
+  "intro": "Web Tool Hub folgt einer einzigen Regel: Deine Dateien verlassen nie dein Gerät. Jedes Tool auf dieser Seite – ob Bild komprimieren, PDF zusammenfügen oder JSON formatieren – läuft komplett in deinem Browser mit JavaScript und Web-APIs. Einen Upload gibt es nicht, weil kein Server existiert, der deine Dateien verarbeitet.",
+  "sections": [
+    {
+      "heading": "Was wir nicht erheben",
+      "body": "Du musst dir kein Konto anlegen. Wir erfassen weder deine Dateien noch deren Inhalte oder Dateinamen. Auf dieser Seite laufen keine Analyse- oder Werbe-Tracker – kein Google Analytics, kein Facebook-Pixel und kein Skript eines Drittanbieters, das dein Verhalten beobachtet."
+    },
+    {
+      "heading": "Wie die Tools tatsächlich funktionieren",
+      "body": "Wenn du in einem Tool eine Datei „hochlädst“, wird sie über die File-API direkt in den Arbeitsspeicher deines Browsers gelesen und mit JavaScript, WebAssembly oder den Canvas-/Web-Audio-APIs verarbeitet – je nachdem, was das Tool braucht. Aufwendigere Aufgaben (Bildkomprimierung, Videoschnitt) laufen in einem Web Worker, damit die Seite nicht einfriert; die Arbeit findet aber trotzdem auf deinem Rechner in deinem Browser-Tab statt. Zur Verarbeitung wird nichts irgendwohin übertragen."
+    },
+    {
+      "heading": "Lokaler Speicher",
+      "body": "Einige Tools legen kleine Datenmengen im lokalen Speicher deines Browsers ab, damit deine Arbeit nicht verloren geht: deine Designauswahl (theme), den Entwurf im Text-Diff (text-diff-draft), den Entwurf im Markdown-Editor (markdown-editor-draft), den Musterverlauf des Regex-Testers (regex-tester-history) und gespeicherte Paletten des Color Pickers (color-picker-saved-palettes). Diese Daten bleiben ausschließlich auf deinem Gerät, werden nie an uns gesendet, und du kannst sie jederzeit löschen, indem du die Daten dieser Website in deinem Browser entfernst."
+    },
+    {
+      "heading": "Ressourcen von Drittanbieter-CDNs",
+      "body": "Deine Dateien werden nie hochgeladen, aber einige Tools laden beim Benutzen ihren eigenen Code oder eigene Daten (nicht deine Inhalte) nach: Video schneiden und der Audio-Konverter holen den ffmpeg-WebAssembly-Kern von cdn.jsdelivr.net; Hintergrund entfernen lädt sein KI-Modell und die WebAssembly-Laufzeit von staticimgly.com; der Kubernetes-YAML-Validator lädt öffentliche Kubernetes-JSON-Schema-Dateien von cdn.jsdelivr.net. Das sind schlichte Downloads öffentlicher Dateien – die CDN-Anbieter können dabei wie bei jeder Website-Ressource deine IP-Adresse und die angeforderte Datei sehen. Die Markdown-Vorschau kann außerdem Bilder anzeigen, die in deinem Text eingebunden sind; verweist du auf ein Bild von einem externen Host, fragt dein Browser es direkt dort an (die Content Security Policy der Seite blockiert das normalerweise)."
+    },
+    {
+      "heading": "Hosting und technische Logs",
+      "body": "Diese Seite wird auf der Infrastruktur von Cloudflare gehostet. Wie bei praktisch jeder Website kann das Edge-Netzwerk von Cloudflare übliche technische Anfragedaten (etwa IP-Adresse, User-Agent und Zeitstempel) zu Sicherheits- und Betriebszwecken protokollieren. Das ist Logging auf Infrastrukturebene, wie es bei jedem Webhosting üblich ist – Web Tool Hub selbst erhebt diese Daten nicht und nutzt sie nicht, um einzelne Personen zu verfolgen."
+    },
+    {
+      "heading": "Cookies",
+      "body": "Wir setzen keine Cookies für Tracking oder Werbung. Sollten wir künftig Cookies verwenden (zum Beispiel, wenn Werbung eingeführt wird), geben wir das hier bekannt und holen, wo gesetzlich vorgeschrieben, deine Einwilligung über ein Banner ein."
+    },
+    {
+      "heading": "Änderungen dieser Erklärung",
+      "body": "Ändert sich diese Erklärung, ändert sich auch das Datum bei „Zuletzt aktualisiert“. Da es sich um eine statische Seite ohne Kontosystem handelt, können wir dich nicht einzeln benachrichtigen – schau hier vorbei, wenn du die aktuellen Bedingungen wissen möchtest."
+    }
+  ]
+}

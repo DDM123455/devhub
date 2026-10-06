@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "title": "Kebijakan Privasi — Web Tool Hub",
+    "description": "Cara Web Tool Hub menangani data Anda: file tidak pernah diunggah, tanpa akun, tanpa pelacakan. Baca kebijakan privasi selengkapnya."
+  },
+  "heading": "Kebijakan Privasi",
+  "updated": "Terakhir diperbarui: Agustus 2026",
+  "intro": "Web Tool Hub dibangun di atas satu aturan: file Anda tidak pernah meninggalkan perangkat Anda. Setiap alat di situs ini — mengompres gambar, menggabungkan PDF, merapikan JSON — berjalan sepenuhnya di browser Anda menggunakan JavaScript dan Web API. Tidak ada tahap unggah, karena memang tidak ada server yang memproses file Anda.",
+  "sections": [
+    {
+      "heading": "Data yang tidak kami kumpulkan",
+      "body": "Kami tidak meminta Anda membuat akun. Kami tidak mengumpulkan file Anda, isinya, maupun nama filenya. Kami tidak memasang pelacak analitik atau iklan di situs ini — tidak ada Google Analytics, tidak ada Facebook Pixel, tidak ada skrip pihak ketiga yang memantau aktivitas Anda di sini."
+    },
+    {
+      "heading": "Cara kerja setiap alat",
+      "body": "Saat Anda \"mengunggah\" file ke alat mana pun di sini, file tersebut langsung dibaca ke memori browser Anda lewat File API dan diproses dengan JavaScript, WebAssembly, atau Canvas/Web Audio API — sesuai kebutuhan alatnya. Pekerjaan berat (kompresi gambar, pemotongan video) dijalankan di dalam Web Worker agar halaman tidak macet, tetapi prosesnya tetap berlangsung di perangkat Anda, di tab browser Anda. Tidak ada yang dikirim ke mana pun untuk diproses."
+    },
+    {
+      "heading": "Penyimpanan lokal",
+      "body": "Beberapa alat menyimpan sedikit data di penyimpanan lokal (local storage) browser agar pekerjaan Anda tidak hilang: pilihan tema (theme), draf Text Diff (text-diff-draft), draf Markdown Editor (markdown-editor-draft), riwayat pola Regex Tester (regex-tester-history), dan palet Color Picker yang tersimpan (color-picker-saved-palettes). Data ini hanya ada di perangkat Anda, tidak pernah dikirim kepada kami, dan bisa Anda hapus kapan saja dengan membersihkan data situs ini di browser."
+    },
+    {
+      "heading": "Aset yang diunduh dari CDN pihak ketiga",
+      "body": "File Anda tidak pernah diunggah, tetapi beberapa alat mengunduh kode atau data miliknya sendiri (bukan konten Anda) saat dipakai: Trim Video dan Audio Converter mengambil inti WebAssembly ffmpeg dari cdn.jsdelivr.net; Remove Background mengambil model AI dan runtime WebAssembly-nya dari staticimgly.com; Kubernetes YAML Validator mengambil file JSON Schema Kubernetes publik dari cdn.jsdelivr.net. Permintaan ini hanyalah unduhan biasa atas file publik, sehingga penyedia CDN tersebut dapat melihat alamat IP Anda dan file yang diminta, seperti pada sumber daya situs web mana pun. Pratinjau Markdown juga dapat menampilkan gambar yang dirujuk dalam teks Anda; jika Anda merujuk gambar dari host eksternal, browser Anda akan memintanya dari host tersebut (kebijakan keamanan konten situs ini biasanya memblokirnya)."
+    },
+    {
+      "heading": "Hosting dan log teknis",
+      "body": "Situs ini dihosting di infrastruktur Cloudflare. Seperti hampir semua situs web, jaringan edge Cloudflare dapat mencatat data permintaan teknis standar (seperti alamat IP, user agent, dan waktu permintaan) untuk keperluan keamanan dan operasional — ini adalah pencatatan tingkat infrastruktur yang lazim pada semua layanan hosting, bukan sesuatu yang dikumpulkan atau diakses oleh Web Tool Hub untuk melacak individu."
+    },
+    {
+      "heading": "Cookie",
+      "body": "Kami tidak memasang cookie untuk pelacakan atau iklan. Jika kelak cookie digunakan (misalnya bila iklan diperkenalkan), hal itu akan dijelaskan di sini dan disertai banner persetujuan bila diwajibkan oleh hukum."
+    },
+    {
+      "heading": "Perubahan kebijakan ini",
+      "body": "Jika kebijakan ini berubah, tanggal \"Terakhir diperbarui\" di atas juga akan berubah. Karena situs ini statis dan tanpa sistem akun, kami tidak punya cara untuk memberi tahu Anda secara pribadi — silakan cek kembali halaman ini jika ingin mengetahui ketentuan terbaru."
+    }
+  ]
+}

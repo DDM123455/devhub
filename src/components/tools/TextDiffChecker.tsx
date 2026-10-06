@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ChangeEvent, type RefObject, type UIEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type DragEvent, type RefObject, type UIEvent } from 'react';
 import {
 	buildDiffHtml,
 	buildUnifiedPatch,
@@ -18,6 +18,16 @@ import type { TextDiffRequest, TextDiffResponse } from './textDiffWorker';
 import { autoFormatText } from '@/lib/text-format';
 import { Button } from '@/components/ui/button';
 import UnifiedDiffView, { UNIFIED_ROW_HEIGHT, UNIFIED_VIEWPORT_HEIGHT, type TextDiffExtraMessages } from './TextDiffUnified';
+import { FileChip, FileLimitsPanel, FileOptionsPanel, type LoadedFile, type TextDiffFileMessages } from './TextDiffFiles';
+import {
+	DEFAULT_EXTRACT_OPTIONS,
+	extractFromBuffer,
+	FileExtractError,
+	finalizeExtractedText,
+	MAX_FILE_BYTES,
+	MAX_SHARE_CHARS,
+	type ExtractOptions,
+} from '@/lib/file-diff-extract';
 
 interface Messages {
 	originalLabel: string;
@@ -77,6 +87,7 @@ interface Messages {
 	clipboardError: string;
 	fileReadError: string;
 	x: TextDiffExtraMessages;
+	files: TextDiffFileMessages;
 }
 
 const DEBOUNCE_MS = 150;
@@ -84,6 +95,13 @@ const DRAFT_STORAGE_KEY = 'text-diff-draft';
 const AUTOSAVE_DEBOUNCE_MS = 500;
 const CLEAR_UNDO_TIMEOUT_MS = 6000;
 const LARGE_INPUT_CHARS = 2_000_000;
+// Texts that came from big files are not mirrored into localStorage (slow + quota).
+const AUTOSAVE_MAX_CHARS = 1_000_000;
+
+type Side = 'original' | 'changed';
+const FILE_ACCEPT =
+	'.txt,.text,.md,.markdown,.json,.jsonl,.yaml,.yml,.toml,.xml,.html,.htm,.css,.scss,.js,.mjs,.ts,.tsx,.jsx,.py,.rb,.php,.java,.c,.h,.cpp,.cs,.go,.rs,.sh,.sql,.log,.ini,.conf,.cfg,.env,.csv,.tsv,.diff,.patch,.srt,.docx,.pdf,.xlsx,.odt,.ods,.odp,.pptx,.rtf,text/*';
+const EXTRACT_AFFECTED_KINDS = new Set(['docx', 'pdf', 'xlsx', 'odt', 'ods', 'odp', 'pptx']);
 
 // Uses the native Compression Streams API (supported in every evergreen
 // browser, no library needed) to gzip each text before base64-encoding it
@@ -559,6 +577,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			if (autosaveSuspendedRef.current) return;
+			if (originalText.length + changedText.length > AUTOSAVE_MAX_CHARS) return;
 			try {
 				if (originalText || changedText) {
 					localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({ original: originalText, changed: changedText }));
@@ -572,6 +591,107 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		return () => clearTimeout(timer);
 	}, [originalText, changedText]);
 
+	// ---- File loading (text / Word / PDF / Excel / OpenDocument / PowerPoint / RTF) ----
+	// The File's bytes are kept in memory only (never in localStorage and never uploaded) so that
+	// changing an extraction option can re-read the file without asking for it again.
+	const fm = messages.files;
+	const [extractOptions, setExtractOptions] = useState<ExtractOptions>(DEFAULT_EXTRACT_OPTIONS);
+	const [loaded, setLoaded] = useState<Record<Side, LoadedFile | null>>({ original: null, changed: null });
+	const [busyName, setBusyName] = useState<Record<Side, string | null>>({ original: null, changed: null });
+	const [fileError, setFileError] = useState<Record<Side, string | null>>({ original: null, changed: null });
+	const [fileNotice, setFileNotice] = useState<string | null>(null);
+	const [dragSide, setDragSide] = useState<Side | 'page' | null>(null);
+	const buffersRef = useRef<Record<Side, { buffer: ArrayBuffer; mime: string } | null>>({ original: null, changed: null });
+	const loadTokenRef = useRef<Record<Side, number>>({ original: 0, changed: 0 });
+	const textsRef = useRef({ original: '', changed: '' });
+	textsRef.current = { original: originalText, changed: changedText };
+	const optionsRef = useRef(extractOptions);
+	const loadedRef = useRef(loaded);
+	loadedRef.current = loaded;
+
+	const setSideText = (side: Side, text: string) => (side === 'original' ? editOriginal(text) : editChanged(text));
+	const fileErrorMessage = (error: unknown) =>
+		error instanceof FileExtractError ? fm.err[error.code].replace('{{max}}', String(MAX_FILE_BYTES / 1024 / 1024)) : fm.err.read;
+	const dropFile = (side: Side) => {
+		loadTokenRef.current[side]++;
+		buffersRef.current[side] = null;
+		setLoaded((prev) => ({ ...prev, [side]: null }));
+		setFileError((prev) => ({ ...prev, [side]: null }));
+		setBusyName((prev) => ({ ...prev, [side]: null }));
+	};
+	const ifCurrent = (side: Side, token: number, fn: () => void) => {
+		if (token === loadTokenRef.current[side]) fn();
+	};
+
+	const loadFile = async (side: Side, file: File) => {
+		const token = ++loadTokenRef.current[side];
+		setFileError((prev) => ({ ...prev, [side]: null }));
+		setFileNotice(null);
+		setBusyName((prev) => ({ ...prev, [side]: file.name }));
+		try {
+			if (file.size > MAX_FILE_BYTES) throw new FileExtractError('tooLarge');
+			const buffer = await file.arrayBuffer();
+			const result = await extractFromBuffer(file.name, file.type, buffer, optionsRef.current, null);
+			if (token !== loadTokenRef.current[side]) return;
+			const text = finalizeExtractedText(result);
+			buffersRef.current[side] = { buffer, mime: file.type };
+			pushUndo(side, textsRef.current[side], 'replace');
+			setLoaded((prev) => ({ ...prev, [side]: { name: file.name, size: file.size, result, sheets: null, text } }));
+			setSideText(side, text);
+		} catch (error) {
+			ifCurrent(side, token, () => setFileError((prev) => ({ ...prev, [side]: fileErrorMessage(error) })));
+		} finally {
+			ifCurrent(side, token, () => setBusyName((prev) => ({ ...prev, [side]: null })));
+		}
+	};
+
+	// Re-reads an already loaded file with new options / a new sheet selection. Text the user has
+	// edited since loading is never overwritten.
+	const reextract = async (side: Side, options: ExtractOptions, sheets: string[] | null) => {
+		const current = loadedRef.current[side];
+		const source = buffersRef.current[side];
+		if (!current || !source || !EXTRACT_AFFECTED_KINDS.has(current.result.kind)) return;
+		if (textsRef.current[side] !== current.text) {
+			setFileNotice(fm.editedKept);
+			return;
+		}
+		const token = ++loadTokenRef.current[side];
+		setBusyName((prev) => ({ ...prev, [side]: current.name }));
+		try {
+			const result = await extractFromBuffer(current.name, source.mime, source.buffer, options, sheets);
+			if (token !== loadTokenRef.current[side]) return;
+			const text = finalizeExtractedText(result);
+			setLoaded((prev) => ({ ...prev, [side]: { ...current, result, sheets, text } }));
+			setSideText(side, text);
+		} catch (error) {
+			ifCurrent(side, token, () => setFileError((prev) => ({ ...prev, [side]: fileErrorMessage(error) })));
+		} finally {
+			ifCurrent(side, token, () => setBusyName((prev) => ({ ...prev, [side]: null })));
+		}
+	};
+
+	const handleExtractOptionsChange = (next: ExtractOptions) => {
+		setExtractOptions(next);
+		optionsRef.current = next;
+		setFileNotice(null);
+		(['original', 'changed'] as const).forEach((side) => void reextract(side, next, loadedRef.current[side]?.sheets ?? null));
+	};
+
+	// One file goes to the given side (or the first empty one); two or more files go to
+	// Original / Changed in the order they were dropped or chosen.
+	const handleFiles = (files: File[], target: Side | null) => {
+		if (files.length === 0) return;
+		setFileNotice(null);
+		if (files.length >= 2) {
+			void loadFile('original', files[0]);
+			void loadFile('changed', files[1]);
+			if (files.length > 2) setFileNotice(fm.onlyTwoFiles);
+			return;
+		}
+		const side = target ?? (textsRef.current.original === '' ? 'original' : textsRef.current.changed === '' ? 'changed' : 'original');
+		void loadFile(side, files[0]);
+	};
+
 	const pushUndo = (side: 'original' | 'changed', previousText: string, kind: 'clear' | 'replace') => {
 		if (previousText === '') return;
 		setUndoStack((stack) => [...stack.slice(-9), { side, previousText, kind }]);
@@ -584,6 +704,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	// an inline Undo (replacing content via Upload/Format is undoable the same way).
 	const handleClear = (which: 'original' | 'changed') => {
 		const previousText = which === 'original' ? originalText : changedText;
+		dropFile(which);
 		if (previousText === '') return;
 		if (which === 'original') editOriginal('');
 		else editChanged('');
@@ -781,8 +902,12 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		link.click();
 		URL.revokeObjectURL(url);
 	};
+	const cleanName = (name: string | undefined) => (name ? name.replace(/\s+/g, ' ').trim() || undefined : undefined);
+	const patchNames = { oldName: cleanName(loaded.original?.name), newName: cleanName(loaded.changed?.name) };
+	const leftTitle = loaded.original?.name ?? messages.originalLabel;
+	const rightTitle = loaded.changed?.name ?? messages.changedLabel;
 	const handleExportPatch = () => {
-		const patch = buildUnifiedPatch(entries);
+		const patch = buildUnifiedPatch(entries, patchNames);
 		if (!patch) {
 			setExportNote(messages.x.exportNothing);
 			return;
@@ -791,7 +916,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		downloadText(patch, 'changes.diff', 'text/x-diff');
 	};
 	const handleCopyPatch = () => {
-		const patch = buildUnifiedPatch(entries);
+		const patch = buildUnifiedPatch(entries, patchNames);
 		if (!patch) {
 			setExportNote(messages.x.exportNothing);
 			return;
@@ -803,29 +928,23 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	};
 	const handleExportHtml = () => {
 		downloadText(
-			buildDiffHtml(entries, { title: `${messages.originalLabel} / ${messages.changedLabel}`, left: messages.originalLabel, right: messages.changedLabel, lang: document.documentElement.lang || 'en' }),
+buildDiffHtml(entries, { title: `${leftTitle} / ${rightTitle}`, left: leftTitle, right: rightTitle, lang: document.documentElement.lang || 'en' }),
 			'diff.html',
 			'text/html',
 		);
 	};
 
-	const handleUploadFile = (which: 'original' | 'changed') => (fileList: FileList | null) => {
-		const file = fileList?.[0];
-		if (!file) return;
-		const reader = new FileReader();
-		reader.onload = () => {
-			const text = typeof reader.result === 'string' ? reader.result : '';
-			pushUndo(which, which === 'original' ? originalText : changedText, 'replace');
-			if (which === 'original') editOriginal(text);
-			else editChanged(text);
-		};
-		reader.onerror = () => setToolError(messages.fileReadError);
-		reader.readAsText(file);
+	const handleUploadFile = (which: Side) => (fileList: FileList | null) => {
+		handleFiles(Array.from(fileList ?? []), which);
 	};
 
 	const handleSwap = () => {
 		editOriginal(changedText);
 		editChanged(originalText);
+		setLoaded((prev) => ({ original: prev.changed, changed: prev.original }));
+		buffersRef.current = { original: buffersRef.current.changed, changed: buffersRef.current.original };
+		loadTokenRef.current = { original: loadTokenRef.current.original + 1, changed: loadTokenRef.current.changed + 1 };
+		setBusyName({ original: null, changed: null });
 	};
 
 	// Beautifies whichever of JSON/XML the pasted text auto-detects as, so two payloads
@@ -921,7 +1040,10 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		const fileRef = isOriginal ? originalFileInputRef : changedFileInputRef;
 		const topUndo = undoStack[undoStack.length - 1];
 		return (
-			<div className="flex flex-col gap-2">
+			<div
+					data-diff-side={which}
+					className={`flex flex-col gap-2 rounded-md ${dragSide === which || dragSide === 'page' ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`}
+				>
 				<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
 					<label htmlFor={`text-diff-${which}`} className="text-sm font-medium text-foreground">
 						{label}
@@ -936,8 +1058,9 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 						<Button
 							type="button"
 							size="sm"
-							variant="ghost"
-							aria-label={messages.uploadAria.replace('{{side}}', label)}
+								variant="ghost"
+								className="min-h-9"
+								aria-label={messages.uploadAria.replace('{{side}}', label)}
 							onClick={() => fileRef.current?.click()}
 						>
 							{messages.uploadFile}
@@ -948,7 +1071,8 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 						<input
 							ref={fileRef}
 							type="file"
-							accept=".txt,text/plain"
+accept={FILE_ACCEPT}
+								multiple
 							className="hidden"
 							tabIndex={-1}
 							aria-hidden="true"
@@ -969,8 +1093,31 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 					gutterRef={isOriginal ? originalGutterRef : changedGutterRef}
 					onScrollSync={syncInputScroll(isOriginal ? 0 : 1)}
 				/>
-				<p role="status" aria-live="polite" className="flex min-h-4 flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
-					{formatFeedback?.side === which && <span>{formatFeedback.message}</span>}
+					{loaded[which] && (
+						<FileChip
+							file={loaded[which] as LoadedFile}
+							edited={(isOriginal ? originalText : changedText) !== (loaded[which] as LoadedFile).text}
+							side={label}
+							messages={fm}
+							onRemove={() => handleClear(which)}
+							onSheetsChange={(sheets) => void reextract(which, extractOptions, sheets)}
+						/>
+					)}
+					{busyName[which] && (
+						<p role="status" className="text-xs text-muted-foreground">
+							{fm.loading.replace('{{name}}', busyName[which] as string)}
+						</p>
+					)}
+					{fileError[which] && (
+						<p role="alert" className="text-xs text-destructive [overflow-wrap:anywhere]">
+							{fileError[which]}
+						</p>
+					)}
+					{!loaded[which] && !busyName[which] && (isOriginal ? originalText : changedText) === '' && (
+						<p className="text-xs text-muted-foreground">{dragSide === which || dragSide === 'page' ? fm.dropActive : fm.dropHint}</p>
+					)}
+					<p role="status" aria-live="polite" className="flex min-h-4 flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
+						{formatFeedback?.side === which && <span>{formatFeedback.message}</span>}
 					{topUndo?.side === which && (
 						<>
 							<span>{topUndo.kind === 'clear' ? messages.clearedNotice : messages.replacedNotice}</span>
@@ -984,8 +1131,34 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		);
 	};
 
+	const hasDraggedFiles = (event: DragEvent) => Array.from(event.dataTransfer?.types ?? []).includes('Files');
+	const sideFromTarget = (target: EventTarget | null): Side | null => {
+		const value = (target as HTMLElement | null)?.closest?.('[data-diff-side]')?.getAttribute('data-diff-side');
+		return value === 'original' || value === 'changed' ? value : null;
+	};
+
+	const shareBlocked = (loaded.original !== null || loaded.changed !== null) && originalText.length + changedText.length > MAX_SHARE_CHARS;
+
 	return (
-		<div className="flex flex-col gap-6">
+		<div
+			className="flex flex-col gap-6"
+			onDragOver={(event) => {
+				if (!hasDraggedFiles(event)) return;
+				event.preventDefault();
+				event.dataTransfer.dropEffect = 'copy';
+				const count = event.dataTransfer.items?.length ?? 1;
+				setDragSide(count >= 2 ? 'page' : (sideFromTarget(event.target) ?? 'page'));
+			}}
+			onDragLeave={(event) => {
+				if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragSide(null);
+			}}
+			onDrop={(event) => {
+				if (!hasDraggedFiles(event)) return;
+				event.preventDefault();
+				setDragSide(null);
+				handleFiles(Array.from(event.dataTransfer.files), sideFromTarget(event.target));
+			}}
+		>
 			<div className="flex flex-col gap-4 rounded-lg border border-border p-4">
 				{sharedLoaded && (
 					<p role="status" className="flex flex-wrap items-center gap-2 rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
@@ -1043,11 +1216,16 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 							{messages.normalizeUnicode}
 						</label>
 					</div>
-					{(originalText !== '' || changedText !== '') && (
-						<Button type="button" size="sm" variant="outline" aria-live="polite" onClick={() => void handleCopyShareLink()}>
-							{shareLinkCopied ? messages.copied : messages.copyShareLink}
-						</Button>
-					)}
+						{(originalText !== '' || changedText !== '') &&
+							(shareBlocked ? (
+								<p role="status" className="text-xs text-muted-foreground">
+									{fm.shareTooLarge.replace('{{max}}', MAX_SHARE_CHARS.toLocaleString('en-US'))}
+								</p>
+							) : (
+								<Button type="button" size="sm" variant="outline" className="min-h-9" aria-live="polite" onClick={() => void handleCopyShareLink()}>
+									{shareLinkCopied ? messages.copied : messages.copyShareLink}
+								</Button>
+							))}
 				</div>
 				<div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-foreground">
 					<div className="flex items-center gap-1">
@@ -1110,7 +1288,14 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 						)}
 					</div>
 				</details>
-				{isLargeInput && <p role="status" className="text-xs text-amber-700 dark:text-amber-400">{messages.largeInputWarning}</p>}
+					<FileOptionsPanel options={extractOptions} onChange={handleExtractOptionsChange} messages={fm} />
+					<FileLimitsPanel messages={fm} />
+					{fileNotice && (
+						<p role="status" className="text-xs text-amber-700 dark:text-amber-400">
+							{fileNotice}
+						</p>
+					)}
+					{isLargeInput && <p role="status" className="text-xs text-amber-700 dark:text-amber-400">{messages.largeInputWarning}</p>}
 				{isComputing && <p role="status" className="text-xs text-muted-foreground">{messages.computing}</p>}
 				{(diffError || toolError) && (
 					<p role="alert" className="text-xs text-destructive">

@@ -15,7 +15,8 @@
   },
   "search": {
     "placeholder": "搜尋工具…",
-    "noResults": "沒有符合的工具"
+    "noResults": "沒有符合的工具",
+    "noResultsHint": "換個關鍵字試試，或在下方依分類瀏覽工具。"
   },
   "sidebar": {
     "note": "我們會持續新增工具。你在這裡做的任何操作都不會傳到伺服器。"
@@ -30,11 +31,17 @@
       "text": "文字",
       "dev": "開發工具",
       "media": "媒體"
-    }
+    },
+    "mainNav": "主要導覽",
+    "language": "語言"
   },
   "footer": {
     "copyright": "© {{year}} Web Tool Hub",
-    "tagline": "為在乎自己檔案歸屬的人打造。"
+    "tagline": "為在乎自己檔案歸屬的人打造。",
+    "toolsByCategory": "工具",
+    "legal": "法律資訊",
+    "language": "語言",
+    "privacyPolicy": "隱私權政策"
   },
   "banner": {
     "privacy": "100% 隱私保護 — 檔案永遠留在你的裝置上"

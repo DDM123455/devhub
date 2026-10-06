@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "title": "Informativa sulla privacy — Web Tool Hub",
+    "description": "Come Web Tool Hub tratta i tuoi dati: i file non vengono mai caricati, nessun account, nessun tracciamento. Leggi l'informativa completa."
+  },
+  "heading": "Informativa sulla privacy",
+  "updated": "Ultimo aggiornamento: agosto 2026",
+  "intro": "Web Tool Hub si basa su una sola regola: i tuoi file non lasciano mai il tuo dispositivo. Ogni strumento del sito — comprimere un'immagine, unire un PDF, formattare un JSON — funziona interamente nel tuo browser con JavaScript e API Web. Non c'è nessun passaggio di upload, perché non esiste alcun server che elabori i tuoi file.",
+  "sections": [
+    {
+      "heading": "Cosa non raccogliamo",
+      "body": "Non ti chiediamo di creare un account. Non raccogliamo i tuoi file, il loro contenuto né i loro nomi. Su questo sito non usiamo strumenti di analisi o tracker pubblicitari: niente Google Analytics, niente Facebook Pixel, nessuno script di terze parti che osservi ciò che fai."
+    },
+    {
+      "heading": "Come funziona davvero ogni strumento",
+      "body": "Quando \"carichi\" un file in uno strumento, questo viene letto direttamente nella memoria del browser tramite la File API ed elaborato con JavaScript, WebAssembly o le API Canvas/Web Audio, a seconda delle necessità. Le operazioni più pesanti (compressione di immagini, taglio di video) girano in un Web Worker per non bloccare la pagina, ma il lavoro avviene comunque sul tuo computer, nella scheda del browser. Nulla viene mai trasmesso altrove per essere elaborato."
+    },
+    {
+      "heading": "Archiviazione locale",
+      "body": "Alcuni strumenti salvano piccole informazioni nella memoria locale del browser per non farti perdere il lavoro: la scelta del tema (theme), la bozza di Text Diff (text-diff-draft), la bozza del Markdown Editor (markdown-editor-draft), la cronologia dei pattern del Regex Tester (regex-tester-history) e le palette salvate del Color Picker (color-picker-saved-palettes). Questi dati restano solo sul tuo dispositivo, non vengono mai inviati a noi e puoi eliminarli in qualsiasi momento cancellando i dati del sito nel browser."
+    },
+    {
+      "heading": "Risorse scaricate da CDN di terze parti",
+      "body": "I tuoi file non vengono mai caricati, ma alcuni strumenti scaricano il proprio codice o i propri dati (non i tuoi contenuti) quando li usi: Trim Video e Audio Converter scaricano il core WebAssembly di ffmpeg da cdn.jsdelivr.net; Remove Background scarica il modello di IA e il runtime WebAssembly da staticimgly.com; Kubernetes YAML Validator scarica i file pubblici di JSON Schema di Kubernetes da cdn.jsdelivr.net. Si tratta di semplici download di file pubblici, quindi questi fornitori di CDN possono vedere il tuo indirizzo IP e il file richiesto, come per qualsiasi risorsa di un sito web. L'anteprima Markdown può inoltre mostrare immagini citate nel testo; se fai riferimento a un'immagine ospitata altrove, il browser la richiederà a quell'host (la content security policy del sito di norma lo impedisce)."
+    },
+    {
+      "heading": "Hosting e log tecnici",
+      "body": "Il sito è ospitato sull'infrastruttura di Cloudflare. Come praticamente ogni sito web, la rete edge di Cloudflare può registrare dati tecnici standard delle richieste (come indirizzo IP, user agent e orario della richiesta) per motivi di sicurezza e operativi: è un log a livello di infrastruttura, comune a qualsiasi hosting, che Web Tool Hub non raccoglie né usa per tracciare le persone."
+    },
+    {
+      "heading": "Cookie",
+      "body": "Non impostiamo cookie di tracciamento o pubblicitari. Qualsiasi futuro utilizzo di cookie (ad esempio in caso di introduzione di pubblicità) sarà indicato qui e subordinato a un banner di consenso dove richiesto dalla legge."
+    },
+    {
+      "heading": "Modifiche a questa informativa",
+      "body": "Se l'informativa cambia, cambierà anche la data di \"Ultimo aggiornamento\" qui sopra. Trattandosi di un sito statico senza sistema di account, non possiamo avvisarti singolarmente: torna qui se vuoi conoscere i termini attuali."
+    }
+  ]
+}

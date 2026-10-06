@@ -180,6 +180,24 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-10-06 (Phase 3.15 — dịch đủ 18 ngôn ngữ + so sánh nội dung FILE trong Text Diff, theo yêu cầu
+  trực tiếp người dùng)** — (1) Text Diff nhận file: .txt/code/.md/.json/.yaml/.csv..., .docx, .pdf,
+  .xlsx, .odt/.ods/.odp, .pptx, .rtf (trích text → đưa vào luồng diff/merge/export sẵn có); kéo-thả 2 file
+  cùng lúc (file đầu → Original); chip tên/loại/dung lượng/độ tin cậy/cảnh báo; tuỳ chọn trích xuất đổi là
+  áp dụng lại không cần chọn lại file; từ chối rõ .doc/.xls/.ppt cũ, ảnh, file mật khẩu, nhị phân, >30MB;
+  KHÔNG OCR. Lib `file-diff-extract.ts` (29 test). Đánh giá độ tin cậy: text/xlsx/ods cao; docx/odt/pptx
+  vừa (mất định dạng, ảnh, footnote); pdf vừa/thấp (không OCR, nhiều cột có thể sai thứ tự); rtf thấp.
+  Verify trên server áp CSP production: docx/pdf/xlsx đọc & diff đúng, 0 vi phạm CSP. (2) Dịch: thêm
+  `scripts/check-i18n.mjs` (báo key thiếu/placeholder lệch theo locale); 18 agent dịch ~1.530 key/locale
+  (7 file tool mới + privacy + key mới của 15 tool cũ), thêm 104 key Text Diff; kết quả: cả 19 locale
+  missing=0, placeholderMismatch=0, mọi JSON hợp lệ. Dịch bằng AI → CẦN NGƯỜI BẢN NGỮ RÀ LẠI: các bài
+  `article.*`/`faq.*` dài, giải thích regex (greedy/lazy/lookaround), thuật ngữ bảo mật K8s, tên kiểu hài
+  hoà màu và loại mù màu, câu số nhiều có {{count}} (ar/de/nl/sv/it), "Unified" ở de/pl/pt/ru/zh-tw/th, tên
+  công cụ nhắc chéo do agent tự đặt (pt/nl). Bản dịch CŨ lỗi thời so với en vẫn còn (agent không đụng):
+  `tool-image-convert.formatsNote`/`article.p4` (ICO 256 vs gói 5 kích thước), `tool-jwt-decoder.
+  verifyAlgorithmUnsupported` (thiếu PS/ES), `tool-image-compress.p3`, `privacyNote` K8s và `dropHint`
+  background-remover ở một số locale — nên rà bằng cách so với en. Vitest 536/536 (test e2e docx từng flaky do
+  timeout khi máy bận → nới timeout 30s), build 522 trang.
 - **2026-10-01 (Phase 3.14 — xử lý thiếu sót so với đối thủ, theo yêu cầu trực tiếp người dùng)** —
   4 agent làm song song theo `COMPETITOR_GAP.md`. Ảnh/PDF: SVG→ảnh, ảnh→PDF, thêm ảnh vào Gộp PDF
   (sort/trang trắng/đánh số), Tách PDF theo dung lượng/bookmark/lẻ-chẵn, Nén ảnh MozJPEG+OxiPNG

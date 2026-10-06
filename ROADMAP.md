@@ -518,6 +518,13 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 - [ ] Test tương tác thật bằng file/thiết bị thật: brush cảm ứng, xuất PDF Markdown, upload .docx/.pdf, HEIC dưới CSP
 - [ ] Các mục cần quyết định: xem COMPETITOR_GAP.md
 
+## Phase 3.15 — Dịch đủ 20 ngôn ngữ + so sánh nội dung file (theo yêu cầu trực tiếp người dùng 2026-10-06)
+
+- [x] `scripts/check-i18n.mjs` + dịch bù ~1.530 key/locale cho 18 ngôn ngữ (missing=0 mọi locale)
+- [x] Text Diff: so sánh nội dung file docx/pdf/xlsx/odt/ods/odp/pptx/rtf/text + đánh giá từng loại
+- [ ] Người bản ngữ rà lại bản dịch (xem PROGRESS.md), cập nhật các key cũ lỗi thời so với en
+- [ ] Test tương tác thật: kéo-thả file trên điện thoại, PDF nhiều cột, xlsx lớn (extract chạy main thread)
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

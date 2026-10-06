@@ -15,7 +15,8 @@
   },
   "search": {
     "placeholder": "Tools durchsuchen…",
-    "noResults": "Kein Tool passt zu"
+    "noResults": "Kein Tool passt zu",
+    "noResultsHint": "Versuch es mit einem anderen Suchbegriff oder stöbere unten nach Kategorien."
   },
   "sidebar": {
     "note": "Neue Tools kommen regelmäßig dazu. Nichts, was du hier anfasst, erreicht jemals einen Server."
@@ -30,11 +31,17 @@
       "text": "Text",
       "dev": "Dev-Tools",
       "media": "Medien"
-    }
+    },
+    "mainNav": "Hauptnavigation",
+    "language": "Sprache"
   },
   "footer": {
     "copyright": "© {{year}} Web Tool Hub",
-    "tagline": "Gemacht für alle, die wollen, dass ihre Dateien auch ihre bleiben."
+    "tagline": "Gemacht für alle, die wollen, dass ihre Dateien auch ihre bleiben.",
+    "toolsByCategory": "Tools",
+    "legal": "Rechtliches",
+    "language": "Sprache",
+    "privacyPolicy": "Datenschutzerklärung"
   },
   "banner": {
     "privacy": "100% Privatsphäre — Deine Dateien bleiben auf deinem Gerät"

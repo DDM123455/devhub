@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "title": "Integritetspolicy — Web Tool Hub",
+    "description": "Så hanterar Web Tool Hub dina uppgifter: dina filer laddas aldrig upp, inga konton, ingen spårning. Läs hela integritetspolicyn."
+  },
+  "heading": "Integritetspolicy",
+  "updated": "Senast uppdaterad: augusti 2026",
+  "intro": "Web Tool Hub bygger på en enda regel: dina filer lämnar aldrig din enhet. Alla verktyg på sidan — att komprimera en bild, slå ihop en PDF eller formatera JSON — körs helt i din webbläsare med JavaScript och webb-API:er. Det finns inget uppladdningssteg, eftersom det inte finns någon server som bearbetar dina filer.",
+  "sections": [
+    {
+      "heading": "Vad vi inte samlar in",
+      "body": "Vi ber dig inte skapa något konto. Vi samlar inte in dina filer, deras innehåll eller deras filnamn. Vi kör inga analys- eller reklamspårare på sidan — här finns ingen Google Analytics, ingen Facebook Pixel och inget tredjepartsskript som övervakar vad du gör."
+    },
+    {
+      "heading": "Så fungerar varje verktyg",
+      "body": "När du \"laddar upp\" en fil till ett verktyg här läses den direkt in i webbläsarens minne via File API och bearbetas med JavaScript, WebAssembly eller Canvas/Web Audio-API:erna — beroende på vad verktyget behöver. Tyngre jobb (bildkomprimering, videoklippning) körs i en Web Worker så att sidan inte hänger sig, men arbetet sker fortfarande på din dator, i din webbläsarflik. Ingenting skickas någonsin vidare för bearbetning."
+    },
+    {
+      "heading": "Lokal lagring",
+      "body": "Vissa verktyg sparar små mängder data i webbläsarens lokala lagring så att du inte förlorar ditt arbete: ditt temaval (theme), utkastet i Textjämförelse (text-diff-draft), utkastet i Markdown-redigeraren (markdown-editor-draft), din mönsterhistorik i Regex-testaren (regex-tester-history) och sparade paletter i Färgväljaren (color-picker-saved-palettes). Den här datan stannar bara på din enhet, skickas aldrig till oss och du kan ta bort den när som helst genom att rensa sidans data i webbläsaren."
+    },
+    {
+      "heading": "Resurser som hämtas från CDN:er hos tredje part",
+      "body": "Dina filer laddas aldrig upp, men vissa verktyg hämtar sin egen kod eller data (inte ditt innehåll) när du använder dem: Videoklippare och Ljudkonverterare hämtar ffmpegs WebAssembly-kärna från cdn.jsdelivr.net; Ta bort bakgrund hämtar sin AI-modell och WebAssembly-körmiljö från staticimgly.com; Kubernetes YAML-validerare hämtar offentliga JSON-scheman för Kubernetes från cdn.jsdelivr.net. Det är vanliga nedladdningar av offentliga filer, så dessa CDN-leverantörer kan se din IP-adress och vilken fil som begärdes, precis som för alla andra webbresurser. Markdown-förhandsgranskningen kan också visa bilder som du refererar till i din text. Om du refererar till en bild från en extern värd begär din webbläsare den från den värden (sidans innehållssäkerhetspolicy blockerar normalt detta)."
+    },
+    {
+      "heading": "Hosting och tekniska loggar",
+      "body": "Sidan körs på Cloudflares infrastruktur. Som praktiskt taget alla webbplatser kan Cloudflares nätverk logga vanliga tekniska förfrågningsuppgifter (till exempel IP-adress, användaragent och tidpunkt) av säkerhets- och driftsskäl — det är loggning på infrastrukturnivå som är vanlig för all webbhotell och inget som Web Tool Hub själv samlar in eller har tillgång till för att spåra enskilda personer."
+    },
+    {
+      "heading": "Cookies",
+      "body": "Vi sätter inga cookies för spårning eller reklam. Om cookies skulle användas i framtiden (till exempel om annonser införs) kommer det att redovisas här och föregås av en samtyckesbanner där lagen kräver det."
+    },
+    {
+      "heading": "Ändringar i policyn",
+      "body": "Om policyn ändras uppdateras även datumet \"Senast uppdaterad\" ovan. Eftersom sidan är statisk och saknar kontosystem kan vi inte meddela dig individuellt — titta in här igen om du vill veta vilka villkor som gäller."
+    }
+  ]
+}

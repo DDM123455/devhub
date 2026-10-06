@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "title": "Polityka prywatności — Web Tool Hub",
+    "description": "Jak Web Tool Hub traktuje Twoje dane: pliki nigdy nie są wysyłane, bez kont i bez śledzenia. Przeczytaj pełną politykę prywatności."
+  },
+  "heading": "Polityka prywatności",
+  "updated": "Ostatnia aktualizacja: sierpień 2026",
+  "intro": "Web Tool Hub opiera się na jednej zasadzie: Twoje pliki nigdy nie opuszczają Twojego urządzenia. Każde narzędzie na tej stronie — kompresja zdjęcia, łączenie plików PDF, formatowanie JSON — działa w całości w Twojej przeglądarce, z użyciem JavaScriptu i interfejsów Web API. Nie ma etapu wysyłania, ponieważ nie ma serwera, który przetwarzałby Twoje pliki.",
+  "sections": [
+    {
+      "heading": "Czego nie zbieramy",
+      "body": "Nie wymagamy zakładania konta. Nie zbieramy Twoich plików, ich zawartości ani nazw. Nie uruchamiamy na tej stronie żadnych narzędzi analitycznych ani reklamowych — nie ma Google Analytics, Facebook Pixel ani żadnego skryptu firm trzecich, który obserwowałby, co tu robisz."
+    },
+    {
+      "heading": "Jak naprawdę działa każde narzędzie",
+      "body": "Gdy „wysyłasz” plik do dowolnego narzędzia, jest on wczytywany bezpośrednio do pamięci przeglądarki za pomocą File API i przetwarzany przy użyciu JavaScriptu, WebAssembly albo interfejsów Canvas/Web Audio — zależnie od potrzeb narzędzia. Cięższe zadania (kompresja zdjęć, przycinanie wideo) działają w Web Workerze, aby strona się nie zawieszała, ale praca nadal odbywa się na Twoim komputerze, w karcie przeglądarki. Nic nie jest nigdzie przesyłane do przetworzenia."
+    },
+    {
+      "heading": "Pamięć lokalna",
+      "body": "Niektóre narzędzia zapisują w pamięci lokalnej przeglądarki niewielkie ilości danych, aby nie utracić pracy: wybrany motyw (theme), wersję roboczą porównywarki tekstu (text-diff-draft), wersję roboczą edytora Markdown (markdown-editor-draft), historię wzorców testera wyrażeń regularnych (regex-tester-history) oraz zapisane palety próbnika kolorów (color-picker-saved-palettes). Te dane pozostają wyłącznie na Twoim urządzeniu, nigdy do nas nie trafiają, a w każdej chwili możesz je usunąć, czyszcząc dane tej witryny w przeglądarce."
+    },
+    {
+      "heading": "Zasoby pobierane z zewnętrznych sieci CDN",
+      "body": "Twoje pliki nigdy nie są wysyłane, ale niektóre narzędzia pobierają własny kod lub dane (nie Twoje treści) podczas użycia: Przycinanie wideo i Konwerter audio pobierają rdzeń WebAssembly ffmpeg z cdn.jsdelivr.net; Usuwanie tła pobiera model AI i środowisko WebAssembly z staticimgly.com; Walidator YAML Kubernetes pobiera publiczne pliki JSON Schema Kubernetesa z cdn.jsdelivr.net. To zwykłe pobrania publicznych plików, więc dostawcy tych sieci CDN mogą widzieć Twój adres IP i żądany plik, tak jak przy każdym zasobie strony internetowej. Podgląd Markdown może też wyświetlać obrazy wskazane w tekście; jeśli odwołasz się do obrazu z zewnętrznego hosta, przeglądarka pobierze go z tego hosta (polityka bezpieczeństwa treści strony zwykle to blokuje)."
+    },
+    {
+      "heading": "Hosting i dzienniki techniczne",
+      "body": "Ta strona jest hostowana w infrastrukturze Cloudflare. Jak niemal każda witryna, sieć brzegowa Cloudflare może zapisywać standardowe techniczne dane żądań (takie jak adres IP, user agent i znacznik czasu) w celach bezpieczeństwa i operacyjnych — to rejestrowanie na poziomie infrastruktury, typowe dla każdego hostingu, a nie coś, co Web Tool Hub sam zbiera lub do czego ma dostęp w celu śledzenia osób."
+    },
+    {
+      "heading": "Pliki cookie",
+      "body": "Nie ustawiamy żadnych plików cookie do śledzenia ani reklam. Ewentualne przyszłe użycie plików cookie (na przykład w razie wprowadzenia reklam) zostanie opisane tutaj i, tam gdzie wymaga tego prawo, poprzedzone banerem zgody."
+    },
+    {
+      "heading": "Zmiany w tej polityce",
+      "body": "Jeśli polityka ulegnie zmianie, zmieni się też powyższa data „Ostatnia aktualizacja”. Ponieważ jest to strona statyczna bez systemu kont, nie mamy możliwości powiadomienia Cię indywidualnie — zajrzyj tu ponownie, jeśli chcesz poznać aktualne warunki."
+    }
+  ]
+}

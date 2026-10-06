@@ -15,7 +15,8 @@
   },
   "search": {
     "placeholder": "Rechercher un outil…",
-    "noResults": "Aucun outil ne correspond à"
+    "noResults": "Aucun outil ne correspond à",
+    "noResultsHint": "Farklı bir anahtar kelime deneyin veya aşağıdan kategorilere göz atın."
   },
   "sidebar": {
     "note": "De nouveaux outils sont ajoutés régulièrement. Rien de ce que vous touchez ici n'atteint jamais un serveur."
@@ -30,11 +31,17 @@
       "text": "Texte",
       "dev": "Outils Dev",
       "media": "Multimédia"
-    }
+    },
+    "mainNav": "Ana gezinme",
+    "language": "Dil"
   },
   "footer": {
     "copyright": "© {{year}} Web Tool Hub",
-    "tagline": "Conçu pour celles et ceux qui préfèrent que leurs fichiers leur appartiennent."
+    "tagline": "Conçu pour celles et ceux qui préfèrent que leurs fichiers leur appartiennent.",
+    "toolsByCategory": "Araçlar",
+    "legal": "Yasal",
+    "language": "Dil",
+    "privacyPolicy": "Gizlilik Politikası"
   },
   "banner": {
     "privacy": "100% Confidentialité — Vos fichiers restent sur votre appareil"

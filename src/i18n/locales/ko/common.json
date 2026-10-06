@@ -15,7 +15,8 @@
   },
   "search": {
     "placeholder": "도구 검색…",
-    "noResults": "일치하는 도구가 없습니다:"
+    "noResults": "일치하는 도구가 없습니다:",
+    "noResultsHint": "Coba kata kunci lain, atau jelajahi alat berdasarkan kategori di bawah."
   },
   "sidebar": {
     "note": "새 도구가 꾸준히 추가됩니다. 여기서 다루는 어떤 것도 서버에 전송되지 않습니다."
@@ -30,11 +31,17 @@
       "text": "텍스트",
       "dev": "개발 도구",
       "media": "미디어"
-    }
+    },
+    "mainNav": "Navigasi utama",
+    "language": "Bahasa"
   },
   "footer": {
     "copyright": "© {{year}} Web Tool Hub",
-    "tagline": "내 파일이 계속 내 것이길 바라는 사람들을 위해 만들었습니다."
+    "tagline": "내 파일이 계속 내 것이길 바라는 사람들을 위해 만들었습니다.",
+    "toolsByCategory": "Alat",
+    "legal": "Hukum",
+    "language": "Bahasa",
+    "privacyPolicy": "Kebijakan Privasi"
   },
   "banner": {
     "privacy": "100% 개인정보 보호 — 파일은 기기 안에 그대로 유지됩니다"

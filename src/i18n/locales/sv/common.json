@@ -15,7 +15,8 @@
   },
   "search": {
     "placeholder": "Sök verktyg…",
-    "noResults": "Inga matchande verktyg"
+    "noResults": "Inga matchande verktyg",
+    "noResultsHint": "Prova ett annat sökord eller bläddra bland verktygen per kategori nedan."
   },
   "sidebar": {
     "note": "Nya verktyg läggs till regelbundet. Inget du gör här når någonsin en server."
@@ -30,11 +31,17 @@
       "text": "Text",
       "dev": "Dev-verktyg",
       "media": "Media"
-    }
+    },
+    "mainNav": "Huvudnavigering",
+    "language": "Språk"
   },
   "footer": {
     "copyright": "© {{year}} Web Tool Hub",
-    "tagline": "Byggt för dig som vill att dina filer ska förbli dina."
+    "tagline": "Byggt för dig som vill att dina filer ska förbli dina.",
+    "toolsByCategory": "Verktyg",
+    "legal": "Juridik",
+    "language": "Språk",
+    "privacyPolicy": "Integritetspolicy"
   },
   "banner": {
     "privacy": "100 % integritet — Filerna stannar på din enhet"

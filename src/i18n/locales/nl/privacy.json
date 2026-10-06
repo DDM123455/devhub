@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "title": "Privacybeleid — Web Tool Hub",
+    "description": "Zo gaat Web Tool Hub met je gegevens om: je bestanden worden nooit geüpload, geen accounts, geen tracking. Lees het volledige privacybeleid."
+  },
+  "heading": "Privacybeleid",
+  "updated": "Laatst bijgewerkt: augustus 2026",
+  "intro": "Web Tool Hub is gebouwd rond één regel: je bestanden verlaten nooit je apparaat. Elke tool op deze site — een afbeelding verkleinen, een PDF samenvoegen, JSON formatteren — draait volledig in je browser met JavaScript en Web API's. Er is geen uploadstap, want er is geen server die je bestanden verwerkt.",
+  "sections": [
+    {
+      "heading": "Wat we niet verzamelen",
+      "body": "We vragen je niet om een account aan te maken. We verzamelen je bestanden, hun inhoud of hun bestandsnamen niet. Op deze site draaien geen analyse- of advertentietrackers — geen Google Analytics, geen Facebook Pixel, geen script van derden dat meekijkt wat je hier doet."
+    },
+    {
+      "heading": "Hoe elke tool echt werkt",
+      "body": "Wanneer je in een van de tools een bestand \"uploadt\", wordt het rechtstreeks in het geheugen van je browser ingelezen via de File API en verwerkt met JavaScript, WebAssembly of de Canvas- en Web Audio-API's — wat de tool ook nodig heeft. Zwaardere taken (afbeeldingen comprimeren, video knippen) draaien in een Web Worker, zodat de pagina niet vastloopt, maar het werk gebeurt nog steeds op je eigen computer, in je browsertabblad. Er wordt niets doorgestuurd om te worden verwerkt."
+    },
+    {
+      "heading": "Lokale opslag",
+      "body": "Sommige tools bewaren kleine stukjes status in de lokale opslag van je browser, zodat je je werk niet kwijtraakt: je themakeuze (theme), het concept van Tekstvergelijking (text-diff-draft), het concept van de Markdown-editor (markdown-editor-draft), de patroongeschiedenis van de Regex-tester (regex-tester-history) en opgeslagen paletten van de Kleurenkiezer (color-picker-saved-palettes). Deze gegevens blijven alleen op je apparaat, worden nooit naar ons verstuurd en je kunt ze op elk moment verwijderen door de sitegegevens in je browser te wissen."
+    },
+    {
+      "heading": "Bestanden die van CDN's van derden worden gedownload",
+      "body": "Je bestanden worden nooit geüpload, maar sommige tools downloaden bij gebruik hun eigen code of gegevens (niet jouw inhoud): Video knippen en Audioconverter halen de ffmpeg WebAssembly-kern op van cdn.jsdelivr.net; Achtergrond verwijderen haalt het AI-model en de WebAssembly-runtime op van staticimgly.com; de Kubernetes YAML-validator haalt openbare Kubernetes JSON Schema-bestanden op van cdn.jsdelivr.net. Dit zijn gewone downloads van openbare bestanden, dus die CDN-aanbieders kunnen je IP-adres en het opgevraagde bestand zien, zoals bij elke website-bron. De Markdown-voorbeeldweergave kan ook afbeeldingen tonen waarnaar in je tekst wordt verwezen; als je naar een afbeelding op een externe host verwijst, vraagt je browser die bij die host op (het contentbeveiligingsbeleid van de site blokkeert dit normaal gesproken)."
+    },
+    {
+      "heading": "Hosting en technische logs",
+      "body": "Deze site wordt gehost op de infrastructuur van Cloudflare. Zoals vrijwel elke website kan het edge-netwerk van Cloudflare standaard technische verzoekgegevens (zoals IP-adres, user agent en tijdstip van het verzoek) loggen voor beveiliging en bedrijfsvoering — dit is logging op infrastructuurniveau die bij alle webhosting hoort, niet iets wat Web Tool Hub zelf verzamelt of gebruikt om personen te volgen."
+    },
+    {
+      "heading": "Cookies",
+      "body": "We plaatsen geen cookies voor tracking of advertenties. Elk toekomstig gebruik van cookies (bijvoorbeeld als er advertenties komen) wordt hier vermeld en, waar de wet dat vereist, achter een toestemmingsbanner geplaatst."
+    },
+    {
+      "heading": "Wijzigingen in dit beleid",
+      "body": "Als dit beleid verandert, verandert ook de datum bij \"Laatst bijgewerkt\" hierboven. Omdat dit een statische site zonder accountsysteem is, kunnen we je niet persoonlijk op de hoogte brengen — kijk hier dus af en toe terug als je de actuele voorwaarden wilt weten."
+    }
+  ]
+}

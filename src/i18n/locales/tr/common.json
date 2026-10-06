@@ -15,7 +15,8 @@
   },
   "search": {
     "placeholder": "Araç ara…",
-    "noResults": "Eşleşen araç yok"
+    "noResults": "Eşleşen araç yok",
+    "noResultsHint": "Farklı bir anahtar kelime deneyin veya aşağıdan kategorilere göz atın."
   },
   "sidebar": {
     "note": "Düzenli olarak yeni araçlar ekleniyor. Burada yaptığınız hiçbir şey bir sunucuya ulaşmaz."
@@ -30,11 +31,17 @@
       "text": "Metin",
       "dev": "Geliştirici Araçları",
       "media": "Medya"
-    }
+    },
+    "mainNav": "Ana gezinme",
+    "language": "Dil"
   },
   "footer": {
     "copyright": "© {{year}} Web Tool Hub",
-    "tagline": "Dosyalarının kendine ait kalmasını isteyenler için yapıldı."
+    "tagline": "Dosyalarının kendine ait kalmasını isteyenler için yapıldı.",
+    "toolsByCategory": "Araçlar",
+    "legal": "Yasal",
+    "language": "Dil",
+    "privacyPolicy": "Gizlilik Politikası"
   },
   "banner": {
     "privacy": "%100 Gizlilik — Dosyalar Cihazınızda Kalır"

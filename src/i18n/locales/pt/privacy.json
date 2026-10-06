@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "title": "Política de Privacidade — Web Tool Hub",
+    "description": "Como o Web Tool Hub trata seus dados: seus arquivos nunca são enviados, sem contas e sem rastreamento. Leia a política de privacidade completa."
+  },
+  "heading": "Política de Privacidade",
+  "updated": "Última atualização: agosto de 2026",
+  "intro": "O Web Tool Hub foi construído em torno de uma regra: seus arquivos nunca saem do seu dispositivo. Todas as ferramentas deste site — comprimir uma imagem, juntar PDFs, formatar JSON — rodam inteiramente no seu navegador, usando JavaScript e APIs Web. Não existe etapa de upload, porque não existe servidor que processe seus arquivos.",
+  "sections": [
+    {
+      "heading": "O que não coletamos",
+      "body": "Não pedimos que você crie uma conta. Não coletamos seus arquivos, o conteúdo deles nem os nomes dos arquivos. Não usamos ferramentas de análise nem rastreadores de publicidade neste site — não há Google Analytics, Facebook Pixel ou qualquer script de terceiros observando o que você faz aqui."
+    },
+    {
+      "heading": "Como cada ferramenta realmente funciona",
+      "body": "Quando você \"envia\" um arquivo para qualquer ferramenta daqui, ele é lido diretamente na memória do seu navegador por meio da File API e processado com JavaScript, WebAssembly ou as APIs Canvas/Web Audio, conforme a necessidade da ferramenta. Tarefas mais pesadas (compressão de imagens, corte de vídeo) rodam dentro de um Web Worker para que a página não trave, mas o trabalho continua acontecendo na sua máquina, na aba do seu navegador. Nada é transmitido para lugar nenhum para ser processado."
+    },
+    {
+      "heading": "Armazenamento local",
+      "body": "Algumas ferramentas guardam pequenas informações no armazenamento local do navegador para que você não perca seu trabalho: a escolha de tema (theme), o rascunho do Comparador de Texto (text-diff-draft), o rascunho do Editor Markdown (markdown-editor-draft), o histórico de padrões do Testador de Regex (regex-tester-history) e as paletas salvas do Seletor de Cores (color-picker-saved-palettes). Esses dados ficam apenas no seu dispositivo, nunca são enviados a nós, e você pode removê-los a qualquer momento limpando os dados deste site no navegador."
+    },
+    {
+      "heading": "Recursos baixados de CDNs de terceiros",
+      "body": "Seus arquivos nunca são enviados, mas algumas ferramentas baixam seu próprio código ou dados (não o seu conteúdo) quando você as usa: Cortar Vídeo e Conversor de Áudio buscam o núcleo WebAssembly do ffmpeg em cdn.jsdelivr.net; Remover Fundo busca seu modelo de IA e o runtime WebAssembly em staticimgly.com; o Validador de YAML do Kubernetes busca arquivos públicos de JSON Schema do Kubernetes em cdn.jsdelivr.net. Essas requisições são simples downloads de arquivos públicos, portanto esses provedores de CDN podem ver seu endereço IP e o arquivo solicitado, como em qualquer recurso de um site. A visualização do Markdown também pode exibir imagens referenciadas no seu texto; se você referenciar uma imagem de um host externo, seu navegador a solicitará a esse host (a política de segurança de conteúdo do site normalmente bloqueia isso)."
+    },
+    {
+      "heading": "Hospedagem e logs técnicos",
+      "body": "Este site é hospedado na infraestrutura da Cloudflare. Como praticamente qualquer site, a rede de borda da Cloudflare pode registrar dados técnicos padrão das requisições (como endereço IP, user agent e horário da requisição) por motivos de segurança e operação — trata-se de um registro em nível de infraestrutura, comum a toda hospedagem web, e não algo que o Web Tool Hub colete ou use para rastrear pessoas."
+    },
+    {
+      "heading": "Cookies",
+      "body": "Não definimos nenhum cookie de rastreamento ou publicidade. Qualquer uso futuro de cookies (por exemplo, caso anúncios sejam introduzidos) será informado aqui e condicionado a um banner de consentimento quando exigido por lei."
+    },
+    {
+      "heading": "Alterações nesta política",
+      "body": "Se esta política mudar, a data de \"Última atualização\" acima também mudará. Como este é um site estático, sem sistema de contas, não temos como avisar você individualmente — volte aqui se quiser conhecer os termos atuais."
+    }
+  ]
+}

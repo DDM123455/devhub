@@ -15,7 +15,8 @@
   },
   "search": {
     "placeholder": "Zoek tools…",
-    "noResults": "Geen tools gevonden"
+    "noResults": "Geen tools gevonden",
+    "noResultsHint": "Probeer een ander zoekwoord of blader hieronder door de tools per categorie."
   },
   "sidebar": {
     "note": "Er worden regelmatig nieuwe tools toegevoegd. Niets van wat je hier doet, bereikt ooit een server."
@@ -30,11 +31,17 @@
       "text": "Tekst",
       "dev": "Devtools",
       "media": "Media"
-    }
+    },
+    "mainNav": "Hoofdnavigatie",
+    "language": "Taal"
   },
   "footer": {
     "copyright": "© {{year}} Web Tool Hub",
-    "tagline": "Gemaakt voor mensen die willen dat hun bestanden van henzelf blijven."
+    "tagline": "Gemaakt voor mensen die willen dat hun bestanden van henzelf blijven.",
+    "toolsByCategory": "Tools",
+    "legal": "Juridisch",
+    "language": "Taal",
+    "privacyPolicy": "Privacybeleid"
   },
   "banner": {
     "privacy": "100% Privacy — Bestanden blijven op je eigen apparaat"

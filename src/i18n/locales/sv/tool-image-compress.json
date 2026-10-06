@@ -7,7 +7,7 @@
   "tagline": "Krymp dina foton på några sekunder, direkt i webbläsaren.",
   "ui": {
     "selectFiles": "Välj bilder",
-    "dropHint": "eller dra och släpp bilder här",
+    "dropHint": "eller dra och släpp bilder här, eller klistra in med Ctrl+V (JPG, PNG, WebP, GIF, BMP, AVIF, HEIC)",
     "quality": "Kvalitet",
     "compress": "Komprimera",
     "compressing": "Komprimerar…",
@@ -18,16 +18,47 @@
     "reduced": "{{percent}}% mindre",
     "noFiles": "Inga bilder valda än.",
     "errorGeneric": "Något gick fel när bilden skulle komprimeras. Försök igen.",
+    "targetFormatLabel": "Konvertera till",
+    "targetFormatOriginal": "Behåll originalformatet",
+    "errorAvifUnsupported": "Den här webbläsaren kan inte exportera AVIF. Prova en aktuell version av Chrome eller Firefox, eller välj ett annat format.",
     "remove": "Ta bort",
     "clearAll": "Rensa allt",
-    "skippedFiles": "{{count}} fil(er) hoppades över eftersom de inte är ett bildformat som stöds."
+    "skippedFiles": "{{count}} fil(er) hoppades över eftersom de inte är ett bildformat som stöds.",
+    "resizeToggleLabel": "Ändra storlek före komprimering",
+    "maxDimensionLabel": "Max bredd/höjd: {{size}} px",
+    "retry": "Försök igen",
+    "compressModeQuality": "Efter kvalitet",
+    "compressModeTargetSize": "Efter målstorlek",
+    "targetSizeLabel": "Målstorlek: {{size}} KB",
+    "processingQueue": "Bearbetar {{current}}/{{total}}",
+    "progressPercent": "{{percent}} %",
+    "notReduced": "ingen storleksminskning",
+    "advancedHeading": "Avancerat",
+    "deepOptimize": "Djupoptimering (MozJPEG för JPEG, OxiPNG för PNG)",
+    "deepOptimizeHint": "Körs i en Web Worker och laddar sin WebAssembly-kodare först när du använder den. Ger mindre filer än standardkodaren men tar längre tid. PNG-utdata är alltid förlustfri, medan WebP/AVIF-utdata fortsätter använda standardkodaren. GIF behåller bara sin första bildruta. HEIC/AVIF/GIF/BMP sparas som JPEG eller PNG när utdataformatet är \"Behåll originalformatet\".",
+    "losslessPng": "Förlustfri PNG (optimera originalfilen utan att ändra pixlar, ignorerar storleksändring)",
+    "oxipngLevel": "OxiPNG-ansträngning",
+    "levelFast": "Snabb",
+    "levelBalanced": "Balanserad",
+    "levelMax": "Maximal (långsam)",
+    "metadataNote": "Omkodning tar bort metadata (EXIF, GPS, kamerauppgifter, färgprofil) — bra för integriteten, men det går inte att behålla metadata.",
+    "targetNotMet": "Det gick inte att nå {{size}} KB ens med lägsta kvalitet; det här är det minsta resultatet. Prova att slå på storleksändring."
   },
   "related": "Relaterade verktyg",
+  "faq": {
+    "heading": "Vanliga frågor",
+    "q1": "Laddas bilderna upp till en server när jag komprimerar dem?",
+    "a1": "Nej — allt körs lokalt i din webbläsare med Web Workers. Dina bilder lämnar aldrig din enhet.",
+    "q2": "Vilka bildformat kan jag komprimera?",
+    "a2": "JPEG, PNG och WebP. Välj en kvalitetsnivå och komprimera en eller flera filer på en gång.",
+    "q3": "Kan jag ladda ner alla komprimerade bilder samtidigt?",
+    "a3": "Ja — när du har komprimerat flera bilder använder du \"Ladda ner alla\" för att få en enda .zip-fil."
+  },
   "article": {
     "heading": "Varför komprimera bilder innan du publicerar dem?",
     "p1": "Ett foto direkt från en modern mobilkamera kan lätt väga 4–8 MB, medan de flesta webbsidor bara behöver en bråkdel av det för att se skarpa ut på skärmen. Överdimensionerade bilder är en av de vanligaste orsakerna till att en sida laddar långsamt, och långsamma sidor tappar besökare och rankas lägre i Googles Core Web Vitals. Att komprimera en bild innan den publiceras tar bort den extra data som ögat ändå aldrig uppfattar, utan att bilden ser annorlunda ut vid normal visningsstorlek.",
     "p2": "Allt sker lokalt i din webbläsare. Själva komprimeringen körs i en Web Worker — en separat tråd inbyggd i moderna webbläsare — så att sidan förblir responsiv även när du komprimerar en hel bunt stora foton samtidigt. Ingen fil laddas någonsin upp till en server, inte ens tillfälligt, vilket betyder ingen uppladdningsväntan, ingen serverbestämd storleksgräns och att dina bilder aldrig lämnar din enhet.",
-    "p3": "Att använda verktyget är enkelt: välj en eller flera JPEG-, PNG- eller WebP-filer, ställ in kvalitetsnivån med reglaget och klicka på Komprimera. Varje bild bearbetas en i taget och resultatet visas direkt tillsammans med originalstorleken, den nya storleken och hur många procent som sparats, så att du kan jämföra innan du laddar ner något. Om resultatet inte blir som du vill, justera bara reglaget och komprimera igen — det finns ingen gräns för hur många gånger du kan prova.",
+    "p3": "Att använda verktyget är enkelt: välj en eller flera JPEG-, PNG- eller WebP-filer, ställ in kvalitetsnivån med reglaget och klicka på Komprimera. Flera bilder komprimeras parallellt i stället för en i taget, och varje resultat visas så fort det är klart, med originalstorleken, den nya storleken och hur många procent som sparats, så att du kan jämföra innan du laddar ner något. Om resultatet inte blir som du vill, justera bara reglaget och komprimera igen — det finns ingen gräns för hur många gånger du kan prova. Om du slår på storleksändring före komprimering begränsas även utdatabildens bredd/höjd, vilket hjälper mest när ett foto visas mycket mindre än i sin ursprungliga upplösning.",
     "p4": "Som utgångspunkt ger 70–80 % kvalitet foton som ser visuellt identiska ut med originalet för de flesta, samtidigt som filstorleken vanligtvis halveras eller mer. Bilder med platta färger, som skärmdumpar, illustrationer och logotyper, komprimeras särskilt bra även vid lägre inställningar. Foton med mycket fin textur, brus eller toningar — tänk skogslöv eller en stjärnhimmel — behåller mer av sin storlek vid samma kvalitetsnivå och drar ofta mer nytta av att dimensionerna minskas än av att kvaliteten sänks ytterligare."
   }
 }

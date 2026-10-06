@@ -15,7 +15,8 @@
   },
   "search": {
     "placeholder": "Buscar ferramentas…",
-    "noResults": "Nenhuma ferramenta corresponde a"
+    "noResults": "Nenhuma ferramenta corresponde a",
+    "noResultsHint": "Tente outra palavra-chave ou navegue pelas ferramentas por categoria abaixo."
   },
   "sidebar": {
     "note": "Novas ferramentas são adicionadas regularmente. Nada do que você usa aqui chega a um servidor."
@@ -30,11 +31,17 @@
       "text": "Texto",
       "dev": "Ferramentas Dev",
       "media": "Multimídia"
-    }
+    },
+    "mainNav": "Navegação principal",
+    "language": "Idioma"
   },
   "footer": {
     "copyright": "© {{year}} Web Tool Hub",
-    "tagline": "Feito para quem prefere que seus arquivos continuem sendo seus."
+    "tagline": "Feito para quem prefere que seus arquivos continuem sendo seus.",
+    "toolsByCategory": "Ferramentas",
+    "legal": "Legal",
+    "language": "Idioma",
+    "privacyPolicy": "Política de Privacidade"
   },
   "banner": {
     "privacy": "100% Privacidade — Seus arquivos permanecem no seu dispositivo"

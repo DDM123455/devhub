@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "title": "隱私權政策 — Web Tool Hub",
+    "description": "了解 Web Tool Hub 如何處理你的資料：檔案絕不上傳、不需註冊帳號、不做任何追蹤。歡迎閱讀完整的隱私權政策。"
+  },
+  "heading": "隱私權政策",
+  "updated": "最後更新：2026 年 8 月",
+  "intro": "Web Tool Hub 只堅持一件事：你的檔案絕不離開你的裝置。本站所有工具，無論是壓縮圖片、合併 PDF 還是格式化 JSON，都完全透過 JavaScript 與 Web API 在你的瀏覽器中執行。這裡沒有上傳這個步驟，因為根本沒有伺服器會處理你的檔案。",
+  "sections": [
+    {
+      "heading": "我們不會蒐集的資料",
+      "body": "我們不要求你建立帳號，也不會蒐集你的檔案、檔案內容或檔名。本站沒有任何分析或廣告追蹤程式，沒有 Google Analytics、沒有 Facebook Pixel，也沒有任何第三方指令碼在監看你的操作。"
+    },
+    {
+      "heading": "各工具實際的運作方式",
+      "body": "當你把檔案「上傳」到本站的工具時，檔案會透過 File API 直接讀入瀏覽器記憶體，再依工具需求以 JavaScript、WebAssembly 或 Canvas／Web Audio API 處理。較吃重的工作（例如圖片壓縮、影片裁剪）會放在 Web Worker 中執行，頁面才不會卡住，但運算仍然發生在你的電腦、你的瀏覽器分頁裡。不會有任何資料被傳送到其他地方處理。"
+    },
+    {
+      "heading": "本機儲存空間",
+      "body": "部分工具會在瀏覽器的本機儲存空間（local storage）保存少量狀態，避免你的進度遺失，包括：佈景主題設定（theme）、文字比較草稿（text-diff-draft）、Markdown 編輯器草稿（markdown-editor-draft）、正規表示式測試器的比對紀錄（regex-tester-history），以及色彩選擇器儲存的調色盤（color-picker-saved-palettes）。這些資料只會留在你的裝置上，不會傳給我們，你隨時可以在瀏覽器中清除本站資料來移除它們。"
+    },
+    {
+      "heading": "從第三方 CDN 下載的資源",
+      "body": "你的檔案絕不會被上傳，但部分工具在使用時會下載自身所需的程式碼或資料（不是你的內容）：影片裁剪與音訊轉檔工具會從 cdn.jsdelivr.net 取得 ffmpeg WebAssembly 核心；去背工具會從 staticimgly.com 取得 AI 模型與 WebAssembly 執行環境；Kubernetes YAML 驗證器會從 cdn.jsdelivr.net 取得公開的 Kubernetes JSON Schema 檔案。這些請求只是下載公開檔案，因此與任何網站資源一樣，這些 CDN 業者可能會看到你的 IP 位址與所請求的檔案。Markdown 預覽也可以顯示文字中引用的圖片；如果你引用了外部網站的圖片，瀏覽器會向該網站請求圖片（本站的內容安全政策通常會阻擋這類請求）。"
+    },
+    {
+      "heading": "主機代管與技術紀錄",
+      "body": "本站架設在 Cloudflare 的基礎設施上。和幾乎所有網站一樣，Cloudflare 的邊緣網路可能基於安全與營運目的記錄標準的技術性請求資料（例如 IP 位址、使用者代理程式與請求時間）。這是所有網站代管服務共通的基礎設施層級紀錄，並非 Web Tool Hub 自行蒐集，我們也不會用這些資料追蹤個人。"
+    },
+    {
+      "heading": "Cookie",
+      "body": "我們不會設定任何用於追蹤或廣告的 Cookie。未來若有使用 Cookie 的情形（例如開始投放廣告），我們會在此說明，並在法律要求時以同意橫幅徵求你的同意。"
+    },
+    {
+      "heading": "政策的異動",
+      "body": "若本政策有所變更，上方的「最後更新」日期也會一併更新。由於本站是沒有帳號系統的靜態網站，我們無法個別通知你，若想了解最新條款，請回到此頁查看。"
+    }
+  ]
+}

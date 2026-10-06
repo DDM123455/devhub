@@ -13,22 +13,46 @@
     "convert": "Konvertera",
     "converting": "Konverterar…",
     "download": "Ladda ner",
+    "downloadAll": "Ladda ner alla (.zip)",
     "original": "Original",
     "converted": "Konverterad",
     "noFiles": "Inga bilder valda än.",
     "errorGeneric": "Något gick fel när bilden skulle konverteras. Försök igen.",
+    "retry": "Försök igen",
     "errorAvifUnsupported": "Den här webbläsaren kan inte exportera AVIF. Prova en aktuell version av Chrome eller Firefox, eller välj ett annat format.",
-    "formatsNote": "ICO-utdata skalas om till maximalt 256×256 (standardstorleken för ikoner). AVIF-export kräver en aktuell version av Chrome eller Firefox. HEIC/HEIF-foton från iPhone läses in automatiskt — inget separat konverteringssteg behövs.",
+    "formatsNote": "ICO-utdata samlar 5 storlekar i en fil (16, 32, 48, 128, 256 px), som en riktig favicon eller Windows-programikon — operativsystemet väljer den som passar. AVIF-export kräver en aktuell version av Chrome eller Firefox. HEIC/HEIF-foton från iPhone läses in automatiskt — inget separat konverteringssteg behövs. SVG-filer rastreras i webbläsaren (välj renderingsskala). Om du väljer PDF blir varje bild en PDF-sida som du också kan slå ihop till en fil.",
     "remove": "Ta bort",
     "clearAll": "Rensa allt",
-    "skippedFiles": "{{count}} fil(er) hoppades över eftersom de inte är ett bildformat som stöds."
+    "skippedFiles": "{{count}} fil(er) hoppades över eftersom de inte är ett bildformat som stöds.",
+    "resizeToggleLabel": "Ändra storlek före konvertering",
+    "maxDimensionLabel": "Max bredd/höjd: {{size}} px",
+    "processingQueue": "Bearbetar {{current}}/{{total}}",
+    "errorTooLarge": "Bilden är för stor för att webbläsaren ska kunna konvertera den. Slå på alternativet för storleksändring (eller använd en mindre bild) och försök igen.",
+    "backgroundLabel": "Bakgrund",
+    "backgroundAuto": "Auto (transparent; vit för JPG/BMP)",
+    "backgroundCustom": "Egen färg",
+    "svgScaleLabel": "SVG-renderingsskala",
+    "errorSvg": "Den här SVG-filen kunde inte renderas. Kontrollera att filen är en giltig SVG med en storlek eller viewBox.",
+    "pdfPageSizeLabel": "PDF-sidstorlek",
+    "pdfPageFit": "Anpassa efter bilden",
+    "pdfMarginLabel": "Marginal: {{mm}} mm",
+    "downloadCombinedPdf": "Ladda ner alla som en PDF"
   },
   "related": "Relaterade verktyg",
+  "faq": {
+    "heading": "Vanliga frågor",
+    "q1": "Mellan vilka bildformat kan jag konvertera?",
+    "a1": "JPEG, PNG, WebP, AVIF, GIF, BMP och ICO, samt inläsning av HEIC/HEIF-foton från iPhone.",
+    "q2": "Kontrolleras webbläsarens AVIF-stöd automatiskt?",
+    "a2": "Ja — om din webbläsare inte kan exportera AVIF talar verktyget tydligt om det i stället för att skapa en trasig fil.",
+    "q3": "Kan jag konvertera flera bilder till samma format på en gång?",
+    "a3": "Ja — välj flera bilder, välj ett målformat och ladda ner dem var för sig eller alla tillsammans som en .zip."
+  },
   "article": {
     "heading": "JPEG, PNG, WebP, AVIF — vilket format ska du använda?",
     "p1": "JPEG, PNG, WebP och alltmer AVIF lagrar alla en bild, men de gör olika avvägningar mellan kvalitet, transparens och filstorlek, och att välja fel format är en vanlig orsak till att ett foto ser sämre ut än det borde eller tar upp mycket mer plats än nödvändigt. Några andra format — GIF, BMP, ICO — fyller smalare, mer specifika behov snarare än vardaglig fotografi. Att kunna konvertera mellan dem alla gör att du kan matcha formatet efter vad bilden faktiskt behöver, istället för att bara behålla vad kameran, skärmdumpsverktyget eller iPhonen råkade spara.",
     "p2": "JPEG är rätt val för vanliga foton: det komprimerar fotografiska detaljer mycket effektivt men saknar stöd för transparens och tappar lite kvalitet varje gång filen sparas om. PNG är förlustfritt och stödjer transparens, vilket passar bättre för skärmdumpar, logotyper och grafik med platta färger. WebP slår generellt sett båda, med stöd för transparens som PNG samtidigt som foton komprimeras nästan lika bra som JPEG. AVIF är ännu nyare och komprimerar ofta ännu hårdare än WebP vid samma visuella kvalitet, även om webbläsarstödet för att exportera det (inte bara visa det) fortfarande hänger efter — det här verktyget talar tydligt om ifall din webbläsare inte kan skapa en AVIF-fil, istället för att i tysthet ge dig en trasig sådan. GIF, BMP och ICO finns för specifika äldre eller särskilda behov: GIF för enkla bilder med platta färger som behöver bred kompatibilitet med äldre program, BMP för okomprimerad rå pixeldata, och ICO specifikt för webbplatsers favicon-ikoner och Windows-programikoner.",
     "p3": "Allt körs lokalt med webbläsarens inbyggda Canvas-API — bilden avkodas, ritas upp på en osynlig canvas och kodas om till målformatet utan att någonsin skickas någonstans. Eftersom ingen webbläsare kan exportera BMP, ICO eller GIF direkt från en canvas innehåller det här verktyget några små bitar ren JavaScript som bygger de filformaten för hand utifrån den råa pixeldatan — fortfarande 100 % lokalt, bara utan att förlita sig på ett webbläsar-API som inte finns. Välj en eller flera bilder (HEIC- och HEIF-foton direkt från en iPhone avkodas automatiskt först), välj målformat, justera kvalitetsreglaget för JPEG, WebP eller AVIF och klicka på Konvertera.",
-    "p4": "Som tumregel: konvertera vanliga foton till WebP eller AVIF för minsta möjliga filer, eller JPEG om du behöver maximal kompatibilitet med äldre program. Behåll skärmdumpar, ikoner och allt som behöver transparens som PNG eller WebP snarare än JPEG. Använd ICO specifikt när du behöver en favicon eller programikon — utdata skalas automatiskt om till standardmåttet 256×256. Stödet för HEIC-inmatning finns rent praktiskt: om ditt fotobibliotek är fullt av HEIC-filer från iPhone som en app eller webbplats vägrar acceptera, avkodar det här verktyget dem på samma sätt som det avkodar alla andra bilder, så att du kan konvertera direkt till vilket format du faktiskt behöver."
+    "p4": "Som tumregel: konvertera vanliga foton till WebP eller AVIF för minsta möjliga filer, eller JPEG om du behöver maximal kompatibilitet med äldre program. Behåll skärmdumpar, ikoner och allt som behöver transparens som PNG eller WebP snarare än JPEG. Använd ICO specifikt när du behöver en favicon eller programikon — utdata samlar automatiskt standardstorlekarna 16/32/48/128/256 px i en fil. Stödet för HEIC-inmatning finns rent praktiskt: om ditt fotobibliotek är fullt av HEIC-filer från iPhone som en app eller webbplats vägrar acceptera, avkodar det här verktyget dem på samma sätt som det avkodar alla andra bilder, så att du kan konvertera direkt till vilket format du faktiskt behöver."
   }
 }

@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "title": "Gizlilik Politikası — Web Tool Hub",
+    "description": "Web Tool Hub verilerinizi nasıl ele alır: dosyalar asla yüklenmez, hesap ve izleme yoktur. Gizlilik politikamızın tamamını okuyun."
+  },
+  "heading": "Gizlilik Politikası",
+  "updated": "Son güncelleme: Ağustos 2026",
+  "intro": "Web Tool Hub tek bir kural üzerine kurulu: dosyalarınız cihazınızdan asla çıkmaz. Bu sitedeki her araç — görsel sıkıştırma, PDF birleştirme, JSON biçimlendirme — JavaScript ve Web API'leri kullanarak tamamen tarayıcınızda çalışır. Yükleme adımı yoktur, çünkü dosyalarınızı işleyen bir sunucu da yoktur.",
+  "sections": [
+    {
+      "heading": "Toplamadıklarımız",
+      "body": "Sizden hesap oluşturmanızı istemeyiz. Dosyalarınızı, içeriklerini veya dosya adlarını toplamayız. Bu sitede herhangi bir analiz ya da reklam izleyicisi çalıştırmayız — Google Analytics, Facebook Pixel veya burada ne yaptığınızı izleyen üçüncü taraf betikler yoktur."
+    },
+    {
+      "heading": "Her araç aslında nasıl çalışır?",
+      "body": "Buradaki bir araca bir dosya \"yüklediğinizde\", dosya File API ile doğrudan tarayıcınızın belleğine okunur ve aracın ihtiyacına göre JavaScript, WebAssembly veya Canvas/Web Audio API'leriyle işlenir. Daha ağır işler (görsel sıkıştırma, video kırpma) sayfa donmasın diye bir Web Worker içinde çalışır; ancak iş yine sizin makinenizde, tarayıcı sekmenizde yapılır. İşlenmek üzere hiçbir şey hiçbir yere gönderilmez."
+    },
+    {
+      "heading": "Yerel depolama",
+      "body": "Bazı araçlar çalışmanız kaybolmasın diye tarayıcınızın yerel depolamasında küçük durum bilgileri saklar: tema tercihiniz (theme), Metin Karşılaştırma taslağı (text-diff-draft), Markdown Editörü taslağı (markdown-editor-draft), Regex Test Aracı desen geçmişiniz (regex-tester-history) ve kaydedilmiş Renk Seçici paletleriniz (color-picker-saved-palettes). Bu veriler yalnızca cihazınızda kalır, bize asla gönderilmez ve tarayıcınızdan bu sitenin verilerini temizleyerek istediğiniz zaman silebilirsiniz."
+    },
+    {
+      "heading": "Üçüncü taraf CDN'lerden indirilen varlıklar",
+      "body": "Dosyalarınız asla yüklenmez, ancak bazı araçlar kullanıldığında kendi kodlarını veya verilerini (sizin içeriğinizi değil) indirir: Video Kırpma ve Ses Dönüştürücü, ffmpeg WebAssembly çekirdeğini cdn.jsdelivr.net'ten alır; Arka Plan Kaldırıcı, yapay zekâ modelini ve WebAssembly çalışma zamanını staticimgly.com'dan alır; Kubernetes YAML Doğrulayıcı, herkese açık Kubernetes JSON Schema dosyalarını cdn.jsdelivr.net'ten alır. Bu istekler herkese açık dosyaların sıradan indirmeleridir; bu nedenle söz konusu CDN sağlayıcıları, her web sitesi kaynağında olduğu gibi IP adresinizi ve istenen dosyayı görebilir. Markdown önizlemesi, metninizde başvurulan görselleri de gösterebilir; harici bir sunucudaki görsele başvurursanız tarayıcınız o görseli ilgili sunucudan ister (sitenin içerik güvenliği politikası bunu normalde engeller)."
+    },
+    {
+      "heading": "Barındırma ve teknik günlükler",
+      "body": "Bu site Cloudflare altyapısında barındırılmaktadır. Hemen her web sitesinde olduğu gibi Cloudflare'in uç ağı da güvenlik ve işletim amacıyla standart teknik istek verilerini (IP adresi, kullanıcı aracısı ve istek zamanı gibi) kaydedebilir — bu, tüm web barındırma hizmetlerinde yaygın olan altyapı düzeyinde bir kayıttır; Web Tool Hub'ın kişileri izlemek için topladığı veya erişebildiği bir şey değildir."
+    },
+    {
+      "heading": "Çerezler",
+      "body": "İzleme veya reklam amacıyla hiçbir çerez kullanmayız. Gelecekte çerez kullanımı olursa (örneğin reklam eklenirse) burada duyurulur ve yasaların gerektirdiği yerlerde bir onay bandının arkasına alınır."
+    },
+    {
+      "heading": "Bu politikadaki değişiklikler",
+      "body": "Bu politika değişirse yukarıdaki \"Son güncelleme\" tarihi de değişir. Hesap sistemi olmayan statik bir site olduğumuz için sizi tek tek bilgilendirme imkânımız yoktur — güncel koşulları öğrenmek isterseniz bu sayfaya tekrar göz atın."
+    }
+  ]
+}
