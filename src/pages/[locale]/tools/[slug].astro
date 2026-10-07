@@ -22,6 +22,7 @@ import VideoTrimPage from '@/components/tools/VideoTrimPage.astro';
 import AudioConverterPage from '@/components/tools/AudioConverterPage.astro';
 import NginxConfigValidatorPage from '@/components/tools/NginxConfigValidatorPage.astro';
 import KubernetesYamlValidatorPage from '@/components/tools/KubernetesYamlValidatorPage.astro';
+import ImageToTextPage from '@/components/tools/ImageToTextPage.astro';
 import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { tools } from '@/data/tools';
@@ -49,6 +50,8 @@ const name = tool.names[locale];
 		<ImageConvertPage lang={locale} />
 	) : toolId === 'background-remover' ? (
 		<BackgroundRemoverPage lang={locale} />
+	) : toolId === 'image-to-text' ? (
+		<ImageToTextPage lang={locale} />
 	) : toolId === 'pdf-merge' ? (
 		<PdfMergePage lang={locale} />
 	) : toolId === 'pdf-split' ? (
