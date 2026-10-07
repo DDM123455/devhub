@@ -528,7 +528,7 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 ## Phase 3.16 — Công cụ mới: Ảnh sang văn bản (OCR) (theo yêu cầu trực tiếp người dùng 2026-10-07)
 
 - [x] Tool `image-to-text` (tesseract.js, tự host worker/WASM, en+vi) + slug 20 ngôn ngữ
-- [ ] Dịch `tool-image-to-text.json` sang 18 ngôn ngữ còn lại (chạy scripts/check-i18n.mjs để kiểm)
+- [x] Dịch `tool-image-to-text.json` sang 18 ngôn ngữ còn lại (check-i18n.mjs: missing=0 mọi locale; cần người bản ngữ rà lại)
 - [ ] Đối chiếu đối thủ bằng WebSearch (agent chỉ dựa trên kiến thức có sẵn), cân nhắc searchable PDF/.docx, tự xoay (OSD)
 - [ ] Lighthouse Performance/SEO ≥ 90 cho trang mới; test ảnh chụp thật (mờ/nghiêng), PDF scan nhiều trang, hủy giữa chừng, offline lần đầu
 

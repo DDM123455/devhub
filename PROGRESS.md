@@ -180,6 +180,16 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-10-07 (Phase 3.16b — dịch tool OCR sang 18 ngôn ngữ)** — Thêm `tool-image-to-text.json` (165 key: meta,
+  heading, ui 108, tên 35 ngôn ngữ nhận dạng, faq, article) cho ar, de, es, fr, hi, id, it, ja, ko, nl, pl, pt,
+  ru, sv, th, tr, zh, zh-tw (6 agent, mỗi agent 3 ngôn ngữ). `node scripts/check-i18n.mjs`: cả 19 locale
+  missing=0, placeholderMismatch=0; vitest 581/581; build 542 trang (24 trang tool × 20 locale). Dịch bằng AI →
+  CẦN NGƯỜI BẢN NGỮ RÀ LẠI: bài `article.*`/`faq.*`, nhãn PSM và tiền xử lý ảnh (nhị phân/ngưỡng/thích ứng),
+  độ dài meta.title/description chưa đo (hi description ~178 ký tự, it ~165), câu có {{count}} dùng cách diễn
+  đạt trung tính, de dùng "Strg+V" thay "Ctrl+V". Tên tool liên quan trong `article.p4` do agent tự đặt, chưa
+  đối chiếu với tools.ts ở từng locale (nl, pl, pt, tr, zh, zh-tw, ar, es, id, fr cần kiểm). Còn treo: key cũ lỗi
+  thời so với en (xem Phase 3.15), nhãn Word Counter "Upload .txt file" cần cập nhật (đã nhận .docx/.pdf), màu gốc
+  Color Picker hiển thị #3C83F6 thay vì #3B82F6 (làm tròn qua HSL).
 - **2026-10-07 (Phase 3.16 — công cụ MỚI "Ảnh sang văn bản (OCR)", theo yêu cầu trực tiếp người dùng +
   sự cố ổ E:)** — Tool `image-to-text` (tesseract.js 7, LSTM): nhiều ảnh/dán Ctrl+V/PDF scan (render
   pdfjs, chọn phạm vi trang), 35 ngôn ngữ (chọn tối đa 4), tiền xử lý canvas (xám/tương phản/ngưỡng
