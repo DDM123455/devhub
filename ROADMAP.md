@@ -525,6 +525,13 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 - [ ] Người bản ngữ rà lại bản dịch (xem PROGRESS.md), cập nhật các key cũ lỗi thời so với en
 - [ ] Test tương tác thật: kéo-thả file trên điện thoại, PDF nhiều cột, xlsx lớn (extract chạy main thread)
 
+## Phase 3.16 — Công cụ mới: Ảnh sang văn bản (OCR) (theo yêu cầu trực tiếp người dùng 2026-10-07)
+
+- [x] Tool `image-to-text` (tesseract.js, tự host worker/WASM, en+vi) + slug 20 ngôn ngữ
+- [ ] Dịch `tool-image-to-text.json` sang 18 ngôn ngữ còn lại (chạy scripts/check-i18n.mjs để kiểm)
+- [ ] Đối chiếu đối thủ bằng WebSearch (agent chỉ dựa trên kiến thức có sẵn), cân nhắc searchable PDF/.docx, tự xoay (OSD)
+- [ ] Lighthouse Performance/SEO ≥ 90 cho trang mới; test ảnh chụp thật (mờ/nghiêng), PDF scan nhiều trang, hủy giữa chừng, offline lần đầu
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

@@ -180,6 +180,24 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-10-07 (Phase 3.16 — công cụ MỚI "Ảnh sang văn bản (OCR)", theo yêu cầu trực tiếp người dùng +
+  sự cố ổ E:)** — Tool `image-to-text` (tesseract.js 7, LSTM): nhiều ảnh/dán Ctrl+V/PDF scan (render
+  pdfjs, chọn phạm vi trang), 35 ngôn ngữ (chọn tối đa 4), tiền xử lý canvas (xám/tương phản/ngưỡng
+  Otsu-adaptive/xoay/phóng to), PSM, độ tin cậy + tô từ nghi ngờ, copy/.txt/zip/gộp, nối dòng, hủy, nút
+  "So sánh trong Text Diff" (hash share-link). Worker + lõi WASM (simd-lstm, và bản không SIMD dự phòng)
+  TỰ HOST qua import `?url` (Vite sinh vào dist/_astro, ~8MB, mỗi file <25MB); dữ liệu ngôn ngữ tải từ
+  jsDelivr (CSP connect-src đã cho phép, trang privacy en+vi đã nêu). Slug + tên 20 ngôn ngữ trong
+  tools.ts; i18n CHỈ en+vi (18 locale còn lại chưa dịch — `node scripts/check-i18n.mjs` sẽ báo thiếu).
+  Verify trên server áp CSP production: ảnh canvas tiếng Anh nhận đúng 100% (6s gồm tải mô hình), tiếng
+  Việt có dấu đúng 100% (96% tin cậy, 5s), 0 vi phạm CSP, không tràn ngang 320px; vitest 581/581, build
+  542 trang. Lưu ý: kết quả trên là chữ vẽ sạch; ảnh chụp thật/mờ/nghiêng/viết tay sẽ kém hơn (bài SEO đã
+  nói rõ). Không có: xuất docx/searchable PDF, tự xoay (OSD), chữ viết tay, dựng lại bảng/nhiều cột.
+  SỰ CỐ Ổ E: (20:48 ngày 06/10) — ổ HDD chứa E: có lỗi phần cứng (Event 154, >54.000 lỗi/24h): tạm thời
+  621/689 file `src` không đọc được và 3 file OCR mới bị mất (đã khôi phục từ bản sao ở scratchpad); sáng
+  07/10 ổ đọc lại được, `git fsck` sạch. Đã sao lưu ra ổ C: tại C:/Users/sickb/rescue-devhub/ gồm
+  devhub-main.bundle (đủ lịch sử tới commit 5791133) và thư mục raw/ (toàn bộ thư mục làm việc, trừ
+  node_modules/dist/.tools). GitHub origin/main mới ở ba193b2, KÉM local 43+ commit → CẦN push (nên lên
+  nhánh rescue) và nên kiểm tra/thay ổ. Windows vẫn báo ổ "Healthy" dù có lỗi → đừng tin chỉ số này.
 - **2026-10-06 (Phase 3.15 — dịch đủ 18 ngôn ngữ + so sánh nội dung FILE trong Text Diff, theo yêu cầu
   trực tiếp người dùng)** — (1) Text Diff nhận file: .txt/code/.md/.json/.yaml/.csv..., .docx, .pdf,
   .xlsx, .odt/.ods/.odp, .pptx, .rtf (trích text → đưa vào luồng diff/merge/export sẵn có); kéo-thả 2 file
