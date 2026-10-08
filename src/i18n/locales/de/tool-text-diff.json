@@ -40,16 +40,14 @@
     "save": "Als .txt speichern",
     "copyShareLink": "Freigabelink kopieren",
     "formatButton": "Formatieren",
-    "formatDetectedJson": "Als JSON formatiert",
-    "formatDetectedXml": "Als XML formatiert",
-    "formatError": "Kein gültiges JSON oder XML — unverändert gelassen",
+    "formatError": "Formatieren nicht möglich — unverändert gelassen",
     "clearedNotice": "Geleert.",
     "undo": "Rückgängig",
     "replacedNotice": "Inhalt ersetzt.",
     "clearAria": "{{side}} leeren",
     "swapAria": "Original- und geänderten Text tauschen",
     "uploadAria": "Datei in {{side}} hochladen",
-    "formatAria": "JSON/XML in {{side}} formatieren",
+    "formatAria": "{{side}} formatieren",
     "copyMergedAria": "Zusammengeführtes Ergebnis kopieren: {{side}}",
     "saveMergedAria": "Zusammengeführtes Ergebnis speichern: {{side}}",
     "formatDuplicateKeys": "Warnung: Doppelte Schlüssel wurden gefunden und unverändert beibehalten.",
@@ -162,7 +160,35 @@
         "rtf": "einfache Umwandlung von Absätzen und Sonderzeichen; komplexe oder eingebettete Inhalte können verloren gehen.",
         "general": "Nicht unterstützt: Bilder/Scans (keine OCR), passwortgeschützte Dateien, alte .doc/.xls/.ppt, Dateien über 30 MB. Dateiinhalte werden nie hochgeladen und nicht gespeichert."
       }
-    }
+    },
+    "formatSettingsHeading": "Vor dem Vergleich formatieren",
+    "formatLanguageLabel": "Formatieren als",
+    "formatAuto": "Automatisch erkennen",
+    "formatIndentLabel": "Einrückung",
+    "formatIndent2": "2 Leerzeichen",
+    "formatIndent4": "4 Leerzeichen",
+    "formatIndentTab": "Tabulator",
+    "formatWidthLabel": "Zeilenbreite",
+    "formatSqlDialectLabel": "SQL-Dialekt",
+    "formatBoth": "Beide formatieren",
+    "formatBothAria": "Beide Texte mit denselben Einstellungen formatieren",
+    "formatBusy": "Wird formatiert…",
+    "formatDone": "Als {{language}} formatiert.",
+    "formatDoneAuto": "Automatisch erkannt und als {{language}} formatiert.",
+    "formatNoChange": "Bereits als {{language}} formatiert — nichts geändert.",
+    "formatEmpty": "Nichts zu formatieren — das Feld ist leer.",
+    "formatErrorAt": "{{language}}-Syntaxfehler in Zeile {{line}}, Spalte {{column}}: {{message}}. Unverändert gelassen.",
+    "formatErrorLine": "{{language}}-Syntaxfehler in Zeile {{line}}: {{message}}. Unverändert gelassen.",
+    "formatErrorNoPos": "{{language}}-Fehler: {{message}}. Unverändert gelassen.",
+    "formatAmbiguous": "Die Sprache konnte nicht bestimmt werden (vielleicht {{candidates}}). Wählen Sie unter „Formatieren als“ eine aus.",
+    "formatUnknown": "Die Sprache konnte nicht bestimmt werden. Wählen Sie unter „Formatieren als“ eine aus.",
+    "formatTooLarge": "Zu groß zum Formatieren (Limit {{max}} Zeichen). Unverändert gelassen.",
+    "formatLargeWarning": "Große Eingabe: Das Formatieren läuft im Hintergrund und kann etwas dauern.",
+    "formatTimeout": "Das Formatieren dauerte zu lange und wurde abgebrochen. Unverändert gelassen.",
+    "formatFailed": "Das Formatieren ist unerwartet fehlgeschlagen. Unverändert gelassen.",
+    "formatStale": "Der Text hat sich während des Formatierens geändert, daher wurde das Ergebnis verworfen.",
+    "formatMismatch": "Beide Seiten wurden als unterschiedliche Sprachen formatiert ({{a}} und {{b}}), daher zeigt der Vergleich möglicherweise weiterhin Stilunterschiede.",
+    "formatNote": "Unterstützt: JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown und GraphQL. Das Formatieren kann Anführungszeichen, Semikolons und Zeilenumbrüche ändern, nicht aber die Bedeutung des Codes. Der Text wird in Ihrem Browser formatiert und lässt sich rückgängig machen."
   },
   "related": "Verwandte Tools",
   "faq": {
@@ -172,13 +198,16 @@
     "q2": "Kann ich die beiden Versionen zu einem finalen Text zusammenführen?",
     "a2": "Ja — mit dem integrierten Merge-Tool können Sie die linke oder rechte Version Änderung für Änderung übernehmen.",
     "q3": "Kann ich Unterschiede bei Leerzeichen oder Groß-/Kleinschreibung ignorieren?",
-    "a3": "Ja — aktivieren Sie \"Leerzeichen ignorieren\" und \"Groß-/Kleinschreibung ignorieren\" unabhängig voneinander."
+    "a3": "Ja — aktivieren Sie \"Leerzeichen ignorieren\" und \"Groß-/Kleinschreibung ignorieren\" unabhängig voneinander.",
+    "q4": "Welche Sprachen kann die Schaltfläche „Formatieren“ verarbeiten?",
+    "a4": "JSON, XML, SQL (Standard-SQL sowie MySQL, PostgreSQL, SQL Server, SQLite, BigQuery und weitere), HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown und GraphQL. Die Sprache wird anhand des Dateinamens oder des Textes automatisch erkannt, und Sie können sie jederzeit von Hand wählen."
   },
   "article": {
     "heading": "Wozu dient ein Textvergleich?",
     "p1": "Sobald zwei Versionen desselben Dokuments existieren — ein Vertrag vor und nach der Prüfung durch einen Anwalt, ein Text vor und nach einer Feedbackrunde, eine Konfigurationsdatei vor und nach dem Commit eines Kollegen —, lautet die eigentlich wichtige Frage fast nie 'sind diese Dateien gleich', sondern 'was genau hat sich geändert'. Beide Versionen nebeneinander zu lesen und jedes hinzugefügte Komma oder jeden umformulierten Satz von Hand zu finden, ist langsam und fehleranfällig, besonders wenn das Dokument mehr als eine Seite umfasst. Ein Textvergleich automatisiert genau das und hebt exakt die Wörter oder Zeilen hervor, die sich unterscheiden — eine Änderung lässt sich so in Sekunden statt Minuten prüfen.",
     "p2": "Dieses Tool läuft vollständig in Ihrem Browser. Beide Textfelder bleiben ausschließlich im Speicher Ihres Geräts, und der Vergleich wird von einer lokal ausgeführten JavaScript-Bibliothek berechnet — nichts, was Sie eingeben oder einfügen, wird jemals an einen Server gesendet, protokolliert oder irgendwo gespeichert. Das ist wichtig, wenn Sie einen Kundenvertrag, eine Passwortdatei oder einen anderen sensiblen Text vergleichen, den Sie nicht durch einen externen Dienst schicken möchten. Schließen Sie den Tab, und alles ist verschwunden — es bleibt kein Verlauf zurück, um den man sich sorgen müsste.",
     "p3": "Fügen Sie den Originaltext links und die aktualisierte Version rechts ein — beide Felder zeigen Zeilennummern an und scrollen synchron, und jedes hat eigene Schaltflächen Leeren, Tauschen und Datei hochladen, um zwei Dateien direkt von der Festplatte zu laden (Klartext, Code, Word, PDF, Excel und mehr) statt zu kopieren und einzufügen. Der Vergleich aktualisiert sich live beim Tippen; es gibt keine Schaltfläche zum Klicken. Wählen Sie Zeichen, Wort oder Zeile, um die Feinheit der Unterschiede zu steuern: Der Zeichenmodus erkennt selbst einen einzelnen Tippfehler, der Wortmodus eignet sich am besten für Fließtext, da er genau zeigt, welche Wörter sich innerhalb eines Satzes geändert haben, und der Zeilenmodus vergleicht ganze Zeilen auf einmal, was zu Code, JSON oder Listen passt, bei denen es darauf ankommt, welche ganzen Zeilen sich verschoben haben statt einzelner Wörter darin. Eine Zeile, die nur in einer Version existiert, wird vollständig grün (hinzugefügt) oder rot (entfernt) angezeigt; eine Zeile, die in beiden existiert, aber bearbeitet wurde, wird orange angezeigt, wobei das genaue geänderte Wort oder die Zeichen darin stärker hervorgehoben sind — so erkennen Sie auf einen Blick eine bearbeitete Zeile von einem unabhängigen Lösch-dann-Einfüge-Paar.",
-    "p4": "Die Zähler für Hinzugefügt/Entfernt/Geändert über dem Vergleich geben auf einen Blick ein Gefühl dafür, wie groß eine Änderung ist, und die Schaltflächen ↑/↓ springen direkt zur nächsten oder vorherigen Änderung, ohne durch unveränderte Zeilen zu scrollen — praktisch bei einem langen Dokument. Eine Vollbild-Schaltfläche erweitert den Vergleich auf die gesamte Bildschirmfläche für eine genauere Prüfung. Unter dem Vergleich verwandelt das Merge-Tool diesen reinen Lese-Diff in etwas, das Sie tatsächlich auflösen können: Jede Änderung hat eigene ←/→-Schaltflächen zwischen den beiden Spalten, mit denen Sie die Bearbeitung der rechten Version in die linke Spalte übernehmen oder die linke Version in die rechte schieben können, Änderung für Änderung, bis jede Spalte genau so aussieht, wie Sie es möchten. Jede Spalte hat eigene Schaltflächen Kopieren und Speichern, damit Sie ein sauberes, zusammengeführtes Ergebnis herausziehen können, ohne etwas neu einzutippen. Sind beide Texte identisch, teilt das Tool das direkt mit, statt ein leeres, mehrdeutiges Ergebnis anzuzeigen."
+    "p4": "Die Zähler für Hinzugefügt/Entfernt/Geändert über dem Vergleich geben auf einen Blick ein Gefühl dafür, wie groß eine Änderung ist, und die Schaltflächen ↑/↓ springen direkt zur nächsten oder vorherigen Änderung, ohne durch unveränderte Zeilen zu scrollen — praktisch bei einem langen Dokument. Eine Vollbild-Schaltfläche erweitert den Vergleich auf die gesamte Bildschirmfläche für eine genauere Prüfung. Unter dem Vergleich verwandelt das Merge-Tool diesen reinen Lese-Diff in etwas, das Sie tatsächlich auflösen können: Jede Änderung hat eigene ←/→-Schaltflächen zwischen den beiden Spalten, mit denen Sie die Bearbeitung der rechten Version in die linke Spalte übernehmen oder die linke Version in die rechte schieben können, Änderung für Änderung, bis jede Spalte genau so aussieht, wie Sie es möchten. Jede Spalte hat eigene Schaltflächen Kopieren und Speichern, damit Sie ein sauberes, zusammengeführtes Ergebnis herausziehen können, ohne etwas neu einzutippen. Sind beide Texte identisch, teilt das Tool das direkt mit, statt ein leeres, mehrdeutiges Ergebnis anzuzeigen.",
+    "p5": "Zwei Versionen desselben Codes sehen oft nur wegen des Stils völlig verschieden aus: minimiert oder schön eingerückt, Tabulatoren oder Leerzeichen, einfache oder doppelte Anführungszeichen, lange Zeilen an unterschiedlichen Stellen umbrochen. Mit den Format-Einstellungen über den beiden Feldern bringen Sie beide Texte vor dem Vergleich auf denselben Standard. Lassen Sie „Formatieren als“ auf „Automatisch erkennen“ (zuerst wird der Dateiname, dann der Text ausgewertet) oder wählen Sie selbst JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown oder GraphQL; dazu eine Einrückung von 2 Leerzeichen, 4 Leerzeichen oder einem Tabulator, eine Zeilenbreite und bei SQL einen Dialekt wie MySQL, PostgreSQL oder SQL Server. „Formatieren“ formatiert ein Feld, „Beide formatieren“ beide mit identischen Einstellungen, und sind die beiden Seiten verschiedene Sprachen, erscheint eine Warnung. Enthält der Text einen Syntaxfehler, bleibt er unverändert, und die Meldung nennt Zeile und Spalte. Die Formatierer (Prettier und sql-formatter) werden erst beim Klick auf „Formatieren“ geladen und laufen in einem Hintergrund-Worker, damit große Eingaben die Seite nicht einfrieren; alles bleibt auf Ihrem Gerät. Das Formatieren kann Anführungszeichen, Semikolons und Zeilenumbrüche ändern, aber nie, was der Code tut, und jede Formatierung lässt sich rückgängig machen."
   }
 }

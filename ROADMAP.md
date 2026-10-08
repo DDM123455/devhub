@@ -543,7 +543,7 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 
 - [x] Tool `sql-formatter` (format/minify/kiểm tra cú pháp, 20 dialect format + 13 dialect validate, en+vi)
 - [x] Text Diff: Format JSON/XML/SQL/HTML/CSS/SCSS/LESS/JS/TS/YAML/Markdown/GraphQL + tự nhận diện
-- [ ] Dịch `tool-sql-formatter.json` và key mới của `tool-text-diff.json` sang 18 ngôn ngữ (chạy scripts/check-i18n.mjs)
+- [x] Dịch `tool-sql-formatter.json` và key mới của `tool-text-diff.json` sang 18 ngôn ngữ (check-i18n.mjs sạch; cần người bản ngữ rà lại)
 - [ ] Kiểm bằng mắt bố cục/dark mode tool SQL, Lighthouse; cân nhắc dịch vụ kiểm schema (cần chọn: chỉ cú pháp là đủ?)
 
 ## Phase 4 — Kiếm tiền & PWA

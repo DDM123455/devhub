@@ -40,16 +40,14 @@
     "save": "Zapisz jako .txt",
     "copyShareLink": "Kopiuj link do udostępniania",
     "formatButton": "Formatuj",
-    "formatDetectedJson": "Sformatowano jako JSON",
-    "formatDetectedXml": "Sformatowano jako XML",
-    "formatError": "To nie jest prawidłowy JSON ani XML — pozostawiono bez zmian",
+    "formatError": "Nie udało się sformatować — pozostawiono bez zmian",
     "clearedNotice": "Wyczyszczono.",
     "undo": "Cofnij",
     "replacedNotice": "Zawartość została zastąpiona.",
     "clearAria": "Wyczyść: {{side}}",
     "swapAria": "Zamień miejscami tekst oryginalny i zmieniony",
     "uploadAria": "Wczytaj plik do pola: {{side}}",
-    "formatAria": "Formatuj JSON/XML w polu: {{side}}",
+    "formatAria": "Formatuj: {{side}}",
     "copyMergedAria": "Kopiuj scalony wynik: {{side}}",
     "saveMergedAria": "Zapisz scalony wynik: {{side}}",
     "formatDuplicateKeys": "Uwaga: wykryto zduplikowane klucze, które pozostawiono bez zmian.",
@@ -162,7 +160,35 @@
         "rtf": "proste przekształcenie akapitów i znaków specjalnych; złożona lub osadzona zawartość może zostać utracona.",
         "general": "Nieobsługiwane: obrazy/skany (brak OCR), pliki chronione hasłem, stare .doc/.xls/.ppt, pliki powyżej 30 MB. Zawartość plików nigdy nie jest wysyłana ani zapisywana."
       }
-    }
+    },
+    "formatSettingsHeading": "Formatuj przed porównaniem",
+    "formatLanguageLabel": "Formatuj jako",
+    "formatAuto": "Wykryj automatycznie",
+    "formatIndentLabel": "Wcięcia",
+    "formatIndent2": "2 spacje",
+    "formatIndent4": "4 spacje",
+    "formatIndentTab": "Tabulator",
+    "formatWidthLabel": "Szerokość wiersza",
+    "formatSqlDialectLabel": "Dialekt SQL",
+    "formatBoth": "Formatuj oba",
+    "formatBothAria": "Sformatuj oba teksty tymi samymi ustawieniami",
+    "formatBusy": "Formatowanie…",
+    "formatDone": "Sformatowano jako {{language}}.",
+    "formatDoneAuto": "Wykryto automatycznie i sformatowano jako {{language}}.",
+    "formatNoChange": "Już sformatowano jako {{language}} — nic się nie zmieniło.",
+    "formatEmpty": "Nie ma czego formatować — pole jest puste.",
+    "formatErrorAt": "Błąd składni ({{language}}) w wierszu {{line}}, kolumnie {{column}}: {{message}}. Pozostawiono bez zmian.",
+    "formatErrorLine": "Błąd składni ({{language}}) w wierszu {{line}}: {{message}}. Pozostawiono bez zmian.",
+    "formatErrorNoPos": "Błąd ({{language}}): {{message}}. Pozostawiono bez zmian.",
+    "formatAmbiguous": "Nie udało się rozpoznać języka (być może {{candidates}}). Wybierz go w polu „Formatuj jako”.",
+    "formatUnknown": "Nie udało się rozpoznać języka. Wybierz go w polu „Formatuj jako”.",
+    "formatTooLarge": "Za duże do sformatowania (limit {{max}} znaków). Pozostawiono bez zmian.",
+    "formatLargeWarning": "Duże dane: formatowanie działa w tle i może chwilę potrwać.",
+    "formatTimeout": "Formatowanie trwało zbyt długo i zostało przerwane. Pozostawiono bez zmian.",
+    "formatFailed": "Formatowanie nieoczekiwanie się nie powiodło. Pozostawiono bez zmian.",
+    "formatStale": "Tekst zmienił się w trakcie formatowania, więc wynik odrzucono.",
+    "formatMismatch": "Obie strony sformatowano jako różne języki ({{a}} i {{b}}), więc porównanie może nadal pokazywać różnice stylu.",
+    "formatNote": "Obsługiwane: JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown i GraphQL. Formatowanie może zmienić cudzysłowy, średniki i podziały wierszy, ale nie znaczenie kodu. Tekst jest formatowany w Twojej przeglądarce, a zmianę można cofnąć."
   },
   "related": "Powiązane narzędzia",
   "faq": {
@@ -172,13 +198,16 @@
     "q2": "Czy mogę scalić obie wersje w jeden ostateczny tekst?",
     "a2": "Tak — wbudowane narzędzie scalania pozwala zaakceptować lewą lub prawą wersję zmiana po zmianie.",
     "q3": "Czy mogę ignorować różnice w białych znakach lub wielkości liter?",
-    "a3": "Tak — włącz niezależnie opcje \"ignoruj białe znaki\" i \"ignoruj wielkość liter\"."
+    "a3": "Tak — włącz niezależnie opcje \"ignoruj białe znaki\" i \"ignoruj wielkość liter\".",
+    "q4": "Jakie języki obsługuje przycisk Formatuj?",
+    "a4": "JSON, XML, SQL (standardowy SQL oraz MySQL, PostgreSQL, SQL Server, SQLite, BigQuery i inne), HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown i GraphQL. Język jest wykrywany automatycznie po nazwie pliku lub treści, a zawsze możesz wybrać go ręcznie."
   },
   "article": {
     "heading": "Po co używać porównywarki tekstów?",
     "p1": "Zawsze gdy istnieją dwie wersje tego samego dokumentu — umowa przed i po poprawkach prawnika, esej przed i po rundzie uwag, plik konfiguracyjny przed i po commicie kolegi z zespołu — najważniejsze pytanie rzadko brzmi „czy to te same pliki”, a raczej „co dokładnie się zmieniło”. Czytanie obu wersji obok siebie i próba wychwycenia każdego dodanego przecinka, usuniętej klauzuli czy przeredagowanego zdania jest powolne i podatne na błędy, zwłaszcza gdy dokument przekracza stronę czy dwie. Porównywarka tekstów automatyzuje to porównanie i podświetla dokładnie te słowa lub linie, które się różnią, dzięki czemu przegląd zmiany zajmuje sekundy zamiast minut.",
     "p2": "To narzędzie działa w całości w Twojej przeglądarce. Oba pola tekstowe pozostają w pamięci na Twoim urządzeniu, a samo porównanie jest obliczane przez lokalnie działającą bibliotekę JavaScript do wyznaczania różnic — nic, co wpiszesz lub wklejasz, nigdy nie jest wysyłane na serwer, rejestrowane ani nigdzie przechowywane. Ma to znaczenie, jeśli porównujesz umowę z klientem, plik z hasłami albo dowolny tekst, którego wolałbyś nie przepuszczać przez usługę zewnętrzną. Zamknij kartę i wszystko znika — nie ma żadnej historii, o którą trzeba by się martwić.",
     "p3": "Wklej oryginalny tekst po lewej stronie, a zaktualizowaną wersję po prawej — oba pola pokazują numery linii i przewijają się synchronicznie, a każde ma własne przyciski Wyczyść, Zamień i Wczytaj plik, dzięki czemu możesz wczytać dwa pliki (zwykły tekst, kod, Word, PDF, Excel i inne) bezpośrednio z dysku zamiast kopiować i wklejać. Porównanie aktualizuje się na żywo w trakcie pisania — nie trzeba niczego naciskać. Wybierz Znak, Słowo lub Linię, aby określić, jak dokładnie mają być rozbijane różnice: tryb Znak wychwytuje pojedynczą literówkę, tryb Słowo jest najlepszy do prozy, ponieważ podświetla dokładnie te słowa, które zmieniły się w zdaniu, a tryb Linia porównuje całe linie naraz, co sprawdza się w przypadku kodu, JSON-a czy treści w formie list, gdzie liczy się, które całe linie się przesunęły, a nie pojedyncze słowa w ich obrębie. Linia, która istnieje tylko w jednej wersji, jest pokazana w całości na zielono (dodana) lub na czerwono (usunięta); linia, która istnieje w obu, ale została zmieniona, jest pokazana na pomarańczowo, z dokładnym zmienionym słowem lub znakami podświetlonymi mocniej w jej wnętrzu — dzięki temu od razu widać różnicę między edytowaną linią a niepowiązaną parą usunięcie-a-potem-wstawienie.",
-    "p4": "Liczniki dodanych/usuniętych/zmienionych elementów nad porównaniem dają szybki obraz skali zmiany, a przyciski ↑/↓ przenoszą od razu do następnej lub poprzedniej zmiany bez przewijania niezmienionych linii — przydatne przy długim dokumencie. Przycisk Pełny ekran rozszerza porównanie na cały ekran, ułatwiając dokładniejszy przegląd. Pod porównaniem narzędzie do scalania zamienia to z zwykłego, tylko-do-odczytu porównania w coś, co faktycznie można rozstrzygnąć: każda zmiana ma własne przyciski ← / → między dwiema kolumnami, pozwalające przenieść edycję z prawej kolumny do lewej lub odwrotnie, po jednej zmianie na raz, aż każda z kolumn będzie brzmiała dokładnie tak, jak chcesz. Każda kolumna ma własne przyciski Kopiuj i Zapisz, dzięki czemu możesz wydobyć czysty, scalony wynik bez ponownego przepisywania czegokolwiek. Jeśli oba teksty okażą się identyczne, narzędzie wprost o tym informuje, zamiast pokazywać pusty, niejednoznaczny wynik — jedna rzecz mniej do domyślania się."
+    "p4": "Liczniki dodanych/usuniętych/zmienionych elementów nad porównaniem dają szybki obraz skali zmiany, a przyciski ↑/↓ przenoszą od razu do następnej lub poprzedniej zmiany bez przewijania niezmienionych linii — przydatne przy długim dokumencie. Przycisk Pełny ekran rozszerza porównanie na cały ekran, ułatwiając dokładniejszy przegląd. Pod porównaniem narzędzie do scalania zamienia to z zwykłego, tylko-do-odczytu porównania w coś, co faktycznie można rozstrzygnąć: każda zmiana ma własne przyciski ← / → między dwiema kolumnami, pozwalające przenieść edycję z prawej kolumny do lewej lub odwrotnie, po jednej zmianie na raz, aż każda z kolumn będzie brzmiała dokładnie tak, jak chcesz. Każda kolumna ma własne przyciski Kopiuj i Zapisz, dzięki czemu możesz wydobyć czysty, scalony wynik bez ponownego przepisywania czegokolwiek. Jeśli oba teksty okażą się identyczne, narzędzie wprost o tym informuje, zamiast pokazywać pusty, niejednoznaczny wynik — jedna rzecz mniej do domyślania się.",
+    "p5": "Dwie wersje tego samego kodu często wyglądają zupełnie inaczej wyłącznie przez styl: zminifikowany czy czytelnie sformatowany, tabulatory czy spacje, pojedyncze czy podwójne cudzysłowy, długie wiersze łamane w różnych miejscach. Ustawienia formatowania nad obu polami pozwalają sprowadzić oba teksty do jednego standardu przed porównaniem. Zostaw „Formatuj jako” na opcji Wykryj automatycznie (najpierw sprawdzana jest nazwa pliku, potem treść) albo sam wybierz JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown lub GraphQL; ustaw wcięcie 2 spacji, 4 spacji lub tabulator, szerokość wiersza, a dla SQL dialekt, np. MySQL, PostgreSQL czy SQL Server. Przycisk Formatuj formatuje jedno pole, Formatuj oba — oba, tymi samymi ustawieniami, a gdy okaże się, że obie strony to różne języki, zobaczysz ostrzeżenie. Jeśli tekst zawiera błąd składni, nic nie jest zmieniane, a komunikat podaje wiersz i kolumnę. Formattery (Prettier i sql-formatter) są pobierane dopiero po kliknięciu Formatuj, działają w procesie w tle, więc duże dane nie zamrażają strony, a wszystko zostaje na Twoim urządzeniu. Formatowanie może zmienić cudzysłowy, średniki i podziały wierszy, ale nigdy tego, co robi kod, a każde sformatowanie można cofnąć."
   }
 }

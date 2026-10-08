@@ -40,16 +40,14 @@
     "save": "Simpan sebagai .txt",
     "copyShareLink": "Salin tautan bagikan",
     "formatButton": "Format",
-    "formatDetectedJson": "Diformat sebagai JSON",
-    "formatDetectedXml": "Diformat sebagai XML",
-    "formatError": "Bukan JSON atau XML yang valid — dibiarkan tidak berubah",
+    "formatError": "Tidak dapat diformat — dibiarkan tidak berubah",
     "clearedNotice": "Dihapus.",
     "undo": "Urungkan",
     "replacedNotice": "Isi diganti.",
     "clearAria": "Hapus {{side}}",
     "swapAria": "Tukar teks asli dan teks yang diubah",
     "uploadAria": "Unggah file ke {{side}}",
-    "formatAria": "Format JSON/XML di {{side}}",
+    "formatAria": "Format {{side}}",
     "copyMergedAria": "Salin hasil gabungan: {{side}}",
     "saveMergedAria": "Simpan hasil gabungan: {{side}}",
     "formatDuplicateKeys": "Peringatan: ditemukan key duplikat dan dibiarkan apa adanya.",
@@ -162,7 +160,35 @@
         "rtf": "konversi sederhana untuk paragraf dan karakter khusus; konten kompleks atau tersemat bisa hilang.",
         "general": "Tidak didukung: gambar/hasil pindai (tanpa OCR), file berkata sandi, .doc/.xls/.ppt lama, file di atas 30 MB. Isi file tidak pernah diunggah dan tidak disimpan."
       }
-    }
+    },
+    "formatSettingsHeading": "Format sebelum membandingkan",
+    "formatLanguageLabel": "Format sebagai",
+    "formatAuto": "Deteksi otomatis",
+    "formatIndentLabel": "Indentasi",
+    "formatIndent2": "2 spasi",
+    "formatIndent4": "4 spasi",
+    "formatIndentTab": "Tab",
+    "formatWidthLabel": "Lebar baris",
+    "formatSqlDialectLabel": "Dialek SQL",
+    "formatBoth": "Format keduanya",
+    "formatBothAria": "Format kedua teks dengan pengaturan yang sama",
+    "formatBusy": "Memformat…",
+    "formatDone": "Diformat sebagai {{language}}.",
+    "formatDoneAuto": "Bahasa terdeteksi otomatis dan diformat sebagai {{language}}.",
+    "formatNoChange": "Sudah terformat sebagai {{language}} — tidak ada yang berubah.",
+    "formatEmpty": "Tidak ada yang diformat — kotak kosong.",
+    "formatErrorAt": "Kesalahan sintaks {{language}} di baris {{line}}, kolom {{column}}: {{message}}. Dibiarkan tidak berubah.",
+    "formatErrorLine": "Kesalahan sintaks {{language}} di baris {{line}}: {{message}}. Dibiarkan tidak berubah.",
+    "formatErrorNoPos": "Kesalahan {{language}}: {{message}}. Dibiarkan tidak berubah.",
+    "formatAmbiguous": "Bahasa tidak dapat dipastikan (mungkin {{candidates}}). Pilih salah satu di “Format sebagai”.",
+    "formatUnknown": "Bahasa tidak dapat dipastikan. Pilih salah satu di “Format sebagai”.",
+    "formatTooLarge": "Terlalu besar untuk diformat (batas {{max}} karakter). Dibiarkan tidak berubah.",
+    "formatLargeWarning": "Input besar: pemformatan berjalan di latar belakang dan mungkin butuh waktu.",
+    "formatTimeout": "Pemformatan terlalu lama dan dihentikan. Dibiarkan tidak berubah.",
+    "formatFailed": "Pemformatan gagal secara tak terduga. Dibiarkan tidak berubah.",
+    "formatStale": "Teks berubah saat diformat, sehingga hasilnya dibuang.",
+    "formatMismatch": "Kedua sisi diformat sebagai bahasa yang berbeda ({{a}} dan {{b}}), sehingga perbandingan mungkin masih menampilkan perbedaan gaya.",
+    "formatNote": "Didukung: JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown, dan GraphQL. Pemformatan dapat mengubah tanda kutip, titik koma, dan pemisah baris, tetapi tidak mengubah arti kode. Teks diformat di browser Anda dan dapat diurungkan."
   },
   "related": "Alat terkait",
   "faq": {
@@ -172,13 +198,16 @@
     "q2": "Bisakah saya menggabungkan kedua versi menjadi satu teks akhir?",
     "a2": "Ya — alat gabung bawaan memungkinkan Anda menerima versi kiri atau kanan per perubahan.",
     "q3": "Bisakah saya mengabaikan perbedaan spasi atau huruf besar/kecil?",
-    "a3": "Ya — aktifkan \"abaikan spasi\" dan \"abaikan huruf besar/kecil\" secara independen."
+    "a3": "Ya — aktifkan \"abaikan spasi\" dan \"abaikan huruf besar/kecil\" secara independen.",
+    "q4": "Bahasa apa saja yang bisa ditangani tombol Format?",
+    "a4": "JSON, XML, SQL (SQL standar plus MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, dan lainnya), HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown, dan GraphQL. Bahasa dideteksi otomatis dari nama file atau isi teks, dan Anda selalu bisa memilihnya secara manual."
   },
   "article": {
     "heading": "Mengapa menggunakan text diff checker?",
     "p1": "Setiap kali ada dua versi dari dokumen yang sama — kontrak sebelum dan sesudah revisi pengacara, esai sebelum dan sesudah sesi masukan, file konfigurasi sebelum dan sesudah commit rekan tim — pertanyaan pentingnya jarang \"apakah kedua file ini sama\" melainkan \"apa sebenarnya yang berubah\". Membaca kedua versi secara berdampingan dan berusaha menemukan setiap koma yang ditambahkan, klausul yang dihapus, atau kalimat yang diubah susunannya itu lambat dan rawan salah, apalagi ketika dokumennya sudah lebih dari satu-dua halaman. Diff checker mengotomatiskan perbandingan itu dan menyoroti tepat kata atau baris mana yang berbeda, sehingga Anda bisa meninjau sebuah perubahan dalam hitungan detik, bukan menit.",
     "p2": "Alat ini berjalan sepenuhnya di browser Anda. Kedua kotak teks tetap berada di memori perangkat Anda dan perbandingannya sendiri dihitung oleh pustaka diffing JavaScript yang berjalan secara lokal — tidak ada yang Anda ketik atau tempel yang pernah dikirim ke server, dicatat, atau disimpan di mana pun. Ini penting jika Anda membandingkan kontrak klien, file kata sandi, atau teks apa pun yang lebih baik tidak Anda lewatkan lewat layanan pihak ketiga. Tutup tab-nya dan semuanya hilang; tidak ada riwayat yang perlu dikhawatirkan.",
     "p3": "Tempel teks asli di sebelah kiri dan versi terbaru di sebelah kanan — kedua kotak menampilkan nomor baris dan bergulir sinkron satu sama lain, dan masing-masing punya tombol Hapus, Tukar, dan Unggah file sendiri sehingga Anda bisa memuat dua file langsung dari disk (teks biasa, kode, Word, PDF, Excel, dan lainnya) alih-alih menyalin-tempel. Perbandingan diperbarui secara langsung saat Anda mengetik; tidak ada tombol yang perlu ditekan. Pilih Karakter, Kata, atau Baris untuk mengatur seberapa detail perbedaan dipecah: mode Karakter menangkap satu perubahan setingkat salah ketik, mode Kata paling cocok untuk prosa karena menyoroti persis kata mana yang berubah di dalam sebuah kalimat, dan mode Baris membandingkan seluruh baris sekaligus, cocok untuk kode, JSON, atau konten berbentuk daftar di mana yang Anda pedulikan adalah baris mana secara keseluruhan yang berpindah, bukan kata individual di dalamnya. Baris yang hanya ada di satu versi ditampilkan sepenuhnya hijau (ditambahkan) atau merah (dihapus); baris yang ada di kedua versi tetapi diedit ditampilkan berwarna oranye, dengan kata atau karakter yang berubah persis di dalamnya disorot lebih kuat — sehingga Anda bisa membedakan baris yang diedit dari pasangan hapus-lalu-tambah yang tidak berkaitan hanya dengan sekali lihat.",
-    "p4": "Hitungan ditambahkan/dihapus/diubah di atas perbandingan memberi Anda gambaran sekilas seberapa besar sebuah perubahan, dan tombol ↑/↓ langsung melompat ke perubahan berikutnya atau sebelumnya tanpa perlu menggulir melewati baris yang tidak berubah — praktis untuk dokumen panjang. Tombol Layar penuh memperluas tampilan perbandingan memenuhi layar untuk peninjauan yang lebih dekat. Di bawah perbandingan, alat merge mengubah ini dari sekadar diff yang hanya bisa dibaca menjadi sesuatu yang benar-benar bisa Anda selesaikan: setiap perubahan punya tombol ← / → sendiri di antara kedua kolom, memungkinkan Anda menarik hasil edit versi kanan ke kolom kiri atau mendorong versi kiri ke kanan, satu perubahan pada satu waktu, sampai salah satu kolom terbaca persis seperti yang Anda inginkan. Setiap kolom punya tombol Salin dan Simpan sendiri, sehingga Anda bisa mengambil hasil gabungan yang bersih tanpa mengetik ulang apa pun. Jika ternyata kedua teks identik, alat ini akan langsung memberi tahu Anda alih-alih menampilkan hasil kosong yang ambigu — satu hal lagi yang tidak perlu Anda ragukan."
+    "p4": "Hitungan ditambahkan/dihapus/diubah di atas perbandingan memberi Anda gambaran sekilas seberapa besar sebuah perubahan, dan tombol ↑/↓ langsung melompat ke perubahan berikutnya atau sebelumnya tanpa perlu menggulir melewati baris yang tidak berubah — praktis untuk dokumen panjang. Tombol Layar penuh memperluas tampilan perbandingan memenuhi layar untuk peninjauan yang lebih dekat. Di bawah perbandingan, alat merge mengubah ini dari sekadar diff yang hanya bisa dibaca menjadi sesuatu yang benar-benar bisa Anda selesaikan: setiap perubahan punya tombol ← / → sendiri di antara kedua kolom, memungkinkan Anda menarik hasil edit versi kanan ke kolom kiri atau mendorong versi kiri ke kanan, satu perubahan pada satu waktu, sampai salah satu kolom terbaca persis seperti yang Anda inginkan. Setiap kolom punya tombol Salin dan Simpan sendiri, sehingga Anda bisa mengambil hasil gabungan yang bersih tanpa mengetik ulang apa pun. Jika ternyata kedua teks identik, alat ini akan langsung memberi tahu Anda alih-alih menampilkan hasil kosong yang ambigu — satu hal lagi yang tidak perlu Anda ragukan.",
+    "p5": "Dua versi kode yang sama sering tampak sangat berbeda hanya karena gaya penulisan: minified atau rapi, tab atau spasi, tanda kutip tunggal atau ganda, baris panjang yang dipotong di tempat berbeda. Gunakan pengaturan Format di atas kedua kotak untuk menyamakan kedua teks ke satu standar sebelum dibandingkan. Biarkan “Format sebagai” pada Deteksi otomatis (nama file diperiksa lebih dulu, baru isi teks) atau pilih sendiri JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown, atau GraphQL; tentukan indentasi 2 spasi, 4 spasi, atau tab, lebar baris, dan untuk SQL sebuah dialek seperti MySQL, PostgreSQL, atau SQL Server. Format memformat satu kotak, Format keduanya memformat kedua kotak dengan pengaturan yang sama persis, dan jika kedua sisi ternyata bahasa yang berbeda, Anda akan mendapat peringatan. Jika teks memiliki kesalahan sintaks, tidak ada yang diubah dan pesan menyebutkan baris serta kolomnya. Formatter (Prettier dan sql-formatter) hanya diunduh saat Anda menekan Format, berjalan di worker latar belakang agar input besar tidak membekukan halaman, dan semuanya tetap berada di perangkat Anda. Pemformatan dapat mengubah tanda kutip, titik koma, dan pemisah baris, tetapi tidak pernah mengubah cara kerja kode, dan setiap format dapat diurungkan."
   }
 }

@@ -180,6 +180,17 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-10-08 (Phase 3.18b — dịch tool SQL Formatter + key mới Text Diff sang 18 ngôn ngữ)** — `tool-sql-formatter.json` (124 key)
+  + 31 key mới và 2 key đổi nghĩa (`ui.formatError`, `ui.formatAria`) của `tool-text-diff.json` cho ar, de, es, fr, hi, id, it, ja,
+  ko, nl, pl, pt, ru, sv, th, tr, zh, zh-tw (6 agent × 3 ngôn ngữ, MỖI agent dùng thư mục tạm riêng để tránh sự cố nhiễm chéo
+  hôm trước). Kiểm tra sau cùng: check-i18n 19 locale sạch, check-stale-i18n (nền 4ca160e) sạch, check-i18n-copies chỉ còn
+  trùng hợp lý (es+pt, fr+pt, zh+zh-tw), không còn trùng giữa các họ ngôn ngữ khác nhau, quét chữ viết sạch (chỉ còn
+  placeholder URL của QR), JSON hợp lệ, vitest 696/696, build 562 trang. Rút gọn 7 meta.title >70 cột (de SQL 78→, vi audio,
+  nl OCR, vi SQL, zh image-convert, es SQL, sv audio). CẦN NGƯỜI BẢN NGỮ RÀ LẠI: thuật ngữ SQL/dialect/"dollar-quoted"/"optimizer
+  hints" (ar, de, es, fr, nl, ru, sv, th, tr, zh, zh-tw), câu cảnh báo "hợp lệ = đúng cú pháp" (validateDisclaimer, faq.a1,
+  article.p4), thuật ngữ chưa đồng nhất giữa tool (ja 整形/フォーマット, ko 포맷/정렬, hi फ़ॉर्मैट/फ़ॉर्मेट), xưng hô de du/Sie giữa
+  `tool-sql-formatter.json` và `tool-text-diff.json`, meta.description chưa đo độ dài (ru/sv ~190-220 ký tự, bản en cũng ~215).
+  Cảnh báo kỹ thuật nhỏ: agent ghi file bằng LF trong khi một số file locale cũ là CRLF (git chuẩn hoá khi commit, vô hại).
 - **2026-10-08 (Phase 3.18 — công cụ MỚI "SQL Formatter & Validator" + Text Diff format nhiều kiểu, theo yêu cầu trực tiếp
   người dùng)** — (1) Tool `sql-formatter` (category dev): format bằng sql-formatter v15 (20 dialect), minify theo token
   (giữ chuỗi/định danh/comment cần thiết), KIỂM TRA CÚ PHÁP bằng node-sql-parser v5 (13 dialect, mỗi dialect một worker riêng

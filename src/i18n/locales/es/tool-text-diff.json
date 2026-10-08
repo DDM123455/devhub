@@ -40,16 +40,14 @@
     "save": "Guardar como .txt",
     "copyShareLink": "Copiar enlace para compartir",
     "formatButton": "Formatear",
-    "formatDetectedJson": "Formateado como JSON",
-    "formatDetectedXml": "Formateado como XML",
-    "formatError": "No es JSON ni XML válido — se dejó sin cambios",
+    "formatError": "No se pudo formatear — se dejó sin cambios",
     "clearedNotice": "Borrado.",
     "undo": "Deshacer",
     "replacedNotice": "Contenido reemplazado.",
     "clearAria": "Borrar {{side}}",
     "swapAria": "Intercambiar el texto original y el modificado",
     "uploadAria": "Subir un archivo a {{side}}",
-    "formatAria": "Formatear JSON/XML en {{side}}",
+    "formatAria": "Formatear {{side}}",
     "copyMergedAria": "Copiar resultado fusionado: {{side}}",
     "saveMergedAria": "Guardar resultado fusionado: {{side}}",
     "formatDuplicateKeys": "Aviso: se encontraron claves duplicadas y se dejaron tal cual.",
@@ -162,7 +160,35 @@
         "rtf": "conversión sencilla de párrafos y caracteres especiales; el contenido complejo o incrustado puede perderse.",
         "general": "No compatible: imágenes/escaneos (sin OCR), archivos protegidos con contraseña, .doc/.xls/.ppt antiguos, archivos de más de 30 MB. El contenido del archivo nunca se sube ni se guarda."
       }
-    }
+    },
+    "formatSettingsHeading": "Formatear antes de comparar",
+    "formatLanguageLabel": "Formatear como",
+    "formatAuto": "Detección automática",
+    "formatIndentLabel": "Sangría",
+    "formatIndent2": "2 espacios",
+    "formatIndent4": "4 espacios",
+    "formatIndentTab": "Tabulación",
+    "formatWidthLabel": "Ancho de línea",
+    "formatSqlDialectLabel": "Dialecto SQL",
+    "formatBoth": "Formatear ambos",
+    "formatBothAria": "Formatear ambos textos con los mismos ajustes",
+    "formatBusy": "Formateando…",
+    "formatDone": "Formateado como {{language}}.",
+    "formatDoneAuto": "Detectado automáticamente y formateado como {{language}}.",
+    "formatNoChange": "Ya estaba formateado como {{language}}: no cambió nada.",
+    "formatEmpty": "No hay nada que formatear: el cuadro está vacío.",
+    "formatErrorAt": "Error de sintaxis de {{language}} en la línea {{line}}, columna {{column}}: {{message}}. Se dejó sin cambios.",
+    "formatErrorLine": "Error de sintaxis de {{language}} en la línea {{line}}: {{message}}. Se dejó sin cambios.",
+    "formatErrorNoPos": "Error de {{language}}: {{message}}. Se dejó sin cambios.",
+    "formatAmbiguous": "No se pudo saber de qué lenguaje se trata (quizá {{candidates}}). Elige uno en «Formatear como».",
+    "formatUnknown": "No se pudo saber de qué lenguaje se trata. Elige uno en «Formatear como».",
+    "formatTooLarge": "Demasiado grande para formatear (límite de {{max}} caracteres). Se dejó sin cambios.",
+    "formatLargeWarning": "Entrada grande: el formateo se ejecuta en segundo plano y puede tardar.",
+    "formatTimeout": "El formateo tardó demasiado y se detuvo. Se dejó sin cambios.",
+    "formatFailed": "El formateo falló de forma inesperada. Se dejó sin cambios.",
+    "formatStale": "El texto cambió mientras se formateaba, así que se descartó el resultado.",
+    "formatMismatch": "Los dos lados se formatearon como lenguajes distintos ({{a}} y {{b}}), por lo que la comparación aún puede mostrar diferencias de estilo.",
+    "formatNote": "Compatibles: JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown y GraphQL. Formatear puede cambiar comillas, puntos y comas y saltos de línea, pero no lo que significa el código. El texto se formatea en tu navegador y se puede deshacer."
   },
   "related": "Herramientas relacionadas",
   "faq": {
@@ -172,13 +198,16 @@
     "q2": "¿Puedo combinar las dos versiones en un texto final?",
     "a2": "Sí — la herramienta de combinación integrada te permite aceptar la versión izquierda o derecha cambio por cambio.",
     "q3": "¿Puedo ignorar las diferencias de espacios en blanco o mayúsculas/minúsculas?",
-    "a3": "Sí — activa \"ignorar espacios\" e \"ignorar mayúsculas/minúsculas\" de forma independiente."
+    "a3": "Sí — activa \"ignorar espacios\" e \"ignorar mayúsculas/minúsculas\" de forma independiente.",
+    "q4": "¿Qué lenguajes puede formatear el botón Formatear?",
+    "a4": "JSON, XML, SQL (SQL estándar más MySQL, PostgreSQL, SQL Server, SQLite, BigQuery y otros), HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown y GraphQL. El lenguaje se detecta automáticamente por el nombre del archivo o por el texto, y siempre puedes elegirlo a mano."
   },
   "article": {
     "heading": "¿Para qué sirve un comparador de textos?",
     "p1": "Cada vez que existen dos versiones de un mismo documento —un contrato antes y después de que lo revise un abogado, un artículo antes y después de una ronda de correcciones, un archivo de configuración antes y después del commit de un compañero— la pregunta importante casi nunca es si los archivos son iguales, sino qué ha cambiado exactamente. Leer las dos versiones en paralelo intentando detectar cada coma añadida o cada frase reescrita es lento y propenso a errores, sobre todo cuando el documento ocupa más de una página. Un comparador de textos automatiza esa tarea y resalta con precisión las palabras o líneas que difieren, para que revisar un cambio te lleve segundos en lugar de minutos.",
     "p2": "Esta herramienta funciona por completo en tu navegador. Ambos cuadros de texto permanecen en la memoria de tu dispositivo y la comparación la calcula una librería de JavaScript que se ejecuta localmente: nada de lo que escribas o pegues se envía nunca a un servidor, ni se registra ni se guarda en ningún sitio. Esto importa si estás comparando un contrato con un cliente, un archivo con contraseñas o cualquier texto que prefieras no pasar por un servicio externo. Cierra la pestaña y todo desaparece; no queda ningún historial del que preocuparse.",
     "p3": "Pega el texto original a la izquierda y la versión actualizada a la derecha: ambos cuadros muestran números de línea y se desplazan de forma sincronizada, y cada uno tiene sus propios botones Borrar, Intercambiar y Subir archivo para cargar dos archivos directamente desde el disco (texto plano, código, Word, PDF, Excel y más) en vez de copiar y pegar. La comparación se actualiza en vivo mientras escribes; no hay ningún botón que pulsar. Elige Carácter, Palabra o Línea para controlar con qué precisión se desglosan las diferencias: el modo Carácter detecta hasta un simple error de tecleo, el modo Palabra es el más adecuado para prosa porque muestra exactamente qué palabras cambiaron dentro de una frase, y el modo Línea compara líneas completas, lo cual conviene a código, JSON o listas donde importa qué líneas enteras se movieron y no las palabras sueltas dentro de ellas. Una línea que solo existe en una versión se muestra totalmente en verde (añadida) o rojo (eliminada); una línea que existe en ambas pero fue editada se muestra en naranja, con la palabra o los caracteres exactos que cambiaron resaltados con más fuerza dentro de ella, para que puedas distinguir a simple vista una línea editada de un par de eliminación-e-inserción sin relación.",
-    "p4": "Los contadores de añadidos/eliminados/modificados encima de la comparación te dan una idea rápida de la magnitud del cambio, y los botones ↑/↓ saltan directamente al cambio siguiente o anterior sin desplazarte por líneas sin modificar, algo muy útil en un documento largo. Un botón de Pantalla completa expande la comparación para revisarla con más detalle. Debajo de la comparación, la herramienta de fusión convierte este diff de solo lectura en algo que realmente puedes resolver: cada cambio tiene sus propios botones ←/→ entre las dos columnas, que te permiten llevar la edición de la versión derecha a la columna izquierda, o llevar la versión izquierda a la derecha, cambio por cambio, hasta que ambas columnas queden exactamente como quieres. Cada columna tiene sus propios botones Copiar y Guardar, para que puedas extraer un resultado fusionado y limpio sin volver a escribir nada. Si los dos textos resultan ser idénticos, la herramienta lo indica directamente en lugar de mostrar un resultado vacío y ambiguo."
+    "p4": "Los contadores de añadidos/eliminados/modificados encima de la comparación te dan una idea rápida de la magnitud del cambio, y los botones ↑/↓ saltan directamente al cambio siguiente o anterior sin desplazarte por líneas sin modificar, algo muy útil en un documento largo. Un botón de Pantalla completa expande la comparación para revisarla con más detalle. Debajo de la comparación, la herramienta de fusión convierte este diff de solo lectura en algo que realmente puedes resolver: cada cambio tiene sus propios botones ←/→ entre las dos columnas, que te permiten llevar la edición de la versión derecha a la columna izquierda, o llevar la versión izquierda a la derecha, cambio por cambio, hasta que ambas columnas queden exactamente como quieres. Cada columna tiene sus propios botones Copiar y Guardar, para que puedas extraer un resultado fusionado y limpio sin volver a escribir nada. Si los dos textos resultan ser idénticos, la herramienta lo indica directamente en lugar de mostrar un resultado vacío y ambiguo.",
+    "p5": "Dos versiones del mismo código suelen parecer totalmente distintas solo por el estilo: minificado o con sangrías, tabulaciones o espacios, comillas simples o dobles, líneas largas partidas en sitios diferentes. Usa los ajustes de formato que hay sobre los dos cuadros para llevar ambos textos a un mismo estándar antes de comparar. Deja «Formatear como» en Detección automática (primero mira el nombre del archivo y luego el texto) o elige tú JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown o GraphQL; fija una sangría de 2 espacios, 4 espacios o una tabulación, un ancho de línea y, para SQL, un dialecto como MySQL, PostgreSQL o SQL Server. Formatear da formato a un cuadro, Formatear ambos lo hace con los dos usando ajustes idénticos, y si resulta que los dos lados son lenguajes distintos, verás un aviso. Si el texto tiene un error de sintaxis no se cambia nada y el mensaje te indica la línea y la columna. Los formateadores (Prettier y sql-formatter) solo se descargan cuando pulsas Formatear, se ejecutan en un proceso en segundo plano para que las entradas grandes no congelen la página, y todo se queda en tu dispositivo. Formatear puede cambiar comillas, puntos y comas y saltos de línea, pero nunca lo que hace el código, y cualquier formateo se puede deshacer."
   }
 }

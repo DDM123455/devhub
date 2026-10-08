@@ -40,16 +40,14 @@
     "save": "Spara som .txt",
     "copyShareLink": "Kopiera delningslänk",
     "formatButton": "Formatera",
-    "formatDetectedJson": "Formaterad som JSON",
-    "formatDetectedXml": "Formaterad som XML",
-    "formatError": "Inte giltig JSON eller XML — lämnades oförändrad",
+    "formatError": "Det gick inte att formatera — lämnades oförändrad",
     "clearedNotice": "Rensat.",
     "undo": "Ångra",
     "replacedNotice": "Innehållet har ersatts.",
     "clearAria": "Rensa {{side}}",
     "swapAria": "Byt plats på den ursprungliga och den ändrade texten",
     "uploadAria": "Ladda upp en fil till {{side}}",
-    "formatAria": "Formatera JSON/XML i {{side}}",
+    "formatAria": "Formatera {{side}}",
     "copyMergedAria": "Kopiera sammanslaget resultat: {{side}}",
     "saveMergedAria": "Spara sammanslaget resultat: {{side}}",
     "formatDuplicateKeys": "Varning: dubblerade nycklar hittades och lämnades som de är.",
@@ -162,7 +160,35 @@
         "rtf": "enkel konvertering av stycken och specialtecken; komplext eller inbäddat innehåll kan gå förlorat.",
         "general": "Stöds inte: bilder/skanningar (ingen OCR), lösenordsskyddade filer, gamla .doc/.xls/.ppt, filer över 30 MB. Filinnehåll laddas aldrig upp och sparas inte."
       }
-    }
+    },
+    "formatSettingsHeading": "Formatera före jämförelse",
+    "formatLanguageLabel": "Formatera som",
+    "formatAuto": "Identifiera automatiskt",
+    "formatIndentLabel": "Indrag",
+    "formatIndent2": "2 blanksteg",
+    "formatIndent4": "4 blanksteg",
+    "formatIndentTab": "Tabb",
+    "formatWidthLabel": "Radbredd",
+    "formatSqlDialectLabel": "SQL-dialekt",
+    "formatBoth": "Formatera båda",
+    "formatBothAria": "Formatera båda texterna med samma inställningar",
+    "formatBusy": "Formaterar…",
+    "formatDone": "Formaterad som {{language}}.",
+    "formatDoneAuto": "Identifierades automatiskt och formaterades som {{language}}.",
+    "formatNoChange": "Redan formaterad som {{language}} — ingenting ändrades.",
+    "formatEmpty": "Inget att formatera — rutan är tom.",
+    "formatErrorAt": "Syntaxfel i {{language}} på rad {{line}}, kolumn {{column}}: {{message}}. Lämnades oförändrad.",
+    "formatErrorLine": "Syntaxfel i {{language}} på rad {{line}}: {{message}}. Lämnades oförändrad.",
+    "formatErrorNoPos": "Fel i {{language}}: {{message}}. Lämnades oförändrad.",
+    "formatAmbiguous": "Det gick inte att avgöra vilket språk det är (kanske {{candidates}}). Välj ett under ”Formatera som”.",
+    "formatUnknown": "Det gick inte att avgöra vilket språk det är. Välj ett under ”Formatera som”.",
+    "formatTooLarge": "För stor för att formateras (gräns {{max}} tecken). Lämnades oförändrad.",
+    "formatLargeWarning": "Stor indata: formateringen körs i bakgrunden och kan ta en stund.",
+    "formatTimeout": "Formateringen tog för lång tid och avbröts. Lämnades oförändrad.",
+    "formatFailed": "Formateringen misslyckades oväntat. Lämnades oförändrad.",
+    "formatStale": "Texten ändrades under formateringen, så resultatet kastades.",
+    "formatMismatch": "De två sidorna formaterades som olika språk ({{a}} och {{b}}), så jämförelsen kan fortfarande visa skillnader i stil.",
+    "formatNote": "Stöd finns för JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown och GraphQL. Formateringen kan ändra citattecken, semikolon och radbrytningar men inte vad koden betyder. Texten formateras i din webbläsare och går att ångra."
   },
   "related": "Relaterade verktyg",
   "faq": {
@@ -172,13 +198,16 @@
     "q2": "Kan jag slå ihop de två versionerna till en slutlig text?",
     "a2": "Ja — det inbyggda sammanslagningsverktyget låter dig acceptera vänster eller höger version ändring för ändring.",
     "q3": "Kan jag ignorera skillnader i blanksteg eller skiftläge?",
-    "a3": "Ja — aktivera \"ignorera blanksteg\" och \"ignorera skiftläge\" var för sig."
+    "a3": "Ja — aktivera \"ignorera blanksteg\" och \"ignorera skiftläge\" var för sig.",
+    "q4": "Vilka språk kan knappen Formatera hantera?",
+    "a4": "JSON, XML, SQL (standard-SQL samt MySQL, PostgreSQL, SQL Server, SQLite, BigQuery med flera), HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown och GraphQL. Språket identifieras automatiskt utifrån filnamnet eller texten, och du kan alltid välja det själv."
   },
   "article": {
     "heading": "Varför använda ett verktyg för textjämförelse?",
     "p1": "Så fort det finns två versioner av samma dokument — ett kontrakt före och efter en jurists ändringar, en uppsats före och efter en omgång feedback, en konfigurationsfil före och efter en kollegas commit — är den viktiga frågan sällan \"är det här samma fil\" utan \"vad exakt har ändrats\". Att läsa båda versionerna sida vid sida och försöka upptäcka varje tillagt kommatecken, borttagen sats eller omformulerad mening är långsamt och felbenäget, särskilt när dokumentet går över en sida eller två. Ett textjämförelseverktyg automatiserar den jämförelsen och markerar precis de ord eller rader som skiljer sig åt, så att du kan granska en ändring på några sekunder istället för minuter.",
     "p2": "Det här verktyget körs helt i din webbläsare. Båda textrutorna hålls i minnet på din enhet och själva jämförelsen beräknas av ett JavaScript-bibliotek för textjämförelse som körs lokalt — inget du skriver eller klistrar in skickas någonsin till en server, loggas eller sparas någonstans. Det spelar roll om du jämför ett kundkontrakt, en lösenordsfil eller vilken text som helst du hellre inte skickar genom en tredjepartstjänst. Stäng fliken och allt är borta; det finns ingen historik att oroa sig för.",
     "p3": "Klistra in den ursprungliga texten till vänster och den uppdaterade versionen till höger — båda rutorna visar radnummer och rullar synkroniserat med varandra, och var och en har sina egna knappar för Rensa, Byt plats och Ladda upp fil så att du kan läsa in två filer direkt från disken (oformaterad text, kod, Word, PDF, Excel med mera) istället för att klippa och klistra. Jämförelsen uppdateras live medan du skriver; det finns ingen knapp att trycka på. Välj Tecken, Ord eller Rad för att styra hur finkorniga skillnaderna ska vara: Tecken-läge fångar en enstaka ändring på skrivfelsnivå, Ord-läge passar bäst för löpande text eftersom det markerar exakt vilka ord som ändrats inuti en mening, och Rad-läge jämför hela rader åt gången, vilket passar kod, JSON eller listliknande innehåll där du bryr dig om vilka hela rader som flyttats snarare än enskilda ord i dem. En rad som bara finns i en version visas helt grön (tillagd) eller röd (borttagen); en rad som finns i båda men har redigerats visas i orange, med de exakta ändrade orden eller tecknen inuti kraftigare markerade — så att du kan skilja en redigerad rad från ett obesläktat par av borttagning-och-tillägg med en blick.",
-    "p4": "Antalet tillagda/borttagna/ändrade delar ovanför jämförelsen ger dig en snabb känsla för hur stor en ändring är, och ↑/↓-knapparna hoppar direkt till nästa eller föregående ändring utan att du behöver rulla genom oförändrade rader — praktiskt i ett långt dokument. En Helskärm-knapp expanderar jämförelsen så att den fyller hela skärmen för närmare granskning. Under jämförelsen förvandlar sammanslagningsverktyget detta från en skrivskyddad jämförelse till något du faktiskt kan lösa: varje ändring får sina egna ←/→-knappar mellan de två kolumnerna, så att du kan dra in höger versions ändring i vänster kolumn eller föra över vänster version till höger, en ändring i taget, tills båda kolumnerna läser exakt som du vill. Varje kolumn har sina egna knappar för Kopiera och Spara, så att du kan hämta ut ett rent, sammanslaget resultat utan att skriva om något. Om de två texterna visar sig vara identiska säger verktyget det rakt ut istället för att visa ett tomt, tvetydigt resultat — en sak mindre att fundera över."
+    "p4": "Antalet tillagda/borttagna/ändrade delar ovanför jämförelsen ger dig en snabb känsla för hur stor en ändring är, och ↑/↓-knapparna hoppar direkt till nästa eller föregående ändring utan att du behöver rulla genom oförändrade rader — praktiskt i ett långt dokument. En Helskärm-knapp expanderar jämförelsen så att den fyller hela skärmen för närmare granskning. Under jämförelsen förvandlar sammanslagningsverktyget detta från en skrivskyddad jämförelse till något du faktiskt kan lösa: varje ändring får sina egna ←/→-knappar mellan de två kolumnerna, så att du kan dra in höger versions ändring i vänster kolumn eller föra över vänster version till höger, en ändring i taget, tills båda kolumnerna läser exakt som du vill. Varje kolumn har sina egna knappar för Kopiera och Spara, så att du kan hämta ut ett rent, sammanslaget resultat utan att skriva om något. Om de två texterna visar sig vara identiska säger verktyget det rakt ut istället för att visa ett tomt, tvetydigt resultat — en sak mindre att fundera över.",
+    "p5": "Två versioner av samma kod kan se helt olika ut bara på grund av stilen: minifierad eller snyggt formaterad, tabbar eller blanksteg, enkla eller dubbla citattecken, långa rader som bryts på olika ställen. Använd formateringsinställningarna ovanför de två rutorna för att få båda texterna till samma standard innan du jämför. Låt ”Formatera som” stå på Identifiera automatiskt (filnamnet kontrolleras först, sedan texten) eller välj själv JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown eller GraphQL. Välj indrag på 2 blanksteg, 4 blanksteg eller en tabb, en radbredd och, för SQL, en dialekt som MySQL, PostgreSQL eller SQL Server. Formatera formaterar en ruta, Formatera båda formaterar båda med identiska inställningar, och om de två sidorna visar sig vara olika språk får du en varning. Om texten har ett syntaxfel ändras ingenting, och meddelandet anger rad och kolumn. Formaterarna (Prettier och sql-formatter) laddas ned först när du trycker på Formatera, körs i en bakgrundsprocess så att stora texter inte låser sidan, och allt stannar på din enhet. Formateringen kan ändra citattecken, semikolon och radbrytningar men aldrig vad koden gör, och varje formatering går att ångra."
   }
 }

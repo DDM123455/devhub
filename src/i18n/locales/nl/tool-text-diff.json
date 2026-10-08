@@ -40,16 +40,14 @@
     "save": "Opslaan als .txt",
     "copyShareLink": "Deellink kopiëren",
     "formatButton": "Formatteren",
-    "formatDetectedJson": "Geformatteerd als JSON",
-    "formatDetectedXml": "Geformatteerd als XML",
-    "formatError": "Geen geldige JSON of XML — ongewijzigd gelaten",
+    "formatError": "Formatteren is niet gelukt — ongewijzigd gelaten",
     "clearedNotice": "Gewist.",
     "undo": "Ongedaan maken",
     "replacedNotice": "Inhoud vervangen.",
     "clearAria": "{{side}} wissen",
     "swapAria": "De oorspronkelijke en gewijzigde tekst omwisselen",
     "uploadAria": "Een bestand laden in {{side}}",
-    "formatAria": "JSON/XML formatteren in {{side}}",
+    "formatAria": "{{side}} formatteren",
     "copyMergedAria": "Samengevoegd resultaat kopiëren: {{side}}",
     "saveMergedAria": "Samengevoegd resultaat opslaan: {{side}}",
     "formatDuplicateKeys": "Let op: er zijn dubbele sleutels gevonden die ongewijzigd zijn gelaten.",
@@ -162,7 +160,35 @@
         "rtf": "eenvoudige omzetting van alinea's en speciale tekens; complexe of ingesloten inhoud kan verloren gaan.",
         "general": "Niet ondersteund: afbeeldingen/scans (geen OCR), met wachtwoord beveiligde bestanden, oude .doc/.xls/.ppt, bestanden groter dan 30 MB. De bestandsinhoud wordt nooit geüpload en niet opgeslagen."
       }
-    }
+    },
+    "formatSettingsHeading": "Formatteren vóór het vergelijken",
+    "formatLanguageLabel": "Formatteren als",
+    "formatAuto": "Automatisch herkennen",
+    "formatIndentLabel": "Inspringing",
+    "formatIndent2": "2 spaties",
+    "formatIndent4": "4 spaties",
+    "formatIndentTab": "Tab",
+    "formatWidthLabel": "Regelbreedte",
+    "formatSqlDialectLabel": "SQL-dialect",
+    "formatBoth": "Beide formatteren",
+    "formatBothAria": "Beide teksten met dezelfde instellingen formatteren",
+    "formatBusy": "Bezig met formatteren…",
+    "formatDone": "Geformatteerd als {{language}}.",
+    "formatDoneAuto": "Automatisch herkend en geformatteerd als {{language}}.",
+    "formatNoChange": "Al geformatteerd als {{language}} — er is niets veranderd.",
+    "formatEmpty": "Niets te formatteren — het veld is leeg.",
+    "formatErrorAt": "Syntaxfout in {{language}} op regel {{line}}, kolom {{column}}: {{message}}. Ongewijzigd gelaten.",
+    "formatErrorLine": "Syntaxfout in {{language}} op regel {{line}}: {{message}}. Ongewijzigd gelaten.",
+    "formatErrorNoPos": "Fout in {{language}}: {{message}}. Ongewijzigd gelaten.",
+    "formatAmbiguous": "Kon niet bepalen welke taal dit is (misschien {{candidates}}). Kies er een bij “Formatteren als”.",
+    "formatUnknown": "Kon niet bepalen welke taal dit is. Kies er een bij “Formatteren als”.",
+    "formatTooLarge": "Te groot om te formatteren (limiet {{max}} tekens). Ongewijzigd gelaten.",
+    "formatLargeWarning": "Grote invoer: het formatteren gebeurt op de achtergrond en kan even duren.",
+    "formatTimeout": "Het formatteren duurde te lang en is gestopt. Ongewijzigd gelaten.",
+    "formatFailed": "Het formatteren is onverwacht mislukt. Ongewijzigd gelaten.",
+    "formatStale": "De tekst veranderde tijdens het formatteren, dus het resultaat is weggegooid.",
+    "formatMismatch": "De twee kanten zijn als verschillende talen geformatteerd ({{a}} en {{b}}), dus het verschil kan nog steeds stijlverschillen tonen.",
+    "formatNote": "Ondersteund: JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown en GraphQL. Formatteren kan aanhalingstekens, puntkomma's en regeleinden veranderen, maar niet wat de code betekent. De tekst wordt in je browser geformatteerd en dit kun je ongedaan maken."
   },
   "related": "Gerelateerde tools",
   "faq": {
@@ -172,13 +198,16 @@
     "q2": "Kan ik de twee versies samenvoegen tot één definitieve tekst?",
     "a2": "Ja — met de ingebouwde samenvoegtool accepteer je de linker of rechter versie per wijziging.",
     "q3": "Kan ik verschillen in witruimte of hoofdlettergebruik negeren?",
-    "a3": "Ja — schakel \"witruimte negeren\" en \"hoofdlettergebruik negeren\" onafhankelijk van elkaar in."
+    "a3": "Ja — schakel \"witruimte negeren\" en \"hoofdlettergebruik negeren\" onafhankelijk van elkaar in.",
+    "q4": "Welke talen kan de knop Formatteren aan?",
+    "a4": "JSON, XML, SQL (standaard-SQL plus MySQL, PostgreSQL, SQL Server, SQLite, BigQuery en meer), HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown en GraphQL. De taal wordt herkend aan de bestandsnaam of de tekst, en je kunt hem altijd zelf kiezen."
   },
   "article": {
     "heading": "Waarom een tool voor tekstvergelijking gebruiken?",
     "p1": "Zodra er twee versies van hetzelfde document bestaan — een contract voor en na de opmerkingen van een advocaat, een essay voor en na een feedbackronde, een configuratiebestand voor en na de commit van een collega — is de belangrijke vraag zelden \"zijn dit dezelfde bestanden\", maar \"wat is er precies veranderd\". Beide versies naast elkaar lezen en proberen elke toegevoegde komma, verwijderde clausule of herschreven zin te ontdekken, is traag en foutgevoelig, zeker zodra een document langer wordt dan een pagina of twee. Een diff-tool automatiseert die vergelijking en markeert precies de woorden of regels die verschillen, zodat je een wijziging in seconden kunt beoordelen in plaats van in minuten.",
     "p2": "Deze tool draait volledig in je browser. Beide tekstvakken blijven in het geheugen op je eigen apparaat en de vergelijking zelf wordt berekend door een JavaScript-bibliotheek die lokaal draait — niets van wat je typt of plakt wordt ooit naar een server gestuurd, gelogd of ergens opgeslagen. Dat is belangrijk als je een klantcontract, een wachtwoordbestand of andere tekst vergelijkt die je liever niet door een externe dienst haalt. Sluit het tabblad en alles is verdwenen — er is geen geschiedenis om je zorgen over te maken.",
     "p3": "Plak de oorspronkelijke tekst links en de bijgewerkte versie rechts — beide vakken tonen regelnummers en scrollen synchroon met elkaar, en elk heeft zijn eigen knoppen Wissen, Omwisselen en Bestand uploaden, zodat je twee bestanden (platte tekst, code, Word, PDF, Excel en meer) rechtstreeks vanaf schijf kunt laden in plaats van te kopiëren en plakken. De vergelijking wordt live bijgewerkt terwijl je typt; er is geen knop om op te drukken. Kies Teken, Woord of Regel om te bepalen hoe fijnmazig verschillen worden opgesplitst: Tekenmodus vangt een enkele wijziging op typfoutniveau, Woordmodus is het beste voor lopende tekst omdat het precies laat zien welke woorden binnen een zin zijn veranderd, en Regelmodus vergelijkt hele regels tegelijk, wat geschikt is voor code, JSON of lijstachtige content waarbij je vooral wilt weten welke complete regels zijn verplaatst in plaats van afzonderlijke woorden daarbinnen. Een regel die alleen in één versie bestaat, wordt volledig groen (toegevoegd) of rood (verwijderd) weergegeven; een regel die in beide bestaat maar bewerkt is, wordt oranje weergegeven, met het exacte gewijzigde woord of de gewijzigde tekens sterker gemarkeerd — zo kun je in één oogopslag een bewerkte regel onderscheiden van een ongerelateerd paar verwijderen-en-invoegen.",
-    "p4": "De tellers voor toegevoegd/verwijderd/gewijzigd boven de vergelijking geven je in één oogopslag een idee van hoe groot een wijziging is, en de ↑/↓-knoppen springen direct naar de volgende of vorige wijziging zonder door ongewijzigde regels te hoeven scrollen — handig bij een lang document. Een knop voor volledig scherm vergroot de vergelijking zodat die het hele scherm vult, voor nauwkeuriger onderzoek. Onder de vergelijking maakt de samenvoegtool hiervan meer dan een alleen-lezen diff: elke wijziging krijgt zijn eigen ←/→-knoppen tussen de twee kolommen, waarmee je de wijziging uit de rechterversie naar de linkerkolom kunt trekken of de linkerversie naar rechts kunt duwen, wijziging voor wijziging, totdat beide kolommen precies zeggen wat je wilt. Elke kolom heeft zijn eigen knoppen Kopiëren en Opslaan, zodat je een schoon, samengevoegd resultaat kunt ophalen zonder iets opnieuw te typen. Blijken de twee teksten identiek te zijn, dan laat de tool dat direct weten in plaats van een leeg, dubbelzinnig resultaat te tonen — weer iets minder om over te twijfelen."
+    "p4": "De tellers voor toegevoegd/verwijderd/gewijzigd boven de vergelijking geven je in één oogopslag een idee van hoe groot een wijziging is, en de ↑/↓-knoppen springen direct naar de volgende of vorige wijziging zonder door ongewijzigde regels te hoeven scrollen — handig bij een lang document. Een knop voor volledig scherm vergroot de vergelijking zodat die het hele scherm vult, voor nauwkeuriger onderzoek. Onder de vergelijking maakt de samenvoegtool hiervan meer dan een alleen-lezen diff: elke wijziging krijgt zijn eigen ←/→-knoppen tussen de twee kolommen, waarmee je de wijziging uit de rechterversie naar de linkerkolom kunt trekken of de linkerversie naar rechts kunt duwen, wijziging voor wijziging, totdat beide kolommen precies zeggen wat je wilt. Elke kolom heeft zijn eigen knoppen Kopiëren en Opslaan, zodat je een schoon, samengevoegd resultaat kunt ophalen zonder iets opnieuw te typen. Blijken de twee teksten identiek te zijn, dan laat de tool dat direct weten in plaats van een leeg, dubbelzinnig resultaat te tonen — weer iets minder om over te twijfelen.",
+    "p5": "Twee versies van dezelfde code zien er vaak alleen door stijl totaal verschillend uit: gecomprimeerd of netjes ingesprongen, tabs of spaties, enkele of dubbele aanhalingstekens, lange regels op andere plekken afgebroken. Gebruik de opmaakinstellingen boven de twee velden om beide teksten op één standaard te brengen voordat je ze vergelijkt. Laat “Formatteren als” op Automatisch herkennen staan (eerst wordt naar de bestandsnaam gekeken, daarna naar de tekst) of kies zelf JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown of GraphQL; kies inspringing met 2 spaties, 4 spaties of een tab, een regelbreedte en, voor SQL, een dialect zoals MySQL, PostgreSQL of SQL Server. Formatteren past één veld aan, Beide formatteren past beide aan met dezelfde instellingen, en als de twee kanten verschillende talen blijken te zijn, krijg je een waarschuwing. Bevat de tekst een syntaxfout, dan blijft alles ongewijzigd en de melding vertelt je de regel en kolom. De formatters (Prettier en sql-formatter) worden pas gedownload als je op Formatteren klikt, draaien in een achtergrondtaak zodat grote invoer de pagina niet laat vastlopen, en alles blijft op je apparaat. Formatteren kan aanhalingstekens, puntkomma's en regeleinden veranderen, maar nooit wat de code doet, en elke opmaak kun je ongedaan maken."
   }
 }
