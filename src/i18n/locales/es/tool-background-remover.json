@@ -7,7 +7,7 @@
   "tagline": "Elimina el fondo de una foto automáticamente y sustitúyelo por un color o una imagen, directamente en tu navegador.",
   "ui": {
     "selectFiles": "Seleccionar imágenes",
-    "dropHint": "o arrastra y suelta las imágenes aquí",
+    "dropHint": "o arrastra y suelta las imágenes aquí (JPG, PNG, WebP, HEIC)",
     "remove": "Quitar fondo",
     "removing": "Quitando el fondo… {{percent}}%",
     "loadingModel": "Descargando modelo de IA (solo la primera vez)… {{percent}}%",

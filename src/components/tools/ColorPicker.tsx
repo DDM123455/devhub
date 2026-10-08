@@ -643,7 +643,9 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 					{harmonyColors.map((c, i) => (
 						<Swatch
 							key={i}
-							hex={rgbToHex(hslToRgb(c))}
+							// The base colour comes back as the very same object: show its exact RGB instead of
+							// the value that has been rounded through integer HSL.
+							hex={c === hsl ? rgbToHex(rgb) : rgbToHex(hslToRgb(c))}
 							copyLabel={messages.copy}
 							copiedLabel={messages.copied}
 							failedLabel={messages.copyFailed}

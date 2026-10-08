@@ -22,7 +22,7 @@
     "computingLabel": "Calculando coincidencias…",
     "highlightedHeading": "Coincidencias resaltadas",
     "matchesHeading": "Coincidencias",
-    "matchCount": "{{count}} coincidencia(s)",
+    "matchCount": "{{count}} coincidencias",
     "noMatches": "sin coincidencias",
     "matchLabel": "Coincidencia {{index}}",
     "fullMatchLabel": "Coincidencia completa",

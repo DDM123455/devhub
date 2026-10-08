@@ -7,7 +7,7 @@
   "tagline": "Verklein je foto's in enkele seconden, rechtstreeks in je browser.",
   "ui": {
     "selectFiles": "Afbeeldingen selecteren",
-    "dropHint": "of sleep afbeeldingen hierheen",
+    "dropHint": "of sleep afbeeldingen hierheen, of plak met Ctrl+V (JPG, PNG, WebP, GIF, BMP, AVIF, HEIC)",
     "quality": "Kwaliteit",
     "compress": "Comprimeren",
     "compressing": "Bezig met comprimeren…",

@@ -20,7 +20,7 @@
     "copy": "Copier",
     "copied": "Copié !",
     "download": "Télécharger le .txt",
-    "uploadFile": "Importer un fichier .txt",
+    "uploadFile": "Importer un fichier",
     "charLimitLabel": "Comparer à une limite de caractères",
     "charLimitNone": "Aucune",
     "charLimitTwitter": "Publication X / Twitter (280)",

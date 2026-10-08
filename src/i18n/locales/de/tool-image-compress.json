@@ -7,7 +7,7 @@
   "tagline": "Verkleinere deine Fotos in Sekunden, direkt im Browser.",
   "ui": {
     "selectFiles": "Bilder auswählen",
-    "dropHint": "oder Bilder hierher ziehen",
+    "dropHint": "oder Bilder hierher ziehen oder mit Strg+V einfügen (JPG, PNG, WebP, GIF, BMP, AVIF, HEIC)",
     "quality": "Qualität",
     "compress": "Komprimieren",
     "compressing": "Wird komprimiert…",

@@ -7,7 +7,7 @@
   "tagline": "Riduci il peso delle tue foto in pochi secondi, direttamente nel browser.",
   "ui": {
     "selectFiles": "Seleziona immagini",
-    "dropHint": "oppure trascina qui le immagini",
+    "dropHint": "oppure trascina qui le immagini o incollale con Ctrl+V (JPG, PNG, WebP, GIF, BMP, AVIF, HEIC)",
     "quality": "Qualità",
     "compress": "Comprimi",
     "compressing": "Compressione…",

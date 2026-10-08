@@ -180,6 +180,21 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-10-08 (Phase 3.17 — xử lý nốt: nhãn Word Counter, màu Color Picker, bản dịch lỗi thời + nhiễm ngôn ngữ)** —
+  (1) Word Counter: nhãn upload "Upload .txt file" → "Upload file" (en/vi + 17 locale). (2) Color Picker: swatch màu gốc
+  trong khối Harmony giờ dùng đúng RGB gốc thay vì đi qua HSL đã làm tròn (#3b82f6 không còn hiện #3C83F6; thử 4 màu).
+  (3) Dò bản dịch lỗi thời bằng script mới `scripts/check-stale-i18n.mjs` (so với commit nền: key tiếng Anh đã đổi mà bản
+  dịch giữ nguyên) → 17 locale × ~20 key được dịch lại (ICO 5 kích thước, JWT PS/ES/JWK, drop hint, Text Diff stats, câu OCR
+  ở trang privacy...). `matchCount` bị báo nhầm (en chỉ đổi match(es)→matches) — chấp nhận. (4) PHÁT HIỆN LỖI NHIỄM NGÔN NGỮ do
+  hôm qua các agent dịch dùng chung scratchpad và đè file của nhau: ko chứa TIẾNG NGA (toàn bộ tool-audio-converter + ~12 key
+  background-remover) và TIẾNG INDONESIA (privacy, common nav/footer/search), fr/privacy.json là TIẾNG THÁI (copy từ th),
+  fr/common có 7 chuỗi TIẾNG THỔ, id/tool-color-picker có heading/related/tagline TIẾNG NGA và ~40 chuỗi tiếng Anh chưa dịch,
+  id/tool-base64 24 chuỗi tiếng Anh, nl/sv/th regex cheat11 tiếng Anh. Tất cả đã dịch lại đúng ngôn ngữ. Thêm script
+  `scripts/check-i18n-copies.mjs` (chuỗi dài trùng hệt ở 2 ngôn ngữ khác nhau, --min N để hạ ngưỡng) để bắt lại lỗi này.
+  Kiểm tra cuối: check-i18n 19 locale sạch, copies chỉ còn trùng hợp lý (es/pt, zh/zh-tw), không còn chuỗi trùng giữa
+  các họ ngôn ngữ khác nhau, JSON hợp lệ, vitest 581/581, build 542 trang. BÀI HỌC: khi chạy nhiều agent dịch song song,
+  mỗi agent phải dùng thư mục tạm RIÊNG; sau đó luôn chạy check-i18n-copies + quét chữ viết (Hangul/Cyrillic/Thai...) để
+  kiểm tra nhiễm chéo. Vẫn CẦN NGƯỜI BẢN NGỮ rà lại (xem Phase 3.15/3.16b).
 - **2026-10-07 (Phase 3.16b — dịch tool OCR sang 18 ngôn ngữ)** — Thêm `tool-image-to-text.json` (165 key: meta,
   heading, ui 108, tên 35 ngôn ngữ nhận dạng, faq, article) cho ar, de, es, fr, hi, id, it, ja, ko, nl, pl, pt,
   ru, sv, th, tr, zh, zh-tw (6 agent, mỗi agent 3 ngôn ngữ). `node scripts/check-i18n.mjs`: cả 19 locale

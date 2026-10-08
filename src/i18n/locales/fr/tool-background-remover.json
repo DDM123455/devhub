@@ -7,7 +7,7 @@
   "tagline": "Détourez automatiquement une photo et remplacez l'arrière-plan par une couleur ou une image, directement dans votre navigateur.",
   "ui": {
     "selectFiles": "Sélectionner des images",
-    "dropHint": "ou glissez-déposez vos images ici",
+    "dropHint": "ou glissez-déposez vos images ici (JPG, PNG, WebP, HEIC)",
     "remove": "Supprimer l'arrière-plan",
     "removing": "Suppression de l'arrière-plan… {{percent}} %",
     "loadingModel": "Téléchargement du modèle IA (première fois uniquement)… {{percent}}%",

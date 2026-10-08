@@ -20,7 +20,7 @@
     "copy": "Kopyala",
     "copied": "Kopyalandı!",
     "download": ".txt indir",
-    "uploadFile": ".txt dosyası yükle",
+    "uploadFile": "Dosya yükle",
     "charLimitLabel": "Karakter sınırına göre denetle",
     "charLimitNone": "Yok",
     "charLimitTwitter": "X / Twitter gönderisi (280)",

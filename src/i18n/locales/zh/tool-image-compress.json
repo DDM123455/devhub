@@ -7,7 +7,7 @@
   "tagline": "在浏览器里几秒钟就能给照片瘦身。",
   "ui": {
     "selectFiles": "选择图片",
-    "dropHint": "或将图片拖放到这里",
+    "dropHint": "或将图片拖放到这里，也可以按 Ctrl+V 粘贴（JPG、PNG、WebP、GIF、BMP、AVIF、HEIC）",
     "quality": "画质",
     "compress": "压缩",
     "compressing": "压缩中…",

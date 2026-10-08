@@ -532,6 +532,13 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 - [ ] Đối chiếu đối thủ bằng WebSearch (agent chỉ dựa trên kiến thức có sẵn), cân nhắc searchable PDF/.docx, tự xoay (OSD)
 - [ ] Lighthouse Performance/SEO ≥ 90 cho trang mới; test ảnh chụp thật (mờ/nghiêng), PDF scan nhiều trang, hủy giữa chừng, offline lần đầu
 
+## Phase 3.17 — Xử lý nốt tồn đọng (theo yêu cầu trực tiếp người dùng 2026-10-08)
+
+- [x] Nhãn Word Counter không còn ".txt"; màu gốc Color Picker chính xác
+- [x] Dịch lại bản dịch lỗi thời (check-stale-i18n.mjs) và sửa nhiễm ngôn ngữ (check-i18n-copies.mjs)
+- [ ] Người bản ngữ rà lại toàn bộ bản dịch AI (ưu tiên ko, fr, id vừa bị dịch lại; bài article/faq dài)
+- [ ] Cân nhắc đưa check-i18n / check-i18n-copies vào bước CI trước khi deploy
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

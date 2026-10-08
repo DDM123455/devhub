@@ -7,7 +7,7 @@
   "tagline": "Zmniejsz rozmiar zdjęć w kilka sekund, prosto w przeglądarce.",
   "ui": {
     "selectFiles": "Wybierz zdjęcia",
-    "dropHint": "lub przeciągnij i upuść zdjęcia tutaj",
+    "dropHint": "lub przeciągnij i upuść zdjęcia tutaj, albo wklej za pomocą Ctrl+V (JPG, PNG, WebP, GIF, BMP, AVIF, HEIC)",
     "quality": "Jakość",
     "compress": "Kompresuj",
     "compressing": "Kompresowanie…",

@@ -7,7 +7,7 @@
   "tagline": "在瀏覽器裡自動去除照片背景，換成純色或自訂圖片。",
   "ui": {
     "selectFiles": "選擇圖片",
-    "dropHint": "或將圖片拖曳到這裡",
+    "dropHint": "或將圖片拖曳到這裡（JPG、PNG、WebP、HEIC）",
     "remove": "去除背景",
     "removing": "去背中… {{percent}}%",
     "loadingModel": "正在下載 AI 模型（僅限首次）… {{percent}}%",

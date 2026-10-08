@@ -22,7 +22,7 @@
     "computingLabel": "Поиск совпадений…",
     "highlightedHeading": "Подсвеченные совпадения",
     "matchesHeading": "Совпадения",
-    "matchCount": "Совпадений: {{count}}",
+    "matchCount": "Найдено совпадений: {{count}}",
     "noMatches": "нет совпадений",
     "matchLabel": "Совпадение {{index}}",
     "fullMatchLabel": "Полное совпадение",

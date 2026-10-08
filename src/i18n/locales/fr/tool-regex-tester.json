@@ -22,7 +22,7 @@
     "computingLabel": "Calcul des correspondances…",
     "highlightedHeading": "Correspondances surlignées",
     "matchesHeading": "Correspondances",
-    "matchCount": "{{count}} correspondance(s)",
+    "matchCount": "{{count}} correspondances",
     "noMatches": "aucune correspondance",
     "matchLabel": "Correspondance {{index}}",
     "fullMatchLabel": "Correspondance complète",

@@ -7,7 +7,7 @@
   "tagline": "Fotoğraflarınızı saniyeler içinde, doğrudan tarayıcınızda küçültün.",
   "ui": {
     "selectFiles": "Resim seç",
-    "dropHint": "veya resimleri buraya sürükleyip bırakın",
+    "dropHint": "veya resimleri buraya sürükleyip bırakın ya da Ctrl+V ile yapıştırın (JPG, PNG, WebP, GIF, BMP, AVIF, HEIC)",
     "quality": "Kalite",
     "compress": "Sıkıştır",
     "compressing": "Sıkıştırılıyor…",

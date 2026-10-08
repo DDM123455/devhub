@@ -47,7 +47,7 @@
     "cheat8": "+ — één of meer keer het vorige token",
     "cheat9": "? — nul of één keer het vorige token",
     "cheat10": "{n,m} — tussen n en m herhalingen",
-    "cheat11": "(...) — capturing group, (?:...) — non-capturing group",
+    "cheat11": "(...) — vastleggende groep, (?:...) — niet-vastleggende groep",
     "cheat12": "\\b — woordgrens, | — alternatie (OF)",
     "historyHeading": "Recente patronen",
     "historyClear": "Geschiedenis wissen",

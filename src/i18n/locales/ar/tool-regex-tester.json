@@ -22,7 +22,7 @@
     "computingLabel": "جارٍ حساب التطابقات…",
     "highlightedHeading": "التطابقات المميزة",
     "matchesHeading": "التطابقات",
-    "matchCount": "{{count}} تطابق(ات)",
+    "matchCount": "{{count}} تطابقات",
     "noMatches": "لا توجد تطابقات",
     "matchLabel": "التطابق {{index}}",
     "fullMatchLabel": "التطابق الكامل",

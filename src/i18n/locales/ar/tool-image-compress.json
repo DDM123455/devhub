@@ -7,7 +7,7 @@
   "tagline": "قلّص حجم صورك في ثوانٍ معدودة، مباشرة داخل متصفحك.",
   "ui": {
     "selectFiles": "اختر الصور",
-    "dropHint": "أو اسحب الصور وأفلتها هنا",
+    "dropHint": "أو اسحب الصور وأفلتها هنا، أو الصقها بـ Ctrl+V (JPG وPNG وWebP وGIF وBMP وAVIF وHEIC)",
     "quality": "الجودة",
     "compress": "ضغط",
     "compressing": "جارٍ الضغط…",

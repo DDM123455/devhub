@@ -7,7 +7,7 @@
   "tagline": "Automatycznie wytnij tło ze zdjęcia, zastąp je kolorem lub obrazem, prosto w przeglądarce.",
   "ui": {
     "selectFiles": "Wybierz zdjęcia",
-    "dropHint": "lub przeciągnij i upuść zdjęcia tutaj",
+    "dropHint": "lub przeciągnij i upuść zdjęcia tutaj (JPG, PNG, WebP, HEIC)",
     "remove": "Usuń tło",
     "removing": "Usuwanie tła… {{percent}}%",
     "loadingModel": "Pobieranie modelu AI (tylko za pierwszym razem)… {{percent}}%",

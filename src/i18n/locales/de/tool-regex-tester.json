@@ -22,7 +22,7 @@
     "computingLabel": "Treffer werden berechnet…",
     "highlightedHeading": "Hervorgehobene Treffer",
     "matchesHeading": "Treffer",
-    "matchCount": "{{count}} Treffer",
+    "matchCount": "{{count}} Treffer gefunden",
     "noMatches": "keine Treffer",
     "matchLabel": "Treffer {{index}}",
     "fullMatchLabel": "Vollständiger Treffer",

@@ -1,39 +1,39 @@
 {
   "meta": {
-    "title": "นโยบายความเป็นส่วนตัว — Web Tool Hub",
-    "description": "Web Tool Hub จัดการข้อมูลของคุณอย่างไร: ไฟล์ไม่ถูกอัปโหลด ไม่ต้องสมัครบัญชี ไม่มีการติดตาม อ่านนโยบายฉบับเต็มได้ที่นี่"
+    "title": "Politique de confidentialité — Web Tool Hub",
+    "description": "Comment Web Tool Hub traite vos données : vos fichiers ne sont jamais envoyés, aucun compte, aucun suivi. Lisez la politique de confidentialité complète."
   },
-  "heading": "นโยบายความเป็นส่วนตัว",
-  "updated": "อัปเดตล่าสุด: สิงหาคม 2026",
-  "intro": "Web Tool Hub สร้างขึ้นบนหลักการข้อเดียว คือไฟล์ของคุณจะไม่ออกจากอุปกรณ์ของคุณ ทุกเครื่องมือบนเว็บไซต์นี้ ไม่ว่าจะบีบอัดรูปภาพ รวมไฟล์ PDF หรือจัดรูปแบบ JSON ล้วนทำงานในเบราว์เซอร์ของคุณทั้งหมดด้วย JavaScript และ Web API ไม่มีขั้นตอนอัปโหลด เพราะไม่มีเซิร์ฟเวอร์ที่ประมวลผลไฟล์ของคุณ",
+  "heading": "Politique de confidentialité",
+  "updated": "Dernière mise à jour : août 2026",
+  "intro": "Web Tool Hub repose sur une seule règle : vos fichiers ne quittent jamais votre appareil. Chaque outil de ce site — compresser une image, fusionner un PDF, formater du JSON — s'exécute entièrement dans votre navigateur grâce à JavaScript et aux API Web. Il n'y a pas d'étape d'envoi, car aucun serveur ne traite vos fichiers.",
   "sections": [
     {
-      "heading": "สิ่งที่เราไม่เก็บรวบรวม",
-      "body": "เราไม่ขอให้คุณสร้างบัญชี เราไม่เก็บไฟล์ เนื้อหาในไฟล์ หรือชื่อไฟล์ของคุณ และเราไม่ใช้ระบบวิเคราะห์สถิติหรือตัวติดตามโฆษณาใด ๆ บนเว็บไซต์นี้ ไม่มี Google Analytics ไม่มี Facebook Pixel และไม่มีสคริปต์ของบุคคลที่สามคอยดูว่าคุณทำอะไรอยู่"
+      "heading": "Ce que nous ne collectons pas",
+      "body": "Nous ne vous demandons pas de créer de compte. Nous ne collectons ni vos fichiers, ni leur contenu, ni leurs noms. Nous n'utilisons aucun outil d'analyse ni traceur publicitaire sur ce site : pas de Google Analytics, pas de Facebook Pixel, aucun script tiers qui observe ce que vous faites ici."
     },
     {
-      "heading": "แต่ละเครื่องมือทำงานอย่างไร",
-      "body": "เมื่อคุณ \"อัปโหลด\" ไฟล์เข้าเครื่องมือใด ๆ ที่นี่ ไฟล์จะถูกอ่านเข้าหน่วยความจำของเบราว์เซอร์โดยตรงผ่าน File API และประมวลผลด้วย JavaScript, WebAssembly หรือ Canvas/Web Audio API ตามที่เครื่องมือนั้นต้องการ งานหนัก เช่น การบีบอัดรูปภาพและการตัดวิดีโอ จะทำงานใน Web Worker เพื่อไม่ให้หน้าเว็บค้าง แต่การประมวลผลยังคงเกิดขึ้นบนเครื่องของคุณ ในแท็บเบราว์เซอร์ของคุณเอง ไม่มีการส่งข้อมูลไปที่ใดเพื่อประมวลผล"
+      "heading": "Comment fonctionne réellement chaque outil",
+      "body": "Lorsque vous « importez » un fichier dans l'un de ces outils, il est lu directement dans la mémoire de votre navigateur grâce à l'API File, puis traité avec JavaScript, WebAssembly ou les API Canvas/Web Audio, selon les besoins de l'outil. Les tâches les plus lourdes (compression d'images, découpe de vidéos) s'exécutent dans un Web Worker pour que la page ne se fige pas, mais le travail reste effectué sur votre machine, dans l'onglet de votre navigateur. Rien n'est jamais transmis ailleurs pour être traité."
     },
     {
-      "heading": "ที่เก็บข้อมูลในเครื่อง (Local Storage)",
-      "body": "บางเครื่องมือบันทึกข้อมูลเล็ก ๆ ไว้ใน local storage ของเบราว์เซอร์เพื่อไม่ให้งานของคุณหาย ได้แก่ ธีมที่คุณเลือก (theme) ฉบับร่างของ Text Diff (text-diff-draft) ฉบับร่างของ Markdown Editor (markdown-editor-draft) ประวัติแพตเทิร์นของ Regex Tester (regex-tester-history) และพาเลตสีที่บันทึกไว้ของ Color Picker (color-picker-saved-palettes) ข้อมูลนี้อยู่บนอุปกรณ์ของคุณเท่านั้น ไม่เคยถูกส่งมาให้เรา และคุณลบได้ทุกเมื่อด้วยการล้างข้อมูลเว็บไซต์นี้ในเบราว์เซอร์"
+      "heading": "Stockage local",
+      "body": "Certains outils enregistrent de petites données dans le stockage local de votre navigateur afin que vous ne perdiez pas votre travail : votre choix de thème (theme), le brouillon de Text Diff (text-diff-draft), le brouillon de l'éditeur Markdown (markdown-editor-draft), l'historique des motifs du testeur de regex (regex-tester-history) et les palettes enregistrées du sélecteur de couleurs (color-picker-saved-palettes). Ces données restent uniquement sur votre appareil, ne nous sont jamais envoyées, et vous pouvez les supprimer à tout moment en effaçant les données de ce site dans votre navigateur."
     },
     {
-      "heading": "ไฟล์ที่ดาวน์โหลดจาก CDN ของบุคคลที่สาม",
-      "body": "ไฟล์ของคุณไม่เคยถูกอัปโหลด แต่บางเครื่องมือจะดาวน์โหลดโค้ดหรือข้อมูลของตัวเอง (ไม่ใช่เนื้อหาของคุณ) เมื่อใช้งาน ได้แก่ Trim Video และ Audio Converter ดึงแกน ffmpeg WebAssembly จาก cdn.jsdelivr.net, Remove Background ดึงโมเดล AI และ WebAssembly runtime จาก staticimgly.com และ Kubernetes YAML Validator ดึงไฟล์ Kubernetes JSON Schema สาธารณะจาก cdn.jsdelivr.net คำขอเหล่านี้เป็นเพียงการดาวน์โหลดไฟล์สาธารณะ ผู้ให้บริการ CDN เหล่านั้นจึงอาจเห็นที่อยู่ IP ของคุณและไฟล์ที่ขอ เช่นเดียวกับทรัพยากรของเว็บไซต์ทั่วไป ตัวอย่าง Markdown ยังแสดงรูปภาพที่อ้างอิงในข้อความของคุณได้ด้วย หากคุณอ้างอิงรูปภาพจากโฮสต์ภายนอก เบราว์เซอร์ของคุณจะขอรูปจากโฮสต์นั้น (ซึ่งโดยปกติ content security policy ของเว็บไซต์จะบล็อกไว้)"
+      "heading": "Ressources téléchargées depuis des CDN tiers",
+      "body": "Vos fichiers ne sont jamais envoyés, mais certains outils téléchargent leur propre code ou leurs propres données (pas votre contenu) lorsque vous les utilisez : Trim Video et Audio Converter récupèrent le noyau WebAssembly de ffmpeg depuis cdn.jsdelivr.net ; Remove Background récupère son modèle d'IA et son runtime WebAssembly depuis staticimgly.com ; Kubernetes YAML Validator récupère des fichiers JSON Schema Kubernetes publics depuis cdn.jsdelivr.net. Ces requêtes sont de simples téléchargements de fichiers publics : ces fournisseurs de CDN peuvent donc voir votre adresse IP et le fichier demandé, comme pour n'importe quelle ressource d'un site web. L'aperçu Markdown peut aussi afficher les images référencées dans votre texte ; si vous référencez une image hébergée ailleurs, votre navigateur la demandera à cet hôte (la politique de sécurité du contenu du site bloque normalement cette requête). Image to Text (OCR) télécharge les données linguistiques des langues que vous choisissez (un fichier .traineddata d'environ 0,4 à 4 Mo chacun) depuis cdn.jsdelivr.net, et votre navigateur peut en conserver une copie dans son cache IndexedDB pour ne pas avoir à la télécharger de nouveau ; seules les données linguistiques sont récupérées, vos images et le texte reconnu ne quittent jamais votre appareil."
     },
     {
-      "heading": "โฮสติ้งและบันทึกทางเทคนิค",
-      "body": "เว็บไซต์นี้โฮสต์บนโครงสร้างพื้นฐานของ Cloudflare เช่นเดียวกับเว็บไซต์ทั่วไป เครือข่ายเอดจ์ของ Cloudflare อาจบันทึกข้อมูลคำขอทางเทคนิคตามปกติ (เช่น ที่อยู่ IP, user agent และเวลาที่ร้องขอ) เพื่อความปลอดภัยและการดำเนินงาน ซึ่งเป็นการบันทึกในระดับโครงสร้างพื้นฐานที่เกิดขึ้นกับการโฮสต์เว็บทุกแห่ง ไม่ใช่ข้อมูลที่ Web Tool Hub เก็บเองหรือเข้าถึงเพื่อติดตามตัวบุคคล"
+      "heading": "Hébergement et journaux techniques",
+      "body": "Ce site est hébergé sur l'infrastructure de Cloudflare. Comme pratiquement tout site web, le réseau périphérique de Cloudflare peut consigner des données techniques standard sur les requêtes (adresse IP, user agent, horodatage de la requête) à des fins de sécurité et d'exploitation. Il s'agit d'une journalisation au niveau de l'infrastructure, commune à tous les hébergements web, et non de données que Web Tool Hub collecte lui-même ou auxquelles il a accès pour suivre des personnes."
     },
     {
-      "heading": "คุกกี้",
-      "body": "เราไม่ตั้งคุกกี้เพื่อการติดตามหรือการโฆษณา หากในอนาคตมีการใช้คุกกี้ (เช่น เมื่อมีการนำโฆษณามาใช้) เราจะแจ้งไว้ที่นี่ และจะแสดงแบนเนอร์ขอความยินยอมในกรณีที่กฎหมายกำหนด"
+      "heading": "Cookies",
+      "body": "Nous ne déposons aucun cookie de suivi ou de publicité. Tout usage futur de cookies (par exemple, si des publicités sont introduites) sera indiqué ici et soumis à une bannière de consentement lorsque la loi l'exige."
     },
     {
-      "heading": "การเปลี่ยนแปลงนโยบายนี้",
-      "body": "หากนโยบายนี้มีการเปลี่ยนแปลง วันที่ \"อัปเดตล่าสุด\" ด้านบนจะเปลี่ยนตามไปด้วย เนื่องจากนี่เป็นเว็บไซต์แบบสแตติกที่ไม่มีระบบบัญชี เราจึงไม่สามารถแจ้งคุณเป็นรายบุคคลได้ หากต้องการทราบข้อกำหนดปัจจุบัน โปรดกลับมาดูที่หน้านี้"
+      "heading": "Modifications de cette politique",
+      "body": "Si cette politique change, la date de « Dernière mise à jour » ci-dessus changera aussi. Comme il s'agit d'un site statique sans système de comptes, nous n'avons aucun moyen de vous prévenir individuellement : revenez consulter cette page si vous souhaitez connaître les conditions en vigueur."
     }
   ]
 }

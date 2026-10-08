@@ -7,7 +7,7 @@
   "tagline": "ブラウザ上で自動的に写真の背景を除去し、色や画像に差し替えられます。",
   "ui": {
     "selectFiles": "画像を選択",
-    "dropHint": "またはここに画像をドラッグ＆ドロップ",
+    "dropHint": "または画像をここにドラッグ＆ドロップ（JPG、PNG、WebP、HEIC）",
     "remove": "背景を除去",
     "removing": "背景を除去中… {{percent}}%",
     "loadingModel": "AIモデルをダウンロード中（初回のみ）… {{percent}}%",

@@ -7,7 +7,7 @@
   "tagline": "Knip automatisch de achtergrond uit een foto, vervang deze door een kleur of afbeelding, rechtstreeks in je browser.",
   "ui": {
     "selectFiles": "Afbeeldingen selecteren",
-    "dropHint": "of sleep afbeeldingen hierheen",
+    "dropHint": "of sleep afbeeldingen hierheen (JPG, PNG, WebP, HEIC)",
     "remove": "Achtergrond verwijderen",
     "removing": "Achtergrond wordt verwijderd… {{percent}}%",
     "loadingModel": "AI-model wordt gedownload (alleen de eerste keer)… {{percent}}%",

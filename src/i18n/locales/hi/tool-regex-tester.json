@@ -22,7 +22,7 @@
     "computingLabel": "मेल निकाले जा रहे हैं…",
     "highlightedHeading": "हाइलाइट किए गए मैच",
     "matchesHeading": "मैच",
-    "matchCount": "{{count}} मैच",
+    "matchCount": "{{count}} मैच मिले",
     "noMatches": "कोई मैच नहीं",
     "matchLabel": "मैच {{index}}",
     "fullMatchLabel": "पूरा मैच",

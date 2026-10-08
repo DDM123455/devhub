@@ -20,7 +20,7 @@
     "copy": "コピー",
     "copied": "コピーしました！",
     "download": ".txt をダウンロード",
-    "uploadFile": ".txt ファイルをアップロード",
+    "uploadFile": "ファイルをアップロード",
     "charLimitLabel": "文字数の上限と照合",
     "charLimitNone": "なし",
     "charLimitTwitter": "X / Twitter の投稿（280）",

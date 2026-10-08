@@ -19,7 +19,7 @@
     "noFiles": "Inga bilder valda än.",
     "errorGeneric": "Något gick fel när bilden skulle konverteras. Försök igen.",
     "retry": "Försök igen",
-    "errorAvifUnsupported": "Den här webbläsaren kan inte exportera AVIF. Prova en aktuell version av Chrome eller Firefox, eller välj ett annat format.",
+    "errorAvifUnsupported": "Din webbläsare kan inte koda AVIF från en canvas, så den här filen konverterades inte. Välj ett annat format, till exempel WebP eller PNG.",
     "formatsNote": "ICO-utdata samlar 5 storlekar i en fil (16, 32, 48, 128, 256 px), som en riktig favicon eller Windows-programikon — operativsystemet väljer den som passar. AVIF-export kräver en aktuell version av Chrome eller Firefox. HEIC/HEIF-foton från iPhone läses in automatiskt — inget separat konverteringssteg behövs. SVG-filer rastreras i webbläsaren (välj renderingsskala). Om du väljer PDF blir varje bild en PDF-sida som du också kan slå ihop till en fil.",
     "remove": "Ta bort",
     "clearAll": "Rensa allt",

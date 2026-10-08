@@ -7,7 +7,7 @@
   "tagline": "브라우저에서 몇 초 만에 사진 용량을 줄이세요.",
   "ui": {
     "selectFiles": "이미지 선택",
-    "dropHint": "또는 이미지를 여기로 드래그하세요",
+    "dropHint": "또는 이미지를 여기로 드래그하거나 Ctrl+V로 붙여넣으세요 (JPG, PNG, WebP, GIF, BMP, AVIF, HEIC)",
     "quality": "화질",
     "compress": "압축",
     "compressing": "압축 중…",

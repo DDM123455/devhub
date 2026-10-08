@@ -7,7 +7,7 @@
   "tagline": "Ritaglia automaticamente lo sfondo da una foto, sostituiscilo con un colore o un'immagine, direttamente nel browser.",
   "ui": {
     "selectFiles": "Seleziona immagini",
-    "dropHint": "oppure trascina qui le immagini",
+    "dropHint": "oppure trascina qui le immagini (JPG, PNG, WebP, HEIC)",
     "remove": "Rimuovi sfondo",
     "removing": "Rimozione sfondo… {{percent}}%",
     "loadingModel": "Download del modello IA in corso (solo la prima volta)… {{percent}}%",

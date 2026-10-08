@@ -1,39 +1,39 @@
 {
   "meta": {
-    "title": "Kebijakan Privasi — Web Tool Hub",
-    "description": "Cara Web Tool Hub menangani data Anda: file tidak pernah diunggah, tanpa akun, tanpa pelacakan. Baca kebijakan privasi selengkapnya."
+    "title": "개인정보처리방침 — Web Tool Hub",
+    "description": "Web Tool Hub가 데이터를 다루는 방식: 파일은 업로드되지 않으며 계정도 추적도 없습니다. 개인정보처리방침 전문을 확인하세요."
   },
-  "heading": "Kebijakan Privasi",
-  "updated": "Terakhir diperbarui: Agustus 2026",
-  "intro": "Web Tool Hub dibangun di atas satu aturan: file Anda tidak pernah meninggalkan perangkat Anda. Setiap alat di situs ini — mengompres gambar, menggabungkan PDF, merapikan JSON — berjalan sepenuhnya di browser Anda menggunakan JavaScript dan Web API. Tidak ada tahap unggah, karena memang tidak ada server yang memproses file Anda.",
+  "heading": "개인정보처리방침",
+  "updated": "최종 업데이트: 2026년 8월",
+  "intro": "Web Tool Hub는 한 가지 원칙으로 만들어졌습니다. 사용자의 파일은 기기 밖으로 나가지 않는다는 것입니다. 이미지 압축, PDF 병합, JSON 정리 등 이 사이트의 모든 도구는 JavaScript와 Web API를 사용해 전적으로 사용자의 브라우저 안에서 실행됩니다. 파일을 처리하는 서버가 없으므로 업로드 단계도 없습니다.",
   "sections": [
     {
-      "heading": "Data yang tidak kami kumpulkan",
-      "body": "Kami tidak meminta Anda membuat akun. Kami tidak mengumpulkan file Anda, isinya, maupun nama filenya. Kami tidak memasang pelacak analitik atau iklan di situs ini — tidak ada Google Analytics, tidak ada Facebook Pixel, tidak ada skrip pihak ketiga yang memantau aktivitas Anda di sini."
+      "heading": "수집하지 않는 정보",
+      "body": "계정을 만들도록 요구하지 않습니다. 사용자의 파일, 파일 내용, 파일 이름을 수집하지 않습니다. 이 사이트에는 분석 도구나 광고 추적기가 없습니다. Google Analytics도, Facebook Pixel도, 사용자의 활동을 지켜보는 서드파티 스크립트도 없습니다."
     },
     {
-      "heading": "Cara kerja setiap alat",
-      "body": "Saat Anda \"mengunggah\" file ke alat mana pun di sini, file tersebut langsung dibaca ke memori browser Anda lewat File API dan diproses dengan JavaScript, WebAssembly, atau Canvas/Web Audio API — sesuai kebutuhan alatnya. Pekerjaan berat (kompresi gambar, pemotongan video) dijalankan di dalam Web Worker agar halaman tidak macet, tetapi prosesnya tetap berlangsung di perangkat Anda, di tab browser Anda. Tidak ada yang dikirim ke mana pun untuk diproses."
+      "heading": "각 도구가 실제로 작동하는 방식",
+      "body": "이곳의 도구에 파일을 \"업로드\"하면, 파일은 File API를 통해 브라우저 메모리로 직접 읽혀 JavaScript, WebAssembly, Canvas/Web Audio API 중 도구에 필요한 방식으로 처리됩니다. 이미지 압축이나 동영상 자르기처럼 무거운 작업은 페이지가 멈추지 않도록 Web Worker 안에서 실행되지만, 작업 자체는 여전히 사용자의 기기, 사용자의 브라우저 탭에서 이루어집니다. 처리를 위해 어디로든 전송되는 데이터는 없습니다."
     },
     {
-      "heading": "Penyimpanan lokal",
-      "body": "Beberapa alat menyimpan sedikit data di penyimpanan lokal (local storage) browser agar pekerjaan Anda tidak hilang: pilihan tema (theme), draf Text Diff (text-diff-draft), draf Markdown Editor (markdown-editor-draft), riwayat pola Regex Tester (regex-tester-history), dan palet Color Picker yang tersimpan (color-picker-saved-palettes). Data ini hanya ada di perangkat Anda, tidak pernah dikirim kepada kami, dan bisa Anda hapus kapan saja dengan membersihkan data situs ini di browser."
+      "heading": "로컬 저장소",
+      "body": "일부 도구는 작업 내용을 잃지 않도록 브라우저의 로컬 저장소(local storage)에 소량의 상태를 저장합니다. 테마 선택(theme), 텍스트 비교 초안(text-diff-draft), 마크다운 편집기 초안(markdown-editor-draft), 정규식 테스터의 패턴 기록(regex-tester-history), 저장한 색상 추출기 팔레트(color-picker-saved-palettes)가 해당합니다. 이 데이터는 사용자의 기기에만 보관되고 저희에게 전송되지 않으며, 브라우저에서 이 사이트의 데이터를 삭제하면 언제든지 지울 수 있습니다."
     },
     {
-      "heading": "Aset yang diunduh dari CDN pihak ketiga",
-      "body": "File Anda tidak pernah diunggah, tetapi beberapa alat mengunduh kode atau data miliknya sendiri (bukan konten Anda) saat dipakai: Trim Video dan Audio Converter mengambil inti WebAssembly ffmpeg dari cdn.jsdelivr.net; Remove Background mengambil model AI dan runtime WebAssembly-nya dari staticimgly.com; Kubernetes YAML Validator mengambil file JSON Schema Kubernetes publik dari cdn.jsdelivr.net. Permintaan ini hanyalah unduhan biasa atas file publik, sehingga penyedia CDN tersebut dapat melihat alamat IP Anda dan file yang diminta, seperti pada sumber daya situs web mana pun. Pratinjau Markdown juga dapat menampilkan gambar yang dirujuk dalam teks Anda; jika Anda merujuk gambar dari host eksternal, browser Anda akan memintanya dari host tersebut (kebijakan keamanan konten situs ini biasanya memblokirnya)."
+      "heading": "서드파티 CDN에서 내려받는 리소스",
+      "body": "파일은 절대 업로드되지 않지만, 일부 도구는 사용할 때 자체 코드나 데이터(사용자의 콘텐츠가 아닙니다)를 내려받습니다. 동영상 자르기와 오디오 변환기는 ffmpeg WebAssembly 코어를 cdn.jsdelivr.net에서, 배경 제거는 AI 모델과 WebAssembly 런타임을 staticimgly.com에서, Kubernetes YAML 검사기는 공개된 Kubernetes JSON Schema 파일을 cdn.jsdelivr.net에서 가져옵니다. 이 요청은 공개 파일을 그대로 내려받는 것이므로, 다른 웹사이트 리소스와 마찬가지로 해당 CDN 제공업체가 사용자의 IP 주소와 요청한 파일을 볼 수 있습니다. 마크다운 미리보기는 텍스트에서 참조한 이미지도 표시할 수 있습니다. 외부 호스트의 이미지를 참조하면 브라우저가 해당 호스트에 이미지를 요청합니다(보통은 사이트의 콘텐츠 보안 정책이 이를 차단합니다). 이미지에서 텍스트 추출(OCR)은 선택한 언어의 언어 데이터(언어당 약 0.4~4MB의 .traineddata 파일)를 cdn.jsdelivr.net에서 내려받으며, 브라우저가 다시 내려받지 않도록 IndexedDB 캐시에 사본을 보관할 수 있습니다. 가져오는 것은 언어 데이터뿐이며, 이미지와 인식된 텍스트는 기기 밖으로 나가지 않습니다."
     },
     {
-      "heading": "Hosting dan log teknis",
-      "body": "Situs ini dihosting di infrastruktur Cloudflare. Seperti hampir semua situs web, jaringan edge Cloudflare dapat mencatat data permintaan teknis standar (seperti alamat IP, user agent, dan waktu permintaan) untuk keperluan keamanan dan operasional — ini adalah pencatatan tingkat infrastruktur yang lazim pada semua layanan hosting, bukan sesuatu yang dikumpulkan atau diakses oleh Web Tool Hub untuk melacak individu."
+      "heading": "호스팅 및 기술 로그",
+      "body": "이 사이트는 Cloudflare 인프라에서 호스팅됩니다. 거의 모든 웹사이트와 마찬가지로 Cloudflare의 엣지 네트워크는 보안과 운영을 위해 IP 주소, 사용자 에이전트, 요청 시각 같은 표준 기술 요청 데이터를 기록할 수 있습니다. 이는 모든 웹 호스팅에서 일반적인 인프라 수준의 로그이며, Web Tool Hub가 개인을 추적하려고 직접 수집하거나 접근하는 정보가 아닙니다."
     },
     {
-      "heading": "Cookie",
-      "body": "Kami tidak memasang cookie untuk pelacakan atau iklan. Jika kelak cookie digunakan (misalnya bila iklan diperkenalkan), hal itu akan dijelaskan di sini dan disertai banner persetujuan bila diwajibkan oleh hukum."
+      "heading": "쿠키",
+      "body": "추적이나 광고를 위한 쿠키는 설정하지 않습니다. 앞으로 쿠키를 사용하게 되면(예: 광고를 도입하는 경우) 이 페이지에 안내하고, 법률에서 요구하는 경우 동의 배너를 통해 동의를 받겠습니다."
     },
     {
-      "heading": "Perubahan kebijakan ini",
-      "body": "Jika kebijakan ini berubah, tanggal \"Terakhir diperbarui\" di atas juga akan berubah. Karena situs ini statis dan tanpa sistem akun, kami tidak punya cara untuk memberi tahu Anda secara pribadi — silakan cek kembali halaman ini jika ingin mengetahui ketentuan terbaru."
+      "heading": "방침 변경",
+      "body": "이 방침이 바뀌면 위의 \"최종 업데이트\" 날짜도 함께 바뀝니다. 이 사이트는 계정 시스템이 없는 정적 사이트이므로 개별적으로 알려 드릴 방법이 없습니다. 최신 약관이 궁금하시면 이 페이지를 다시 확인해 주세요."
     }
   ]
 }

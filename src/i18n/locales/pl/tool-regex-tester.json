@@ -22,7 +22,7 @@
     "computingLabel": "Obliczanie dopasowań…",
     "highlightedHeading": "Podświetlone dopasowania",
     "matchesHeading": "Dopasowania",
-    "matchCount": "{{count}} dopasowań",
+    "matchCount": "Dopasowania: {{count}}",
     "noMatches": "brak dopasowań",
     "matchLabel": "Dopasowanie {{index}}",
     "fullMatchLabel": "Pełne dopasowanie",

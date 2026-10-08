@@ -22,7 +22,7 @@
     "computingLabel": "일치 항목 계산 중…",
     "highlightedHeading": "하이라이트된 매치",
     "matchesHeading": "매치 결과",
-    "matchCount": "{{count}}개 매치",
+    "matchCount": "{{count}}개 일치",
     "noMatches": "매치 없음",
     "matchLabel": "매치 {{index}}",
     "fullMatchLabel": "전체 매치",

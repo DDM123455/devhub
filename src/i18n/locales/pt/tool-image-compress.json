@@ -7,7 +7,7 @@
   "tagline": "Reduza o tamanho das suas fotos em segundos, direto no navegador.",
   "ui": {
     "selectFiles": "Selecionar imagens",
-    "dropHint": "ou arraste e solte as imagens aqui",
+    "dropHint": "ou arraste e solte as imagens aqui, ou cole com Ctrl+V (JPG, PNG, WebP, GIF, BMP, AVIF, HEIC)",
     "quality": "Qualidade",
     "compress": "Comprimir",
     "compressing": "Comprimindo…",

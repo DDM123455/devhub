@@ -7,7 +7,7 @@
   "tagline": "Entferne den Hintergrund eines Fotos automatisch und ersetze ihn durch eine Farbe oder ein Bild, direkt im Browser.",
   "ui": {
     "selectFiles": "Bilder auswählen",
-    "dropHint": "oder Bilder hierher ziehen",
+    "dropHint": "oder Bilder hierher ziehen (JPG, PNG, WebP, HEIC)",
     "remove": "Hintergrund entfernen",
     "removing": "Hintergrund wird entfernt… {{percent}} %",
     "loadingModel": "KI-Modell wird heruntergeladen (nur beim ersten Mal)… {{percent}}%",

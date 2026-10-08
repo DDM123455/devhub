@@ -7,7 +7,7 @@
   "tagline": "在瀏覽器裡幾秒鐘就能把照片檔案變小。",
   "ui": {
     "selectFiles": "選擇圖片",
-    "dropHint": "或將圖片拖曳到這裡",
+    "dropHint": "或將圖片拖曳到這裡，也可以按 Ctrl+V 貼上（JPG、PNG、WebP、GIF、BMP、AVIF、HEIC）",
     "quality": "畫質",
     "compress": "壓縮",
     "compressing": "壓縮中…",

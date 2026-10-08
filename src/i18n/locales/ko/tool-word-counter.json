@@ -20,7 +20,7 @@
     "copy": "복사",
     "copied": "복사됨!",
     "download": ".txt 다운로드",
-    "uploadFile": ".txt 파일 업로드",
+    "uploadFile": "파일 업로드",
     "charLimitLabel": "글자 수 제한과 비교",
     "charLimitNone": "없음",
     "charLimitTwitter": "X / Twitter 게시물 (280)",

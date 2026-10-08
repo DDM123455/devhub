@@ -22,7 +22,7 @@
     "computingLabel": "一致を計算中…",
     "highlightedHeading": "マッチ箇所のハイライト",
     "matchesHeading": "マッチ結果",
-    "matchCount": "{{count}} 件マッチ",
+    "matchCount": "{{count}} 件の一致",
     "noMatches": "マッチなし",
     "matchLabel": "マッチ {{index}}",
     "fullMatchLabel": "完全一致",

@@ -7,7 +7,7 @@
   "tagline": "Potong latar belakang foto secara otomatis, ganti dengan warna atau gambar, langsung di browser Anda.",
   "ui": {
     "selectFiles": "Pilih gambar",
-    "dropHint": "atau seret dan lepas gambar di sini",
+    "dropHint": "atau seret dan lepas gambar di sini (JPG, PNG, WebP, HEIC)",
     "remove": "Hapus Latar Belakang",
     "removing": "Menghapus latar belakang… {{percent}}%",
     "loadingModel": "Mengunduh model AI (hanya sekali di awal)… {{percent}}%",

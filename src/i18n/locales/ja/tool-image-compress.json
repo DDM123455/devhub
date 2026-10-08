@@ -7,7 +7,7 @@
   "tagline": "ブラウザ上で数秒のうちに写真の容量を減らせます。",
   "ui": {
     "selectFiles": "画像を選択",
-    "dropHint": "またはここに画像をドラッグ＆ドロップ",
+    "dropHint": "または画像をここにドラッグ＆ドロップするか、Ctrl+V で貼り付け（JPG、PNG、WebP、GIF、BMP、AVIF、HEIC）",
     "quality": "画質",
     "compress": "圧縮",
     "compressing": "圧縮中…",

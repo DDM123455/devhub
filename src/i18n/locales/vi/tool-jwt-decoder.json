@@ -11,7 +11,7 @@
     "loadSample": "Dùng token mẫu",
     "clear": "Xóa",
     "decodeErrorFormat": "Chuỗi này không phải JWT hợp lệ — một token cần đúng 3 phần cách nhau bởi dấu chấm (header.payload.signature).",
-    "decodeErrorBase64": "Không giải mã được token này — một trong các phần không phải Base64URL hợp lệ.",
+    "decodeErrorBase64": "Không giải mã được token này — một trong các phần không phải Base64URL hợp lệ (hoặc không phải văn bản UTF-8 hợp lệ).",
     "decodeErrorJson": "Không đọc được token này — header hoặc payload sau khi giải mã không phải JSON hợp lệ.",
     "headerHeading": "Header",
     "payloadHeading": "Payload",

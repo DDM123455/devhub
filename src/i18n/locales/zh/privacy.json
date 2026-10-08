@@ -21,7 +21,7 @@
     },
     {
       "heading": "从第三方 CDN 下载的资源",
-      "body": "你的文件不会被上传，但部分工具在使用时会下载自身所需的代码或数据（不是你的内容）：视频裁剪和音频转换器会从 cdn.jsdelivr.net 获取 ffmpeg WebAssembly 核心；背景移除会从 staticimgly.com 获取 AI 模型和 WebAssembly 运行时；Kubernetes YAML 校验器会从 cdn.jsdelivr.net 获取公开的 Kubernetes JSON Schema 文件。这些请求只是对公开文件的普通下载，因此与访问任何网站资源一样，这些 CDN 服务商可能会看到你的 IP 地址和所请求的文件。Markdown 预览也可以显示文本中引用的图片；如果你引用了外部站点的图片，浏览器会向该站点请求它（本站的内容安全策略通常会阻止这种请求）。"
+      "body": "你的文件不会被上传，但部分工具在使用时会下载自身所需的代码或数据（不是你的内容）：视频裁剪和音频转换器会从 cdn.jsdelivr.net 获取 ffmpeg WebAssembly 核心；背景移除会从 staticimgly.com 获取 AI 模型和 WebAssembly 运行时；Kubernetes YAML 校验器会从 cdn.jsdelivr.net 获取公开的 Kubernetes JSON Schema 文件。这些请求只是对公开文件的普通下载，因此与访问任何网站资源一样，这些 CDN 服务商可能会看到你的 IP 地址和所请求的文件。Markdown 预览也可以显示文本中引用的图片；如果你引用了外部站点的图片，浏览器会向该站点请求它（本站的内容安全策略通常会阻止这种请求）。图片转文字（OCR）会从 cdn.jsdelivr.net 下载你所选语言的语言数据（每个 .traineddata 文件约 0.4–4 MB），浏览器可能会将其缓存在 IndexedDB 中，以免重复下载；只会获取语言数据，你的图片和识别出的文字绝不会离开你的设备。"
     },
     {
       "heading": "托管与技术日志",

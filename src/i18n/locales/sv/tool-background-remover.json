@@ -7,7 +7,7 @@
   "tagline": "Klipp ut bakgrunden från ett foto automatiskt, ersätt den med en färg eller bild, direkt i webbläsaren.",
   "ui": {
     "selectFiles": "Välj bilder",
-    "dropHint": "eller dra och släpp bilder här",
+    "dropHint": "eller dra och släpp bilder här (JPG, PNG, WebP, HEIC)",
     "remove": "Ta bort bakgrund",
     "removing": "Tar bort bakgrund… {{percent}}%",
     "loadingModel": "Laddar ner AI-modell (endast första gången)… {{percent}}%",
