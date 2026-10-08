@@ -47,7 +47,6 @@
     "clearAria": "{{side}} alanını temizle",
     "swapAria": "Orijinal ve değiştirilmiş metinlerin yerini değiştir",
     "uploadAria": "{{side}} alanına dosya yükle",
-    "formatAria": "{{side}} metnini biçimlendir",
     "copyMergedAria": "Birleştirilmiş sonucu kopyala: {{side}}",
     "saveMergedAria": "Birleştirilmiş sonucu kaydet: {{side}}",
     "formatDuplicateKeys": "Uyarı: yinelenen anahtarlar bulundu ve olduğu gibi bırakıldı.",
@@ -161,7 +160,6 @@
         "general": "Desteklenmeyenler: görseller/taramalar (OCR yok), parola korumalı dosyalar, eski .doc/.xls/.ppt, 30 MB üzeri dosyalar. Dosya içeriği hiçbir zaman yüklenmez ve saklanmaz."
       }
     },
-    "formatSettingsHeading": "Karşılaştırmadan önce biçimlendir",
     "formatLanguageLabel": "Biçim",
     "formatAuto": "Otomatik algıla",
     "formatIndentLabel": "Girinti",
@@ -170,8 +168,17 @@
     "formatIndentTab": "Sekme",
     "formatWidthLabel": "Satır genişliği",
     "formatSqlDialectLabel": "SQL lehçesi",
-    "formatBoth": "İkisini de biçimlendir",
     "formatBothAria": "İki metni de aynı ayarlarla biçimlendir",
+    "formatEmptyBoth": "Biçimlendirilecek bir şey yok — iki kutu da boş.",
+    "formatOptions": "Biçimlendirme seçenekleri",
+    "formatOptionsHint": "Varsayılan, her kutu için otomatik algılamadır. Tarayıcınızda çalışır; söz dizimi hatası olursa metin değiştirilmez.",
+    "dismissNotice": "Kapat",
+    "compareButton": "Karşılaştır",
+    "compareAria": "İki metni karşılaştır ve sonuca git",
+    "compareEmpty": "Karşılaştırmak için iki kutuya da metin girin.",
+    "compareFound": "Bulunan fark sayısı: {{count}}.",
+    "compareIdentical": "İki metin birebir aynı.",
+    "resultsHeading": "Karşılaştırma sonucu",
     "formatBusy": "Biçimlendiriliyor…",
     "formatDone": "{{language}} olarak biçimlendirildi.",
     "formatDoneAuto": "Otomatik algılandı ve {{language}} olarak biçimlendirildi.",
@@ -180,15 +187,14 @@
     "formatErrorAt": "{{language}} söz dizimi hatası, {{line}}. satır, {{column}}. sütun: {{message}}. Değiştirilmeden bırakıldı.",
     "formatErrorLine": "{{language}} söz dizimi hatası, {{line}}. satır: {{message}}. Değiştirilmeden bırakıldı.",
     "formatErrorNoPos": "{{language}} hatası: {{message}}. Değiştirilmeden bırakıldı.",
-    "formatAmbiguous": "Bunun hangi dil olduğu anlaşılamadı (belki {{candidates}}). “Biçim” alanından birini seçin.",
-    "formatUnknown": "Bunun hangi dil olduğu anlaşılamadı. “Biçim” alanından birini seçin.",
+    "formatAmbiguous": "Bunun hangi dil olduğu anlaşılamadı (belki {{candidates}}). Dişli menüsünü açın ve “Biçim” alanından birini seçin.",
+    "formatUnknown": "Bunun hangi dil olduğu anlaşılamadı. Dişli menüsünü açın ve “Biçim” alanından birini seçin.",
     "formatTooLarge": "Biçimlendirmek için çok büyük (sınır {{max}} karakter). Değiştirilmeden bırakıldı.",
     "formatLargeWarning": "Büyük giriş: biçimlendirme arka planda çalışır ve biraz sürebilir.",
     "formatTimeout": "Biçimlendirme çok uzun sürdü ve durduruldu. Değiştirilmeden bırakıldı.",
     "formatFailed": "Biçimlendirme beklenmedik şekilde başarısız oldu. Değiştirilmeden bırakıldı.",
     "formatStale": "Biçimlendirme sırasında metin değiştiği için sonuç atıldı.",
-    "formatMismatch": "İki taraf farklı dillerde biçimlendirildi ({{a}} ve {{b}}); bu yüzden karşılaştırmada yine de stil farkları görünebilir.",
-    "formatNote": "Desteklenenler: JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown ve GraphQL. Biçimlendirme tırnakları, noktalı virgülleri ve satır sonlarını değiştirebilir, ancak kodun anlamını değiştirmez. Metin tarayıcınızda biçimlendirilir ve geri alınabilir."
+    "formatMismatch": "İki taraf farklı dillerde biçimlendirildi ({{a}} ve {{b}}); bu yüzden karşılaştırmada yine de stil farkları görünebilir."
   },
   "related": "İlgili araçlar",
   "faq": {
@@ -208,6 +214,6 @@
     "p2": "Bu araç tamamen tarayıcınızda çalışır. İki metin kutusu da cihazınızda bellekte kalır ve karşılaştırmanın kendisi yerel olarak çalışan bir JavaScript karşılaştırma kütüphanesi tarafından hesaplanır — yazdığınız veya yapıştırdığınız hiçbir şey bir sunucuya gönderilmez, kaydedilmez ya da herhangi bir yerde saklanmaz. Bir müşteri sözleşmesi, bir parola dosyası ya da üçüncü taraf bir servisten geçirmek istemediğiniz herhangi bir metni karşılaştırıyorsanız bu önemlidir. Sekmeyi kapattığınızda her şey gider; endişelenecek bir geçmiş yoktur.",
     "p3": "Orijinal metni sola, güncellenmiş sürümü sağa yapıştırın — her iki kutu da satır numaraları gösterir ve birbiriyle senkronize olarak kayar; her birinin kendi Temizle, Yer Değiştir ve Dosya Yükle düğmeleri vardır, böylece kopyala-yapıştır yerine doğrudan diskten iki dosya (düz metin, kod, Word, PDF, Excel ve daha fazlası) yükleyebilirsiniz. Karşılaştırma siz yazdıkça anlık olarak güncellenir; basılacak bir düğme yoktur. Farkların ne kadar ince ayrıntılı bölüneceğini kontrol etmek için Karakter, Kelime veya Satır seçin: Karakter modu tek bir yazım hatası düzeyindeki düzenlemeyi yakalar, Kelime modu düzyazı için en iyisidir çünkü bir cümle içinde tam olarak hangi kelimelerin değiştiğini vurgular, Satır modu ise bütün satırları bir bütün olarak karşılaştırır ve satır içindeki tek tek kelimeler yerine hangi satırların tamamen taşındığıyla ilgilendiğiniz kod, JSON ya da liste tarzı içerikler için uygundur. Yalnızca bir sürümde bulunan bir satır tamamen yeşil (eklendi) veya kırmızı (kaldırıldı) gösterilir; her iki sürümde de bulunan ama düzenlenmiş bir satır turuncu gösterilir ve içindeki tam olarak değişen kelime ya da karakterler daha güçlü vurgulanır — böylece düzenlenmiş bir satırı, ilgisiz bir sil-sonra-ekle çiftinden bir bakışta ayırt edebilirsiniz.",
     "p4": "Karşılaştırmanın üstündeki eklendi/kaldırıldı/değiştirildi sayıları, değişikliğin ne kadar büyük olduğu konusunda bir bakışta fikir verir; ↑/↓ düğmeleri ise değişmeyen satırlarda gezinmeden doğrudan bir sonraki ya da önceki değişikliğe atlar — uzun bir belgede oldukça kullanışlıdır. Bir Tam Ekran düğmesi, daha yakından inceleme için karşılaştırmayı ekranı kaplayacak şekilde genişletir. Karşılaştırmanın altındaki birleştirme aracı, bunu salt okunur bir farktan gerçekten çözebileceğiniz bir şeye dönüştürür: her değişikliğin iki sütun arasında kendi ← / → düğmeleri vardır, böylece sağ sürümün düzenlemesini sol sütuna çekebilir ya da sol sürümü sağa itebilirsiniz — her sütun tam olarak istediğiniz gibi okununcaya kadar, tek seferde bir değişiklik. Her sütunun kendi Kopyala ve Kaydet düğmeleri vardır, böylece hiçbir şeyi yeniden yazmadan temiz, birleştirilmiş bir sonuç elde edebilirsiniz. İki metin aynı çıkarsa, araç boş, belirsiz bir sonuç göstermek yerine bunu doğrudan size söyler — üzerinde tekrar düşünmeniz gereken bir şey daha eksilir.",
-    "p5": "Aynı kodun iki sürümü, yalnızca stil yüzünden bambaşka görünebilir: küçültülmüş ve düzenli yazılmış hali, sekme ve boşluk, tek ve çift tırnak, farklı yerlerden bölünmüş uzun satırlar. Karşılaştırmadan önce iki metni de aynı standarda getirmek için iki kutunun üstündeki Biçim ayarlarını kullanın. “Biçim” alanını Otomatik algıla olarak bırakın (önce dosya adına, sonra metne bakar) ya da JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown veya GraphQL'den birini kendiniz seçin; 2 boşluk, 4 boşluk veya sekme girintisini ve bir satır genişliğini belirleyin, SQL için de MySQL, PostgreSQL ya da SQL Server gibi bir lehçe seçin. Biçimlendir tek kutuyu, İkisini de biçimlendir ise iki kutuyu aynı ayarlarla biçimlendirir; iki taraf farklı dillerdeyse uyarı görürsünüz. Metinde söz dizimi hatası varsa hiçbir şey değiştirilmez ve mesaj satır ile sütunu bildirir. Biçimlendiriciler (Prettier ve sql-formatter) yalnızca Biçimlendir'e bastığınızda indirilir, büyük girişler sayfayı dondurmasın diye arka plandaki bir çalışanda çalışır ve her şey cihazınızda kalır. Biçimlendirme tırnakları, noktalı virgülleri ve satır sonlarını değiştirebilir ama kodun ne yaptığını asla değiştirmez; her biçimlendirme geri alınabilir."
+    "p5": "Aynı kodun iki sürümü, yalnızca stil yüzünden bambaşka görünebilir: küçültülmüş ve düzenli yazılmış hali, sekme ve boşluk, tek ve çift tırnak, farklı yerlerden bölünmüş uzun satırlar. Karşılaştırmadan önce iki metni de aynı standarda getirmek için iki kutunun üstündeki Biçimlendir düğmesine basın; her kutunun dilini kendisi algılar (önce dosya adına, sonra metne bakar). Yanındaki dişli menüsünden dilerseniz JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown veya GraphQL dilini kendiniz seçebilir, 2 boşluk, 4 boşluk ya da sekme girintisini, satır genişliğini ve SQL için MySQL, PostgreSQL veya SQL Server gibi bir lehçeyi belirleyebilirsiniz. Biçimlendirme iki kutuya da aynı ayarlarla uygulanır; iki taraf farklı dillerdeyse uyarı alırsınız. Metinde söz dizimi hatası varsa hiçbir şey değişmez ve mesaj size satırı ile sütunu söyler. Biçimlendiriciler (Prettier ve sql-formatter) yalnızca Biçimlendir’e bastığınızda indirilir, büyük girişler sayfayı dondurmasın diye arka plandaki bir worker içinde çalışır ve her şey cihazınızda kalır. Biçimlendirme tırnakları, noktalı virgülleri ve satır sonlarını değiştirebilir ama kodun ne yaptığını asla değiştirmez; her biçimlendirme geri alınabilir. Hazır olduğunuzda doğrudan sonuca gitmek için Karşılaştır’a basın."
   }
 }

@@ -47,7 +47,6 @@
     "clearAria": "Effacer {{side}}",
     "swapAria": "Inverser le texte original et le texte modifié",
     "uploadAria": "Importer un fichier dans {{side}}",
-    "formatAria": "Formater {{side}}",
     "copyMergedAria": "Copier le résultat fusionné : {{side}}",
     "saveMergedAria": "Enregistrer le résultat fusionné : {{side}}",
     "formatDuplicateKeys": "Attention : des clés en double ont été trouvées et conservées telles quelles.",
@@ -161,7 +160,6 @@
         "general": "Non pris en charge : images/scans (pas d'OCR), fichiers protégés par mot de passe, anciens .doc/.xls/.ppt, fichiers de plus de 30 Mo. Le contenu des fichiers n'est jamais envoyé et n'est pas conservé."
       }
     },
-    "formatSettingsHeading": "Formater avant de comparer",
     "formatLanguageLabel": "Formater en",
     "formatAuto": "Détection automatique",
     "formatIndentLabel": "Indentation",
@@ -170,8 +168,17 @@
     "formatIndentTab": "Tabulation",
     "formatWidthLabel": "Largeur de ligne",
     "formatSqlDialectLabel": "Dialecte SQL",
-    "formatBoth": "Formater les deux",
     "formatBothAria": "Formater les deux textes avec les mêmes réglages",
+    "formatEmptyBoth": "Rien à formater — les deux zones sont vides.",
+    "formatOptions": "Options de formatage",
+    "formatOptionsHint": "Par défaut, le langage de chaque zone est détecté automatiquement. Tout s'exécute dans votre navigateur ; en cas d'erreur de syntaxe, le texte reste inchangé.",
+    "dismissNotice": "Fermer",
+    "compareButton": "Comparer",
+    "compareAria": "Comparer les deux textes et aller au résultat",
+    "compareEmpty": "Saisissez du texte dans les deux zones pour comparer.",
+    "compareFound": "Différences trouvées : {{count}}.",
+    "compareIdentical": "Les deux textes sont identiques.",
+    "resultsHeading": "Résultat de la comparaison",
     "formatBusy": "Formatage en cours…",
     "formatDone": "Formaté en {{language}}.",
     "formatDoneAuto": "Langage détecté automatiquement et formaté en {{language}}.",
@@ -180,15 +187,14 @@
     "formatErrorAt": "Erreur de syntaxe {{language}} à la ligne {{line}}, colonne {{column}} : {{message}}. Laissé inchangé.",
     "formatErrorLine": "Erreur de syntaxe {{language}} à la ligne {{line}} : {{message}}. Laissé inchangé.",
     "formatErrorNoPos": "Erreur {{language}} : {{message}}. Laissé inchangé.",
-    "formatAmbiguous": "Impossible de déterminer le langage (peut-être {{candidates}}). Choisissez-en un dans « Formater en ».",
-    "formatUnknown": "Impossible de déterminer le langage. Choisissez-en un dans « Formater en ».",
+    "formatAmbiguous": "Impossible de déterminer le langage (peut-être {{candidates}}). Ouvrez le menu en forme d'engrenage et choisissez-en un dans « Formater en ».",
+    "formatUnknown": "Impossible de déterminer le langage. Ouvrez le menu en forme d'engrenage et choisissez-en un dans « Formater en ».",
     "formatTooLarge": "Trop volumineux pour être formaté (limite : {{max}} caractères). Laissé inchangé.",
     "formatLargeWarning": "Texte volumineux : le formatage s'exécute en arrière-plan et peut prendre du temps.",
     "formatTimeout": "Le formatage a pris trop de temps et a été interrompu. Laissé inchangé.",
     "formatFailed": "Le formatage a échoué de façon inattendue. Laissé inchangé.",
     "formatStale": "Le texte a changé pendant le formatage ; le résultat a donc été ignoré.",
-    "formatMismatch": "Les deux côtés ont été formatés dans des langages différents ({{a}} et {{b}}) ; la comparaison peut donc encore montrer des différences de style.",
-    "formatNote": "Pris en charge : JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown et GraphQL. Le formatage peut modifier les guillemets, les points-virgules et les sauts de ligne, mais pas le sens du code. Le texte est formaté dans votre navigateur et l'opération peut être annulée."
+    "formatMismatch": "Les deux côtés ont été formatés dans des langages différents ({{a}} et {{b}}) ; la comparaison peut donc encore montrer des différences de style."
   },
   "related": "Outils associés",
   "faq": {
@@ -208,6 +214,6 @@
     "p2": "Cet outil fonctionne entièrement dans votre navigateur. Les deux zones de texte restent en mémoire sur votre appareil, et la comparaison est calculée par une bibliothèque JavaScript exécutée localement — rien de ce que vous tapez ou collez n'est jamais envoyé à un serveur, ni enregistré, ni stocké où que ce soit. C'est important si vous comparez un contrat avec un client, un fichier de mots de passe, ou tout texte que vous préférez ne pas faire transiter par un service tiers. Fermez l'onglet et tout disparaît ; aucun historique ne subsiste.",
     "p3": "Collez le texte original à gauche et la version modifiée à droite : les deux zones affichent des numéros de ligne et défilent de façon synchronisée, chacune avec ses propres boutons Effacer, Inverser et Importer un fichier pour charger deux fichiers directement depuis le disque (texte brut, code, Word, PDF, Excel et plus) plutôt que de faire un copier-coller. La comparaison se met à jour en direct pendant la saisie ; il n'y a aucun bouton à cliquer. Choisissez Caractère, Mot ou Ligne pour régler la finesse de la comparaison : le mode Caractère détecte jusqu'à une simple faute de frappe, le mode Mot convient le mieux à la prose puisqu'il indique précisément quels mots ont changé dans une phrase, et le mode Ligne compare des lignes entières, ce qui convient au code, au JSON ou aux listes où ce qui compte est de savoir quelles lignes entières ont bougé plutôt que les mots isolés qu'elles contiennent. Une ligne qui n'existe que dans une version s'affiche entièrement en vert (ajoutée) ou en rouge (supprimée) ; une ligne qui existe dans les deux mais a été modifiée s'affiche en orange, avec le mot ou les caractères exacts qui ont changé surlignés plus fortement à l'intérieur — de quoi distinguer d'un coup d'œil une ligne modifiée d'une simple paire suppression-puis-ajout sans rapport.",
     "p4": "Les compteurs d'ajouts/suppressions/modifications au-dessus de la comparaison donnent une idée rapide de l'ampleur du changement, et les boutons ↑/↓ sautent directement au changement suivant ou précédent sans faire défiler les lignes inchangées — pratique sur un document long. Un bouton Plein écran agrandit la comparaison pour l'examiner de plus près. Sous la comparaison, l'outil de fusion transforme ce diff en lecture seule en quelque chose que vous pouvez réellement résoudre : chaque changement dispose de ses propres boutons ←/→ entre les deux colonnes, permettant de faire passer la modification de la version de droite dans la colonne de gauche, ou celle de gauche dans la droite, changement par changement, jusqu'à ce que chaque colonne corresponde exactement à ce que vous voulez. Chaque colonne dispose de ses propres boutons Copier et Enregistrer, pour récupérer un résultat fusionné et propre sans rien retaper. Si les deux textes s'avèrent identiques, l'outil l'indique directement plutôt que d'afficher un résultat vide et ambigu.",
-    "p5": "Deux versions d'un même code semblent parfois totalement différentes à cause du seul style : minifié ou mis en forme, tabulations ou espaces, guillemets simples ou doubles, longues lignes coupées à des endroits différents. Utilisez les réglages de formatage au-dessus des deux zones pour ramener les deux textes à une même norme avant de les comparer. Laissez « Formater en » sur Détection automatique (le nom du fichier est examiné en premier, puis le texte) ou choisissez vous-même JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown ou GraphQL ; réglez l'indentation sur 2 espaces, 4 espaces ou une tabulation, ainsi que la largeur de ligne et, pour le SQL, un dialecte comme MySQL, PostgreSQL ou SQL Server. Formater traite une seule zone, Formater les deux applique exactement les mêmes réglages aux deux, et un avertissement s'affiche si les deux côtés se révèlent être des langages différents. Si le texte contient une erreur de syntaxe, rien n'est modifié et le message indique la ligne et la colonne. Les formateurs (Prettier et sql-formatter) ne sont téléchargés qu'au moment où vous cliquez sur Formater, s'exécutent dans un worker en arrière-plan pour que les gros textes ne figent pas la page, et tout reste sur votre appareil. Le formatage peut changer les guillemets, les points-virgules et les sauts de ligne, mais jamais ce que fait le code, et chaque mise en forme peut être annulée."
+    "p5": "Deux versions d'un même code semblent parfois totalement différentes à cause du seul style : minifié ou mis en forme, tabulations ou espaces, guillemets simples ou doubles, longues lignes coupées à des endroits différents. Cliquez sur le bouton Formater au-dessus des deux zones pour ramener les deux textes à une même norme avant de comparer ; il détecte seul le langage de chaque zone (d'abord d'après le nom du fichier, puis d'après le texte). Dans le menu en forme d'engrenage à côté, vous pouvez à la place choisir vous-même JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown ou GraphQL, une indentation de 2 espaces, de 4 espaces ou une tabulation, une largeur de ligne et, pour le SQL, un dialecte comme MySQL, PostgreSQL ou SQL Server. Le formatage s'applique aux deux zones avec des réglages identiques, et un avertissement s'affiche si les deux côtés sont de langages différents. En cas d'erreur de syntaxe, rien n'est modifié et le message indique la ligne et la colonne. Les formateurs (Prettier et sql-formatter) ne sont téléchargés que lorsque vous cliquez sur Formater, tournent dans un worker en arrière-plan pour ne pas figer la page avec de gros contenus, et tout reste sur votre appareil. Le formatage peut changer les guillemets, les points-virgules et les retours à la ligne, mais jamais ce que fait le code, et chaque formatage peut être annulé. Une fois prêt, cliquez sur Comparer pour aller directement au résultat."
   }
 }

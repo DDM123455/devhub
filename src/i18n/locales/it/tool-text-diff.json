@@ -47,7 +47,6 @@
     "clearAria": "Cancella {{side}}",
     "swapAria": "Scambia il testo originale e quello modificato",
     "uploadAria": "Carica un file in {{side}}",
-    "formatAria": "Formatta {{side}}",
     "copyMergedAria": "Copia il risultato del merge: {{side}}",
     "saveMergedAria": "Salva il risultato del merge: {{side}}",
     "formatDuplicateKeys": "Attenzione: sono state trovate chiavi duplicate e sono state lasciate invariate.",
@@ -161,7 +160,6 @@
         "general": "Non supportati: immagini/scansioni (nessun OCR), file protetti da password, vecchi .doc/.xls/.ppt, file oltre 30 MB. Il contenuto dei file non viene mai caricato né salvato."
       }
     },
-    "formatSettingsHeading": "Formatta prima di confrontare",
     "formatLanguageLabel": "Formatta come",
     "formatAuto": "Rilevamento automatico",
     "formatIndentLabel": "Rientro",
@@ -170,8 +168,17 @@
     "formatIndentTab": "Tab",
     "formatWidthLabel": "Larghezza riga",
     "formatSqlDialectLabel": "Dialetto SQL",
-    "formatBoth": "Formatta entrambi",
     "formatBothAria": "Formatta entrambi i testi con le stesse impostazioni",
+    "formatEmptyBoth": "Niente da formattare: entrambe le caselle sono vuote.",
+    "formatOptions": "Opzioni di formattazione",
+    "formatOptionsHint": "Di default il linguaggio viene rilevato per ogni casella. Funziona nel browser; se c'è un errore di sintassi il testo resta invariato.",
+    "dismissNotice": "Chiudi",
+    "compareButton": "Confronta",
+    "compareAria": "Confronta i due testi e vai ai risultati",
+    "compareEmpty": "Inserisci del testo in entrambe le caselle per confrontare.",
+    "compareFound": "Differenze trovate: {{count}}.",
+    "compareIdentical": "I due testi sono identici.",
+    "resultsHeading": "Risultato del confronto",
     "formatBusy": "Formattazione in corso…",
     "formatDone": "Formattato come {{language}}.",
     "formatDoneAuto": "Rilevato automaticamente e formattato come {{language}}.",
@@ -180,15 +187,14 @@
     "formatErrorAt": "Errore di sintassi {{language}} alla riga {{line}}, colonna {{column}}: {{message}}. Lasciato invariato.",
     "formatErrorLine": "Errore di sintassi {{language}} alla riga {{line}}: {{message}}. Lasciato invariato.",
     "formatErrorNoPos": "Errore {{language}}: {{message}}. Lasciato invariato.",
-    "formatAmbiguous": "Impossibile capire di che linguaggio si tratti (forse {{candidates}}). Scegline uno in «Formatta come».",
-    "formatUnknown": "Impossibile capire di che linguaggio si tratti. Scegline uno in «Formatta come».",
+    "formatAmbiguous": "Impossibile capire di che linguaggio si tratti (forse {{candidates}}). Apri il menu a ingranaggio e scegline uno in «Formatta come».",
+    "formatUnknown": "Impossibile capire di che linguaggio si tratti. Apri il menu a ingranaggio e scegline uno in «Formatta come».",
     "formatTooLarge": "Troppo grande per essere formattato (limite {{max}} caratteri). Lasciato invariato.",
     "formatLargeWarning": "Input di grandi dimensioni: la formattazione avviene in background e può richiedere un po' di tempo.",
     "formatTimeout": "La formattazione ha richiesto troppo tempo ed è stata interrotta. Lasciato invariato.",
     "formatFailed": "La formattazione non è riuscita per un errore imprevisto. Lasciato invariato.",
     "formatStale": "Il testo è cambiato durante la formattazione, quindi il risultato è stato scartato.",
-    "formatMismatch": "I due lati sono stati formattati come linguaggi diversi ({{a}} e {{b}}), quindi il confronto potrebbe mostrare ancora differenze di stile.",
-    "formatNote": "Supportati: JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown e GraphQL. La formattazione può cambiare virgolette, punti e virgola e a capo, ma non il significato del codice. Il testo viene formattato nel tuo browser e l'operazione si può annullare."
+    "formatMismatch": "I due lati sono stati formattati come linguaggi diversi ({{a}} e {{b}}), quindi il confronto potrebbe mostrare ancora differenze di stile."
   },
   "related": "Strumenti correlati",
   "faq": {
@@ -208,6 +214,6 @@
     "p2": "Questo strumento funziona interamente nel tuo browser. Entrambe le caselle di testo restano in memoria sul tuo dispositivo e il confronto viene calcolato da una libreria JavaScript di diffing eseguita in locale — nulla di ciò che digiti o incolli viene mai inviato a un server, registrato o salvato da nessuna parte. Questo conta se stai confrontando un contratto con un cliente, un file di password, o qualsiasi testo che preferiresti non far passare attraverso un servizio di terze parti. Chiudi la scheda e tutto scompare — nessuna cronologia di cui preoccuparsi.",
     "p3": "Incolla il testo originale a sinistra e la versione aggiornata a destra — entrambe le caselle mostrano i numeri di riga e scorrono in sincronia tra loro, e ciascuna ha i propri pulsanti Cancella, Scambia e Carica file così puoi caricare due file direttamente dal disco (testo semplice, codice, Word, PDF, Excel e altro) invece di copiare e incollare. Il confronto si aggiorna in tempo reale mentre digiti; non c'è nessun pulsante da premere. Scegli Carattere, Parola o Riga per controllare quanto finemente vengono scomposte le differenze: la modalità Carattere cattura una singola modifica a livello di refuso, la modalità Parola è ideale per la prosa perché evidenzia esattamente quali parole sono cambiate all'interno di una frase, e la modalità Riga confronta intere righe alla volta, adatta a codice, JSON o contenuti in stile elenco dove conta capire quali righe intere si sono spostate piuttosto che le singole parole al loro interno. Una riga che esiste solo in una versione viene mostrata interamente verde (aggiunta) o rossa (rimossa); una riga che esiste in entrambe ma è stata modificata viene mostrata in arancione, con la parola o i caratteri esatti cambiati evidenziati più intensamente al suo interno — così puoi distinguere a colpo d'occhio una riga modificata da una coppia scorrelata di cancellazione-e-inserimento.",
     "p4": "I conteggi di aggiunte/rimozioni/modifiche sopra il confronto ti danno un'idea a colpo d'occhio di quanto sia grande una modifica, e i pulsanti ↑/↓ saltano direttamente alla modifica successiva o precedente senza dover scorrere righe invariate — comodo su un documento lungo. Un pulsante Schermo intero espande il confronto per riempire lo schermo per una revisione più attenta. Sotto il confronto, lo strumento di merge trasforma questo da un diff di sola lettura in qualcosa che puoi effettivamente risolvere: ogni modifica ha i propri pulsanti ← / → tra le due colonne, che ti permettono di portare la modifica della versione destra nella colonna sinistra o spingere la versione sinistra in quella destra, una modifica alla volta, finché entrambe le colonne non leggono esattamente come vuoi tu. Ogni colonna ha i propri pulsanti Copia e Salva, così puoi estrarre un risultato pulito e unito senza riscrivere nulla. Se i due testi risultano identici, lo strumento te lo dice direttamente invece di mostrare un risultato vuoto e ambiguo — una preoccupazione in meno.",
-    "p5": "Due versioni dello stesso codice spesso sembrano completamente diverse solo per lo stile: minimizzato o formattato, tab o spazi, apici singoli o doppi, righe lunghe spezzate in punti diversi. Usa le impostazioni di formattazione sopra le due caselle per portare entrambi i testi allo stesso standard prima del confronto. Lascia «Formatta come» su Rilevamento automatico (guarda prima il nome del file, poi il testo) oppure scegli tu JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown o GraphQL; imposta un rientro di 2 spazi, 4 spazi o un tab, una larghezza di riga e, per l'SQL, un dialetto come MySQL, PostgreSQL o SQL Server. Formatta lavora su una sola casella, Formatta entrambi le formatta tutte e due con impostazioni identiche, e se i due lati risultano di linguaggi diversi compare un avviso. Se il testo contiene un errore di sintassi non viene modificato nulla e il messaggio indica riga e colonna. I formattatori (Prettier e sql-formatter) vengono scaricati solo quando premi Formatta, funzionano in un worker in background così gli input grandi non bloccano la pagina, e tutto resta sul tuo dispositivo. La formattazione può cambiare virgolette, punti e virgola e a capo, ma mai ciò che fa il codice, e ogni formattazione si può annullare."
+    "p5": "Due versioni dello stesso codice spesso sembrano completamente diverse solo per lo stile: minimizzato o formattato, tab o spazi, apici singoli o doppi, righe lunghe spezzate in punti diversi. Premi il pulsante Formatta sopra le due caselle per portare entrambi i testi allo stesso standard prima del confronto: riconosce da solo il linguaggio di ciascuna casella (guarda prima il nome del file, poi il testo). Nel menu a ingranaggio accanto puoi invece scegliere tu JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown o GraphQL, un rientro di 2 spazi, 4 spazi o tabulazione, una larghezza di riga e, per l'SQL, un dialetto come MySQL, PostgreSQL o SQL Server. Formatta applica a entrambe le caselle le stesse impostazioni e, se i due lati risultano di linguaggi diversi, ricevi un avviso. Se il testo ha un errore di sintassi non viene modificato nulla e il messaggio indica riga e colonna. I formattatori (Prettier e sql-formatter) vengono scaricati solo quando premi Formatta, girano in un worker in background così gli input grandi non bloccano la pagina e tutto resta sul tuo dispositivo. La formattazione può cambiare virgolette, punti e virgola e a capo, ma mai ciò che il codice fa, e ogni formattazione si può annullare. Quando sei pronto, premi Confronta per andare subito al risultato."
   }
 }

@@ -47,7 +47,6 @@
     "clearAria": "Limpar {{side}}",
     "swapAria": "Trocar o texto original e o texto alterado",
     "uploadAria": "Enviar um arquivo para {{side}}",
-    "formatAria": "Formatar {{side}}",
     "copyMergedAria": "Copiar resultado mesclado: {{side}}",
     "saveMergedAria": "Salvar resultado mesclado: {{side}}",
     "formatDuplicateKeys": "Atenção: foram encontradas chaves duplicadas, mantidas como estão.",
@@ -161,7 +160,6 @@
         "general": "Não suportado: imagens/documentos escaneados (sem OCR), arquivos protegidos por senha, .doc/.xls/.ppt antigos e arquivos acima de 30 MB. O conteúdo dos arquivos nunca é enviado nem armazenado."
       }
     },
-    "formatSettingsHeading": "Formatar antes de comparar",
     "formatLanguageLabel": "Formatar como",
     "formatAuto": "Detectar automaticamente",
     "formatIndentLabel": "Indentação",
@@ -170,8 +168,17 @@
     "formatIndentTab": "Tab",
     "formatWidthLabel": "Largura da linha",
     "formatSqlDialectLabel": "Dialeto SQL",
-    "formatBoth": "Formatar ambos",
     "formatBothAria": "Formatar os dois textos com as mesmas configurações",
+    "formatEmptyBoth": "Nada para formatar — as duas caixas estão vazias.",
+    "formatOptions": "Opções de formatação",
+    "formatOptionsHint": "Por padrão, a linguagem de cada caixa é detectada automaticamente. Roda no navegador; se houver erro de sintaxe, o texto não é alterado.",
+    "dismissNotice": "Dispensar",
+    "compareButton": "Comparar",
+    "compareAria": "Comparar os dois textos e ir para o resultado",
+    "compareEmpty": "Digite texto nas duas caixas para comparar.",
+    "compareFound": "Diferenças encontradas: {{count}}.",
+    "compareIdentical": "Os dois textos são idênticos.",
+    "resultsHeading": "Resultado da comparação",
     "formatBusy": "Formatando…",
     "formatDone": "Formatado como {{language}}.",
     "formatDoneAuto": "Detectado automaticamente e formatado como {{language}}.",
@@ -180,15 +187,14 @@
     "formatErrorAt": "Erro de sintaxe em {{language}} na linha {{line}}, coluna {{column}}: {{message}}. Mantido sem alterações.",
     "formatErrorLine": "Erro de sintaxe em {{language}} na linha {{line}}: {{message}}. Mantido sem alterações.",
     "formatErrorNoPos": "Erro em {{language}}: {{message}}. Mantido sem alterações.",
-    "formatAmbiguous": "Não foi possível identificar a linguagem (talvez {{candidates}}). Escolha uma em “Formatar como”.",
-    "formatUnknown": "Não foi possível identificar a linguagem. Escolha uma em “Formatar como”.",
+    "formatAmbiguous": "Não foi possível identificar a linguagem (talvez {{candidates}}). Abra o menu da engrenagem e escolha uma em “Formatar como”.",
+    "formatUnknown": "Não foi possível identificar a linguagem. Abra o menu da engrenagem e escolha uma em “Formatar como”.",
     "formatTooLarge": "Grande demais para formatar (limite de {{max}} caracteres). Mantido sem alterações.",
     "formatLargeWarning": "Entrada grande: a formatação roda em segundo plano e pode demorar.",
     "formatTimeout": "A formatação demorou demais e foi interrompida. Mantido sem alterações.",
     "formatFailed": "A formatação falhou inesperadamente. Mantido sem alterações.",
     "formatStale": "O texto mudou durante a formatação, então o resultado foi descartado.",
-    "formatMismatch": "Os dois lados foram formatados como linguagens diferentes ({{a}} e {{b}}), então a comparação ainda pode mostrar diferenças de estilo.",
-    "formatNote": "Suportados: JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown e GraphQL. A formatação pode mudar aspas, pontos e vírgulas e quebras de linha, mas não o significado do código. O texto é formatado no seu navegador e a ação pode ser desfeita."
+    "formatMismatch": "Os dois lados foram formatados como linguagens diferentes ({{a}} e {{b}}), então a comparação ainda pode mostrar diferenças de estilo."
   },
   "related": "Ferramentas relacionadas",
   "faq": {
@@ -208,6 +214,6 @@
     "p2": "Esta ferramenta roda inteiramente no seu navegador. As duas caixas de texto ficam apenas na memória do seu dispositivo, e a comparação é calculada por uma biblioteca JavaScript executada localmente — nada do que você digita ou cola é enviado a um servidor, registrado ou armazenado em lugar nenhum. Isso importa quando você está comparando um contrato com um cliente, um arquivo de senhas ou qualquer texto que prefira não passar por um serviço de terceiros. Feche a aba e tudo desaparece; não sobra histórico nenhum para se preocupar.",
     "p3": "Cole o texto original à esquerda e a versão atualizada à direita — as duas caixas mostram números de linha e rolam de forma sincronizada, e cada uma tem seus próprios botões Limpar, Trocar e Enviar arquivo para carregar dois arquivos (texto simples, código, Word, PDF, Excel e mais) direto do disco em vez de copiar e colar. A comparação atualiza ao vivo enquanto você digita; não há botão nenhum para clicar. Escolha Caractere, Palavra ou Linha para controlar o nível de detalhe das diferenças: o modo Caractere pega até um erro de digitação isolado, o modo Palavra é o mais indicado para prosa porque mostra exatamente quais palavras mudaram dentro de uma frase, e o modo Linha compara linhas inteiras de cada vez, o que combina com código, JSON ou listas onde importa quais linhas inteiras mudaram, não as palavras isoladas dentro delas. Uma linha que só existe em uma versão aparece totalmente verde (adicionada) ou vermelha (removida); uma linha que existe nas duas mas foi editada aparece em laranja, com a palavra ou os caracteres exatos que mudaram destacados com mais força dentro dela — assim dá para diferenciar de cara uma linha editada de um par de remoção-e-inserção sem relação.",
     "p4": "Os contadores de adicionados/removidos/modificados acima da comparação dão uma ideia rápida do tamanho da mudança, e os botões ↑/↓ pulam direto para a próxima mudança ou a anterior sem precisar rolar por linhas inalteradas — útil num documento longo. Um botão de Tela cheia expande a comparação para ocupar a tela toda para uma revisão mais de perto. Abaixo da comparação, a ferramenta de mesclagem transforma esse diff somente leitura em algo que você realmente resolve: cada mudança tem seus próprios botões ←/→ entre as duas colunas, permitindo puxar a edição da versão da direita para a coluna da esquerda, ou empurrar a versão da esquerda para a direita, mudança por mudança, até as duas colunas ficarem exatamente como você quer. Cada coluna tem seus próprios botões Copiar e Salvar, para você extrair um resultado mesclado e limpo sem digitar nada de novo. Se os dois textos forem idênticos, a ferramenta avisa isso diretamente, em vez de mostrar um resultado vazio e ambíguo.",
-    "p5": "Duas versões do mesmo código muitas vezes parecem totalmente diferentes só por causa do estilo: minificado ou bem indentado, tabs ou espaços, aspas simples ou duplas, linhas longas quebradas em lugares diferentes. Use as configurações de formatação acima das duas caixas para levar os dois textos a um mesmo padrão antes de comparar. Deixe “Formatar como” em Detectar automaticamente (primeiro olha o nome do arquivo, depois o texto) ou escolha você mesmo JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown ou GraphQL; defina uma indentação de 2 espaços, 4 espaços ou tab, uma largura de linha e, para SQL, um dialeto como MySQL, PostgreSQL ou SQL Server. Formatar formata uma caixa, Formatar ambos formata as duas com configurações idênticas e, se os dois lados forem linguagens diferentes, você recebe um aviso. Se o texto tiver um erro de sintaxe, nada é alterado e a mensagem informa a linha e a coluna. Os formatadores (Prettier e sql-formatter) só são baixados quando você clica em Formatar, rodam em um processo em segundo plano para que entradas grandes não travem a página, e tudo permanece no seu dispositivo. A formatação pode mudar aspas, pontos e vírgulas e quebras de linha, mas nunca o que o código faz, e qualquer formatação pode ser desfeita."
+    "p5": "Duas versões do mesmo código muitas vezes parecem totalmente diferentes só por causa do estilo: minificado ou bem formatado, tabs ou espaços, aspas simples ou duplas, linhas longas quebradas em lugares distintos. Clique no botão Formatar acima das duas caixas para levar os dois textos a um mesmo padrão antes de comparar; ele detecta sozinho a linguagem de cada caixa (primeiro pelo nome do arquivo, depois pelo texto). No menu da engrenagem ao lado, você pode escolher manualmente JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown ou GraphQL, uma indentação de 2 espaços, 4 espaços ou tab, a largura da linha e, para SQL, um dialeto como MySQL, PostgreSQL ou SQL Server. O botão formata as duas caixas com configurações idênticas e, se os dois lados forem de linguagens diferentes, você recebe um aviso. Se o texto tiver erro de sintaxe, nada é alterado e a mensagem informa a linha e a coluna. Os formatadores (Prettier e sql-formatter) só são baixados quando você clica em Formatar, rodam em um worker em segundo plano para que entradas grandes não travem a página, e tudo fica no seu dispositivo. A formatação pode mudar aspas, ponto e vírgula e quebras de linha, mas nunca o que o código faz, e qualquer formatação pode ser desfeita. Quando estiver pronto, clique em Comparar para ir direto ao resultado."
   }
 }
