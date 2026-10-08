@@ -546,6 +546,12 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 - [x] Dịch `tool-sql-formatter.json` và key mới của `tool-text-diff.json` sang 18 ngôn ngữ (check-i18n.mjs sạch; cần người bản ngữ rà lại)
 - [ ] Kiểm bằng mắt bố cục/dark mode tool SQL, Lighthouse; cân nhắc dịch vụ kiểm schema (cần chọn: chỉ cú pháp là đủ?)
 
+## Phase 3.19 — Text Diff gọn lại + Code Formatter riêng (yêu cầu trực tiếp 2026-10-08)
+
+- [x] Text Diff: 1 nút Format cùng hàng tiêu đề + nút So sánh cuộn tới kết quả
+- [x] Tool `code-formatter` (en+vi)
+- [ ] Dịch tool-code-formatter.json + key mới tool-text-diff.json sang 18 ngôn ngữ
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

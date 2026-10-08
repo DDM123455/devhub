@@ -90,11 +90,9 @@ interface Messages {
 	clearAria: string;
 	swapAria: string;
 	uploadAria: string;
-	formatAria: string;
 	copyMergedAria: string;
 	saveMergedAria: string;
 	formatDuplicateKeys: string;
-	formatSettingsHeading: string;
 	formatLanguageLabel: string;
 	formatAuto: string;
 	formatIndentLabel: string;
@@ -103,8 +101,17 @@ interface Messages {
 	formatIndentTab: string;
 	formatWidthLabel: string;
 	formatSqlDialectLabel: string;
-	formatBoth: string;
 	formatBothAria: string;
+	formatEmptyBoth: string;
+	formatOptions: string;
+	formatOptionsHint: string;
+	dismissNotice: string;
+	compareButton: string;
+	compareAria: string;
+	compareEmpty: string;
+	compareFound: string;
+	compareIdentical: string;
+	resultsHeading: string;
 	formatBusy: string;
 	formatDone: string;
 	formatDoneAuto: string;
@@ -121,7 +128,6 @@ interface Messages {
 	formatFailed: string;
 	formatStale: string;
 	formatMismatch: string;
-	formatNote: string;
 	largeInputWarning: string;
 	workerError: string;
 	trailingNewlineNote: string;
@@ -144,6 +150,8 @@ const LARGE_INPUT_CHARS = 2_000_000;
 const AUTOSAVE_MAX_CHARS = 1_000_000;
 
 type Side = 'original' | 'changed';
+// 'all' = a notice that is not about one particular box (e.g. both boxes empty).
+type NoticeKey = Side | 'all';
 const FILE_ACCEPT =
 	'.txt,.text,.md,.markdown,.json,.jsonl,.yaml,.yml,.toml,.xml,.html,.htm,.css,.scss,.js,.mjs,.ts,.tsx,.jsx,.py,.rb,.php,.java,.c,.h,.cpp,.cs,.go,.rs,.sh,.sql,.log,.ini,.conf,.cfg,.env,.csv,.tsv,.diff,.patch,.srt,.docx,.pdf,.xlsx,.odt,.ods,.odp,.pptx,.rtf,text/*';
 const EXTRACT_AFFECTED_KINDS = new Set(['docx', 'pdf', 'xlsx', 'odt', 'ods', 'odp', 'pptx']);
@@ -531,12 +539,21 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	const [copiedSide, setCopiedSide] = useState<'left' | 'right' | null>(null);
 	const [hunkOverrides, setHunkOverrides] = useState<Map<number, HunkOverride>>(new Map());
 	const [shareLinkCopied, setShareLinkCopied] = useState(false);
-	const [formatFeedback, setFormatFeedback] = useState<Record<Side, { message: string; error: boolean } | null>>({ original: null, changed: null });
+	const [formatFeedback, setFormatFeedback] = useState<Record<NoticeKey, { message: string; error: boolean } | null>>({ all: null, original: null, changed: null });
+	const [optionsOpen, setOptionsOpen] = useState(false);
+	const [compareRequested, setCompareRequested] = useState(false);
+	const [compareNote, setCompareNote] = useState<string | null>(null);
+	const compareNoteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const diffInflightRef = useRef(false);
+	const resultsRef = useRef<HTMLElement>(null);
+	const toolbarRef = useRef<HTMLDivElement>(null);
+	const optionsButtonRef = useRef<HTMLButtonElement>(null);
+	const optionsFirstRef = useRef<HTMLSelectElement>(null);
 	const [formatBusy, setFormatBusy] = useState<Record<Side, boolean>>({ original: false, changed: false });
 	const [formatLang, setFormatLang] = useState<FormatLanguage | 'auto'>('auto');
 	const [formatOptions, setFormatOptions] = useState<FormatOptions>(DEFAULT_FORMAT_OPTIONS);
 	const [formatCrossNote, setFormatCrossNote] = useState<string | null>(null);
-	const formatNoteTimers = useRef<Record<Side, ReturnType<typeof setTimeout> | null>>({ original: null, changed: null });
+	const formatNoteTimers = useRef<Record<NoticeKey, ReturnType<typeof setTimeout> | null>>({ all: null, original: null, changed: null });
 	// Stack of snapshots (not a single slot) so clearing/replacing twice in a row can
 	// still be undone one step at a time.
 	const [undoStack, setUndoStack] = useState<Array<{ side: 'original' | 'changed'; previousText: string; kind: 'clear' | 'replace' }>>([]);
@@ -802,6 +819,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	// worker can never leave "Computing…" stuck forever.
 	useEffect(() => {
 		const worker = new Worker(new URL('./textDiffWorker.ts', import.meta.url), { type: 'module' });
+		diffInflightRef.current = true;
 		setIsComputing(true);
 		setDiffError(false);
 		worker.onmessage = (event: MessageEvent<TextDiffResponse>) => {
@@ -811,11 +829,13 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 				setEntries(event.data.entries);
 				setNotes(event.data.notes);
 			}
+			diffInflightRef.current = false;
 			setIsComputing(false);
 			worker.terminate();
 		};
 		worker.onerror = () => {
 			setDiffError(true);
+			diffInflightRef.current = false;
 			setIsComputing(false);
 			worker.terminate();
 		};
@@ -1002,11 +1022,11 @@ buildDiffHtml(entries, { title: `${leftTitle} / ${rightTitle}`, left: leftTitle,
 	// prettier languages in a lazily created worker that loads only the parser needed
 	// (see `format-languages.ts`, `format-run.ts`). A failure never touches the text; success
 	// is undoable like the other replace actions.
-	const setFormatNote = (side: Side, note: { message: string; error: boolean } | null) => {
+	const setFormatNote = (side: NoticeKey, note: { message: string; error: boolean } | null) => {
 		const timer = formatNoteTimers.current[side];
 		if (timer) clearTimeout(timer);
 		setFormatFeedback((prev) => ({ ...prev, [side]: note }));
-		formatNoteTimers.current[side] = note ? setTimeout(() => setFormatFeedback((prev) => ({ ...prev, [side]: null })), note.error ? 15000 : 6000) : null;
+		formatNoteTimers.current[side] = note ? setTimeout(() => setFormatFeedback((prev) => ({ ...prev, [side]: null })), note.error ? 12000 : 6000) : null;
 	};
 
 	const formatErrorMessage = (label: string, error: FormatErrorInfo): string => {
@@ -1082,18 +1102,90 @@ buildDiffHtml(entries, { title: `${leftTitle} / ${rightTitle}`, left: leftTitle,
 		return language;
 	};
 
-	const handleFormat = (which: Side) => {
+	// The single toolbar "Format" button: formats BOTH boxes, each with its own auto-detected
+	// language (unless the user forced one in the options menu). An empty box is skipped silently
+	// when the other one has text; warns when auto-detection found two different languages (the
+	// diff will then still show style differences).
+	const handleFormatAll = async () => {
 		setFormatCrossNote(null);
-		void formatOne(which);
+		setOptionsOpen(false);
+		const sides = (['original', 'changed'] as const).filter((side) => textsRef.current[side].trim() !== '');
+		if (sides.length === 0) {
+			setFormatNote('original', null);
+			setFormatNote('changed', null);
+			setFormatNote('all', { message: messages.formatEmptyBoth, error: true });
+			return;
+		}
+		setFormatNote('all', null);
+		(['original', 'changed'] as const).filter((side) => !sides.includes(side)).forEach((side) => setFormatNote(side, null));
+		const results = await Promise.all(sides.map((side) => formatOne(side)));
+		if (results.length === 2 && results[0] && results[1] && results[0] !== results[1])
+			setFormatCrossNote(messages.formatMismatch.replace('{{a}}', languageLabel(results[0])).replace('{{b}}', languageLabel(results[1])));
 	};
 
-	// One click to bring both sides to the same style; warns when auto-detection found two
-	// different languages (the diff will then still show style differences).
-	const handleFormatBoth = async () => {
-		setFormatCrossNote(null);
-		const [a, b] = await Promise.all([formatOne('original'), formatOne('changed')]);
-		if (a && b && a !== b) setFormatCrossNote(messages.formatMismatch.replace('{{a}}', languageLabel(a)).replace('{{b}}', languageLabel(b)));
+	const showCompareNote = (text: string) => {
+		if (compareNoteTimer.current) clearTimeout(compareNoteTimer.current);
+		setCompareNote(text);
+		compareNoteTimer.current = setTimeout(() => setCompareNote(null), 6000);
 	};
+
+	// "Compare": the diff already runs live while typing, so this waits until any in-flight
+	// computation has finished (see the effect below), then scrolls to the results region.
+	const handleCompare = () => {
+		setOptionsOpen(false);
+		if (originalText.trim() === '' && changedText.trim() === '') {
+			showCompareNote(messages.compareEmpty);
+			return;
+		}
+		setCompareNote(null);
+		setCompareRequested(true);
+	};
+
+	useEffect(() => {
+		if (!compareRequested) return;
+		const pending =
+			originalText !== debouncedOriginal || changedText !== debouncedChanged || diffInflightRef.current || isComputing;
+		if (pending) return;
+		setCompareRequested(false);
+		const target = resultsRef.current;
+		if (target) {
+			const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+			target.focus({ preventScroll: true });
+		}
+		if (!diffError) {
+			const total = hunkStartRows.length || stats.added + stats.removed + stats.modified;
+			showCompareNote(hasChanges ? messages.compareFound.replace('{{count}}', String(total)) : messages.compareIdentical);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [compareRequested, originalText, changedText, debouncedOriginal, debouncedChanged, isComputing, entries]);
+
+	// Options popover: Esc closes (focus returns to the gear), as does a pointer press or focus
+	// moving outside of the toolbar.
+	useEffect(() => {
+		if (!optionsOpen) return;
+		optionsFirstRef.current?.focus();
+		const onPointer = (event: PointerEvent) => {
+			if (!toolbarRef.current?.contains(event.target as Node)) setOptionsOpen(false);
+		};
+		const onFocusIn = (event: FocusEvent) => {
+			if (!toolbarRef.current?.contains(event.target as Node)) setOptionsOpen(false);
+		};
+		document.addEventListener('pointerdown', onPointer);
+		document.addEventListener('focusin', onFocusIn);
+		return () => {
+			document.removeEventListener('pointerdown', onPointer);
+			document.removeEventListener('focusin', onFocusIn);
+		};
+	}, [optionsOpen]);
+
+	useEffect(
+		() => () => {
+			if (compareNoteTimer.current) clearTimeout(compareNoteTimer.current);
+			Object.values(formatNoteTimers.current).forEach((timer) => timer && clearTimeout(timer));
+		},
+		[],
+	);
 
 
 	// Rows outside the current window aren't in the DOM under virtualization,
@@ -1168,12 +1260,129 @@ buildDiffHtml(entries, { title: `${leftTitle} / ${rightTitle}`, left: leftTitle,
 		return (
 			<div
 					data-diff-side={which}
-					className={`flex flex-col gap-2 rounded-md ${dragSide === which || dragSide === 'page' ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`}
+					className={`flex flex-col gap-2 rounded-md md:row-span-3 md:grid md:grid-rows-subgrid md:gap-y-2 ${dragSide === which || dragSide === 'page' ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`}
 				>
-				<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
-					<label htmlFor={`text-diff-${which}`} className="text-sm font-medium text-foreground">
-						{label}
-					</label>
+				<div className="relative flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+					<div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+						<label htmlFor={`text-diff-${which}`} className="text-sm font-medium text-foreground">
+							{label}
+						</label>
+						{isOriginal && (
+							<div
+								ref={toolbarRef}
+								className="flex items-center gap-1"
+								onKeyDown={(event) => {
+									if (event.key === 'Escape' && optionsOpen) {
+										event.stopPropagation();
+										setOptionsOpen(false);
+										optionsButtonRef.current?.focus();
+									}
+								}}
+							>
+								<Button
+									type="button"
+									size="sm"
+									variant="outline"
+									className="min-h-9 px-3"
+									disabled={anyFormatBusy}
+									aria-label={messages.formatBothAria}
+									onClick={() => void handleFormatAll()}
+								>
+									{anyFormatBusy ? messages.formatBusy : messages.formatButton}
+								</Button>
+								<Button
+									ref={optionsButtonRef}
+									type="button"
+									size="sm"
+									variant="outline"
+									className="min-h-9 min-w-9 px-0"
+									aria-label={messages.formatOptions}
+									title={messages.formatOptions}
+									aria-expanded={optionsOpen}
+									aria-controls="text-diff-format-options"
+									aria-haspopup="true"
+									onClick={() => setOptionsOpen((open) => !open)}
+								>
+									<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+								<circle cx="12" cy="12" r="3" />
+								<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+							</svg>
+								</Button>
+					{optionsOpen && (
+						<div
+							id="text-diff-format-options"
+							role="group"
+							aria-label={messages.formatOptions}
+							className="absolute left-0 top-full z-20 mt-1 flex w-[min(20rem,calc(100vw-3rem))] flex-col gap-3 rounded-md border border-border bg-background p-3 shadow-lg"
+						>
+							<label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
+								{messages.formatLanguageLabel}
+								<select
+									ref={optionsFirstRef}
+									value={formatLang}
+									onChange={(event) => setFormatLang(event.target.value as FormatLanguage | 'auto')}
+									className="min-h-9 max-w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
+								>
+									<option value="auto">{messages.formatAuto}</option>
+									{FORMAT_LANGUAGES.map((language) => (
+										<option key={language.id} value={language.id}>
+											{language.label}
+										</option>
+									))}
+								</select>
+							</label>
+							<label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
+								{messages.formatIndentLabel}
+								<select
+									value={formatOptions.indent}
+									onChange={(event) => setFormatOptions((prev) => ({ ...prev, indent: event.target.value as FormatOptions['indent'] }))}
+									className="min-h-9 max-w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
+								>
+									{INDENT_CHOICES.map((choice) => (
+										<option key={choice} value={choice}>
+											{choice === '2' ? messages.formatIndent2 : choice === '4' ? messages.formatIndent4 : messages.formatIndentTab}
+										</option>
+									))}
+								</select>
+							</label>
+							{formatLang !== 'json' && formatLang !== 'xml' && formatLang !== 'sql' && (
+								<label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
+									{messages.formatWidthLabel}
+									<select
+										value={formatOptions.printWidth}
+										onChange={(event) => setFormatOptions((prev) => ({ ...prev, printWidth: Number(event.target.value) }))}
+										className="min-h-9 max-w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
+									>
+										{PRINT_WIDTHS.map((width) => (
+											<option key={width} value={width}>
+												{width}
+											</option>
+										))}
+									</select>
+								</label>
+							)}
+							{(formatLang === 'sql' || formatLang === 'auto') && (
+								<label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
+									{messages.formatSqlDialectLabel}
+									<select
+										value={formatOptions.sqlDialect}
+										onChange={(event) => isSqlDialect(event.target.value) && setFormatOptions((prev) => ({ ...prev, sqlDialect: event.target.value as FormatOptions['sqlDialect'] }))}
+										className="min-h-9 max-w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
+									>
+										{SQL_DIALECTS.map((dialect) => (
+											<option key={dialect.id} value={dialect.id}>
+												{dialect.label}
+											</option>
+										))}
+									</select>
+								</label>
+							)}
+							<p className="text-xs text-muted-foreground">{messages.formatOptionsHint}</p>
+						</div>
+					)}
+							</div>
+						)}
+					</div>
 					<div className="flex flex-wrap gap-1">
 						<Button type="button" size="sm" variant="ghost" aria-label={messages.clearAria.replace('{{side}}', label)} onClick={() => handleClear(which)}>
 							{messages.clear}
@@ -1190,17 +1399,6 @@ buildDiffHtml(entries, { title: `${leftTitle} / ${rightTitle}`, left: leftTitle,
 							onClick={() => fileRef.current?.click()}
 						>
 							{messages.uploadFile}
-						</Button>
-						<Button
-								type="button"
-								size="sm"
-								variant="ghost"
-								className="min-h-9"
-								disabled={formatBusy[which]}
-								aria-label={messages.formatAria.replace('{{side}}', label)}
-								onClick={() => handleFormat(which)}
-							>
-							{formatBusy[which] ? messages.formatBusy : messages.formatButton}
 						</Button>
 						<input
 							ref={fileRef}
@@ -1227,6 +1425,7 @@ accept={FILE_ACCEPT}
 					gutterRef={isOriginal ? originalGutterRef : changedGutterRef}
 					onScrollSync={syncInputScroll(isOriginal ? 0 : 1)}
 				/>
+				<div className="flex min-w-0 flex-col gap-2">
 					{loaded[which] && (
 						<FileChip
 							file={loaded[which] as LoadedFile}
@@ -1247,17 +1446,10 @@ accept={FILE_ACCEPT}
 							{fileError[which]}
 						</p>
 					)}
-					{formatFeedback[which]?.error && (
-						<p role="alert" className="text-xs text-destructive [overflow-wrap:anywhere]">
-							{formatFeedback[which]!.message}
-						</p>
-					)}
 					{!loaded[which] && !busyName[which] && (isOriginal ? originalText : changedText) === '' && (
 						<p className="text-xs text-muted-foreground">{dragSide === which || dragSide === 'page' ? fm.dropActive : fm.dropHint}</p>
 					)}
 					<p role="status" aria-live="polite" className="flex min-h-4 flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
-						{formatBusy[which] && <span>{messages.formatBusy}</span>}
-						{formatFeedback[which] && !formatFeedback[which]!.error && <span>{formatFeedback[which]!.message}</span>}
 					{topUndo?.side === which && (
 						<>
 							<span>{topUndo.kind === 'clear' ? messages.clearedNotice : messages.replacedNotice}</span>
@@ -1267,6 +1459,7 @@ accept={FILE_ACCEPT}
 						</>
 					)}
 				</p>
+				</div>
 			</div>
 		);
 	};
@@ -1275,6 +1468,13 @@ accept={FILE_ACCEPT}
 	const sideFromTarget = (target: EventTarget | null): Side | null => {
 		const value = (target as HTMLElement | null)?.closest?.('[data-diff-side]')?.getAttribute('data-diff-side');
 		return value === 'original' || value === 'changed' ? value : null;
+	};
+
+	const anyFormatBusy = formatBusy.original || formatBusy.changed;
+	const notices = (['all', 'original', 'changed'] as const).filter((key) => formatFeedback[key] !== null);
+	const noticeText = (key: NoticeKey) => {
+		const message = formatFeedback[key]!.message;
+		return key === 'all' ? message : `${key === 'original' ? messages.originalLabel : messages.changedLabel}: ${message}`;
 	};
 
 	const shareBlocked = (loaded.original !== null || loaded.changed !== null) && originalText.length + changedText.length > MAX_SHARE_CHARS;
@@ -1310,94 +1510,53 @@ accept={FILE_ACCEPT}
 						)}
 					</p>
 				)}
-				<div role="group" aria-labelledby="text-diff-format-heading" className="flex flex-col gap-2 rounded-md border border-border p-3">
-					<p id="text-diff-format-heading" className="text-sm font-medium text-foreground">
-						{messages.formatSettingsHeading}
-					</p>
-					<div className="flex flex-wrap items-end gap-x-3 gap-y-2">
-						<label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
-							{messages.formatLanguageLabel}
-							<select
-								value={formatLang}
-								onChange={(event) => setFormatLang(event.target.value as FormatLanguage | 'auto')}
-								className="min-h-9 max-w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
-							>
-								<option value="auto">{messages.formatAuto}</option>
-								{FORMAT_LANGUAGES.map((language) => (
-									<option key={language.id} value={language.id}>
-										{language.label}
-									</option>
-								))}
-							</select>
-						</label>
-						<label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
-							{messages.formatIndentLabel}
-							<select
-								value={formatOptions.indent}
-								onChange={(event) => setFormatOptions((prev) => ({ ...prev, indent: event.target.value as FormatOptions['indent'] }))}
-								className="min-h-9 max-w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
-							>
-								{INDENT_CHOICES.map((choice) => (
-									<option key={choice} value={choice}>
-										{choice === '2' ? messages.formatIndent2 : choice === '4' ? messages.formatIndent4 : messages.formatIndentTab}
-									</option>
-								))}
-							</select>
-						</label>
-						{formatLang !== 'json' && formatLang !== 'xml' && formatLang !== 'sql' && (
-							<label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
-								{messages.formatWidthLabel}
-								<select
-									value={formatOptions.printWidth}
-									onChange={(event) => setFormatOptions((prev) => ({ ...prev, printWidth: Number(event.target.value) }))}
-									className="min-h-9 max-w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
-								>
-									{PRINT_WIDTHS.map((width) => (
-										<option key={width} value={width}>
-											{width}
-										</option>
-									))}
-								</select>
-							</label>
-						)}
-						{(formatLang === 'sql' || formatLang === 'auto') && (
-							<label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
-								{messages.formatSqlDialectLabel}
-								<select
-									value={formatOptions.sqlDialect}
-									onChange={(event) => isSqlDialect(event.target.value) && setFormatOptions((prev) => ({ ...prev, sqlDialect: event.target.value as FormatOptions['sqlDialect'] }))}
-									className="min-h-9 max-w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
-								>
-									{SQL_DIALECTS.map((dialect) => (
-										<option key={dialect.id} value={dialect.id}>
-											{dialect.label}
-										</option>
-									))}
-								</select>
-							</label>
-						)}
-						<Button
-							type="button"
-							size="sm"
-							variant="outline"
-							className="min-h-9"
-							disabled={formatBusy.original || formatBusy.changed}
-							aria-label={messages.formatBothAria}
-							onClick={() => void handleFormatBoth()}
-						>
-							{formatBusy.original || formatBusy.changed ? messages.formatBusy : messages.formatBoth}
-						</Button>
-					</div>
-					<p className="text-xs text-muted-foreground">{messages.formatNote}</p>
-					{formatCrossNote && (
-						<p role="status" className="text-xs text-amber-700 dark:text-amber-400">
-							{formatCrossNote}
-						</p>
-					)}
-				</div>
-				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:grid-rows-[auto_auto_auto] md:gap-y-0">
 					{renderPanel('original')}
 					{renderPanel('changed')}
+				</div>
+				<div className="flex justify-center">
+					<Button type="button" className="min-h-9 w-full px-8 font-semibold md:w-auto md:min-w-48" aria-label={messages.compareAria} onClick={handleCompare}>
+						{messages.compareButton}
+					</Button>
+				</div>
+				{/* Compact notices right under the toolbar: format results/errors and the compare summary.
+				    The polite live region is always mounted so announcements are reliably read. */}
+				<div className="flex flex-col gap-1 empty:hidden">
+					<div role="status" aria-live="polite" className="flex flex-col gap-1 text-xs text-muted-foreground empty:hidden">
+						{compareNote && <p className="[overflow-wrap:anywhere]">{compareNote}</p>}
+						{anyFormatBusy && <p>{messages.formatBusy}</p>}
+						{notices
+							.filter((key) => !formatFeedback[key]!.error)
+							.map((key) => (
+								<p key={key} className="[overflow-wrap:anywhere]">
+									{noticeText(key)}
+								</p>
+							))}
+						{formatCrossNote && <p className="text-amber-700 dark:text-amber-400 [overflow-wrap:anywhere]">{formatCrossNote}</p>}
+					</div>
+					{notices.some((key) => formatFeedback[key]!.error) && (
+						<div role="alert" className="flex flex-col gap-1 text-xs text-destructive">
+							{notices
+								.filter((key) => formatFeedback[key]!.error)
+								.map((key) => (
+									<p key={key} className="[overflow-wrap:anywhere]">
+										{noticeText(key)}
+									</p>
+								))}
+						</div>
+					)}
+					{(notices.length > 0 || formatCrossNote) && (
+						<button
+							type="button"
+							className="min-h-9 self-start rounded-md px-2 text-xs font-medium text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+							onClick={() => {
+								(['all', 'original', 'changed'] as const).forEach((key) => setFormatNote(key, null));
+								setFormatCrossNote(null);
+							}}
+						>
+							{messages.dismissNotice}
+						</button>
+					)}
 				</div>
 
 				<div className="flex flex-wrap items-center gap-4">
@@ -1529,6 +1688,14 @@ accept={FILE_ACCEPT}
 				)}
 			</div>
 
+			<section
+				id="text-diff-results"
+				ref={resultsRef}
+				tabIndex={-1}
+				aria-label={messages.resultsHeading}
+				className="flex scroll-mt-28 flex-col gap-6 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background md:scroll-mt-20"
+			>
+			<h2 className="sr-only">{messages.resultsHeading}</h2>
 			{hasChanges ? (
 				<div
 					ref={sideBySideContainerRef}
@@ -1547,7 +1714,7 @@ accept={FILE_ACCEPT}
 								{messages.statsModified.replace('{{count}}', String(stats.modified))}
 							</span>
 						</div>
-						<div className="flex items-center gap-2">
+						<div className="flex flex-wrap items-center gap-2">
 							<Button type="button" size="icon-xs" variant="outline" aria-label={messages.prevChange} onClick={() => jumpToHunk(activeHunk - 1)}>
 								↑
 							</Button>
@@ -1703,6 +1870,7 @@ accept={FILE_ACCEPT}
 					</div>
 				</div>
 			)}
+			</section>
 		</div>
 	);
 }

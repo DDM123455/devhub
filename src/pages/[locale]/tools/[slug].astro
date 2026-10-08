@@ -24,6 +24,7 @@ import NginxConfigValidatorPage from '@/components/tools/NginxConfigValidatorPag
 import KubernetesYamlValidatorPage from '@/components/tools/KubernetesYamlValidatorPage.astro';
 import ImageToTextPage from '@/components/tools/ImageToTextPage.astro';
 import SqlFormatterPage from '@/components/tools/SqlFormatterPage.astro';
+import CodeFormatterPage from '@/components/tools/CodeFormatterPage.astro';
 import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { tools } from '@/data/tools';
@@ -93,6 +94,8 @@ const name = tool.names[locale];
 		<KubernetesYamlValidatorPage lang={locale} />
 	) : toolId === 'sql-formatter' ? (
 		<SqlFormatterPage lang={locale} />
+	) : toolId === 'code-formatter' ? (
+		<CodeFormatterPage lang={locale} />
 	) : (
 		<Layout title={`${name} — Web Tool Hub`} description={name} lang={locale}>
 			<section class="px-4 py-10">

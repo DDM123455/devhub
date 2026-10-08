@@ -180,6 +180,7 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-10-08 (Phase 3.19 — Text Diff gọn lại + tool Code Formatter riêng)** — Text Diff: bỏ khung Format lớn; MỘT nút "Định dạng" (tự nhận diện từng bên) + bánh răng tuỳ chọn nằm cùng hàng tiêu đề "Văn bản gốc"; nút "So sánh" nổi bật dưới hai ô, bấm sẽ cuộn mượt tới kết quả + focus + aria-live. Tool mới `code-formatter` (12 ngôn ngữ, tự nhận diện, thụt lề/độ rộng/phương ngữ SQL, minify JSON, tải về, lỗi dòng/cột, link so sánh sang Text Diff). Mới có en+vi; 18 ngôn ngữ còn lại CHƯA dịch (key mới của tool-code-formatter.json và tool-text-diff.json). vitest 738/738, build 582 trang, CSP 0 vi phạm.
 - **2026-10-08 (Phase 3.18b — dịch tool SQL Formatter + key mới Text Diff sang 18 ngôn ngữ)** — `tool-sql-formatter.json` (124 key)
   + 31 key mới và 2 key đổi nghĩa (`ui.formatError`, `ui.formatAria`) của `tool-text-diff.json` cho ar, de, es, fr, hi, id, it, ja,
   ko, nl, pl, pt, ru, sv, th, tr, zh, zh-tw (6 agent × 3 ngôn ngữ, MỖI agent dùng thư mục tạm riêng để tránh sự cố nhiễm chéo
