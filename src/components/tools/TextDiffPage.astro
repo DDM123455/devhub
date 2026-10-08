@@ -3,6 +3,7 @@ import { jsonLd } from '@/lib/json-ld';
 import Layout from '../../layouts/Layout.astro';
 import FaqSection from '@/components/layout/FaqSection.astro';
 import TextDiffChecker from './TextDiffChecker';
+import i18next from 'i18next';
 import { getFixedT } from '@/i18n/i18next';
 import { tools } from '@/data/tools';
 import type { Locale } from '@/i18n/config';
@@ -53,8 +54,6 @@ const messages = {
 	save: t('ui.save'),
 	copyShareLink: t('ui.copyShareLink'),
 	formatButton: t('ui.formatButton'),
-	formatDetectedJson: t('ui.formatDetectedJson'),
-	formatDetectedXml: t('ui.formatDetectedXml'),
 	formatError: t('ui.formatError'),
 	clearedNotice: t('ui.clearedNotice'),
 	undo: t('ui.undo'),
@@ -66,6 +65,34 @@ const messages = {
 	copyMergedAria: t('ui.copyMergedAria'),
 	saveMergedAria: t('ui.saveMergedAria'),
 	formatDuplicateKeys: t('ui.formatDuplicateKeys'),
+	formatSettingsHeading: t('ui.formatSettingsHeading'),
+	formatLanguageLabel: t('ui.formatLanguageLabel'),
+	formatAuto: t('ui.formatAuto'),
+	formatIndentLabel: t('ui.formatIndentLabel'),
+	formatIndent2: t('ui.formatIndent2'),
+	formatIndent4: t('ui.formatIndent4'),
+	formatIndentTab: t('ui.formatIndentTab'),
+	formatWidthLabel: t('ui.formatWidthLabel'),
+	formatSqlDialectLabel: t('ui.formatSqlDialectLabel'),
+	formatBoth: t('ui.formatBoth'),
+	formatBothAria: t('ui.formatBothAria'),
+	formatBusy: t('ui.formatBusy'),
+	formatDone: t('ui.formatDone'),
+	formatDoneAuto: t('ui.formatDoneAuto'),
+	formatNoChange: t('ui.formatNoChange'),
+	formatEmpty: t('ui.formatEmpty'),
+	formatErrorAt: t('ui.formatErrorAt'),
+	formatErrorLine: t('ui.formatErrorLine'),
+	formatErrorNoPos: t('ui.formatErrorNoPos'),
+	formatAmbiguous: t('ui.formatAmbiguous'),
+	formatUnknown: t('ui.formatUnknown'),
+	formatTooLarge: t('ui.formatTooLarge'),
+	formatLargeWarning: t('ui.formatLargeWarning'),
+	formatTimeout: t('ui.formatTimeout'),
+	formatFailed: t('ui.formatFailed'),
+	formatStale: t('ui.formatStale'),
+	formatMismatch: t('ui.formatMismatch'),
+	formatNote: t('ui.formatNote'),
 	largeInputWarning: t('ui.largeInputWarning'),
 	workerError: t('ui.workerError'),
 	trailingNewlineNote: t('ui.trailingNewlineNote'),
@@ -79,10 +106,15 @@ const messages = {
 	files: t('ui.files', { returnObjects: true }) as never,
 };
 
+// The Format article paragraph / FAQ entry are rendered only in locales that already have them,
+// so a not-yet-translated locale never shows an English paragraph in the middle of its page.
+const hasOwn = (key: string) => i18next.getResource(lang, 'tool-text-diff', key) !== undefined;
+
 const faqItems = [
 	{ question: t('faq.q1'), answer: t('faq.a1') },
 	{ question: t('faq.q2'), answer: t('faq.a2') },
 	{ question: t('faq.q3'), answer: t('faq.a3') },
+	...(hasOwn('faq.q4') ? [{ question: t('faq.q4'), answer: t('faq.a4') }] : []),
 ];
 
 const schema = {
@@ -117,6 +149,7 @@ const schema = {
 			<p>{t('article.p2')}</p>
 			<p>{t('article.p3')}</p>
 			<p>{t('article.p4')}</p>
+			{hasOwn('article.p5') && <p>{t('article.p5')}</p>}
 		</div>
 	</section>
 	<section class="border-t border-border px-4 py-10">

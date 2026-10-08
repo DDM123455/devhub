@@ -1,0 +1,87 @@
+---
+import { jsonLd } from '@/lib/json-ld';
+import Layout from '../../layouts/Layout.astro';
+import FaqSection from '@/components/layout/FaqSection.astro';
+import SqlFormatter from './SqlFormatter';
+import { getFixedT } from '@/i18n/i18next';
+import { tools } from '@/data/tools';
+import type { Locale } from '@/i18n/config';
+
+interface Props {
+	lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getFixedT(lang, 'tool-sql-formatter');
+
+const tool = tools.find((item) => item.id === 'sql-formatter')!;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+// Internal link tới 3 công cụ liên quan trực tiếp (định dạng JSON, regex, so sánh văn bản).
+const relatedIds = ['json-formatter', 'regex-tester', 'text-diff'];
+const relatedTools = relatedIds.map((id) => tools.find((item) => item.id === id)).filter((item) => item !== undefined);
+
+// Toàn bộ chuỗi giao diện nằm dưới `ui.*` (kể cả errors/hints/samples) và đi qua i18n.
+const messages = t('ui', { returnObjects: true }) as never;
+
+const faqItems = [
+	{ question: t('faq.q1'), answer: t('faq.a1') },
+	{ question: t('faq.q2'), answer: t('faq.a2') },
+	{ question: t('faq.q3'), answer: t('faq.a3') },
+	{ question: t('faq.q4'), answer: t('faq.a4') },
+];
+
+const schema = {
+	'@context': 'https://schema.org',
+	'@type': 'WebApplication',
+	name: t('heading'),
+	description: t('meta.description'),
+	url: canonicalUrl,
+	applicationCategory: 'DeveloperApplication',
+	operatingSystem: 'Any',
+	offers: {
+		'@type': 'Offer',
+		price: '0',
+		priceCurrency: 'USD',
+	},
+};
+---
+
+<Layout title={t('meta.title')} description={t('meta.description')} lang={lang} ogImage={`/og/${tool.category}.png`}>
+	<script type="application/ld+json" set:html={jsonLd(schema)} />
+	<section class="px-4 py-10">
+		<h1 class="text-heading-1 text-foreground">{t('heading')}</h1>
+		<p class="mt-2 text-muted-foreground">{t('tagline')}</p>
+		<div class="mt-6">
+			<SqlFormatter client:load messages={messages} />
+		</div>
+	</section>
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-heading-2 text-foreground">{t('article.heading')}</h2>
+		<div class="mt-4 flex max-w-3xl flex-col gap-4 mx-auto [overflow-wrap:anywhere] text-muted-foreground">
+			<p>{t('article.p1')}</p>
+			<p>{t('article.p2')}</p>
+			<p>{t('article.p3')}</p>
+			<p>{t('article.p4')}</p>
+		</div>
+	</section>
+	<section class="border-t border-border px-4 py-10">
+		<FaqSection heading={t('faq.heading')} items={faqItems} />
+	</section>
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-heading-2 text-foreground">{t('related')}</h2>
+		<ul class="mt-4 flex flex-col gap-1">
+			{
+				relatedTools.map((related) => (
+					<li>
+						<a
+							href={`/${lang}/tools/${related!.slugs[lang]}/`}
+							class="text-sm text-primary hover:underline"
+						>
+							{related!.names[lang]}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+</Layout>

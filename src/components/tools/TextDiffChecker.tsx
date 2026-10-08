@@ -15,7 +15,26 @@ import {
 	type HunkOverride,
 } from '@/lib/text-diff';
 import type { TextDiffRequest, TextDiffResponse } from './textDiffWorker';
-import { autoFormatText } from '@/lib/text-format';
+import { formatXmlStrict } from '@/lib/text-format';
+import {
+	checkFormatSize,
+	DEFAULT_FORMAT_OPTIONS,
+	detectLanguage,
+	FORMAT_LANGUAGES,
+	FORMAT_MAX_CHARS,
+	INDENT_CHOICES,
+	indentUnit,
+	isDecisive,
+	isSqlDialect,
+	languageLabel,
+	PRINT_WIDTHS,
+	SQL_DIALECTS,
+	type FormatErrorInfo,
+	type FormatLanguage,
+	type FormatOptions,
+} from '@/lib/format-languages';
+import type { FormatRunResult } from '@/lib/format-run';
+import { FORMAT_TIMEOUT_MESSAGE, formatInWorker } from './formatClient';
 import { Button } from '@/components/ui/button';
 import UnifiedDiffView, { UNIFIED_ROW_HEIGHT, UNIFIED_VIEWPORT_HEIGHT, type TextDiffExtraMessages } from './TextDiffUnified';
 import { FileChip, FileLimitsPanel, FileOptionsPanel, type LoadedFile, type TextDiffFileMessages } from './TextDiffFiles';
@@ -64,8 +83,6 @@ interface Messages {
 	save: string;
 	copyShareLink: string;
 	formatButton: string;
-	formatDetectedJson: string;
-	formatDetectedXml: string;
 	formatError: string;
 	clearedNotice: string;
 	undo: string;
@@ -77,6 +94,34 @@ interface Messages {
 	copyMergedAria: string;
 	saveMergedAria: string;
 	formatDuplicateKeys: string;
+	formatSettingsHeading: string;
+	formatLanguageLabel: string;
+	formatAuto: string;
+	formatIndentLabel: string;
+	formatIndent2: string;
+	formatIndent4: string;
+	formatIndentTab: string;
+	formatWidthLabel: string;
+	formatSqlDialectLabel: string;
+	formatBoth: string;
+	formatBothAria: string;
+	formatBusy: string;
+	formatDone: string;
+	formatDoneAuto: string;
+	formatNoChange: string;
+	formatEmpty: string;
+	formatErrorAt: string;
+	formatErrorLine: string;
+	formatErrorNoPos: string;
+	formatAmbiguous: string;
+	formatUnknown: string;
+	formatTooLarge: string;
+	formatLargeWarning: string;
+	formatTimeout: string;
+	formatFailed: string;
+	formatStale: string;
+	formatMismatch: string;
+	formatNote: string;
 	largeInputWarning: string;
 	workerError: string;
 	trailingNewlineNote: string;
@@ -486,7 +531,12 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	const [copiedSide, setCopiedSide] = useState<'left' | 'right' | null>(null);
 	const [hunkOverrides, setHunkOverrides] = useState<Map<number, HunkOverride>>(new Map());
 	const [shareLinkCopied, setShareLinkCopied] = useState(false);
-	const [formatFeedback, setFormatFeedback] = useState<{ side: 'original' | 'changed'; message: string } | null>(null);
+	const [formatFeedback, setFormatFeedback] = useState<Record<Side, { message: string; error: boolean } | null>>({ original: null, changed: null });
+	const [formatBusy, setFormatBusy] = useState<Record<Side, boolean>>({ original: false, changed: false });
+	const [formatLang, setFormatLang] = useState<FormatLanguage | 'auto'>('auto');
+	const [formatOptions, setFormatOptions] = useState<FormatOptions>(DEFAULT_FORMAT_OPTIONS);
+	const [formatCrossNote, setFormatCrossNote] = useState<string | null>(null);
+	const formatNoteTimers = useRef<Record<Side, ReturnType<typeof setTimeout> | null>>({ original: null, changed: null });
 	// Stack of snapshots (not a single slot) so clearing/replacing twice in a row can
 	// still be undone one step at a time.
 	const [undoStack, setUndoStack] = useState<Array<{ side: 'original' | 'changed'; previousText: string; kind: 'clear' | 'replace' }>>([]);
@@ -947,28 +997,104 @@ buildDiffHtml(entries, { title: `${leftTitle} / ${rightTitle}`, left: leftTitle,
 		setBusyName({ original: null, changed: null });
 	};
 
-	// Beautifies whichever of JSON/XML the pasted text auto-detects as, so two payloads
-	// that only differ in whitespace/line-breaking (a common case for API responses and
-	// config exports) don't diff as "everything changed". Detection + formatting is 100%
-	// client-side (see `text-format.ts`) — nothing here is sent anywhere.
-	const handleFormat = (which: 'original' | 'changed') => {
-		const text = which === 'original' ? originalText : changedText;
-		const result = autoFormatText(text);
-		if (!result) {
-			setFormatFeedback({ side: which, message: messages.formatError });
-			setTimeout(() => setFormatFeedback(null), 2500);
-			return;
-		}
-		pushUndo(which, text, 'replace');
-		if (which === 'original') editOriginal(result.value);
-		else editChanged(result.value);
-		const base = result.detected === 'json' ? messages.formatDetectedJson : messages.formatDetectedXml;
-		setFormatFeedback({
-			side: which,
-			message: result.warnings.includes('duplicateKeys') ? `${base} ${messages.formatDuplicateKeys}` : base,
-		});
-		setTimeout(() => setFormatFeedback(null), 4000);
+	// Formats one side with the chosen (or auto-detected) language so two pastes that differ only
+	// in style diff cleanly. Everything runs in this browser: JSON/XML here, SQL and the
+	// prettier languages in a lazily created worker that loads only the parser needed
+	// (see `format-languages.ts`, `format-run.ts`). A failure never touches the text; success
+	// is undoable like the other replace actions.
+	const setFormatNote = (side: Side, note: { message: string; error: boolean } | null) => {
+		const timer = formatNoteTimers.current[side];
+		if (timer) clearTimeout(timer);
+		setFormatFeedback((prev) => ({ ...prev, [side]: note }));
+		formatNoteTimers.current[side] = note ? setTimeout(() => setFormatFeedback((prev) => ({ ...prev, [side]: null })), note.error ? 15000 : 6000) : null;
 	};
+
+	const formatErrorMessage = (label: string, error: FormatErrorInfo): string => {
+		if (error.message === FORMAT_TIMEOUT_MESSAGE) return messages.formatTimeout;
+		if (error.message === 'worker-error') return messages.formatFailed;
+		const template = error.line === undefined ? messages.formatErrorNoPos : error.column === undefined ? messages.formatErrorLine : messages.formatErrorAt;
+		return template
+			.replace('{{language}}', label)
+			.replace('{{line}}', String(error.line ?? ''))
+			.replace('{{column}}', String(error.column ?? ''))
+			.replace('{{message}}', error.message);
+	};
+
+	const formatOne = async (side: Side): Promise<FormatLanguage | null> => {
+		const text = textsRef.current[side];
+		if (text.trim() === '') {
+			setFormatNote(side, { message: messages.formatEmpty, error: true });
+			return null;
+		}
+		const size = checkFormatSize(text.length);
+		if (size === 'tooLarge') {
+			setFormatNote(side, { message: messages.formatTooLarge.replace('{{max}}', FORMAT_MAX_CHARS.toLocaleString('en-US')), error: true });
+			return null;
+		}
+		let language: FormatLanguage;
+		let auto = false;
+		if (formatLang === 'auto') {
+			const detection = detectLanguage(text, loadedRef.current[side]?.name);
+			if (!isDecisive(detection) || !detection.language) {
+				const names = detection.candidates.map(languageLabel).join(', ');
+				setFormatNote(side, { message: names ? messages.formatAmbiguous.replace('{{candidates}}', names) : messages.formatUnknown, error: true });
+				return null;
+			}
+			language = detection.language;
+			auto = true;
+		} else {
+			language = formatLang;
+		}
+		const label = languageLabel(language);
+		setFormatNote(side, null);
+		setFormatBusy((prev) => ({ ...prev, [side]: true }));
+		let result: FormatRunResult;
+		try {
+			if (language === 'xml') {
+				const xml = formatXmlStrict(text, indentUnit(formatOptions.indent));
+				result = 'error' in xml ? { ok: false, error: xml.error } : { ok: true, value: xml.value, warnings: [] };
+			} else {
+				result = await formatInWorker(text, language, formatOptions);
+			}
+		} catch {
+			result = { ok: false, error: { message: 'worker-error' } };
+		} finally {
+			setFormatBusy((prev) => ({ ...prev, [side]: false }));
+		}
+		if (textsRef.current[side] !== text) {
+			setFormatNote(side, { message: messages.formatStale, error: true });
+			return language;
+		}
+		if (!result.ok) {
+			setFormatNote(side, { message: formatErrorMessage(label, result.error), error: true });
+			return language;
+		}
+		if (result.value === text) {
+			setFormatNote(side, { message: messages.formatNoChange.replace('{{language}}', label), error: false });
+			return language;
+		}
+		pushUndo(side, text, 'replace');
+		setSideText(side, result.value);
+		const parts = [(auto ? messages.formatDoneAuto : messages.formatDone).replace('{{language}}', label)];
+		if (result.warnings.includes('duplicateKeys')) parts.push(messages.formatDuplicateKeys);
+		if (size === 'warn') parts.push(messages.formatLargeWarning);
+		setFormatNote(side, { message: parts.join(' '), error: false });
+		return language;
+	};
+
+	const handleFormat = (which: Side) => {
+		setFormatCrossNote(null);
+		void formatOne(which);
+	};
+
+	// One click to bring both sides to the same style; warns when auto-detection found two
+	// different languages (the diff will then still show style differences).
+	const handleFormatBoth = async () => {
+		setFormatCrossNote(null);
+		const [a, b] = await Promise.all([formatOne('original'), formatOne('changed')]);
+		if (a && b && a !== b) setFormatCrossNote(messages.formatMismatch.replace('{{a}}', languageLabel(a)).replace('{{b}}', languageLabel(b)));
+	};
+
 
 	// Rows outside the current window aren't in the DOM under virtualization,
 	// so `scrollIntoView` (which needs a real element to target) no longer
@@ -1065,8 +1191,16 @@ buildDiffHtml(entries, { title: `${leftTitle} / ${rightTitle}`, left: leftTitle,
 						>
 							{messages.uploadFile}
 						</Button>
-						<Button type="button" size="sm" variant="ghost" aria-label={messages.formatAria.replace('{{side}}', label)} onClick={() => handleFormat(which)}>
-							{messages.formatButton}
+						<Button
+								type="button"
+								size="sm"
+								variant="ghost"
+								className="min-h-9"
+								disabled={formatBusy[which]}
+								aria-label={messages.formatAria.replace('{{side}}', label)}
+								onClick={() => handleFormat(which)}
+							>
+							{formatBusy[which] ? messages.formatBusy : messages.formatButton}
 						</Button>
 						<input
 							ref={fileRef}
@@ -1113,11 +1247,17 @@ accept={FILE_ACCEPT}
 							{fileError[which]}
 						</p>
 					)}
+					{formatFeedback[which]?.error && (
+						<p role="alert" className="text-xs text-destructive [overflow-wrap:anywhere]">
+							{formatFeedback[which]!.message}
+						</p>
+					)}
 					{!loaded[which] && !busyName[which] && (isOriginal ? originalText : changedText) === '' && (
 						<p className="text-xs text-muted-foreground">{dragSide === which || dragSide === 'page' ? fm.dropActive : fm.dropHint}</p>
 					)}
 					<p role="status" aria-live="polite" className="flex min-h-4 flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
-						{formatFeedback?.side === which && <span>{formatFeedback.message}</span>}
+						{formatBusy[which] && <span>{messages.formatBusy}</span>}
+						{formatFeedback[which] && !formatFeedback[which]!.error && <span>{formatFeedback[which]!.message}</span>}
 					{topUndo?.side === which && (
 						<>
 							<span>{topUndo.kind === 'clear' ? messages.clearedNotice : messages.replacedNotice}</span>
@@ -1170,6 +1310,91 @@ accept={FILE_ACCEPT}
 						)}
 					</p>
 				)}
+				<div role="group" aria-labelledby="text-diff-format-heading" className="flex flex-col gap-2 rounded-md border border-border p-3">
+					<p id="text-diff-format-heading" className="text-sm font-medium text-foreground">
+						{messages.formatSettingsHeading}
+					</p>
+					<div className="flex flex-wrap items-end gap-x-3 gap-y-2">
+						<label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
+							{messages.formatLanguageLabel}
+							<select
+								value={formatLang}
+								onChange={(event) => setFormatLang(event.target.value as FormatLanguage | 'auto')}
+								className="min-h-9 max-w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
+							>
+								<option value="auto">{messages.formatAuto}</option>
+								{FORMAT_LANGUAGES.map((language) => (
+									<option key={language.id} value={language.id}>
+										{language.label}
+									</option>
+								))}
+							</select>
+						</label>
+						<label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
+							{messages.formatIndentLabel}
+							<select
+								value={formatOptions.indent}
+								onChange={(event) => setFormatOptions((prev) => ({ ...prev, indent: event.target.value as FormatOptions['indent'] }))}
+								className="min-h-9 max-w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
+							>
+								{INDENT_CHOICES.map((choice) => (
+									<option key={choice} value={choice}>
+										{choice === '2' ? messages.formatIndent2 : choice === '4' ? messages.formatIndent4 : messages.formatIndentTab}
+									</option>
+								))}
+							</select>
+						</label>
+						{formatLang !== 'json' && formatLang !== 'xml' && formatLang !== 'sql' && (
+							<label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
+								{messages.formatWidthLabel}
+								<select
+									value={formatOptions.printWidth}
+									onChange={(event) => setFormatOptions((prev) => ({ ...prev, printWidth: Number(event.target.value) }))}
+									className="min-h-9 max-w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
+								>
+									{PRINT_WIDTHS.map((width) => (
+										<option key={width} value={width}>
+											{width}
+										</option>
+									))}
+								</select>
+							</label>
+						)}
+						{(formatLang === 'sql' || formatLang === 'auto') && (
+							<label className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
+								{messages.formatSqlDialectLabel}
+								<select
+									value={formatOptions.sqlDialect}
+									onChange={(event) => isSqlDialect(event.target.value) && setFormatOptions((prev) => ({ ...prev, sqlDialect: event.target.value as FormatOptions['sqlDialect'] }))}
+									className="min-h-9 max-w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
+								>
+									{SQL_DIALECTS.map((dialect) => (
+										<option key={dialect.id} value={dialect.id}>
+											{dialect.label}
+										</option>
+									))}
+								</select>
+							</label>
+						)}
+						<Button
+							type="button"
+							size="sm"
+							variant="outline"
+							className="min-h-9"
+							disabled={formatBusy.original || formatBusy.changed}
+							aria-label={messages.formatBothAria}
+							onClick={() => void handleFormatBoth()}
+						>
+							{formatBusy.original || formatBusy.changed ? messages.formatBusy : messages.formatBoth}
+						</Button>
+					</div>
+					<p className="text-xs text-muted-foreground">{messages.formatNote}</p>
+					{formatCrossNote && (
+						<p role="status" className="text-xs text-amber-700 dark:text-amber-400">
+							{formatCrossNote}
+						</p>
+					)}
+				</div>
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 					{renderPanel('original')}
 					{renderPanel('changed')}

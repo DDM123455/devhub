@@ -119,35 +119,35 @@ function parseJsonPreserving(text: string): { node: JsonNode; hasDuplicateKeys: 
 	return { node, hasDuplicateKeys };
 }
 
-function printJson(node: JsonNode, depth: number, compact = false): string {
+function printJson(node: JsonNode, depth: number, compact = false, unit = '  '): string {
 	if (node.t === 'raw') return node.text;
 	if (compact) {
-		if (node.t === 'array') return `[${node.items.map((item) => printJson(item, 0, true)).join(',')}]`;
-		return `{${node.entries.map(([k, v]) => `${JSON.stringify(k)}:${printJson(v, 0, true)}`).join(',')}}`;
+		if (node.t === 'array') return `[${node.items.map((item) => printJson(item, 0, true, unit)).join(',')}]`;
+		return `{${node.entries.map(([k, v]) => `${JSON.stringify(k)}:${printJson(v, 0, true, unit)}`).join(',')}}`;
 	}
-	const pad = '  '.repeat(depth + 1);
-	const end = '  '.repeat(depth);
+	const pad = unit.repeat(depth + 1);
+	const end = unit.repeat(depth);
 	if (node.t === 'array') {
 		if (node.items.length === 0) return '[]';
-		return `[\n${node.items.map((item) => pad + printJson(item, depth + 1)).join(',\n')}\n${end}]`;
+		return `[\n${node.items.map((item) => pad + printJson(item, depth + 1, false, unit)).join(',\n')}\n${end}]`;
 	}
 	if (node.entries.length === 0) return '{}';
-	return `{\n${node.entries.map(([k, v]) => `${pad}${JSON.stringify(k)}: ${printJson(v, depth + 1)}`).join(',\n')}\n${end}}`;
+	return `{\n${node.entries.map(([k, v]) => `${pad}${JSON.stringify(k)}: ${printJson(v, depth + 1, false, unit)}`).join(',\n')}\n${end}}`;
 }
 
-export function formatJsonLossless(text: string, compact = false): { value: string; hasDuplicateKeys: boolean } | null {
+export function formatJsonLossless(text: string, compact = false, unit = '  '): { value: string; hasDuplicateKeys: boolean } | null {
 	try {
 		const { node, hasDuplicateKeys } = parseJsonPreserving(text.trim());
-		return { value: printJson(node, 0, compact), hasDuplicateKeys };
+		return { value: printJson(node, 0, compact, unit), hasDuplicateKeys };
 	} catch {
 		return null;
 	}
 }
 
-function tryFormatJson(text: string): FormatResult | null {
+function tryFormatJson(text: string, unit: string): FormatResult | null {
 	const trimmed = text.trim();
 	if (trimmed === '' || !(trimmed.startsWith('{') || trimmed.startsWith('['))) return null;
-	const result = formatJsonLossless(trimmed);
+	const result = formatJsonLossless(trimmed, false, unit);
 	if (!result) return null;
 	return { value: result.value, detected: 'json', warnings: result.hasDuplicateKeys ? ['duplicateKeys'] : [] };
 }
@@ -176,8 +176,8 @@ export function escapeXmlAttr(value: string): string {
 // whose only child is a single text node are kept inline (`<tag>value</tag>`), and
 // MIXED content (text interleaved with child elements, e.g. `<p>Hi <b>x</b></p>`) is
 // emitted verbatim on one line since re-indenting it would change the document's text.
-function indentXmlNode(node: Node, depth: number, lines: string[]): void {
-	const indent = '  '.repeat(depth);
+function indentXmlNode(node: Node, depth: number, lines: string[], unit = '  '): void {
+	const indent = unit.repeat(depth);
 	if (node.nodeType === Node.COMMENT_NODE) {
 		lines.push(`${indent}<!--${node.textContent ?? ''}-->`);
 		return;
@@ -216,11 +216,11 @@ function indentXmlNode(node: Node, depth: number, lines: string[]): void {
 		return;
 	}
 	lines.push(`${indent}<${element.tagName}${attrs}>`);
-	for (const child of meaningfulChildren) indentXmlNode(child, depth + 1, lines);
+	for (const child of meaningfulChildren) indentXmlNode(child, depth + 1, lines, unit);
 	lines.push(`${indent}</${element.tagName}>`);
 }
 
-function tryFormatXml(text: string): FormatResult | null {
+function tryFormatXml(text: string, unit: string): FormatResult | null {
 	const trimmed = text.trim();
 	if (!trimmed.startsWith('<')) return null;
 	const doc = new DOMParser().parseFromString(trimmed, 'application/xml');
@@ -237,7 +237,7 @@ function tryFormatXml(text: string): FormatResult | null {
 			child.nodeType === Node.COMMENT_NODE ||
 			(child.nodeType === Node.PROCESSING_INSTRUCTION_NODE && (child as ProcessingInstruction).target !== 'xml')
 		) {
-			indentXmlNode(child, 0, lines);
+			indentXmlNode(child, 0, lines, unit);
 		}
 	}
 	return lines.length > 0 ? { value: lines.join('\n'), detected: 'xml', warnings: [] } : null;
@@ -246,9 +246,35 @@ function tryFormatXml(text: string): FormatResult | null {
 // Tries JSON first (cheap syntactic check, no DOM work) then XML. Returns null rather than
 // throwing so the caller can leave the user's text untouched and show an inline hint instead
 // of losing their input on a false-positive detection.
-export function autoFormatText(text: string): FormatResult | null {
-	const asJson = tryFormatJson(text);
+export function autoFormatText(text: string, unit = '  '): FormatResult | null {
+	const asJson = tryFormatJson(text, unit);
 	if (asJson) return asJson;
 	if (typeof DOMParser === 'undefined') return null;
-	return tryFormatXml(text);
+	return tryFormatXml(text, unit);
+}
+
+/**
+ * Formats strictly as XML (no JSON attempt) and, on malformed XML, returns the parser's
+ * message with line/column when the browser reports them (Chrome: "error on line 2 at column 5",
+ * Firefox: "Line Number 2, Column 5"). Needs a DOM.
+ */
+export function formatXmlStrict(text: string, unit = '  '): FormatResult | { error: { line?: number; column?: number; message: string } } {
+	const trimmed = text.trim();
+	if (typeof DOMParser === 'undefined' || !trimmed.startsWith('<')) return { error: { message: 'Not XML' } };
+	const result = tryFormatXml(trimmed, unit);
+	if (result) return result;
+	const doc = new DOMParser().parseFromString(trimmed, 'application/xml');
+	const raw = doc.getElementsByTagName('parsererror')[0]?.textContent ?? '';
+	const pos = /line(?: number)?\s*:?\s*(\d+)[^\d]{1,12}column(?: number)?\s*:?\s*(\d+)/i.exec(raw);
+	const detail =
+		/column\s*\d+\s*:\s*([^\n]+)/i.exec(raw)?.[1] ??
+		raw.split('\n').find((l) => l.trim() !== '' && !/^this page contains/i.test(l.trim())) ??
+		'Malformed XML';
+	return {
+		error: {
+			line: pos ? Number(pos[1]) : undefined,
+			column: pos ? Number(pos[2]) : undefined,
+			message: detail.replace(/\s+/g, ' ').trim().slice(0, 160),
+		},
+	};
 }

@@ -40,16 +40,14 @@
     "save": "Save as .txt",
     "copyShareLink": "Copy share link",
     "formatButton": "Format",
-    "formatDetectedJson": "Formatted as JSON",
-    "formatDetectedXml": "Formatted as XML",
-    "formatError": "Not valid JSON or XML — left unchanged",
+    "formatError": "Could not format — left unchanged",
     "clearedNotice": "Cleared.",
     "undo": "Undo",
     "replacedNotice": "Content replaced.",
     "clearAria": "Clear {{side}}",
     "swapAria": "Swap the original and changed texts",
     "uploadAria": "Upload a file into {{side}}",
-    "formatAria": "Format JSON/XML in {{side}}",
+    "formatAria": "Format {{side}}",
     "copyMergedAria": "Copy merged result: {{side}}",
     "saveMergedAria": "Save merged result: {{side}}",
     "formatDuplicateKeys": "Warning: duplicate keys were found and kept as-is.",
@@ -162,7 +160,35 @@
         "rtf": "simple conversion of paragraphs and special characters; complex or embedded content may be lost.",
         "general": "Not supported: images/scans (no OCR), password-protected files, old .doc/.xls/.ppt, files over 30 MB. File content is never uploaded and is not stored."
       }
-    }
+    },
+    "formatSettingsHeading": "Format before comparing",
+    "formatLanguageLabel": "Format as",
+    "formatAuto": "Auto-detect",
+    "formatIndentLabel": "Indent",
+    "formatIndent2": "2 spaces",
+    "formatIndent4": "4 spaces",
+    "formatIndentTab": "Tab",
+    "formatWidthLabel": "Line width",
+    "formatSqlDialectLabel": "SQL dialect",
+    "formatBoth": "Format both",
+    "formatBothAria": "Format both texts with the same settings",
+    "formatBusy": "Formatting…",
+    "formatDone": "Formatted as {{language}}.",
+    "formatDoneAuto": "Auto-detected and formatted as {{language}}.",
+    "formatNoChange": "Already formatted as {{language}} — nothing changed.",
+    "formatEmpty": "Nothing to format — the box is empty.",
+    "formatErrorAt": "{{language}} syntax error at line {{line}}, column {{column}}: {{message}}. Left unchanged.",
+    "formatErrorLine": "{{language}} syntax error at line {{line}}: {{message}}. Left unchanged.",
+    "formatErrorNoPos": "{{language}} error: {{message}}. Left unchanged.",
+    "formatAmbiguous": "Could not tell which language this is (maybe {{candidates}}). Choose one in “Format as”.",
+    "formatUnknown": "Could not tell which language this is. Choose one in “Format as”.",
+    "formatTooLarge": "Too large to format (limit {{max}} characters). Left unchanged.",
+    "formatLargeWarning": "Large input: formatting runs in the background and may take a while.",
+    "formatTimeout": "Formatting took too long and was stopped. Left unchanged.",
+    "formatFailed": "Formatting failed unexpectedly. Left unchanged.",
+    "formatStale": "The text changed while formatting, so the result was discarded.",
+    "formatMismatch": "The two sides were formatted as different languages ({{a}} and {{b}}), so the diff may still show style differences.",
+    "formatNote": "Supported: JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown and GraphQL. Formatting can change quotes, semicolons and line breaks but not what the code means. The text is formatted in your browser and can be undone."
   },
   "related": "Related tools",
   "faq": {
@@ -172,13 +198,16 @@
     "q2": "Can I merge the two versions into one final text?",
     "a2": "Yes — the built-in merge tool lets you accept the left or right version hunk by hunk.",
     "q3": "Can I ignore whitespace or capitalization differences?",
-    "a3": "Yes — toggle \"ignore whitespace\" and \"ignore case\" independently."
+    "a3": "Yes — toggle \"ignore whitespace\" and \"ignore case\" independently.",
+    "q4": "Which languages can the Format button handle?",
+    "a4": "JSON, XML, SQL (standard SQL plus MySQL, PostgreSQL, SQL Server, SQLite, BigQuery and more), HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown and GraphQL. The language is auto-detected from the file name or the text, and you can always pick it by hand."
   },
   "article": {
     "heading": "Why use a text diff checker?",
     "p1": "Anytime two versions of the same document exist — a contract before and after a lawyer's edits, an essay before and after a round of feedback, a config file before and after a teammate's commit — the important question is rarely \"are these the same file\" but \"what exactly changed.\" Reading both versions side by side and trying to spot every added comma, deleted clause, or reworded sentence is slow and error-prone, especially once a document runs past a page or two. A diff checker automates that comparison and highlights precisely the words or lines that differ, so you can review a change in seconds instead of minutes.",
     "p2": "This tool runs entirely in your browser. Both text boxes stay in memory on your device and the comparison itself is computed by a JavaScript diffing library running locally — nothing you type or paste is ever sent to a server, logged, or stored anywhere. That matters if you're comparing a client contract, a password file, or any text you'd rather not put through a third-party service. Close the tab and everything is gone; there's no history to worry about.",
     "p3": "Paste the original text on the left and the updated version on the right — both boxes show line numbers and scroll in sync with each other, and each has its own Clear, Swap, and Upload file buttons so you can load two files straight from disk (plain text, code, Word, PDF, Excel and more) instead of copy-pasting. The comparison updates live as you type; there's no button to press. Pick Character, Word, or Line to control how finely differences are broken down: Character mode catches a single typo-level edit, Word mode is best for prose since it highlights exactly which words changed inside a sentence, and Line mode compares whole lines at a time, which suits code, JSON, or list-style content where you care about which entire lines moved rather than individual words within them. A line that only exists in one version is shown fully green (added) or red (removed); a line that exists in both but was edited is shown in orange, with the exact changed word or characters inside it highlighted more strongly — so you can tell an edited line apart from an unrelated delete-then-insert pair at a glance.",
-    "p4": "The added/removed/modified counts above the comparison give you an at-a-glance sense of how big a change is, and the ↑/↓ buttons jump straight to the next or previous change without scrolling through unchanged lines — handy on a long document. A Fullscreen button expands the comparison to fill the screen for closer review. Below the comparison, the merge tool turns this from a read-only diff into something you can actually resolve: each change gets its own ← / → buttons between the two columns, letting you pull the right version's edit into the left column or push the left version into the right, one change at a time, until either column reads exactly the way you want. Each column has its own Copy and Save buttons, so you can lift out a clean, merged result without retyping anything. If the two texts turn out to be identical, the tool tells you so directly instead of showing a blank, ambiguous result — one less thing to second-guess."
+    "p4": "The added/removed/modified counts above the comparison give you an at-a-glance sense of how big a change is, and the ↑/↓ buttons jump straight to the next or previous change without scrolling through unchanged lines — handy on a long document. A Fullscreen button expands the comparison to fill the screen for closer review. Below the comparison, the merge tool turns this from a read-only diff into something you can actually resolve: each change gets its own ← / → buttons between the two columns, letting you pull the right version's edit into the left column or push the left version into the right, one change at a time, until either column reads exactly the way you want. Each column has its own Copy and Save buttons, so you can lift out a clean, merged result without retyping anything. If the two texts turn out to be identical, the tool tells you so directly instead of showing a blank, ambiguous result — one less thing to second-guess.",
+    "p5": "Two versions of the same code often look completely different only because of style: minified versus pretty-printed, tabs versus spaces, single versus double quotes, long lines wrapped in different places. Use the Format settings above the two boxes to bring both texts to one standard before you compare. Leave “Format as” on Auto-detect (it looks at the file name first, then at the text) or choose JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown or GraphQL yourself; pick an indent of 2 spaces, 4 spaces or a tab, a line width, and for SQL a dialect such as MySQL, PostgreSQL or SQL Server. Format formats one box, Format both formats both with identical settings, and if the two sides turn out to be different languages you get a warning. If the text has a syntax error nothing is changed and the message tells you the line and column. The formatters (Prettier and sql-formatter) are downloaded only when you press Format, run in a background worker so large inputs do not freeze the page, and everything stays on your device. Formatting may change quotes, semicolons and line breaks but never what the code does, and every format can be undone."
   }
 }

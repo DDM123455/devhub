@@ -539,6 +539,13 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 - [ ] Người bản ngữ rà lại toàn bộ bản dịch AI (ưu tiên ko, fr, id vừa bị dịch lại; bài article/faq dài)
 - [ ] Cân nhắc đưa check-i18n / check-i18n-copies vào bước CI trước khi deploy
 
+## Phase 3.18 — SQL Formatter & Validator + Text Diff format nhiều kiểu (theo yêu cầu trực tiếp người dùng 2026-10-08)
+
+- [x] Tool `sql-formatter` (format/minify/kiểm tra cú pháp, 20 dialect format + 13 dialect validate, en+vi)
+- [x] Text Diff: Format JSON/XML/SQL/HTML/CSS/SCSS/LESS/JS/TS/YAML/Markdown/GraphQL + tự nhận diện
+- [ ] Dịch `tool-sql-formatter.json` và key mới của `tool-text-diff.json` sang 18 ngôn ngữ (chạy scripts/check-i18n.mjs)
+- [ ] Kiểm bằng mắt bố cục/dark mode tool SQL, Lighthouse; cân nhắc dịch vụ kiểm schema (cần chọn: chỉ cú pháp là đủ?)
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

@@ -180,6 +180,22 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-10-08 (Phase 3.18 — công cụ MỚI "SQL Formatter & Validator" + Text Diff format nhiều kiểu, theo yêu cầu trực tiếp
+  người dùng)** — (1) Tool `sql-formatter` (category dev): format bằng sql-formatter v15 (20 dialect), minify theo token
+  (giữ chuỗi/định danh/comment cần thiết), KIỂM TRA CÚ PHÁP bằng node-sql-parser v5 (13 dialect, mỗi dialect một worker riêng
+  chỉ tải khi chọn: 208–329 KB), lỗi báo dòng/cột tuyệt đối (đúng cả CRLF), đoạn mã quanh lỗi, nút "Show in input", gợi ý
+  (frm→FROM, thiếu ngoặc, dấu phẩy thừa), kiểm tra từng câu lệnh, tách câu an toàn ($$...$$, [bracket], GO, thân
+  procedure), kéo-thả .sql ≤5MB, mẫu, Undo, nhớ cài đặt. Giới hạn trung thực: "hợp lệ" = đúng cú pháp theo parser, không
+  biết schema; parser từ chối một số cú pháp DB thật chấp nhận (vd `DO $$..$$` PostgreSQL) và quá dễ dãi với vài ca (T-SQL
+  chấp nhận `select from;`); không xử lý DELIMITER MySQL / dấu `/` PL/SQL; ClickHouse/N1QL/PL/SQL có format nhưng chưa có
+  bộ kiểm cú pháp. (2) Text Diff: nút Format nay hỗ trợ JSON, XML, SQL (13 dialect), HTML, CSS/SCSS/LESS, JS/JSX, TS/TSX, YAML,
+  Markdown, GraphQL qua prettier standalone (mỗi nhóm một worker, chỉ tải khi bấm: css 243KB, html 247KB/932KB có script,
+  js 615KB, ts 1.2MB, md 504KB, yaml 229KB, graphql 132KB, sql 268KB); tự nhận diện (đuôi file → nội dung) với độ tin cậy,
+  mơ hồ thì hỏi chọn tay; lỗi cú pháp giữ nguyên văn bản + báo đúng bên/dòng/cột; "Format both"; thụt lề 2/4/tab, độ rộng
+  dòng. Dependencies thêm: sql-formatter, node-sql-parser, prettier. Verify trên server áp CSP production: SQL format +
+  báo lỗi đúng, Text Diff format JS/CSS/HTML/YAML/SQL đúng, 0 vi phạm CSP; vitest 696/696, build 562 trang. Giao diện CHỈ
+  en+vi (tool-sql-formatter.json và key mới của tool-text-diff.json) — 18 locale còn lại cần dịch (check-i18n sẽ báo).
+  Chưa kiểm bằng mắt: bố cục desktop/dark mode của tool SQL, Lighthouse. Thông báo lỗi CSS còn tiền tố "CssSyntaxError:".
 - **2026-10-08 (Phase 3.17 — xử lý nốt: nhãn Word Counter, màu Color Picker, bản dịch lỗi thời + nhiễm ngôn ngữ)** —
   (1) Word Counter: nhãn upload "Upload .txt file" → "Upload file" (en/vi + 17 locale). (2) Color Picker: swatch màu gốc
   trong khối Harmony giờ dùng đúng RGB gốc thay vì đi qua HSL đã làm tròn (#3b82f6 không còn hiện #3C83F6; thử 4 màu).

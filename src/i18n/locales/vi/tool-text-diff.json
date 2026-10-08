@@ -40,16 +40,14 @@
     "save": "Lưu file .txt",
     "copyShareLink": "Sao chép link chia sẻ",
     "formatButton": "Định dạng",
-    "formatDetectedJson": "Đã định dạng theo JSON",
-    "formatDetectedXml": "Đã định dạng theo XML",
-    "formatError": "Không phải JSON hay XML hợp lệ — giữ nguyên văn bản",
+    "formatError": "Không định dạng được — giữ nguyên văn bản",
     "clearedNotice": "Đã xóa.",
     "undo": "Hoàn tác",
     "replacedNotice": "Đã thay nội dung.",
     "clearAria": "Xóa {{side}}",
     "swapAria": "Hoán đổi văn bản gốc và văn bản đã sửa",
     "uploadAria": "Tải tệp vào {{side}}",
-    "formatAria": "Định dạng JSON/XML trong {{side}}",
+    "formatAria": "Định dạng {{side}}",
     "copyMergedAria": "Sao chép kết quả hợp nhất: {{side}}",
     "saveMergedAria": "Lưu kết quả hợp nhất: {{side}}",
     "formatDuplicateKeys": "Cảnh báo: có khóa trùng lặp, đã giữ nguyên.",
@@ -162,7 +160,35 @@
         "rtf": "chuyển đổi đơn giản đoạn văn và ký tự đặc biệt; nội dung phức tạp hoặc nhúng có thể mất.",
         "general": "Không hỗ trợ: ảnh/bản scan (không OCR), tệp có mật khẩu, .doc/.xls/.ppt cũ, tệp trên 30 MB. Nội dung tệp không bao giờ được tải lên và không được lưu lại."
       }
-    }
+    },
+    "formatSettingsHeading": "Định dạng trước khi so sánh",
+    "formatLanguageLabel": "Định dạng theo",
+    "formatAuto": "Tự nhận diện",
+    "formatIndentLabel": "Thụt lề",
+    "formatIndent2": "2 dấu cách",
+    "formatIndent4": "4 dấu cách",
+    "formatIndentTab": "Tab",
+    "formatWidthLabel": "Độ rộng dòng",
+    "formatSqlDialectLabel": "Phương ngữ SQL",
+    "formatBoth": "Định dạng cả hai",
+    "formatBothAria": "Định dạng cả hai văn bản với cùng thiết lập",
+    "formatBusy": "Đang định dạng…",
+    "formatDone": "Đã định dạng theo {{language}}.",
+    "formatDoneAuto": "Đã tự nhận diện và định dạng theo {{language}}.",
+    "formatNoChange": "Đã đúng chuẩn {{language}} sẵn — không có gì thay đổi.",
+    "formatEmpty": "Không có gì để định dạng — ô đang trống.",
+    "formatErrorAt": "Lỗi cú pháp {{language}} ở dòng {{line}}, cột {{column}}: {{message}}. Đã giữ nguyên văn bản.",
+    "formatErrorLine": "Lỗi cú pháp {{language}} ở dòng {{line}}: {{message}}. Đã giữ nguyên văn bản.",
+    "formatErrorNoPos": "Lỗi {{language}}: {{message}}. Đã giữ nguyên văn bản.",
+    "formatAmbiguous": "Không xác định được đây là ngôn ngữ nào (có thể là {{candidates}}). Hãy chọn một kiểu ở “Định dạng theo”.",
+    "formatUnknown": "Không xác định được đây là ngôn ngữ nào. Hãy chọn một kiểu ở “Định dạng theo”.",
+    "formatTooLarge": "Quá lớn để định dạng (giới hạn {{max}} ký tự). Đã giữ nguyên văn bản.",
+    "formatLargeWarning": "Dữ liệu lớn: việc định dạng chạy nền và có thể mất một lúc.",
+    "formatTimeout": "Định dạng mất quá lâu nên đã bị dừng. Đã giữ nguyên văn bản.",
+    "formatFailed": "Định dạng thất bại ngoài dự kiến. Đã giữ nguyên văn bản.",
+    "formatStale": "Văn bản đã thay đổi trong lúc định dạng nên kết quả bị bỏ.",
+    "formatMismatch": "Hai bên được định dạng theo hai ngôn ngữ khác nhau ({{a}} và {{b}}), nên phần so sánh có thể vẫn hiện khác biệt về kiểu viết.",
+    "formatNote": "Hỗ trợ: JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown và GraphQL. Định dạng có thể đổi dấu nháy, dấu chấm phẩy và chỗ xuống dòng nhưng không đổi ý nghĩa của mã. Văn bản được định dạng ngay trong trình duyệt của bạn và có thể hoàn tác."
   },
   "related": "Công cụ liên quan",
   "faq": {
@@ -172,13 +198,16 @@
     "q2": "Có thể gộp hai phiên bản thành một bản văn bản cuối cùng không?",
     "a2": "Có — công cụ gộp cho phép chấp nhận phiên bản trái hoặc phải theo từng đoạn khác biệt.",
     "q3": "Có thể bỏ qua khác biệt về khoảng trắng hoặc hoa/thường không?",
-    "a3": "Có — bật riêng từng tùy chọn \"bỏ qua khoảng trắng\" và \"bỏ qua hoa/thường\"."
+    "a3": "Có — bật riêng từng tùy chọn \"bỏ qua khoảng trắng\" và \"bỏ qua hoa/thường\".",
+    "q4": "Nút Định dạng xử lý được những ngôn ngữ nào?",
+    "a4": "JSON, XML, SQL (SQL chuẩn cùng MySQL, PostgreSQL, SQL Server, SQLite, BigQuery và nhiều loại khác), HTML, CSS, SCSS, LESS, JavaScript/JSX, TypeScript/TSX, YAML, Markdown và GraphQL. Ngôn ngữ được tự nhận diện từ tên tệp hoặc nội dung, và bạn luôn có thể tự chọn lại bằng tay."
   },
   "article": {
     "heading": "Vì sao cần công cụ so sánh văn bản?",
     "p1": "Khi có hai phiên bản của cùng một tài liệu — hợp đồng trước và sau khi luật sư chỉnh sửa, bài viết trước và sau khi biên tập góp ý, file cấu hình trước và sau khi đồng nghiệp commit — câu hỏi quan trọng hiếm khi là \"hai file này có giống nhau không\" mà là \"chính xác điều gì đã thay đổi\". Đọc song song hai bản và cố gắng phát hiện từng dấu phẩy được thêm, từng câu bị xoá hay viết lại bằng mắt thường rất chậm và dễ bỏ sót, nhất là khi tài liệu dài hơn một trang. Công cụ so sánh văn bản tự động hoá việc này, làm nổi bật chính xác những từ hoặc dòng khác nhau, giúp bạn rà soát một thay đổi trong vài giây thay vì vài phút.",
     "p2": "Công cụ này chạy hoàn toàn trên trình duyệt của bạn. Hai ô văn bản chỉ tồn tại trong bộ nhớ thiết bị, và việc so sánh được tính toán bởi một thư viện JavaScript chạy ngay tại chỗ — không có nội dung nào bạn gõ hay dán được gửi lên máy chủ, ghi log hay lưu trữ ở bất kỳ đâu. Điều này quan trọng nếu bạn đang so sánh một hợp đồng với khách hàng, một file chứa mật khẩu, hay bất kỳ văn bản nào bạn không muốn đưa qua dịch vụ bên thứ ba. Đóng tab trình duyệt là mọi thứ biến mất, không có lịch sử nào để lo lắng.",
     "p3": "Dán văn bản gốc vào ô bên trái, văn bản đã sửa vào ô bên phải — cả hai ô đều hiện số thứ tự dòng và cuộn đồng bộ với nhau, mỗi ô có sẵn nút Xóa, Hoán đổi và Tải tệp riêng để nạp thẳng file từ máy (văn bản, code, Word, PDF, Excel…) thay vì copy-paste. Kết quả so sánh cập nhật ngay khi bạn gõ, không cần bấm nút nào. Chọn Ký tự, Từ hoặc Dòng để quyết định độ chi tiết của so sánh: chế độ Ký tự bắt được cả một lỗi gõ nhỏ, chế độ Từ phù hợp nhất với văn xuôi vì chỉ rõ chính xác từ nào thay đổi trong câu, còn chế độ Dòng so sánh cả dòng một lúc, hợp với code, JSON hay danh sách theo dòng khi bạn quan tâm dòng nào thay đổi toàn bộ hơn là từng từ bên trong. Một dòng chỉ tồn tại ở một bên sẽ hiện toàn bộ màu xanh (thêm) hoặc đỏ (xóa); một dòng tồn tại ở cả hai bên nhưng bị sửa sẽ hiện màu cam, với đúng phần từ hoặc ký tự đã đổi được tô đậm hơn bên trong — nhờ vậy bạn phân biệt được ngay một dòng bị SỬA với một cặp xóa-rồi-thêm không liên quan.",
-    "p4": "Ba badge đếm số dòng thêm/xóa/sửa phía trên khung so sánh cho bạn cái nhìn nhanh về mức độ thay đổi, còn 2 nút ↑/↓ giúp nhảy thẳng tới thay đổi kế tiếp hoặc trước đó mà không cần cuộn qua các dòng không đổi — rất tiện với tài liệu dài. Nút Toàn màn hình phóng to khung so sánh chiếm hết màn hình để xem kỹ hơn. Phía dưới khung so sánh là công cụ hợp nhất, biến bản so sánh chỉ-để-xem thành thứ bạn thực sự xử lý được: mỗi thay đổi có cặp nút ←/→ riêng nằm giữa 2 cột, cho phép kéo bản sửa bên phải sang cột trái, hoặc đẩy bản gốc bên trái sang cột phải, xử lý từng thay đổi một cho tới khi cả hai cột đúng như ý muốn. Mỗi cột có nút Sao chép và Lưu riêng, giúp bạn lấy ra kết quả đã hợp nhất sạch sẽ mà không cần gõ lại gì. Nếu hai văn bản giống hệt nhau, công cụ sẽ báo rõ điều đó thay vì hiển thị một kết quả trống khó hiểu."
+    "p4": "Ba badge đếm số dòng thêm/xóa/sửa phía trên khung so sánh cho bạn cái nhìn nhanh về mức độ thay đổi, còn 2 nút ↑/↓ giúp nhảy thẳng tới thay đổi kế tiếp hoặc trước đó mà không cần cuộn qua các dòng không đổi — rất tiện với tài liệu dài. Nút Toàn màn hình phóng to khung so sánh chiếm hết màn hình để xem kỹ hơn. Phía dưới khung so sánh là công cụ hợp nhất, biến bản so sánh chỉ-để-xem thành thứ bạn thực sự xử lý được: mỗi thay đổi có cặp nút ←/→ riêng nằm giữa 2 cột, cho phép kéo bản sửa bên phải sang cột trái, hoặc đẩy bản gốc bên trái sang cột phải, xử lý từng thay đổi một cho tới khi cả hai cột đúng như ý muốn. Mỗi cột có nút Sao chép và Lưu riêng, giúp bạn lấy ra kết quả đã hợp nhất sạch sẽ mà không cần gõ lại gì. Nếu hai văn bản giống hệt nhau, công cụ sẽ báo rõ điều đó thay vì hiển thị một kết quả trống khó hiểu.",
+    "p5": "Hai phiên bản của cùng một đoạn mã thường trông khác hẳn nhau chỉ vì cách viết: bản nén một dòng so với bản đã xuống dòng đẹp, tab so với dấu cách, nháy đơn so với nháy kép, dòng dài bị ngắt ở những chỗ khác nhau. Hãy dùng phần thiết lập Định dạng phía trên hai ô văn bản để đưa cả hai về một chuẩn trước khi so sánh. Để “Định dạng theo” ở chế độ Tự nhận diện (công cụ xét tên tệp trước, rồi đến nội dung) hoặc tự chọn JSON, XML, SQL, HTML, CSS, SCSS, LESS, JavaScript, TypeScript, YAML, Markdown hay GraphQL; chọn thụt lề 2 dấu cách, 4 dấu cách hoặc tab, độ rộng dòng, và với SQL thì chọn phương ngữ như MySQL, PostgreSQL hay SQL Server. Nút Định dạng xử lý một ô, nút Định dạng cả hai xử lý cả hai ô với cùng thiết lập, và nếu hai bên hóa ra là hai ngôn ngữ khác nhau bạn sẽ nhận được cảnh báo. Nếu văn bản có lỗi cú pháp thì không có gì bị đổi và thông báo cho biết dòng và cột bị lỗi. Các bộ định dạng (Prettier và sql-formatter) chỉ được tải khi bạn bấm Định dạng, chạy trong luồng nền để dữ liệu lớn không làm đơ trang, và mọi thứ vẫn nằm trên thiết bị của bạn. Định dạng có thể đổi dấu nháy, dấu chấm phẩy và chỗ xuống dòng nhưng không bao giờ đổi hành vi của mã, và mỗi lần định dạng đều hoàn tác được."
   }
 }
