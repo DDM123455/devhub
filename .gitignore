@@ -25,3 +25,5 @@ pnpm-debug.log*
 
 # local toolchain (Node runtime downloaded outside system PATH)
 .tools/
+
+.vercel
