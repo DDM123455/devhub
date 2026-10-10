@@ -4,7 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import FaqSection from '@/components/layout/FaqSection.astro';
 import KubernetesYamlValidator from './KubernetesYamlValidator';
 import { getFixedT } from '@/i18n/i18next';
-import { tools } from '@/data/tools';
+import { tools, getRelatedTools } from '@/data/tools';
 import type { Locale } from '@/i18n/config';
 import { K8S_ISSUE_KEYS } from '@/lib/k8s-yaml-validator';
 import { SECURITY_CHECK_IDS } from '@/lib/k8s-security';
@@ -18,7 +18,7 @@ const t = getFixedT(lang, 'tool-kubernetes-yaml-validator');
 
 const tool = tools.find((item) => item.id === 'kubernetes-yaml-validator')!;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
-const relatedTools = tools.filter((item) => item.category === tool.category && item.id !== tool.id);
+const relatedTools = getRelatedTools(tool);
 
 const messages = {
 	inputLabel: t('ui.inputLabel'),

@@ -557,6 +557,12 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 - [x] Panel chọn màu từ ảnh: kính lúp, lấy mẫu trung bình, zoom, bàn phím, lịch sử (en+vi)
 - [ ] Dịch 26 key ui.imgPick* sang 18 ngôn ngữ (hiện dùng bản tiếng Anh)
 
+## Phase 3.21 — Kiểm toán SEO (yêu cầu trực tiếp 2026-10-10)
+
+- [x] Kiểm toán kỹ thuật toàn site + script seo:audit + test hồi quy + sửa P1/P2
+- [ ] Tên miền riêng, gửi sitemap Search Console/Bing, `_redirects` thật (cần bạn)
+- [ ] Rút gọn 81 meta description dài ở 16 locale còn lại (kèm lần dịch kế tiếp)
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

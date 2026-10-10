@@ -5,7 +5,7 @@ import FaqSection from '@/components/layout/FaqSection.astro';
 import TextDiffChecker from './TextDiffChecker';
 import i18next from 'i18next';
 import { getFixedT } from '@/i18n/i18next';
-import { tools } from '@/data/tools';
+import { tools, getRelatedTools } from '@/data/tools';
 import type { Locale } from '@/i18n/config';
 
 interface Props {
@@ -17,7 +17,7 @@ const t = getFixedT(lang, 'tool-text-diff');
 
 const tool = tools.find((item) => item.id === 'text-diff')!;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
-const relatedTools = tools.filter((item) => item.category === tool.category && item.id !== tool.id);
+const relatedTools = getRelatedTools(tool);
 
 const messages = {
 	originalLabel: t('ui.originalLabel'),

@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Mã hóa/Giải mã Base64 Online Miễn phí — Web Tool Hub",
-    "description": "Mã hóa văn bản và file sang Base64 hoặc giải mã Base64 về văn bản, ảnh, file gốc — hỗ trợ data URI và bảng chữ cái an toàn cho URL. Xử lý ngay trên trình duyệt, không tải lên server."
+    "description": "Mã hóa văn bản và file sang Base64 hoặc giải mã về văn bản, ảnh, file gốc — hỗ trợ data URI và Base64 an toàn cho URL. Xử lý trên trình duyệt, không tải lên."
   },
   "heading": "Mã hóa/Giải mã Base64",
   "tagline": "Mã hóa văn bản hoặc file sang Base64, hoặc giải mã Base64 về dạng gốc — hoàn toàn trên trình duyệt của bạn.",

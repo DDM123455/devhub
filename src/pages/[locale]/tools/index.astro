@@ -7,5 +7,6 @@ export function getStaticPaths() {
 
 // /{locale}/tools/ không có trang riêng: chuyển về danh sách công cụ ở trang chủ locale.
 const { locale } = Astro.params;
-return Astro.redirect(`/${locale}/`);
+// 301 (not the default 302): Astro writes a 2-second meta-refresh page for 302 but an immediate one for 301.
+return Astro.redirect(`/${locale}/`, 301);
 ---

@@ -4,7 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import FaqSection from '@/components/layout/FaqSection.astro';
 import PdfMerger from './PdfMerger';
 import { getFixedT } from '@/i18n/i18next';
-import { tools } from '@/data/tools';
+import { tools, getRelatedTools } from '@/data/tools';
 import type { Locale } from '@/i18n/config';
 
 interface Props {
@@ -16,7 +16,7 @@ const t = getFixedT(lang, 'tool-pdf-merge');
 
 const tool = tools.find((item) => item.id === 'pdf-merge')!;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
-const relatedTools = tools.filter((item) => item.category === tool.category && item.id !== tool.id);
+const relatedTools = getRelatedTools(tool);
 
 const messages = {
 	selectFiles: t('ui.selectFiles'),

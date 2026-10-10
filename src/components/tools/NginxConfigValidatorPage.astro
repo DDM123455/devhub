@@ -4,7 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import FaqSection from '@/components/layout/FaqSection.astro';
 import NginxConfigValidator from './NginxConfigValidator';
 import { getFixedT } from '@/i18n/i18next';
-import { tools } from '@/data/tools';
+import { tools, getRelatedTools } from '@/data/tools';
 import type { Locale } from '@/i18n/config';
 import { NGINX_ISSUE_KEYS } from '@/lib/nginx-parser';
 
@@ -17,7 +17,7 @@ const t = getFixedT(lang, 'tool-nginx-config-validator');
 
 const tool = tools.find((item) => item.id === 'nginx-config-validator')!;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
-const relatedTools = tools.filter((item) => item.category === tool.category && item.id !== tool.id);
+const relatedTools = getRelatedTools(tool);
 
 const messages = {
 	inputLabel: t('ui.inputLabel'),

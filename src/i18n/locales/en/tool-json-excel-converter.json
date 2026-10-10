@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "JSON to Excel Converter Online Free — Web Tool Hub",
-    "description": "Convert JSON to a real .xlsx Excel file instantly in your browser — auto-detects multiple sheets, flattens nested fields, preserves numbers and booleans. No upload, no server."
+    "description": "Convert JSON to a real .xlsx Excel file in your browser — auto-detects multiple sheets, flattens nested fields, keeps numbers and booleans. No upload, no server."
   },
   "heading": "JSON → Excel Converter",
   "tagline": "Convert JSON into a real, downloadable .xlsx workbook — multiple sheets, flattened fields, real number/boolean cell types — entirely in your browser.",

@@ -23,7 +23,8 @@ export default defineConfig({
     defaultLocale: 'en',
     routing: {
       prefixDefaultLocale: true,
-      redirectToDefaultLocale: true
+      // false: the root redirect is src/pages/index.astro (301, immediate). With true, Astro generates its own 302 page, which waits 2 s.
+      redirectToDefaultLocale: false
     }
   },
 
@@ -60,7 +61,11 @@ export default defineConfig({
     react(),
     sitemap({
       // Bỏ trang 404 (mọi biến thể) khỏi sitemap; trang '/' chỉ là redirect nên không có file riêng.
-      filter: (page) => !/\/404\/?$/.test(page) && new URL(page).pathname !== '/',
+      filter: (page) => {
+        const path = new URL(page).pathname;
+        // Also drop the /<locale>/tools/ index pages: they only meta-refresh (noindex) to the locale home.
+        return !/\/404\/?$/.test(page) && path !== '/' && !/^\/[^/]+\/tools\/?$/.test(path);
+      },
       i18n: {
         defaultLocale: 'en',
         locales: sitemapLocales

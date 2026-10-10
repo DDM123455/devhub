@@ -1,4 +1,5 @@
 ---
-// Astro auto-generates a redirect to /en/ here at build time because
-// i18n.routing.redirectToDefaultLocale is enabled in astro.config.mjs.
+// Root "/" -> default locale. Explicit 301 so the static output is an immediate meta refresh;
+// the 302 that i18n.routing.redirectToDefaultLocale generates waits 2 seconds before redirecting.
+return Astro.redirect("/en/", 301);
 ---

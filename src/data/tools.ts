@@ -1211,3 +1211,22 @@ export const tools: ToolDefinition[] = [
 		},
 	},
 ];
+
+// Topical cross-category links. A category with only two tools (PDF, Media) otherwise
+// leaves each of its pages with a single internal "related" link; these add the tools
+// a visitor of that page really needs next (verified against what each tool does).
+const CROSS_RELATED: Record<string, string[]> = {
+	'pdf-merge': ['image-convert', 'image-to-text'], // accepts JPG/PNG pages; scanned PDFs need OCR
+	'pdf-split': ['image-to-text'], // OCR the pages that come out
+	'audio-converter': ['base64-tool'], // audio as a data URI
+	'video-trim': ['image-convert'], // GIF export
+};
+
+/** Same-category tools first, then the curated cross-category ones; never the tool itself. */
+export function getRelatedTools(tool: ToolDefinition): ToolDefinition[] {
+	const same = tools.filter((item) => item.category === tool.category && item.id !== tool.id);
+	const extra = (CROSS_RELATED[tool.id] ?? [])
+		.map((id) => tools.find((item) => item.id === id))
+		.filter((item): item is ToolDefinition => item !== undefined && !same.includes(item));
+	return [...same, ...extra];
+}

@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Kiểm Tra Cấu Hình Nginx Miễn Phí — Web Tool Hub",
-    "description": "Kiểm tra cú pháp nginx.conf, phát hiện thiếu dấu chấm phẩy/dấu ngoặc, directive đặt sai chỗ và các lỗi bảo mật thường gặp — hoàn toàn trong trình duyệt, không tải lên server."
+    "description": "Kiểm tra cú pháp nginx.conf: thiếu dấu chấm phẩy/ngoặc, directive đặt sai chỗ, lỗi bảo mật thường gặp — hoàn toàn trong trình duyệt, không tải lên server."
   },
   "heading": "Kiểm tra cấu hình Nginx",
   "tagline": "Dán file nginx.conf vào đây để phát hiện lỗi cú pháp, directive đặt sai vị trí và các lỗi bảo mật thường gặp — trước khi bạn reload nginx thật.",

@@ -4,6 +4,7 @@ import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { categories } from '@/data/categories';
 import { tools } from '@/data/tools';
+import { jsonLd } from '@/lib/json-ld';
 import { EmptyState } from '@/components/ui/empty-state';
 import { SearchX } from 'lucide-react';
 
@@ -16,9 +17,21 @@ const t = getFixedT(locale);
 
 const toolCount = tools.length;
 const categoryCount = categories.length;
+
+// WebSite structured data for the home page only. No SearchAction: the on-page search filters in the
+// browser and has no URL a crawler could call, so claiming a sitelinks search box would be untrue.
+const websiteSchema = {
+	"@context": "https://schema.org",
+	"@type": "WebSite",
+	name: "Web Tool Hub",
+	url: new URL(`/${locale}/`, Astro.site).toString(),
+	inLanguage: locale,
+	description: t("meta.description"),
+};
 ---
 
 <Layout title={t('meta.title')} description={t('meta.description')} lang={locale}>
+	<script type="application/ld+json" set:html={jsonLd(websiteSchema)} />
 	<section class="mx-auto max-w-2xl px-4 pt-8 pb-9 sm:px-8 sm:pt-9">
 		<p class="mb-3.5 font-mono text-xs tracking-wide text-emerald-700 dark:text-emerald-400">{t('home.kicker')}</p>
 		<h1 class="mb-3.5 text-heading-1 text-foreground sm:text-display">

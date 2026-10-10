@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Giải mã & Kiểm tra chữ ký JWT Online Miễn phí — Web Tool Hub",
-    "description": "Giải mã header và payload của JWT, kiểm tra chữ ký HS256/RS256, xem hạn dùng và ký lại token đã chỉnh sửa — ngay trên trình duyệt. Không tải lên server, không cần đăng ký."
+    "description": "Giải mã header và payload JWT, kiểm tra chữ ký HS256/RS256, xem hạn dùng và ký lại token đã sửa — ngay trên trình duyệt. Không tải lên server, không cần đăng ký."
   },
   "heading": "Giải mã JWT",
   "tagline": "Giải mã, kiểm tra chữ ký và ký lại JSON Web Token ngay lập tức — hoàn toàn trên trình duyệt của bạn.",

@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "SQL Formatter & Validator Online Free — Format, Minify, Check Syntax",
-    "description": "Format, beautify, minify and syntax-check SQL for MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, Snowflake and more. Shows the exact line and column of errors. Runs in your browser — your queries never leave your device."
+    "description": "Format, beautify, minify and syntax-check SQL for MySQL, PostgreSQL, SQL Server, SQLite and more. Shows the exact error line. Runs fully in your browser."
   },
   "heading": "SQL Formatter & Validator",
   "tagline": "Beautify or minify SQL, and check it for syntax errors with the exact line and column — for 20 dialects, entirely in your browser.",

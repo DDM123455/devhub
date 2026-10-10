@@ -169,7 +169,7 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 			</div>
 
 			<div className="flex flex-col gap-2">
-				<h3 className="text-sm font-semibold text-foreground">{messages.caseOptionsHeading}</h3>
+				<h2 className="text-sm font-semibold text-foreground">{messages.caseOptionsHeading}</h2>
 				<div className="flex flex-wrap gap-2">
 					{caseModes.map((item) => (
 						<button
@@ -190,7 +190,7 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 			</div>
 
 			<div className="flex flex-col gap-2">
-				<h3 className="text-sm font-semibold text-foreground">{messages.utilitiesHeading}</h3>
+				<h2 className="text-sm font-semibold text-foreground">{messages.utilitiesHeading}</h2>
 				<div className="flex flex-wrap gap-2">
 					{utilityModes.map((item) => (
 						<button
@@ -217,7 +217,7 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 				</label>
 			)}
 			<div className="flex flex-col gap-2">
-				<h3 className="text-sm font-semibold text-foreground">{messages.stylizedHeading}</h3>
+				<h2 className="text-sm font-semibold text-foreground">{messages.stylizedHeading}</h2>
 				<div className="flex flex-wrap gap-2">
 					{stylizedModes.map((item) => {
 						const pressed = mode === 'stylized' && stylizedStyle === item.value;
