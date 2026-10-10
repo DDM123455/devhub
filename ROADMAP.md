@@ -552,6 +552,11 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 - [x] Tool `code-formatter` (en+vi)
 - [ ] Dịch tool-code-formatter.json + key mới tool-text-diff.json sang 18 ngôn ngữ
 
+## Phase 3.20 — Color Picker chọn màu từ ảnh (yêu cầu trực tiếp 2026-10-10)
+
+- [x] Panel chọn màu từ ảnh: kính lúp, lấy mẫu trung bình, zoom, bàn phím, lịch sử (en+vi)
+- [ ] Dịch 26 key ui.imgPick* sang 18 ngôn ngữ (hiện dùng bản tiếng Anh)
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

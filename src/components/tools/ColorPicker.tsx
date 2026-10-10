@@ -22,8 +22,9 @@ import {
 import { copyTextSafe } from '@/lib/safe-clipboard';
 import { decodePaletteHash } from '@/lib/color-extra';
 import ColorPickerExtras, { type ExtraMessages } from './ColorPickerExtras';
+import ColorPickerImage, { type ImagePickMessages } from './ColorPickerImage';
 
-interface Messages extends ExtraMessages {
+interface Messages extends ExtraMessages, ImagePickMessages {
 	pickerHeading: string;
 	hexLabel: string;
 	rLabel: string;
@@ -800,6 +801,8 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 					))}
 				</div>
 			</div>
+
+			<ColorPickerImage onPickColor={(picked) => applyRgb(hexToRgb(picked)!)} messages={messages} />
 
 			<ColorPickerExtras
 				hex={hex}
