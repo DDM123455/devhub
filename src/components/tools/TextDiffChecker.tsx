@@ -356,14 +356,20 @@ function DiffRowContent({
 	return (
 		<div
 			className={`h-6 whitespace-pre px-2 font-mono text-sm leading-6 text-foreground ${
-				adoptedFromOtherSide ? 'bg-blue-500/15' : lineBackgroundClass(entry.type)
+				adoptedFromOtherSide
+					? 'bg-blue-500/15'
+					: // A modified line with segments highlights only the changed part (like
+						// Diffchecker/Mergely); tinting the whole line hid which part changed.
+						entry.type === 'modified' && segments
+						? ''
+						: lineBackgroundClass(entry.type)
 			}`}
 		>
 			{segments
 				? segments.map((seg, index) => {
 						const isChangedPart = side === 'left' ? seg.removed : seg.added;
 						return (
-							<span key={index} className={isChangedPart ? 'bg-orange-400/50 font-semibold' : undefined}>
+							<span key={index} className={isChangedPart ? 'rounded-sm bg-orange-400/60 font-semibold' : undefined}>
 								{seg.value}
 							</span>
 						);
