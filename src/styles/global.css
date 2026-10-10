@@ -171,6 +171,15 @@
 }
 
 @layer base {
+  /* JetBrains Mono turns "->", "=>", "!=" ... into ligature glyphs; in tools that
+     show the user's own text that changes what they see, so keep literal chars. */
+  .font-mono,
+  code,
+  pre,
+  textarea {
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "calt" 0;
+  }
   * {
     @apply border-border outline-ring/50;
     }

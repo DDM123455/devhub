@@ -308,6 +308,20 @@ function LineNumberedTextarea({ id, value, onChange, placeholder, ariaLabel, onS
 	);
 }
 
+// Rows are absolutely positioned (virtualised), so they do not widen the scroll
+// container by themselves: a long line overflowed its row and the highlight
+// stopped at the viewport edge. Reserve the width of the longest line instead.
+function longestLineChars(entries: DiffLineEntry[]): number {
+	let max = 0;
+	for (const e of entries) {
+		const l = e.leftText?.length ?? 0;
+		const r = e.rightText?.length ?? 0;
+		if (l > max) max = l;
+		if (r > max) max = r;
+	}
+	return max;
+}
+
 function lineBackgroundClass(type: DiffLineEntry['type']): string {
 	if (type === 'added') return 'bg-green-500/15';
 	if (type === 'removed') return 'bg-red-500/15';
@@ -378,9 +392,10 @@ function DiffColumn({ entries, lineNumbers, side, scrollRef, onScroll, activeRow
 		onScroll(event);
 	};
 	const { startIndex, endIndex } = computeVisibleRange(scrollTop, DIFF_VIEWPORT_HEIGHT, entries.length, OVERSCAN_ROWS);
+	const contentWidth = `calc(3.5rem + ${longestLineChars(entries)}ch)`;
 	return (
 		<div ref={scrollRef} onScroll={handleScroll} className="h-96 overflow-auto bg-background">
-			<div style={{ height: entries.length * ROW_HEIGHT, position: 'relative' }}>
+			<div style={{ height: entries.length * ROW_HEIGHT, position: 'relative', minWidth: contentWidth }}>
 				{entries.slice(startIndex, endIndex).map((entry, i) => {
 					const index = startIndex + i;
 					return (
@@ -421,9 +436,10 @@ interface MergeColumnProps {
 
 function MergeColumn({ entries, side, hunkOverrides, scrollRef, scrollTop, onScroll }: MergeColumnProps) {
 	const { startIndex, endIndex } = computeVisibleRange(scrollTop, MERGE_VIEWPORT_HEIGHT, entries.length, OVERSCAN_ROWS);
+	const contentWidth = `calc(1rem + ${longestLineChars(entries)}ch)`;
 	return (
 		<div ref={scrollRef} onScroll={onScroll} className="h-72 overflow-auto rounded-md border border-border">
-			<div style={{ height: entries.length * ROW_HEIGHT, position: 'relative' }}>
+			<div style={{ height: entries.length * ROW_HEIGHT, position: 'relative', minWidth: contentWidth }}>
 				{entries.slice(startIndex, endIndex).map((entry, i) => {
 					const index = startIndex + i;
 					return (
