@@ -290,7 +290,7 @@ export default function WordCounter({ messages, lang = 'en' }: { messages: Messa
 					</Button>
 					<label
 						htmlFor="word-counter-file-input"
-						className="has-[+input:focus-visible]:ring-2 has-[+input:focus-visible]:ring-ring inline-flex h-7 cursor-pointer items-center rounded-md border border-border px-2.5 text-[0.8rem] font-medium text-foreground hover:bg-muted"
+						className="has-[+input:focus-visible]:ring-2 has-[+input:focus-visible]:ring-ring inline-flex h-9 cursor-pointer items-center rounded-md border border-border px-2.5 text-[0.8rem] font-medium text-foreground hover:bg-muted"
 					>
 						{messages.uploadFile}
 					</label>

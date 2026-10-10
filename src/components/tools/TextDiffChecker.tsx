@@ -1588,7 +1588,7 @@ accept={FILE_ACCEPT}
 								key={g}
 								type="button"
 								onClick={() => setGranularity(g)} aria-pressed={granularity === g}
-								className={`rounded-md border px-2.5 py-1 text-xs font-medium ${
+								className={`min-h-9 rounded-md border px-3 py-1.5 text-xs font-medium ${
 									granularity === g ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'
 								}`}
 							>
@@ -1642,7 +1642,7 @@ accept={FILE_ACCEPT}
 								type="button"
 								onClick={() => setViewMode(mode)}
 								aria-pressed={viewMode === mode}
-								className={`min-h-9 rounded-md border px-2.5 py-1 text-xs font-medium ${
+								className={`min-h-9 min-h-9 rounded-md border px-3 py-1.5 text-xs font-medium ${
 									viewMode === mode ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'
 								}`}
 							>

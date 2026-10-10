@@ -218,3 +218,25 @@
     }
   }
 }
+
+/* One look for every dropdown. The tools set their own heights (30/34/36/40/44px)
+   and the browser draws a different OS-native control on each platform; this is
+   deliberately unlayered so it wins over the per-tool Tailwind utilities. */
+select:not([multiple]):not([size]):not([class*="jse-"]) {
+  appearance: none;
+  -webkit-appearance: none;
+  min-height: 2.5rem;
+  padding-right: 2rem;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  background-size: 1rem;
+  cursor: pointer;
+}
+html.dark select:not([multiple]):not([size]):not([class*="jse-"]) {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+}
+select:not([multiple]):not([size]):disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
