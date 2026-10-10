@@ -28,7 +28,32 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    // Dev only: these are loaded with a dynamic import() inside client islands, so Vite would
+    // otherwise discover and re-optimise them mid-session — which invalidates the page's
+    // `?v=` hash and makes the import fail ("Failed to fetch dynamically imported module",
+    // blank QR preview / OCR error) until the dev server is restarted. Pre-bundle them up front.
+    optimizeDeps: {
+      include: [
+        'jszip',
+        'qr-code-styling',
+        'heic2any',
+        'pdfjs-dist',
+        'pdf-lib',
+        'exceljs',
+        'mammoth/mammoth.browser.js',
+        'katex',
+        'tesseract.js',
+        'tesseract.js/dist/tesseract.esm.min.js',
+        'sql-formatter',
+        'prettier/standalone',
+        'marked',
+        'jsonrepair',
+        'dompurify',
+        'gifenc',
+        '@breezystack/lamejs'
+      ]
+    }
   },
 
   integrations: [

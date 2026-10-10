@@ -555,7 +555,19 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 	useEffect(() => {
 		if (effectiveBatchMode || isEmpty) return;
 		let cancelled = false;
-		void import('qr-code-styling').then(({ default: QRCodeStylingCtor }) => {
+		// A dynamic-import failure (stale cached page pointing at a chunk from an older
+		// deploy, a flaky network, Vite re-optimising deps in dev) used to leave the
+		// preview silently blank. Retry once, then show the render-error message.
+		const loadQrLib = () => import('qr-code-styling').catch(() => new Promise<typeof import('qr-code-styling')>((resolve, reject) => {
+			setTimeout(() => import('qr-code-styling').then(resolve, reject), 1000);
+		}));
+		void loadQrLib().catch((err: unknown) => {
+			console.error('QR code library failed to load:', err);
+			if (!cancelled) setRenderError({ key: renderKey, kind: 'other' });
+			return null;
+		}).then((mod) => {
+			if (!mod) return;
+			const QRCodeStylingCtor = mod.default;
 			if (cancelled) return;
 			const container = containerRef.current;
 			if (!container) return;
