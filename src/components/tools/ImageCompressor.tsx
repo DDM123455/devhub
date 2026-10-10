@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import imageCompression from 'browser-image-compression';
+import compressionLibUrl from 'browser-image-compression/dist/browser-image-compression.js?url';
 import JSZip from 'jszip';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -412,6 +413,10 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 						// does exactly that.
 						maxSizeMB: compressMode === 'targetSize' ? Math.max(targetSizeKb / 1024, 0.01) : 10,
 						useWebWorker: true,
+						// Default libURL is a jsDelivr CDN script, which the production CSP
+						// (script-src 'self') blocks — the lib then silently falls back to the
+						// main thread. Serve the same file from our own origin instead.
+						libURL: new URL(compressionLibUrl, window.location.origin).href,
 						initialQuality: compressMode === 'quality' ? quality : undefined,
 						maxWidthOrHeight: resizeEnabled ? maxDimension : undefined,
 						fileType: forcedType,

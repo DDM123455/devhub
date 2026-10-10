@@ -1712,7 +1712,7 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 				)}
 			</div>
 
-			<div className="flex min-w-0 flex-1 flex-col items-center justify-center gap-3 rounded-md border border-border p-6">
+			<div className="flex min-w-0 flex-1 flex-col items-center justify-center gap-3 rounded-md border border-border p-6 md:sticky md:top-20 md:self-start">
 				{!effectiveBatchMode && isEmpty && (
 					<p className="max-w-xs text-center text-sm text-muted-foreground">{messages.emptyState}</p>
 				)}

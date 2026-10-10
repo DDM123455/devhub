@@ -1405,11 +1405,11 @@ buildDiffHtml(entries, { title: `${leftTitle} / ${rightTitle}`, left: leftTitle,
 							</div>
 						)}
 					</div>
-					<div className="flex flex-wrap gap-1">
-						<Button type="button" size="sm" variant="ghost" aria-label={messages.clearAria.replace('{{side}}', label)} onClick={() => handleClear(which)}>
+					<div className="flex flex-wrap items-center gap-1">
+						<Button type="button" size="sm" variant="ghost" className="min-h-9" aria-label={messages.clearAria.replace('{{side}}', label)} onClick={() => handleClear(which)}>
 							{messages.clear}
 						</Button>
-						<Button type="button" size="sm" variant="ghost" aria-label={messages.swapAria} onClick={handleSwap}>
+						<Button type="button" size="sm" variant="ghost" className="min-h-9" aria-label={messages.swapAria} onClick={handleSwap}>
 							{messages.swap}
 						</Button>
 						<Button
