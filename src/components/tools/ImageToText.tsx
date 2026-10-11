@@ -256,6 +256,14 @@ export default function ImageToText({ messages, languageNames, locale, textDiffH
 	sourcesRef.current = sources;
 	resultsRef.current = results;
 
+	// The initial state must match the server render, so the browser's own languages are applied right after
+	// mount - and only while the user has not touched the language list yet.
+	useEffect(() => {
+		const initial = defaultOcrLanguages(locale);
+		const fromBrowser = defaultOcrLanguages(locale, navigator.languages ?? []);
+		if (fromBrowser.join() !== initial.join()) setLanguages((prev) => (prev.join() === initial.join() ? fromBrowser : prev));
+	}, [locale]);
+
 	const newId = () => `${(idRef.current += 1)}`;
 	const trackUrl = (url: string) => {
 		urlsRef.current.add(url);

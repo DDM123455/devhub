@@ -3,6 +3,7 @@ import { locales } from '../../i18n/config';
 import {
 	buildLangParam,
 	defaultOcrLanguages,
+	ocrLanguageForBrowserTag,
 	isOcrLanguage,
 	MAX_OCR_LANGUAGES,
 	normalizeOcrLanguages,
@@ -28,6 +29,23 @@ describe('ocr-languages', () => {
 	it('mặc định: ngôn ngữ trang + eng; en chỉ eng', () => {
 		expect(defaultOcrLanguages('en')).toEqual(['eng']);
 		expect(defaultOcrLanguages('vi')).toEqual(['vie', 'eng']);
+	});
+	it('thêm ngôn ngữ trình duyệt: người Việt mở trang tiếng Anh vẫn có vie', () => {
+		expect(defaultOcrLanguages('en', ['vi-VN', 'en-US'])).toEqual(['vie', 'eng']);
+		expect(defaultOcrLanguages('en', ['en-US', 'en'])).toEqual(['eng']);
+		expect(defaultOcrLanguages('vi', ['vi', 'fr-FR'])).toEqual(['vie', 'fra', 'eng']);
+		// tối đa 2 ngôn ngữ ngoài eng, không trùng
+		expect(defaultOcrLanguages('de', ['fr', 'es', 'it'])).toEqual(['deu', 'fra', 'eng']);
+		expect(defaultOcrLanguages('vi', ['vi', 'vi-VN'])).toEqual(['vie', 'eng']);
+		expect(defaultOcrLanguages('en', ['xx-YY'])).toEqual(['eng']);
+	});
+	it('thẻ ngôn ngữ trình duyệt: phân biệt Trung giản thể / phồn thể', () => {
+		expect(ocrLanguageForBrowserTag('zh-CN')).toBe('chi_sim');
+		expect(ocrLanguageForBrowserTag('zh-Hans')).toBe('chi_sim');
+		expect(ocrLanguageForBrowserTag('zh-TW')).toBe('chi_tra');
+		expect(ocrLanguageForBrowserTag('zh-Hant-HK')).toBe('chi_tra');
+		expect(ocrLanguageForBrowserTag('vi-VN')).toBe('vie');
+		expect(ocrLanguageForBrowserTag('qq')).toBeNull();
 	});
 	it('normalize: bỏ mã lạ, trùng, cắt tối đa, không bao giờ rỗng', () => {
 		expect(normalizeOcrLanguages(['vie', 'xxx', 'vie', 'eng'])).toEqual(['vie', 'eng']);

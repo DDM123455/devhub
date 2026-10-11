@@ -116,13 +116,30 @@ export function ocrLanguageForLocale(locale: string): OcrLanguage {
 	return LOCALE_TO_LANGUAGE[locale.toLowerCase()] ?? 'eng';
 }
 
+/** Mã tessdata cho một thẻ ngôn ngữ của trình duyệt ("vi-VN", "zh-Hant-TW", ...), hoặc null nếu chưa hỗ trợ. */
+export function ocrLanguageForBrowserTag(tag: string): OcrLanguage | null {
+	const t = tag.toLowerCase();
+	if (t.startsWith('zh')) return /-(tw|hk|mo|hant)/.test(t) ? 'chi_tra' : 'chi_sim';
+	return LOCALE_TO_LANGUAGE[t] ?? LOCALE_TO_LANGUAGE[t.split('-')[0]] ?? null;
+}
+
 /**
  * Ngôn ngữ mặc định: ngôn ngữ của trang, kèm tiếng Anh (văn bản thực tế rất hay lẫn từ/ký tự
  * tiếng Anh, số, URL). Locale en chỉ có eng.
+ *
+ * `browserLanguages` (navigator.languages) bổ sung ngôn ngữ người dùng thật sự đọc: một người Việt mở
+ * trang tiếng Anh vẫn hay OCR ảnh tiếng Việt, và chỉ với `eng` mọi dấu thanh bị mất. Tối đa 2 ngôn ngữ
+ * ngoài tiếng Anh để không làm chậm nhận dạng.
  */
-export function defaultOcrLanguages(locale: string): OcrLanguage[] {
+export function defaultOcrLanguages(locale: string, browserLanguages: readonly string[] = []): OcrLanguage[] {
 	const main = ocrLanguageForLocale(locale);
-	return main === 'eng' ? ['eng'] : [main, 'eng'];
+	const out: OcrLanguage[] = main === 'eng' ? [] : [main];
+	for (const tag of browserLanguages) {
+		const code = ocrLanguageForBrowserTag(tag);
+		if (code && code !== 'eng' && !out.includes(code)) out.push(code);
+		if (out.length >= 2) break;
+	}
+	return [...out, 'eng'];
 }
 
 /** Lọc mã không hợp lệ, bỏ trùng, cắt tối đa MAX_OCR_LANGUAGES; luôn trả ít nhất 1 ngôn ngữ. */
