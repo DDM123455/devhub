@@ -79,7 +79,10 @@
       "patchCopied": "统一 diff 已复制到剪贴板。",
       "collapsedLines": "已隐藏 {{count}} 行未更改的内容",
       "exportNothing": "没有可导出的行级差异。",
-      "unifiedAria": "统一 diff"
+      "unifiedAria": "统一 diff",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "上传文件",

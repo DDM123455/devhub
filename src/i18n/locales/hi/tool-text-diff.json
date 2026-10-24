@@ -79,7 +79,10 @@
       "patchCopied": "यूनिफ़ाइड diff क्लिपबोर्ड पर कॉपी हो गया।",
       "collapsedLines": "{{count}} अपरिवर्तित पंक्तियाँ छिपी हैं",
       "exportNothing": "एक्सपोर्ट करने के लिए पंक्तियों में कोई अंतर नहीं है।",
-      "unifiedAria": "यूनिफ़ाइड diff"
+      "unifiedAria": "यूनिफ़ाइड diff",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "फ़ाइल अपलोड करें",

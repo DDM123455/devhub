@@ -16,8 +16,8 @@
     "ignoreWhitespace": "Bỏ qua khoảng trắng thừa",
     "ignoreCase": "Không phân biệt hoa/thường",
     "ignoreEmptyLines": "Bỏ qua dòng trống",
-    "normalizeLineEndings": "Chuẩn hóa xuống dòng (CRLF/LF)",
-    "normalizeUnicode": "Chuẩn hóa Unicode",
+    "normalizeLineEndings": "Coi kiểu xuống dòng Windows và Unix là như nhau",
+    "normalizeUnicode": "Coi chữ có dấu gõ theo kiểu khác nhau là như nhau",
     "ignoreLineBreaks": "Bỏ qua ngắt dòng (văn bản xuống dòng khác)",
     "ignoreLineOrder": "Bỏ qua thứ tự dòng (sắp xếp dòng trước)",
     "computing": "Đang tính diff…",
@@ -79,7 +79,10 @@
       "patchCopied": "Đã sao chép unified diff vào clipboard.",
       "collapsedLines": "Đã ẩn {{count}} dòng không đổi",
       "exportNothing": "Không có khác biệt theo dòng để xuất.",
-      "unifiedAria": "Diff dạng hợp nhất"
+      "unifiedAria": "Diff dạng hợp nhất",
+      "highlightByLabel": "Tô sáng theo:",
+      "moreOptions": "Tùy chọn khác",
+      "loadSample": "Dùng dữ liệu mẫu"
     },
     "files": {
       "uploadAny": "Tải tệp lên",

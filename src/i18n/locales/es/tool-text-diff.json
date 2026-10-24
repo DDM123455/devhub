@@ -79,7 +79,10 @@
       "patchCopied": "Diff unificado copiado al portapapeles.",
       "collapsedLines": "{{count}} líneas sin cambios ocultas",
       "exportNothing": "No hay diferencias de línea que exportar.",
-      "unifiedAria": "Diff unificado"
+      "unifiedAria": "Diff unificado",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "Subir archivo",

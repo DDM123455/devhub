@@ -79,7 +79,10 @@
       "patchCopied": "Diff ujednolicony skopiowano do schowka.",
       "collapsedLines": "Ukryte niezmienione wiersze: {{count}}",
       "exportNothing": "Brak różnic w wierszach do wyeksportowania.",
-      "unifiedAria": "Diff ujednolicony"
+      "unifiedAria": "Diff ujednolicony",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "Wczytaj plik",

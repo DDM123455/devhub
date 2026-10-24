@@ -541,6 +541,10 @@ function MergeAcceptColumn({
 	);
 }
 
+// Tiny neutral example so a first-time visitor can see what the tool does without inventing text.
+const SAMPLE_ORIGINAL = 'The quick brown fox\njumps over the lazy dog.\nThis line stays the same.\nOnly in the original.\nLast line';
+const SAMPLE_CHANGED = 'The quick brown cat\njumps over the lazy dog.\nThis line stays the same.\nA brand new line.\nLast line';
+
 export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	const [originalText, setOriginalText] = useState('');
 	const [changedText, setChangedText] = useState('');
@@ -598,6 +602,10 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	const editChanged = (value: string) => {
 		autosaveSuspendedRef.current = false;
 		setChangedText(value);
+	};
+	const handleLoadSample = () => {
+		editOriginal(SAMPLE_ORIGINAL);
+		editChanged(SAMPLE_CHANGED);
 	};
 
 	// Mirrors the `?token=`/`?pattern=` deep-link pattern used elsewhere on the
@@ -904,6 +912,9 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 
 	const isLargeInput = originalText.length + changedText.length > LARGE_INPUT_CHARS;
 	const stats = useMemo(() => countLineStats(entries), [entries]);
+	// How many of the tucked-away options differ from their default, so a closed "More options" never hides an active one.
+	const moreActive =
+		(ignoreEmptyLines ? 1 : 0) + (normalizeUnicode ? 1 : 0) + (sortLines ? 1 : 0) + (normalizeLineEndings ? 0 : 1) + (ignoreRegexText.trim() !== '' ? 1 : 0);
 	const hasChanges = stats.added > 0 || stats.removed > 0 || stats.modified > 0;
 
 	// Reset per-hunk merge choices whenever the underlying comparison changes — stale
@@ -1417,9 +1428,11 @@ buildDiffHtml(entries, { title: `${leftTitle} / ${rightTitle}`, left: leftTitle,
 						<Button type="button" size="sm" variant="ghost" className="min-h-9" aria-label={messages.clearAria.replace('{{side}}', label)} onClick={() => handleClear(which)}>
 							{messages.clear}
 						</Button>
-						<Button type="button" size="sm" variant="ghost" className="min-h-9" aria-label={messages.swapAria} onClick={handleSwap}>
-							{messages.swap}
-						</Button>
+						{!isOriginal && (
+							<Button type="button" size="sm" variant="ghost" className="min-h-9" aria-label={messages.swapAria} onClick={handleSwap}>
+								{messages.swap}
+							</Button>
+						)}
 						<Button
 							type="button"
 							size="sm"
@@ -1544,10 +1557,15 @@ accept={FILE_ACCEPT}
 					{renderPanel('original')}
 					{renderPanel('changed')}
 				</div>
-				<div className="flex justify-center">
-					<Button type="button" className="min-h-9 w-full px-8 font-semibold md:w-auto md:min-w-48" aria-label={messages.compareAria} onClick={handleCompare}>
+				<div className="flex flex-col items-center justify-center gap-2 sm:flex-row">
+					<Button type="button" className="min-h-9 w-full px-8 font-semibold sm:w-auto md:min-w-48" aria-label={messages.compareAria} onClick={handleCompare}>
 						{messages.compareButton}
 					</Button>
+					{originalText === '' && changedText === '' && (
+						<Button type="button" variant="outline" className="min-h-9 w-full sm:w-auto" onClick={handleLoadSample}>
+							{messages.x.loadSample}
+						</Button>
+					)}
 				</div>
 				{/* Compact notices right under the toolbar: format results/errors and the compare summary.
 				    The polite live region is always mounted so announcements are reliably read. */}
@@ -1591,6 +1609,7 @@ accept={FILE_ACCEPT}
 
 				<div className="flex flex-wrap items-center gap-4">
 					<div className="flex items-center gap-1 text-sm text-foreground">
+						<span className="mr-1 text-xs text-muted-foreground">{messages.x.highlightByLabel}</span>
 						{(['char', 'word', 'line'] as const).map((g) => (
 							<button
 								key={g}
@@ -1614,28 +1633,8 @@ accept={FILE_ACCEPT}
 							{messages.ignoreCase}
 						</label>
 						<label className="flex cursor-pointer items-center gap-1.5">
-							<input type="checkbox" checked={ignoreEmptyLines} onChange={(event) => setIgnoreEmptyLines(event.target.checked)} />
-							{messages.ignoreEmptyLines}
-						</label>
-						<label className="flex cursor-pointer items-center gap-1.5">
-							<input
-								type="checkbox"
-								checked={normalizeLineEndings}
-								onChange={(event) => setNormalizeLineEndings(event.target.checked)}
-							/>
-							{messages.normalizeLineEndings}
-						</label>
-						<label className="flex cursor-pointer items-center gap-1.5">
-							<input type="checkbox" checked={normalizeUnicode} onChange={(event) => setNormalizeUnicode(event.target.checked)} />
-							{messages.normalizeUnicode}
-						</label>
-						<label className="flex cursor-pointer items-center gap-1.5">
 							<input type="checkbox" checked={ignoreLineBreaks} onChange={(event) => setIgnoreLineBreaks(event.target.checked)} />
 							{messages.ignoreLineBreaks}
-						</label>
-						<label className="flex cursor-pointer items-center gap-1.5">
-							<input type="checkbox" checked={sortLines} onChange={(event) => setSortLines(event.target.checked)} />
-							{messages.ignoreLineOrder}
 						</label>
 					</div>
 						{(originalText !== '' || changedText !== '') &&
@@ -1689,6 +1688,34 @@ accept={FILE_ACCEPT}
 					)}
 				</div>
 				<details className="rounded-md border border-border p-3">
+					<summary className="flex min-h-9 cursor-pointer items-center text-sm font-medium text-foreground">
+						{messages.x.moreOptions}
+						{moreActive > 0 && <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">{moreActive}</span>}
+					</summary>
+					<div className="mt-3 flex flex-col gap-3">
+					<div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-foreground">
+						<label className="flex cursor-pointer items-center gap-1.5">
+							<input type="checkbox" checked={ignoreEmptyLines} onChange={(event) => setIgnoreEmptyLines(event.target.checked)} />
+							{messages.ignoreEmptyLines}
+						</label>
+						<label className="flex cursor-pointer items-center gap-1.5">
+							<input
+								type="checkbox"
+								checked={normalizeLineEndings}
+								onChange={(event) => setNormalizeLineEndings(event.target.checked)}
+							/>
+							{messages.normalizeLineEndings}
+						</label>
+						<label className="flex cursor-pointer items-center gap-1.5">
+							<input type="checkbox" checked={normalizeUnicode} onChange={(event) => setNormalizeUnicode(event.target.checked)} />
+							{messages.normalizeUnicode}
+						</label>
+						<label className="flex cursor-pointer items-center gap-1.5">
+							<input type="checkbox" checked={sortLines} onChange={(event) => setSortLines(event.target.checked)} />
+							{messages.ignoreLineOrder}
+						</label>
+					</div>
+				<details className="rounded-md border border-border p-3">
 					<summary className="cursor-pointer text-sm font-medium text-foreground">{messages.x.ignoreRegexHeading}</summary>
 					<div className="mt-2 flex flex-col gap-1">
 						<label htmlFor="text-diff-ignore-regex" className="text-xs text-muted-foreground">
@@ -1712,6 +1739,8 @@ accept={FILE_ACCEPT}
 				</details>
 					<FileOptionsPanel options={extractOptions} onChange={handleExtractOptionsChange} messages={fm} />
 					<FileLimitsPanel messages={fm} />
+					</div>
+				</details>
 					{fileNotice && (
 						<p role="status" className="text-xs text-amber-700 dark:text-amber-400">
 							{fileNotice}

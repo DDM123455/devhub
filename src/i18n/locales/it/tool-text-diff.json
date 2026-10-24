@@ -79,7 +79,10 @@
       "patchCopied": "Diff unificato copiato negli appunti.",
       "collapsedLines": "{{count}} righe invariate nascoste",
       "exportNothing": "Non ci sono differenze di riga da esportare.",
-      "unifiedAria": "Diff unificato"
+      "unifiedAria": "Diff unificato",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "Carica file",

@@ -79,7 +79,10 @@
       "patchCopied": "Birleşik diff panoya kopyalandı.",
       "collapsedLines": "{{count}} değişmeyen satır gizlendi",
       "exportNothing": "Dışa aktarılacak satır farkı yok.",
-      "unifiedAria": "Birleşik diff"
+      "unifiedAria": "Birleşik diff",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "Dosya yükle",

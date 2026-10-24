@@ -79,7 +79,10 @@
       "patchCopied": "Diff unificado copiado para a área de transferência.",
       "collapsedLines": "{{count}} linhas inalteradas ocultas",
       "exportNothing": "Não há diferenças de linhas para exportar.",
-      "unifiedAria": "Diff unificado"
+      "unifiedAria": "Diff unificado",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "Enviar arquivo",

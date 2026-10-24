@@ -79,7 +79,10 @@
       "patchCopied": "Unified diff naar het klembord gekopieerd.",
       "collapsedLines": "{{count}} ongewijzigde regels verborgen",
       "exportNothing": "Er zijn geen regelverschillen om te exporteren.",
-      "unifiedAria": "Unified diff"
+      "unifiedAria": "Unified diff",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "Bestand uploaden",

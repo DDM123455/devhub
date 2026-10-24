@@ -79,7 +79,10 @@
       "patchCopied": "Diff unifié copié dans le presse-papiers.",
       "collapsedLines": "{{count}} lignes inchangées masquées",
       "exportNothing": "Il n'y a aucune différence de ligne à exporter.",
-      "unifiedAria": "Diff unifié"
+      "unifiedAria": "Diff unifié",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "Importer un fichier",

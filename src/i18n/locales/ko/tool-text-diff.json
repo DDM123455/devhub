@@ -79,7 +79,10 @@
       "patchCopied": "통합 diff를 클립보드에 복사했습니다.",
       "collapsedLines": "변경 없는 {{count}}줄 숨김",
       "exportNothing": "내보낼 줄 단위 차이가 없습니다.",
-      "unifiedAria": "통합 diff"
+      "unifiedAria": "통합 diff",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "파일 업로드",

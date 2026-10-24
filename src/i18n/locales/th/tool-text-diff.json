@@ -79,7 +79,10 @@
       "patchCopied": "คัดลอก unified diff ไปยังคลิปบอร์ดแล้ว",
       "collapsedLines": "ซ่อนบรรทัดที่ไม่เปลี่ยนแปลง {{count}} บรรทัด",
       "exportNothing": "ไม่มีความแตกต่างระดับบรรทัดให้ส่งออก",
-      "unifiedAria": "Unified diff"
+      "unifiedAria": "Unified diff",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "อัปโหลดไฟล์",

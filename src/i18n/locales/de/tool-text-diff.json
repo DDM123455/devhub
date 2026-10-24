@@ -79,7 +79,10 @@
       "patchCopied": "Unified Diff in die Zwischenablage kopiert.",
       "collapsedLines": "{{count}} unveränderte Zeilen ausgeblendet",
       "exportNothing": "Es gibt keine Zeilenunterschiede zum Exportieren.",
-      "unifiedAria": "Unified Diff"
+      "unifiedAria": "Unified Diff",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "Datei hochladen",

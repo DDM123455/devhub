@@ -79,7 +79,10 @@
       "patchCopied": "Unified diff disalin ke clipboard.",
       "collapsedLines": "{{count}} baris tidak berubah disembunyikan",
       "exportNothing": "Tidak ada perbedaan baris untuk diekspor.",
-      "unifiedAria": "Unified diff"
+      "unifiedAria": "Unified diff",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "Unggah file",

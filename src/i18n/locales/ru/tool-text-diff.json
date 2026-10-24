@@ -79,7 +79,10 @@
       "patchCopied": "Единый diff скопирован в буфер обмена.",
       "collapsedLines": "Скрыто неизменённых строк: {{count}}",
       "exportNothing": "Нет различий в строках для экспорта.",
-      "unifiedAria": "Единый diff"
+      "unifiedAria": "Единый diff",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "Загрузить файл",

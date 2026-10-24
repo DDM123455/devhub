@@ -16,8 +16,8 @@
     "ignoreWhitespace": "Ignore extra whitespace",
     "ignoreCase": "Ignore case",
     "ignoreEmptyLines": "Ignore empty lines",
-    "normalizeLineEndings": "Normalize line endings (CRLF/LF)",
-    "normalizeUnicode": "Unicode normalization",
+    "normalizeLineEndings": "Treat Windows and Unix line endings as the same",
+    "normalizeUnicode": "Treat accented letters typed in different ways as the same",
     "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
     "ignoreLineOrder": "Ignore line order (sort lines first)",
     "computing": "Computing diff…",
@@ -79,7 +79,10 @@
       "patchCopied": "Unified diff copied to the clipboard.",
       "collapsedLines": "{{count}} unchanged lines hidden",
       "exportNothing": "There are no line differences to export.",
-      "unifiedAria": "Unified diff"
+      "unifiedAria": "Unified diff",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "Upload file",

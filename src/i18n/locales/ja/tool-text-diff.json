@@ -79,7 +79,10 @@
       "patchCopied": "統合diffをクリップボードにコピーしました。",
       "collapsedLines": "変更のない{{count}}行を非表示",
       "exportNothing": "エクスポートできる行の差分がありません。",
-      "unifiedAria": "統合diff"
+      "unifiedAria": "統合diff",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "ファイルをアップロード",

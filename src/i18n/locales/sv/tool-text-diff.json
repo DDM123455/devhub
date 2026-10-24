@@ -79,7 +79,10 @@
       "patchCopied": "Enhetlig diff kopierad till urklipp.",
       "collapsedLines": "{{count}} oförändrade rader dolda",
       "exportNothing": "Det finns inga radskillnader att exportera.",
-      "unifiedAria": "Enhetlig diff"
+      "unifiedAria": "Enhetlig diff",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "Ladda upp fil",

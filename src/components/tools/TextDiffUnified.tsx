@@ -2,6 +2,9 @@ import { useState, type RefObject, type UIEvent } from 'react';
 import type { UnifiedRow } from '@/lib/text-diff';
 
 export interface TextDiffExtraMessages {
+	highlightByLabel: string;
+	moreOptions: string;
+	loadSample: string;
 	viewLabel: string;
 	viewSplit: string;
 	viewUnified: string;

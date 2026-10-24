@@ -79,7 +79,10 @@
       "patchCopied": "تم نسخ الفروقات الموحّدة إلى الحافظة.",
       "collapsedLines": "تم إخفاء {{count}} أسطر غير متغيرة",
       "exportNothing": "لا توجد اختلافات في الأسطر لتصديرها.",
-      "unifiedAria": "عرض الفروقات الموحّد"
+      "unifiedAria": "عرض الفروقات الموحّد",
+      "highlightByLabel": "Highlight by:",
+      "moreOptions": "More options",
+      "loadSample": "Load sample"
     },
     "files": {
       "uploadAny": "رفع ملف",
