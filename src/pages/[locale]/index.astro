@@ -5,6 +5,7 @@ import { getFixedT } from '@/i18n/i18next';
 import { categories } from '@/data/categories';
 import { tools } from '@/data/tools';
 import { jsonLd } from '@/lib/json-ld';
+import { toolSearchText } from '@/lib/tool-search';
 import { EmptyState } from '@/components/ui/empty-state';
 import { SearchX } from 'lucide-react';
 
@@ -105,7 +106,7 @@ const websiteSchema = {
 								<a
 									href={`/${locale}/tools/${tool.slugs[locale]}/`}
 									data-tool-item
-									data-tool-name={tool.names[locale].toLowerCase()}
+									data-tool-search={toolSearchText(tool.id, locale, [tool.names[locale], tool.names.en])}
 									class="group flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
 								>
 									<span class="flex-1">{tool.names[locale]}</span>
@@ -131,6 +132,8 @@ const websiteSchema = {
 </Layout>
 
 <script>
+	import { matchesQuery } from '@/lib/tool-search';
+
 	const searchInput = document.getElementById('tool-search') as HTMLInputElement | null;
 	const emptyState = document.getElementById('tool-search-empty');
 	const emptyStateQuery = document.getElementById('tool-search-empty-query');
@@ -140,12 +143,11 @@ const websiteSchema = {
 	const categoryCountChip = document.getElementById('category-count-chip');
 
 	searchInput?.addEventListener('input', () => {
-		const query = searchInput.value.trim().toLowerCase();
+		const query = searchInput.value;
 
 		let visibleToolCount = 0;
 		for (const item of toolItems) {
-			const name = item.dataset.toolName ?? '';
-			const isVisible = query === '' || name.includes(query);
+			const isVisible = matchesQuery(item.dataset.toolSearch ?? '', query);
 			item.classList.toggle('hidden', !isVisible);
 			if (isVisible) visibleToolCount += 1;
 		}
@@ -167,6 +169,16 @@ const websiteSchema = {
 		if (categoryCountChip) categoryCountChip.textContent = String(visibleCategoryCount);
 
 		if (emptyStateQuery) emptyStateQuery.textContent = `"${searchInput.value.trim()}"`;
-		emptyState?.classList.toggle('hidden', query === '' || visibleCategoryCount > 0);
+		emptyState?.classList.toggle('hidden', query.trim() === '' || visibleCategoryCount > 0);
+	});
+
+	// Enter opens the first tool that is still shown, so "type, Enter" is enough.
+	searchInput?.addEventListener('keydown', (event) => {
+		if (event.key !== 'Enter' || searchInput.value.trim() === '') return;
+		const first = toolItems.find((item) => !item.classList.contains('hidden')) as HTMLAnchorElement | undefined;
+		if (first) {
+			event.preventDefault();
+			window.location.href = first.href;
+		}
 	});
 </script>
