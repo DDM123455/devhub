@@ -7,6 +7,9 @@ import Footer from '@/components/layout/Footer.astro';
 import { rtlLocales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { getAlternates, toHreflang } from '@/lib/locale-paths';
+// Same file the @font-face rule points at (Vite gives it the same hashed name), so the browser can start
+// fetching the main body font while it is still downloading the CSS instead of after parsing it.
+import bodyFontLatin from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 
 interface Props {
 	title: string;
@@ -72,6 +75,7 @@ const OG_LOCALE: Record<Locale, string> = {
 				} catch (e) {}
 			})();
 		</script>
+		<link rel="preload" as="font" type="font/woff2" href={bodyFontLatin} crossorigin />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<link rel="canonical" href={canonicalUrl} />

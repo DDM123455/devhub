@@ -18,6 +18,13 @@ export default defineConfig({
   // Domain thật do Cloudflare cấp sau khi connect Git (Workers static assets, không phải *.pages.dev cổ điển).
   site: 'https://devhub.duongdangmanh01.workers.dev',
 
+  // Every page change is a full page load (static multi-page site). Prefetching the target page when the
+  // pointer rests on a link (or on tap/focus) gives it a head start, so the click feels near-instant.
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'hover'
+  },
+
   i18n: {
     locales,
     defaultLocale: 'en',

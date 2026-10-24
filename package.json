@@ -8,7 +8,7 @@
   "scripts": {
     "seo:audit": "node scripts/seo-audit.mjs",
     "dev": "astro dev",
-    "build": "astro build && node scripts/fix-404-output.mjs",
+    "build": "astro build && node scripts/fix-404-output.mjs && node scripts/strip-katex-css.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "test": "vitest run"
