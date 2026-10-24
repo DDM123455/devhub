@@ -18,6 +18,8 @@
     "ignoreEmptyLines": "تجاهل الأسطر الفارغة",
     "normalizeLineEndings": "توحيد نهايات الأسطر (CRLF/LF)",
     "normalizeUnicode": "توحيد يونيكود",
+    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
+    "ignoreLineOrder": "Ignore line order (sort lines first)",
     "computing": "جارٍ حساب الاختلافات…",
     "statsAdded": "الأسطر المضافة: {{count}}",
     "statsRemoved": "الأسطر المحذوفة: {{count}}",

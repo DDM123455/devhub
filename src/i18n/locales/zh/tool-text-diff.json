@@ -18,6 +18,8 @@
     "ignoreEmptyLines": "忽略空行",
     "normalizeLineEndings": "规范化换行符 (CRLF/LF)",
     "normalizeUnicode": "Unicode 规范化",
+    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
+    "ignoreLineOrder": "Ignore line order (sort lines first)",
     "computing": "正在计算差异…",
     "statsAdded": "新增行数：{{count}}",
     "statsRemoved": "删除行数：{{count}}",

@@ -18,6 +18,8 @@
     "ignoreEmptyLines": "Abaikan baris kosong",
     "normalizeLineEndings": "Normalisasi akhir baris (CRLF/LF)",
     "normalizeUnicode": "Normalisasi Unicode",
+    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
+    "ignoreLineOrder": "Ignore line order (sort lines first)",
     "computing": "Menghitung perbedaan…",
     "statsAdded": "Baris ditambahkan: {{count}}",
     "statsRemoved": "Baris dihapus: {{count}}",

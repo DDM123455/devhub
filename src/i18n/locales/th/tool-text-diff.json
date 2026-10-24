@@ -18,6 +18,8 @@
     "ignoreEmptyLines": "ไม่สนใจบรรทัดที่ว่าง",
     "normalizeLineEndings": "ปรับมาตรฐานอักขระจบบรรทัด (CRLF/LF)",
     "normalizeUnicode": "การปรับมาตรฐานยูนิโค้ด",
+    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
+    "ignoreLineOrder": "Ignore line order (sort lines first)",
     "computing": "กำลังคำนวณความแตกต่าง…",
     "statsAdded": "บรรทัดที่เพิ่ม: {{count}}",
     "statsRemoved": "บรรทัดที่ลบ: {{count}}",

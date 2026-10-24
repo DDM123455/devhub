@@ -28,12 +28,19 @@ export interface DiffOptions {
 	// Global regexes whose matches are removed from each LINE before comparing (e.g. timestamps),
 	// so lines that differ only in those parts count as unchanged. Display keeps the original text.
 	ignorePatterns?: RegExp[];
+	// Sorts the lines of both sides (by the same normalised key used for comparing) before diffing, so the
+	// same set of lines in a different order counts as identical. Duplicates are kept, so a line that
+	// appears 3 times on one side and 2 on the other still differs.
+	sortLines?: boolean;
 }
 
 export interface PreprocessOptions {
 	normalizeLineEndings?: boolean;
 	normalizeUnicode?: boolean;
 	ignoreEmptyLines?: boolean;
+	// Turns every line break (and the indentation after it) into one space, so the same text wrapped
+	// at different places compares as equal. The whole document becomes a single line.
+	ignoreLineBreaks?: boolean;
 }
 
 // Applied to both sides before diffing (not to the raw textarea value the user sees/
@@ -48,6 +55,8 @@ export function preprocessDiffInput(text: string, options: PreprocessOptions): s
 	if (options.normalizeLineEndings) result = result.replace(/\r\n?/g, '\n');
 	if (options.normalizeUnicode) result = result.normalize('NFC');
 	if (options.ignoreEmptyLines) result = result.split('\n').filter((line) => line.trim() !== '').join('\n');
+	// Every break (CRLF, CR or LF) plus the whitespace around it, including blank lines, becomes one space.
+	if (options.ignoreLineBreaks) result = result.replace(/[ \t]*(?:\r\n|\r|\n)\s*/g, ' ').trim();
 	return result;
 }
 
@@ -215,9 +224,17 @@ export function lineKey(line: string, options: DiffOptions): string {
 // (with an intra-line sub-diff for highlighting) — any leftover lines on the longer
 // side fall back to plain added/removed. Lines are compared via a normalised key
 // (ignoreCase / ignoreWhitespace) but entries always carry each side's original text.
+// Stable sort by the comparison key, ties broken by the raw text (code-unit order, locale independent).
+function sortByKey(lines: string[], options: DiffOptions): string[] {
+	return lines
+		.map((line) => ({ line, key: lineKey(line, options) }))
+		.sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : a.line < b.line ? -1 : a.line > b.line ? 1 : 0))
+		.map((item) => item.line);
+}
+
 export function buildLineDiff(left: string, right: string, granularity: DiffGranularity, options: DiffOptions = {}): DiffLineEntry[] {
-	const leftLines = splitDocumentLines(left);
-	const rightLines = splitDocumentLines(right);
+	const leftLines = options.sortLines ? sortByKey(splitDocumentLines(left), options) : splitDocumentLines(left);
+	const rightLines = options.sortLines ? sortByKey(splitDocumentLines(right), options) : splitDocumentLines(right);
 	const lineParts = diffArrays(
 		leftLines.map((l) => lineKey(l, options)),
 		rightLines.map((l) => lineKey(l, options)),

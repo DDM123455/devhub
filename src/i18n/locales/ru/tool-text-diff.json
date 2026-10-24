@@ -18,6 +18,8 @@
     "ignoreEmptyLines": "Игнорировать пустые строки",
     "normalizeLineEndings": "Нормализовать окончания строк (CRLF/LF)",
     "normalizeUnicode": "Нормализация Unicode",
+    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
+    "ignoreLineOrder": "Ignore line order (sort lines first)",
     "computing": "Вычисление различий…",
     "statsAdded": "Добавлено строк: {{count}}",
     "statsRemoved": "Удалено строк: {{count}}",

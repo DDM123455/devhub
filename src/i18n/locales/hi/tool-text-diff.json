@@ -18,6 +18,8 @@
     "ignoreEmptyLines": "खाली पंक्तियाँ अनदेखा करें",
     "normalizeLineEndings": "पंक्ति समाप्ति सामान्य करें (CRLF/LF)",
     "normalizeUnicode": "यूनिकोड सामान्यीकरण",
+    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
+    "ignoreLineOrder": "Ignore line order (sort lines first)",
     "computing": "अंतर की गणना हो रही है…",
     "statsAdded": "जोड़ी गई लाइनें: {{count}}",
     "statsRemoved": "हटाई गई लाइनें: {{count}}",

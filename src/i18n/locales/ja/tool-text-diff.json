@@ -18,6 +18,8 @@
     "ignoreEmptyLines": "空行を無視",
     "normalizeLineEndings": "改行コードを正規化 (CRLF/LF)",
     "normalizeUnicode": "Unicode正規化",
+    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
+    "ignoreLineOrder": "Ignore line order (sort lines first)",
     "computing": "差分を計算中…",
     "statsAdded": "追加行数: {{count}}",
     "statsRemoved": "削除行数: {{count}}",

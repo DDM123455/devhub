@@ -18,6 +18,8 @@
     "ignoreEmptyLines": "Boş satırları yoksay",
     "normalizeLineEndings": "Satır sonlarını normalleştir (CRLF/LF)",
     "normalizeUnicode": "Unicode normalleştirme",
+    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
+    "ignoreLineOrder": "Ignore line order (sort lines first)",
     "computing": "Fark hesaplanıyor…",
     "statsAdded": "Eklenen satır: {{count}}",
     "statsRemoved": "Silinen satır: {{count}}",

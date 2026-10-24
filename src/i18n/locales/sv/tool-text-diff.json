@@ -18,6 +18,8 @@
     "ignoreEmptyLines": "Ignorera tomma rader",
     "normalizeLineEndings": "Normalisera radslut (CRLF/LF)",
     "normalizeUnicode": "Unicode-normalisering",
+    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
+    "ignoreLineOrder": "Ignore line order (sort lines first)",
     "computing": "Beräknar skillnad…",
     "statsAdded": "Tillagda rader: {{count}}",
     "statsRemoved": "Borttagna rader: {{count}}",

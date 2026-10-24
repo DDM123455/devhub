@@ -18,6 +18,8 @@
     "ignoreEmptyLines": "빈 줄 무시",
     "normalizeLineEndings": "줄 끝 정규화 (CRLF/LF)",
     "normalizeUnicode": "유니코드 정규화",
+    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
+    "ignoreLineOrder": "Ignore line order (sort lines first)",
     "computing": "차이 계산 중…",
     "statsAdded": "추가된 줄: {{count}}",
     "statsRemoved": "삭제된 줄: {{count}}",

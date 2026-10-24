@@ -61,6 +61,8 @@ interface Messages {
 	ignoreEmptyLines: string;
 	normalizeLineEndings: string;
 	normalizeUnicode: string;
+	ignoreLineBreaks: string;
+	ignoreLineOrder: string;
 	computing: string;
 	statsAdded: string;
 	statsRemoved: string;
@@ -550,6 +552,8 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 	// modified. The difference is still surfaced as a note (see `notes` below).
 	const [normalizeLineEndings, setNormalizeLineEndings] = useState(true);
 	const [normalizeUnicode, setNormalizeUnicode] = useState(false);
+	const [ignoreLineBreaks, setIgnoreLineBreaks] = useState(false);
+	const [sortLines, setSortLines] = useState(false);
 	const [viewMode, setViewMode] = useState<'split' | 'unified'>('split');
 	// null = show every unchanged line; a number = keep that many lines of context around changes.
 	const [contextLines, setContextLines] = useState<number | null>(null);
@@ -871,6 +875,8 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 			ignoreEmptyLines,
 			normalizeLineEndings,
 			normalizeUnicode,
+			ignoreLineBreaks,
+			sortLines,
 			ignorePatterns: ignoreCompile.error ? [] : ignoreSources,
 		};
 		worker.postMessage(request);
@@ -884,6 +890,8 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		ignoreEmptyLines,
 		normalizeLineEndings,
 		normalizeUnicode,
+		ignoreLineBreaks,
+		sortLines,
 		ignoreSources,
 		ignoreCompile.error,
 	]);
@@ -1620,6 +1628,14 @@ accept={FILE_ACCEPT}
 						<label className="flex cursor-pointer items-center gap-1.5">
 							<input type="checkbox" checked={normalizeUnicode} onChange={(event) => setNormalizeUnicode(event.target.checked)} />
 							{messages.normalizeUnicode}
+						</label>
+						<label className="flex cursor-pointer items-center gap-1.5">
+							<input type="checkbox" checked={ignoreLineBreaks} onChange={(event) => setIgnoreLineBreaks(event.target.checked)} />
+							{messages.ignoreLineBreaks}
+						</label>
+						<label className="flex cursor-pointer items-center gap-1.5">
+							<input type="checkbox" checked={sortLines} onChange={(event) => setSortLines(event.target.checked)} />
+							{messages.ignoreLineOrder}
 						</label>
 					</div>
 						{(originalText !== '' || changedText !== '') &&

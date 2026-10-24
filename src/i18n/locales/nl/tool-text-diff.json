@@ -18,6 +18,8 @@
     "ignoreEmptyLines": "Lege regels negeren",
     "normalizeLineEndings": "Regeleinden normaliseren (CRLF/LF)",
     "normalizeUnicode": "Unicode-normalisatie",
+    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
+    "ignoreLineOrder": "Ignore line order (sort lines first)",
     "computing": "Verschil berekenen…",
     "statsAdded": "Toegevoegde regels: {{count}}",
     "statsRemoved": "Verwijderde regels: {{count}}",

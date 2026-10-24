@@ -18,6 +18,8 @@
     "ignoreEmptyLines": "Ignorer les lignes vides",
     "normalizeLineEndings": "Normaliser les fins de ligne (CRLF/LF)",
     "normalizeUnicode": "Normalisation Unicode",
+    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
+    "ignoreLineOrder": "Ignore line order (sort lines first)",
     "computing": "Calcul des différences…",
     "statsAdded": "Lignes ajoutées : {{count}}",
     "statsRemoved": "Lignes supprimées : {{count}}",

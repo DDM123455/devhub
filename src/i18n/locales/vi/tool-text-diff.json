@@ -18,6 +18,8 @@
     "ignoreEmptyLines": "Bỏ qua dòng trống",
     "normalizeLineEndings": "Chuẩn hóa xuống dòng (CRLF/LF)",
     "normalizeUnicode": "Chuẩn hóa Unicode",
+    "ignoreLineBreaks": "Bỏ qua ngắt dòng (văn bản xuống dòng khác)",
+    "ignoreLineOrder": "Bỏ qua thứ tự dòng (sắp xếp dòng trước)",
     "computing": "Đang tính diff…",
     "statsAdded": "Dòng thêm: {{count}}",
     "statsRemoved": "Dòng xóa: {{count}}",
