@@ -419,18 +419,23 @@ export default function SqlFormatter({ messages: m }: { messages: Messages }) {
 		<div className="flex flex-col gap-4">
 			<p className="rounded-md bg-emerald-500/10 px-3 py-2 text-xs text-emerald-700 dark:text-emerald-400">{m.privacyNote}</p>
 
-			<details open className="rounded-lg border border-border p-4">
+			{/* The dialect is the one setting people change most, so it stays out in the open; the other eleven
+			    options are tucked away (closed) so the input box and the Format button are on the first screen. */}
+			<div className="max-w-xs">
+				<Field id="sql-dialect" label={m.dialectLabel}>
+					<select id="sql-dialect" className={fieldCls} value={settings.language} onChange={(e) => update('language', e.target.value as FormatLanguage)}>
+						{FORMAT_LANGUAGES.map((l) => (
+							<option key={l} value={l}>
+								{l === 'sql' ? m.dialectStandard : LANGUAGE_NAMES[l]}
+							</option>
+						))}
+					</select>
+				</Field>
+			</div>
+
+			<details className="rounded-lg border border-border p-4">
 				<summary className="flex min-h-9 cursor-pointer items-center text-sm font-medium text-foreground">{m.optionsHeading}</summary>
 				<div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-					<Field id="sql-dialect" label={m.dialectLabel}>
-						<select id="sql-dialect" className={fieldCls} value={settings.language} onChange={(e) => update('language', e.target.value as FormatLanguage)}>
-							{FORMAT_LANGUAGES.map((l) => (
-								<option key={l} value={l}>
-									{l === 'sql' ? m.dialectStandard : LANGUAGE_NAMES[l]}
-								</option>
-							))}
-						</select>
-					</Field>
 					<Field id="sql-validate-as" label={m.validateAsLabel}>
 						<select id="sql-validate-as" className={fieldCls} value={validateChoice} onChange={(e) => setValidateChoice(e.target.value as ValidateChoice)}>
 							<option value="auto">{m.validateAuto}</option>
