@@ -18,8 +18,8 @@
     "ignoreEmptyLines": "忽略空行",
     "normalizeLineEndings": "规范化换行符 (CRLF/LF)",
     "normalizeUnicode": "Unicode 规范化",
-    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
-    "ignoreLineOrder": "Ignore line order (sort lines first)",
+    "ignoreLineBreaks": "忽略换行（重新换行的文本）",
+    "ignoreLineOrder": "忽略行顺序（先对行排序）",
     "computing": "正在计算差异…",
     "statsAdded": "新增行数：{{count}}",
     "statsRemoved": "删除行数：{{count}}",
@@ -80,9 +80,9 @@
       "collapsedLines": "已隐藏 {{count}} 行未更改的内容",
       "exportNothing": "没有可导出的行级差异。",
       "unifiedAria": "统一 diff",
-      "highlightByLabel": "Highlight by:",
-      "moreOptions": "More options",
-      "loadSample": "Load sample"
+      "highlightByLabel": "高亮粒度：",
+      "moreOptions": "更多选项",
+      "loadSample": "加载示例"
     },
     "files": {
       "uploadAny": "上传文件",

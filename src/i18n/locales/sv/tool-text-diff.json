@@ -18,8 +18,8 @@
     "ignoreEmptyLines": "Ignorera tomma rader",
     "normalizeLineEndings": "Normalisera radslut (CRLF/LF)",
     "normalizeUnicode": "Unicode-normalisering",
-    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
-    "ignoreLineOrder": "Ignore line order (sort lines first)",
+    "ignoreLineBreaks": "Ignorera radbrytningar (text med annan radbrytning)",
+    "ignoreLineOrder": "Ignorera radordning (sortera rader först)",
     "computing": "Beräknar skillnad…",
     "statsAdded": "Tillagda rader: {{count}}",
     "statsRemoved": "Borttagna rader: {{count}}",
@@ -80,9 +80,9 @@
       "collapsedLines": "{{count}} oförändrade rader dolda",
       "exportNothing": "Det finns inga radskillnader att exportera.",
       "unifiedAria": "Enhetlig diff",
-      "highlightByLabel": "Highlight by:",
-      "moreOptions": "More options",
-      "loadSample": "Load sample"
+      "highlightByLabel": "Markera efter:",
+      "moreOptions": "Fler alternativ",
+      "loadSample": "Läs in exempel"
     },
     "files": {
       "uploadAny": "Ladda upp fil",

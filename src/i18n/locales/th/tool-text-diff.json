@@ -18,8 +18,8 @@
     "ignoreEmptyLines": "ไม่สนใจบรรทัดที่ว่าง",
     "normalizeLineEndings": "ปรับมาตรฐานอักขระจบบรรทัด (CRLF/LF)",
     "normalizeUnicode": "การปรับมาตรฐานยูนิโค้ด",
-    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
-    "ignoreLineOrder": "Ignore line order (sort lines first)",
+    "ignoreLineBreaks": "ไม่สนใจการขึ้นบรรทัดใหม่ (ข้อความที่ตัดบรรทัดต่างกัน)",
+    "ignoreLineOrder": "ไม่สนใจลำดับบรรทัด (เรียงบรรทัดก่อน)",
     "computing": "กำลังคำนวณความแตกต่าง…",
     "statsAdded": "บรรทัดที่เพิ่ม: {{count}}",
     "statsRemoved": "บรรทัดที่ลบ: {{count}}",
@@ -80,9 +80,9 @@
       "collapsedLines": "ซ่อนบรรทัดที่ไม่เปลี่ยนแปลง {{count}} บรรทัด",
       "exportNothing": "ไม่มีความแตกต่างระดับบรรทัดให้ส่งออก",
       "unifiedAria": "Unified diff",
-      "highlightByLabel": "Highlight by:",
-      "moreOptions": "More options",
-      "loadSample": "Load sample"
+      "highlightByLabel": "ไฮไลต์ตาม:",
+      "moreOptions": "ตัวเลือกเพิ่มเติม",
+      "loadSample": "โหลดตัวอย่าง"
     },
     "files": {
       "uploadAny": "อัปโหลดไฟล์",

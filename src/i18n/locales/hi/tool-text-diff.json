@@ -18,8 +18,8 @@
     "ignoreEmptyLines": "खाली पंक्तियाँ अनदेखा करें",
     "normalizeLineEndings": "पंक्ति समाप्ति सामान्य करें (CRLF/LF)",
     "normalizeUnicode": "यूनिकोड सामान्यीकरण",
-    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
-    "ignoreLineOrder": "Ignore line order (sort lines first)",
+    "ignoreLineBreaks": "लाइन ब्रेक अनदेखा करें (दोबारा लपेटा गया टेक्स्ट)",
+    "ignoreLineOrder": "लाइनों का क्रम अनदेखा करें (पहले लाइनें क्रमबद्ध करें)",
     "computing": "अंतर की गणना हो रही है…",
     "statsAdded": "जोड़ी गई लाइनें: {{count}}",
     "statsRemoved": "हटाई गई लाइनें: {{count}}",
@@ -80,9 +80,9 @@
       "collapsedLines": "{{count}} अपरिवर्तित पंक्तियाँ छिपी हैं",
       "exportNothing": "एक्सपोर्ट करने के लिए पंक्तियों में कोई अंतर नहीं है।",
       "unifiedAria": "यूनिफ़ाइड diff",
-      "highlightByLabel": "Highlight by:",
-      "moreOptions": "More options",
-      "loadSample": "Load sample"
+      "highlightByLabel": "हाइलाइट करें:",
+      "moreOptions": "और विकल्प",
+      "loadSample": "नमूना लोड करें"
     },
     "files": {
       "uploadAny": "फ़ाइल अपलोड करें",

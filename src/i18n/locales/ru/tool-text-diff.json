@@ -18,8 +18,8 @@
     "ignoreEmptyLines": "Игнорировать пустые строки",
     "normalizeLineEndings": "Нормализовать окончания строк (CRLF/LF)",
     "normalizeUnicode": "Нормализация Unicode",
-    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
-    "ignoreLineOrder": "Ignore line order (sort lines first)",
+    "ignoreLineBreaks": "Игнорировать переносы строк (текст с другими переносами)",
+    "ignoreLineOrder": "Игнорировать порядок строк (сначала сортировать)",
     "computing": "Вычисление различий…",
     "statsAdded": "Добавлено строк: {{count}}",
     "statsRemoved": "Удалено строк: {{count}}",
@@ -80,9 +80,9 @@
       "collapsedLines": "Скрыто неизменённых строк: {{count}}",
       "exportNothing": "Нет различий в строках для экспорта.",
       "unifiedAria": "Единый diff",
-      "highlightByLabel": "Highlight by:",
-      "moreOptions": "More options",
-      "loadSample": "Load sample"
+      "highlightByLabel": "Выделять по:",
+      "moreOptions": "Другие параметры",
+      "loadSample": "Загрузить пример"
     },
     "files": {
       "uploadAny": "Загрузить файл",

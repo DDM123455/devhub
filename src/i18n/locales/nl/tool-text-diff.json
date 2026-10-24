@@ -18,8 +18,8 @@
     "ignoreEmptyLines": "Lege regels negeren",
     "normalizeLineEndings": "Regeleinden normaliseren (CRLF/LF)",
     "normalizeUnicode": "Unicode-normalisatie",
-    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
-    "ignoreLineOrder": "Ignore line order (sort lines first)",
+    "ignoreLineBreaks": "Regeleinden negeren (opnieuw afgebroken tekst)",
+    "ignoreLineOrder": "Regelvolgorde negeren (regels eerst sorteren)",
     "computing": "Verschil berekenen…",
     "statsAdded": "Toegevoegde regels: {{count}}",
     "statsRemoved": "Verwijderde regels: {{count}}",
@@ -80,9 +80,9 @@
       "collapsedLines": "{{count}} ongewijzigde regels verborgen",
       "exportNothing": "Er zijn geen regelverschillen om te exporteren.",
       "unifiedAria": "Unified diff",
-      "highlightByLabel": "Highlight by:",
-      "moreOptions": "More options",
-      "loadSample": "Load sample"
+      "highlightByLabel": "Markeren op:",
+      "moreOptions": "Meer opties",
+      "loadSample": "Voorbeeld laden"
     },
     "files": {
       "uploadAny": "Bestand uploaden",

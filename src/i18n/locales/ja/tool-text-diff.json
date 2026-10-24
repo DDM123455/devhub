@@ -18,8 +18,8 @@
     "ignoreEmptyLines": "空行を無視",
     "normalizeLineEndings": "改行コードを正規化 (CRLF/LF)",
     "normalizeUnicode": "Unicode正規化",
-    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
-    "ignoreLineOrder": "Ignore line order (sort lines first)",
+    "ignoreLineBreaks": "改行を無視（折り返し位置が違うテキスト）",
+    "ignoreLineOrder": "行の順序を無視（先に行を並べ替え）",
     "computing": "差分を計算中…",
     "statsAdded": "追加行数: {{count}}",
     "statsRemoved": "削除行数: {{count}}",
@@ -80,9 +80,9 @@
       "collapsedLines": "変更のない{{count}}行を非表示",
       "exportNothing": "エクスポートできる行の差分がありません。",
       "unifiedAria": "統合diff",
-      "highlightByLabel": "Highlight by:",
-      "moreOptions": "More options",
-      "loadSample": "Load sample"
+      "highlightByLabel": "強調の単位：",
+      "moreOptions": "その他のオプション",
+      "loadSample": "サンプルを読み込む"
     },
     "files": {
       "uploadAny": "ファイルをアップロード",

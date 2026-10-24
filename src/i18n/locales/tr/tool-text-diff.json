@@ -18,8 +18,8 @@
     "ignoreEmptyLines": "Boş satırları yoksay",
     "normalizeLineEndings": "Satır sonlarını normalleştir (CRLF/LF)",
     "normalizeUnicode": "Unicode normalleştirme",
-    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
-    "ignoreLineOrder": "Ignore line order (sort lines first)",
+    "ignoreLineBreaks": "Satır sonlarını yok say (yeniden satırlanmış metin)",
+    "ignoreLineOrder": "Satır sırasını yok say (önce satırları sırala)",
     "computing": "Fark hesaplanıyor…",
     "statsAdded": "Eklenen satır: {{count}}",
     "statsRemoved": "Silinen satır: {{count}}",
@@ -80,9 +80,9 @@
       "collapsedLines": "{{count}} değişmeyen satır gizlendi",
       "exportNothing": "Dışa aktarılacak satır farkı yok.",
       "unifiedAria": "Birleşik diff",
-      "highlightByLabel": "Highlight by:",
-      "moreOptions": "More options",
-      "loadSample": "Load sample"
+      "highlightByLabel": "Vurgu birimi:",
+      "moreOptions": "Diğer seçenekler",
+      "loadSample": "Örnek yükle"
     },
     "files": {
       "uploadAny": "Dosya yükle",

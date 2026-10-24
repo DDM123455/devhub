@@ -18,8 +18,8 @@
     "ignoreEmptyLines": "忽略空白行",
     "normalizeLineEndings": "統一換行符號 (CRLF/LF)",
     "normalizeUnicode": "Unicode 正規化",
-    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
-    "ignoreLineOrder": "Ignore line order (sort lines first)",
+    "ignoreLineBreaks": "忽略換行（重新換行的文字）",
+    "ignoreLineOrder": "忽略行順序（先排序各行）",
     "computing": "正在計算差異…",
     "statsAdded": "新增行數：{{count}}",
     "statsRemoved": "刪除行數：{{count}}",
@@ -80,9 +80,9 @@
       "collapsedLines": "已隱藏 {{count}} 行未變更的內容",
       "exportNothing": "沒有可匯出的行層級差異。",
       "unifiedAria": "整合 diff",
-      "highlightByLabel": "Highlight by:",
-      "moreOptions": "More options",
-      "loadSample": "Load sample"
+      "highlightByLabel": "醒目提示單位：",
+      "moreOptions": "更多選項",
+      "loadSample": "載入範例"
     },
     "files": {
       "uploadAny": "上傳檔案",

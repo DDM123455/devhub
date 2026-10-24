@@ -18,8 +18,8 @@
     "ignoreEmptyLines": "빈 줄 무시",
     "normalizeLineEndings": "줄 끝 정규화 (CRLF/LF)",
     "normalizeUnicode": "유니코드 정규화",
-    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
-    "ignoreLineOrder": "Ignore line order (sort lines first)",
+    "ignoreLineBreaks": "줄바꿈 무시(줄 바꿈 위치가 다른 텍스트)",
+    "ignoreLineOrder": "줄 순서 무시(먼저 줄 정렬)",
     "computing": "차이 계산 중…",
     "statsAdded": "추가된 줄: {{count}}",
     "statsRemoved": "삭제된 줄: {{count}}",
@@ -80,9 +80,9 @@
       "collapsedLines": "변경 없는 {{count}}줄 숨김",
       "exportNothing": "내보낼 줄 단위 차이가 없습니다.",
       "unifiedAria": "통합 diff",
-      "highlightByLabel": "Highlight by:",
-      "moreOptions": "More options",
-      "loadSample": "Load sample"
+      "highlightByLabel": "강조 단위:",
+      "moreOptions": "더 많은 옵션",
+      "loadSample": "샘플 불러오기"
     },
     "files": {
       "uploadAny": "파일 업로드",

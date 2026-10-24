@@ -18,8 +18,8 @@
     "ignoreEmptyLines": "Ignora righe vuote",
     "normalizeLineEndings": "Normalizza fine riga (CRLF/LF)",
     "normalizeUnicode": "Normalizzazione Unicode",
-    "ignoreLineBreaks": "Ignore line breaks (re-wrapped text)",
-    "ignoreLineOrder": "Ignore line order (sort lines first)",
+    "ignoreLineBreaks": "Ignora le interruzioni di riga (testo riformattato)",
+    "ignoreLineOrder": "Ignora l'ordine delle righe (ordina prima)",
     "computing": "Calcolo delle differenze…",
     "statsAdded": "Righe aggiunte: {{count}}",
     "statsRemoved": "Righe rimosse: {{count}}",
@@ -80,9 +80,9 @@
       "collapsedLines": "{{count}} righe invariate nascoste",
       "exportNothing": "Non ci sono differenze di riga da esportare.",
       "unifiedAria": "Diff unificato",
-      "highlightByLabel": "Highlight by:",
-      "moreOptions": "More options",
-      "loadSample": "Load sample"
+      "highlightByLabel": "Evidenzia per:",
+      "moreOptions": "Altre opzioni",
+      "loadSample": "Carica esempio"
     },
     "files": {
       "uploadAny": "Carica file",
