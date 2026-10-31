@@ -94,6 +94,30 @@ export function buildSearchText(names: readonly string[], keywords = ''): string
 	return normalizeSearchText([...names, keywords].join(' '));
 }
 
+/** The names alone (no keywords), normalized: what `scoreQuery` treats as a strong match. */
+export function toolNameText(names: readonly string[]): string {
+	return normalizeSearchText(names.join(' '));
+}
+
+/**
+ * How well a tool answers a query; 0 = not a match (same rule as `matchesQuery`). Per typed word: a word-start
+ * in the tool NAME is worth far more than one only in its keywords; a name that is exactly the query, or starts
+ * with it, wins over a name that merely contains the words. Used to order results and pick what Enter opens.
+ */
+export function scoreQuery(searchText: string, nameText: string, query: string): number {
+	const tokens = normalizeSearchText(query).split(' ').filter(Boolean);
+	if (tokens.length === 0) return 0;
+	if (!matchesQuery(searchText, query)) return 0;
+	const paddedName = ` ${nameText} `;
+	let score = 0;
+	for (const token of tokens) score += paddedName.includes(` ${token}`) ? 100 : 20;
+	const phrase = tokens.join(' ');
+	if (nameText === phrase) score += 300;
+	else if (nameText.startsWith(phrase)) score += 150;
+	else if (paddedName.includes(` ${phrase}`)) score += 50;
+	return score;
+}
+
 /**
  * Every word the user typed must be the START of some word in the tool's search text, in any order
  * ("pdf merge" finds "Merge PDF"). Prefix, not substring: "anh" must not match "thanh".

@@ -5,7 +5,7 @@ import { getFixedT } from '@/i18n/i18next';
 import { categories } from '@/data/categories';
 import { tools } from '@/data/tools';
 import { jsonLd } from '@/lib/json-ld';
-import { toolSearchText } from '@/lib/tool-search';
+import { toolNameText, toolSearchText } from '@/lib/tool-search';
 import { EmptyState } from '@/components/ui/empty-state';
 import { SearchX } from 'lucide-react';
 
@@ -107,6 +107,7 @@ const websiteSchema = {
 									href={`/${locale}/tools/${tool.slugs[locale]}/`}
 									data-tool-item
 									data-tool-search={toolSearchText(tool.id, locale, [tool.names[locale], tool.names.en])}
+									data-tool-name={toolNameText([tool.names[locale], tool.names.en])}
 									class="group flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
 								>
 									<span class="flex-1">{tool.names[locale]}</span>
@@ -132,7 +133,7 @@ const websiteSchema = {
 </Layout>
 
 <script>
-	import { matchesQuery } from '@/lib/tool-search';
+	import { scoreQuery } from '@/lib/tool-search';
 
 	const searchInput = document.getElementById('tool-search') as HTMLInputElement | null;
 	const emptyState = document.getElementById('tool-search-empty');
@@ -141,16 +142,33 @@ const websiteSchema = {
 	const categoryCards = Array.from(document.querySelectorAll<HTMLElement>('[data-category-card]'));
 	const toolCountChip = document.getElementById('tool-count-chip');
 	const categoryCountChip = document.getElementById('category-count-chip');
+	let bestItemRef: HTMLElement | undefined;
 
 	searchInput?.addEventListener('input', () => {
 		const query = searchInput.value;
 
+		// Best match first: tools inside a card, and the cards themselves, are ordered with CSS `order`
+		// (no DOM reshuffling); an empty query restores the original order.
+		const searching = query.trim() !== '';
 		let visibleToolCount = 0;
+		let bestItem: HTMLElement | undefined;
+		let bestScore = 0;
+		const cardBest = new Map<HTMLElement, number>();
 		for (const item of toolItems) {
-			const isVisible = matchesQuery(item.dataset.toolSearch ?? '', query);
+			const score = scoreQuery(item.dataset.toolSearch ?? '', item.dataset.toolName ?? '', query);
+			const isVisible = !searching || score > 0;
 			item.classList.toggle('hidden', !isVisible);
+			item.style.order = searching && isVisible ? String(-score) : '';
 			if (isVisible) visibleToolCount += 1;
+			if (searching && score > bestScore) {
+				bestScore = score;
+				bestItem = item;
+			}
+			const card = item.closest<HTMLElement>('[data-category-card]');
+			if (card && score > (cardBest.get(card) ?? 0)) cardBest.set(card, score);
 		}
+		for (const card of categoryCards) card.style.order = searching ? String(-(cardBest.get(card) ?? 0)) : '';
+		bestItemRef = bestItem;
 
 		let visibleCategoryCount = 0;
 		for (const card of categoryCards) {
@@ -172,10 +190,10 @@ const websiteSchema = {
 		emptyState?.classList.toggle('hidden', query.trim() === '' || visibleCategoryCount > 0);
 	});
 
-	// Enter opens the first tool that is still shown, so "type, Enter" is enough.
+	// Enter opens the best-scoring tool (first shown one as a fallback), so "type, Enter" is enough.
 	searchInput?.addEventListener('keydown', (event) => {
 		if (event.key !== 'Enter' || searchInput.value.trim() === '') return;
-		const first = toolItems.find((item) => !item.classList.contains('hidden')) as HTMLAnchorElement | undefined;
+		const first = (bestItemRef ?? toolItems.find((item) => !item.classList.contains('hidden'))) as HTMLAnchorElement | undefined;
 		if (first) {
 			event.preventDefault();
 			window.location.href = first.href;

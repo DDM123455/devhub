@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { tools } from '../../data/tools';
-import { TOOL_KEYWORDS, matchesQuery, normalizeSearchText, toolSearchText } from '../tool-search';
+import { TOOL_KEYWORDS, matchesQuery, normalizeSearchText, scoreQuery, toolNameText, toolSearchText } from '../tool-search';
 
 const locales = Object.keys(tools[0].names) as Array<keyof (typeof tools)[number]['names']>;
 const textOf = (id: string, locale: (typeof locales)[number]) => {
@@ -127,5 +127,35 @@ describe('what people really type (Vietnamese, with and without diacritics)', ()
 	}
 	it('"ảnh" and "anh" find the same tools', () => {
 		expect(find('ảnh', 'vi')).toEqual(find('anh', 'vi'));
+	});
+});
+
+describe('scoreQuery (ranking)', () => {
+	const rank = (query: string, locale: (typeof locales)[number] = 'en') =>
+		tools
+			.map((t) => ({
+				id: t.id,
+				score: scoreQuery(textOf(t.id, locale), toolNameText([t.names[locale], t.names.en]), query),
+			}))
+			.filter((r) => r.score > 0)
+			.sort((a, b) => b.score - a.score)
+			.map((r) => r.id);
+
+	it('is 0 exactly when the tool does not match', () => {
+		for (const q of ['pdf', 'json', 'zzz', 'compress'])
+			for (const t of tools)
+				expect(scoreQuery(textOf(t.id, 'en'), toolNameText([t.names.en]), q) > 0, `${q} / ${t.id}`).toBe(matchesQuery(textOf(t.id, 'en'), q));
+		expect(scoreQuery('a', 'a', '')).toBe(0);
+	});
+	it('a name match beats a keyword-only match', () => {
+		expect(rank('pdf').slice(0, 2).sort()).toEqual(['pdf-merge', 'pdf-split']);
+		expect(rank('json')[0]).toBe('json-formatter');
+		expect(rank('color')[0]).toBe('color-picker');
+	});
+	it('the full tool name ranks that tool first', () => {
+		for (const t of tools) expect(rank(t.names.en)[0], t.names.en).toBe(t.id);
+	});
+	it('Vietnamese without diacritics still puts the obvious tool first', () => {
+		expect(rank('nen anh', 'vi')[0]).toBe('image-compress');
 	});
 });
