@@ -350,7 +350,9 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 			ffmpeg.on('progress', ({ progress: p }) => setProgress(Math.min(100, Math.max(0, Math.round((Number.isFinite(p) ? p : 0) * 100)))));
 			// Plain toBlobURL (no progress callback): see VideoTrim for why the progress option breaks on gzip'd CDN responses.
 			const coreURL = await toBlobURL(`${CORE_BASE}/ffmpeg-core.js`, 'text/javascript');
-			const wasmURL = await toBlobURL(`${CORE_BASE}/ffmpeg-core.wasm`, 'application/wasm');
+			// The wasm is passed as a plain https URL (not a blob:): the core fetches it itself, and the CSP's connect-src
+			// allows cdn.jsdelivr.net but not blob:. Only the small JS core goes through a blob URL (script-src blob:).
+			const wasmURL = `${CORE_BASE}/ffmpeg-core.wasm`;
 			await ffmpeg.load({ coreURL, wasmURL });
 			ffmpegRef.current = ffmpeg;
 			return ffmpeg;

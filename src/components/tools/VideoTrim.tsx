@@ -472,7 +472,9 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 			// byte count read from the stream), then tries to re-read the already-consumed Response
 			// body and crashes with "body stream already read". Plain toBlobURL avoids that path.
 			const coreURL = await toBlobURL(`${CORE_BASE}/ffmpeg-core.js`, 'text/javascript');
-			const wasmURL = await toBlobURL(`${CORE_BASE}/ffmpeg-core.wasm`, 'application/wasm');
+			// The wasm is passed as a plain https URL (not a blob:): the core fetches it itself, and the CSP's connect-src
+			// allows cdn.jsdelivr.net but not blob:. Only the small JS core goes through a blob URL (script-src blob:).
+			const wasmURL = `${CORE_BASE}/ffmpeg-core.wasm`;
 			await ffmpeg.load({ coreURL, wasmURL });
 			ffmpegRef.current = ffmpeg;
 			setEngineState('ready');
