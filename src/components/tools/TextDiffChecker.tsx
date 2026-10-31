@@ -1575,7 +1575,7 @@ accept={FILE_ACCEPT}
 				</div>
 				{/* Compact notices right under the toolbar: format results/errors and the compare summary.
 				    The polite live region is always mounted so announcements are reliably read. */}
-				<div className="flex flex-col gap-1 empty:hidden">
+				<div className="flex flex-col gap-1 empty:hidden [&:not(:has(p,button))]:hidden">
 					<div role="status" aria-live="polite" className="flex flex-col gap-1 text-xs text-muted-foreground empty:hidden">
 						{compareNote && <p className="[overflow-wrap:anywhere]">{compareNote}</p>}
 						{anyFormatBusy && <p>{messages.formatBusy}</p>}
@@ -1639,60 +1639,6 @@ accept={FILE_ACCEPT}
 								</Button>
 							))}
 				</div>
-				<details className="rounded-md border border-border p-3">
-					<summary className="flex min-h-9 cursor-pointer items-center text-sm font-medium text-foreground">
-						{messages.x.moreOptions}
-						{moreActive > 0 && <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">{moreActive}</span>}
-					</summary>
-					<div className="mt-3 flex flex-col gap-3">
-					<div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-foreground">
-						<label className="flex cursor-pointer items-center gap-1.5">
-							<input type="checkbox" checked={ignoreEmptyLines} onChange={(event) => setIgnoreEmptyLines(event.target.checked)} />
-							{messages.ignoreEmptyLines}
-						</label>
-						<label className="flex cursor-pointer items-center gap-1.5">
-							<input
-								type="checkbox"
-								checked={normalizeLineEndings}
-								onChange={(event) => setNormalizeLineEndings(event.target.checked)}
-							/>
-							{messages.normalizeLineEndings}
-						</label>
-						<label className="flex cursor-pointer items-center gap-1.5">
-							<input type="checkbox" checked={normalizeUnicode} onChange={(event) => setNormalizeUnicode(event.target.checked)} />
-							{messages.normalizeUnicode}
-						</label>
-						<label className="flex cursor-pointer items-center gap-1.5">
-							<input type="checkbox" checked={sortLines} onChange={(event) => setSortLines(event.target.checked)} />
-							{messages.ignoreLineOrder}
-						</label>
-					</div>
-				<details className="rounded-md border border-border p-3">
-					<summary className="cursor-pointer text-sm font-medium text-foreground">{messages.x.ignoreRegexHeading}</summary>
-					<div className="mt-2 flex flex-col gap-1">
-						<label htmlFor="text-diff-ignore-regex" className="text-xs text-muted-foreground">
-							{messages.x.ignoreRegexHelp}
-						</label>
-						<textarea
-							id="text-diff-ignore-regex"
-							value={ignoreRegexText}
-							onChange={(event) => setIgnoreRegexText(event.target.value)}
-							placeholder={messages.x.ignoreRegexPlaceholder}
-							rows={3}
-							spellCheck={false}
-							className="w-full rounded-md border border-border bg-background p-2 font-mono text-xs text-foreground"
-						/>
-						{ignoreCompile.error && (
-							<p role="alert" className="text-xs text-destructive">
-								{messages.x.ignoreRegexInvalid.replace('{{message}}', ignoreCompile.error)}
-							</p>
-						)}
-					</div>
-				</details>
-					<FileOptionsPanel options={extractOptions} onChange={handleExtractOptionsChange} messages={fm} />
-					<FileLimitsPanel messages={fm} />
-					</div>
-				</details>
 					{fileNotice && (
 						<p role="status" className="text-xs text-amber-700 dark:text-amber-400">
 							{fileNotice}
@@ -1951,6 +1897,60 @@ accept={FILE_ACCEPT}
 				</div>
 			)}
 			</section>
+			<details className="rounded-md border border-border p-3">
+				<summary className="flex min-h-9 cursor-pointer items-center text-sm font-medium text-foreground">
+					{messages.x.moreOptions}
+					{moreActive > 0 && <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">{moreActive}</span>}
+				</summary>
+				<div className="mt-3 flex flex-col gap-3">
+				<div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-foreground">
+					<label className="flex cursor-pointer items-center gap-1.5">
+						<input type="checkbox" checked={ignoreEmptyLines} onChange={(event) => setIgnoreEmptyLines(event.target.checked)} />
+						{messages.ignoreEmptyLines}
+					</label>
+					<label className="flex cursor-pointer items-center gap-1.5">
+						<input
+							type="checkbox"
+							checked={normalizeLineEndings}
+							onChange={(event) => setNormalizeLineEndings(event.target.checked)}
+						/>
+						{messages.normalizeLineEndings}
+					</label>
+					<label className="flex cursor-pointer items-center gap-1.5">
+						<input type="checkbox" checked={normalizeUnicode} onChange={(event) => setNormalizeUnicode(event.target.checked)} />
+						{messages.normalizeUnicode}
+					</label>
+					<label className="flex cursor-pointer items-center gap-1.5">
+						<input type="checkbox" checked={sortLines} onChange={(event) => setSortLines(event.target.checked)} />
+						{messages.ignoreLineOrder}
+					</label>
+				</div>
+			<details className="rounded-md border border-border p-3">
+				<summary className="cursor-pointer text-sm font-medium text-foreground">{messages.x.ignoreRegexHeading}</summary>
+				<div className="mt-2 flex flex-col gap-1">
+					<label htmlFor="text-diff-ignore-regex" className="text-xs text-muted-foreground">
+						{messages.x.ignoreRegexHelp}
+					</label>
+					<textarea
+						id="text-diff-ignore-regex"
+						value={ignoreRegexText}
+						onChange={(event) => setIgnoreRegexText(event.target.value)}
+						placeholder={messages.x.ignoreRegexPlaceholder}
+						rows={3}
+						spellCheck={false}
+						className="w-full rounded-md border border-border bg-background p-2 font-mono text-xs text-foreground"
+					/>
+					{ignoreCompile.error && (
+						<p role="alert" className="text-xs text-destructive">
+							{messages.x.ignoreRegexInvalid.replace('{{message}}', ignoreCompile.error)}
+						</p>
+					)}
+				</div>
+			</details>
+				<FileOptionsPanel options={extractOptions} onChange={handleExtractOptionsChange} messages={fm} />
+				<FileLimitsPanel messages={fm} />
+				</div>
+			</details>
 		</div>
 	);
 }
