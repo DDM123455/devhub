@@ -7,6 +7,10 @@
   "tagline": "Pick a color, generate a palette, and check contrast — all in your browser.",
   "ui": {
     "pickerHeading": "Color picker",
+    "tabPick": "Pick color",
+    "tabPalette": "Palettes",
+    "tabContrast": "Contrast",
+    "tabsAria": "Color tools",
     "hexLabel": "HEX",
     "rLabel": "R",
     "gLabel": "G",

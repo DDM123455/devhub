@@ -7,6 +7,10 @@
   "tagline": "Chọn một màu, tạo bảng phối màu, và kiểm tra độ tương phản — tất cả ngay trong trình duyệt.",
   "ui": {
     "pickerHeading": "Bộ chọn màu",
+    "tabPick": "Chọn màu",
+    "tabPalette": "Bảng màu",
+    "tabContrast": "Tương phản",
+    "tabsAria": "Công cụ màu",
     "hexLabel": "HEX",
     "rLabel": "R",
     "gLabel": "G",

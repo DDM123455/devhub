@@ -85,6 +85,9 @@ function useCopyState() {
 	return { key, failed, copy };
 }
 
+export type ExtraPart = 'formats' | 'shades' | 'contrast' | 'vision';
+const ALL_PARTS: readonly ExtraPart[] = ['formats', 'shades', 'contrast', 'vision'];
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
 	return (
 		<section className="rounded-lg border border-border p-4">
@@ -100,12 +103,14 @@ export default function ColorPickerExtras({
 	paletteHexes,
 	onPickColor,
 	messages,
+	parts = ALL_PARTS,
 }: {
 	hex: string;
 	rgb: Rgb;
 	paletteHexes: string[];
 	onPickColor: (hex: string) => void;
 	messages: ExtraMessages;
+	parts?: readonly ExtraPart[];
 }) {
 	const { key: copiedKey, failed: copyFailed, copy } = useCopyState();
 	// Feature detection after mount keeps the server-rendered markup and first client render identical.
@@ -226,6 +231,7 @@ export default function ColorPickerExtras({
 
 	return (
 		<>
+			{parts.includes('formats') && (
 			<Section title={messages.formatsHeading}>
 				<div className="mt-1 flex flex-wrap items-center justify-between gap-2">
 					<p className="text-xs text-muted-foreground">{messages.formatsHint}</p>
@@ -256,7 +262,9 @@ export default function ColorPickerExtras({
 					))}
 				</ul>
 			</Section>
+			)}
 
+			{parts.includes('shades') && (
 			<Section title={messages.shadesHeading}>
 				<p className="mt-1 text-xs text-muted-foreground">{messages.shadesHint}</p>
 				<ul className="mt-3 grid grid-cols-4 gap-1.5 sm:grid-cols-6 lg:grid-cols-11">
@@ -289,7 +297,9 @@ export default function ColorPickerExtras({
 					</Button>
 				</div>
 			</Section>
+			)}
 
+			{parts.includes('contrast') && (
 			<Section title={messages.customContrastHeading}>
 				<div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
 					{colorField('cp-contrast-fg', messages.customFgLabel, fgText, setFgText, messages.useSelectedFg)}
@@ -343,7 +353,9 @@ export default function ColorPickerExtras({
 					</div>
 				)}
 			</Section>
+			)}
 
+			{parts.includes('vision') && (
 			<Section title={messages.visionHeading}>
 				<p className="mt-1 text-xs text-muted-foreground">{messages.visionHint}</p>
 				<div className="mt-3 flex flex-col gap-2">
@@ -365,6 +377,7 @@ export default function ColorPickerExtras({
 					<span className="text-xs text-muted-foreground">{messages.shareNote}</span>
 				</div>
 			</Section>
+			)}
 		</>
 	);
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { Lock, Unlock, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,6 +25,10 @@ import ColorPickerExtras, { type ExtraMessages } from './ColorPickerExtras';
 import ColorPickerImage, { type ImagePickMessages } from './ColorPickerImage';
 
 interface Messages extends ExtraMessages, ImagePickMessages {
+	tabPick: string;
+	tabPalette: string;
+	tabContrast: string;
+	tabsAria: string;
 	pickerHeading: string;
 	hexLabel: string;
 	rLabel: string;
@@ -271,6 +275,9 @@ function isInteractiveTarget(target: HTMLElement | null): boolean {
 	return !!target.closest('input, textarea, select, button, a, summary, [role="button"], [role="link"], [contenteditable="true"]');
 }
 
+type ColorTab = 'pick' | 'palette' | 'contrast';
+const COLOR_TABS: readonly ColorTab[] = ['pick', 'palette', 'contrast'];
+
 export default function ColorPicker({ messages }: { messages: Messages }) {
 	// HSL and RGB are both kept in state: editing one side derives the other, but
 	// the side being edited is never re-derived from its lossy counterpart — so
@@ -293,11 +300,13 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 	const [undoDelete, setUndoDelete] = useState<{ palette: SavedPalette; index: number } | null>(null);
 	const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const paletteCardRef = useRef<HTMLDivElement>(null);
+	const [tab, setTab] = useState<ColorTab>('pick');
 
 	useEffect(() => {
 		// A palette share link (#p=hex-hex-...) takes precedence over a random palette.
 		const shared = decodePaletteHash(window.location.hash);
 		if (shared) {
+			setTab('palette');
 			setPalette(shared.map((h) => rgbToHsl(hexToRgb(h) ?? { r: 0, g: 0, b: 0 })));
 			setLocked(Array(shared.length).fill(false));
 		} else {
@@ -517,6 +526,7 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 			const target = e.target as HTMLElement | null;
 			if (isInteractiveTarget(target)) return;
 			if (e.code === 'KeyG') {
+				setTab('palette');
 				regenerate();
 				return;
 			}
@@ -586,8 +596,41 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 		</label>
 	);
 
+	const onTabKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+		const i = COLOR_TABS.indexOf(tab);
+		let next = -1;
+		if (e.key === 'ArrowRight') next = (i + 1) % COLOR_TABS.length;
+		else if (e.key === 'ArrowLeft') next = (i + COLOR_TABS.length - 1) % COLOR_TABS.length;
+		else if (e.key === 'Home') next = 0;
+		else if (e.key === 'End') next = COLOR_TABS.length - 1;
+		if (next < 0) return;
+		e.preventDefault();
+		setTab(COLOR_TABS[next]);
+		document.getElementById(`color-tab-${COLOR_TABS[next]}`)?.focus();
+	};
+
 	return (
 		<div className="flex flex-col gap-6">
+			<div role="tablist" aria-label={messages.tabsAria} className="flex flex-wrap gap-1 border-b border-border" onKeyDown={onTabKeyDown}>
+				{COLOR_TABS.map((id) => (
+					<button
+						key={id}
+						type="button"
+						role="tab"
+						id={`color-tab-${id}`}
+						aria-selected={tab === id}
+						aria-controls={`color-panel-${id}`}
+						tabIndex={tab === id ? 0 : -1}
+						onClick={() => setTab(id)}
+						className={`-mb-px min-h-10 rounded-t-md border-b-2 px-4 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+							tab === id ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'
+						}`}
+					>
+						{id === 'pick' ? messages.tabPick : id === 'palette' ? messages.tabPalette : messages.tabContrast}
+					</button>
+				))}
+			</div>
+			<div role="tabpanel" id="color-panel-pick" aria-labelledby="color-tab-pick" hidden={tab !== 'pick'} tabIndex={-1} className="flex flex-col gap-6 outline-none">
 			<div className="rounded-lg border border-border p-4">
 				<span className="text-sm font-medium text-foreground">{messages.pickerHeading}</span>
 				<div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start">
@@ -622,6 +665,16 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 				{hexError && <p role="alert" className="mt-2 text-sm text-destructive">{messages.invalidHexError}</p>}
 			</div>
 
+
+			<ColorPickerExtras
+				hex={hex}
+				rgb={rgb}
+				paletteHexes={paletteHexes}
+				onPickColor={(picked) => applyRgb(hexToRgb(picked)!)}
+				messages={messages}
+				parts={['formats']}
+			/>
+
 			<div className="rounded-lg border border-border p-4">
 				<div className="flex flex-wrap items-center justify-between gap-2">
 					<span className="text-sm font-medium text-foreground">{messages.harmonyHeading}</span>
@@ -655,6 +708,11 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 				</div>
 			</div>
 
+
+			<ColorPickerImage onPickColor={(picked) => applyRgb(hexToRgb(picked)!)} messages={messages} />
+
+			</div>
+			<div role="tabpanel" id="color-panel-palette" aria-labelledby="color-tab-palette" hidden={tab !== 'palette'} tabIndex={-1} className="flex flex-col gap-6 outline-none">
 			<div ref={paletteCardRef} className="rounded-lg border border-border p-4">
 				<div className="flex flex-wrap items-center justify-between gap-2">
 					<span className="text-sm font-medium text-foreground">{messages.randomHeading}</span>
@@ -733,6 +791,7 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 				</div>
 			</div>
 
+
 			{(savedPalettes.length > 0 || undoDelete) && (
 				<div className="rounded-lg border border-border p-4">
 					<span className="text-sm font-medium text-foreground">{messages.savedPalettesHeading}</span>
@@ -772,6 +831,17 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 				</div>
 			)}
 
+
+			<ColorPickerExtras
+				hex={hex}
+				rgb={rgb}
+				paletteHexes={paletteHexes}
+				onPickColor={(picked) => applyRgb(hexToRgb(picked)!)}
+				messages={messages}
+				parts={['shades', 'vision']}
+			/>
+			</div>
+			<div role="tabpanel" id="color-panel-contrast" aria-labelledby="color-tab-contrast" hidden={tab !== 'contrast'} tabIndex={-1} className="flex flex-col gap-6 outline-none">
 			<div className="rounded-lg border border-border p-4">
 				<span className="text-sm font-medium text-foreground">{messages.contrastHeading}</span>
 				<div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -802,7 +872,6 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 				</div>
 			</div>
 
-			<ColorPickerImage onPickColor={(picked) => applyRgb(hexToRgb(picked)!)} messages={messages} />
 
 			<ColorPickerExtras
 				hex={hex}
@@ -810,7 +879,9 @@ export default function ColorPicker({ messages }: { messages: Messages }) {
 				paletteHexes={paletteHexes}
 				onPickColor={(picked) => applyRgb(hexToRgb(picked)!)}
 				messages={messages}
+				parts={['contrast']}
 			/>
+			</div>
 		</div>
 	);
 }
