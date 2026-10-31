@@ -15,6 +15,10 @@ interface Messages {
 	caseAlternating: string;
 	caseInverse: string;
 	caseOptionsHeading: string;
+	groupCommon: string;
+	groupCode: string;
+	groupCleanup: string;
+	groupLines: string;
 	utilRemoveSpaces: string;
 	utilRemoveLineBreaks: string;
 	utilSortLines: string;
@@ -97,35 +101,62 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 		URL.revokeObjectURL(url);
 	};
 
-	const caseModes: Array<{ value: CaseMode; label: string }> = [
+	type ModeItem = { value: CaseMode; label: string };
+	const commonModes: ModeItem[] = [
 		{ value: 'upper', label: messages.caseUpper },
 		{ value: 'lower', label: messages.caseLower },
 		{ value: 'title', label: messages.caseTitle },
-		{ value: 'camel', label: messages.caseCamel },
-		{ value: 'snake', label: messages.caseSnake },
 		{ value: 'sentence', label: messages.caseSentence },
+		{ value: 'capitalized', label: messages.caseCapitalized },
 		{ value: 'alternating', label: messages.caseAlternating },
 		{ value: 'inverse', label: messages.caseInverse },
+	];
+	const codeModes: ModeItem[] = [
+		{ value: 'camel', label: messages.caseCamel },
 		{ value: 'pascal', label: messages.casePascal },
+		{ value: 'snake', label: messages.caseSnake },
 		{ value: 'kebab', label: messages.caseKebab },
 		{ value: 'constant', label: messages.caseConstant },
 		{ value: 'dot', label: messages.caseDot },
 		{ value: 'path', label: messages.casePath },
 		{ value: 'train', label: messages.caseTrain },
-		{ value: 'capitalized', label: messages.caseCapitalized },
 	];
-
-	const utilityModes: Array<{ value: CaseMode; label: string }> = [
+	const cleanupModes: ModeItem[] = [
 		{ value: 'removeSpaces', label: messages.utilRemoveSpaces },
 		{ value: 'removeLineBreaks', label: messages.utilRemoveLineBreaks },
+		{ value: 'trimLines', label: messages.utilTrim },
+	];
+	const lineModes: ModeItem[] = [
 		{ value: 'sortLines', label: messages.utilSortLines },
 		{ value: 'sortLinesDesc', label: messages.utilSortLinesDesc },
 		{ value: 'dedupeLines', label: messages.utilDedupe },
 		{ value: 'reverseLines', label: messages.utilReverse },
-		{ value: 'trimLines', label: messages.utilTrim },
 		{ value: 'numberLines', label: messages.utilNumber },
 		{ value: 'prefixSuffix', label: messages.utilPrefixSuffix },
 	];
+
+	const renderGroup = (caption: string, items: ModeItem[]) => (
+		<div role="group" aria-label={caption} className="flex flex-col gap-1.5">
+			<h3 className="text-xs font-medium text-muted-foreground">{caption}</h3>
+			<div className="flex flex-wrap gap-2">
+				{items.map((item) => (
+					<button
+						key={item.value}
+						type="button"
+						onClick={() => setMode(item.value)}
+						aria-pressed={mode === item.value}
+						className={`min-h-9 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${
+							mode === item.value
+								? 'border-primary bg-primary text-primary-foreground'
+								: 'border-border text-foreground hover:bg-muted'
+						}`}
+					>
+						{item.label}
+					</button>
+				))}
+			</div>
+		</div>
+	);
 
 	const stylizedModes: Array<{ value: StylizedStyle; label: string }> = [
 		{ value: 'bold', label: messages.styleBold },
@@ -168,46 +199,16 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 				/>
 			</div>
 
-			<div className="flex flex-col gap-2">
+			<div className="flex flex-col gap-3">
 				<h2 className="text-sm font-semibold text-foreground">{messages.caseOptionsHeading}</h2>
-				<div className="flex flex-wrap gap-2">
-					{caseModes.map((item) => (
-						<button
-							key={item.value}
-							type="button"
-							onClick={() => setMode(item.value)}
-							aria-pressed={mode === item.value}
-							className={`min-h-9 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${
-								mode === item.value
-									? 'border-primary bg-primary text-primary-foreground'
-									: 'border-border text-foreground hover:bg-muted'
-							}`}
-						>
-							{item.label}
-						</button>
-					))}
-				</div>
+				{renderGroup(messages.groupCommon, commonModes)}
+				{renderGroup(messages.groupCode, codeModes)}
 			</div>
 
-			<div className="flex flex-col gap-2">
+			<div className="flex flex-col gap-3">
 				<h2 className="text-sm font-semibold text-foreground">{messages.utilitiesHeading}</h2>
-				<div className="flex flex-wrap gap-2">
-					{utilityModes.map((item) => (
-						<button
-							key={item.value}
-							type="button"
-							onClick={() => setMode(item.value)}
-							aria-pressed={mode === item.value}
-							className={`min-h-9 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${
-								mode === item.value
-									? 'border-primary bg-primary text-primary-foreground'
-									: 'border-border text-foreground hover:bg-muted'
-							}`}
-						>
-							{item.label}
-						</button>
-					))}
-				</div>
+				{renderGroup(messages.groupCleanup, cleanupModes)}
+				{renderGroup(messages.groupLines, lineModes)}
 			</div>
 
 			{(mode === 'sortLines' || mode === 'sortLinesDesc') && (
