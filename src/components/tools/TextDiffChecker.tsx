@@ -1525,6 +1525,12 @@ accept={FILE_ACCEPT}
 	return (
 		<div
 			className="flex flex-col gap-6"
+			onKeyDown={(event) => {
+				if (event.key === 'Enter' && (event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey) {
+					event.preventDefault();
+					handleCompare();
+				}
+			}}
 			onDragOver={(event) => {
 				if (!hasDraggedFiles(event)) return;
 				event.preventDefault();
@@ -1558,7 +1564,7 @@ accept={FILE_ACCEPT}
 					{renderPanel('changed')}
 				</div>
 				<div className="flex flex-col items-center justify-center gap-2 sm:flex-row">
-					<Button type="button" className="min-h-9 w-full px-8 font-semibold sm:w-auto md:min-w-48" aria-label={messages.compareAria} onClick={handleCompare}>
+					<Button type="button" className="min-h-9 w-full px-8 font-semibold sm:w-auto md:min-w-48" aria-label={messages.compareAria} aria-keyshortcuts="Control+Enter Meta+Enter" title={messages.x.compareShortcut} onClick={handleCompare}>
 						{messages.compareButton}
 					</Button>
 					{originalText === '' && changedText === '' && (
@@ -1608,21 +1614,6 @@ accept={FILE_ACCEPT}
 				</div>
 
 				<div className="flex flex-wrap items-center gap-4">
-					<div className="flex items-center gap-1 text-sm text-foreground">
-						<span className="mr-1 text-xs text-muted-foreground">{messages.x.highlightByLabel}</span>
-						{(['char', 'word', 'line'] as const).map((g) => (
-							<button
-								key={g}
-								type="button"
-								onClick={() => setGranularity(g)} aria-pressed={granularity === g}
-								className={`min-h-9 rounded-md border px-3 py-1.5 text-xs font-medium ${
-									granularity === g ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'
-								}`}
-							>
-								{g === 'char' ? messages.modeChar : g === 'word' ? messages.modeWord : messages.modeLine}
-							</button>
-						))}
-					</div>
 					<div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-foreground">
 						<label className="flex cursor-pointer items-center gap-1.5">
 							<input type="checkbox" checked={ignoreWhitespace} onChange={(event) => setIgnoreWhitespace(event.target.checked)} />
@@ -1647,45 +1638,6 @@ accept={FILE_ACCEPT}
 									{shareLinkCopied ? messages.copied : messages.copyShareLink}
 								</Button>
 							))}
-				</div>
-				<div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-foreground">
-					<div className="flex items-center gap-1">
-						<span className="text-xs text-muted-foreground">{messages.x.viewLabel}</span>
-						{(['split', 'unified'] as const).map((mode) => (
-							<button
-								key={mode}
-								type="button"
-								onClick={() => setViewMode(mode)}
-								aria-pressed={viewMode === mode}
-								className={`min-h-9 min-h-9 rounded-md border px-3 py-1.5 text-xs font-medium ${
-									viewMode === mode ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'
-								}`}
-							>
-								{mode === 'split' ? messages.x.viewSplit : messages.x.viewUnified}
-							</button>
-						))}
-					</div>
-					<label className="flex items-center gap-1.5 text-xs text-muted-foreground">
-						{messages.x.contextLabel}
-						<select
-							value={contextLines === null ? 'all' : String(contextLines)}
-							onChange={(event) => setContextLines(event.target.value === 'all' ? null : Number(event.target.value))}
-							className="min-h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"
-						>
-							<option value="all">{messages.x.contextAll}</option>
-							{[0, 1, 3, 5, 10].map((n) => (
-								<option key={n} value={String(n)}>
-									{messages.x.contextN.replace('{{n}}', String(n))}
-								</option>
-							))}
-						</select>
-					</label>
-					{viewMode === 'unified' && (
-						<label className="flex min-h-9 cursor-pointer items-center gap-1.5">
-							<input type="checkbox" checked={wrapLines} onChange={(event) => setWrapLines(event.target.checked)} />
-							{messages.x.wrapLines}
-						</label>
-					)}
 				</div>
 				<details className="rounded-md border border-border p-3">
 					<summary className="flex min-h-9 cursor-pointer items-center text-sm font-medium text-foreground">
@@ -1769,6 +1721,67 @@ accept={FILE_ACCEPT}
 					className={`flex flex-col gap-3 rounded-lg border border-border p-4 ${isSideBySideFullscreen ? 'bg-background' : ''}`}
 				>
 											{renderNotes()}
+						<div className="flex flex-col gap-2 text-sm text-foreground">
+							<div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+								<div className="flex items-center gap-1">
+									<span className="mr-1 text-xs text-muted-foreground">{messages.x.highlightByLabel}</span>
+									{(['char', 'word', 'line'] as const).map((g) => (
+										<button
+											key={g}
+											type="button"
+											onClick={() => setGranularity(g)}
+											aria-pressed={granularity === g}
+											title={g === 'char' ? messages.x.hintChar : g === 'word' ? messages.x.hintWord : messages.x.hintLine}
+											className={`min-h-9 rounded-md border px-3 py-1.5 text-xs font-medium ${
+												granularity === g ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'
+											}`}
+										>
+											{g === 'char' ? messages.modeChar : g === 'word' ? messages.modeWord : messages.modeLine}
+										</button>
+									))}
+								</div>
+								<div className="flex items-center gap-1">
+									<span className="text-xs text-muted-foreground">{messages.x.viewLabel}</span>
+									{(['split', 'unified'] as const).map((mode) => (
+										<button
+											key={mode}
+											type="button"
+											onClick={() => setViewMode(mode)}
+											aria-pressed={viewMode === mode}
+											className={`min-h-9 rounded-md border px-3 py-1.5 text-xs font-medium ${
+												viewMode === mode ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground'
+											}`}
+										>
+											{mode === 'split' ? messages.x.viewSplit : messages.x.viewUnified}
+										</button>
+									))}
+								</div>
+								<label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+									{messages.x.contextLabel}
+									<select
+										value={contextLines === null ? 'all' : String(contextLines)}
+										onChange={(event) => setContextLines(event.target.value === 'all' ? null : Number(event.target.value))}
+										className="min-h-9 rounded-md border border-border bg-background px-2 text-sm text-foreground"
+									>
+										<option value="all">{messages.x.contextAll}</option>
+										{[0, 1, 3, 5, 10].map((n) => (
+											<option key={n} value={String(n)}>
+												{messages.x.contextN.replace('{{n}}', String(n))}
+											</option>
+										))}
+									</select>
+								</label>
+								{viewMode === 'unified' && (
+									<label className="flex min-h-9 cursor-pointer items-center gap-1.5">
+										<input type="checkbox" checked={wrapLines} onChange={(event) => setWrapLines(event.target.checked)} />
+										{messages.x.wrapLines}
+									</label>
+								)}
+							</div>
+							<p className="text-xs text-muted-foreground">
+								{granularity === 'char' ? messages.x.hintChar : granularity === 'word' ? messages.x.hintWord : messages.x.hintLine}
+							</p>
+						</div>
 						<div className="flex flex-wrap items-center justify-between gap-2">
 							<div className="flex flex-wrap gap-2 text-xs font-medium">
 							<span className="rounded bg-green-500/15 px-2 py-1 text-green-700 dark:text-green-300">

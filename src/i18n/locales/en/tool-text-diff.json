@@ -81,6 +81,10 @@
       "exportNothing": "There are no line differences to export.",
       "unifiedAria": "Unified diff",
       "highlightByLabel": "Highlight by:",
+      "hintChar": "Character: marks the exact letters that changed inside a line (best for typos and small edits).",
+      "hintWord": "Word: marks whole words that changed inside a line (best for prose).",
+      "hintLine": "Line: marks only whole lines as changed, with no highlight inside them.",
+      "compareShortcut": "Shortcut: Ctrl+Enter (Cmd+Enter on Mac)",
       "moreOptions": "More options",
       "loadSample": "Load sample"
     },

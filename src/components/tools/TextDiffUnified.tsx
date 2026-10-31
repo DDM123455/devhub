@@ -3,6 +3,10 @@ import type { UnifiedRow } from '@/lib/text-diff';
 
 export interface TextDiffExtraMessages {
 	highlightByLabel: string;
+	hintChar: string;
+	hintWord: string;
+	hintLine: string;
+	compareShortcut: string;
 	moreOptions: string;
 	loadSample: string;
 	viewLabel: string;

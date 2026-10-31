@@ -81,6 +81,10 @@
       "exportNothing": "Không có khác biệt theo dòng để xuất.",
       "unifiedAria": "Diff dạng hợp nhất",
       "highlightByLabel": "Tô sáng theo:",
+      "hintChar": "Ký tự: đánh dấu đúng từng chữ cái thay đổi trong dòng (hợp với lỗi chính tả, sửa nhỏ).",
+      "hintWord": "Từ: đánh dấu cả từ thay đổi trong dòng (hợp với văn xuôi).",
+      "hintLine": "Dòng: chỉ đánh dấu cả dòng đã đổi, không tô sáng bên trong dòng.",
+      "compareShortcut": "Phím tắt: Ctrl+Enter (Cmd+Enter trên Mac)",
       "moreOptions": "Tùy chọn khác",
       "loadSample": "Dùng dữ liệu mẫu"
     },
