@@ -563,6 +563,12 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 - [ ] Tên miền riêng, gửi sitemap Search Console/Bing, `_redirects` thật (cần bạn)
 - [ ] Rút gọn 81 meta description dài ở 16 locale còn lại (kèm lần dịch kế tiếp)
 
+## Phase 3.23 — Kiểm tra chuẩn ISO (yêu cầu trực tiếp 2026-10-31)
+
+- [x] Thư viện `iso-validate` + dữ liệu tham chiếu + 37 test
+- [x] Giao diện + 20 ngôn ngữ (bản dịch AI, cần người bản ngữ rà)
+- [ ] Mở rộng: ISO 3166-2 (tỉnh/bang), ISO 15924 (chữ viết), ISO 10962 CFI, ISO 4217 theo ngày hiệu lực
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

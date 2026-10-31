@@ -25,6 +25,7 @@ import KubernetesYamlValidatorPage from '@/components/tools/KubernetesYamlValida
 import ImageToTextPage from '@/components/tools/ImageToTextPage.astro';
 import SqlFormatterPage from '@/components/tools/SqlFormatterPage.astro';
 import CodeFormatterPage from '@/components/tools/CodeFormatterPage.astro';
+import IsoValidatorPage from '@/components/tools/IsoValidatorPage.astro';
 import { locales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { tools } from '@/data/tools';
@@ -96,6 +97,8 @@ const name = tool.names[locale];
 		<SqlFormatterPage lang={locale} />
 	) : toolId === 'code-formatter' ? (
 		<CodeFormatterPage lang={locale} />
+	) : toolId === 'iso-validator' ? (
+		<IsoValidatorPage lang={locale} />
 	) : (
 		<Layout title={`${name} — Web Tool Hub`} description={name} lang={locale}>
 			<section class="px-4 py-10">

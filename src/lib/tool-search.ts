@@ -46,6 +46,7 @@ export const TOOL_KEYWORDS: Record<string, string> = {
 	'code-formatter': 'code format beautify pretty prettier javascript typescript css html js ts yaml markdown graphql minify indent',
 	'video-trim': 'video trim cut clip mp4 gif shorten',
 	'audio-converter': 'audio convert mp3 wav ogg flac m4a aac sound music',
+	'iso-validator': 'iso validate validator check standard iban bic swift isin lei isbn issn vin container doi 8601 date time duration currency country language luhn credit card',
 };
 
 /**
@@ -79,6 +80,7 @@ export const LOCALE_KEYWORDS: Record<string, Record<string, string>> = {
 		'code-formatter': 'dinh dang lam dep ma nguon',
 		'video-trim': 'cat video ngan',
 		'audio-converter': 'doi am thanh nhac',
+		'iso-validator': 'kiem tra chuan iso ngay gio tien te quoc gia ngon ngu ngan hang the so khung xe',
 	},
 };
 
