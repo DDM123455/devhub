@@ -411,3 +411,18 @@ describe('formatSql lỗi + i18n', () => {
 		for (const k of Object.keys(fe)) expect(vars(fv[k]), k).toBe(vars(fe[k]));
 	});
 });
+
+describe('formatSql placeholders (auto)', () => {
+	const fmt = (sql: string, language = 'sql') => formatSql(sql, { ...DEFAULT_FORMAT_SETTINGS, language: language as never });
+	it('the standard dialect accepts ?, $1, :name and @name without picking a parameter style', () => {
+		for (const q of ['SELECT * FROM t WHERE a = ?', 'SELECT * FROM t WHERE a = $1', 'SELECT * FROM t WHERE a = :name', 'SELECT * FROM t WHERE a = @name']) {
+			const r = fmt(q);
+			expect(r.ok, q).toBe(true);
+			if (r.ok) expect(r.output.replace(/\s+/g, ' ')).toContain(q.split('WHERE ')[1]);
+		}
+	});
+	it('an explicit parameter style is still honoured', () => {
+		const r = formatSql('SELECT * FROM t WHERE a = $1', { ...DEFAULT_FORMAT_SETTINGS, paramStyle: 'dollar' });
+		expect(r.ok).toBe(true);
+	});
+});

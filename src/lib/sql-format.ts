@@ -81,7 +81,11 @@ export function sanitizeSettings(raw: unknown): FormatSettings {
 
 export type FormatResult = { ok: true; output: string } | { ok: false; message: string; line?: number; column?: number };
 
-function paramTypesFor(style: ParamStyle): FormatOptionsWithLanguage['paramTypes'] | undefined {
+// The standard 'sql' dialect only knows `?`; people paste Postgres `$1`, named `:name` and `@name` too, which
+// otherwise fail with an obscure "Unexpected" error. 'auto' accepts all of them there; real dialects keep their own rules.
+const PERMISSIVE_PARAMS: NonNullable<FormatOptionsWithLanguage['paramTypes']> = { positional: true, numbered: ['$'], named: [':', '@'], quoted: [] };
+
+function paramTypesFor(style: ParamStyle, language: string): FormatOptionsWithLanguage['paramTypes'] | undefined {
 	switch (style) {
 		case 'positional':
 			return { positional: true, numbered: [], named: [], quoted: [] };
@@ -92,7 +96,7 @@ function paramTypesFor(style: ParamStyle): FormatOptionsWithLanguage['paramTypes
 		case 'at':
 			return { positional: false, numbered: [], named: ['@'], quoted: [] };
 		default:
-			return undefined;
+			return language === 'sql' ? PERMISSIVE_PARAMS : undefined;
 	}
 }
 
@@ -112,7 +116,7 @@ export function formatSql(sql: string, s: FormatSettings): FormatResult {
 		denseOperators: s.denseOperators,
 		newlineBeforeSemicolon: s.newlineBeforeSemicolon,
 	};
-	const pt = paramTypesFor(s.paramStyle);
+	const pt = paramTypesFor(s.paramStyle, s.language);
 	if (pt) cfg.paramTypes = pt;
 	let output: string;
 	try {

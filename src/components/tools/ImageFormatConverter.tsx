@@ -569,6 +569,13 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 					objectUrls.current.delete(item.resultPreviewUrl);
 				}
 				const resultBlob = await convertImage(item.file, settings, decodedBlobs.current.get(item.id));
+				// The user changed format/quality/resize while this one was converting: the settings-change
+				// effect below skips 'processing' items, so without this the old result would land as "done"
+				// next to the new settings (e.g. an ICO result shown while PDF is selected).
+				if (JSON.stringify(settingsRef.current) !== JSON.stringify(settings)) {
+					setItems((prev) => prev.map((it) => (it.id === item.id ? { ...it, status: 'pending' } : it)));
+					return;
+				}
 				const resultPreviewUrl = trackUrl(URL.createObjectURL(resultBlob));
 				setItems((prev) =>
 					prev.map((it) =>

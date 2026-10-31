@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { compressToUrlSafeBase64 } from '@/lib/hash-share';
+import { formatJsonLossless } from '@/lib/text-format';
 import { validateJsonSchema, type SchemaError } from '@/lib/json-schema-validate';
 import {
 	detectRepairIssues,
@@ -84,6 +85,10 @@ function indentValue(indent: Indent): string | number {
 	return indent === 'tab' ? '\t' : Number(indent);
 }
 
+function indentUnit(indent: Indent): string {
+	return indent === 'tab' ? '\t' : ' '.repeat(Number(indent));
+}
+
 function CopyButton({ text, messages }: { text: string; messages: JsonAdvancedMessages }) {
 	const { copied, failed, copy } = useCopyToClipboard();
 	return (
@@ -144,12 +149,14 @@ export default function JsonAdvancedPanel({
 	};
 
 	const handleFormat = (minify: boolean) => {
-		const parsed = parseCurrent();
-		if (!parsed.ok) {
+		// Lossless printer: JSON.parse/stringify would round integers beyond 2^53 (IDs!), turn 1e400 into null
+		// and silently drop all but the last duplicate key.
+		const result = formatJsonLossless(getText(), minify, indentUnit(indent));
+		if (!result) {
 			setStatus({ kind: 'error', text: messages.formatInvalid });
 			return;
 		}
-		setText(minify ? JSON.stringify(parsed.value) : JSON.stringify(parsed.value, null, indentValue(indent)));
+		setText(result.value);
 		setStatus(null);
 	};
 
@@ -171,7 +178,8 @@ export default function JsonAdvancedPanel({
 				if (!issues.includes('ndjson')) issues.push('ndjson');
 			} else {
 				const { jsonrepair } = await import('jsonrepair');
-				repaired = JSON.stringify(JSON.parse(jsonrepair(original)), null, indentValue(indent));
+				const fixed = jsonrepair(original);
+				repaired = formatJsonLossless(fixed, false, indentUnit(indent))?.value ?? JSON.stringify(JSON.parse(fixed), null, indentValue(indent));
 			}
 			setText(repaired);
 			setStatus({
