@@ -47,7 +47,7 @@ describe('tool page meta description (en, vi)', () => {
 	it('is present and does not exceed ~160 characters', () => {
 		const bad = rows
 			.filter((r) => r.locale === 'en' || r.locale === 'vi')
-			.filter((r) => r.description.length < 50 || [...r.description].length > 165)
+			.filter((r) => r.description.length < 50 || [...r.description].length > 160)
 			.map((r) => `${r.locale}/${r.file}: ${[...r.description].length}`);
 		expect(bad).toEqual([]);
 	});

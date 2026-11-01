@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Nginx Config Validator Online Free — Web Tool Hub",
-    "description": "Validate nginx.conf syntax, catch missing semicolons/braces, wrong-context directives, and common security misconfigurations — entirely in your browser, no upload."
+    "description": "Validate nginx.conf syntax, catch missing semicolons/braces, wrong-context directives, and common security misconfigurations — in your browser, no upload."
   },
   "heading": "Nginx Config Validator",
   "tagline": "Paste an nginx.conf and catch syntax errors, misplaced directives, and common security mistakes — before you reload nginx.",

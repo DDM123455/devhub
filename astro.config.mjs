@@ -11,7 +11,8 @@ import { readFileSync } from 'node:fs';
 const configSrc = readFileSync(new URL('./src/i18n/config.ts', import.meta.url), 'utf8');
 const localesBlock = configSrc.slice(configSrc.indexOf('export const locales'), configSrc.indexOf('as const'));
 const locales = [...localesBlock.matchAll(/'([^']+)'/g)].map((m) => m[1]);
-const sitemapLocales = Object.fromEntries(locales.map((l) => [l, l === 'zh-tw' ? 'zh-TW' : l]));
+const indexable = ['en', 'vi']; // keep in sync with indexableLocales in src/i18n/config.ts
+const sitemapLocales = Object.fromEntries(locales.filter((l) => indexable.includes(l)).map((l) => [l, l === 'zh-tw' ? 'zh-TW' : l]));
 
 // https://astro.build/config
 export default defineConfig({
@@ -71,6 +72,7 @@ export default defineConfig({
       filter: (page) => {
         const path = new URL(page).pathname;
         // Also drop the /<locale>/tools/ index pages: they only meta-refresh (noindex) to the locale home.
+        if (!indexable.includes(path.split('/')[1])) return false;
         return !/\/404\/?$/.test(page) && path !== '/' && !/^\/[^/]+\/tools\/?$/.test(path);
       },
       i18n: {

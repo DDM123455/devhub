@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Kiểm Tra YAML Kubernetes Miễn Phí — Web Tool Hub",
-    "description": "Kiểm tra manifest Kubernetes theo đúng schema OpenAPI thật, phát hiện apiVersion đã lỗi thời và lỗi cú pháp YAML — hoàn toàn trong trình duyệt, không tải lên server."
+    "description": "Kiểm tra manifest Kubernetes theo schema OpenAPI thật, phát hiện apiVersion đã lỗi thời và lỗi cú pháp YAML — hoàn toàn trong trình duyệt, không tải lên server."
   },
   "heading": "Kiểm tra YAML Kubernetes",
   "tagline": "Dán 1 (hoặc nhiều, ngăn cách bằng ---) manifest Kubernetes vào đây để kiểm tra theo đúng schema Kubernetes thật trước khi bạn kubectl apply.",

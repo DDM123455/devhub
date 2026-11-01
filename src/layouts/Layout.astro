@@ -4,7 +4,7 @@ import Header from '@/components/layout/Header.astro';
 import PrivacyBanner from '@/components/layout/PrivacyBanner.astro';
 import Sidebar from '@/components/layout/Sidebar.astro';
 import Footer from '@/components/layout/Footer.astro';
-import { rtlLocales, type Locale } from '@/i18n/config';
+import { rtlLocales, indexableLocales, type Locale } from '@/i18n/config';
 import { getFixedT } from '@/i18n/i18next';
 import { getAlternates, toHreflang } from '@/lib/locale-paths';
 // Same file the @font-face rule points at (Vite gives it the same hashed name), so the browser can start
@@ -28,7 +28,9 @@ const dir = rtlLocales.has(lang) ? 'rtl' : 'ltr';
 const t = getFixedT(lang);
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
 // hreflang: tự suy ra từ pathname (home / privacy / tool theo slug bản địa); 404 và trang lạ thì không có.
-const alternates = getAlternates(Astro.url.pathname, lang);
+// Chỉ en + vi được lập chỉ mục lúc đầu: các bản dịch khác là noindex và không xuất hiện trong hreflang.
+const alternates = indexableLocales.has(lang) ? getAlternates(Astro.url.pathname, lang).filter((a) => indexableLocales.has(a.locale)) : [];
+const robotsNoindex = noindex || !indexableLocales.has(lang);
 const ogImageUrl = new URL(ogImage, Astro.site).toString();
 
 // Open Graph's og:locale wants a language_TERRITORY tag, not the bare 2-letter code this
@@ -85,7 +87,7 @@ const OG_LOCALE: Record<Locale, string> = {
 		{alternates.length > 0 && (
 			<link rel="alternate" hreflang="x-default" href={new URL(alternates.find((a) => a.locale === 'en')!.path, Astro.site).toString()} />
 		)}
-		{noindex && <meta name="robots" content="noindex" />}
+		{robotsNoindex && <meta name="robots" content="noindex" />}
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>

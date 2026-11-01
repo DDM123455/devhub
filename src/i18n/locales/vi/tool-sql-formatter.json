@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Định dạng SQL Online Miễn Phí — Format, Minify, Kiểm tra cú pháp",
-    "description": "Định dạng, làm đẹp, nén và kiểm tra cú pháp SQL cho MySQL, PostgreSQL, SQL Server, SQLite... Báo đúng dòng lỗi. Chạy trong trình duyệt, truy vấn không rời thiết bị."
+    "description": "Định dạng, làm đẹp, nén và kiểm tra cú pháp SQL cho MySQL, PostgreSQL, SQL Server, SQLite... Báo đúng dòng lỗi. Chạy trong trình duyệt, không rời thiết bị."
   },
   "heading": "Định dạng & Kiểm tra SQL",
   "tagline": "Làm đẹp hoặc nén SQL, và kiểm tra lỗi cú pháp với đúng dòng, đúng cột — cho 20 dialect, chạy hoàn toàn trong trình duyệt.",
