@@ -105,7 +105,7 @@ function ErrorBlock({ m, error, sql, onJump }: { m: ValidationMessages; error: S
 function Summary({ m, report }: { m: ValidationMessages; report: ValidationReport }) {
 	const kinds = Object.entries(report.kinds).map(([k, n]) => (n > 1 ? `${k} ×${n}` : k));
 	return (
-		<dl className="grid gap-x-3 gap-y-1 text-xs sm:grid-cols-[auto_1fr]">
+		<dl className="grid gap-x-3 gap-y-1 text-xs sm:grid-cols-[auto_minmax(0,1fr)]">
 			{kinds.length > 0 && (
 				<>
 					<dt className="text-muted-foreground">{m.typesLabel}</dt>

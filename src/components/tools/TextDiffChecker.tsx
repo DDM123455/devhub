@@ -1832,8 +1832,8 @@ accept={FILE_ACCEPT}
 			{hasChanges && (
 				<div className="flex flex-col gap-3 rounded-lg border border-border p-4">
 					<h2 className="text-sm font-semibold text-foreground">{messages.mergeToolHeading}</h2>
-					<div className="grid grid-cols-1 gap-0 md:grid-cols-[1fr_2.5rem_1fr]">
-						<div ref={mergeLeftContainerRef} className={`flex flex-col gap-2 ${isMergeLeftFullscreen ? 'bg-background p-4' : ''}`}>
+					<div className="grid grid-cols-1 gap-0 md:grid-cols-[minmax(0,1fr)_2.5rem_minmax(0,1fr)]">
+						<div ref={mergeLeftContainerRef} className={`flex min-w-0 flex-col gap-2 ${isMergeLeftFullscreen ? 'bg-background p-4' : ''}`}>
 							<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
 								<span className="text-sm font-medium text-foreground">{messages.mergeLeftHeading}</span>
 								<div className="flex gap-1">
@@ -1869,7 +1869,7 @@ accept={FILE_ACCEPT}
 							onScroll={handleMergeScroll(1)}
 						/>
 
-						<div ref={mergeRightContainerRef} className={`flex flex-col gap-2 ${isMergeRightFullscreen ? 'bg-background p-4' : ''}`}>
+						<div ref={mergeRightContainerRef} className={`flex min-w-0 flex-col gap-2 ${isMergeRightFullscreen ? 'bg-background p-4' : ''}`}>
 							<div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
 								<span className="text-sm font-medium text-foreground">{messages.mergeRightHeading}</span>
 								<div className="flex gap-1">
