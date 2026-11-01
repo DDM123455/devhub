@@ -1,0 +1,12 @@
+{
+	// Cloudflare Workers static assets: the site is the pre-built `dist/` folder (no Worker script, no server code).
+	// `public/_headers` is copied into dist/ and gives every response its security headers (CSP etc.).
+	// The Worker name must match the Worker created in the Cloudflare dashboard (Workers Builds checks it).
+	"name": "privatetoolhub",
+	"compatibility_date": "2025-09-01",
+	"assets": {
+		"directory": "./dist",
+		// Unknown URLs get the nearest 404.html (scripts/fix-404-output.mjs puts one in each locale folder).
+		"not_found_handling": "404-page"
+	}
+}
