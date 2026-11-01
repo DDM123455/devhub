@@ -1,0 +1,5 @@
+# Real HTTP 301s, served before the static files (Cloudflare Workers static assets / Pages `_redirects`).
+# Without these, "/" and "/<locale>/tools/" are tiny HTML pages with a meta refresh: the browser shows a blank
+# "Redirecting from / to /en/" page for a moment, and crawlers see a 200 instead of a redirect.
+/ /en/ 301
+/:locale/tools/ /:locale/ 301
