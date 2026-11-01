@@ -23,6 +23,7 @@
     "formatsNote": "Ảnh ICO xuất ra gồm 5 kích thước trong cùng 1 file (16, 32, 48, 128, 256px), giống favicon hay icon ứng dụng Windows chuẩn — hệ điều hành sẽ tự chọn kích thước phù hợp. Xuất AVIF cần trình duyệt Chrome hoặc Firefox bản mới. Ảnh HEIC/HEIF từ iPhone được tự động đọc — không cần bước chuyển đổi riêng. File SVG được vẽ thành ảnh ngay trong trình duyệt (chọn tỉ lệ render); chọn PDF để biến mỗi ảnh thành một trang PDF và có thể gộp tất cả thành một file.",
     "remove": "Xóa",
     "clearAll": "Xóa tất cả",
+    "cancel": "Hủy",
     "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ.",
     "resizeToggleLabel": "Thay đổi kích thước trước khi chuyển đổi",
     "maxDimensionLabel": "Kích thước tối đa: {{size}}px",

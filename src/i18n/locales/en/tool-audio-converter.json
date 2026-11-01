@@ -22,6 +22,7 @@
     "convertedLabel": "Converted",
     "sizeAndDuration": "{{size}} · {{duration}}",
     "clear": "Choose a different file",
+    "cancel": "Cancel",
     "decodeError": "Couldn't read this audio file — it may be corrupted or in a format this browser can't decode.",
     "encodeError": "Conversion failed. Try a different bitrate, or choose a different file.",
     "channelDownmixWarning": "This file has {{count}} audio channels. They will be mixed down to stereo in the converted file.",

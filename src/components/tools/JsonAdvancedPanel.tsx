@@ -25,6 +25,7 @@ export interface JsonAdvancedMessages {
 	minify: string;
 	repair: string;
 	share: string;
+	clear: string;
 	shareCopied: string;
 	shareFailed: string;
 	shareNote: string;
@@ -280,6 +281,9 @@ export default function JsonAdvancedPanel({
 				</Button>
 				<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={() => void handleShare()}>
 					{messages.share}
+				</Button>
+				<Button type="button" size="sm" variant="ghost" className="min-h-9" onClick={() => { setText(''); setStatus(null); }}>
+					{messages.clear}
 				</Button>
 			</div>
 			<p className="text-xs text-muted-foreground">{messages.shareNote}</p>

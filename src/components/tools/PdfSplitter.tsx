@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLeaveWarning } from './useLeaveWarning';
 import { PDFDocument, degrees } from 'pdf-lib';
 import { getPdfOutline, renderPdfThumbnails, type PdfOutlineEntry } from '@/lib/pdf-thumbnails';
 import { Button } from '@/components/ui/button';
@@ -110,6 +111,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 	const [rangesInput, setRangesInput] = useState('');
 	const [everyN, setEveryN] = useState(1);
 	const [isProcessing, setIsProcessing] = useState(false);
+	useLeaveWarning(isProcessing);
 	const [splitProgress, setSplitProgress] = useState<{ current: number; total: number } | null>(null);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [results, setResults] = useState<ResultFile[]>([]);
@@ -806,7 +808,7 @@ export default function PdfSplitter({ messages }: { messages: Messages }) {
 				</div>
 			)}
 
-			<div>
+			<div className={`${canSplit ? ' max-md:sticky max-md:bottom-0 max-md:z-10 max-md:border-t max-md:border-border max-md:bg-background/95 max-md:py-2 max-md:backdrop-blur' : ''}`.trim()}>
 				<Button type="button" onClick={handleSplit} disabled={!canSplit}>
 					{isProcessing ? messages.splitting : messages.split}
 				</Button>

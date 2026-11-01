@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useLeaveWarning } from './useLeaveWarning';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { subscribeEngineProgress, warmFfmpegEngine } from '@/lib/ffmpeg-engine';
 import { baseNameOf } from '@/lib/file-utils';
 import { isVideoFile, safeVideoExt } from '@/lib/media-ext';
 import {
@@ -248,6 +251,13 @@ const selectClass = 'min-h-9 rounded-md border border-border bg-background px-2 
 
 export default function VideoTrim({ messages }: { messages: Messages }) {
 	const [videoFile, setVideoFile] = useState<File | null>(null);
+	const [engineDownload, setEngineDownload] = useState(0);
+	useEffect(() => subscribeEngineProgress(setEngineDownload), []);
+	// Fetch the 32 MB engine as soon as a video is chosen instead of waiting for the Trim button.
+	const hasVideo = videoFile !== null;
+	useEffect(() => {
+		if (hasVideo) void warmFfmpegEngine();
+	}, [hasVideo]);
 	const [videoUrl, setVideoUrl] = useState<string | null>(null);
 	const [duration, setDuration] = useState<number | null>(null);
 	const [metadataFailed, setMetadataFailed] = useState(false);
@@ -267,6 +277,7 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [engineState, setEngineState] = useState<EngineState>('idle');
 	const [processing, setProcessing] = useState(false);
+	useLeaveWarning(processing);
 	const [progress, setProgress] = useState(0);
 	const [stepInfo, setStepInfo] = useState<{ current: number; total: number } | null>(null);
 	const [resultUrl, setResultUrl] = useState<string | null>(null);
@@ -459,6 +470,7 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 		if (ffmpegRef.current && engineState === 'ready') return ffmpegRef.current;
 		setEngineState('loading');
 		try {
+			await warmFfmpegEngine();
 			const [{ FFmpeg }, { toBlobURL }] = await Promise.all([import('@ffmpeg/ffmpeg'), import('@ffmpeg/util')]);
 			const ffmpeg = new FFmpeg();
 			ffmpeg.on('progress', ({ progress: p }) => {
@@ -971,7 +983,13 @@ export default function VideoTrim({ messages }: { messages: Messages }) {
 							{messages.clear}
 						</Button>
 						{engineState === 'loading' && (
-							<p role="status" className="text-xs text-muted-foreground">{messages.loadingEngineLabel}</p>
+							<div className="flex w-full flex-col gap-1">
+								<p role="status" className="text-xs text-muted-foreground">
+									{messages.loadingEngineLabel}
+									{engineDownload > 0 && engineDownload < 100 ? ` ${engineDownload}%` : ''}
+								</p>
+								<Progress value={engineDownload > 0 && engineDownload < 100 ? engineDownload : null} aria-label={messages.loadingEngineLabel} />
+							</div>
 						)}
 						{processing && engineState === 'ready' && (
 							<p role="status" className="text-xs text-muted-foreground">

@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLeaveWarning } from './useLeaveWarning';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { subscribeEngineProgress, warmFfmpegEngine } from '@/lib/ffmpeg-engine';
 import { baseNameOf, dedupeName } from '@/lib/file-utils';
 import {
 	applyChannelMode,
@@ -41,6 +44,7 @@ interface Messages {
 	convertedLabel: string;
 	sizeAndDuration: string;
 	clear: string;
+	cancel: string;
 	decodeError: string;
 	encodeError: string;
 	channelDownmixWarning: string;
@@ -231,6 +235,7 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 	const [channelMode, setChannelMode] = useState<ChannelMode>('keep');
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [processing, setProcessing] = useState(false);
+	useLeaveWarning(processing);
 	const [stage, setStage] = useState<'idle' | Stage | 'engine'>('idle');
 	const [progress, setProgress] = useState(0);
 	const [batchPos, setBatchPos] = useState<{ current: number; total: number; name: string } | null>(null);
@@ -255,6 +260,13 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 
 	const singleItem = items.length === 1;
 	const formatInfo = AUDIO_FORMATS[outputFormat];
+	const [engineDownload, setEngineDownload] = useState(0);
+	useEffect(() => subscribeEngineProgress(setEngineDownload), []);
+	// Start fetching the 32 MB engine as soon as there is a file and a format that needs it, not on Convert.
+	const hasItems = items.length > 0;
+	useEffect(() => {
+		if (formatInfo.viaFfmpeg && hasItems) void warmFfmpegEngine();
+	}, [formatInfo.viaFfmpeg, hasItems]);
 	const formatLabels: Record<AudioFormat, string> = {
 		mp3: messages.formatMp3,
 		wav: messages.formatWav,
@@ -345,6 +357,7 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 		if (ffmpegRef.current) return ffmpegRef.current;
 		setStage('engine');
 		try {
+			await warmFfmpegEngine();
 			const [{ FFmpeg }, { toBlobURL }] = await Promise.all([import('@ffmpeg/ffmpeg'), import('@ffmpeg/util')]);
 			const ffmpeg = new FFmpeg();
 			ffmpeg.on('progress', ({ progress: p }) => setProgress(Math.min(100, Math.max(0, Math.round((Number.isFinite(p) ? p : 0) * 100)))));
@@ -593,6 +606,17 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 		setGlobalError(null);
 		setTrimStart(0);
 		setTrimEnd(0);
+	};
+
+	// Stops the running conversion (encode worker and ffmpeg are terminated for real); files stay in the list.
+	const handleCancel = () => {
+		runTokenRef.current++;
+		terminateWorker();
+		terminateFfmpeg();
+		setProcessing(false);
+		setStage('idle');
+		setBatchPos(null);
+		setItems((prev) => prev.map((it) => (it.status === 'processing' ? { ...it, status: 'pending' } : it)));
 	};
 
 	const saveBlob = (blob: Blob, name: string) => {
@@ -883,6 +907,11 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 								{messages.downloadAll}
 							</Button>
 						)}
+						{processing && (
+							<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={handleCancel}>
+								{messages.cancel}
+							</Button>
+						)}
 						<Button type="button" size="sm" variant="ghost" className="min-h-9" onClick={handleClear}>
 							{messages.clear}
 						</Button>
@@ -895,15 +924,24 @@ export default function AudioConverter({ messages }: { messages: Messages }) {
 							</p>
 						)}
 						{processing && stage === 'engine' && (
-							<p role="status" className="text-xs text-muted-foreground">{messages.engineLoading}</p>
+							<div className="flex w-full flex-col gap-1">
+								<p role="status" className="text-xs text-muted-foreground">
+									{messages.engineLoading}
+									{engineDownload > 0 && engineDownload < 100 ? ` ${engineDownload}%` : ''}
+								</p>
+								<Progress value={engineDownload > 0 && engineDownload < 100 ? engineDownload : null} aria-label={messages.engineLoading} />
+							</div>
 						)}
 						{processing && stage === 'decoding' && (
 							<p role="status" className="text-xs text-muted-foreground">{messages.decodingLabel}</p>
 						)}
 						{processing && stage === 'encoding' && (
-							<p role="status" className="text-xs text-muted-foreground">
-								{messages.encodingLabel.replace('{{percent}}', String(progress))}
-							</p>
+							<div className="flex w-full flex-col gap-1">
+								<p role="status" className="text-xs text-muted-foreground">
+									{messages.encodingLabel.replace('{{percent}}', String(progress))}
+								</p>
+								<Progress value={progress} aria-label={messages.encodingLabel.replace('{{percent}}', String(progress))} />
+							</div>
 						)}
 					</div>
 

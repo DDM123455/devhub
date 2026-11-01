@@ -23,6 +23,7 @@
     "formatsNote": "ICO output bundles 5 sizes in one file (16, 32, 48, 128, 256px), like a proper favicon or Windows app icon — the OS picks whichever fits. AVIF export needs a recent Chrome or Firefox. HEIC/HEIF photos from iPhone are read automatically — no separate conversion step needed. SVG files are rasterised in your browser (pick the render scale); choosing PDF turns each image into a PDF page you can also combine into one file.",
     "remove": "Remove",
     "clearAll": "Clear all",
+    "cancel": "Cancel",
     "skippedFiles": "{{count}} file(s) were skipped because they're not a supported image format.",
     "resizeToggleLabel": "Resize before converting",
     "maxDimensionLabel": "Max width/height: {{size}}px",

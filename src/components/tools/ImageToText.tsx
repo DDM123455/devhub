@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLeaveWarning } from './useLeaveWarning';
 import { FileText, RotateCcw, RotateCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -230,6 +231,7 @@ export default function ImageToText({ messages, languageNames, locale, textDiffH
 	const [status, setStatus] = useState<Status>({ kind: 'idle' });
 	const [live, setLive] = useState<OcrProgress | null>(null);
 	const [running, setRunning] = useState(false);
+	useLeaveWarning(running);
 	const [globalError, setGlobalError] = useState<{ detail: string } | null>(null);
 	const [notices, setNotices] = useState<string[]>([]);
 	const [isDragOver, setIsDragOver] = useState(false);
@@ -1050,7 +1052,7 @@ export default function ImageToText({ messages, languageNames, locale, textDiffH
 			</details>
 
 			{/* Nút chạy */}
-			<div className="flex flex-wrap items-center gap-2">
+			<div className={`flex flex-wrap items-center gap-2${canRun ? ' max-md:sticky max-md:bottom-0 max-md:z-10 max-md:border-t max-md:border-border max-md:bg-background/95 max-md:py-2 max-md:backdrop-blur' : ''}`.trim()}>
 				<Button type="button" className={`${BTN} px-4`} onClick={() => void run()} disabled={!canRun}>
 					{running ? messages.extracting : messages.extract}
 					{unitCount > 0 && !running && ` (${unitCount})`}

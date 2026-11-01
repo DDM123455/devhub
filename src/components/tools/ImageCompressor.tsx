@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLeaveWarning } from './useLeaveWarning';
 import imageCompression from 'browser-image-compression';
 import compressionLibUrl from 'browser-image-compression/dist/browser-image-compression.js?url';
 import JSZip from 'jszip';
@@ -141,6 +142,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 	const [lossless, setLossless] = useState(false);
 	const [oxipngLevel, setOxipngLevel] = useState(3);
 	const [isProcessing, setIsProcessing] = useState(false);
+	useLeaveWarning(isProcessing);
 	const runningRef = useRef(false);
 	const [isZipping, setIsZipping] = useState(false);
 	const [skippedCount, setSkippedCount] = useState(0);
@@ -880,7 +882,7 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 				</ul>
 			)}
 
-			<div className="flex flex-wrap items-center gap-3">
+			<div className={`flex flex-wrap items-center gap-3${canCompress ? ' max-md:sticky max-md:bottom-0 max-md:z-10 max-md:border-t max-md:border-border max-md:bg-background/95 max-md:py-2 max-md:backdrop-blur' : ''}`.trim()}>
 				<Button type="button" onClick={handleCompress} disabled={!canCompress}>
 					{isProcessing ? messages.compressing : messages.compress}
 				</Button>

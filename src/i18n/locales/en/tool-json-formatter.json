@@ -50,6 +50,7 @@
       "share": "Copy share link",
       "shareCopied": "Share link copied. The JSON is compressed into the URL hash and never sent to a server.",
       "shareFailed": "Could not copy the share link.",
+      "clear": "Clear",
       "shareNote": "Repair fixes comments, single quotes, trailing commas, unquoted keys, Python constants and NDJSON. Share links keep the JSON in the URL hash only.",
       "formatInvalid": "The JSON is invalid, so it cannot be formatted. Try Repair JSON.",
       "repairedPrefix": "Repaired. Fixed:",

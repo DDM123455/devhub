@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLeaveWarning } from './useLeaveWarning';
 import { removeBackground } from '@imgly/background-removal';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -471,6 +472,7 @@ async function buildDisplayBlob(cutoutBlob: Blob, options: DisplayOptions): Prom
 export default function BackgroundRemover({ messages }: { messages: Messages }) {
 	const [items, setItems] = useState<ImageItem[]>([]);
 	const [isProcessing, setIsProcessing] = useState(false);
+	useLeaveWarning(isProcessing);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [backgroundMode, setBackgroundMode] = useState<BackgroundMode>('transparent');
 	const [backgroundColor, setBackgroundColor] = useState('#22C55E');
@@ -1366,7 +1368,7 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 					);
 				})()}
 
-			<div className="flex flex-wrap items-center gap-3">
+			<div className={`flex flex-wrap items-center gap-3${canRemove ? ' max-md:sticky max-md:bottom-0 max-md:z-10 max-md:border-t max-md:border-border max-md:bg-background/95 max-md:py-2 max-md:backdrop-blur' : ''}`.trim()}>
 				<Button type="button" onClick={() => void handleRemove(true)} disabled={!canRemove}>
 					{isProcessing
 						? (() => {

@@ -50,6 +50,7 @@
       "share": "Sao chép link chia sẻ",
       "shareCopied": "Đã sao chép link chia sẻ. JSON được nén vào phần hash của URL và không bao giờ gửi lên máy chủ.",
       "shareFailed": "Không sao chép được link chia sẻ.",
+      "clear": "Xóa",
       "shareNote": "Sửa JSON xử lý: chú thích, nháy đơn, dấu phẩy thừa, khoá không có nháy, hằng số Python và NDJSON. Link chia sẻ chỉ lưu JSON trong hash của URL.",
       "formatInvalid": "JSON không hợp lệ nên không thể định dạng. Hãy thử Sửa JSON.",
       "repairedPrefix": "Đã sửa. Đã xử lý:",

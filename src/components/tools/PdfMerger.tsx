@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLeaveWarning } from './useLeaveWarning';
 import { PDFDocument, StandardFonts, degrees, rgb } from 'pdf-lib';
 import { renderPdfThumbnails, type PdfPageThumbnail } from '@/lib/pdf-thumbnails';
 import { Button } from '@/components/ui/button';
@@ -148,6 +149,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 	const [files, setFiles] = useState<FileEntry[]>([]);
 	const [pages, setPages] = useState<PageItem[]>([]);
 	const [isProcessing, setIsProcessing] = useState(false);
+	useLeaveWarning(isProcessing);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [dragPageId, setDragPageId] = useState<string | null>(null);
 	const [mergedBlob, setMergedBlob] = useState<Blob | null>(null);
@@ -783,7 +785,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 				</div>
 			)}
 
-			<div className="flex flex-wrap items-center gap-3">
+			<div className={`flex flex-wrap items-center gap-3${canMerge ? ' max-md:sticky max-md:bottom-0 max-md:z-10 max-md:border-t max-md:border-border max-md:bg-background/95 max-md:py-2 max-md:backdrop-blur' : ''}`.trim()}>
 				<Button type="button" onClick={handleMerge} disabled={!canMerge}>
 					{isProcessing ? messages.merging : messages.merge}
 				</Button>

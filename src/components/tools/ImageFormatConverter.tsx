@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLeaveWarning } from './useLeaveWarning';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { BeforeAfterSlider } from '@/components/ui/before-after-slider';
@@ -30,6 +31,7 @@ interface Messages {
 	formatsNote: string;
 	remove: string;
 	clearAll: string;
+	cancel: string;
 	skippedFiles: string;
 	resizeToggleLabel: string;
 	maxDimensionLabel: string;
@@ -458,6 +460,7 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 	const [pdfPageMode, setPdfPageMode] = useState<PdfPageMode>('a4');
 	const [pdfMarginMm, setPdfMarginMm] = useState(10);
 	const [isProcessing, setIsProcessing] = useState(false);
+	useLeaveWarning(isProcessing);
 	const [isZipping, setIsZipping] = useState(false);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [skippedCount, setSkippedCount] = useState(0);
@@ -558,8 +561,11 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 		pdfMarginMm,
 	};
 
+	// Bumped by every run and by Cancel: a run whose id no longer matches stops pulling items and drops its in-flight result.
+	const runIdRef = useRef(0);
+
 	const convertOne = useCallback(
-		async (item: ImageItem, settings: ConvertSettings) => {
+		async (item: ImageItem, settings: ConvertSettings, runId: number) => {
 			setItems((prev) =>
 				prev.map((it) => (it.id === item.id ? { ...it, status: 'processing' } : it)),
 			);
@@ -572,7 +578,7 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 				// The user changed format/quality/resize while this one was converting: the settings-change
 				// effect below skips 'processing' items, so without this the old result would land as "done"
 				// next to the new settings (e.g. an ICO result shown while PDF is selected).
-				if (JSON.stringify(settingsRef.current) !== JSON.stringify(settings)) {
+				if (runId !== runIdRef.current || JSON.stringify(settingsRef.current) !== JSON.stringify(settings)) {
 					setItems((prev) => prev.map((it) => (it.id === item.id ? { ...it, status: 'pending' } : it)));
 					return;
 				}
@@ -613,6 +619,7 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 		if (queue.length === 0) return;
 		// Snapshot setting tại thời điểm bấm.
 		const settings = settingsRef.current;
+		const runId = ++runIdRef.current;
 		setIsProcessing(true);
 		try {
 			// Worker-pool pattern (same as Image Compressor's batch processing): a
@@ -620,16 +627,24 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 			// queue as soon as they finish their current one.
 			let cursor = 0;
 			const runLane = async (): Promise<void> => {
+				if (runId !== runIdRef.current) return;
 				const index = cursor++;
 				if (index >= queue.length) return;
-				await convertOne(queue[index], settings);
+				await convertOne(queue[index], settings, runId);
 				return runLane();
 			};
 			await Promise.all(Array.from({ length: Math.min(CONCURRENCY, queue.length) }, runLane));
 		} finally {
-			setIsProcessing(false);
+			if (runId === runIdRef.current) setIsProcessing(false);
 		}
 	}, [convertOne]);
+
+	// Canvas encoding cannot be aborted mid-image, so the image being converted finishes in the background and is discarded.
+	const handleCancel = useCallback(() => {
+		runIdRef.current++;
+		setIsProcessing(false);
+		setItems((prev) => prev.map((it) => (it.status === 'processing' ? { ...it, status: 'pending' } : it)));
+	}, []);
 
 	// Chỉ xử lý item đang chờ hoặc lỗi.
 	const handleConvert = useCallback(
@@ -1016,10 +1031,15 @@ export default function ImageFormatConverter({ messages }: { messages: Messages 
 				</ul>
 			)}
 
-			<div className="flex flex-wrap items-center gap-3">
+			<div className={`flex flex-wrap items-center gap-3${canConvert ? ' max-md:sticky max-md:bottom-0 max-md:z-10 max-md:border-t max-md:border-border max-md:bg-background/95 max-md:py-2 max-md:backdrop-blur' : ''}`.trim()}>
 				<Button type="button" onClick={handleConvert} disabled={!canConvert}>
 					{isProcessing ? messages.converting : messages.convert}
 				</Button>
+				{isProcessing && (
+					<Button type="button" variant="outline" onClick={handleCancel}>
+						{messages.cancel}
+					</Button>
+				)}
 				{doneCount > 1 && (
 					<Button type="button" variant="secondary" onClick={handleDownloadAll} disabled={isZipping}>
 						{messages.downloadAll}
