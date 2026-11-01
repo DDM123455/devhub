@@ -1,10 +1,10 @@
 {
   "meta": {
-    "title": "Kiểm tra chuẩn ISO online — IBAN, ISO 8601, ISBN, VIN",
-    "description": "Dán giá trị để kiểm tra theo chuẩn ISO: IBAN, BIC, ISIN, ngày giờ ISO 8601, ISBN, ISSN, VIN, mã tiền tệ, quốc gia, ngôn ngữ. Chạy ngay trên trình duyệt."
+    "title": "Kiểm tra chuẩn ISO online — IBAN, ISO 8601, ISO 8583, ISBN",
+    "description": "Kiểm tra giá trị theo chuẩn ISO: IBAN, BIC, ISIN, ngày giờ ISO 8601, bản tin thẻ ISO 8583, ISBN, VIN, mã tiền tệ, quốc gia. Chạy ngay trên trình duyệt."
   },
   "heading": "Kiểm tra chuẩn ISO",
-  "tagline": "Dán IBAN, ngày giờ, ISBN, mã tiền tệ... và biết ngay giá trị khớp chuẩn ISO nào, hoặc sai ở đâu.",
+  "tagline": "Dán IBAN, ngày giờ, ISBN, mã tiền tệ, bản tin thẻ ngân hàng ISO 8583... và biết ngay giá trị khớp chuẩn ISO nào, hoặc sai ở đâu.",
   "related": "Công cụ liên quan",
   "ui": {
     "inputLabel": "Giá trị cần kiểm tra (mỗi dòng một giá trị)",
@@ -47,7 +47,8 @@
       "issn": "ISSN",
       "vin": "VIN (số khung xe)",
       "container": "số container",
-      "doi": "DOI"
+      "doi": "DOI",
+      "iso8583": "bản tin giao dịch thẻ ngân hàng"
     },
     "reasons": {
       "badLength": "Sai độ dài: cần {{expected}} ký tự, đang có {{got}}.",
@@ -70,7 +71,23 @@
       "badInterval": "Khoảng không hợp lệ. Dùng dạng đầu/cuối, đầu/khoảng hoặc khoảng/cuối.",
       "endBeforeStart": "Thời điểm kết thúc nằm trước thời điểm bắt đầu.",
       "badWeek": "Số tuần vượt giới hạn — năm {{year}} có {{max}} tuần.",
-      "badOrdinal": "Ngày trong năm vượt giới hạn — năm {{year}} có {{max}} ngày."
+      "badOrdinal": "Ngày trong năm vượt giới hạn — năm {{year}} có {{max}} ngày.",
+      "badMti": "{{mti}} không phải chỉ báo loại bản tin (MTI) hợp lệ: các chữ số phiên bản, lớp, chức năng và nguồn gốc phải nằm trong phạm vi cho phép.",
+      "badBitmap": "Bitmap không hợp lệ.",
+      "badBitmap_notHex": "Bitmap chứa ký tự không phải hệ thập lục phân.",
+      "badBitmap_secondaryMissing": "Bitmap đầu báo có bitmap phụ nhưng bản tin đã hết trước đó.",
+      "badBitmap_tooShort": "Bản tin quá ngắn, không đủ chứa MTI và bitmap.",
+      "truncated": "DE {{de}} cần thêm {{need}} ký tự (hoặc byte) nhưng chỉ còn {{have}} — bản tin bị cắt cụt.",
+      "badLengthIndicator": "DE {{de}}: chỉ báo độ dài \"{{got}}\" không phải là số.",
+      "fieldTooLong": "DE {{de}}: độ dài khai báo {{got}} vượt mức tối đa {{max}}.",
+      "badFieldDigits": "DE {{de}} ({{name}}) chỉ được chứa chữ số.",
+      "badFieldChars": "DE {{de}} ({{name}}) chứa ký tự mà định dạng của nó không cho phép.",
+      "unsupportedField": "DE {{de}} được bật trong bitmap nhưng không được hỗ trợ ở đây (bitmap bậc ba hoặc trường không định nghĩa).",
+      "trailingData": "Còn thừa {{count}} ký tự (hoặc byte) sau trường cuối cùng mà bitmap khai báo.",
+      "badFieldDate": "DE {{de}} ({{name}}) = {{value}} không phải ngày hợp lệ.",
+      "badFieldTime": "DE {{de}} ({{name}}) = {{value}} không phải giờ hợp lệ.",
+      "badFieldCurrency": "DE {{de}} ({{name}}) = {{value}} không phải mã tiền tệ số ISO 4217.",
+      "badFieldCountry": "DE {{de}} ({{name}}) = {{value}} không phải mã quốc gia số ISO 3166-1."
     },
     "detail": {
       "type": "Loại",
@@ -116,7 +133,14 @@
       "end": "Kết thúc",
       "repeat": "Lặp lại",
       "weekdayIndex": "Thứ",
-      "note": "Ghi chú"
+      "note": "Ghi chú",
+      "encoding": "Mã hoá",
+      "lengthHeader": "Tiêu đề độ dài",
+      "mti": "MTI",
+      "mtiMeaning": "Loại bản tin",
+      "bitmap": "Bitmap",
+      "fieldCount": "Số trường",
+      "field": "Trường"
     },
     "types": {
       "date": "ngày dương lịch",
@@ -178,13 +202,16 @@
     "q4": "Vì sao một giá trị lại khớp hai chuẩn?",
     "a4": "Một số mã ngắn hợp lệ trong nhiều danh sách. ID vừa là Indonesia (ISO 3166-1) vừa là tiếng Indonesia (ISO 639-1), còn 840 vừa là Hoa Kỳ vừa là đô la Mỹ. Công cụ liệt kê mọi chuẩn mà giá trị thỏa mãn.",
     "q5": "Tôi có kiểm tra nhiều giá trị cùng lúc được không?",
-    "a5": "Được. Dán mỗi dòng một giá trị, tối đa 5.000 dòng, công cụ tự nhận diện chuẩn của từng dòng. Bạn có thể lọc theo hợp lệ hoặc không hợp lệ, sao chép phần hợp lệ hoặc tải kết quả dạng CSV."
+    "a5": "Được. Dán mỗi dòng một giá trị, tối đa 5.000 dòng, công cụ tự nhận diện chuẩn của từng dòng. Bạn có thể lọc theo hợp lệ hoặc không hợp lệ, sao chép phần hợp lệ hoặc tải kết quả dạng CSV.",
+    "q6": "Làm sao kiểm tra một bản tin ISO 8583?",
+    "a6": "Dán cả bản tin trên một dòng. Công cụ hiểu hai dạng: văn bản (MTI 4 chữ số, bitmap 16 hoặc 32 ký tự thập lục phân, rồi các trường là ký tự, trường độ dài thay đổi có chữ số LL/LLL) và hex của các byte thô (MTI BCD, bitmap nhị phân, số nén BCD). Tiêu đề độ dài 2 byte hoặc 4 chữ số ở đầu được tự nhận và bỏ qua. Kết quả hiển thị ý nghĩa MTI, bitmap và từng trường dữ liệu, hoặc lỗi đầu tiên tìm thấy. Các trường theo bảng ISO 8583:1987; định dạng riêng của mạng bạn có thể khác."
   },
   "article": {
     "heading": "Công cụ kiểm tra ISO này làm gì",
     "p1": "Hầu hết mã định danh mà doanh nghiệp trao đổi mỗi ngày đều theo một chuẩn ISO, và phần lớn có chữ số kiểm tra để bắt lỗi gõ sai trước khi nó gây ra giao dịch thất bại, lô hàng bị từ chối hay bản ghi sai. Công cụ này nhận bất cứ gì bạn dán, mỗi dòng một giá trị, xác định giá trị có thể thuộc chuẩn nào và cho biết nó có đạt hay không, kèm các thành phần tìm thấy bên trong.",
     "p2": "Với ngày giờ, công cụ theo ISO 8601: ngày dương lịch kiểu gọn và kiểu có gạch, ngày theo tuần như 2024-W09-4, ngày trong năm, giờ có hoặc không có độ lệch UTC, khoảng thời gian như P3Y6M4DT12H30M5S và các khoảng thời điểm. Công cụ biết năm nhuận, năm nào có 53 tuần, cách ghi 24:00 cuối ngày và giây nhuận, đồng thời chỉ ra lỗi hay gặp: dùng dấu cách thay chữ T, trộn kiểu gọn với kiểu có gạch, hay ngày 30 tháng 2.",
     "p3": "Với tiền và ngân hàng, công cụ kiểm tra IBAN theo danh bạ của từng quốc gia, gồm độ dài chính xác và định dạng tài khoản trong nước, rồi xác minh chữ số kiểm tra mod-97. Mã BIC được tách thành ngân hàng, quốc gia và chi nhánh; ISIN và LEI được xác minh bằng quy tắc chữ số kiểm tra riêng; số thẻ thanh toán được thử bằng công thức Luhn và đầu số nhà phát hành. Mã tiền tệ lấy từ ISO 4217 kèm mã số và số chữ số thập phân, còn mã quốc gia và ngôn ngữ lấy từ ISO 3166-1 và ISO 639, kể cả thẻ ngôn ngữ như zh-Hant-TW.",
-    "p4": "Với sản phẩm và logistics, công cụ kiểm tra ISBN-10 và ISBN-13 (và đổi qua lại), ISSN, 17 ký tự của số khung xe, số container vận chuyển với mã chủ sở hữu và chữ số kiểm tra, cùng định dạng DOI. Hãy nhớ ý nghĩa của việc kiểm tra: nó chứng minh giá trị viết đúng, không chứng minh cuốn sách, chiếc xe hay tài khoản đó tồn tại. Mọi thứ chạy cục bộ trong trình duyệt nên ngay cả giá trị nhạy cảm cũng không rời khỏi thiết bị của bạn."
+    "p4": "Với sản phẩm và logistics, công cụ kiểm tra ISBN-10 và ISBN-13 (và đổi qua lại), ISSN, 17 ký tự của số khung xe, số container vận chuyển với mã chủ sở hữu và chữ số kiểm tra, cùng định dạng DOI. Hãy nhớ ý nghĩa của việc kiểm tra: nó chứng minh giá trị viết đúng, không chứng minh cuốn sách, chiếc xe hay tài khoản đó tồn tại. Mọi thứ chạy cục bộ trong trình duyệt nên ngay cả giá trị nhạy cảm cũng không rời khỏi thiết bị của bạn.",
+    "p5": "ISO 8583 là định dạng bản tin đứng sau các giao dịch thẻ: mỗi lệnh xin phép, mua hàng, đảo giao dịch hay kiểm tra mạng giữa máy POS/ATM, ngân hàng thanh toán và ngân hàng phát hành đều là một bản tin ISO 8583. Bản tin mở đầu bằng chỉ báo loại bản tin (MTI) 4 chữ số: chữ số đầu là phiên bản (0 = 1987, 1 = 1993, 2 = 2003), tiếp theo là lớp (xin phép, tài chính, đảo, quản lý mạng...), chức năng (yêu cầu, phản hồi, thông báo) và bên gửi. Sau đó là bitmap 64 hoặc 128 bit; mỗi bit bật cho biết trường dữ liệu (DE) tương ứng có mặt, ví dụ DE 2 là số thẻ, DE 3 mã xử lý, DE 4 số tiền, DE 11 số vết (STAN), DE 39 mã phản hồi. Bạn có thể dán bản tin dạng văn bản như tài liệu thường trình bày (MTI, bitmap thập lục phân, các trường là ký tự) hoặc dạng hex của các byte thô với số được nén BCD; công cụ tự nhận ra dạng nào, bỏ qua tiêu đề độ dài nếu có, liệt kê từng trường kèm tên, và báo các lỗi như trường bị cắt cụt hay quá dài, chỉ báo độ dài sai, dữ liệu thừa, ngày giờ không thể có, mã tiền tệ hoặc quốc gia không tồn tại. Công cụ dùng bảng trường ISO 8583:1987, nên bản tin theo bố cục 1993/2003, trường riêng có cấu trúc con hoặc bitmap bậc ba có thể bị báo sai dù hợp lệ trên mạng của bạn."
   }
 }

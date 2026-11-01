@@ -55,6 +55,7 @@ const SAMPLE = [
 	'1M8GDM9AXKP042788',
 	'DEUTDEFF',
 	'10.1038/nphys1170',
+	'0200723800000080800016411111111111111100000000000001000002292359591234562359590229TERM0001704',
 	'not an iso code',
 ].join('\n');
 
@@ -127,7 +128,7 @@ export default function IsoValidator({ messages: m, lang }: { messages: IsoMessa
 	const renderDetails = (details: IsoDetail[]) => (
 		<dl className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs">
 			{details.map((x, i) => (
-				<div key={`${x.key}-${i}`} className="flex gap-1">
+				<div key={`${x.key}-${i}`} className={x.key === 'field' ? 'flex basis-full gap-1' : 'flex gap-1'}>
 					<dt className="text-muted-foreground">{m.detail[x.key] ?? x.key}:</dt>
 					<dd className="font-mono text-foreground [overflow-wrap:anywhere]">{valueText(x.key, x.value)}</dd>
 				</div>

@@ -1,10 +1,10 @@
 {
   "meta": {
-    "title": "ISO Validator Online — IBAN, ISO 8601, ISBN, VIN & More",
-    "description": "Paste a value and check it against ISO standards: IBAN, BIC, ISIN, ISO 8601 dates, ISBN, ISSN, VIN, currency, country and language codes. Runs in your browser."
+    "title": "ISO Validator Online — IBAN, ISO 8601, ISO 8583, ISBN & More",
+    "description": "Check a value against ISO standards: IBAN, BIC, ISIN, ISO 8601 dates, ISO 8583 card messages, ISBN, VIN, currency and country codes. Runs in your browser."
   },
   "heading": "ISO Standards Validator",
-  "tagline": "Paste IBANs, dates, ISBNs, currency codes and more — see at once which ISO standard each one matches, or exactly why it fails.",
+  "tagline": "Paste IBANs, dates, ISBNs, currency codes, ISO 8583 bank card messages and more — see at once which ISO standard each one matches, or exactly why it fails.",
   "related": "Related tools",
   "ui": {
     "inputLabel": "Values to check (one per line)",
@@ -47,7 +47,8 @@
       "issn": "ISSN",
       "vin": "VIN",
       "container": "container number",
-      "doi": "DOI"
+      "doi": "DOI",
+      "iso8583": "bank card transaction message"
     },
     "reasons": {
       "badLength": "Wrong length: expected {{expected}} characters, found {{got}}.",
@@ -70,7 +71,23 @@
       "badInterval": "Not a valid interval. Use start/end, start/duration or duration/end.",
       "endBeforeStart": "The end comes before the start.",
       "badWeek": "Week number out of range — {{year}} has {{max}} weeks.",
-      "badOrdinal": "Day of year out of range — {{year}} has {{max}} days."
+      "badOrdinal": "Day of year out of range — {{year}} has {{max}} days.",
+      "badMti": "{{mti}} is not a valid message type indicator (MTI): the version, class, function and origin digits must each be in range.",
+      "badBitmap": "The bitmap is not valid.",
+      "badBitmap_notHex": "The bitmap contains characters that are not hexadecimal.",
+      "badBitmap_secondaryMissing": "The first bitmap announces a secondary bitmap, but the message ends before it.",
+      "badBitmap_tooShort": "The message is too short to hold an MTI and a bitmap.",
+      "truncated": "DE {{de}} needs {{need}} more characters (or bytes) but only {{have}} remain — the message is cut off.",
+      "badLengthIndicator": "DE {{de}}: the length indicator \"{{got}}\" is not a number.",
+      "fieldTooLong": "DE {{de}}: the declared length {{got}} is above the maximum of {{max}}.",
+      "badFieldDigits": "DE {{de}} ({{name}}) must contain digits only.",
+      "badFieldChars": "DE {{de}} ({{name}}) contains characters its format does not allow.",
+      "unsupportedField": "DE {{de}} is set in the bitmap but is not supported here (tertiary bitmap or undefined field).",
+      "trailingData": "{{count}} characters (or bytes) are left over after the last field the bitmap announces.",
+      "badFieldDate": "DE {{de}} ({{name}}) = {{value}} is not a valid date.",
+      "badFieldTime": "DE {{de}} ({{name}}) = {{value}} is not a valid time.",
+      "badFieldCurrency": "DE {{de}} ({{name}}) = {{value}} is not an ISO 4217 numeric currency code.",
+      "badFieldCountry": "DE {{de}} ({{name}}) = {{value}} is not an ISO 3166-1 numeric country code."
     },
     "detail": {
       "type": "Type",
@@ -116,7 +133,14 @@
       "end": "End",
       "repeat": "Repeats",
       "weekdayIndex": "Weekday",
-      "note": "Note"
+      "note": "Note",
+      "encoding": "Encoding",
+      "lengthHeader": "Length header",
+      "mti": "MTI",
+      "mtiMeaning": "Message type",
+      "bitmap": "Bitmap",
+      "fieldCount": "Fields present",
+      "field": "Field"
     },
     "types": {
       "date": "calendar date",
@@ -178,13 +202,16 @@
     "q4": "Why does one value match two standards?",
     "a4": "Some short codes are valid in more than one list. ID is both Indonesia (ISO 3166-1) and Indonesian (ISO 639-1), and 840 is both the United States and the US dollar. The tool lists every standard the value satisfies.",
     "q5": "Can I check many values at once?",
-    "a5": "Yes. Paste one value per line, up to 5,000 lines, and the tool detects the standard of each. Filter by valid or invalid, copy the valid ones, or download the result as a CSV file."
+    "a5": "Yes. Paste one value per line, up to 5,000 lines, and the tool detects the standard of each. Filter by valid or invalid, copy the valid ones, or download the result as a CSV file.",
+    "q6": "How do I check an ISO 8583 message?",
+    "a6": "Paste the whole message on one line. Two layouts are understood: text (a four-digit MTI, a 16- or 32-character hexadecimal bitmap, then the fields as characters, with LL/LLL length digits for variable fields) and a hex dump of the raw bytes (BCD MTI, binary bitmap, BCD numbers). A two-byte or four-digit length header in front is detected and skipped. The result shows the MTI meaning, the bitmap and each data element, or the first problem found. Fields follow the ISO 8583:1987 table; custom formats of your network may differ."
   },
   "article": {
     "heading": "What this ISO validator checks",
     "p1": "Most identifiers that businesses exchange every day follow an ISO standard, and most of them carry a check digit so that a mistyped character is caught before it causes a failed payment, a rejected shipment or a wrong record. This tool takes whatever you paste, one value per line, works out which standard it could belong to and tells you whether it passes, together with the parts it found inside the value.",
     "p2": "For dates and times it follows ISO 8601: calendar dates in the compact and the dashed style, week dates such as 2024-W09-4, ordinal dates, times with or without a UTC offset, durations such as P3Y6M4DT12H30M5S and intervals. It knows leap years, which years have 53 weeks, the 24:00 end-of-day notation and the leap second, and it points out the common mistakes: a space instead of the letter T, a mix of compact and dashed styles, or a 30th of February.",
     "p3": "For money it checks IBANs against the registry of each country, including the exact length and the national account format, and verifies the mod-97 check digits. BIC codes are split into bank, country and branch, ISIN and LEI codes are verified with their own check-digit rules, and payment card numbers are tested with the Luhn formula and the issuer prefix. Currency codes come from ISO 4217 with their numeric code and minor units, and country and language codes come from ISO 3166-1 and ISO 639, including language tags such as zh-Hant-TW.",
-    "p4": "For products and logistics it validates ISBN-10 and ISBN-13 (and converts between them), ISSN, the 17 characters of a vehicle identification number, shipping container numbers with their owner code and check digit, and the format of a DOI. Remember what validation means: it proves a value is well formed, not that the book, vehicle or account exists. Everything runs locally in your browser, so even sensitive values never leave your device."
+    "p4": "For products and logistics it validates ISBN-10 and ISBN-13 (and converts between them), ISSN, the 17 characters of a vehicle identification number, shipping container numbers with their owner code and check digit, and the format of a DOI. Remember what validation means: it proves a value is well formed, not that the book, vehicle or account exists. Everything runs locally in your browser, so even sensitive values never leave your device.",
+    "p5": "ISO 8583 is the message format behind card payments: every authorization, purchase, reversal and network test between a terminal, an acquirer and an issuer is one ISO 8583 message. A message starts with a four-digit message type indicator (MTI) whose digits give the edition (0 = 1987, 1 = 1993, 2 = 2003), the class (authorization, financial, reversal, network management…), the function (request, response, advice) and who sent it. A bitmap of 64 or 128 bits follows, and each bit that is set says that the matching data element (DE) is present, such as DE 2 for the card number, DE 3 for the processing code, DE 4 for the amount, DE 11 for the trace number or DE 39 for the response code. Paste a message either as the text most documentation shows (MTI, hexadecimal bitmap and fields as characters) or as a hex dump of the raw bytes with BCD-packed numbers; the checker detects which one it is, strips an optional length header, lists every field with its name and flags truncated or oversized fields, bad length indicators, leftover data, impossible dates and times and unknown currency or country codes. It follows the 1987 data element table, so messages that use 1993 or 2003 layouts, private fields with their own sub-structure or a tertiary bitmap may be reported as invalid even though they are valid on your network."
   }
 }

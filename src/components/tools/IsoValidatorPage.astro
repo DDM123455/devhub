@@ -21,9 +21,20 @@ const relatedIds = ['csv-json-converter', 'regex-tester', 'text-diff'];
 const relatedTools = relatedIds.map((id) => tools.find((item) => item.id === id)).filter((item) => item !== undefined);
 
 // All UI strings live under `ui.*` and go through i18n.
-const messages = t('ui', { returnObjects: true }) as never;
+// i18next does not merge missing keys inside a returned object from the fallback language, so overlay the English
+// strings first: a locale that has not translated a newly added message then shows English instead of nothing.
+const tEn = getFixedT('en', 'tool-iso-validator');
+const merge = (base: unknown, over: unknown): unknown => {
+	if (base && over && typeof base === 'object' && typeof over === 'object' && !Array.isArray(base) && !Array.isArray(over)) {
+		const out: Record<string, unknown> = { ...(base as Record<string, unknown>) };
+		for (const [k, v] of Object.entries(over as Record<string, unknown>)) out[k] = merge(out[k], v);
+		return out;
+	}
+	return over ?? base;
+};
+const messages = merge(tEn('ui', { returnObjects: true }), t('ui', { returnObjects: true })) as never;
 
-const faqItems = [1, 2, 3, 4, 5].map((n) => ({ question: t(`faq.q${n}`), answer: t(`faq.a${n}`) }));
+const faqItems = [1, 2, 3, 4, 5, 6].map((n) => ({ question: t(`faq.q${n}`, { defaultValue: tEn(`faq.q${n}`) }), answer: t(`faq.a${n}`, { defaultValue: tEn(`faq.a${n}`) }) }));
 
 const schema = {
 	'@context': 'https://schema.org',
@@ -57,6 +68,7 @@ const schema = {
 			<p>{t('article.p2')}</p>
 			<p>{t('article.p3')}</p>
 			<p>{t('article.p4')}</p>
+			<p>{t('article.p5', { defaultValue: tEn('article.p5') })}</p>
 		</div>
 	</section>
 	<section class="border-t border-border px-4 py-10">

@@ -7,6 +7,7 @@ import { COUNTRIES } from './iso-data/countries';
 import { CURRENCIES } from './iso-data/currencies';
 import { LANGUAGES } from './iso-data/languages';
 import { IBAN_COUNTRIES } from './iso-data/iban-registry';
+import { looksLikeIso8583, parseIso8583 } from './iso8583';
 
 export type IsoStandardId =
 	| 'iso8601'
@@ -22,7 +23,8 @@ export type IsoStandardId =
 	| 'issn'
 	| 'vin'
 	| 'container'
-	| 'doi';
+	| 'doi'
+	| 'iso8583';
 
 export type IsoReason =
 	| 'badLength'
@@ -44,7 +46,20 @@ export type IsoReason =
 	| 'badInterval'
 	| 'endBeforeStart'
 	| 'badWeek'
-	| 'badOrdinal';
+	| 'badOrdinal'
+	| 'badMti'
+	| 'badBitmap'
+	| 'truncated'
+	| 'badLengthIndicator'
+	| 'fieldTooLong'
+	| 'badFieldDigits'
+	| 'badFieldChars'
+	| 'unsupportedField'
+	| 'trailingData'
+	| 'badFieldDate'
+	| 'badFieldTime'
+	| 'badFieldCurrency'
+	| 'badFieldCountry';
 
 export interface IsoDetail {
 	/** i18n key under `detail.` */
@@ -87,6 +102,7 @@ export const ISO_STANDARDS: ReadonlyArray<{ id: IsoStandardId; iso: string }> = 
 	{ id: 'vin', iso: 'ISO 3779' },
 	{ id: 'container', iso: 'ISO 6346' },
 	{ id: 'doi', iso: 'ISO 26324' },
+	{ id: 'iso8583', iso: 'ISO 8583' },
 ];
 
 // ---------------------------------------------------------------------------------------------------------
@@ -574,6 +590,22 @@ function checkDoi(raw: string): IsoResult {
 	return pass('doi', [d('registrant', m[1]), d('suffix', m[2]), d('note', 'formatOnly')], s);
 }
 
+/** ISO 8583 financial message (ASCII text or hex dump of the bytes): header, MTI, bitmap and every data element. */
+function checkIso8583(raw: string): IsoResult {
+	const p = parseIso8583(raw);
+	const details: IsoDetail[] = [d('encoding', p.encoding === 'ascii' ? 'ASCII' : 'Binary (BCD)')];
+	if (p.header > 0) details.push(d('lengthHeader', p.header));
+	if (p.mti) details.push(d('mti', p.mti));
+	if (p.mtiMeaning) details.push(d('mtiMeaning', p.mtiMeaning));
+	if (p.bitmap) details.push(d('bitmap', p.bitmap));
+	if (p.bitmap) details.push(d('fieldCount', p.fields.length));
+	for (const f of p.fields) {
+		details.push(d('field', `DE ${String(f.de).padStart(3, '0')} · ${f.name}: ${f.value}${f.meaning ? ` (${f.meaning})` : ''}`));
+	}
+	if (!p.ok && p.problem) return fail('iso8583', p.problem.reason, p.problem.params as Record<string, string | number>, details);
+	return pass('iso8583', details);
+}
+
 // ---------------------------------------------------------------------------------------------------------
 // registry
 
@@ -623,6 +655,7 @@ const VALIDATORS: Validator[] = [
 	{ id: 'issn', shape: (s) => /^(?:issn:?\s*)?\d{4}-\d{3}[\dXx]$/i.test(A(s)), check: (s) => checkIssn(s.trim().replace(/^issn:?\s*/i, '')) },
 	{ id: 'vin', shape: (s) => /^(?=.*[A-Za-z])[A-Za-z0-9]{17}$/.test(s.replace(/\s/g, '')), check: checkVin },
 	{ id: 'container', shape: (s) => /^[A-Za-z]{4}[\s-]?\d{6}[\s-]?\d$/.test(A(s)), check: checkContainer },
+	{ id: 'iso8583', shape: looksLikeIso8583, check: checkIso8583 },
 	{ id: 'doi', shape: (s) => /^(?:doi:\s*|https?:\/\/(?:dx\.)?doi\.org\/)?10\.\d{4,9}\/\S+$/i.test(A(s)), check: checkDoi },
 ];
 const BY_ID = new Map(VALIDATORS.map((v) => [v.id, v]));
