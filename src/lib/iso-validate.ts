@@ -7,7 +7,8 @@ import { COUNTRIES } from './iso-data/countries';
 import { CURRENCIES } from './iso-data/currencies';
 import { LANGUAGES } from './iso-data/languages';
 import { IBAN_COUNTRIES } from './iso-data/iban-registry';
-import { looksLikeIso8583, parseIso8583 } from './iso8583';
+import { looksLikeIso8583, parseIso8583, serviceCodeMeaning } from './iso8583';
+import { CFI_CATEGORIES, CFI_GROUPS, MCC_BY_CODE, mccGroup } from './iso-data/mcc';
 
 export type IsoStandardId =
 	| 'iso8601'
@@ -24,7 +25,11 @@ export type IsoStandardId =
 	| 'vin'
 	| 'container'
 	| 'doi'
-	| 'iso8583';
+	| 'iso8583'
+	| 'rf'
+	| 'cfi'
+	| 'mcc'
+	| 'track';
 
 export type IsoReason =
 	| 'badLength'
@@ -60,7 +65,9 @@ export type IsoReason =
 	| 'badFieldTime'
 	| 'badFieldCurrency'
 	| 'badFieldCountry'
-	| 'badFieldLength';
+	| 'badFieldLength'
+	| 'badCfiCategory'
+	| 'badExpiry';
 
 export interface IsoDetail {
 	/** i18n key under `detail.` */
@@ -104,6 +111,10 @@ export const ISO_STANDARDS: ReadonlyArray<{ id: IsoStandardId; iso: string }> = 
 	{ id: 'container', iso: 'ISO 6346' },
 	{ id: 'doi', iso: 'ISO 26324' },
 	{ id: 'iso8583', iso: 'ISO 8583' },
+	{ id: 'rf', iso: 'ISO 11649' },
+	{ id: 'cfi', iso: 'ISO 10962' },
+	{ id: 'mcc', iso: 'ISO 18245' },
+	{ id: 'track', iso: 'ISO/IEC 7813' },
 ];
 
 // ---------------------------------------------------------------------------------------------------------
@@ -591,6 +602,64 @@ function checkDoi(raw: string): IsoResult {
 	return pass('doi', [d('registrant', m[1]), d('suffix', m[2]), d('note', 'formatOnly')], s);
 }
 
+/** ISO 11649 structured creditor reference: RF + 2 check digits + up to 21 characters, check by mod 97 like an IBAN. */
+function checkRf(raw: string): IsoResult {
+	const s = raw.replace(/[\s-]/g, '').toUpperCase();
+	if (!/^[A-Z0-9]+$/.test(s)) return fail('rf', 'badCharacters');
+	if (!s.startsWith('RF') || !/^\d{2}$/.test(s.slice(2, 4))) return fail('rf', 'badStructure');
+	if (s.length < 5 || s.length > 25) return fail('rf', 'badLength', { expected: '5–25', got: s.length });
+	const details = [d('checkDigits', s.slice(2, 4)), d('reference', s.slice(4))];
+	if (mod97(s.slice(4) + s.slice(0, 4)) !== 1) return fail('rf', 'badCheckDigit', undefined, details);
+	return pass('rf', details, s.replace(/(.{4})/g, '$1 ').trim());
+}
+
+/** ISO 10962 classification of financial instruments: six letters, the first one the category. */
+function checkCfi(raw: string): IsoResult {
+	const s = raw.replace(/\s/g, '').toUpperCase();
+	if (!/^[A-Z]+$/.test(s)) return fail('cfi', 'badCharacters');
+	if (s.length !== 6) return fail('cfi', 'badLength', { expected: 6, got: s.length });
+	const category = CFI_CATEGORIES[s[0]];
+	if (!category) return fail('cfi', 'badCfiCategory', { code: s[0] });
+	const group = CFI_GROUPS[s[0]]?.[s[1]];
+	return pass('cfi', [d('cfiCategory', `${s[0]} — ${category}`), d('cfiGroup', group ? `${s[1]} — ${group}` : s[1]), d('cfiAttributes', s.slice(2)), d('note', 'cfiAttributes')], s);
+}
+
+/** ISO 18245 merchant category code: four digits in the ranges the standard assigns. */
+function checkMcc(raw: string): IsoResult {
+	const s = raw.trim();
+	if (!/^\d+$/.test(s)) return fail('mcc', 'badCharacters');
+	if (s.length !== 4) return fail('mcc', 'badLength', { expected: 4, got: s.length });
+	const group = mccGroup(Number(s));
+	if (!group) return fail('mcc', 'unknownCode');
+	const description = MCC_BY_CODE.get(s);
+	return pass('mcc', [d('mccRange', group), ...(description ? [d('description', description)] : [d('note', 'mccUnlisted')])], s);
+}
+
+/** ISO/IEC 7813 magnetic-stripe track 2 (PAN=YYMMSSS…) or track 1 (%B PAN ^ NAME ^ YYMMSSS…). */
+function checkTrack(raw: string): IsoResult {
+	const s = raw.trim();
+	let pan = '';
+	let yy = '';
+	let mm = '';
+	let service = '';
+	let rest = '';
+	let name = '';
+	const t1 = s.match(/^%?B(\d+)\^([^^]*)\^(\d{2})(\d{2})(\d{3})?(.*?)\??$/);
+	const t2 = s.match(/^;?(\d+)[=D](\d{2})(\d{2})(\d{3})?([\d=]*)\??$/);
+	if (t1) [, pan, name, yy, mm, service = '', rest] = t1;
+	else if (t2) [, pan, yy, mm, service = '', rest] = t2;
+	else return fail('track', 'badStructure');
+	if (pan.length < 12 || pan.length > 19) return fail('track', 'badLength', { expected: '12–19', got: pan.length });
+	const details: IsoDetail[] = [d('type', t1 ? 'track1' : 'track2'), d('pan', pan)];
+	if (name) details.push(d('name', name.trim()));
+	details.push(d('expiry', `20${yy}-${mm}`));
+	if (service) details.push(d('serviceCode', `${service} — ${serviceCodeMeaning(service)}`));
+	if (rest) details.push(d('discretionary', `${rest.length}`));
+	if (Number(mm) < 1 || Number(mm) > 12) return fail('track', 'badExpiry', { value: `${yy}${mm}` }, details);
+	if (!luhnOk(pan)) return fail('track', 'badCheckDigit', undefined, details);
+	return pass('track', details);
+}
+
 /** ISO 8583 financial message (ASCII text or hex dump of the bytes): header, MTI, bitmap and every data element. */
 function checkIso8583(raw: string): IsoResult {
 	const p = parseIso8583(raw);
@@ -660,6 +729,11 @@ const VALIDATORS: Validator[] = [
 	{ id: 'vin', shape: (s) => /^(?=.*[A-Za-z])[A-Za-z0-9]{17}$/.test(s.replace(/\s/g, '')), check: checkVin },
 	{ id: 'container', shape: (s) => /^[A-Za-z]{4}[\s-]?\d{6}[\s-]?\d$/.test(A(s)), check: checkContainer },
 	{ id: 'iso8583', shape: looksLikeIso8583, check: checkIso8583 },
+	{ id: 'rf', shape: (s) => /^RF\d{2}[A-Z0-9 ]{1,28}$/i.test(A(s)), check: checkRf },
+	// four digits / six letters look like far too many other values to be guessed: reachable by choosing the standard
+	{ id: 'cfi', shape: () => false, check: checkCfi },
+	{ id: 'mcc', shape: () => false, check: checkMcc },
+	{ id: 'track', shape: (s) => /^;?\d{12,19}[=D]\d{7,}\??$/.test(A(s)) || /^%?B\d{12,19}\^[^^]+\^\d{4}/.test(A(s)), check: checkTrack },
 	{ id: 'doi', shape: (s) => /^(?:doi:\s*|https?:\/\/(?:dx\.)?doi\.org\/)?10\.\d{4,9}\/\S+$/i.test(A(s)), check: checkDoi },
 ];
 const BY_ID = new Map(VALIDATORS.map((v) => [v.id, v]));

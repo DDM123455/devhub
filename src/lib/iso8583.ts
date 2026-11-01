@@ -193,18 +193,21 @@ function lengthOf(def: Iso8583Field, value: string): { text: string; ok: boolean
 	return { text: `${actual} ${unit} (fixed ${fixed})`, ok: actual === fixed, expected: String(fixed) };
 }
 
+/** Reads the three digits of a magnetic-stripe service code (ISO/IEC 7813 / 7812). */
+export function serviceCodeMeaning(code: string): string {
+	const [a, b, c] = code;
+	const first = { '1': 'international interchange', '2': 'international, use chip', '5': 'national interchange only', '6': 'national, use chip', '7': 'private use', '9': 'test' }[a] ?? 'unknown';
+	const second = { '0': 'normal authorization', '2': 'online authorization by issuer', '4': 'online authorization, except bilateral agreement' }[b] ?? 'unknown';
+	const third = { '0': 'PIN required', '1': 'no restrictions', '2': 'goods and services only', '3': 'ATM only, PIN required', '5': 'goods and services only, PIN required', '6': 'no restrictions, PIN if possible', '7': 'goods and services, PIN if possible' }[c] ?? 'unknown';
+	return `${first}; ${second}; ${third}`;
+}
+
 function trackLines(value: string): string[] {
 	const m = value.match(/^(\d{12,19})[=D](\d{4}|=)(\d{3})?(.*)$/);
 	if (!m) return [];
 	const out = [`PAN: ${m[1]}`];
 	if (/^\d{4}$/.test(m[2])) out.push(`Expiry: 20${m[2].slice(0, 2)}-${m[2].slice(2)} (YYMM)`);
-	if (m[3]) {
-		const [a, b, c] = m[3];
-		const first = { '1': 'international interchange', '2': 'international, use chip', '5': 'national interchange only', '6': 'national, use chip', '7': 'private use', '9': 'test' }[a] ?? 'unknown';
-		const second = { '0': 'normal authorization', '2': 'online authorization by issuer', '4': 'online authorization, except bilateral agreement' }[b] ?? 'unknown';
-		const third = { '0': 'PIN required', '1': 'no restrictions', '2': 'goods and services only', '3': 'ATM only, PIN required', '5': 'goods and services only, PIN required', '6': 'no restrictions, PIN if possible', '7': 'goods and services, PIN if possible' }[c] ?? 'unknown';
-		out.push(`Service code ${m[3]}: ${first}; ${second}; ${third}`);
-	}
+	if (m[3]) out.push(`Service code ${m[3]}: ${serviceCodeMeaning(m[3])}`);
 	if (m[4]) out.push(`Discretionary data: ${m[4].length} characters`);
 	return out;
 }

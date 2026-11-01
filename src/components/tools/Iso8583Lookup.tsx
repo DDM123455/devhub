@@ -1,12 +1,15 @@
 import { useMemo, useState } from 'react';
 import { ISO8583_FIELDS } from '@/lib/iso-data/iso8583-fields';
 import { RESPONSE_CODE_LIST, describeField, type ResponseCategory } from '@/lib/iso-data/iso8583-codes';
+import { MCC_LIST, mccGroup } from '@/lib/iso-data/mcc';
 
 export interface LookupMessages {
 	heading: string;
 	hint: string;
 	tabResponse: string;
 	tabFields: string;
+	tabMcc: string;
+	colGroup: string;
 	searchPlaceholder: string;
 	searchLabel: string;
 	colCode: string;
@@ -35,8 +38,8 @@ function specOf(de: number): string {
 	return f.type === 'b' ? `b ${f.len} bits` : `${t} ${f.len}`;
 }
 
-type Tab = 'response' | 'fields';
-const TABS: readonly Tab[] = ['response', 'fields'];
+type Tab = 'response' | 'fields' | 'mcc';
+const TABS: readonly Tab[] = ['response', 'fields', 'mcc'];
 
 /** Reference tables next to the ISO 8583 validator: DE 39 response codes and what every data element means. */
 export default function Iso8583Lookup({ messages: m }: { messages: LookupMessages }) {
@@ -58,6 +61,11 @@ export default function Iso8583Lookup({ messages: m }: { messages: LookupMessage
 				const num = String(f.de);
 				return num === q.replace(/^de\s*/, '') || f.name.toLowerCase().includes(q) || describeField(f.de).toLowerCase().includes(q) || `de${num}` === q.replace(/\s/g, '');
 			}),
+		[q],
+	);
+
+	const mccs = useMemo(
+		() => MCC_LIST.filter(([code, text]) => q === '' || code.includes(q) || text.toLowerCase().includes(q) || (mccGroup(Number(code)) ?? '').toLowerCase().includes(q)),
 		[q],
 	);
 
@@ -95,7 +103,7 @@ export default function Iso8583Lookup({ messages: m }: { messages: LookupMessage
 							tab === id ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'
 						}`}
 					>
-						{id === 'response' ? m.tabResponse : m.tabFields}
+						{id === 'response' ? m.tabResponse : id === 'fields' ? m.tabFields : m.tabMcc}
 					</button>
 				))}
 			</div>
@@ -130,6 +138,29 @@ export default function Iso8583Lookup({ messages: m }: { messages: LookupMessage
 										<td className="px-3 py-1.5">
 											<span className={`rounded-full px-2 py-0.5 text-xs font-medium ${CATEGORY_STYLE[cat]}`}>{m.categories[cat]}</span>
 										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					)
+				) : tab === 'mcc' ? (
+					mccs.length === 0 ? (
+						<p className="p-3 text-sm text-muted-foreground">{m.empty}</p>
+					) : (
+						<table className="w-full border-collapse text-left text-sm">
+							<thead className="sticky top-0 bg-muted text-xs text-muted-foreground">
+								<tr>
+									<th scope="col" className="px-3 py-1.5 font-medium">{m.colCode}</th>
+									<th scope="col" className="px-3 py-1.5 font-medium">{m.colMeaning}</th>
+									<th scope="col" className="px-3 py-1.5 font-medium">{m.colGroup}</th>
+								</tr>
+							</thead>
+							<tbody>
+								{mccs.map(([code, text]) => (
+									<tr key={code} className="border-t border-border">
+										<td className="px-3 py-1.5 font-mono font-semibold text-foreground">{code}</td>
+										<td className="px-3 py-1.5 text-foreground">{text}</td>
+										<td className="px-3 py-1.5 text-xs text-muted-foreground">{mccGroup(Number(code))}</td>
 									</tr>
 								))}
 							</tbody>
