@@ -1667,9 +1667,38 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 					</div>
 				</details>
 
+			</div>
+
+			<div className="flex min-w-0 flex-1 flex-col items-center justify-center gap-3 rounded-md border border-border p-6 md:sticky md:top-20 md:self-start">
+				{!effectiveBatchMode && isEmpty && (
+					<p className="max-w-xs text-center text-sm text-muted-foreground">{messages.emptyState}</p>
+				)}
+				{!effectiveBatchMode && !isEmpty && hasRenderError && (
+					<p role="alert" className="max-w-xs text-center text-sm text-destructive">
+						{activeError === 'capacity'
+							? messages.errorTooLong
+							: activeError === 'canvas'
+								? messages.errorCanvasSmall
+								: messages.errorRender}
+					</p>
+				)}
+				{effectiveBatchMode && (
+					<p className="max-w-xs text-center text-sm text-muted-foreground">{messages.batchPreviewNotice}</p>
+				)}
+				{/* Kept mounted (never removed from the JSX tree), just visually hidden:
+				    qr-code-styling's instance holds a reference to this exact DOM node via
+				    .append(), and removing it from the tree would leave .update() writing
+				    into a detached element. */}
+				<div
+					ref={containerRef}
+					role="img"
+					aria-label={ariaLabel}
+					style={{ width: size, height: size, maxWidth: '100%' }}
+					className={hasRenderError || effectiveBatchMode || isEmpty ? 'hidden' : '[&>canvas]:h-auto [&>canvas]:max-w-full'}
+				/>
 				{!effectiveBatchMode && (
-					<div className="flex flex-col gap-2">
-						<div className="flex flex-wrap gap-2">
+					<div className="flex w-full flex-col items-center gap-2">
+						<div className="flex flex-wrap justify-center gap-2">
 							<Button
 								type="button"
 								className="min-h-10"
@@ -1722,35 +1751,6 @@ export default function QrCodeGenerator({ messages }: { messages: Messages }) {
 						)}
 					</div>
 				)}
-			</div>
-
-			<div className="flex min-w-0 flex-1 flex-col items-center justify-center gap-3 rounded-md border border-border p-6 md:sticky md:top-20 md:self-start">
-				{!effectiveBatchMode && isEmpty && (
-					<p className="max-w-xs text-center text-sm text-muted-foreground">{messages.emptyState}</p>
-				)}
-				{!effectiveBatchMode && !isEmpty && hasRenderError && (
-					<p role="alert" className="max-w-xs text-center text-sm text-destructive">
-						{activeError === 'capacity'
-							? messages.errorTooLong
-							: activeError === 'canvas'
-								? messages.errorCanvasSmall
-								: messages.errorRender}
-					</p>
-				)}
-				{effectiveBatchMode && (
-					<p className="max-w-xs text-center text-sm text-muted-foreground">{messages.batchPreviewNotice}</p>
-				)}
-				{/* Kept mounted (never removed from the JSX tree), just visually hidden:
-				    qr-code-styling's instance holds a reference to this exact DOM node via
-				    .append(), and removing it from the tree would leave .update() writing
-				    into a detached element. */}
-				<div
-					ref={containerRef}
-					role="img"
-					aria-label={ariaLabel}
-					style={{ width: size, height: size, maxWidth: '100%' }}
-					className={hasRenderError || effectiveBatchMode || isEmpty ? 'hidden' : '[&>canvas]:h-auto [&>canvas]:max-w-full'}
-				/>
 			</div>
 		</div>
 	);

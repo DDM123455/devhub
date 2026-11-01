@@ -258,9 +258,8 @@ export default function JsonAdvancedPanel({
 	};
 
 	return (
-		<div className="flex flex-col gap-3 rounded-lg border border-border p-4">
-			<span className="text-sm font-medium text-foreground">{messages.heading}</span>
-
+		<>
+		<div className="order-first flex flex-col gap-2 rounded-lg border border-border p-3">
 			<div className="flex flex-wrap items-center gap-2">
 				<label className="flex items-center gap-2 text-sm text-foreground">
 					{messages.indentLabel}
@@ -270,13 +269,13 @@ export default function JsonAdvancedPanel({
 						<option value="tab">{messages.indentTab}</option>
 					</select>
 				</label>
-				<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={() => handleFormat(false)}>
+				<Button type="button" size="sm" className="min-h-9" onClick={() => handleFormat(false)}>
 					{messages.format}
 				</Button>
 				<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={() => handleFormat(true)}>
 					{messages.minify}
 				</Button>
-				<Button type="button" size="sm" className="min-h-9" onClick={() => void handleRepair()}>
+				<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={() => void handleRepair()}>
 					{messages.repair}
 				</Button>
 				<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={() => void handleShare()}>
@@ -296,6 +295,10 @@ export default function JsonAdvancedPanel({
 					{status.text}
 				</p>
 			)}
+		</div>
+
+		<div className="flex flex-col gap-3 rounded-lg border border-border p-4">
+			<span className="text-sm font-medium text-foreground">{messages.heading}</span>
 
 			<details className="rounded-md border border-border p-3">
 				<summary className="cursor-pointer text-sm font-medium text-foreground">{messages.codeHeading}</summary>
@@ -315,7 +318,7 @@ export default function JsonAdvancedPanel({
 							{messages.rootName}
 							<input type="text" value={rootName} onChange={(e) => setRootName(e.target.value)} className={`${fieldClass} w-36`} />
 						</label>
-						<Button type="button" size="sm" className="min-h-9" onClick={handleGenerateCode}>
+						<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={handleGenerateCode}>
 							{messages.codeGenerate}
 						</Button>
 					</div>
@@ -340,7 +343,7 @@ export default function JsonAdvancedPanel({
 				<div className="mt-3 flex flex-col gap-3">
 					<div className="flex flex-col gap-2">
 						<div>
-							<Button type="button" size="sm" className="min-h-9" onClick={handleGenerateSchema}>
+							<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={handleGenerateSchema}>
 								{messages.schemaGenerate}
 							</Button>
 						</div>
@@ -370,7 +373,7 @@ export default function JsonAdvancedPanel({
 							className={areaClass}
 						/>
 						<div>
-							<Button type="button" size="sm" className="min-h-9" onClick={handleValidate}>
+							<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={handleValidate}>
 								{messages.validateButton}
 							</Button>
 						</div>
@@ -421,7 +424,7 @@ export default function JsonAdvancedPanel({
 								className={`${fieldClass} min-w-48 font-mono`}
 							/>
 						</label>
-						<Button type="button" size="sm" className="min-h-9" onClick={handlePath}>
+						<Button type="button" size="sm" variant="outline" className="min-h-9" onClick={handlePath}>
 							{messages.pathRun}
 						</Button>
 					</div>
@@ -465,5 +468,6 @@ export default function JsonAdvancedPanel({
 				</div>
 			</details>
 		</div>
+		</>
 	);
 }

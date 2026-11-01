@@ -183,7 +183,7 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 				className="w-full resize-y rounded-md border border-border bg-background p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
 			/>
 
-			<div>
+			<div className="flex flex-wrap items-center gap-2">
 				<label
 					htmlFor="text-case-file-input"
 					className="has-[+input:focus-visible]:ring-2 has-[+input:focus-visible]:ring-ring inline-flex cursor-pointer items-center rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted"
@@ -197,6 +197,9 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 					className="sr-only"
 					onChange={(event) => handleFileUpload(event.target)}
 				/>
+				<Button type="button" size="sm" variant="outline" onClick={() => setText('')} disabled={text === ''}>
+					{messages.clear}
+				</Button>
 			</div>
 
 			<div className="flex flex-col gap-3">
@@ -283,9 +286,19 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 			)}
 
 			<div className="flex flex-col gap-2">
-				<label htmlFor="case-output" className="text-sm font-medium text-foreground">
-					{messages.outputLabel}
-				</label>
+				<div className="flex flex-wrap items-center justify-between gap-2">
+					<label htmlFor="case-output" className="text-sm font-medium text-foreground">
+						{messages.outputLabel}
+					</label>
+					<div className="flex flex-wrap items-center gap-2">
+						<Button type="button" size="sm" aria-live="polite" onClick={handleCopy} disabled={output === ''}>
+							{copied ? messages.copied : failed ? messages.copyFailed : messages.copy}
+						</Button>
+						<Button type="button" size="sm" variant="outline" onClick={handleFileDownload} disabled={output === ''}>
+							{messages.downloadFile}
+						</Button>
+					</div>
+				</div>
 				<textarea
 					id="case-output"
 					value={output}
@@ -298,17 +311,6 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 				</p>
 			</div>
 
-			<div className="flex flex-wrap items-center gap-3">
-				<Button type="button" aria-live="polite" onClick={handleCopy} disabled={output === ''}>
-					{copied ? messages.copied : failed ? messages.copyFailed : messages.copy}
-				</Button>
-				<Button type="button" variant="outline" onClick={handleFileDownload} disabled={output === ''}>
-					{messages.downloadFile}
-				</Button>
-				<Button type="button" variant="outline" onClick={() => setText('')} disabled={text === ''}>
-					{messages.clear}
-				</Button>
-			</div>
 		</div>
 	);
 }
