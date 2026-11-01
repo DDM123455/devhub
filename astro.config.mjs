@@ -15,8 +15,8 @@ const sitemapLocales = Object.fromEntries(locales.map((l) => [l, l === 'zh-tw' ?
 
 // https://astro.build/config
 export default defineConfig({
-  // Domain thật do Cloudflare cấp sau khi connect Git (Workers static assets, không phải *.pages.dev cổ điển).
-  site: 'https://devhub.duongdangmanh01.workers.dev',
+  // Domain riêng (mua ở Cloudflare Registrar, gắn vào Worker static assets). Đổi site = đổi toàn bộ canonical/hreflang/sitemap/OG.
+  site: 'https://privatetoolhub.com',
 
   // Every page change is a full page load (static multi-page site). Prefetching the target page when the
   // pointer rests on a link (or on tap/focus) gives it a head start, so the click feels near-instant.
