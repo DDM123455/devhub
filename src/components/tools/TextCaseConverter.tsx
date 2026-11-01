@@ -173,17 +173,18 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 	};
 
 	return (
-		<div className="flex flex-col gap-4 rounded-lg border border-border p-4">
+		<div className="grid gap-4 rounded-lg border border-border p-4 md:grid-cols-2 md:[&>:not([data-col])]:col-span-2">
 			<textarea
+				data-col="in"
 				value={text}
 				onChange={(event) => setText(event.target.value)}
 				placeholder={messages.placeholder}
 				aria-label={messages.inputLabel}
 				rows={8}
-				className="w-full resize-y rounded-md border border-border bg-background p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+				className="w-full min-w-0 resize-y rounded-md border border-border bg-background p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary md:col-start-1 md:row-start-2"
 			/>
 
-			<div className="flex flex-wrap items-center gap-2">
+			<div data-col="in" className="flex flex-wrap items-center gap-2 md:col-start-1 md:row-start-1">
 				<label
 					htmlFor="text-case-file-input"
 					className="has-[+input:focus-visible]:ring-2 has-[+input:focus-visible]:ring-ring inline-flex cursor-pointer items-center rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted"
@@ -285,7 +286,7 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 				</p>
 			)}
 
-			<div className="flex flex-col gap-2">
+			<div data-col="out" className="flex min-w-0 flex-col gap-2 md:col-start-2 md:row-start-1 md:row-span-2">
 				<div className="flex flex-wrap items-center justify-between gap-2">
 					<label htmlFor="case-output" className="text-sm font-medium text-foreground">
 						{messages.outputLabel}

@@ -901,39 +901,69 @@ export default function CsvJsonConverter({ messages }: { messages: Messages }) {
 				</div>
 			)}
 
-			<div className="flex flex-col gap-1">
-				<label htmlFor="csv-json-input" className="text-sm font-medium text-foreground">
-					{mode === 'csv-to-json' ? messages.inputLabelCsv : messages.inputLabelJson}
-				</label>
+			{/* Input | swap | output side by side from md up; stacked on phones. */}
+			<div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+				<div className="flex min-w-0 flex-col gap-2">
+				<div className="flex flex-col gap-1">
+					<label htmlFor="csv-json-input" className="text-sm font-medium text-foreground">
+						{mode === 'csv-to-json' ? messages.inputLabelCsv : messages.inputLabelJson}
+					</label>
+					<textarea
+						id="csv-json-input"
+						value={input}
+						onChange={(e) => {
+							setInput(e.target.value);
+							setInputFromFile(false);
+						}}
+						placeholder={mode === 'csv-to-json' ? messages.inputPlaceholderCsv : messages.inputPlaceholderJson}
+						rows={8}
+						spellCheck={false}
+						className="w-full rounded-md border border-border bg-background p-3 font-mono text-xs break-all text-foreground"
+					/>
+				</div>
+
+				<div className="flex gap-2">
+					<Button type="button" size="sm" variant="ghost" onClick={handleLoadSample}>
+						{messages.loadSample}
+					</Button>
+					<Button
+						type="button"
+						size="sm"
+						variant="ghost"
+						onClick={() => {
+							setInput('');
+							setInputFromFile(false);
+						}}
+					>
+						{messages.clear}
+					</Button>
+				</div>
+				</div>
+			<div className="flex justify-center md:self-center">
+				<Button type="button" size="sm" variant="outline" onClick={handleSwap} disabled={!canSwap}>
+					{messages.swap}
+				</Button>
+			</div>
+			<div className="flex min-w-0 flex-col gap-1">
+				<div className="flex items-center justify-between">
+					<label htmlFor="csv-json-output" className="text-sm font-medium text-foreground">
+						{messages.outputLabel}
+					</label>
+					<div className="flex items-center gap-1">
+						<CopyButton value={output} label={messages.copy} copiedLabel={messages.copied} failedLabel={messages.copyFailed} />
+						<Button type="button" size="sm" variant="ghost" disabled={output === ''} onClick={handleDownload}>
+							{messages.download}
+						</Button>
+					</div>
+				</div>
 				<textarea
-					id="csv-json-input"
-					value={input}
-					onChange={(e) => {
-						setInput(e.target.value);
-						setInputFromFile(false);
-					}}
-					placeholder={mode === 'csv-to-json' ? messages.inputPlaceholderCsv : messages.inputPlaceholderJson}
+					id="csv-json-output"
+					readOnly
+					value={output}
 					rows={8}
-					spellCheck={false}
-					className="w-full rounded-md border border-border bg-background p-3 font-mono text-xs break-all text-foreground"
+					className="w-full rounded-md border border-border bg-muted p-3 font-mono text-xs break-all text-foreground"
 				/>
 			</div>
-
-			<div className="flex gap-2">
-				<Button type="button" size="sm" variant="ghost" onClick={handleLoadSample}>
-					{messages.loadSample}
-				</Button>
-				<Button
-					type="button"
-					size="sm"
-					variant="ghost"
-					onClick={() => {
-						setInput('');
-						setInputFromFile(false);
-					}}
-				>
-					{messages.clear}
-				</Button>
 			</div>
 
 			{error && <p role="alert" className="text-sm text-destructive">{error}</p>}
@@ -1005,32 +1035,7 @@ export default function CsvJsonConverter({ messages }: { messages: Messages }) {
 				</div>
 			)}
 
-			<div className="flex justify-center">
-				<Button type="button" size="sm" variant="outline" onClick={handleSwap} disabled={!canSwap}>
-					{messages.swap}
-				</Button>
-			</div>
 
-			<div className="flex flex-col gap-1">
-				<div className="flex items-center justify-between">
-					<label htmlFor="csv-json-output" className="text-sm font-medium text-foreground">
-						{messages.outputLabel}
-					</label>
-					<div className="flex items-center gap-1">
-						<CopyButton value={output} label={messages.copy} copiedLabel={messages.copied} failedLabel={messages.copyFailed} />
-						<Button type="button" size="sm" variant="ghost" disabled={output === ''} onClick={handleDownload}>
-							{messages.download}
-						</Button>
-					</div>
-				</div>
-				<textarea
-					id="csv-json-output"
-					readOnly
-					value={output}
-					rows={8}
-					className="w-full rounded-md border border-border bg-muted p-3 font-mono text-xs break-all text-foreground"
-				/>
-			</div>
 		</div>
 	);
 }

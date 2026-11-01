@@ -381,7 +381,9 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 						)}
 					</div>
 
-					<div className="flex flex-col gap-1">
+					{/* Input | swap | output side by side from md up, stacked on phones. */}
+					<div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+					<div className="flex min-w-0 flex-col gap-1">
 						<label htmlFor="base64-text-input" className="text-sm font-medium text-foreground">
 							{messages.textInputLabel}
 						</label>
@@ -396,13 +398,13 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 						/>
 					</div>
 
-					<div className="flex justify-center">
+					<div className="flex justify-center md:self-center">
 						<Button type="button" size="sm" variant="outline" className="h-auto max-w-full whitespace-normal py-1 text-center" onClick={handleSwap} disabled={textOutput === ''}>
 							{messages.swap}
 						</Button>
 					</div>
 
-					<div className="flex flex-col gap-1">
+					<div className="flex min-w-0 flex-col gap-1">
 						<div className="flex items-center justify-between">
 							<label htmlFor="base64-text-output" className="text-sm font-medium text-foreground">
 								{messages.textOutputLabel}
@@ -416,6 +418,7 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 							rows={6}
 							className="w-full rounded-md border border-border bg-muted p-3 font-mono text-xs break-all text-foreground"
 						/>
+					</div>
 					</div>
 
 					{analysis && (

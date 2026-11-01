@@ -1,5 +1,21 @@
 # UX_AUDIT — rà soát nút bấm, thanh tiến trình, bố cục từng công cụ (2026-11-01)
 
+## Cập nhật sau khi sửa (2026-11-01) — đọc trước phần còn lại
+
+**Đã làm (bước 1–3, 5, 7, 8 của mục 3):** thanh công cụ JSON lên trên editor + nút Xoá; Copy/Download lên đầu ô kết quả (Case); nút tải QR dưới bản xem trước;
+Audio/Video có `<Progress>` + % tải engine + tự tải sẵn engine; hàng nút chính dính đáy mobile (Nén ảnh, Chuyển ảnh, Xoá nền, OCR, Gộp/Tách PDF);
+nút Huỷ (Audio, Chuyển ảnh) + cảnh báo khi đóng tab lúc đang xử lý; bố cục hai cột Input | Output từ 768px cho **Case Converter, Base64, CSV↔JSON**
+(đo: Case Copy y=835→149, khối 1146→892px; Base64 715→544px; CSV 1044→940px; mobile vẫn xếp dọc, không tràn ngang).
+
+**Phần báo cáo này đã đo SAI (không cần sửa):**
+- *"K8s / Nginx / ISO không có Sao chép/Tải báo cáo"* — sai. Chúng có "Xuất báo cáo" (JSON), chỉ hiện sau khi có kết quả; mình đo ở trạng thái rỗng.
+- *"ISO không có nút Xoá"* — sai, có nhưng chỉ hiện khi đã nhập.
+- *"Regex có 15 chip chiếm cả hàng"* — sai, đã gập trong `<details>`; trình duyệt vẫn tính kích thước nội dung của `<details>` đóng nên số đo bị phình.
+- Markdown giữ nguyên (nút xuất đã nằm ở một hàng riêng, gom vào menu không đáng).
+
+**Chưa làm:** JSON→Excel hai cột (công cụ này không có ô kết quả dạng văn bản, nên không áp dụng); Case Converter trên mobile vẫn để ô kết quả sau các nhóm nút (y≈1323 / Copy y≈1279);
+chưa chụp ảnh để nhìn bằng mắt; không có kiểm kiểu TypeScript (repo không cài `tsc`).
+
 ## Cách làm và giới hạn (đọc trước)
 
 - Đo bằng DOM trên bản build + CSP production, 26 trang tiếng Anh, ở 1280×900 và 390×844 (mobile, 7 trang).
