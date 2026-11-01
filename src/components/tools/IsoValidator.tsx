@@ -61,6 +61,14 @@ const SAMPLE = [
 
 const PAGE = 100;
 
+// a multi-line message (SWIFT, ISO 20022) is shown by its first lines only; the result lists what was read from it
+function preview(input: string): string {
+	const text = input.trim();
+	const lines = text.split(/\r\n|\r|\n/);
+	const head = lines.slice(0, 3).join(' ⏎ ');
+	return lines.length > 3 || head.length > 240 ? `${head.slice(0, 240)} …` : head;
+}
+
 function fill(template: string, params: Record<string, string | number> = {}): string {
 	return template.replace(/\{\{(\w+)\}\}/g, (_, k: string) => String(params[k] ?? ''));
 }
@@ -163,7 +171,7 @@ export default function IsoValidator({ messages: m, lang }: { messages: IsoMessa
 				{row.status === 'valid' ? m.statusValid : row.status === 'invalid' ? m.statusInvalid : m.statusUnrecognized}
 			</span>
 			<div className="min-w-0 flex-1">
-				<p className="font-mono text-sm text-foreground [overflow-wrap:anywhere]">{row.input.trim()}</p>
+				<p className="font-mono text-sm text-foreground [overflow-wrap:anywhere]">{preview(row.input)}</p>
 				{row.status === 'unrecognized' ? <p className="mt-0.5 text-xs text-muted-foreground">{m.unrecognizedHint}</p> : row.matches.map(renderMatch)}
 			</div>
 		</li>

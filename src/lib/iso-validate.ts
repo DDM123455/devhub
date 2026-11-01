@@ -8,6 +8,8 @@ import { CURRENCIES } from './iso-data/currencies';
 import { LANGUAGES } from './iso-data/languages';
 import { IBAN_COUNTRIES } from './iso-data/iban-registry';
 import { looksLikeIso8583, parseIso8583, serviceCodeMeaning } from './iso8583';
+import { looksLikeSwift, parseSwiftMt } from './swift-mt';
+import { looksLikeIso20022, parseIso20022 } from './iso20022';
 import { CFI_CATEGORIES, CFI_GROUPS, MCC_BY_CODE, mccGroup } from './iso-data/mcc';
 
 export type IsoStandardId =
@@ -29,7 +31,9 @@ export type IsoStandardId =
 	| 'rf'
 	| 'cfi'
 	| 'mcc'
-	| 'track';
+	| 'track'
+	| 'swift'
+	| 'iso20022';
 
 export type IsoReason =
 	| 'badLength'
@@ -67,7 +71,29 @@ export type IsoReason =
 	| 'badFieldCountry'
 	| 'badFieldLength'
 	| 'badCfiCategory'
-	| 'badExpiry';
+	| 'badExpiry'
+	| 'badSwiftBlocks'
+	| 'badSwiftHeader'
+	| 'swiftMissingTag'
+	| 'badSwiftTagFormat'
+	| 'badSwiftDate'
+	| 'badSwiftCurrency'
+	| 'badSwiftAmount'
+	| 'badSwiftCode'
+	| 'badSwiftBic'
+	| 'badSwiftLineLength'
+	| 'badSwiftLineCount'
+	| 'badXml'
+	| 'badIso20022Namespace'
+	| 'badIso20022Root'
+	| 'badIso20022Header'
+	| 'badIso20022Count'
+	| 'badIso20022CtrlSum'
+	| 'badIso20022Iban'
+	| 'badIso20022Bic'
+	| 'badIso20022Currency'
+	| 'badIso20022Amount'
+	| 'badIso20022Length';
 
 export interface IsoDetail {
 	/** i18n key under `detail.` */
@@ -115,6 +141,8 @@ export const ISO_STANDARDS: ReadonlyArray<{ id: IsoStandardId; iso: string }> = 
 	{ id: 'cfi', iso: 'ISO 10962' },
 	{ id: 'mcc', iso: 'ISO 18245' },
 	{ id: 'track', iso: 'ISO/IEC 7813' },
+	{ id: 'swift', iso: 'ISO 15022' },
+	{ id: 'iso20022', iso: 'ISO 20022' },
 ];
 
 // ---------------------------------------------------------------------------------------------------------
@@ -660,6 +688,41 @@ function checkTrack(raw: string): IsoResult {
 	return pass('track', details);
 }
 
+// the two multi-line message formats share the same value checks the single-line standards use
+const messageDeps = {
+	validBic: (v: string) => /^[A-Z0-9]{8}(?:[A-Z0-9]{3})?$/.test(v.toUpperCase()) && checkBic(v).ok,
+	validCurrency: (v: string) => CURRENCY_BY_CODE.has(v.toUpperCase()),
+	validIban: (v: string) => checkIban(v).ok,
+};
+
+/** SWIFT FIN message (ISO 15022 syntax): blocks 1–5 and the :tag: fields of block 4. */
+function checkSwift(raw: string): IsoResult {
+	const p = parseSwiftMt(raw, messageDeps);
+	const details: IsoDetail[] = [];
+	if (p.mt) details.push(d('swiftType', `MT${p.mt}${p.mtName ? ` — ${p.mtName}` : ''}`));
+	else details.push(d('note', 'swiftNoType'));
+	if (p.sender) details.push(d('sender', p.sender));
+	if (p.receiver) details.push(d('receiver', p.receiver));
+	for (const f of p.fields) details.push(d('field', `:${f.tag}: ${f.name} = ${f.lines.join(' / ')}${f.info ? ` (${f.info})` : ''}`));
+	if (!p.ok && p.problem) return fail('swift', p.problem.reason, p.problem.params as Record<string, string | number>, details);
+	return pass('swift', details);
+}
+
+/** ISO 20022 XML message: structure, header, totals and typed values (not a full XSD validation). */
+function checkIso20022(raw: string): IsoResult {
+	const p = parseIso20022(raw, messageDeps);
+	const details: IsoDetail[] = [];
+	if (p.messageId) details.push(d('messageType', p.messageId));
+	if (p.messageName) details.push(d('messageName', p.messageName));
+	if (p.rootElement) details.push(d('rootElement', p.rootElement));
+	for (const [k, v] of p.groupHeader) details.push(d('field', `GrpHdr/${k} = ${v}`));
+	if (p.txCount > 0) details.push(d('txCount', p.txCount));
+	for (const n of p.notes) details.push(d('note', n));
+	details.push(d('note', 'schemaNotChecked'));
+	if (!p.ok && p.problem) return fail('iso20022', p.problem.reason, p.problem.params as Record<string, string | number>, details);
+	return pass('iso20022', details);
+}
+
 /** ISO 8583 financial message (ASCII text or hex dump of the bytes): header, MTI, bitmap and every data element. */
 function checkIso8583(raw: string): IsoResult {
 	const p = parseIso8583(raw);
@@ -729,6 +792,8 @@ const VALIDATORS: Validator[] = [
 	{ id: 'vin', shape: (s) => /^(?=.*[A-Za-z])[A-Za-z0-9]{17}$/.test(s.replace(/\s/g, '')), check: checkVin },
 	{ id: 'container', shape: (s) => /^[A-Za-z]{4}[\s-]?\d{6}[\s-]?\d$/.test(A(s)), check: checkContainer },
 	{ id: 'iso8583', shape: looksLikeIso8583, check: checkIso8583 },
+	{ id: 'swift', shape: looksLikeSwift, check: checkSwift },
+	{ id: 'iso20022', shape: looksLikeIso20022, check: checkIso20022 },
 	{ id: 'rf', shape: (s) => /^RF\d{2}[A-Z0-9 ]{1,28}$/i.test(A(s)), check: checkRf },
 	// four digits / six letters look like far too many other values to be guessed: reachable by choosing the standard
 	{ id: 'cfi', shape: () => false, check: checkCfi },
@@ -778,6 +843,13 @@ export interface TextResult {
 
 /** One value per line; blank lines are skipped. */
 export function validateText(text: string, forced?: IsoStandardId): TextResult {
+	// a SWIFT or ISO 20022 message spans many lines: the whole text is ONE value, not one value per line
+	if (forced === 'swift' || forced === 'iso20022' || (forced === undefined && (looksLikeSwift(text) || looksLikeIso20022(text)))) {
+		if (text.trim() !== '') {
+			const row = validateLine(text, forced);
+			return { rows: [row], counts: { valid: 0, invalid: 0, unrecognized: 0, [row.status]: 1 }, truncated: false };
+		}
+	}
 	const lines = text.split(/\r\n|\r|\n/).filter((l) => l.trim() !== '');
 	const truncated = lines.length > MAX_LINES;
 	const rows = lines.slice(0, MAX_LINES).map((l) => validateLine(l, forced));

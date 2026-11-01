@@ -8,7 +8,7 @@
   "related": "Công cụ liên quan",
   "ui": {
     "inputLabel": "Giá trị cần kiểm tra (mỗi dòng một giá trị)",
-    "inputPlaceholder": "GB82 WEST 1234 5698 7654 32\n2024-02-29T10:00:00Z\n978-0-306-40615-7\nEUR",
+    "inputPlaceholder": "GB82 WEST 1234 5698 7654 32\n2024-02-29T10:00:00Z\n978-0-306-40615-7\nEUR\n\nBản tin SWIFT MT (ISO 15022) và XML ISO 20022 gồm nhiều dòng: dán nguyên một bản tin mỗi lần.",
     "standardLabel": "Kiểm tra theo",
     "auto": "Tự nhận diện (khuyên dùng)",
     "loadSample": "Dùng dữ liệu mẫu",
@@ -52,7 +52,9 @@
       "rf": "mã tham chiếu chủ nợ (RF)",
       "cfi": "CFI (phân loại công cụ tài chính)",
       "mcc": "mã ngành hàng người bán (MCC)",
-      "track": "dữ liệu rãnh từ của thẻ"
+      "track": "dữ liệu rãnh từ của thẻ",
+      "swift": "bản tin SWIFT FIN (MT)",
+      "iso20022": "bản tin tài chính XML"
     },
     "reasons": {
       "badLength": "Sai độ dài: cần {{expected}} ký tự, đang có {{got}}.",
@@ -94,7 +96,29 @@
       "badFieldCountry": "DE {{de}} ({{name}}) = {{value}} không phải mã quốc gia số ISO 3166-1.",
       "badFieldLength": "DE {{de}} ({{name}}) có độ dài {{got}}, nhưng quy tắc là {{expected}}.",
       "badCfiCategory": "Chữ cái đầu \"{{code}}\" không phải nhóm CFI (C, D, E, F, H, I, J, K, L, M, O, R, S hoặc T).",
-      "badExpiry": "Ngày hết hạn {{value}} (YYMM) có tháng ngoài khoảng 01–12."
+      "badExpiry": "Ngày hết hạn {{value}} (YYMM) có tháng ngoài khoảng 01–12.",
+      "badSwiftBlocks": "Cấu trúc bản tin sai ({{why}}): phải có block 4, bắt đầu bằng các dòng :tag: và kết thúc bằng dòng \"-\" trước dấu ngoặc đóng.",
+      "badSwiftHeader": "Block {{block}} của phần đầu không hợp lệ (kiểm tra BIC và độ dài từng phần).",
+      "swiftMissingTag": "MT{{mt}} bắt buộc có trường :{{tag}}: nhưng đang thiếu.",
+      "badSwiftTagFormat": "Trường :{{tag}}: không khớp định dạng {{rule}}.",
+      "badSwiftDate": "Trường :{{tag}}: có ngày không hợp lệ \"{{value}}\" (YYMMDD).",
+      "badSwiftCurrency": "Trường :{{tag}}: có \"{{value}}\", không phải mã tiền tệ ISO 4217.",
+      "badSwiftAmount": "Trường :{{tag}}: có số tiền \"{{value}}\": dùng chữ số với dấu phẩy thập phân và không có dấu phân cách hàng nghìn.",
+      "badSwiftCode": "Trường :{{tag}}: có \"{{value}}\", nhưng chỉ cho phép {{allowed}}.",
+      "badSwiftBic": "Trường :{{tag}}: có \"{{value}}\", không phải BIC hợp lệ.",
+      "badSwiftLineLength": "Trường :{{tag}}: có dòng dài hơn {{max}} ký tự.",
+      "badSwiftLineCount": "Trường :{{tag}}: có nhiều hơn {{max}} dòng.",
+      "badXml": "XML không đúng cú pháp (dòng {{line}}): {{why}}.",
+      "badIso20022Namespace": "Namespace \"{{value}}\" không phải mã định danh bản tin ISO 20022 như urn:iso:std:iso:20022:tech:xsd:pain.001.001.09.",
+      "badIso20022Root": "Cần phần tử {{expected}} nhưng gặp {{got}}.",
+      "badIso20022Header": "Phần tử {{element}} của group header: {{why}}.",
+      "badIso20022Count": "Group header ghi {{expected}} giao dịch nhưng bản tin có {{got}}.",
+      "badIso20022CtrlSum": "Tổng kiểm soát {{got}} không bằng tổng các số tiền, {{expected}}.",
+      "badIso20022Iban": "\"{{value}}\" không phải IBAN hợp lệ.",
+      "badIso20022Bic": "\"{{value}}\" không phải BIC hợp lệ.",
+      "badIso20022Currency": "\"{{value}}\" không phải mã tiền tệ ISO 4217.",
+      "badIso20022Amount": "Số tiền \"{{value}}\" phải là số dương với tối đa 5 chữ số thập phân.",
+      "badIso20022Length": "Phần tử {{element}} dài hơn {{max}} ký tự."
     },
     "detail": {
       "type": "Loại",
@@ -160,7 +184,14 @@
       "pan": "Số thẻ",
       "expiry": "Hết hạn",
       "serviceCode": "Mã dịch vụ",
-      "discretionary": "Dữ liệu tuỳ ý (số ký tự)"
+      "discretionary": "Dữ liệu tuỳ ý (số ký tự)",
+      "swiftType": "Loại bản tin",
+      "sender": "Bên gửi",
+      "receiver": "Bên nhận",
+      "messageType": "Mã bản tin",
+      "messageName": "Tên bản tin",
+      "rootElement": "Phần tử nghiệp vụ",
+      "txCount": "Số giao dịch"
     },
     "types": {
       "date": "ngày dương lịch",
@@ -193,7 +224,10 @@
       "formatOnly": "Chỉ kiểm tra định dạng. Muốn biết DOI có tồn tại hay không cần tra cứu trực tuyến.",
       "withdrawn": "Đồng tiền đã ngừng sử dụng.",
       "cfiAttributes": "Bốn chữ cái cuối là thuộc tính, ý nghĩa phụ thuộc nhóm và loại (X = không áp dụng); xem ISO 10962.",
-      "mccUnlisted": "Mã hợp lệ trong khoảng này nhưng không có trong danh sách đi kèm; các tổ chức thẻ công bố bảng đầy đủ."
+      "mccUnlisted": "Mã hợp lệ trong khoảng này nhưng không có trong danh sách đi kèm; các tổ chức thẻ công bố bảng đầy đủ.",
+      "swiftNoType": "Chỉ dán block 4 nên chưa biết loại bản tin và chưa kiểm các trường bắt buộc. Hãy dán cả bản tin ({1:…}{2:…}{4:…-}) để kiểm.",
+      "schemaNotChecked": "Đã kiểm: XML đúng cú pháp, namespace, phần tử nghiệp vụ, group header, số lượng, tổng kiểm soát, IBAN, BIC, tiền tệ và độ dài. Chưa kiểm: toàn bộ lược đồ XSD của phiên bản bản tin này.",
+      "unknownFamily": "Họ bản tin này không có trong danh sách đi kèm nên chỉ áp dụng các quy tắc chung."
     },
     "regions": {
       "northAmerica": "Bắc Mỹ (bắt buộc có chữ số kiểm tra)",
@@ -262,6 +296,7 @@
     "p3": "Với tiền và ngân hàng, công cụ kiểm tra IBAN theo danh bạ của từng quốc gia, gồm độ dài chính xác và định dạng tài khoản trong nước, rồi xác minh chữ số kiểm tra mod-97. Mã BIC được tách thành ngân hàng, quốc gia và chi nhánh; ISIN và LEI được xác minh bằng quy tắc chữ số kiểm tra riêng; số thẻ thanh toán được thử bằng công thức Luhn và đầu số nhà phát hành. Mã tiền tệ lấy từ ISO 4217 kèm mã số và số chữ số thập phân, còn mã quốc gia và ngôn ngữ lấy từ ISO 3166-1 và ISO 639, kể cả thẻ ngôn ngữ như zh-Hant-TW.",
     "p4": "Với sản phẩm và logistics, công cụ kiểm tra ISBN-10 và ISBN-13 (và đổi qua lại), ISSN, 17 ký tự của số khung xe, số container vận chuyển với mã chủ sở hữu và chữ số kiểm tra, cùng định dạng DOI. Hãy nhớ ý nghĩa của việc kiểm tra: nó chứng minh giá trị viết đúng, không chứng minh cuốn sách, chiếc xe hay tài khoản đó tồn tại. Mọi thứ chạy cục bộ trong trình duyệt nên ngay cả giá trị nhạy cảm cũng không rời khỏi thiết bị của bạn.",
     "p5": "ISO 8583 là định dạng bản tin đứng sau các giao dịch thẻ: mỗi lệnh xin phép, mua hàng, đảo giao dịch hay kiểm tra mạng giữa máy POS/ATM, ngân hàng thanh toán và ngân hàng phát hành đều là một bản tin ISO 8583. Bản tin mở đầu bằng chỉ báo loại bản tin (MTI) 4 chữ số: chữ số đầu là phiên bản (0 = 1987, 1 = 1993, 2 = 2003), tiếp theo là lớp (xin phép, tài chính, đảo, quản lý mạng...), chức năng (yêu cầu, phản hồi, thông báo) và bên gửi. Sau đó là bitmap 64 hoặc 128 bit; mỗi bit bật cho biết trường dữ liệu (DE) tương ứng có mặt, ví dụ DE 2 là số thẻ, DE 3 mã xử lý, DE 4 số tiền, DE 11 số vết (STAN), DE 39 mã phản hồi. Bạn có thể dán bản tin dạng văn bản như tài liệu thường trình bày (MTI, bitmap thập lục phân, các trường là ký tự) hoặc dạng hex của các byte thô với số được nén BCD; công cụ tự nhận ra dạng nào, bỏ qua tiêu đề độ dài nếu có, liệt kê từng trường kèm tên, và báo các lỗi như trường bị cắt cụt hay quá dài, chỉ báo độ dài sai, dữ liệu thừa, ngày giờ không thể có, mã tiền tệ hoặc quốc gia không tồn tại. Công cụ dùng bảng trường ISO 8583:1987, nên bản tin theo bố cục 1993/2003, trường riêng có cấu trúc con hoặc bitmap bậc ba có thể bị báo sai dù hợp lệ trên mạng của bạn.",
-    "p6": "Ngoài các định danh, công cụ còn hiểu một số mã ngân hàng và thanh toán. Mã tham chiếu chủ nợ (ISO 11649) bắt đầu bằng RF cùng hai chữ số kiểm tra và được xác minh bằng cùng quy tắc mod-97 như IBAN, nên lỗi gõ nhầm trong tham chiếu thanh toán được phát hiện trước khi đến ngân hàng. Mã CFI (ISO 10962) gồm sáu chữ cái phân loại một công cụ tài chính — chữ đầu là nhóm (E cổ phiếu, D nợ, F hợp đồng tương lai...) — còn mã ngành hàng (ISO 18245) là số bốn chữ số cho mạng thẻ biết người bán kinh doanh loại gì; hai loại này không được tự đoán vì bất kỳ sáu chữ cái hay bốn chữ số nào cũng có thể là chúng, nên hãy chọn chuẩn trong danh sách. Dữ liệu rãnh (ISO/IEC 7813) là thứ lưu trên dải từ: số thẻ, ngày hết hạn, mã dịch vụ ba chữ số và dữ liệu tuỳ ý, kiểm bằng quy tắc Luhn và tháng hợp lệ. Các bảng tra cứu bên dưới công cụ liệt kê mọi mã phản hồi DE 39, mọi trường dữ liệu ISO 8583 và các mã ngành hàng phổ biến."
+    "p6": "Ngoài các định danh, công cụ còn hiểu một số mã ngân hàng và thanh toán. Mã tham chiếu chủ nợ (ISO 11649) bắt đầu bằng RF cùng hai chữ số kiểm tra và được xác minh bằng cùng quy tắc mod-97 như IBAN, nên lỗi gõ nhầm trong tham chiếu thanh toán được phát hiện trước khi đến ngân hàng. Mã CFI (ISO 10962) gồm sáu chữ cái phân loại một công cụ tài chính — chữ đầu là nhóm (E cổ phiếu, D nợ, F hợp đồng tương lai...) — còn mã ngành hàng (ISO 18245) là số bốn chữ số cho mạng thẻ biết người bán kinh doanh loại gì; hai loại này không được tự đoán vì bất kỳ sáu chữ cái hay bốn chữ số nào cũng có thể là chúng, nên hãy chọn chuẩn trong danh sách. Dữ liệu rãnh (ISO/IEC 7813) là thứ lưu trên dải từ: số thẻ, ngày hết hạn, mã dịch vụ ba chữ số và dữ liệu tuỳ ý, kiểm bằng quy tắc Luhn và tháng hợp lệ. Các bảng tra cứu bên dưới công cụ liệt kê mọi mã phản hồi DE 39, mọi trường dữ liệu ISO 8583 và các mã ngành hàng phổ biến.",
+    "p7": "Hai định dạng bản tin khác được kiểm cả bản tin chứ không theo từng dòng. Bản tin SWIFT FIN (cú pháp ISO 15022) có tối đa năm block — tiêu đề cơ bản, tiêu đề ứng dụng chứa loại bản tin và BIC bên nhận, tiêu đề người dùng, phần nội dung ở block 4 và phần kết — còn block 4 là danh sách các trường :tag:; công cụ kiểm BIC ở tiêu đề, các trường bắt buộc của MT103 (chuyển tiền khách hàng), MT202 (chuyển tiền giữa tổ chức) và các bản tin tự do n99, cùng định dạng các thẻ thông dụng như :32A: (ngày, tiền tệ, số tiền dùng dấu phẩy thập phân), :23B:, :71A:, :20: và các trường bên liên quan có BIC. Bản tin ISO 20022 là XML có namespace nêu tên bản tin (ví dụ pain.001.001.09 hoặc pacs.008.001.08); công cụ kiểm XML đúng cú pháp, namespace và phần tử nghiệp vụ khớp nhau, group header đầy đủ, số giao dịch và tổng kiểm soát khớp với nội dung, và mọi IBAN, BIC, tiền tệ, số tiền đều hợp lệ. Công cụ không thay thế việc kiểm theo XSD chính thức, nên hãy dùng lược đồ của ngân hàng cho bước kiểm cuối."
   }
 }

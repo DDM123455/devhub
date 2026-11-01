@@ -8,7 +8,7 @@
   "related": "Related tools",
   "ui": {
     "inputLabel": "Values to check (one per line)",
-    "inputPlaceholder": "GB82 WEST 1234 5698 7654 32\n2024-02-29T10:00:00Z\n978-0-306-40615-7\nEUR",
+    "inputPlaceholder": "GB82 WEST 1234 5698 7654 32\n2024-02-29T10:00:00Z\n978-0-306-40615-7\nEUR\n\nSWIFT MT (ISO 15022) and ISO 20022 XML messages span many lines: paste one whole message at a time.",
     "standardLabel": "Check against",
     "auto": "Auto-detect (recommended)",
     "loadSample": "Load sample",
@@ -52,7 +52,9 @@
       "rf": "creditor reference (RF)",
       "cfi": "CFI (financial instrument classification)",
       "mcc": "merchant category code (MCC)",
-      "track": "card magnetic-stripe track data"
+      "track": "card magnetic-stripe track data",
+      "swift": "SWIFT FIN message (MT)",
+      "iso20022": "XML financial message"
     },
     "reasons": {
       "badLength": "Wrong length: expected {{expected}} characters, found {{got}}.",
@@ -94,7 +96,29 @@
       "badFieldCountry": "DE {{de}} ({{name}}) = {{value}} is not an ISO 3166-1 numeric country code.",
       "badFieldLength": "DE {{de}} ({{name}}) has length {{got}}, but the rule is {{expected}}.",
       "badCfiCategory": "The first letter \"{{code}}\" is not a CFI category (C, D, E, F, H, I, J, K, L, M, O, R, S or T).",
-      "badExpiry": "The expiry date {{value}} (YYMM) has a month outside 01–12."
+      "badExpiry": "The expiry date {{value}} (YYMM) has a month outside 01–12.",
+      "badSwiftBlocks": "The message structure is wrong ({{why}}): block 4 must exist, start with :tag: lines and end with a line \"-\" before the closing brace.",
+      "badSwiftHeader": "Block {{block}} of the header is not valid (check the BIC and the length of each part).",
+      "swiftMissingTag": "MT{{mt}} requires field :{{tag}}: but it is missing.",
+      "badSwiftTagFormat": "Field :{{tag}}: does not match the format {{rule}}.",
+      "badSwiftDate": "Field :{{tag}}: has an invalid date \"{{value}}\" (YYMMDD).",
+      "badSwiftCurrency": "Field :{{tag}}: has \"{{value}}\", which is not an ISO 4217 currency code.",
+      "badSwiftAmount": "Field :{{tag}}: has the amount \"{{value}}\": use digits with a comma as the decimal sign and no thousands separator.",
+      "badSwiftCode": "Field :{{tag}}: has \"{{value}}\", but only {{allowed}} are allowed.",
+      "badSwiftBic": "Field :{{tag}}: has \"{{value}}\", which is not a valid BIC.",
+      "badSwiftLineLength": "Field :{{tag}}: has a line longer than {{max}} characters.",
+      "badSwiftLineCount": "Field :{{tag}}: has more than {{max}} lines.",
+      "badXml": "The XML is not well-formed (line {{line}}): {{why}}.",
+      "badIso20022Namespace": "The namespace \"{{value}}\" is not an ISO 20022 message identifier such as urn:iso:std:iso:20022:tech:xsd:pain.001.001.09.",
+      "badIso20022Root": "Expected the element {{expected}} but found {{got}}.",
+      "badIso20022Header": "Group header element {{element}} is {{why}}.",
+      "badIso20022Count": "The group header says {{expected}} transactions but the message contains {{got}}.",
+      "badIso20022CtrlSum": "The control sum {{got}} does not equal the sum of the amounts, {{expected}}.",
+      "badIso20022Iban": "\"{{value}}\" is not a valid IBAN.",
+      "badIso20022Bic": "\"{{value}}\" is not a valid BIC.",
+      "badIso20022Currency": "\"{{value}}\" is not an ISO 4217 currency code.",
+      "badIso20022Amount": "The amount \"{{value}}\" must be a positive number with at most 5 decimals.",
+      "badIso20022Length": "The element {{element}} is longer than {{max}} characters."
     },
     "detail": {
       "type": "Type",
@@ -160,7 +184,14 @@
       "pan": "Card number",
       "expiry": "Expiry",
       "serviceCode": "Service code",
-      "discretionary": "Discretionary data (characters)"
+      "discretionary": "Discretionary data (characters)",
+      "swiftType": "Message type",
+      "sender": "Sender",
+      "receiver": "Receiver",
+      "messageType": "Message identifier",
+      "messageName": "Message name",
+      "rootElement": "Business element",
+      "txCount": "Transactions"
     },
     "types": {
       "date": "calendar date",
@@ -193,7 +224,10 @@
       "formatOnly": "Only the format is checked. Whether the DOI exists needs an online lookup.",
       "withdrawn": "Withdrawn currency (no longer in use).",
       "cfiAttributes": "The last four letters are attributes whose meaning depends on the category and group (X = not applicable); see ISO 10962.",
-      "mccUnlisted": "A valid code in this range that is not in the bundled list; the card schemes publish the full table."
+      "mccUnlisted": "A valid code in this range that is not in the bundled list; the card schemes publish the full table.",
+      "swiftNoType": "Only block 4 was pasted, so the message type is unknown and its mandatory fields were not checked. Paste the whole message ({1:…}{2:…}{4:…-}) for that.",
+      "schemaNotChecked": "Checked: well-formed XML, namespace, business element, group header, counts, control sum, IBAN, BIC, currency and lengths. Not checked: the full XSD schema of this message version.",
+      "unknownFamily": "This message family is not in the bundled list, so only the general rules were applied."
     },
     "regions": {
       "northAmerica": "North America (check digit required)",
@@ -262,6 +296,7 @@
     "p3": "For money it checks IBANs against the registry of each country, including the exact length and the national account format, and verifies the mod-97 check digits. BIC codes are split into bank, country and branch, ISIN and LEI codes are verified with their own check-digit rules, and payment card numbers are tested with the Luhn formula and the issuer prefix. Currency codes come from ISO 4217 with their numeric code and minor units, and country and language codes come from ISO 3166-1 and ISO 639, including language tags such as zh-Hant-TW.",
     "p4": "For products and logistics it validates ISBN-10 and ISBN-13 (and converts between them), ISSN, the 17 characters of a vehicle identification number, shipping container numbers with their owner code and check digit, and the format of a DOI. Remember what validation means: it proves a value is well formed, not that the book, vehicle or account exists. Everything runs locally in your browser, so even sensitive values never leave your device.",
     "p5": "ISO 8583 is the message format behind card payments: every authorization, purchase, reversal and network test between a terminal, an acquirer and an issuer is one ISO 8583 message. A message starts with a four-digit message type indicator (MTI) whose digits give the edition (0 = 1987, 1 = 1993, 2 = 2003), the class (authorization, financial, reversal, network management…), the function (request, response, advice) and who sent it. A bitmap of 64 or 128 bits follows, and each bit that is set says that the matching data element (DE) is present, such as DE 2 for the card number, DE 3 for the processing code, DE 4 for the amount, DE 11 for the trace number or DE 39 for the response code. Paste a message either as the text most documentation shows (MTI, hexadecimal bitmap and fields as characters) or as a hex dump of the raw bytes with BCD-packed numbers; the checker detects which one it is, strips an optional length header, lists every field with its name and flags truncated or oversized fields, bad length indicators, leftover data, impossible dates and times and unknown currency or country codes. It follows the 1987 data element table, so messages that use 1993 or 2003 layouts, private fields with their own sub-structure or a tertiary bitmap may be reported as invalid even though they are valid on your network.",
-    "p6": "Beyond identifiers, the validator also understands a few banking and payment codes. A creditor reference (ISO 11649) starts with RF and two check digits and is verified with the same mod-97 rule as an IBAN, so a mistyped payment reference is caught before it reaches the bank. A CFI code (ISO 10962) is six letters that classify a financial instrument — the first letter is the category (E for equities, D for debt, F for futures…) — and a merchant category code (ISO 18245) is the four-digit number that tells the card network what kind of business a merchant runs; both are never guessed automatically because any six letters or four digits could be one, so pick the standard from the list. Track data (ISO/IEC 7813) is what a magnetic stripe stores: card number, expiry, a three-digit service code and discretionary data, checked with the Luhn rule and a real month. The reference tables under the validator list every DE 39 response code, every ISO 8583 data element and the common merchant category codes."
+    "p6": "Beyond identifiers, the validator also understands a few banking and payment codes. A creditor reference (ISO 11649) starts with RF and two check digits and is verified with the same mod-97 rule as an IBAN, so a mistyped payment reference is caught before it reaches the bank. A CFI code (ISO 10962) is six letters that classify a financial instrument — the first letter is the category (E for equities, D for debt, F for futures…) — and a merchant category code (ISO 18245) is the four-digit number that tells the card network what kind of business a merchant runs; both are never guessed automatically because any six letters or four digits could be one, so pick the standard from the list. Track data (ISO/IEC 7813) is what a magnetic stripe stores: card number, expiry, a three-digit service code and discretionary data, checked with the Luhn rule and a real month. The reference tables under the validator list every DE 39 response code, every ISO 8583 data element and the common merchant category codes.",
+    "p7": "Two further message formats are checked as a whole rather than line by line. A SWIFT FIN message (ISO 15022 syntax) has up to five blocks — basic header, application header with the message type and receiving BIC, user header, the text in block 4 and a trailer — and block 4 is a list of :tag: fields; the validator checks the header BICs, the mandatory fields of an MT103 (customer credit transfer), an MT202 (institution transfer) and the n99 free-format messages, and the format of the common tags such as :32A: (date, currency, amount with a decimal comma), :23B:, :71A:, :20: and the BIC-bearing party fields. An ISO 20022 message is XML whose namespace names the message (for example pain.001.001.09 or pacs.008.001.08); the validator checks that the XML is well formed, the namespace and business element match, the group header is complete, the number of transactions and control sum agree with the content, and every IBAN, BIC, currency and amount is valid. It does not replace validation against the official XSD, so use your bank's schema for the final check."
   }
 }
