@@ -74,7 +74,7 @@ const TABLE: ReadonlyArray<readonly [number, string, Iso8583Type, number, 0 | 2 
 	[52, 'PIN data', 'b', 64, 0],
 	[53, 'Security-related control information', 'n', 16, 0],
 	[54, 'Additional amounts', 'an', 120, 3],
-	[55, 'ICC (chip) data', 'ans', 999, 3],
+	[55, 'ICC (chip) data', 'b', 999, 3],
 	[56, 'Reserved (ISO)', 'ans', 999, 3],
 	[57, 'Reserved (national)', 'ans', 999, 3],
 	[58, 'Reserved (national)', 'ans', 999, 3],
@@ -152,30 +152,6 @@ const TABLE: ReadonlyArray<readonly [number, string, Iso8583Type, number, 0 | 2 
 export const ISO8583_FIELDS: ReadonlyMap<number, Iso8583Field> = new Map(
 	TABLE.map(([de, name, type, len, lv]) => [de, { de, name, type, len, lv }]),
 );
-
-/** Common values of DE 39 (response code) — enough to read most real traffic. */
-export const RESPONSE_CODES: Readonly<Record<string, string>> = {
-	'00': 'Approved',
-	'01': 'Refer to card issuer',
-	'03': 'Invalid merchant',
-	'04': 'Pick up card',
-	'05': 'Do not honor',
-	'12': 'Invalid transaction',
-	'13': 'Invalid amount',
-	'14': 'Invalid card number',
-	'30': 'Format error',
-	'41': 'Lost card',
-	'43': 'Stolen card',
-	'51': 'Insufficient funds',
-	'54': 'Expired card',
-	'55': 'Incorrect PIN',
-	'57': 'Transaction not permitted to cardholder',
-	'58': 'Transaction not permitted to terminal',
-	'61': 'Exceeds withdrawal limit',
-	'65': 'Exceeds withdrawal frequency',
-	'91': 'Issuer or switch inoperative',
-	'96': 'System malfunction',
-};
 
 /** First two digits of DE 3 (processing code). */
 export const PROCESSING_CODES: Readonly<Record<string, string>> = {

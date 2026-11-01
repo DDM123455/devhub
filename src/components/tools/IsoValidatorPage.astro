@@ -3,6 +3,7 @@ import { jsonLd } from '@/lib/json-ld';
 import Layout from '../../layouts/Layout.astro';
 import FaqSection from '@/components/layout/FaqSection.astro';
 import IsoValidator from './IsoValidator';
+import Iso8583Lookup from './Iso8583Lookup';
 import { getFixedT } from '@/i18n/i18next';
 import { tools } from '@/data/tools';
 import type { Locale } from '@/i18n/config';
@@ -59,6 +60,7 @@ const schema = {
 		<p class="mt-2 text-muted-foreground">{t('tagline')}</p>
 		<div class="mt-6">
 			<IsoValidator client:load messages={messages} lang={lang} />
+			<Iso8583Lookup client:idle messages={(messages as { lookup: never }).lookup} />
 		</div>
 	</section>
 	<section class="border-t border-border px-4 py-10">

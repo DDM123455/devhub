@@ -9,7 +9,9 @@
 
 import { COUNTRIES } from './iso-data/countries';
 import { CURRENCIES } from './iso-data/currencies';
-import { ISO8583_FIELDS, PROCESSING_CODES, RESPONSE_CODES, type Iso8583Field } from './iso-data/iso8583-fields';
+import { ISO8583_FIELDS, PROCESSING_CODES, type Iso8583Field } from './iso-data/iso8583-fields';
+import { RESPONSE_CODES, describeField, responseCodeCategory } from './iso-data/iso8583-codes';
+import { parseTlv, tlvLines } from './emv-tlv';
 
 export type Iso8583Encoding = 'ascii' | 'binary';
 
@@ -20,6 +22,18 @@ export interface ParsedField {
 	value: string;
 	/** human meaning, when the value has a well-known one (response code, currency, …) */
 	meaning?: string;
+	/** the format the standard gives this field, e.g. "n..19 (LLVAR)" or "n 6" */
+	spec: string;
+	/** the length found, with the unit and the rule it was held to, e.g. "16 digits (max 19)" */
+	length: string;
+	/** false when the length breaks the field's rule */
+	lengthOk: boolean;
+	/** the length the field must have, e.g. "6" or "12 to 19" */
+	lengthRule: string;
+	/** what the field is for */
+	description: string;
+	/** decoded parts of a composite field (EMV tags of DE 55, track 2 parts of DE 35) */
+	sub: string[];
 }
 
 export type Iso8583Problem =
@@ -32,6 +46,7 @@ export type Iso8583Problem =
 	| { reason: 'badFieldChars'; params: { de: number; name: string } }
 	| { reason: 'unsupportedField'; params: { de: number } }
 	| { reason: 'trailingData'; params: { count: number } }
+	| { reason: 'badFieldLength'; params: { de: number; name: string; got: string; expected: string } }
 	| { reason: 'badFieldDate'; params: { de: number; name: string; value: string } }
 	| { reason: 'badFieldTime'; params: { de: number; name: string; value: string } }
 	| { reason: 'badFieldCurrency'; params: { de: number; name: string; value: string } }
@@ -144,6 +159,78 @@ const hexToAscii = (hex: string) => String.fromCharCode(...(hex.match(/../g) ?? 
 const PRINTABLE = /^[\x20-\x7e]*$/;
 
 // ---------------------------------------------------------------------------------------------------------
+// per-field facts: format, length rule, explanation
+
+const TYPE_LABEL: Record<string, string> = { n: 'n', an: 'an', ans: 'ans', b: 'b', z: 'z', xn: 'x+n' };
+
+function specOf(def: Iso8583Field): string {
+	const t = TYPE_LABEL[def.type];
+	if (def.lv > 0) return `${t}${'.'.repeat(def.lv)}${def.len} (${def.lv === 2 ? 'LLVAR' : 'LLLVAR'})`;
+	if (def.type === 'b') return `b ${def.len} bits`;
+	return `${t} ${def.len}`;
+}
+
+/** How long the value is, in the unit that fits its type, and whether that obeys the field's length rule. */
+function lengthOf(def: Iso8583Field, value: string): { text: string; ok: boolean; expected: string } {
+	let actual = value.length;
+	let unit = 'chars';
+	if (def.type === 'n') unit = 'digits';
+	else if (def.type === 'b') {
+		actual = Math.ceil(value.length / 2);
+		unit = 'bytes';
+	}
+	const fixed = def.type === 'b' ? def.len / 8 : def.type === 'xn' ? def.len + 1 : def.len;
+	if (def.lv > 0) {
+		let ok = actual <= def.len;
+		let expected = `up to ${def.len}`;
+		// a card number is 12 to 19 digits (ISO/IEC 7812); the field allows up to 19 but nothing shorter than 12 is a PAN
+		if (def.de === 2) {
+			ok = actual >= 12 && actual <= 19;
+			expected = '12 to 19';
+		}
+		return { text: `${actual} ${unit} (max ${def.len})`, ok, expected };
+	}
+	return { text: `${actual} ${unit} (fixed ${fixed})`, ok: actual === fixed, expected: String(fixed) };
+}
+
+function trackLines(value: string): string[] {
+	const m = value.match(/^(\d{12,19})[=D](\d{4}|=)(\d{3})?(.*)$/);
+	if (!m) return [];
+	const out = [`PAN: ${m[1]}`];
+	if (/^\d{4}$/.test(m[2])) out.push(`Expiry: 20${m[2].slice(0, 2)}-${m[2].slice(2)} (YYMM)`);
+	if (m[3]) {
+		const [a, b, c] = m[3];
+		const first = { '1': 'international interchange', '2': 'international, use chip', '5': 'national interchange only', '6': 'national, use chip', '7': 'private use', '9': 'test' }[a] ?? 'unknown';
+		const second = { '0': 'normal authorization', '2': 'online authorization by issuer', '4': 'online authorization, except bilateral agreement' }[b] ?? 'unknown';
+		const third = { '0': 'PIN required', '1': 'no restrictions', '2': 'goods and services only', '3': 'ATM only, PIN required', '5': 'goods and services only, PIN required', '6': 'no restrictions, PIN if possible', '7': 'goods and services, PIN if possible' }[c] ?? 'unknown';
+		out.push(`Service code ${m[3]}: ${first}; ${second}; ${third}`);
+	}
+	if (m[4]) out.push(`Discretionary data: ${m[4].length} characters`);
+	return out;
+}
+
+function enrich(def: Iso8583Field, value: string): ParsedField {
+	const len = lengthOf(def, value);
+	const field: ParsedField = {
+		de: def.de,
+		name: def.name,
+		value,
+		spec: specOf(def),
+		length: len.text,
+		lengthOk: len.ok,
+		lengthRule: len.expected,
+		description: describeField(def.de),
+		sub: [],
+	};
+	if (def.de === 35) field.sub = trackLines(value);
+	if (def.de === 55 && /^[0-9A-Fa-f]+$/.test(value) && value.length % 2 === 0) {
+		const tlv = parseTlv(value);
+		if (tlv) field.sub = tlvLines(tlv);
+	}
+	return field;
+}
+
+// ---------------------------------------------------------------------------------------------------------
 // field decoding
 
 type Fail = Iso8583Problem;
@@ -212,8 +299,12 @@ function readField(r: Reader, enc: Iso8583Encoding, def: Iso8583Field): string {
 		}
 		case 'an':
 		case 'ans': {
-			const text = hexToAscii(r.take(len));
-			if (!PRINTABLE.test(text)) throw new Stop({ reason: 'badFieldChars', params: { de: def.de, name: def.name } });
+			const hex = r.take(len);
+			const text = hexToAscii(hex);
+			if (!PRINTABLE.test(text)) {
+				if (variable && def.de >= 46) return hex; // private / reserved data may be binary
+				throw new Stop({ reason: 'badFieldChars', params: { de: def.de, name: def.name } });
+			}
 			if (def.type === 'an' && !/^[A-Za-z0-9]*$/.test(text)) throw new Stop({ reason: 'badFieldChars', params: { de: def.de, name: def.name } });
 			return text;
 		}
@@ -304,7 +395,7 @@ function checkSemantics(fields: ParsedField[]): Iso8583Problem | null {
 				f.meaning = PROCESSING_CODES[f.value.slice(0, 2)];
 				break;
 			case 39:
-				f.meaning = RESPONSE_CODES[f.value];
+				f.meaning = RESPONSE_CODES[f.value] ? `${RESPONSE_CODES[f.value]} [${responseCodeCategory(f.value)}]` : 'Not in the standard list (network-specific code)';
 				break;
 		}
 	}
@@ -357,7 +448,14 @@ function parseWith(enc: Iso8583Encoding, text: string, bytes: Uint8Array): Iso85
 			if (de === 1) continue;
 			const def = ISO8583_FIELDS.get(de)!;
 			try {
-				base.fields.push({ de, name: def.name, value: readField(r, enc, def) });
+				const field = enrich(def, readField(r, enc, def));
+				base.fields.push(field);
+				if (!field.lengthOk) {
+					throw new Stop({
+						reason: 'badFieldLength',
+						params: { de, name: def.name, got: field.length, expected: field.lengthRule },
+					});
+				}
 			} catch (e) {
 				if (e instanceof Truncated) throw new Stop({ reason: 'truncated', params: { de, need: e.need, have: e.have } });
 				throw e;

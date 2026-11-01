@@ -87,7 +87,8 @@
       "badFieldDate": "DE {{de}} ({{name}}) = {{value}} không phải ngày hợp lệ.",
       "badFieldTime": "DE {{de}} ({{name}}) = {{value}} không phải giờ hợp lệ.",
       "badFieldCurrency": "DE {{de}} ({{name}}) = {{value}} không phải mã tiền tệ số ISO 4217.",
-      "badFieldCountry": "DE {{de}} ({{name}}) = {{value}} không phải mã quốc gia số ISO 3166-1."
+      "badFieldCountry": "DE {{de}} ({{name}}) = {{value}} không phải mã quốc gia số ISO 3166-1.",
+      "badFieldLength": "DE {{de}} ({{name}}) có độ dài {{got}}, nhưng quy tắc là {{expected}}."
     },
     "detail": {
       "type": "Loại",
@@ -140,7 +141,10 @@
       "mtiMeaning": "Loại bản tin",
       "bitmap": "Bitmap",
       "fieldCount": "Số trường",
-      "field": "Trường"
+      "field": "Trường",
+      "fieldSpec": "Định dạng & độ dài",
+      "fieldInfo": "Ý nghĩa",
+      "fieldSub": "Giải mã"
     },
     "types": {
       "date": "ngày dương lịch",
@@ -189,6 +193,29 @@
       "U": "container hàng hóa",
       "J": "thiết bị gắn với container hàng hóa",
       "Z": "rơ-moóc hoặc khung gầm"
+    },
+    "lookup": {
+      "heading": "Tra cứu ISO 8583: mã phản hồi và các trường dữ liệu",
+      "hint": "Tra ý nghĩa mã phản hồi DE 39, hoặc mỗi trường dữ liệu (DE) chứa gì và phải dài bao nhiêu.",
+      "tabResponse": "Mã phản hồi DE 39",
+      "tabFields": "Trường dữ liệu (DE 2–128)",
+      "searchLabel": "Tìm kiếm",
+      "searchPlaceholder": "vd. 51, \"insufficient\", DE 55, amount",
+      "colCode": "Mã",
+      "colMeaning": "Ý nghĩa",
+      "colCategory": "Kết quả",
+      "colField": "Trường",
+      "colName": "Tên",
+      "colFormat": "Định dạng",
+      "empty": "Không có kết quả nào khớp.",
+      "networkNote": "Ý nghĩa theo ISO 8583 và cách dùng phổ biến của các tổ chức thẻ. Mỗi mạng (Visa, Mastercard, các switch nội địa) có danh sách riêng, nên hãy đối chiếu đặc tả của mạng với các mã khác nhau. Tên và mô tả trường là tiếng Anh.",
+      "categories": {
+        "approved": "Chấp nhận",
+        "declined": "Từ chối",
+        "pickup": "Thu hồi thẻ",
+        "error": "Lỗi",
+        "system": "Hệ thống"
+      }
     }
   },
   "faq": {

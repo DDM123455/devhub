@@ -66,7 +66,7 @@ describe('parseIso8583 — ASCII', () => {
 		expect(p.fields.find((f) => f.de === 2)!.value).toBe('4111111111111111');
 		expect(p.fields.find((f) => f.de === 41)!.value).toBe('TERM0001');
 		expect(p.fields.find((f) => f.de === 49)!.meaning).toBe('VND');
-		expect(p.fields.find((f) => f.de === 39)!.meaning).toBe('Approved');
+		expect(p.fields.find((f) => f.de === 39)!.meaning).toContain('Approved');
 	});
 	it('handles a secondary bitmap', () => {
 		const p = parseIso8583(ascii('0800', [[11, '000001'], [70, '301']]));
@@ -150,6 +150,52 @@ describe('parseIso8583 — binary (hex dump)', () => {
 		const p = parseIso8583(body.slice(0, body.length - 6));
 		expect(p.ok).toBe(false);
 		expect(p.problem?.reason).toBe('truncated');
+	});
+});
+
+describe('per-field explanation and length checks', () => {
+	it('gives every field its format, length rule and meaning', () => {
+		const p = parseIso8583(ascii('0200', ASCII_FIELDS));
+		const pan = p.fields.find((f) => f.de === 2)!;
+		expect(pan.spec).toBe('n..19 (LLVAR)');
+		expect(pan.length).toBe('16 digits (max 19)');
+		expect(pan.lengthOk).toBe(true);
+		expect(pan.description).toMatch(/card number/i);
+		const stan = p.fields.find((f) => f.de === 11)!;
+		expect(stan.spec).toBe('n 6');
+		expect(stan.length).toBe('6 digits (fixed 6)');
+		expect(p.fields.find((f) => f.de === 41)!.spec).toBe('ans 8');
+	});
+	it('rejects a card number shorter than 12 digits even though LLVAR allows it', () => {
+		const p = parseIso8583(ascii('0200', [[2, '08' + '41111111']]));
+		expect(p.ok).toBe(false);
+		expect(p.problem?.reason).toBe('badFieldLength');
+	});
+	it('explains DE 39 with the response-code table and its category', () => {
+		const p = parseIso8583(ascii('0210', [[39, '51']]));
+		expect(p.fields[0].meaning).toContain('Not sufficient funds');
+		expect(p.fields[0].meaning).toContain('declined');
+		expect(parseIso8583(ascii('0210', [[39, 'ZZ']])).fields[0].meaning).toContain('network-specific');
+	});
+	it('decodes track 2 (DE 35)', () => {
+		const t2 = '4111111111111111=25122011234567890';
+		const p = parseIso8583(ascii('0200', [[35, String(t2.length).padStart(2, '0') + t2]]));
+		expect(p.ok).toBe(true);
+		const lines = p.fields[0].sub;
+		expect(lines[0]).toBe('PAN: 4111111111111111');
+		expect(lines[1]).toContain('2025-12');
+		expect(lines[2]).toContain('Service code 201');
+	});
+	it('unpacks EMV TLV data in DE 55', () => {
+		// 9F26 (8 bytes cryptogram) + 9F27 80 (ARQC) + 5F2A 0704 (VND) + 9C 00 (purchase)
+		const tlv = '9F2608A1B2C3D4E5F60718' + '9F270180' + '5F2A020704' + '9C0100';
+		const p = parseIso8583(ascii('0200', [[55, String(tlv.length).padStart(3, '0') + tlv]]));
+		expect(p.ok).toBe(true);
+		const text = p.fields[0].sub.join('\n');
+		expect(text).toContain('9F26 · Application cryptogram: A1B2C3D4E5F60718');
+		expect(text).toContain('ARQC');
+		expect(text).toContain('Transaction currency code');
+		expect(text).toContain('purchase');
 	});
 });
 

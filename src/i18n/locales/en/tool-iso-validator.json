@@ -87,7 +87,8 @@
       "badFieldDate": "DE {{de}} ({{name}}) = {{value}} is not a valid date.",
       "badFieldTime": "DE {{de}} ({{name}}) = {{value}} is not a valid time.",
       "badFieldCurrency": "DE {{de}} ({{name}}) = {{value}} is not an ISO 4217 numeric currency code.",
-      "badFieldCountry": "DE {{de}} ({{name}}) = {{value}} is not an ISO 3166-1 numeric country code."
+      "badFieldCountry": "DE {{de}} ({{name}}) = {{value}} is not an ISO 3166-1 numeric country code.",
+      "badFieldLength": "DE {{de}} ({{name}}) has length {{got}}, but the rule is {{expected}}."
     },
     "detail": {
       "type": "Type",
@@ -140,7 +141,10 @@
       "mtiMeaning": "Message type",
       "bitmap": "Bitmap",
       "fieldCount": "Fields present",
-      "field": "Field"
+      "field": "Field",
+      "fieldSpec": "Format & length",
+      "fieldInfo": "Meaning",
+      "fieldSub": "Decoded"
     },
     "types": {
       "date": "calendar date",
@@ -189,6 +193,29 @@
       "U": "freight container",
       "J": "detachable freight-container equipment",
       "Z": "trailer or chassis"
+    },
+    "lookup": {
+      "heading": "ISO 8583 reference: response codes and data elements",
+      "hint": "Look up what a DE 39 response code means, or what any data element (DE) holds and how long it must be.",
+      "tabResponse": "DE 39 response codes",
+      "tabFields": "Data elements (DE 2–128)",
+      "searchLabel": "Search",
+      "searchPlaceholder": "e.g. 51, \"insufficient\", DE 55, amount",
+      "colCode": "Code",
+      "colMeaning": "Meaning",
+      "colCategory": "Result",
+      "colField": "Field",
+      "colName": "Name",
+      "colFormat": "Format",
+      "empty": "Nothing matches that search.",
+      "networkNote": "Meanings follow ISO 8583 and common card-scheme usage. Each network (Visa, Mastercard, domestic switches) keeps its own list, so check its specification for codes that differ.",
+      "categories": {
+        "approved": "Approved",
+        "declined": "Declined",
+        "pickup": "Pick up card",
+        "error": "Error",
+        "system": "System"
+      }
     }
   },
   "faq": {

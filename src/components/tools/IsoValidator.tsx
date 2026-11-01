@@ -128,9 +128,9 @@ export default function IsoValidator({ messages: m, lang }: { messages: IsoMessa
 	const renderDetails = (details: IsoDetail[]) => (
 		<dl className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs">
 			{details.map((x, i) => (
-				<div key={`${x.key}-${i}`} className={x.key === 'field' ? 'flex basis-full gap-1' : 'flex gap-1'}>
+				<div key={`${x.key}-${i}`} className={x.key === 'field' ? 'mt-1 flex basis-full gap-1' : x.key === 'fieldSpec' || x.key === 'fieldInfo' || x.key === 'fieldSub' ? 'flex basis-full gap-1 pl-4' : 'flex gap-1'}>
 					<dt className="text-muted-foreground">{m.detail[x.key] ?? x.key}:</dt>
-					<dd className="font-mono text-foreground [overflow-wrap:anywhere]">{valueText(x.key, x.value)}</dd>
+					<dd className={x.key === 'fieldInfo' ? 'text-muted-foreground [overflow-wrap:anywhere]' : 'font-mono text-foreground [overflow-wrap:anywhere]'}>{valueText(x.key, x.value)}</dd>
 				</div>
 			))}
 		</dl>

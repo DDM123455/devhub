@@ -59,7 +59,8 @@ export type IsoReason =
 	| 'badFieldDate'
 	| 'badFieldTime'
 	| 'badFieldCurrency'
-	| 'badFieldCountry';
+	| 'badFieldCountry'
+	| 'badFieldLength';
 
 export interface IsoDetail {
 	/** i18n key under `detail.` */
@@ -600,7 +601,10 @@ function checkIso8583(raw: string): IsoResult {
 	if (p.bitmap) details.push(d('bitmap', p.bitmap));
 	if (p.bitmap) details.push(d('fieldCount', p.fields.length));
 	for (const f of p.fields) {
-		details.push(d('field', `DE ${String(f.de).padStart(3, '0')} · ${f.name}: ${f.value}${f.meaning ? ` (${f.meaning})` : ''}`));
+		details.push(d('field', `DE ${String(f.de).padStart(3, '0')} · ${f.name}: ${f.value.length > 120 ? `${f.value.slice(0, 120)}… (${f.value.length} chars)` : f.value}${f.meaning ? ` (${f.meaning})` : ''}`));
+		details.push(d('fieldSpec', `${f.spec} · ${f.length} ${f.lengthOk ? '✓' : '✗'}`));
+		details.push(d('fieldInfo', f.description));
+		for (const line of f.sub) details.push(d('fieldSub', line));
 	}
 	if (!p.ok && p.problem) return fail('iso8583', p.problem.reason, p.problem.params as Record<string, string | number>, details);
 	return pass('iso8583', details);
