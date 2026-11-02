@@ -124,6 +124,7 @@ const OG_LOCALE: Record<Locale, string> = {
 		</div>
 		<Footer lang={lang} />
 		<script>
+			import '@/lib/navigation-warmup';
 			const sidebar = document.getElementById('sidebar');
 			const sidebarBackdrop = document.getElementById('sidebar-backdrop');
 			const sidebarToggle = document.getElementById('sidebar-toggle');

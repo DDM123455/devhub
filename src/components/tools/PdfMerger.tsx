@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLeaveWarning } from './useLeaveWarning';
-import { PDFDocument, StandardFonts, degrees, rgb } from 'pdf-lib';
-import { renderPdfThumbnails, type PdfPageThumbnail } from '@/lib/pdf-thumbnails';
+import type { PDFDocument } from 'pdf-lib';
+import type { PdfPageThumbnail } from '@/lib/pdf-thumbnails';
+// Keep PDF engines out of the initial page bundle. Load only when a file is selected.
+const renderPdfThumbnails: typeof import('@/lib/pdf-thumbnails').renderPdfThumbnails = async (...args) =>
+	(await import('@/lib/pdf-thumbnails')).renderPdfThumbnails(...args);
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { combineRotation, isPasswordError } from '@/lib/pdf-utils';
@@ -383,6 +386,7 @@ export default function PdfMerger({ messages }: { messages: Messages }) {
 		setPreviewThumbnails(null);
 
 		try {
+			const { PDFDocument, StandardFonts, degrees, rgb } = await import('pdf-lib');
 			const mergedDoc = await PDFDocument.create();
 
 			// Gom theo file: mỗi file chỉ load 1 lần và copyPages 1 lần cho tất cả trang cần dùng.

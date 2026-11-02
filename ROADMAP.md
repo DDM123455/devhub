@@ -588,3 +588,5 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 - [ ] Đăng Hacker News (Show HN)
 - [ ] Setup Google Analytics hoặc Plausible (privacy-friendly)
 - [ ] Theo dõi index coverage trên Search Console hàng tuần
+
+- [x] 2026-11-02 — navigation: Đo production: HTML cache HIT vẫn có TTFB khoảng 1,7–4,2 giây trong lần đo; chưa đủ để kết luận nguyên nhân mạng/edge. Merge PDF chuyển pdf-lib và pdf-thumbnails sang import động khi chọn/xử lý file. Thêm warmup module giao diện khi hover/focus link công cụ (giới hạn 4 URL, không chạy engine, bỏ qua saveData/2G). 976 test qua; build 602 trang. Chưa đo sau deploy, chưa push.
