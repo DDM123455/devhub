@@ -187,6 +187,23 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 		return { textOutput: '', textError: result.reason === 'notText' ? messages.decodeNotText : messages.decodeError };
 	}, [textInput, mode, urlSafe, lineWrap, decodeEncoding, lineMode, prettyJson, messages.decodeError, messages.decodeNotText, messages.x.lineError]);
 
+	const inlineFile = useMemo(() => {
+		if (mode !== 'decode' || lineMode || !textInput.trim()) return null;
+		try {
+			const header = base64ToBytes(fromUrlSafeOrStandard(cleanBase64Input(textInput).slice(0, 64)));
+			if (!detectImageMime(header) && textError !== messages.decodeNotText) return null;
+			return decodeBase64File(textInput);
+		} catch { return null; }
+	}, [mode, lineMode, textInput, textError, messages.decodeNotText]);
+	const downloadInlineFile = () => {
+		if (!inlineFile) return;
+		const url = URL.createObjectURL(new Blob([inlineFile.bytes], { type: inlineFile.mime }));
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = `decoded.${EXTENSION_BY_MIME[inlineFile.mime] ?? 'bin'}`;
+		link.click();
+		setTimeout(() => URL.revokeObjectURL(url), 1000);
+	};
 	const analysis = useMemo(() => (mode === 'decode' && textInput.trim() !== '' && !lineMode ? analyzeBase64(textInput) : null), [mode, textInput, lineMode]);
 	const decodedLooksLikeJson = useMemo(() => {
 		if (mode !== 'decode' || lineMode || textInput.trim() === '') return false;
@@ -396,15 +413,19 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 							<label htmlFor="base64-text-output" className="text-sm font-medium text-foreground">
 								{messages.textOutputLabel}
 							</label>
-							<CopyButton value={textOutput} label={messages.copy} copiedLabel={messages.copied} failedLabel={messages.copyFailed} ariaLabel={messages.copyOutputAria} />
+							{!inlineFile && <CopyButton value={textOutput} label={messages.copy} copiedLabel={messages.copied} failedLabel={messages.copyFailed} ariaLabel={messages.copyOutputAria} />}
 						</div>
-						<textarea
+						{inlineFile ? <div className="flex min-h-32 flex-col items-start gap-3 rounded-md border border-border bg-muted p-3">
+							{inlineFile.mime.startsWith('image/') && <img src={inlineFile.dataUri} alt={messages.imagePreviewLabel} className="max-h-72 max-w-full rounded-md object-contain" />}
+							<p role="status" className="text-xs text-muted-foreground">{inlineFile.mime} · {inlineFile.bytes.length.toLocaleString()} B</p>
+							<Button type="button" variant="outline" aria-label={messages.downloadAria} onClick={downloadInlineFile}>{messages.downloadFile}</Button>
+						</div> : <textarea
 							id="base64-text-output"
 							readOnly
 							value={textOutput}
 							rows={6}
 							className="w-full rounded-md border border-border bg-muted p-3 font-mono text-xs break-all text-foreground"
-						/>
+						/>}
 					</div>
 					</div>
 
@@ -436,8 +457,8 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 							))}
 						</div>
 					)}
-					{textError && <p role="alert" className="text-sm text-destructive">{textError}</p>}
-					{mode === 'decode' && textInput.trim() !== '' && (
+					{textError && !inlineFile && <p role="alert" className="text-sm text-destructive">{textError}</p>}
+					{mode === 'decode' && textInput.trim() !== '' && !inlineFile && (
 						<Button type="button" variant="outline" onClick={() => { handleFileDecodeInputChange(textInput); setTab('file'); }}>
 							{messages.fileDecodeHeading}
 						</Button>

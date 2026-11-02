@@ -1,5 +1,7 @@
 # ROADMAP.md — Web Tool Hub (Client-Side, Zero Server Cost)
 
+- [x] 2026-11-02 — Base64 Decode hiển thị ảnh/file trực tiếp trong Output, không cần chuyển tab.
+
 - [x] 2026-11-02 — Đưa XML vào trang JSON với chọn JSON/XML, format, validate, copy và tải XML.
 
 - [x] 2026-11-02 — Hiển thị rõ XML trong tên công cụ, tiêu đề và từ khóa tìm kiếm en/vi.
