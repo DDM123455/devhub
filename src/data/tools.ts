@@ -420,8 +420,8 @@ export const tools: ToolDefinition[] = [
 			sv: 'json-formaterare',
 		},
 		names: {
-			en: 'JSON Formatter & Validator',
-			vi: 'Định dạng & kiểm tra JSON',
+			en: 'JSON / XML Formatter & Validator',
+			vi: 'Định dạng & kiểm tra JSON / XML',
 			es: 'Formateador y validador JSON',
 			pt: 'Formatador e validador JSON',
 			fr: 'Formateur et validateur JSON',
@@ -1188,8 +1188,8 @@ export const tools: ToolDefinition[] = [
 			sv: 'kodformaterare',
 		},
 		names: {
-			en: 'XML & Code Formatter',
-			vi: 'Định dạng XML & Code',
+			en: 'Code Formatter & Beautifier',
+			vi: 'Định dạng code (Code Formatter)',
 			es: 'Formateador de código',
 			pt: 'Formatador de código',
 			fr: 'Formateur de code',

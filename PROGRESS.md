@@ -180,6 +180,8 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-11-02 (json-xml)** — Theo yêu cầu đưa XML vào JSON Formatter: trang và tên en/vi thành JSON / XML Formatter & Validator, có chọn JSON/XML. XML dùng parser hiện hành, định dạng, kiểm cú pháp kèm dòng/cột, sao chép/tải .xml; giới hạn 200.000 ký tự, không XSD. Giữ nội dung khi chuyển chế độ, giữ URL cũ. Khôi phục tên Code Formatter. Trình duyệt xác minh format, khoảng trắng, XML đúng/sai, giữ nội dung khi chuyển; không có console error. 979 test qua, build 602 trang, SEO P0=P1=P2=0.
+
 - **2026-11-02 (xml-discovery)** — Đổi tên danh sách công cụ và H1 en/vi thành XML & Code Formatter / Định dạng XML & Code, thêm từ khóa XML/validate/kiểm tra cú pháp trong tìm kiếm trang chủ. Giữ URL hiện hành. 980 test qua; build 602 trang thành công.
 
 - **2026-11-02 (base64perf)** — Chỉ đọc header khi nhận dạng ảnh, tránh decode toàn bộ payload hai lần. Trình duyệt xác nhận Base64 PNG thuần hiển thị preview 1px và MIME image/png. File chooser encode chưa xác minh qua automation. 980 test qua; build 602 trang.

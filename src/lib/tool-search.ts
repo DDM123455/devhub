@@ -32,7 +32,7 @@ export const TOOL_KEYWORDS: Record<string, string> = {
 	'word-counter': 'count words characters letters sentences paragraphs reading time length limit seo',
 	'text-case-converter': 'case upper lower title camel snake kebab capitalize uppercase lowercase text',
 	'markdown-editor': 'markdown md preview editor viewer html readme',
-	'json-formatter': 'json format beautify pretty minify validate lint repair viewer',
+	'json-formatter': 'json xml format beautify pretty minify validate validator syntax lint repair viewer',
 	'qr-generator': 'qr code barcode generator wifi vcard link',
 	'jwt-decoder': 'jwt token decode verify bearer auth jws',
 	'base64-tool': 'base64 encode decode data uri binary',

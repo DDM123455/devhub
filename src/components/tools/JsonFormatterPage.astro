@@ -2,7 +2,7 @@
 import { jsonLd } from '@/lib/json-ld';
 import Layout from '../../layouts/Layout.astro';
 import FaqSection from '@/components/layout/FaqSection.astro';
-import JsonFormatter from './JsonFormatter';
+import JsonXmlFormatter from './JsonXmlFormatter';
 import { getFixedT } from '@/i18n/i18next';
 import { tools, getRelatedTools } from '@/data/tools';
 import type { Locale } from '@/i18n/config';
@@ -13,6 +13,7 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = getFixedT(lang, 'tool-json-formatter');
+const xml = { ...getFixedT('en', 'tool-json-formatter')('xml', { returnObjects: true }) as object, ...t('xml', { returnObjects: true }) as object } as never;
 
 const tool = tools.find((item) => item.id === 'json-formatter')!;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
@@ -137,7 +138,7 @@ const schema = {
 		<h1 class="text-heading-1 text-foreground">{t('heading')}</h1>
 		<p class="mt-2 text-muted-foreground">{t('tagline')}</p>
 		<div class="mt-6">
-			<JsonFormatter client:load messages={messages} />
+			<JsonXmlFormatter client:load messages={messages} xml={xml} />
 		</div>
 	</section>
 	<section class="border-t border-border px-4 py-10">

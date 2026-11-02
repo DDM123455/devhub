@@ -1,10 +1,10 @@
 {
   "meta": {
-    "title": "Định dạng & kiểm tra JSON miễn phí — Web Tool Hub",
-    "description": "Định dạng, kiểm tra và duyệt JSON miễn phí, xử lý hoàn toàn trên trình duyệt. Chế độ cây tương tác, phát hiện lỗi cú pháp. Không upload, không đăng ký."
+    "title": "Định dạng & Kiểm tra JSON, XML online miễn phí",
+    "description": "Định dạng và kiểm tra JSON, XML ngay trong trình duyệt. Báo lỗi cú pháp, sao chép và tải kết quả; dữ liệu không tải lên máy chủ."
   },
-  "heading": "Định dạng & kiểm tra JSON",
-  "tagline": "Định dạng, kiểm tra và khám phá dữ liệu JSON, ngay trên trình duyệt của bạn.",
+  "heading": "Định dạng & Kiểm tra JSON / XML",
+  "tagline": "Chọn JSON hoặc XML để định dạng và kiểm tra dữ liệu, ngay trên trình duyệt của bạn.",
   "ui": {
     "themeNotice": "Khung soạn thảo này giữ giao diện sáng riêng, không đổi theo dark mode của trang — giống cách một trình soạn code nhúng vào bất kỳ trang nào thường hoạt động.",
     "errorWithLine": "Lỗi cú pháp ở dòng {{line}}: {{message}}",
@@ -110,5 +110,22 @@
     "p2": "Công cụ này không bao giờ gửi bất cứ thứ gì đi đâu cả. Nó được xây trên jsoneditor — thư viện JavaScript phân tích và render lại JSON hoàn toàn trong bộ nhớ trình duyệt của bạn. Việc phân tích cú pháp, in đẹp (pretty-print) và kiểm tra hợp lệ đều diễn ra tại chỗ bằng engine JavaScript có sẵn của trình duyệt — không có máy chủ nào tham gia, nên không có gì bạn dán vào đây rời khỏi thiết bị của bạn.",
     "p3": "Dán JSON vào khung soạn thảo ở chế độ text rồi dùng nút Format trên thanh công cụ để in đẹp, hoặc Compact để nén lại về một dòng. Nếu JSON có lỗi cú pháp — dấu phẩy thừa cuối cùng, thiếu dấu ngoặc kép, dấu ngoặc không khớp — trình soạn thảo sẽ báo ngay với thông báo lỗi rõ ràng kèm đúng số dòng, thay vì bắt bạn dò mắt cả tài liệu; nút \"Đến dòng lỗi\" sẽ nhảy thẳng tới dòng đó và bôi chọn sẵn để bạn không phải cuộn tìm trong một file dài. Chuyển sang chế độ tree qua menu thả xuống ở trên để duyệt cùng dữ liệu đó dưới dạng cây có thể thu gọn, tương tác được: mở/đóng các object và array lồng nhau, sửa từng giá trị ngay tại chỗ, sắp xếp lại hoặc xóa trường trực tiếp — thay đổi sẽ phản ánh ngay vào phần text ngay khi bạn chuyển chế độ trở lại.",
     "p4": "Sự kết hợp này bao phủ hầu hết công việc JSON hàng ngày: dọn sạch một phản hồi API trước khi dán vào tài liệu, kiểm tra một file config trước khi commit, hay khám phá một payload lồng sâu nhiều tầng mà không bị lạc mất đang ở array nào. Cần dữ liệu ở định dạng khác? Các nút phía dưới khung soạn thảo chuyển JSON hiện tại thẳng sang XML, YAML hoặc CSV — hữu ích khi một script của đồng nghiệp cần file cấu hình YAML, hay một bảng tính cần dạng hàng-cột phẳng thay vì JSON lồng nhau — kết quả chuyển đổi hiện ngay tại chỗ để sao chép nhanh hoặc tải về trọn file. Vì mọi thứ chỉ tồn tại trong tab trình duyệt, đóng tab là trình soạn thảo xóa sạch hoàn toàn — không có lịch sử hay bản nháp nào được lưu lại, đúng là điều bạn muốn khi JSON đang xử lý có thể chứa dữ liệu nhạy cảm."
+  },
+  "xml": {
+    "selector": "Định dạng dữ liệu",
+    "input": "XML đầu vào",
+    "output": "XML đã định dạng",
+    "format": "Định dạng XML",
+    "validate": "Kiểm tra XML",
+    "valid": "Cú pháp XML hợp lệ. Nội dung đầu vào không bị thay đổi.",
+    "hint": "Định dạng hoặc kiểm tra cú pháp XML, thẻ đóng/mở, thuộc tính và namespace. Không kiểm tra XSD. Ctrl+Enter: định dạng.",
+    "invalid": "XML không hợp lệ: {{message}}",
+    "location": "dòng {{line}}, cột {{column}}",
+    "clear": "Xoá",
+    "copy": "Sao chép",
+    "copied": "Đã chép!",
+    "copyFailed": "Không sao chép được",
+    "download": "Tải XML",
+    "tooLarge": "XML giới hạn 200.000 ký tự. Hãy giảm kích thước tài liệu."
   }
 }
