@@ -3,7 +3,7 @@ import { indentUnit, type FormatLanguage, type FormatOptions } from '../../lib/f
 import { locateJsonError } from '../../lib/code-formatter-json-error';
 import { runFormat, type FormatRunResult } from '../../lib/format-run';
 
-export type CodeRunMode = 'format' | 'minify';
+export type CodeRunMode = 'format' | 'minify' | 'validate';
 
 /**
  * One entry point for the Code Formatter screen. It only dispatches to the code shared with the
@@ -26,7 +26,7 @@ export async function runCodeFormatter(
 ): Promise<FormatRunResult> {
 	if (language === 'xml') {
 		const xml = formatXmlStrict(text, indentUnit(options.indent));
-		return 'error' in xml ? { ok: false, error: xml.error } : { ok: true, value: xml.value, warnings: xml.warnings };
+		return 'error' in xml ? { ok: false, error: xml.error } : { ok: true, value: mode === 'validate' ? text : xml.value, warnings: xml.warnings };
 	}
 	if (language === 'json') {
 		if (mode === 'minify') {

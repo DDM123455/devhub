@@ -592,3 +592,5 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 - [x] 2026-11-02 — navigation: Đo production: HTML cache HIT vẫn có TTFB khoảng 1,7–4,2 giây trong lần đo; chưa đủ để kết luận nguyên nhân mạng/edge. Merge PDF chuyển pdf-lib và pdf-thumbnails sang import động khi chọn/xử lý file. Thêm warmup module giao diện khi hover/focus link công cụ (giới hạn 4 URL, không chạy engine, bỏ qua saveData/2G). 976 test qua; build 602 trang. Chưa đo sau deploy, chưa push.
 
 - [x] 2026-11-02 — base64: Base64 File tự nhận PNG/JPEG/GIF/WebP/BMP/ICO/AVIF từ byte khi dán Base64 thuần, dùng MIME đúng cho preview và tải xuống; thêm nút chuyển từ Text Decode sang File Decode. Có giới hạn đầu vào; test round-trip byte, MIME sai, URL-safe và input lỗi. Chỉ xử lý tại trình duyệt.
+
+- [x] 2026-11-02 — xml: Code Formatter thêm nút Validate XML, giữ nguyên input, báo lỗi dòng/cột; kiểm cú pháp, không kiểm XSD. Format bảo toàn khoảng trắng text, mixed content, xml:space và CDATA. Kiểm tra trình duyệt en/vi với XML đúng/sai; 980 test qua, build 602 trang, SEO P0=P1=P2=0.

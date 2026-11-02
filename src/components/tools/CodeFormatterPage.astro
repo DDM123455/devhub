@@ -23,7 +23,7 @@ const textDiffTool = tools.find((item) => item.id === 'text-diff')!;
 const textDiffHref = `/${lang}/tools/${textDiffTool.slugs[lang]}/`;
 
 // All UI strings live under `ui.*` and go through i18n.
-const messages = t('ui', { returnObjects: true }) as never;
+const messages = { ...getFixedT('en', 'tool-code-formatter')('ui', { returnObjects: true }) as object, ...t('ui', { returnObjects: true }) as object } as never;
 
 const faqItems = [
 	{ question: t('faq.q1'), answer: t('faq.a1') },

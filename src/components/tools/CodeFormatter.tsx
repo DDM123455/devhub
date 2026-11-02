@@ -63,6 +63,10 @@ export interface CodeFormatterMessages {
 	copyFailed: string;
 	download: string;
 	format: string;
+	validateXml: string;
+	xmlValid: string;
+	xmlValidationHint: string;
+	xmlValidationFailed: string;
 	minify: string;
 	runHint: string;
 	loadSample: string;
@@ -119,7 +123,7 @@ type OutputState =
 	| { phase: 'ambiguous'; candidates: FormatLanguage[] }
 	| { phase: 'tooLarge'; chars: number }
 	| { phase: 'done'; mode: CodeRunMode; language: FormatLanguage; text: string; source: string; duplicateKeys: boolean }
-	| { phase: 'error'; language: FormatLanguage; message: string; line?: number; column?: number }
+	| { phase: 'error'; language: FormatLanguage; message: string; line?: number; column?: number; validating?: boolean }
 	| { phase: 'failure'; kind: 'timeout' | 'worker' };
 
 const DEBOUNCE_AUTO_MS = 700;
@@ -229,6 +233,7 @@ export default function CodeFormatter({ messages: m, textDiffHref }: Props) {
 			return;
 		}
 		const language = resolution.language;
+		setNotice(null);
 		const seq = ++seqRef.current;
 		setOutput((o) => (o.phase === 'done' ? o : { phase: 'running' }));
 		let result;
@@ -239,16 +244,20 @@ export default function CodeFormatter({ messages: m, textDiffHref }: Props) {
 			return;
 		}
 		if (seq !== seqRef.current) return;
-		if (result.ok) {
+		if (result.ok && mode === 'validate') {
+			setNotice(m.xmlValid);
+			setOutput({ phase: 'idle' });
+		} else if (result.ok) {
+			setNotice(null);
 			setOutput({ phase: 'done', mode, language, text: result.value, source: text, duplicateKeys: result.warnings.includes('duplicateKeys') });
 		} else if (result.error.message === FORMAT_TIMEOUT_MESSAGE) {
 			setOutput({ phase: 'failure', kind: 'timeout' });
 		} else if (result.error.message === 'worker-error') {
 			setOutput({ phase: 'failure', kind: 'worker' });
 		} else {
-			setOutput({ phase: 'error', language, message: result.error.message, line: result.error.line, column: result.error.column });
+			setOutput({ phase: 'error', language, message: result.error.message, line: result.error.line, column: result.error.column, validating: mode === 'validate' });
 		}
-	}, []);
+	}, [m.xmlValid]);
 
 	// Optional auto-format while typing (off by default; paused for big inputs; never nags about ambiguity).
 	useEffect(() => {
@@ -392,7 +401,7 @@ export default function CodeFormatter({ messages: m, textDiffHref }: Props) {
 		problem = (
 			<div role="alert" className="flex flex-col gap-2 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
 				<p>
-					{fillTemplate(m.formatFailed, { language: languageLabel(output.language), message: output.message })}
+					{fillTemplate(output.validating ? m.xmlValidationFailed : m.formatFailed, { language: languageLabel(output.language), message: output.message })}
 					{where}
 				</p>
 				<p className="text-xs">{m.inputKept}</p>
@@ -521,12 +530,18 @@ export default function CodeFormatter({ messages: m, textDiffHref }: Props) {
 				</Button>
 			</div>
 			<p className="text-xs text-muted-foreground">{m.optionsNote}</p>
+			{activeLanguage === 'xml' && <p className="text-xs text-muted-foreground">{m.xmlValidationHint}</p>}
 
 			<div className="flex flex-wrap items-center gap-2">
 				<Button type="button" size="lg" onClick={() => void run('format')}>
 					{m.format}
 					<span className="ml-1.5 hidden text-xs opacity-70 sm:inline">{m.runHint}</span>
 				</Button>
+				{activeLanguage === 'xml' && (
+					<Button type="button" size="lg" variant="outline" title={m.xmlValidationHint} onClick={() => void run('validate', { language: 'xml' })}>
+						{m.validateXml}
+					</Button>
+				)}
 				{canMinify && (
 					<Button type="button" size="lg" variant="secondary" onClick={() => void run('minify')}>
 						{m.minify}

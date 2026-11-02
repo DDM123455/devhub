@@ -69,7 +69,11 @@
     "fileReadError": "Không đọc được file này.",
     "fileLoaded": "Đã mở {{name}}.",
     "compareDiff": "So sánh trước/sau trong Text Diff",
-    "compareTooLarge": "Quá lớn để so sánh qua liên kết."
+    "compareTooLarge": "Quá lớn để so sánh qua liên kết.",
+    "validateXml": "Kiểm tra XML",
+    "xmlValid": "Cú pháp XML hợp lệ. Nội dung nhập được giữ nguyên.",
+    "xmlValidationHint": "Kiểm tra cú pháp XML, cặp thẻ, thuộc tính và namespace. Chưa kiểm tra theo schema XSD.",
+    "xmlValidationFailed": "XML không hợp lệ: {{message}}"
   },
   "faq": {
     "heading": "Câu hỏi thường gặp",

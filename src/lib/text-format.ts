@@ -193,12 +193,21 @@ function indentXmlNode(node: Node, depth: number, lines: string[], unit = '  '):
 	if (node.nodeType !== Node.ELEMENT_NODE) return;
 
 	const element = node as Element;
+	// Formatting must not alter whitespace explicitly preserved by the document.
+	if (element.getAttributeNS('http://www.w3.org/XML/1998/namespace', 'space') === 'preserve') {
+		lines.push(indent + new XMLSerializer().serializeToString(element));
+		return;
+	}
 	const attrs = Array.from(element.attributes)
 		.map((attr) => ` ${attr.name}="${escapeXmlAttr(attr.value)}"`)
 		.join('');
 	const meaningfulChildren = Array.from(element.childNodes).filter(
 		(child) => !(child.nodeType === Node.TEXT_NODE && (child.textContent ?? '').trim() === ''),
 	);
+	if (element.childNodes.length > 0 && Array.from(element.childNodes).every(child => child.nodeType === Node.TEXT_NODE)) {
+		lines.push(indent + new XMLSerializer().serializeToString(element));
+		return;
+	}
 
 	if (meaningfulChildren.length === 0) {
 		lines.push(`${indent}<${element.tagName}${attrs}/>`);
@@ -206,11 +215,11 @@ function indentXmlNode(node: Node, depth: number, lines: string[], unit = '  '):
 	}
 	if (meaningfulChildren.length === 1 && meaningfulChildren[0].nodeType === Node.TEXT_NODE) {
 		lines.push(
-			`${indent}<${element.tagName}${attrs}>${escapeXmlText((meaningfulChildren[0].textContent ?? '').trim())}</${element.tagName}>`,
+			`${indent}<${element.tagName}${attrs}>${escapeXmlText(meaningfulChildren[0].textContent ?? '')}</${element.tagName}>`,
 		);
 		return;
 	}
-	const hasTextChild = meaningfulChildren.some((child) => child.nodeType === Node.TEXT_NODE);
+	const hasTextChild = meaningfulChildren.some((child) => child.nodeType === Node.TEXT_NODE || child.nodeType === Node.CDATA_SECTION_NODE);
 	if (hasTextChild) {
 		lines.push(indent + new XMLSerializer().serializeToString(element));
 		return;

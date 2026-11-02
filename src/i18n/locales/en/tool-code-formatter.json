@@ -69,7 +69,11 @@
     "fileReadError": "Could not read that file.",
     "fileLoaded": "Loaded {{name}}.",
     "compareDiff": "Compare before/after in Text Diff",
-    "compareTooLarge": "Too large to compare through a link."
+    "compareTooLarge": "Too large to compare through a link.",
+    "validateXml": "Validate XML",
+    "xmlValid": "XML syntax is valid. Your input was not changed.",
+    "xmlValidationHint": "Checks XML syntax, matching tags, attributes and namespaces. Does not validate against an XSD schema.",
+    "xmlValidationFailed": "Invalid XML: {{message}}"
   },
   "faq": {
     "heading": "Frequently asked questions",
