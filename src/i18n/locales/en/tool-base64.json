@@ -7,7 +7,7 @@
   "tagline": "Encode text or files to Base64, or decode Base64 back — entirely in your browser.",
   "ui": {
     "textTabLabel": "Text",
-    "fileTabLabel": "File",
+    "fileTabLabel": "Files & images",
     "encodeOption": "Encode",
     "decodeOption": "Decode",
     "textInputLabel": "Input",

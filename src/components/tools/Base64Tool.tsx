@@ -9,6 +9,7 @@ import {
 	fromUrlSafeOrStandard,
 } from '@/lib/base64';
 import { analyzeBase64, mapLinesSafe, prettyPrintIfJson } from '@/lib/base64-extra';
+import { decodeBase64File } from '@/lib/base64-file';
 import Base64Advanced, { type Base64ExtraMessages } from './Base64Advanced';
 import { useCopyToClipboard } from './useCopyToClipboard';
 
@@ -256,36 +257,18 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 		setFileDecodeInput(value);
 		setFileDecodeError(null);
 		const parsed = extractDataUri(value);
-		if (parsed) setFileDecodeMime(parsed.mime);
+		try { setFileDecodeMime(decodeBase64File(value).mime); } catch { if (parsed) setFileDecodeMime(parsed.mime); }
 	};
 
-	const decodedPreviewUri = useMemo(() => {
-		if (fileDecodeInput.trim() === '') return null;
-		const parsed = extractDataUri(fileDecodeInput);
-		const base64 = cleanBase64Input(fileDecodeInput);
-		const mime = parsed ? parsed.mime : fileDecodeMime;
-		try {
-			// Normalise URL-safe / unpadded input to standard padded Base64 so the data: URI loads.
-			const normalized = fromUrlSafeOrStandard(base64);
-			base64ToBytes(normalized);
-			return `data:${mime};base64,${normalized}`;
-		} catch {
-			return null;
-		}
+	const decodedFile = useMemo(() => {
+		try { return decodeBase64File(fileDecodeInput, fileDecodeMime); } catch { return null; }
 	}, [fileDecodeInput, fileDecodeMime]);
+	const decodedPreviewUri = decodedFile?.dataUri ?? null;
 
 	const handleDownloadDecodedFile = () => {
 		setFileDecodeError(null);
-		const parsed = extractDataUri(fileDecodeInput);
-		const base64 = cleanBase64Input(fileDecodeInput);
-		const mime = parsed ? parsed.mime : fileDecodeMime;
-		let bytes: Uint8Array;
-		try {
-			bytes = base64ToBytes(fromUrlSafeOrStandard(base64));
-		} catch {
-			setFileDecodeError(messages.fileDecodeError);
-			return;
-		}
+		if (!decodedFile) { setFileDecodeError(messages.fileDecodeError); return; }
+		const { bytes, mime } = decodedFile;
 		const blob = new Blob([bytes], { type: mime });
 		const url = URL.createObjectURL(blob);
 		const link = document.createElement('a');
@@ -450,6 +433,11 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 						</div>
 					)}
 					{textError && <p role="alert" className="text-sm text-destructive">{textError}</p>}
+					{mode === 'decode' && textInput.trim() !== '' && (
+						<Button type="button" variant="outline" onClick={() => { handleFileDecodeInputChange(textInput); setTab('file'); }}>
+							{messages.fileDecodeHeading}
+						</Button>
+					)}
 					{textInput !== '' && !textError && (
 						<p className="text-xs text-muted-foreground">
 							{messages.sizeInfo.replace('{{input}}', String(textInput.length)).replace('{{output}}', String(textOutput.length))}
@@ -608,7 +596,7 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 								/>
 							</div>
 						</div>
-						{decodedPreviewUri && fileDecodeMime.startsWith('image/') && (
+						{decodedPreviewUri && decodedFile?.mime.startsWith('image/') && (
 							<div className="flex flex-col gap-1">
 								<span className="text-xs text-muted-foreground">{messages.imagePreviewLabel}</span>
 								<img

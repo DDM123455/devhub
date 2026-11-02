@@ -7,7 +7,7 @@
   "tagline": "Mã hóa văn bản hoặc file sang Base64, hoặc giải mã Base64 về dạng gốc — hoàn toàn trên trình duyệt của bạn.",
   "ui": {
     "textTabLabel": "Văn bản",
-    "fileTabLabel": "File",
+    "fileTabLabel": "File & hình ảnh",
     "encodeOption": "Mã hóa",
     "decodeOption": "Giải mã",
     "textInputLabel": "Đầu vào",

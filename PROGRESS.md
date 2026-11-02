@@ -180,6 +180,8 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-11-02 (base64)** — Base64 File tự nhận PNG/JPEG/GIF/WebP/BMP/ICO/AVIF từ byte khi dán Base64 thuần, dùng MIME đúng cho preview và tải xuống; thêm nút chuyển từ Text Decode sang File Decode. Có giới hạn đầu vào; test round-trip byte, MIME sai, URL-safe và input lỗi. Chỉ xử lý tại trình duyệt.
+
 - **2026-11-02 (navigation)** — Đo production: HTML cache HIT vẫn có TTFB khoảng 1,7–4,2 giây trong lần đo; chưa đủ để kết luận nguyên nhân mạng/edge. Merge PDF chuyển pdf-lib và pdf-thumbnails sang import động khi chọn/xử lý file. Thêm warmup module giao diện khi hover/focus link công cụ (giới hạn 4 URL, không chạy engine, bỏ qua saveData/2G). 976 test qua; build 602 trang. Chưa đo sau deploy, chưa push.
 
 - **2026-11-01 (Chỉ lập chỉ mục en + vi; rút gọn mô tả meta en/vi)** — Theo yêu cầu: 18 ngôn ngữ dịch máy chưa rà soát tạm `noindex` để tránh rủi ro nội dung kém chất lượng/trùng lặp. `indexableLocales` (`src/i18n/config.ts`, hiện `en`,`vi`) điều khiển `Layout.astro`: ngôn ngữ ngoài danh sách có `<meta name="robots" content="noindex">` và KHÔNG có hreflang; trang en/vi chỉ có hreflang en/vi + x-default. `astro.config.mjs` lọc sitemap chỉ còn en/vi (56 URL, trước là 560) — không chặn bằng robots.txt để Google còn thấy thẻ noindex. Mở lại một ngôn ngữ: thêm vào `indexableLocales` VÀ mảng `indexable` trong `astro.config.mjs`. Rút gọn 8 mô tả en/vi quá 160 ký tự; test `seo-meta` siết còn ≤160. Chưa làm: 186 mô tả dài ở 18 ngôn ngữ còn lại (đang noindex nên chưa gấp) và một số tiêu đề ko/ja; Bing Webmaster Tools người dùng đã tự đăng ký; đo tốc độ các trang khác chưa chạy. vitest 976/976, build 602 trang, SEO audit P0=P1=P2=0.
