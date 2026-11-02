@@ -3,7 +3,7 @@
     "title": "Code Formatter & Beautifier Online — JS, CSS, HTML, JSON, SQL",
     "description": "Free online code formatter: auto-detects the language and beautifies JS, TypeScript, CSS, HTML, JSON, SQL, YAML and more. Runs in your browser, never uploaded."
   },
-  "heading": "Code Formatter & Beautifier",
+  "heading": "XML & Code Formatter",
   "tagline": "Paste or open a file, press Format, get tidy code. The language is detected automatically — JavaScript, TypeScript, CSS, HTML, JSON, XML, SQL, YAML, Markdown and GraphQL, all in your browser.",
   "related": "Related tools",
   "ui": {

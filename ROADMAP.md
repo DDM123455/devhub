@@ -1,5 +1,7 @@
 # ROADMAP.md — Web Tool Hub (Client-Side, Zero Server Cost)
 
+- [x] 2026-11-02 — Hiển thị rõ XML trong tên công cụ, tiêu đề và từ khóa tìm kiếm en/vi.
+
 > Mỗi dòng `- [ ]` là MỘT task. Tick thành `- [x]` ngay khi xong theo quy trình trong
 > `CLAUDE.md`. Không được tick nếu chưa build thử thành công.
 

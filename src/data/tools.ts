@@ -1188,8 +1188,8 @@ export const tools: ToolDefinition[] = [
 			sv: 'kodformaterare',
 		},
 		names: {
-			en: 'Code Formatter & Beautifier',
-			vi: 'Định dạng code (Code Formatter)',
+			en: 'XML & Code Formatter',
+			vi: 'Định dạng XML & Code',
 			es: 'Formateador de código',
 			pt: 'Formatador de código',
 			fr: 'Formateur de code',
