@@ -9,7 +9,7 @@ import {
 	fromUrlSafeOrStandard,
 } from '@/lib/base64';
 import { analyzeBase64, mapLinesSafe, prettyPrintIfJson } from '@/lib/base64-extra';
-import { decodeBase64File } from '@/lib/base64-file';
+import { decodeBase64File, detectImageMime } from '@/lib/base64-file';
 import Base64Advanced, { type Base64ExtraMessages } from './Base64Advanced';
 import { useCopyToClipboard } from './useCopyToClipboard';
 
@@ -257,7 +257,11 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 		setFileDecodeInput(value);
 		setFileDecodeError(null);
 		const parsed = extractDataUri(value);
-		try { setFileDecodeMime(decodeBase64File(value).mime); } catch { if (parsed) setFileDecodeMime(parsed.mime); }
+		try {
+			// Inspect only the header here; the memo below decodes the complete file once.
+			const header = base64ToBytes(fromUrlSafeOrStandard(cleanBase64Input(value).slice(0, 64)));
+			setFileDecodeMime(detectImageMime(header) ?? parsed?.mime ?? 'application/octet-stream');
+		} catch { if (parsed) setFileDecodeMime(parsed.mime); }
 	};
 
 	const decodedFile = useMemo(() => {
