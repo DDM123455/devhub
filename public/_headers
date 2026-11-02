@@ -27,6 +27,7 @@
 # - 'wasm-unsafe-eval' is required for any of the WebAssembly-based tools
 #   (ffmpeg.wasm, onnxruntime-web, heic2any/libheif) to compile at all.
 /*
+  Cache-Control: public, max-age=60, must-revalidate
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY

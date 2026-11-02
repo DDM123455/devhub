@@ -14,7 +14,7 @@ async function warm(anchor: HTMLAnchorElement) {
 	inFlight = true;
 	warmed.add(url.href);
 	try {
-		const response = await fetch(url.href, { priority: 'low' } as RequestInit);
+		const response = await fetch(url.href, { priority: 'low', cache: 'force-cache' } as RequestInit);
 		if (!response.ok) return;
 		const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
 		for (const island of doc.querySelectorAll('astro-island[client="load"]')) {
