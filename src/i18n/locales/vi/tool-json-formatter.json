@@ -126,6 +126,15 @@
     "copied": "Đã chép!",
     "copyFailed": "Không sao chép được",
     "download": "Tải XML",
-    "tooLarge": "XML giới hạn 200.000 ký tự. Hãy giảm kích thước tài liệu."
+    "tooLarge": "XML giới hạn 200.000 ký tự. Hãy giảm kích thước tài liệu.",
+    "indent": "Thụt lề",
+    "indentSpaces": "{{n}} dấu cách",
+    "indentTab": "Tab",
+    "minify": "Nén gọn",
+    "viewText": "Văn bản",
+    "viewTree": "Cây",
+    "expandAll": "Mở hết",
+    "collapseAll": "Thu hết",
+    "treeEmpty": "Không có gì để hiển thị dạng cây."
   }
 }

@@ -51,6 +51,7 @@ interface Messages {
 	verifyEnterPublicKey: string;
 	verifyInvalidPublicKey: string;
 	localVerifyNotice: string;
+	verifyWhyNote: string;
 	editHeading: string;
 	editHeaderLabel: string;
 	editPayloadLabel: string;
@@ -532,6 +533,7 @@ export default function JwtDecoder({ messages }: { messages: Messages }) {
 
 					<div className="flex flex-col gap-3 rounded-lg border border-border p-4">
 						<span className="text-sm font-medium text-foreground">{messages.verifyHeading}</span>
+						<p className="text-xs text-muted-foreground">{messages.verifyWhyNote}</p>
 						<p className="text-xs text-muted-foreground">{messages.localVerifyNotice}</p>
 													{kind === 'other' ? (
 							<p className="text-sm text-muted-foreground">{isAlgNone ? messages.verifyAlgNone : messages.verifyAlgorithmUnsupported}</p>

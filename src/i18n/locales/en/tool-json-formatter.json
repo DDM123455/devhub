@@ -126,6 +126,15 @@
     "copied": "Copied!",
     "copyFailed": "Copy failed",
     "download": "Download XML",
-    "tooLarge": "XML input is limited to 200,000 characters. Reduce the document size."
+    "tooLarge": "XML input is limited to 200,000 characters. Reduce the document size.",
+    "indent": "Indent",
+    "indentSpaces": "{{n}} spaces",
+    "indentTab": "Tab",
+    "minify": "Minify",
+    "viewText": "Text",
+    "viewTree": "Tree",
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse all",
+    "treeEmpty": "Nothing to show as a tree."
   }
 }

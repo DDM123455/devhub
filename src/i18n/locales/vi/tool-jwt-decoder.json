@@ -40,6 +40,7 @@
     "verifyEnterPublicKey": "Dán public key để bật nút Kiểm tra chữ ký.",
     "verifyInvalidPublicKey": "Không dùng được public key này - hãy chắc chắn đây là key PEM SPKI hoặc JWK/JWKS khớp với thuật toán của token.",
     "localVerifyNotice": "Việc kiểm tra chữ ký và ký lại token chạy hoàn toàn trên trình duyệt bằng Web Crypto API — secret, key và token của bạn không bao giờ được gửi đi đâu cả.",
+    "verifyWhyNote": "Vì sao không cần secret vẫn giải mã được? Header và payload của JWT chỉ được mã hoá Base64URL chứ không được mã hoá bí mật, nên ai có token cũng đọc được — đừng đưa mật khẩu hay dữ liệu riêng tư vào JWT. Secret hoặc public key chỉ cần để kiểm tra chữ ký, tức xác nhận token chưa bị sửa.",
     "editHeading": "Chỉnh sửa & ký lại",
     "editHeaderLabel": "Header (có thể chỉnh sửa)",
     "editPayloadLabel": "Payload (có thể chỉnh sửa)",

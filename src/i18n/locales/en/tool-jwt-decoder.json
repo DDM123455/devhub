@@ -40,6 +40,7 @@
     "verifyEnterPublicKey": "Paste a public key to enable the Verify button.",
     "verifyInvalidPublicKey": "Couldn't use this public key - make sure it is a PEM SPKI key or a JWK/JWKS that matches the token's algorithm.",
     "localVerifyNotice": "Verification and re-signing run entirely in your browser using the Web Crypto API — your secret, key, and token are never sent anywhere.",
+    "verifyWhyNote": "Why can this token be decoded without a secret? A JWT header and payload are only Base64URL-encoded, not encrypted, so anyone holding the token can read them — never put passwords or private data in a JWT. The secret or public key is only needed to verify the signature, i.e. to prove the token was not tampered with.",
     "editHeading": "Edit & re-sign",
     "editHeaderLabel": "Header (editable)",
     "editPayloadLabel": "Payload (editable)",
