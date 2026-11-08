@@ -1,4 +1,5 @@
 import { dialects, isDialect, type Dialect } from "@/lib/schema-java/dialects";
+import { inputKindMismatch } from "@/lib/schema-java/input-kind";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,7 +40,12 @@ export default function SchemaJavaConverter({
   const worker = useRef<Worker | null>(null),
     timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stop = () => {
-    worker.current?.terminate();
+    if (worker.current) {
+      worker.current.onerror = null;
+      worker.current.onmessage = null;
+      worker.current.onmessageerror = null;
+      worker.current.terminate();
+    }
     worker.current = null;
     if (timer.current) clearTimeout(timer.current);
   };
@@ -56,19 +62,40 @@ export default function SchemaJavaConverter({
   };
   const run = (useMapping = false, kind = output) => {
     invalidate();
+    const mismatch = inputKindMismatch(input, inputKind);
+    if (mismatch) {
+      setResult({
+        files: [],
+        diagnostics: [{ severity: "error", code: mismatch }],
+      });
+      return;
+    }
     setBusy(true);
-    const w = new Worker(new URL("./schemaJavaWorker.ts", import.meta.url), {
-      type: "module",
-    });
+    let w: Worker;
+    try {
+      w = new Worker(new URL("./schemaJavaWorker.ts", import.meta.url), {
+        type: "module",
+      });
+    } catch {
+      setBusy(false);
+      setResult({
+        files: [],
+        diagnostics: [{ severity: "error", code: "worker" }],
+      });
+      return;
+    }
     worker.current = w;
     const fail = (code: string) => {
+      if (worker.current !== w) return;
       stop();
       setBusy(false);
       setResult({ files: [], diagnostics: [{ severity: "error", code }] });
     };
     timer.current = setTimeout(() => fail("timeout"), 12000);
     w.onerror = () => fail("worker");
+    w.onmessageerror = () => fail("worker");
     w.onmessage = (e) => {
+      if (worker.current !== w) return;
       stop();
       setBusy(false);
       if (e.data.model) {
@@ -78,15 +105,19 @@ export default function SchemaJavaConverter({
       setResult(e.data.result);
       setFileIndex(0);
     };
-    w.postMessage({
-      input,
-      inputKind,
-      sourceDialect,
-      schema,
-      model: useMapping ? model : undefined,
-      options,
-      output: kind,
-    } satisfies Request);
+    try {
+      w.postMessage({
+        input,
+        inputKind,
+        sourceDialect,
+        schema,
+        model: useMapping ? model : undefined,
+        options,
+        output: kind,
+      } satisfies Request);
+    } catch {
+      fail("worker");
+    }
   };
   const save = (path: string, text: string, type = "text/plain") => {
     const url = URL.createObjectURL(new Blob([text], { type }));
@@ -589,6 +620,34 @@ export default function SchemaJavaConverter({
                 </li>
               ))}
             </ul>
+          )}
+          {result.diagnostics.some(
+            (d) => d.code === "inputSqlSelectedJava",
+          ) && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                invalidate();
+                setModel(undefined);
+                setInputKind("sql");
+              }}
+            >
+              {m.useSqlInput}
+            </Button>
+          )}
+          {result.diagnostics.some(
+            (d) => d.code === "inputJavaSelectedSql",
+          ) && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                invalidate();
+                setModel(undefined);
+                setInputKind("java");
+              }}
+            >
+              {m.useJavaInput}
+            </Button>
           )}
           {selected ? (
             <>

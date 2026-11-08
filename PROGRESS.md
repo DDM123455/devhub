@@ -180,6 +180,16 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-11-08 — SQL/Java input mismatch + worker error UX (ảnh người dùng)**: ảnh chọn Java
+  nhưng dán SQL. Repro trên production hiện tại: worker HTTP 200 và báo unsupported, chưa tái
+  hiện được worker failure trong ảnh; scope trong ảnh là bản cũ, stale assets/tab chỉ là giả
+  thuyết. Thêm format hint bounded trước worker và trong worker, nút chuyển SQL/Java giữ nguyên
+  input. Tách lỗi tải engine, sửa thông báo worker (không còn bảo giảm input), catch constructor/
+  postMessage/messageerror và gỡ handler worker cũ khi terminate để tránh callback stale. SQL
+  engine init nằm trong try/catch và chỉ cần cho SQL/schema. 72 suite/1027 test qua, build 622
+  trang; Puppeteer local: mismatch không mở worker, switch không mất input, chặn worker request
+  thật → thông báo load failure đúng → retry thành công; regression 4 Java output/ZIP/mobile qua.
+
 - **2026-11-08 — Adapter Oracle cho SQL ↔ Java (yêu cầu trực tiếp)**: thêm parser DDL
   recursive-descent riêng dùng tokenizer Oracle, không fallback parser MySQL. Hỗ trợ CREATE
   TABLE quan hệ 12c+, NUMBER(p,s), VARCHAR2/NVARCHAR2/CHAR/NCHAR, DATE/TIMESTAMP timezone,

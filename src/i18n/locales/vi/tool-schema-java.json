@@ -80,7 +80,7 @@
     "diag_empty": "Hãy dán SQL hoặc Java.",
     "diag_tooLarge": "Đầu vào vượt 200.000 ký tự.",
     "diag_timeout": "Xử lý quá 12 giây. Hãy giảm kích thước đầu vào.",
-    "diag_worker": "Worker chuyển đổi gặp lỗi. Thử đầu vào nhỏ hơn.",
+    "diag_worker": "Không khởi chạy hoặc tải được worker chuyển đổi. Hãy sao chép nội dung trước khi tải lại trang rồi thử lại.",
     "diag_package": "Tên package không hợp lệ. Không dùng dấu đường dẫn hoặc từ khóa Java.",
     "diag_recordVersion": "Record yêu cầu Java 16 trở lên.",
     "diag_bootVersion": "Profile Spring Boot 3 yêu cầu Java 17 trở lên.",
@@ -116,7 +116,12 @@
     "diag_sqliteAffinity": "SQLite dùng type affinity: precision của số thập phân, boolean và ngày giờ cần kiểm tra ở tầng ứng dụng.",
     "diag_oracleExpression": "Biểu thức Oracle được giữ nguyên văn. Công cụ chưa kiểm tra đầy đủ ngữ nghĩa biểu thức; cần đối chiếu với database.",
     "diag_oracleSemantics": "Kiểm tra ngữ nghĩa Oracle: DATE có cả giờ; LOCAL TIME ZONE phụ thuộc múi giờ phiên; độ dài BYTE, boolean dạng số và UUID có thể cần mapping riêng.",
-    "diag_oracleTime": "Oracle không có cột TIME độc lập. Cần chọn cách biểu diễn ngày/giờ rõ ràng trước khi xuất trường này."
+    "diag_oracleTime": "Oracle không có cột TIME độc lập. Cần chọn cách biểu diễn ngày/giờ rõ ràng trước khi xuất trường này.",
+    "diag_inputSqlSelectedJava": "Nội dung có dạng SQL nhưng đang chọn Java class / record. Hãy chuyển định dạng đầu vào sang SQL DDL / SELECT; nội dung sẽ được giữ nguyên.",
+    "diag_inputJavaSelectedSql": "Nội dung có dạng Java nhưng đang chọn SQL. Hãy chuyển định dạng đầu vào sang Java class / record.",
+    "useSqlInput": "Chuyển đầu vào sang SQL",
+    "useJavaInput": "Chuyển đầu vào sang Java",
+    "diag_engineLoad": "Không tải được bộ phân tích SQL. Hãy sao chép nội dung trước khi tải lại trang, kiểm tra kết nối rồi thử lại."
   },
   "related": "Công cụ liên quan",
   "article": {

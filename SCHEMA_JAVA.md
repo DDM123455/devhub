@@ -94,3 +94,9 @@ Jakarta Persistence 3.1, Validation 3.0.2 and Lombok 1.18.36 in the local Maven 
 `scripts/verify-schema-java.cjs` exercises the built site at localhost:4329 using Puppeteer
 (set PUPPETEER_PATH when the existing installation differs). It checks worker output, mobile
 overflow, ZIP contents and en/vi routes. No new runtime dependency was added.
+
+The UI checks obvious SQL/Java format mismatches before starting a worker and offers a format
+switch without changing the input. Worker startup/asset failures are distinct from parser errors;
+the UI recommends copying input before refreshing, rather than incorrectly blaming input size.
+SQL engine initialization is guarded inside the worker, and terminated workers cannot update a
+newer conversion through stale callbacks.

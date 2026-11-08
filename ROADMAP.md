@@ -585,6 +585,7 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 - [ ] Mở rộng parser Java: generic/inheritance/EmbeddedId/input relationship; SQL ALTER/CTE/UNION
 - [x] Adapter MariaDB (MySQL-compatible DDL), SQL Server, SQLite; UI nguồn/đích, native DDL tests
 - [x] Adapter Oracle 12c+ relational DDL subset: parser riêng, mapping/identity/comment, Java/SQL export, UI/sample/tests
+- [x] Sai định dạng SQL/Java: nhận diện trước worker, nút chuyển giữ input; phân biệt lỗi engine/worker và kiểm thử retry
 - [ ] Oracle SELECT/sequence/PLSQL/ALTER và DDL nâng cao; mapping enum/JSON provider chuyên biệt, MapStruct
 - [ ] Dịch đầy đủ UI/article ngoài en/vi và đo lại Lighthouse trên production sau deploy
 

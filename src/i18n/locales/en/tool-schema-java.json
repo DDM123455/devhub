@@ -80,7 +80,7 @@
     "diag_empty": "Paste SQL or Java first.",
     "diag_tooLarge": "Input exceeds the 200,000-character limit.",
     "diag_timeout": "Processing exceeded 12 seconds. Reduce input size.",
-    "diag_worker": "The conversion worker failed. Retry with smaller input.",
+    "diag_worker": "The conversion worker could not start or load. Copy your input before refreshing the page, then try again.",
     "diag_package": "Invalid Java package. Path separators and reserved words are not allowed.",
     "diag_recordVersion": "Records require Java 16 or later.",
     "diag_bootVersion": "The Spring Boot 3 profile requires Java 17 or later.",
@@ -116,7 +116,12 @@
     "diag_sqliteAffinity": "SQLite uses type affinity: decimal precision, boolean and date/time semantics require application-level review.",
     "diag_oracleExpression": "Oracle expression preserved as source text. This tool does not fully validate expression semantics; review it against your database.",
     "diag_oracleSemantics": "Review Oracle semantics: DATE includes time; LOCAL TIME ZONE uses the session timezone; BYTE length, numeric boolean and UUID representations may need explicit mapping.",
-    "diag_oracleTime": "Oracle has no standalone TIME column. Supply an explicit date/time representation before exporting this field."
+    "diag_oracleTime": "Oracle has no standalone TIME column. Supply an explicit date/time representation before exporting this field.",
+    "diag_inputSqlSelectedJava": "The input looks like SQL, but Java class / record is selected. Switch the input format to SQL DDL / SELECT and keep your text.",
+    "diag_inputJavaSelectedSql": "The input looks like Java, but SQL is selected. Switch the input format to Java class / record.",
+    "useSqlInput": "Switch input to SQL",
+    "useJavaInput": "Switch input to Java",
+    "diag_engineLoad": "The SQL engine could not load. Copy your input before refreshing the page, then check your connection and retry."
   },
   "related": "Related tools",
   "article": {
