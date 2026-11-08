@@ -1,6 +1,10 @@
 import type { Column, Dialect, Diagnostic } from "./model";
+import { isMysql } from "./dialects";
 export function javaType(sql: string): string {
   const t = sql.toUpperCase();
+  if (t === "UNIQUEIDENTIFIER") return "UUID";
+  if (t === "BIT") return "Boolean";
+  if (t === "DATETIMEOFFSET") return "OffsetDateTime";
   if (/^(BIGINT|BIGSERIAL)/.test(t)) return "Long";
   if (/^(SMALLINT|SMALLSERIAL|TINYINT)/.test(t)) return "Short";
   if (/^(INT|INTEGER|SERIAL|MEDIUMINT)/.test(t)) return "Integer";
@@ -49,14 +53,90 @@ export function sqlType(c: Column, d: Dialect, diags: Diagnostic[]): string {
     "byte[]": d === "postgresql" ? "BYTEA" : "BLOB",
   };
   let type = types[c.javaType];
+  if (d === "sqlserver") {
+    const specific: Record<string, string> = {
+      String: "NVARCHAR(MAX)",
+      UUID: "UNIQUEIDENTIFIER",
+      Boolean: "BIT",
+      boolean: "BIT",
+      LocalDateTime: "DATETIME2",
+      OffsetDateTime: "DATETIMEOFFSET",
+      Instant: "DATETIMEOFFSET",
+      "byte[]": "VARBINARY(MAX)",
+      Double: "FLOAT",
+      double: "FLOAT",
+    };
+    type = specific[c.javaType] ?? type;
+  }
+  if (d === "sqlite") {
+    if (
+      [
+        "Long",
+        "Integer",
+        "Short",
+        "Byte",
+        "long",
+        "int",
+        "short",
+        "byte",
+        "Boolean",
+        "boolean",
+      ].includes(c.javaType)
+    )
+      type = "INTEGER";
+    if (
+      [
+        "LocalDate",
+        "LocalDateTime",
+        "OffsetDateTime",
+        "Instant",
+        "LocalTime",
+        "OffsetTime",
+        "UUID",
+        "String",
+      ].includes(c.javaType)
+    )
+      type = "TEXT";
+    if (c.javaType === "byte[]") type = "BLOB";
+    if (
+      [
+        "BigDecimal",
+        "LocalDate",
+        "LocalDateTime",
+        "OffsetDateTime",
+        "Instant",
+        "Boolean",
+        "boolean",
+      ].includes(c.javaType)
+    )
+      diags.push({
+        severity: "warning",
+        code: "sqliteAffinity",
+        detail: c.name,
+      });
+  }
   if (c.javaType === "String" && c.length !== undefined)
-    type = `VARCHAR(${c.length})`;
+    type =
+      d === "sqlserver"
+        ? `NVARCHAR(${c.length})`
+        : d === "sqlite"
+          ? "TEXT"
+          : `VARCHAR(${c.length})`;
   if (c.javaType === "BigDecimal" && c.precision !== undefined)
     type = `DECIMAL(${c.precision},${c.scale ?? 0})`;
   if (/JSON/.test(same))
-    type = d === "postgresql" ? (same === "JSONB" ? "JSONB" : "JSON") : "JSON";
+    type =
+      d === "postgresql"
+        ? same === "JSONB"
+          ? "JSONB"
+          : "JSON"
+        : isMysql(d)
+          ? "JSON"
+          : d === "sqlserver"
+            ? "NVARCHAR(MAX)"
+            : "TEXT";
   if (
-    d === "mysql" &&
+    isMysql(d) &&
     ["OffsetDateTime", "OffsetTime", "Instant"].includes(c.javaType)
   )
     diags.push({ severity: "warning", code: "timezoneLoss", detail: c.name });

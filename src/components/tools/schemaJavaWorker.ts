@@ -12,7 +12,7 @@ import { readMetadata } from "@/lib/schema-java/metadata";
 export interface Request {
   input: string;
   inputKind: "sql" | "java" | "metadata";
-  sourceDialect: "postgresql" | "mysql";
+  sourceDialect: Options["dialect"];
   schema: string;
   model?: Model;
   options: Options;

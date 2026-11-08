@@ -1,12 +1,13 @@
 import { MAX_INPUT, type Model } from "./model";
 import { validateModel } from "./validate";
+import { isDialect } from "./dialects";
 /** Import only our bounded data format, never executable code or ZIP paths. */
 export function readMetadata(text: string): Model {
   if (text.length > MAX_INPUT * 10) throw new Error("tooLarge");
   const m = JSON.parse(text) as Model;
   if (
     m.version !== 1 ||
-    !["postgresql", "mysql"].includes(m.dialect) ||
+    !isDialect(m.dialect) ||
     !Array.isArray(m.tables) ||
     m.tables.length > 200
   )

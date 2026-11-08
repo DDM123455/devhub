@@ -180,6 +180,15 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-11-08 — SQL ↔ Java mở rộng database**: thêm registry adapter và UI nguồn/đích cho
+  MariaDB (DDL phổ biến dùng MySQL parser), SQL Server (native T-SQL parser), SQLite (native
+  parser). Mapping IDENTITY(seed,increment), AUTOINCREMENT SQLite, NVARCHAR/DATETIME2/
+  DATETIMEOFFSET/UNIQUEIDENTIFIER/BIT; TIMESTAMP SQL Server map binary. Xuất SQL theo dialect,
+  cảnh báo type affinity SQLite và comment không thể xuất. Metadata/preset nhận đủ 5 dialect.
+  Oracle chưa có parser nên chưa công bố hỗ trợ. 70 suite/1013 test qua, gồm javac; build 622
+  trang. Puppeteer production local xác nhận dropdown 5 lựa chọn và DTO từ DDL native của
+  cả SQL Server/SQLite/MariaDB. Cập nhật en/vi, tài liệu phạm vi; không thêm dependency.
+
 - **2026-11-08 — SQL ↔ Java models (yêu cầu trực tiếp)**: thêm tool `schema-java`, parser
   SQL AST PostgreSQL/MySQL + parser Java declaration subset bằng token/delimiter, schema trung
   gian có provenance, generator Entity/DTO/record/projection/SQL. Có multi-table, IdClass,

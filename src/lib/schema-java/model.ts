@@ -1,4 +1,5 @@
-export type Dialect = "postgresql" | "mysql";
+export type { Dialect } from "./dialects";
+import type { Dialect } from "./dialects";
 export type Origin = "input" | "user" | "inferred";
 export interface Diagnostic {
   severity: "error" | "warning";

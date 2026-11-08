@@ -1,5 +1,8 @@
 import * as pg from "node-sql-parser/build/postgresql";
 import * as my from "node-sql-parser/build/mysql";
+import * as tsql from "node-sql-parser/build/transactsql";
+import * as sqlite from "node-sql-parser/build/sqlite";
+import { parserDatabase, isMysql } from "./dialects";
 import {
   assignNames,
   checkInput,
@@ -14,7 +17,14 @@ import { tokenizeSql, syntaxFor } from "../sql-tokenize";
 // The vendor AST differs between dialects; keep its untyped boundary in this adapter.
 type Ast = any;
 export function parserFor(d: Dialect): Ast {
-  const m: any = d === "postgresql" ? pg : my;
+  const m: any =
+    d === "postgresql"
+      ? pg
+      : d === "sqlserver"
+        ? tsql
+        : d === "sqlite"
+          ? sqlite
+          : my;
   return new (m.Parser ?? m.default.Parser)();
 }
 const name = (v: Ast): string =>
@@ -27,7 +37,7 @@ export function parseSql(
 ): Model {
   checkInput(input);
   const p = parserFor(dialect),
-    options = { database: dialect === "postgresql" ? "Postgresql" : "MySQL" };
+    options = { database: parserDatabase(dialect) };
   const model: Model = { version: 1, dialect, tables: [], diagnostics: [] };
   const tokens = tokenizeSql(input, syntaxFor(dialect)).filter(
     (t) => !["ws", "lineComment", "blockComment"].includes(t.type),
@@ -35,7 +45,10 @@ export function parseSql(
   const identityModes: string[] = [];
   const edits: { start: number; end: number }[] = [];
   for (let i = 0; i < tokens.length; i++)
-    if (tokens[i].value.toUpperCase() === "GENERATED") {
+    if (
+      dialect === "postgresql" &&
+      tokens[i].value.toUpperCase() === "GENERATED"
+    ) {
       const words = tokens.slice(i, i + 6).map((t) => t.value.toUpperCase());
       if (words.slice(0, 4).join(" ") === "GENERATED ALWAYS AS IDENTITY") {
         identityModes.push("always");
@@ -196,6 +209,27 @@ export function parseSql(
           !!def.auto_increment ||
           /SERIAL/.test(sql) ||
           !!def.generated_by_default;
+        if (dialect === "sqlserver" && def.auto_increment) {
+          c.unknown.identitySeed = def.auto_increment.seed?.value ?? 1;
+          c.unknown.identityIncrement =
+            def.auto_increment.increment?.value ?? 1;
+        }
+        if (
+          dialect === "sqlserver" &&
+          ["TIMESTAMP", "ROWVERSION"].includes(sql)
+        )
+          c.javaType = "byte[]";
+        if (
+          dialect === "sqlite" &&
+          (c.javaType === "BigDecimal" ||
+            c.javaType.startsWith("Local") ||
+            c.javaType === "Boolean")
+        )
+          model.diagnostics.push({
+            severity: "warning",
+            code: "sqliteAffinity",
+            detail: c.name,
+          });
         if (def.generated_by_default)
           c.unknown.identityMode = identityModes[identityIndex++] ?? "default";
         if (def.default_val) c.default = expression(def.default_val.value);

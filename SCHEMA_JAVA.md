@@ -5,10 +5,10 @@ uploaded or logged. `javac` tests use only fixed synthetic fixtures checked into
 
 ## Implemented paths
 
-- PostgreSQL/MySQL CREATE TABLE → Entity, DTO, Java record, Spring Data interface projection.
+- PostgreSQL/MySQL/MariaDB/SQL Server/SQLite CREATE TABLE → Entity, DTO, Java record, Spring Data interface projection.
 - Scalar, field-based Java class / record → the same intermediate model → Java output or SQL draft.
 - Simple SELECT → DTO/record/projection, optionally resolving column types against supplied DDL.
-- PostgreSQL ↔ MySQL SQL drafts with warnings for nonportable expressions and timezone semantics.
+- SQL drafts across these five dialects, with warnings for nonportable expressions and timezone semantics.
 - Multi-table output, editable metadata, package ZIP, sidecar JSON import/export, option presets,
   plain Java DTO mapper with explicit null policy for UpdateRequest.
 
@@ -23,6 +23,15 @@ validation. A dedicated worker bounds parse time to 12 seconds; input is limited
 characters. No database credentials are needed.
 
 ## Supported subset and limitations
+
+- MariaDB uses the MySQL AST adapter for common DDL, not MariaDB-specific sequences or extensions.
+- SQL Server uses a native T-SQL AST adapter: IDENTITY seed/increment, bracket identifiers,
+  NVARCHAR, DATETIME2, DATETIMEOFFSET, BIT and UNIQUEIDENTIFIER. TIMESTAMP/ROWVERSION map to
+  binary values. Vendor-specific storage, temporal tables and computed-column syntax remain limited.
+- SQLite uses its native AST adapter and INTEGER PRIMARY KEY AUTOINCREMENT output. SQLite type
+  affinity does not enforce decimal precision or Java date/boolean semantics; diagnostics flag these.
+- SQL Server/SQLite SQL comments remain in metadata with an explicit warning. Cross-dialect defaults
+  and check/generated expressions are never assumed portable. Oracle remains unsupported.
 
 - DDL: scalar columns, nullability, length, decimal precision/scale, defaults, identity/serial,
   primary/composite keys, explicit foreign keys, unique/check constraints, simple indexes and
@@ -42,7 +51,7 @@ characters. No database credentials are needed.
   does not imply identity. Bean Validation is not database metadata. Cross-dialect defaults and
   generated/check expressions are omitted with explicit diagnostics, preserved in the sidecar.
 - Mapper requires a corresponding Entity and compatible getters/setters in the same package.
-  MapStruct, Oracle, SQL Server, SQLite, migration diff and database connections are not implemented.
+  MapStruct, Oracle, migration diff and database connections are not implemented.
 - UI and explanatory copy are en/vi; other registered locale routes use the repository's English
   fallback convention. Native-language editorial review remains outstanding.
 
@@ -54,7 +63,7 @@ Compared against official documentation, reviewed 2026-11-08:
 | --- | --- | --- | --- |
 | Schema → Java | Entity reverse engineering | Tables, POJOs, records and more | Scalar JPA/DTO/record/projection subset |
 | DTO / mapper | DTO designer, MapStruct | POJOs/interfaces, configurable generation | DTO variants, plain Java mapper |
-| Dialect/provider breadth | IDE and project-aware integrations | Broad dialect-aware code generation | PostgreSQL/MySQL only |
+| Dialect/provider breadth | IDE and project-aware integrations | Broad dialect-aware code generation | PostgreSQL/MySQL/MariaDB/SQL Server/SQLite subsets |
 | Migration / database introspection | Database connections and migrations | Database metadata/codegen integrations | Deliberately excluded: paste/file data stays local |
 | Metadata review | IDE tooling | Generator configuration | Editable mapping + loss diagnostics + JSON sidecar |
 

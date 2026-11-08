@@ -6,7 +6,7 @@
     "description": "Convert PostgreSQL and MySQL tables to Java Entity, DTO, record or projection. Review Java-to-SQL mappings locally, without uploading code."
   },
   "ui": {
-    "scope": "Supported: PostgreSQL/MySQL CREATE TABLE and simple SELECT; Java field-based classes and records. Unsupported syntax is rejected. No database connection; all processing stays in your browser.",
+    "scope": "Supported: PostgreSQL, MySQL, MariaDB, SQL Server and SQLite CREATE TABLE and simple SELECT; scalar Java classes and records. Dialect-specific extensions may need review. All processing stays in your browser.",
     "inputKind": "Input format",
     "sqlInput": "SQL DDL / SELECT",
     "javaInput": "Java class / record",
@@ -112,20 +112,21 @@
     "diag_invalidMetadata": "Invalid metadata. Check duplicate names, lengths and precision/scale.",
     "diag_metadataImported": "Metadata imported. Review it before generating code.",
     "diag_mapperPolicy": "Mapper requires getters/setters and a constructor. Choose the null policy for UpdateRequest.",
-    "diag_mapperEntity": "Mapper expects the corresponding Entity in the same package with compatible accessors."
+    "diag_mapperEntity": "Mapper expects the corresponding Entity in the same package with compatible accessors.",
+    "diag_sqliteAffinity": "SQLite uses type affinity: decimal precision, boolean and date/time semantics require application-level review."
   },
   "related": "Related tools",
   "article": {
     "heading": "Converting schemas without losing the assumptions",
-    "p1": "A database table and a Java class describe different things. SQL records storage rules, constraints, indexes and expressions. A Java model describes values and application behaviour. This converter introduces an intermediate schema so you can inspect both views before downloading files. Start by choosing PostgreSQL or MySQL, paste one or more CREATE TABLE statements, and select the desired output. The tool parses SQL into an abstract syntax tree. It never executes statements or connects to a database. An unsupported statement blocks export rather than disappearing silently.",
+    "p1": "A database table and a Java class describe different things. SQL records storage rules, constraints, indexes and expressions. A Java model describes values and application behaviour. This converter introduces an intermediate schema so you can inspect both views before downloading files. Start by choosing PostgreSQL, MySQL, MariaDB, SQL Server or SQLite, paste one or more CREATE TABLE statements, and select the desired output. The tool parses SQL into an abstract syntax tree. It never executes statements or connects to a database. An unsupported statement blocks export rather than disappearing silently.",
     "p2": "Entity output includes persistence annotations and requires a primary key. Composite keys use IdClass with an equality implementation. Foreign keys remain scalar values, avoiding accidental relationship loading. DTO classes contain no persistence annotations; request and response variants let you exclude identifiers, audit fields and sensitive fields. Partial UpdateRequest output does not inherit required-field validation. Records require Java 16 or later. Interface projections expose getters and need property names or SQL aliases that Spring Data can resolve. Simple SELECT expressions without known types are explicitly marked for review.",
     "p3": "For reverse conversion, paste a field-based Java class or a record. The supported Java declaration parser reads scalar fields and common JPA column annotations, skips method bodies, and rejects inheritance, generics and relationship declarations it cannot faithfully interpret. Review the mapping table before generating SQL: a missing length is not secretly replaced with VARCHAR(255), and a field named id is not automatically considered generated. Unknown nullability remains visible. The database draft therefore captures your chosen assumptions, not a promise to recreate a lost production schema.",
     "p4": "Choose the Spring Boot namespace, Java version, package, constructors, validation and naming options in the advanced panel. Individual files can be copied or downloaded, and ZIP export preserves package folders plus the intermediate metadata. Keep that sidecar when reviewing cross-dialect output, because defaults and provider-specific types may need manual migration work. SQL and Java stay in the browser, processing runs in a worker with a time limit, and no credentials are requested. Review all warnings and test the generated code with your actual dependencies before adopting it."
   },
   "faq": {
     "heading": "Questions",
-    "q1": "Are Oracle and SQL Server supported?",
-    "a1": "No. This version exposes PostgreSQL and MySQL only, with a documented syntax subset.",
+    "q1": "Which databases are supported?",
+    "a1": "PostgreSQL, MySQL, MariaDB (common MySQL-compatible DDL), SQL Server and SQLite within the documented subset. Oracle is not supported yet.",
     "q2": "Does Java → SQL recover the exact schema?",
     "a2": "No. DTOs and records lack database metadata; review and supply the missing information before using the draft.",
     "q3": "Is any code uploaded or executed?",

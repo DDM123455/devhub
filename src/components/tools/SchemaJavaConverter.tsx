@@ -1,3 +1,4 @@
+import { dialects, isDialect, type Dialect } from "@/lib/schema-java/dialects";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,9 +23,7 @@ export default function SchemaJavaConverter({
 }) {
   const [input, setInput] = useState(""),
     [inputKind, setInputKind] = useState<"sql" | "java" | "metadata">("sql"),
-    [sourceDialect, setSourceDialect] = useState<"postgresql" | "mysql">(
-      "postgresql",
-    ),
+    [sourceDialect, setSourceDialect] = useState<Dialect>("postgresql"),
     [schema, setSchema] = useState("");
   const [options, setOptions] = useState<Options>({ ...defaults }),
     [output, setOutput] = useState<Output>("entity"),
@@ -180,8 +179,11 @@ export default function SchemaJavaConverter({
               setSourceDialect(e.target.value as typeof sourceDialect);
             }}
           >
-            <option value="postgresql">PostgreSQL</option>
-            <option value="mysql">MySQL</option>
+            {dialects.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.label}
+              </option>
+            ))}
           </select>
         </label>
         <label>
@@ -282,8 +284,11 @@ export default function SchemaJavaConverter({
                 option("dialect", e.target.value as Options["dialect"])
               }
             >
-              <option value="postgresql">PostgreSQL</option>
-              <option value="mysql">MySQL</option>
+              {dialects.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.label}
+                </option>
+              ))}
             </select>
           </label>
           <label>
@@ -657,7 +662,17 @@ export default function SchemaJavaConverter({
                 if (f.size > 20000) throw Error();
                 const v = JSON.parse(await f.text());
                 const valid = { ...defaults };
-                if(v.typeOverrides && typeof v.typeOverrides==='object' && !Array.isArray(v.typeOverrides) && Object.values(v.typeOverrides).every(x=>typeof x==='string')) valid.typeOverrides=Object.fromEntries(Object.entries(v.typeOverrides));
+                if (
+                  v.typeOverrides &&
+                  typeof v.typeOverrides === "object" &&
+                  !Array.isArray(v.typeOverrides) &&
+                  Object.values(v.typeOverrides).every(
+                    (x) => typeof x === "string",
+                  )
+                )
+                  valid.typeOverrides = Object.fromEntries(
+                    Object.entries(v.typeOverrides),
+                  );
                 for (const key of Object.keys(defaults) as (keyof Options)[])
                   if (
                     key !== "typeOverrides" &&
@@ -665,7 +680,7 @@ export default function SchemaJavaConverter({
                   )
                     (valid as any)[key] = v[key];
                 if (
-                  !["mysql", "postgresql"].includes(valid.dialect) ||
+                  !isDialect(valid.dialect) ||
                   !["jakarta", "javax"].includes(valid.namespace) ||
                   ![8, 11, 16, 17, 21].includes(valid.javaVersion) ||
                   ![
@@ -673,7 +688,8 @@ export default function SchemaJavaConverter({
                     "CreateRequest",
                     "UpdateRequest",
                     "Response",
-                  ].includes(valid.dtoKind) || !['choose','ignore','overwrite'].includes(valid.nullPolicy)
+                  ].includes(valid.dtoKind) ||
+                  !["choose", "ignore", "overwrite"].includes(valid.nullPolicy)
                 )
                   throw Error();
                 invalidate();
