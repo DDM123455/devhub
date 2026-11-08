@@ -180,6 +180,8 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-11-08 — Rà chất lượng web, sửa XML và đồng bộ hướng dẫn**: tìm thấy Nén gọn XML trim từng dòng làm đổi text/CDATA; đổi sang serialize tài liệu gốc, giữ mọi whitespace có thể có nghĩa. Cây XML không trim text hay biến whitespace-only thành thẻ rỗng. Trình duyệt CSP production xác nhận text nhiều dòng, CDATA, xml:space và whitespace-only giữ nguyên, không console error. Cập nhật FAQ/hướng dẫn en+vi JSON/XML (thao tác, giới hạn, tree, minify bảo toàn, không XSD) và Base64 (preview trực tiếp, download, giới hạn từng dòng). Thêm FAQ XML vào page/schema. 1026 test qua, 1 skipped; build 622 trang; SEO P0=P1=P2=0, P3=3. Crawl production 58 URL đều 200+có H1. Năm request mẫu TTFB 580–1278 ms, không phải Lighthouse hay tốc độ tương tác. i18n vi không thiếu key/placeholder mismatch; 18 locale khác ban đầu thiếu 282 key/locale, sau thêm 3 key hướng dẫn en/vi là 285 (chưa coi là đã dịch). Phần thiếu chính ISO 108, SQL/Java 130, JSON/XML 28; vẫn noindex ngoài en/vi. Còn 81 meta dài, tên H1 lặp và 2 title 404 ngắn P3. Chưa kiểm chức năng end-to-end toàn bộ công cụ, chưa đo CWV; chưa push.
+
 - **2026-11-08 — SQL/Java input mismatch + worker error UX (ảnh người dùng)**: ảnh chọn Java
   nhưng dán SQL. Repro trên production hiện tại: worker HTTP 200 và báo unsupported, chưa tái
   hiện được worker failure trong ảnh; scope trong ảnh là bản cũ, stale assets/tab chỉ là giả

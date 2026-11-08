@@ -16,7 +16,7 @@ const INDENTS: Record<string, string> = { '2': '  ', '4': '    ', tab: '\t' };
 
 function XmlTreeNode({ node, depth, openAll }: { node: Element; depth: number; openAll: boolean | null }) {
   const attrs = Array.from(node.attributes);
-  const kids = Array.from(node.childNodes).filter((c) => c.nodeType === 1 || (c.nodeType === 3 && c.textContent?.trim()) || c.nodeType === 4 || c.nodeType === 8);
+  const kids = Array.from(node.childNodes).filter((c) => c.nodeType === 1 || c.nodeType === 3 || c.nodeType === 4 || c.nodeType === 8);
   const onlyText = kids.length > 0 && kids.every((c) => c.nodeType === 3 || c.nodeType === 4);
   const open = (
     <>
@@ -28,7 +28,7 @@ function XmlTreeNode({ node, depth, openAll }: { node: Element; depth: number; o
   );
   if (kids.length === 0) return <div className="pl-4">{open}<span className="text-primary"> /&gt;</span></div>;
   if (onlyText) {
-    return <div className="pl-4">{open}<span className="text-primary">&gt;</span>{node.textContent?.trim()}<span className="text-primary">&lt;/{node.tagName}&gt;</span></div>;
+    return <div className="whitespace-pre-wrap pl-4">{open}<span className="text-primary">&gt;</span>{node.textContent}<span className="text-primary">&lt;/{node.tagName}&gt;</span></div>;
   }
   return (
     <details className="pl-4" open={openAll ?? depth < 2} key={String(openAll)}>
@@ -36,7 +36,7 @@ function XmlTreeNode({ node, depth, openAll }: { node: Element; depth: number; o
       {kids.map((c, i) =>
         c.nodeType === 1 ? <XmlTreeNode key={i} node={c as Element} depth={depth + 1} openAll={openAll} />
           : c.nodeType === 8 ? <div key={i} className="pl-4 text-muted-foreground">&lt;!--{c.textContent}--&gt;</div>
-            : <div key={i} className="pl-4">{c.textContent?.trim()}</div>)}
+            : <div key={i} className="whitespace-pre-wrap pl-4">{c.textContent}</div>)}
     </details>
   );
 }
@@ -63,7 +63,9 @@ export default function JsonXmlFormatter({ messages, xml }: {
       return;
     }
     if (action === 'format') setOutput(result.value);
-    if (action === 'minify') setOutput(result.value.split('\n').map((l) => l.trim()).join(''));
+    // Serialize the original document: trimming formatted lines corrupts text/CDATA.
+    // Preserve all text whitespace because its significance requires a schema.
+    if (action === 'minify') setOutput(new XMLSerializer().serializeToString(new DOMParser().parseFromString(input, 'application/xml')));
     setStatus({ error: false, text: xml.valid });
   }
   function reset() { setInput(''); setOutput(''); setStatus(null); setOpenAll(null); }
