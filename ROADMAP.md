@@ -584,7 +584,8 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 - [x] Test/compile Java, build, QA browser/mobile và Lighthouse ≥90 trên preview gzip
 - [ ] Mở rộng parser Java: generic/inheritance/EmbeddedId/input relationship; SQL ALTER/CTE/UNION
 - [x] Adapter MariaDB (MySQL-compatible DDL), SQL Server, SQLite; UI nguồn/đích, native DDL tests
-- [ ] Adapter Oracle, mapping enum/JSON provider chuyên biệt, MapStruct
+- [x] Adapter Oracle 12c+ relational DDL subset: parser riêng, mapping/identity/comment, Java/SQL export, UI/sample/tests
+- [ ] Oracle SELECT/sequence/PLSQL/ALTER và DDL nâng cao; mapping enum/JSON provider chuyên biệt, MapStruct
 - [ ] Dịch đầy đủ UI/article ngoài en/vi và đo lại Lighthouse trên production sau deploy
 
 ## Phase 4 — Kiếm tiền & PWA

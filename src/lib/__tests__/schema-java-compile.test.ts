@@ -50,8 +50,46 @@ it.skipIf(!enabled)(
             files.push(path);
           }
         }
-      const relationModel=parseSql('CREATE TABLE parent (id BIGINT PRIMARY KEY); CREATE TABLE child (id BIGINT PRIMARY KEY, parent_id BIGINT, FOREIGN KEY(parent_id) REFERENCES parent(id));','mysql');
-      for(const kind of ['entity','dto'] as const){const r=generate(relationModel,kind,{...defaults,relationships:true,mapper:kind==='dto',dtoKind:'UpdateRequest',nullPolicy:'ignore',packageName:'test.mappers'});expect(r.files.length,JSON.stringify(r.diagnostics)).toBe(kind==='entity'?2:4);for(const f of r.files){const path=join(dir,f.path);mkdirSync(dirname(path),{recursive:true});writeFileSync(path,f.content);files.push(path);}}
+      const relationModel = parseSql(
+        "CREATE TABLE parent (id BIGINT PRIMARY KEY); CREATE TABLE child (id BIGINT PRIMARY KEY, parent_id BIGINT, FOREIGN KEY(parent_id) REFERENCES parent(id));",
+        "mysql",
+      );
+      for (const kind of ["entity", "dto"] as const) {
+        const r = generate(relationModel, kind, {
+          ...defaults,
+          relationships: true,
+          mapper: kind === "dto",
+          dtoKind: "UpdateRequest",
+          nullPolicy: "ignore",
+          packageName: "test.mappers",
+        });
+        expect(r.files.length, JSON.stringify(r.diagnostics)).toBe(
+          kind === "entity" ? 2 : 4,
+        );
+        for (const f of r.files) {
+          const path = join(dir, f.path);
+          mkdirSync(dirname(path), { recursive: true });
+          writeFileSync(path, f.content);
+          files.push(path);
+        }
+      }
+      const oracleModel = parseSql(
+        "CREATE TABLE customer (id NUMBER(18) GENERATED ALWAYS AS IDENTITY PRIMARY KEY, name VARCHAR2(100 CHAR), balance NUMBER(12,2), created_at DATE, event_at TIMESTAMP WITH TIME ZONE, payload BLOB);",
+        "oracle",
+      );
+      for (const kind of ["entity", "dto", "record", "projection"] as const) {
+        const r = generate(oracleModel, kind, {
+          ...defaults,
+          packageName: "test.oracle.output" + kind,
+        });
+        expect(r.files.length, JSON.stringify(r.diagnostics)).toBe(1);
+        for (const f of r.files) {
+          const path = join(dir, f.path);
+          mkdirSync(dirname(path), { recursive: true });
+          writeFileSync(path, f.content);
+          files.push(path);
+        }
+      }
       execFileSync(
         "javac",
         [

@@ -4,6 +4,7 @@ export const dialects = [
   { id: "mariadb", label: "MariaDB", database: "MySQL" },
   { id: "sqlserver", label: "SQL Server", database: "TransactSQL" },
   { id: "sqlite", label: "SQLite", database: "SQLite" },
+  { id: "oracle", label: "Oracle (12c+ DDL)", database: "Oracle" },
 ] as const;
 export type Dialect = (typeof dialects)[number]["id"];
 export const isMysql = (d: Dialect) => d === "mysql" || d === "mariadb";

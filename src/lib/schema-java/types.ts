@@ -2,6 +2,12 @@ import type { Column, Dialect, Diagnostic } from "./model";
 import { isMysql } from "./dialects";
 export function javaType(sql: string): string {
   const t = sql.toUpperCase();
+  if (["NUMBER", "DEC", "INTEGER"].includes(t) && t !== "INTEGER")
+    return "BigDecimal";
+  if (t === "RAW") return "byte[]";
+  if (["CLOB", "NCLOB"].includes(t)) return "String";
+  if (t === "BINARY_FLOAT") return "Float";
+  if (t === "BINARY_DOUBLE") return "Double";
   if (t === "UNIQUEIDENTIFIER") return "UUID";
   if (t === "BIT") return "Boolean";
   if (t === "DATETIMEOFFSET") return "OffsetDateTime";
@@ -53,6 +59,77 @@ export function sqlType(c: Column, d: Dialect, diags: Diagnostic[]): string {
     "byte[]": d === "postgresql" ? "BYTEA" : "BLOB",
   };
   let type = types[c.javaType];
+  if (d === "oracle") {
+    const specific: Record<string, string> = {
+      String: "CLOB",
+      Long: "NUMBER(19,0)",
+      long: "NUMBER(19,0)",
+      Integer: "NUMBER(10,0)",
+      int: "NUMBER(10,0)",
+      Short: "NUMBER(5,0)",
+      short: "NUMBER(5,0)",
+      Byte: "NUMBER(3,0)",
+      byte: "NUMBER(3,0)",
+      Boolean: "NUMBER(1,0)",
+      boolean: "NUMBER(1,0)",
+      BigDecimal: "NUMBER",
+      Float: "BINARY_FLOAT",
+      float: "BINARY_FLOAT",
+      Double: "BINARY_DOUBLE",
+      double: "BINARY_DOUBLE",
+      UUID: "VARCHAR2(36 CHAR)",
+      LocalDate: "DATE",
+      LocalDateTime: "TIMESTAMP",
+      OffsetDateTime: "TIMESTAMP WITH TIME ZONE",
+      Instant: "TIMESTAMP WITH TIME ZONE",
+      "byte[]": "BLOB",
+    };
+    type = specific[c.javaType];
+    if (c.javaType === "LocalTime" || c.javaType === "OffsetTime") {
+      diags.push({ severity: "error", code: "oracleTime", detail: c.name });
+      return "TIMESTAMP";
+    }
+    if (["Boolean", "boolean", "UUID", "LocalDate"].includes(c.javaType))
+      diags.push({
+        severity: "warning",
+        code: "oracleSemantics",
+        detail: c.name + ": " + c.javaType,
+      });
+    if (c.sqlType === "RAW" && c.length !== undefined)
+      type = `RAW(${c.length})`;
+    if (c.sqlType === "DATE" && c.javaType === "LocalDateTime") type = "DATE";
+    if (c.sqlType === "NCLOB" && c.javaType === "String") type = "NCLOB";
+    if (c.sqlType === "FLOAT" && c.javaType === "BigDecimal")
+      type =
+        c.unknown.binaryPrecision === undefined
+          ? "FLOAT"
+          : `FLOAT(${Number(c.unknown.binaryPrecision)})`;
+    if (
+      ["INTEGER", "INT", "SMALLINT"].includes(c.sqlType) &&
+      c.javaType === "BigDecimal"
+    )
+      type = "NUMBER(38,0)";
+    if (
+      c.sqlType === "TIMESTAMP WITH LOCAL TIME ZONE" &&
+      c.javaType === "LocalDateTime"
+    )
+      type = c.sqlType;
+    if (
+      ["NUMBER", "DECIMAL", "DEC", "NUMERIC"].includes(c.sqlType) &&
+      c.precision !== undefined &&
+      ["BigDecimal", "Integer", "Long"].includes(c.javaType)
+    )
+      type = `NUMBER(${c.precision},${c.scale ?? 0})`;
+    if (
+      c.sqlType.startsWith("TIMESTAMP") &&
+      c.unknown.temporalPrecision !== undefined &&
+      /^\d$/.test(String(c.unknown.temporalPrecision))
+    )
+      type = type.replace(
+        "TIMESTAMP",
+        `TIMESTAMP(${c.unknown.temporalPrecision})`,
+      );
+  }
   if (d === "sqlserver") {
     const specific: Record<string, string> = {
       String: "NVARCHAR(MAX)",
@@ -117,13 +194,17 @@ export function sqlType(c: Column, d: Dialect, diags: Diagnostic[]): string {
   }
   if (c.javaType === "String" && c.length !== undefined)
     type =
-      d === "sqlserver"
-        ? `NVARCHAR(${c.length})`
-        : d === "sqlite"
-          ? "TEXT"
-          : `VARCHAR(${c.length})`;
+      d === "oracle"
+        ? ["NVARCHAR2", "NCHAR"].includes(c.sqlType)
+          ? `${c.sqlType}(${c.length})`
+          : `${c.sqlType === "CHAR" ? "CHAR" : "VARCHAR2"}(${c.length} ${c.unknown.lengthSemantics === "BYTE" ? "BYTE" : "CHAR"})`
+        : d === "sqlserver"
+          ? `NVARCHAR(${c.length})`
+          : d === "sqlite"
+            ? "TEXT"
+            : `VARCHAR(${c.length})`;
   if (c.javaType === "BigDecimal" && c.precision !== undefined)
-    type = `DECIMAL(${c.precision},${c.scale ?? 0})`;
+    type = `${d === "oracle" ? "NUMBER" : "DECIMAL"}(${c.precision},${c.scale ?? 0})`;
   if (/JSON/.test(same))
     type =
       d === "postgresql"
@@ -134,7 +215,9 @@ export function sqlType(c: Column, d: Dialect, diags: Diagnostic[]): string {
           ? "JSON"
           : d === "sqlserver"
             ? "NVARCHAR(MAX)"
-            : "TEXT";
+            : d === "oracle"
+              ? "CLOB"
+              : "TEXT";
   if (
     isMysql(d) &&
     ["OffsetDateTime", "OffsetTime", "Instant"].includes(c.javaType)

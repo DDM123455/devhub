@@ -180,6 +180,18 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-11-08 — Adapter Oracle cho SQL ↔ Java (yêu cầu trực tiếp)**: thêm parser DDL
+  recursive-descent riêng dùng tokenizer Oracle, không fallback parser MySQL. Hỗ trợ CREATE
+  TABLE quan hệ 12c+, NUMBER(p,s), VARCHAR2/NVARCHAR2/CHAR/NCHAR, DATE/TIMESTAMP timezone,
+  RAW/BLOB/CLOB/NCLOB, FLOAT/BINARY_FLOAT/BINARY_DOUBLE; identity với 3 mode và start/increment;
+  PK/FK/unique/check/index/comment. Identifier unquoted uppercase, tên quoted được giữ cả SQL
+  và annotation JPA, LOB có @Lob; Oracle DATE → LocalDateTime. SQL/preset/metadata nhận Oracle,
+  mẫu Oracle riêng trong UI. Biểu thức giữ raw kèm cảnh báo chưa validate toàn bộ ngữ nghĩa.
+  SELECT Oracle, sequence/PLSQL/ALTER/partition/virtual columns và NUMBER negative scale chưa
+  hỗ trợ, báo lỗi rõ. 71 suite/1023 test qua, có javac cho 4 loại Java từ Oracle; build 622
+  trang. Puppeteer production local: Oracle sample → Entity → DTO → SQL Oracle; mobile sạch,
+  không page error. Không chạy SQL trên Oracle server. Chi tiết tại SCHEMA_JAVA.md.
+
 - **2026-11-08 — SQL ↔ Java mở rộng database**: thêm registry adapter và UI nguồn/đích cho
   MariaDB (DDL phổ biến dùng MySQL parser), SQL Server (native T-SQL parser), SQLite (native
   parser). Mapping IDENTITY(seed,increment), AUTOINCREMENT SQLite, NVARCHAR/DATETIME2/

@@ -6,7 +6,7 @@
     "description": "Chuyển bảng PostgreSQL, MySQL sang Java Entity, DTO, record và projection. Chỉnh metadata Java sang SQL tại trình duyệt, không tải code lên server."
   },
   "ui": {
-    "scope": "Hỗ trợ CREATE TABLE, SELECT đơn giản của PostgreSQL, MySQL, MariaDB, SQL Server và SQLite; Java class và record vô hướng. Phần mở rộng riêng từng database có thể cần kiểm tra. Xử lý tại trình duyệt.",
+    "scope": "Hỗ trợ CREATE TABLE quan hệ của PostgreSQL, MySQL, MariaDB, SQL Server, SQLite và Oracle 12c+. SELECT đơn giản áp dụng cho 5 hệ đầu; Oracle hiện chỉ hỗ trợ DDL. Cú pháp ngoài phạm vi sẽ báo lỗi. Xử lý tại trình duyệt.",
     "inputKind": "Định dạng đầu vào",
     "sqlInput": "SQL DDL / SELECT",
     "javaInput": "Java class / record",
@@ -113,12 +113,15 @@
     "diag_metadataImported": "Đã nhập metadata. Kiểm tra trước khi sinh code.",
     "diag_mapperPolicy": "Mapper cần getter/setter và constructor. Hãy chọn chính sách null cho UpdateRequest.",
     "diag_mapperEntity": "Mapper cần Entity tương ứng cùng package và getter/setter tương thích.",
-    "diag_sqliteAffinity": "SQLite dùng type affinity: precision của số thập phân, boolean và ngày giờ cần kiểm tra ở tầng ứng dụng."
+    "diag_sqliteAffinity": "SQLite dùng type affinity: precision của số thập phân, boolean và ngày giờ cần kiểm tra ở tầng ứng dụng.",
+    "diag_oracleExpression": "Biểu thức Oracle được giữ nguyên văn. Công cụ chưa kiểm tra đầy đủ ngữ nghĩa biểu thức; cần đối chiếu với database.",
+    "diag_oracleSemantics": "Kiểm tra ngữ nghĩa Oracle: DATE có cả giờ; LOCAL TIME ZONE phụ thuộc múi giờ phiên; độ dài BYTE, boolean dạng số và UUID có thể cần mapping riêng.",
+    "diag_oracleTime": "Oracle không có cột TIME độc lập. Cần chọn cách biểu diễn ngày/giờ rõ ràng trước khi xuất trường này."
   },
   "related": "Công cụ liên quan",
   "article": {
     "heading": "Chuyển schema và kiểm tra các giả định",
-    "p1": "Bảng dữ liệu và class Java mô tả hai khía cạnh khác nhau. SQL lưu kiểu cột, ràng buộc, chỉ mục và biểu thức mặc định. Java mô tả giá trị mà ứng dụng sử dụng. Công cụ này đưa cả hai về schema trung gian để bạn kiểm tra trước khi tải kết quả. Chọn PostgreSQL, MySQL, MariaDB, SQL Server hoặc SQLite, dán một hay nhiều câu CREATE TABLE, sau đó chọn loại model cần sinh. Parser xây dựng cây cú pháp; không thực thi SQL và không kết nối cơ sở dữ liệu.",
+    "p1": "Bảng dữ liệu và class Java mô tả hai khía cạnh khác nhau. SQL lưu kiểu cột, ràng buộc, chỉ mục và biểu thức mặc định. Java mô tả giá trị mà ứng dụng sử dụng. Công cụ này đưa cả hai về schema trung gian để bạn kiểm tra trước khi tải kết quả. Chọn PostgreSQL, MySQL, MariaDB, SQL Server, SQLite hoặc Oracle (chỉ DDL), dán một hay nhiều câu CREATE TABLE, sau đó chọn loại model cần sinh. Parser xây dựng cây cú pháp; không thực thi SQL và không kết nối cơ sở dữ liệu.",
     "p2": "Entity cần có khóa chính. Khi bảng không khai báo khóa, hãy chọn cột định danh trong mapping. Khóa ghép dùng IdClass, còn foreign key mặc định giữ trường ID để tránh sinh quan hệ tải dữ liệu ngoài ý muốn. DTO không có annotation persistence. Các biến thể CreateRequest, UpdateRequest và Response cho phép loại ID, trường audit hoặc dữ liệu nhạy cảm. UpdateRequest không tự kế thừa validation bắt buộc của Entity. Record yêu cầu Java 16 trở lên; projection cần getter khớp thuộc tính hoặc alias SQL.",
     "p3": "Khi chuyển ngược, bạn có thể dán class Java dùng field hoặc record với kiểu vô hướng. Parser đọc annotation cột JPA phổ biến và bỏ qua thân phương thức. Kế thừa, generic và relationship chưa được xử lý đầy đủ sẽ báo lỗi. Những thông tin Java không cung cấp như độ dài, nullability, identity hoặc default cần được bổ sung ở bảng mapping. Công cụ không tự xem trường tên id là auto increment, cũng không âm thầm biến mọi String thành VARCHAR(255). SQL sinh ra từ DTO là bản nháp cần rà soát.",
     "p4": "Phần nâng cao cho phép chọn namespace Spring Boot, phiên bản Java, package, constructor, getter/setter, builder và validation. Bạn có thể sao chép từng tệp hoặc tải ZIP theo thư mục package. Tệp schema-metadata.json giữ thông tin trung gian để đối chiếu khi chuyển dialect. Các default và kiểu dữ liệu riêng của database có thể cần chỉnh thủ công. Nội dung được xử lý trong worker tại trình duyệt, có giới hạn thời gian và kích thước. Không cần credential và không gửi code lên dịch vụ bên ngoài."
@@ -126,7 +129,7 @@
   "faq": {
     "heading": "Câu hỏi thường gặp",
     "q1": "Hỗ trợ những database nào?",
-    "a1": "PostgreSQL, MySQL, MariaDB (DDL thông dụng tương thích MySQL), SQL Server và SQLite trong tập cú pháp được công bố. Chưa hỗ trợ Oracle.",
+    "a1": "PostgreSQL, MySQL, MariaDB (DDL thông dụng tương thích MySQL), SQL Server, SQLite và DDL quan hệ Oracle 12c+ trong tập cú pháp được công bố. Chưa hỗ trợ SELECT Oracle, sequence và PL/SQL.",
     "q2": "Java → SQL có khôi phục schema chính xác không?",
     "a2": "Không. DTO và record thiếu metadata database; cần kiểm tra và bổ sung trước khi dùng SQL nháp.",
     "q3": "Code có bị tải lên hoặc thực thi không?",

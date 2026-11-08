@@ -23,6 +23,12 @@ const cap = (v: string) => v.charAt(0).toUpperCase() + v.slice(1);
 const sensitive = (c: Column) =>
   /password|secret|token|credential|salt/i.test(c.name);
 export function generate(model: Model, kind: Output, o: Options): Result {
+  const persistenceName = (value: string) =>
+    str(
+      model.dialect === "oracle"
+        ? '"' + value.replaceAll('"', '""') + '"'
+        : value,
+    );
   const r: Result = {
     files: [],
     diagnostics: [...model.diagnostics, ...validateModel(model)],
@@ -198,7 +204,16 @@ export function generate(model: Model, kind: Output, o: Options): Result {
           ["Long", "Integer", "long", "int"].includes(types.get(c)!)
         )
           a.push("@GeneratedValue(strategy = GenerationType.IDENTITY)");
-        const attrs = [`name = ${str(c.name)}`];
+        else if (c.identity)
+          r.diagnostics.push({
+            severity: "warning",
+            code: "identityReview",
+            detail:
+              c.name +
+              ": choose an integral Java ID mapping to generate @GeneratedValue",
+          });
+        const attrs = [`name = ${persistenceName(c.name)}`];
+        if (["CLOB", "NCLOB", "BLOB"].includes(c.sqlType)) a.push("@Lob");
         if (c.nullable !== null) attrs.push(`nullable = ${c.nullable}`);
         for (const k of ["length", "precision", "scale"] as const)
           if (c[k] !== undefined) attrs.push(`${k} = ${c[k]}`);
@@ -221,7 +236,7 @@ export function generate(model: Model, kind: Output, o: Options): Result {
     } else {
       let head = doc(t.comment);
       if (entity) {
-        head += `@Entity\n@Table(name = ${str(t.name)}${t.schema ? `, schema = ${str(t.schema)}` : ""})\n`;
+        head += `@Entity\n@Table(name = ${persistenceName(t.name)}${t.schema ? `, schema = ${persistenceName(t.schema)}` : ""})\n`;
         if (keys.length > 1) head += `@IdClass(${name}.Key.class)\n`;
       }
       if (o.lombok) {
@@ -297,7 +312,7 @@ export function generate(model: Model, kind: Output, o: Options): Result {
           );
           let field = identifier(target.name) + "Reference" + index;
           while (cols.some((c) => c.javaName === field)) field += "_";
-          body += `\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumns({${fk.columns.map((c, i) => `@JoinColumn(name = ${str(c)}, referencedColumnName = ${str(fk.reference!.columns[i])}, insertable = false, updatable = false)`).join(", ")}})\n    private ${targetName} ${field};\n`;
+          body += `\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumns({${fk.columns.map((c, i) => `@JoinColumn(name = ${persistenceName(c)}, referencedColumnName = ${persistenceName(fk.reference!.columns[i])}, insertable = false, updatable = false)`).join(", ")}})\n    private ${targetName} ${field};\n`;
         }
       }
       body += "}\n";
@@ -398,6 +413,7 @@ function generateSql(m: Model, o: Options, r: Result): Result {
     if (
       !isMysql(o.dialect) &&
       o.dialect !== "postgresql" &&
+      o.dialect !== "oracle" &&
       (t.comment || t.columns.some((c) => c.comment))
     )
       r.diagnostics.push({
@@ -408,6 +424,42 @@ function generateSql(m: Model, o: Options, r: Result): Result {
     const rows = t.columns.map((c) => {
       let type = sqlType(c, o.dialect, r.diagnostics);
       let row = `  ${q(c.name)} ${type}`;
+      if (o.dialect === "oracle" && c.identity) {
+        if (
+          !type.startsWith("NUMBER") ||
+          t.columns.filter((x) => x.identity).length > 1
+        )
+          r.diagnostics.push({
+            severity: "error",
+            code: "identityReview",
+            detail: c.name,
+          });
+        const mode =
+          c.unknown.identityMode === "always"
+            ? "ALWAYS"
+            : c.unknown.identityMode === "defaultOnNull"
+              ? "BY DEFAULT ON NULL"
+              : "BY DEFAULT";
+        row += ` GENERATED ${mode} AS IDENTITY`;
+        if (
+          c.unknown.identitySeed !== undefined ||
+          c.unknown.identityIncrement !== undefined
+        ) {
+          const seed = Number(c.unknown.identitySeed ?? 1),
+            inc = Number(c.unknown.identityIncrement ?? 1);
+          if (
+            !Number.isSafeInteger(seed) ||
+            !Number.isSafeInteger(inc) ||
+            inc === 0
+          )
+            r.diagnostics.push({
+              severity: "error",
+              code: "identityReview",
+              detail: c.name,
+            });
+          else row += ` (START WITH ${seed} INCREMENT BY ${inc})`;
+        }
+      }
       if (o.dialect === "sqlite" && c.identity) {
         if (!c.primaryKey || t.columns.filter((x) => x.primaryKey).length !== 1)
           r.diagnostics.push({
@@ -424,7 +476,7 @@ function generateSql(m: Model, o: Options, r: Result): Result {
           detail: t.name + "." + c.name,
         });
       if (c.nullable === false || c.primaryKey) row += " NOT NULL";
-      if (c.identity && o.dialect !== "sqlite") {
+      if (c.identity && o.dialect !== "sqlite" && o.dialect !== "oracle") {
         if (!/^(BIGINT|INTEGER|SMALLINT)$/.test(type) || !c.primaryKey) {
           r.diagnostics.push({
             severity: "error",
@@ -441,7 +493,13 @@ function generateSql(m: Model, o: Options, r: Result): Result {
                 : " GENERATED BY DEFAULT AS IDENTITY";
       }
       if (c.default !== undefined) {
-        if (m.dialect === o.dialect) row += " DEFAULT " + c.default;
+        if (m.dialect === o.dialect)
+          row +=
+            " DEFAULT " +
+            (o.dialect === "oracle" && c.unknown.defaultOnNull
+              ? "ON NULL "
+              : "") +
+            c.default;
         else
           r.diagnostics.push({
             severity: "warning",
@@ -503,11 +561,11 @@ function generateSql(m: Model, o: Options, r: Result): Result {
       chunks.push(
         `CREATE INDEX ${q(c.name ?? t.name + "_idx_" + i)} ON ${full(t)} (${c.columns.map(q).join(", ")});`,
       );
-    if (o.dialect === "postgresql" && t.comment)
+    if ((o.dialect === "postgresql" || o.dialect === "oracle") && t.comment)
       chunks.push(
         `COMMENT ON TABLE ${full(t)} IS '${t.comment.replaceAll("'", "''")}';`,
       );
-    if (o.dialect === "postgresql")
+    if (o.dialect === "postgresql" || o.dialect === "oracle")
       for (const c of t.columns)
         if (c.comment)
           chunks.push(

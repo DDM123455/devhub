@@ -14,9 +14,11 @@ import {
 } from "./model";
 import { javaType } from "./types";
 import { tokenizeSql, syntaxFor } from "../sql-tokenize";
+import { parseOracle } from "./oracle-parser";
 // The vendor AST differs between dialects; keep its untyped boundary in this adapter.
 type Ast = any;
 export function parserFor(d: Dialect): Ast {
+  if (d === "oracle") throw new Error("Oracle uses the dedicated DDL parser");
   const m: any =
     d === "postgresql"
       ? pg
@@ -36,6 +38,7 @@ export function parseSql(
   schema?: Model,
 ): Model {
   checkInput(input);
+  if (dialect === "oracle") return parseOracle(input);
   const p = parserFor(dialect),
     options = { database: parserDatabase(dialect) };
   const model: Model = { version: 1, dialect, tables: [], diagnostics: [] };
