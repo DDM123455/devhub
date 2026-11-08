@@ -1,0 +1,20 @@
+// Local production UI smoke test. Uses an existing Puppeteer install; no schema leaves localhost.
+const assert=require('node:assert/strict');
+const fs=require('node:fs');const path=require('node:path');
+const puppeteer=require(process.env.PUPPETEER_PATH || 'C:/Users/sickb/AppData/Local/npm-cache/_npx/7d92d9a2d2ccc630/node_modules/puppeteer');
+(async()=>{const browser=await puppeteer.launch({headless:true});try{const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.setViewport({width:1440,height:1000});await page.goto('http://127.0.0.1:4329/en/tools/sql-java-converter/',{waitUntil:'networkidle0'});
+ await page.waitForFunction(()=>{const el=document.querySelector('astro-island');return el&&!el.hasAttribute('ssr');});
+ const click=async text=>{const handles=await page.$$('button');for(const h of handles)if((await h.evaluate(el=>el.textContent.trim()))===text){await h.click();return;}throw Error('Button missing: '+text);};
+ await click('Load sample');await click('Parse & convert');await page.waitForFunction(()=>document.querySelector('textarea[aria-label="Output preview"]')?.value.includes('@Entity'),{timeout:20000});
+ assert((await page.$eval('textarea[aria-label="Output preview"]',x=>x.value)).includes('BigDecimal'));
+ for(const [button,expected] of [['DTO class','public class CustomersDTO'],['Interface projection','public interface CustomersProjection'],['Java record','public record']]){await click(button);await page.waitForFunction(value=>document.querySelector('textarea[aria-label="Output preview"]')?.value.includes(value),{timeout:20000},expected);}
+ await page.setViewport({width:375,height:850});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),375);
+ await page.screenshot({path:'.tools/qa/schema-java-mobile.png',fullPage:true});
+ await page.setViewport({width:1440,height:1000});await page.screenshot({path:'.tools/qa/schema-java-desktop.png',fullPage:true});
+ const dir=fs.mkdtempSync(path.resolve('.tools/qa/schema-java-download-'));const cdp=await page.createCDPSession();await cdp.send('Page.setDownloadBehavior',{behavior:'allow',downloadPath:dir});await click('Download ZIP + metadata');
+ await page.waitForFunction(()=>document.body.textContent.includes('Download ZIP'));await new Promise(r=>setTimeout(r,1500));assert(fs.existsSync(path.join(dir,'java-models.zip')));const JSZip=require('jszip');const zip=await JSZip.loadAsync(fs.readFileSync(path.join(dir,'java-models.zip')));assert(zip.file('schema-metadata.json'));assert(Object.keys(zip.files).some(x=>x.endsWith('.java')));
+ const selects=await page.$$('select');await selects[0].select('java');await click('Load sample');await click('Replace');await selects[2].select('sql');await click('Parse & convert');await page.waitForFunction(()=>document.querySelector('textarea[aria-label="Output preview"]')?.value.includes('CREATE TABLE'));
+ await click('JPA Entity');await page.waitForFunction(()=>document.body.textContent.includes('Choose at least one primary key'));
+ await page.click('input[aria-label="Primary key id"]');assert(await page.$eval('input[aria-label="Primary key id"]',el=>el.checked));await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));for(const h of await page.$$('button'))if(await h.evaluate(el=>el.textContent.trim()==='Generate with edited mapping')){await h.focus();await h.press('Enter');break;}await page.waitForFunction(()=>document.querySelector('textarea[aria-label="Output preview"]')?.value.includes('@Id'),{timeout:15000});
+ await page.goto('http://127.0.0.1:4329/vi/tools/chuyen-doi-sql-java/',{waitUntil:'networkidle0'});assert((await page.$eval('h1',e=>e.textContent)).includes('Chuyển đổi'));assert.deepEqual(errors,[]);console.log('PASS: SQL → Entity/DTO/record/projection; Java → SQL → Entity with edited PK; mobile; ZIP; Vietnamese; no page errors');
+ }finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

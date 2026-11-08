@@ -11,6 +11,11 @@ export interface ToolDefinition {
 
 export const tools: ToolDefinition[] = [
 	{
+		id: 'schema-java', category: 'dev',
+		slugs: {en:'sql-java-converter',vi:'chuyen-doi-sql-java',es:'convertidor-sql-java',pt:'conversor-sql-java',fr:'convertisseur-sql-java',de:'sql-java-konverter',ja:'sql-java変換',ko:'sql-java-변환',zh:'sql-java转换','zh-tw':'sql-java轉換',it:'convertitore-sql-java',ru:'конвертер-sql-java',nl:'sql-java-omzetter',pl:'konwerter-sql-java',tr:'sql-java-donusturucu',id:'konverter-sql-java',ar:'تحويل-sql-java',hi:'sql-java-कनवर्टर',th:'แปลง-sql-java',sv:'sql-java-omvandlare'},
+		names: {en:'SQL ↔ Java Models',vi:'SQL ↔ Java Model',es:'SQL ↔ Modelos Java',pt:'SQL ↔ Modelos Java',fr:'SQL ↔ Modèles Java',de:'SQL ↔ Java-Modelle',ja:'SQL ↔ Javaモデル',ko:'SQL ↔ Java 모델',zh:'SQL ↔ Java 模型','zh-tw':'SQL ↔ Java 模型',it:'SQL ↔ Modelli Java',ru:'SQL ↔ Модели Java',nl:'SQL ↔ Java-modellen',pl:'SQL ↔ Modele Java',tr:'SQL ↔ Java Modelleri',id:'SQL ↔ Model Java',ar:'SQL ↔ نماذج Java',hi:'SQL ↔ Java मॉडल',th:'SQL ↔ โมเดล Java',sv:'SQL ↔ Java-modeller'},
+	},
+	{
 		id: 'image-compress',
 		category: 'image',
 		slugs: {

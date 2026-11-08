@@ -1,0 +1,7 @@
+{
+  "heading": "SQL ↔ Java 模型轉換",
+  "meta": {
+    "title": "SQL 轉 Java Entity 與 DTO 工具 — Web Tool Hub",
+    "description": "將 PostgreSQL、MySQL 資料表轉換為 Java Entity、DTO、record 或 projection。在瀏覽器中檢查中繼資料並匯出 SQL，不必上傳程式碼，支援套件目錄 ZIP 下載。"
+  }
+}

@@ -1,0 +1,23 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import FaqSection from '@/components/layout/FaqSection.astro';
+import SchemaJavaConverter from './SchemaJavaConverter';
+import { getFixedT } from '@/i18n/i18next';
+import type { Locale } from '@/i18n/config';
+import { tools, getRelatedTools } from '@/data/tools';
+import { jsonLd } from '@/lib/json-ld';
+import source from '@/i18n/locales/en/tool-schema-java.json';
+interface Props {lang:Locale}
+const {lang}=Astro.props;
+const t=getFixedT(lang,'tool-schema-java');
+const tool=tools.find(x=>x.id==='schema-java')!;
+const messages=Object.fromEntries(Object.keys(source.ui).map(k=>[k,t(`ui.${k}`)]));
+const schema={'@context':'https://schema.org','@type':'WebApplication',name:t('heading'),description:t('meta.description'),url:new URL(Astro.url.pathname,Astro.site).toString(),applicationCategory:'DeveloperApplication',operatingSystem:'Any',offers:{'@type':'Offer',price:'0',priceCurrency:'USD'}};
+---
+<Layout lang={lang} title={t('meta.title')} description={t('meta.description')} ogImage="/og/dev.png">
+ <script type="application/ld+json" set:html={jsonLd(schema)}/>
+ <section class="min-w-0 px-4 py-10"><h1 class="text-heading-1">{t('heading')}</h1><p class="mt-2 text-muted-foreground">{t('tagline')}</p><div class="mt-6 min-w-0"><SchemaJavaConverter client:load messages={messages}/></div></section>
+ <section class="border-t border-border px-4 py-10"><div class="mx-auto max-w-3xl"><h2 class="text-heading-2">{t('article.heading')}</h2><div class="mt-4 space-y-4 text-muted-foreground">{[1,2,3,4].map(n=><p>{t(`article.p${n}`)}</p>)}</div></div></section>
+ <section class="border-t border-border px-4 py-10"><FaqSection heading={t('faq.heading')} items={[1,2,3].map(n=>({question:t(`faq.q${n}`),answer:t(`faq.a${n}`)}))}/></section>
+ <section class="px-4 py-10"><h2 class="text-heading-2">{t('related')}</h2><ul>{getRelatedTools(tool).slice(0,3).map(x=><li><a class="text-primary hover:underline" href={`/${lang}/tools/${x.slugs[lang]}/`}>{x.names[lang]}</a></li>)}</ul></section>
+</Layout>

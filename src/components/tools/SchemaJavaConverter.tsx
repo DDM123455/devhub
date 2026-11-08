@@ -1,0 +1,692 @@
+import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  defaults,
+  type Model,
+  type Options,
+  type Output,
+  type Result,
+} from "@/lib/schema-java/model";
+import type { Request } from "./schemaJavaWorker";
+type Messages = Record<string, string>;
+const sample =
+  "CREATE TABLE customers (\n  id BIGINT PRIMARY KEY,\n  email VARCHAR(120) NOT NULL,\n  balance DECIMAL(12,2) DEFAULT 0,\n  created_at TIMESTAMP,\n  UNIQUE (email)\n);";
+const javaSample =
+  "public record Customer(Long id, String email, java.math.BigDecimal balance) {}";
+const inputClass =
+  "w-full min-w-0 rounded border border-border bg-background p-2 text-foreground";
+export default function SchemaJavaConverter({
+  messages: m,
+}: {
+  messages: Messages;
+}) {
+  const [input, setInput] = useState(""),
+    [inputKind, setInputKind] = useState<"sql" | "java" | "metadata">("sql"),
+    [sourceDialect, setSourceDialect] = useState<"postgresql" | "mysql">(
+      "postgresql",
+    ),
+    [schema, setSchema] = useState("");
+  const [options, setOptions] = useState<Options>({ ...defaults }),
+    [output, setOutput] = useState<Output>("entity"),
+    [model, setModel] = useState<Model>(),
+    [result, setResult] = useState<Result>(),
+    [busy, setBusy] = useState(false),
+    [fileIndex, setFileIndex] = useState(0),
+    [tableIndex, setTableIndex] = useState(0),
+    [notice, setNotice] = useState(""),
+    [confirmSample, setConfirmSample] = useState(false);
+  const worker = useRef<Worker | null>(null),
+    timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stop = () => {
+    worker.current?.terminate();
+    worker.current = null;
+    if (timer.current) clearTimeout(timer.current);
+  };
+  useEffect(() => () => stop(), []);
+  const invalidate = () => {
+    stop();
+    setBusy(false);
+    setResult(undefined);
+    setNotice("");
+  };
+  const option = <K extends keyof Options>(key: K, value: Options[K]) => {
+    invalidate();
+    setOptions((p) => ({ ...p, [key]: value }));
+  };
+  const run = (useMapping = false, kind = output) => {
+    invalidate();
+    setBusy(true);
+    const w = new Worker(new URL("./schemaJavaWorker.ts", import.meta.url), {
+      type: "module",
+    });
+    worker.current = w;
+    const fail = (code: string) => {
+      stop();
+      setBusy(false);
+      setResult({ files: [], diagnostics: [{ severity: "error", code }] });
+    };
+    timer.current = setTimeout(() => fail("timeout"), 12000);
+    w.onerror = () => fail("worker");
+    w.onmessage = (e) => {
+      stop();
+      setBusy(false);
+      if (e.data.model) {
+        setModel(e.data.model);
+        setTableIndex(0);
+      }
+      setResult(e.data.result);
+      setFileIndex(0);
+    };
+    w.postMessage({
+      input,
+      inputKind,
+      sourceDialect,
+      schema,
+      model: useMapping ? model : undefined,
+      options,
+      output: kind,
+    } satisfies Request);
+  };
+  const save = (path: string, text: string, type = "text/plain") => {
+    const url = URL.createObjectURL(new Blob([text], { type }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = path.split("/").pop()!;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+  const downloadZip = async () => {
+    try {
+      const { default: JSZip } = await import("jszip");
+      const zip = new JSZip();
+      for (const f of result?.files ?? []) zip.file(f.path, f.content);
+      if (model)
+        zip.file("schema-metadata.json", JSON.stringify(model, null, 2));
+      const blob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "java-models.zip";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      setNotice(m.failed);
+    }
+  };
+  const selected = result?.files[fileIndex];
+  const table = model?.tables[tableIndex];
+  const changeColumn = (i: number, key: string, value: unknown) => {
+    invalidate();
+    setModel((prev) =>
+      prev
+        ? {
+            ...prev,
+            tables: prev.tables.map((t, ti) =>
+              ti !== tableIndex
+                ? t
+                : {
+                    ...t,
+                    columns: t.columns.map((c, ci) =>
+                      ci !== i
+                        ? c
+                        : {
+                            ...c,
+                            [key]: value,
+                            origin: { ...c.origin, [key]: "user" },
+                          },
+                    ),
+                  },
+            ),
+          }
+        : prev,
+    );
+  };
+  const loadSample = () => {
+    invalidate();
+    setInput(inputKind === "sql" ? sample : javaSample);
+    setModel(undefined);
+    setConfirmSample(false);
+  };
+  return (
+    <div className="flex min-w-0 flex-col gap-5">
+      <p className="rounded border border-border bg-muted p-3 text-sm">
+        {m.scope}
+      </p>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <label>
+          {m.inputKind}
+          <select
+            className={inputClass}
+            value={inputKind}
+            onChange={(e) => {
+              invalidate();
+              setModel(undefined);
+              setInputKind(e.target.value as "sql" | "java" | "metadata");
+            }}
+          >
+            <option value="sql">{m.sqlInput}</option>
+            <option value="java">{m.javaInput}</option>
+            <option value="metadata">{m.metadataInput}</option>
+          </select>
+        </label>
+        <label>
+          {m.sourceDialect}
+          <select
+            className={inputClass}
+            value={sourceDialect}
+            onChange={(e) => {
+              invalidate();
+              setModel(undefined);
+              setSourceDialect(e.target.value as typeof sourceDialect);
+            }}
+          >
+            <option value="postgresql">PostgreSQL</option>
+            <option value="mysql">MySQL</option>
+          </select>
+        </label>
+        <label>
+          {m.output}
+          <select
+            className={inputClass}
+            value={output}
+            onChange={(e) => {
+              invalidate();
+              setOutput(e.target.value as Output);
+            }}
+          >
+            {(["entity", "dto", "record", "projection", "sql"] as Output[]).map(
+              (k) => (
+                <option key={k} value={k}>
+                  {m[k]}
+                </option>
+              ),
+            )}
+          </select>
+        </label>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant="outline"
+          onClick={() => (input.trim() ? setConfirmSample(true) : loadSample())}
+        >
+          {m.sample}
+        </Button>
+        {confirmSample && (
+          <div role="alert" className="flex flex-wrap items-center gap-2">
+            <span>{m.replace}</span>
+            <Button onClick={loadSample}>{m.confirm}</Button>
+            <Button variant="outline" onClick={() => setConfirmSample(false)}>
+              {m.cancel}
+            </Button>
+          </div>
+        )}
+      </div>
+      <label>
+        {m.input}
+        <textarea
+          spellCheck={false}
+          className={inputClass + " h-72 font-mono text-sm"}
+          value={input}
+          maxLength={200001}
+          onChange={(e) => {
+            invalidate();
+            setModel(undefined);
+            setInput(e.target.value);
+          }}
+        />
+      </label>
+      <details className="rounded border border-border p-3">
+        <summary className="cursor-pointer">{m.advanced}</summary>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {(["packageName", "className", "prefix"] as const).map((k) => (
+            <label key={k}>
+              {m[k]}
+              <input
+                className={inputClass}
+                value={options[k]}
+                onChange={(e) => option(k, e.target.value)}
+              />
+            </label>
+          ))}
+          <label>
+            {m.javaVersion}
+            <select
+              className={inputClass}
+              value={options.javaVersion}
+              onChange={(e) => option("javaVersion", Number(e.target.value))}
+            >
+              {[8, 11, 16, 17, 21].map((n) => (
+                <option key={n}>{n}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            {m.profile}
+            <select
+              className={inputClass}
+              value={options.namespace}
+              onChange={(e) =>
+                option("namespace", e.target.value as "jakarta" | "javax")
+              }
+            >
+              <option value="jakarta">Spring Boot 3 / Jakarta</option>
+              <option value="javax">Spring Boot 2 / javax</option>
+            </select>
+          </label>
+          <label>
+            {m.targetDialect}
+            <select
+              className={inputClass}
+              value={options.dialect}
+              onChange={(e) =>
+                option("dialect", e.target.value as Options["dialect"])
+              }
+            >
+              <option value="postgresql">PostgreSQL</option>
+              <option value="mysql">MySQL</option>
+            </select>
+          </label>
+          <label>
+            {m.dtoKind}
+            <select
+              className={inputClass}
+              value={options.dtoKind}
+              onChange={(e) =>
+                option("dtoKind", e.target.value as Options["dtoKind"])
+              }
+            >
+              {["DTO", "CreateRequest", "UpdateRequest", "Response"].map(
+                (x) => (
+                  <option key={x}>{x}</option>
+                ),
+              )}
+            </select>
+          </label>
+          {(
+            [
+              "lombok",
+              "noArgs",
+              "allArgs",
+              "accessors",
+              "builder",
+              "serializable",
+              "validation",
+              "primitives",
+              "includeId",
+              "includeAudit",
+              "includeSensitive",
+              "relationships",
+              "mapper",
+            ] as const
+          ).map((k) => (
+            <label className="flex items-center gap-2" key={k}>
+              <input
+                type="checkbox"
+                checked={options[k]}
+                onChange={(e) => option(k, e.target.checked)}
+              />
+              {m[k]}
+            </label>
+          ))}
+          <label>
+            {m.nullPolicy}
+            <select
+              className={inputClass}
+              value={options.nullPolicy}
+              onChange={(e) =>
+                option("nullPolicy", e.target.value as Options["nullPolicy"])
+              }
+            >
+              <option value="choose">{m.choose}</option>
+              <option value="ignore">{m.ignoreNull}</option>
+              <option value="overwrite">{m.overwriteNull}</option>
+            </select>
+          </label>
+          <label>
+            {m.typeOverrides}
+            <textarea
+              className={inputClass + " h-24 font-mono text-sm"}
+              defaultValue={Object.entries(options.typeOverrides)
+                .map(([k, v]) => k + "=" + v)
+                .join("\n")}
+              onBlur={(e) =>
+                option(
+                  "typeOverrides",
+                  Object.fromEntries(
+                    e.target.value
+                      .split("\n")
+                      .filter((x) => x.includes("="))
+                      .map((x) => {
+                        const at = x.indexOf("=");
+                        return [x.slice(0, at), x.slice(at + 1)];
+                      }),
+                  ),
+                )
+              }
+            />
+          </label>
+        </div>
+        <label className="mt-4 block">
+          {m.schema}
+          <textarea
+            className={inputClass + " h-32 font-mono text-sm"}
+            value={schema}
+            onChange={(e) => {
+              invalidate();
+              setModel(undefined);
+              setSchema(e.target.value);
+            }}
+          />
+        </label>
+      </details>
+      <div className="flex flex-wrap gap-2">
+        <Button disabled={busy || !input.trim()} onClick={() => run()}>
+          {busy ? m.loading : m.convert}
+        </Button>
+        {model && (
+          <Button variant="outline" disabled={busy} onClick={() => run(true)}>
+            {m.apply}
+          </Button>
+        )}
+      </div>
+      <p role="status" aria-live="polite">
+        {notice || (busy ? m.loading : "")}
+      </p>
+      {model && model.tables.length > 0 && (
+        <section className="min-w-0 rounded border border-border p-3">
+          <h2 className="font-semibold">{m.mapping}</h2>
+          <p className="text-sm text-muted-foreground">{m.mappingHint}</p>
+          <label>
+            {m.table}
+            <select
+              className={inputClass}
+              value={tableIndex}
+              onChange={(e) => setTableIndex(Number(e.target.value))}
+            >
+              {model.tables.map((t, i) => (
+                <option value={i} key={i}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          {table && (
+            <div className="mt-3 overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr>
+                    {[
+                      "column",
+                      "sqlType",
+                      "javaType",
+                      "nullable",
+                      "primaryKey",
+                      "selected",
+                      "length",
+                      "precision",
+                      "scale",
+                      "identity",
+                      "default",
+                    ].map((k) => (
+                      <th className="p-2 text-start" key={k}>
+                        {m[k]}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {table.columns.map((c, i) => (
+                    <tr key={i}>
+                      {(
+                        [
+                          "name",
+                          "sqlType",
+                          "javaType",
+                          "nullable",
+                          "primaryKey",
+                          "selected",
+                          "length",
+                          "precision",
+                          "scale",
+                          "identity",
+                          "default",
+                        ] as const
+                      ).map((k) => (
+                        <td className="p-1" key={k}>
+                          {k === "nullable" ? (
+                            <select
+                              aria-label={m.nullable + " " + c.name}
+                              value={
+                                c.nullable === null
+                                  ? "unknown"
+                                  : String(c.nullable)
+                              }
+                              onChange={(e) =>
+                                changeColumn(
+                                  i,
+                                  k,
+                                  e.target.value === "unknown"
+                                    ? null
+                                    : e.target.value === "true",
+                                )
+                              }
+                            >
+                              <option value="unknown">{m.unknown}</option>
+                              <option value="true">{m.yes}</option>
+                              <option value="false">{m.no}</option>
+                            </select>
+                          ) : ["primaryKey", "selected", "identity"].includes(
+                              k,
+                            ) ? (
+                            <input
+                              aria-label={(m[k] ?? k) + " " + c.name}
+                              type="checkbox"
+                              checked={!!c[k]}
+                              onChange={(e) =>
+                                changeColumn(i, k, e.target.checked)
+                              }
+                            />
+                          ) : (
+                            <input
+                              aria-label={
+                                (m[k === "name" ? "column" : k] ?? k) +
+                                " " +
+                                c.name
+                              }
+                              className={inputClass + " min-w-24"}
+                              value={String(c[k] ?? "")}
+                              type={
+                                ["length", "precision", "scale"].includes(k)
+                                  ? "number"
+                                  : "text"
+                              }
+                              min="0"
+                              onChange={(e) =>
+                                changeColumn(
+                                  i,
+                                  k,
+                                  ["length", "precision", "scale"].includes(k)
+                                    ? e.target.value === ""
+                                      ? undefined
+                                      : Number(e.target.value)
+                                    : e.target.value,
+                                )
+                              }
+                            />
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      )}
+      {result && (
+        <section className="min-w-0 space-y-3">
+          <div
+            className="flex flex-wrap gap-2"
+            role="group"
+            aria-label={m.output}
+          >
+            {(["entity", "dto", "record", "projection", "sql"] as Output[]).map(
+              (k) => (
+                <Button
+                  variant={output === k ? "default" : "outline"}
+                  key={k}
+                  disabled={busy}
+                  onClick={() => {
+                    setOutput(k);
+                    run(true, k);
+                  }}
+                >
+                  {m[k]}
+                </Button>
+              ),
+            )}
+          </div>
+          {result.diagnostics.length > 0 && (
+            <ul className="space-y-2" aria-live="polite">
+              {result.diagnostics.map((d, i) => (
+                <li
+                  className={
+                    d.severity === "error"
+                      ? "rounded border border-red-500 p-2"
+                      : "rounded border border-amber-500 p-2"
+                  }
+                  key={i}
+                >
+                  <strong>
+                    {d.severity === "error" ? m.error : m.warning}:{" "}
+                  </strong>
+                  {m["diag_" + d.code] ?? m.diag_syntax}
+                  {d.detail && (
+                    <pre className="whitespace-pre-wrap break-words text-xs">
+                      {d.detail}
+                    </pre>
+                  )}
+                  {d.line && (
+                    <span>
+                      {" "}
+                      ({m.line} {d.line}:{d.column})
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+          {selected ? (
+            <>
+              <label>
+                {m.file}
+                <select
+                  className={inputClass}
+                  value={fileIndex}
+                  onChange={(e) => setFileIndex(Number(e.target.value))}
+                >
+                  {result.files.map((f, i) => (
+                    <option key={f.path} value={i}>
+                      {f.path}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <textarea
+                readOnly
+                aria-label={m.preview}
+                className={inputClass + " h-96 font-mono text-sm"}
+                value={selected.content}
+              />
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(selected.content);
+                      setNotice(m.copied);
+                    } catch {
+                      setNotice(m.failed);
+                    }
+                  }}
+                >
+                  {m.copy}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => save(selected.path, selected.content)}
+                >
+                  {m.download}
+                </Button>
+                <Button variant="outline" onClick={downloadZip}>
+                  {m.zip}
+                </Button>
+              </div>
+            </>
+          ) : (
+            <p>{m.noOutput}</p>
+          )}
+          {output === "projection" && (
+            <p className="text-sm">{m.projectionHint}</p>
+          )}
+        </section>
+      )}
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant="outline"
+          onClick={() =>
+            save(
+              "schema-java-preset.json",
+              JSON.stringify(options, null, 2),
+              "application/json",
+            )
+          }
+        >
+          {m.exportPreset}
+        </Button>
+        <label className="min-w-0 max-w-full rounded border border-border p-2">
+          {m.importPreset}
+          <input
+            type="file"
+            className="block w-full min-w-0"
+            accept=".json"
+            onChange={async (e) => {
+              try {
+                const f = e.target.files?.[0];
+                if (!f) return;
+                if (f.size > 20000) throw Error();
+                const v = JSON.parse(await f.text());
+                const valid = { ...defaults };
+                if(v.typeOverrides && typeof v.typeOverrides==='object' && !Array.isArray(v.typeOverrides) && Object.values(v.typeOverrides).every(x=>typeof x==='string')) valid.typeOverrides=Object.fromEntries(Object.entries(v.typeOverrides));
+                for (const key of Object.keys(defaults) as (keyof Options)[])
+                  if (
+                    key !== "typeOverrides" &&
+                    typeof v[key] === typeof defaults[key]
+                  )
+                    (valid as any)[key] = v[key];
+                if (
+                  !["mysql", "postgresql"].includes(valid.dialect) ||
+                  !["jakarta", "javax"].includes(valid.namespace) ||
+                  ![8, 11, 16, 17, 21].includes(valid.javaVersion) ||
+                  ![
+                    "DTO",
+                    "CreateRequest",
+                    "UpdateRequest",
+                    "Response",
+                  ].includes(valid.dtoKind) || !['choose','ignore','overwrite'].includes(valid.nullPolicy)
+                )
+                  throw Error();
+                invalidate();
+                setOptions(valid);
+              } catch {
+                setNotice(m.failed);
+              } finally {
+                e.target.value = "";
+              }
+            }}
+          />
+        </label>
+      </div>
+    </div>
+  );
+}

@@ -1,5 +1,6 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
+import SchemaJavaPage from '@/components/tools/SchemaJavaPage.astro';
 import ImageCompressPage from '@/components/tools/ImageCompressPage.astro';
 import ImageConvertPage from '@/components/tools/ImageConvertPage.astro';
 import BackgroundRemoverPage from '@/components/tools/BackgroundRemoverPage.astro';
@@ -47,7 +48,9 @@ const name = tool.names[locale];
 ---
 
 {
-	toolId === 'image-compress' ? (
+	toolId === 'schema-java' ? (
+		<SchemaJavaPage lang={locale} />
+	) : toolId === 'image-compress' ? (
 		<ImageCompressPage lang={locale} />
 	) : toolId === 'image-convert' ? (
 		<ImageConvertPage lang={locale} />

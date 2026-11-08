@@ -21,6 +21,7 @@ export function normalizeSearchText(text: string): string {
  * what people type on every locale ("pdf", "json", "ocr", "compress"). Only claim what the tool really does.
  */
 export const TOOL_KEYWORDS: Record<string, string> = {
+	'schema-java': 'sql java spring boot jpa hibernate entity dto record projection schema ddl create table postgres mysql mapper database chuyen doi model',
 	'image-compress': 'compress reduce shrink optimize resize photo picture jpeg jpg png webp size kb',
 	'image-convert': 'convert format change jpg jpeg png webp avif gif bmp heic ico svg photo picture resize',
 	'background-remover': 'remove background transparent cutout erase bg png photo picture',

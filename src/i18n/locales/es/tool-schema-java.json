@@ -1,0 +1,7 @@
+{
+  "heading": "Conversor SQL ↔ modelos Java",
+  "meta": {
+    "title": "Convertir SQL a Java Entity y DTO — Web Tool Hub",
+    "description": "Convierte tablas PostgreSQL y MySQL en Entity, DTO, record o proyecciones Java. Revisa los metadatos y exporta SQL localmente, sin subir código."
+  }
+}

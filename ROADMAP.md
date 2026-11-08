@@ -575,6 +575,17 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 - [x] Giao diện + 20 ngôn ngữ (bản dịch AI, cần người bản ngữ rà)
 - [ ] Mở rộng: ISO 3166-2 (tỉnh/bang), ISO 15924 (chữ viết), ISO 10962 CFI, ISO 4217 theo ngày hiệu lực
 
+## Phase 3.24 — SQL ↔ Java model converter (yêu cầu trực tiếp 2026-11-08)
+
+- [x] PostgreSQL/MySQL CREATE TABLE → Entity/DTO/record/projection; schema trung gian, diagnostics
+- [x] Java scalar class/record → model/SQL draft; bảng bổ sung metadata và chặn Entity thiếu PK
+- [x] SELECT subset + schema tùy chọn; SQL dialect conversion với cảnh báo mất thông tin
+- [x] Multi-table, IdClass, FK relationship tùy chọn, mapper Java thuần, preset/metadata/ZIP
+- [x] Test/compile Java, build, QA browser/mobile và Lighthouse ≥90 trên preview gzip
+- [ ] Mở rộng parser Java: generic/inheritance/EmbeddedId/input relationship; SQL ALTER/CTE/UNION
+- [ ] Adapter Oracle/SQL Server/SQLite, mapping enum/JSON provider chuyên biệt, MapStruct
+- [ ] Dịch đầy đủ UI/article ngoài en/vi và đo lại Lighthouse trên production sau deploy
+
 ## Phase 4 — Kiếm tiền & PWA
 
 - [ ] Tích hợp Google AdSense: banner dưới nav

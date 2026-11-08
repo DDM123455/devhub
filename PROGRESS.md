@@ -180,6 +180,21 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+- **2026-11-08 — SQL ↔ Java models (yêu cầu trực tiếp)**: thêm tool `schema-java`, parser
+  SQL AST PostgreSQL/MySQL + parser Java declaration subset bằng token/delimiter, schema trung
+  gian có provenance, generator Entity/DTO/record/projection/SQL. Có multi-table, IdClass,
+  relationship FK chỉ đọc tùy chọn, mapper Java thuần với null-policy UpdateRequest, chỉnh
+  metadata, preset, ZIP và sidecar. Worker giới hạn 12s/200k ký tự; không gửi dữ liệu ra ngoài.
+  UI/article en+vi, tên/slug/meta 20 locale; phần nội dung locale khác fallback en theo quy ước.
+  Giới hạn và benchmark JPA Buddy/jOOQ ghi tại `SCHEMA_JAVA.md`, không công bố full Java/SQL.
+  **Kiểm chứng**: 69 suite / 1003 test qua (bật SCHEMA_JAVA_COMPILE=1); javac JDK17 dùng JAR
+  Jakarta/Lombok thật, gồm IdClass, DTO/record/projection, mapper và FK relationship. Build 622
+  trang; SEO P0=P1=P2=0. Puppeteer production: SQL → 4 loại Java, Java → SQL → Entity sau chỉnh
+  PK, ZIP có Java + metadata, en/vi và mobile 375px không tràn. Sửa tràn 8px của input preset.
+  Lighthouse local: Performance 98/SEO 100 với gzip (server test không nén: 83/100); chưa phải
+  số đo production. Lượt click automation sau đổi mapping bị thay đổi layout; xác minh thao tác
+  bàn phím và toàn bộ luồng thành công. Không sửa file người dùng `Web Tool Hub.dc.html`.
+
 - **2026-11-03 (Sửa JSON/XML Formatter, Base64, ghi chú JWT)** — Người dùng báo: chọn XML thì chuyển chậm và thiếu format/tree; Base64 decode ảnh bị vỡ bố cục; JWT không cần secret vẫn decode. **XML:** bộ chọn JSON/XML đổi thành 2 nút bấm; panel XML thêm chọn thụt lề (2/4 tab), nút Nén gọn (minify), chế độ xem Văn bản/Cây (thẻ `<details>` thu/mở, nút Mở hết/Thu hết), giữ Format/Validate/Copy/Download (key i18n mới en+vi). Đo trên bản build: đổi JSON→XML tức thì (không tái hiện được độ trễ; nghi ngờ do trình soạn JSON đang nạp khi mới mở trang). **Base64:** cột Input/Output căn trên (không còn kéo giãn), swap ở trên, ảnh preview max-h-56, khung output `min-w-0 overflow-hidden`; không tái hiện được lỗi vỡ thật với PNG/JPEG/WebP (cả data URI) — SVG decode ra văn bản (không có preview ảnh). **JWT:** thêm đoạn giải thích trong mục Verify: decode không cần secret vì payload chỉ Base64URL, secret chỉ dùng để kiểm chữ ký. Chưa rõ ý "phải kéo xuống mới thấy chức năng" ở Base64 (tab "Convert & compress" dài ~1230px). vitest 979/979, build 602 trang.
 - **2026-11-02 (base64-inline)** — Decode trong tab Text tự nhận dạng ảnh theo byte và hiện preview/MIME/dung lượng/nút tải ngay phần Output; binary không phải text có thể tải .bin cùng chỗ. Không ép chuyển tab hay báo lỗi văn bản khi đã giải mã được file. Line-by-line giữ hành vi riêng. Trình duyệt xác nhận PNG tải preview 1px, nút tải xuất hiện, không alert, SGVsbG8= vẫn trả Hello. 979 test qua; build 602 trang. Chưa push.
 
