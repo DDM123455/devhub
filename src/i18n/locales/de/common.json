@@ -5,7 +5,7 @@
   },
   "home": {
     "kicker": "Lokale Verarbeitung · Kein Upload · Für immer kostenlos",
-    "heading": "Jedes Tool, das du brauchst. Null Daten verlassen deinen Browser.",
+    "heading": "Jedes Tool, das du brauchst. Deine Dateien verlassen deinen Browser nie.",
     "tagline": "Schnelle, offlinefähige Tools für Bilder, PDFs, Text und Code — alles wird lokal verarbeitet, direkt in diesem Tab.",
     "comingSoon": "Tools folgen in Kürze.",
     "stats": {
@@ -19,7 +19,7 @@
     "noResultsHint": "Versuch es mit einem anderen Suchbegriff oder stöbere unten nach Kategorien."
   },
   "sidebar": {
-    "note": "Neue Tools kommen regelmäßig dazu. Nichts, was du hier anfasst, erreicht jemals einen Server."
+    "note": "Neue Tools kommen regelmäßig dazu. Deine Dateien und Texte werden in diesem Tab verarbeitet und nie hochgeladen."
   },
   "nav": {
     "toggleMenu": "Menü umschalten",

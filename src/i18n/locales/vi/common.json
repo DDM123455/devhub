@@ -5,7 +5,7 @@
   },
   "home": {
     "kicker": "Xử lý tại trình duyệt · Không tải lên · Miễn phí mãi mãi",
-    "heading": "Mọi công cụ bạn cần. Không dữ liệu nào rời khỏi trình duyệt.",
+    "heading": "Mọi công cụ bạn cần. Tệp của bạn không rời khỏi trình duyệt.",
     "tagline": "Tiện ích nhanh, chạy được cả khi offline cho ảnh, PDF, văn bản và mã nguồn — xử lý hoàn toàn cục bộ, ngay trong tab này.",
     "comingSoon": "Công cụ sắp ra mắt.",
     "stats": {
@@ -19,7 +19,7 @@
     "noResultsHint": "Thử từ khóa khác, hoặc duyệt công cụ theo nhóm bên dưới."
   },
   "sidebar": {
-    "note": "Công cụ mới được bổ sung thường xuyên. Không gì bạn dùng ở đây từng chạm tới máy chủ."
+    "note": "Công cụ mới được bổ sung thường xuyên. Tệp và văn bản của bạn được xử lý ngay trong tab này, không tải lên máy chủ."
   },
   "nav": {
     "toggleMenu": "Bật/tắt menu",

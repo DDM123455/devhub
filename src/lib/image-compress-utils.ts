@@ -24,6 +24,50 @@ export function isAcceptedCompressInput(file: { name: string; type: string }): b
 	return ACCEPTED_MIME.has(file.type) || ACCEPTED_EXT.test(file.name);
 }
 
+/**
+ * GIF có từ 2 khung hình trở lên hay không — canvas chỉ vẽ được khung đầu, nên người dùng
+ * cần biết trước là ảnh sẽ mất phần động.
+ *
+ * Phải đi đúng theo cấu trúc block của GIF chứ không quét byte 0x2C bừa: byte đó xuất hiện
+ * rất nhiều bên trong dữ liệu LZW đã nén và sẽ cho kết quả sai.
+ */
+export function isAnimatedGif(bytes: Uint8Array): boolean {
+	const header = String.fromCharCode(...bytes.subarray(0, 6));
+	if (header !== 'GIF87a' && header !== 'GIF89a') return false;
+
+	// Logical Screen Descriptor (7 byte); bit 7 của byte packed báo có Global Color Table.
+	let at = 10;
+	const packed = bytes[at];
+	at = 13 + (packed & 0x80 ? 3 * 2 ** ((packed & 0x07) + 1) : 0);
+
+	// Bỏ qua chuỗi sub-block (mỗi block mở đầu bằng độ dài, kết thúc bằng block rỗng).
+	const skipSubBlocks = () => {
+		while (at < bytes.length) {
+			const size = bytes[at];
+			at += 1 + size;
+			if (size === 0) return;
+		}
+	};
+
+	let frames = 0;
+	while (at < bytes.length) {
+		const marker = bytes[at++];
+		if (marker === 0x3b) break; // Trailer
+		if (marker === 0x21) {
+			at++; // nhãn extension
+			skipSubBlocks();
+			continue;
+		}
+		if (marker !== 0x2c) break; // byte lạ: file hỏng, dừng với những gì đếm được
+		if (++frames > 1) return true;
+		const local = bytes[at + 8];
+		at += 9 + (local & 0x80 ? 3 * 2 ** ((local & 0x07) + 1) : 0);
+		at++; // LZW minimum code size
+		skipSubBlocks();
+	}
+	return false;
+}
+
 /** MIME thực của file đầu vào, suy từ type hoặc đuôi (trình duyệt đôi khi để type rỗng cho HEIC/AVIF). */
 export function inputMimeOf(file: { name: string; type: string }): string {
 	if (file.type) return file.type;

@@ -5,7 +5,7 @@
   },
   "home": {
     "kicker": "Cihazda işlenir · Yükleme yok · Sonsuza dek ücretsiz",
-    "heading": "İhtiyacınız olan her araç. Tarayıcınızdan hiçbir veri çıkmaz.",
+    "heading": "İhtiyacınız olan her araç. Dosyalarınız tarayıcınızdan çıkmaz.",
     "tagline": "Görseller, PDF'ler, metin ve kod için hızlı, çevrimdışı çalışabilen araçlar — hepsi bu sekmede, yerel olarak işlenir.",
     "comingSoon": "Yakında yeni araçlar geliyor.",
     "stats": {
@@ -19,7 +19,7 @@
     "noResultsHint": "Farklı bir anahtar kelime deneyin veya aşağıdan kategorilere göz atın."
   },
   "sidebar": {
-    "note": "Düzenli olarak yeni araçlar ekleniyor. Burada yaptığınız hiçbir şey bir sunucuya ulaşmaz."
+    "note": "Düzenli olarak yeni araçlar ekleniyor. Dosyalarınız ve metinleriniz bu sekmede işlenir, hiçbir zaman yüklenmez."
   },
   "nav": {
     "toggleMenu": "Menüyü aç/kapat",

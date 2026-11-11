@@ -5,7 +5,7 @@
   },
   "home": {
     "kicker": "Lokale verwerking · Geen uploads · Voor altijd gratis",
-    "heading": "Elke tool die je nodig hebt. Geen data verlaat je browser.",
+    "heading": "Elke tool die je nodig hebt. Je bestanden verlaten je browser nooit.",
     "tagline": "Snelle, offline bruikbare tools voor afbeeldingen, PDF's, tekst en code — allemaal lokaal verwerkt, gewoon in dit tabblad.",
     "comingSoon": "Binnenkort meer tools.",
     "stats": {
@@ -19,7 +19,7 @@
     "noResultsHint": "Probeer een ander zoekwoord of blader hieronder door de tools per categorie."
   },
   "sidebar": {
-    "note": "Er worden regelmatig nieuwe tools toegevoegd. Niets van wat je hier doet, bereikt ooit een server."
+    "note": "Er worden regelmatig nieuwe tools toegevoegd. Je bestanden en teksten worden in dit tabblad verwerkt en nooit geüpload."
   },
   "nav": {
     "toggleMenu": "Menu openen/sluiten",

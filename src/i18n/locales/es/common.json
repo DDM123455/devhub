@@ -5,7 +5,7 @@
   },
   "home": {
     "kicker": "Procesamiento local · Sin subidas · Gratis para siempre",
-    "heading": "Todas las herramientas que necesitas. Cero datos salen de tu navegador.",
+    "heading": "Todas las herramientas que necesitas. Tus archivos nunca salen de tu navegador.",
     "tagline": "Utilidades rápidas, capaces de funcionar sin conexión, para imágenes, PDF, texto y código — todo procesado localmente, justo en esta pestaña.",
     "comingSoon": "Herramientas próximamente.",
     "stats": {
@@ -19,7 +19,7 @@
     "noResultsHint": "Prueba con otra palabra clave o explora las herramientas por categoría más abajo."
   },
   "sidebar": {
-    "note": "Añadimos herramientas nuevas con regularidad. Nada de lo que toques aquí llega jamás a un servidor."
+    "note": "Añadimos herramientas nuevas con regularidad. Tus archivos y textos se procesan en esta pestaña, nunca se suben."
   },
   "nav": {
     "toggleMenu": "Alternar menú",

@@ -24,6 +24,7 @@
     "remove": "Xóa",
     "clearAll": "Xóa tất cả",
     "skippedFiles": "Đã bỏ qua {{count}} tệp vì không phải định dạng ảnh được hỗ trợ.",
+    "animatedGifWarning": "{{count}} ảnh GIF động: chỉ khung hình đầu tiên được giữ lại, nên kết quả là ảnh tĩnh.",
     "resizeToggleLabel": "Thay đổi kích thước trước khi nén",
     "maxDimensionLabel": "Kích thước tối đa: {{size}}px",
     "retry": "Thử lại",

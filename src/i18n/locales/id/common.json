@@ -5,7 +5,7 @@
   },
   "home": {
     "kicker": "Diproses lokal · Tanpa unggah · Gratis selamanya",
-    "heading": "Setiap alat yang Anda butuhkan. Tidak ada data yang meninggalkan browser Anda.",
+    "heading": "Setiap alat yang Anda butuhkan. File Anda tidak pernah meninggalkan browser.",
     "tagline": "Alat cepat yang bisa dipakai offline untuk gambar, PDF, teks, dan kode — semuanya diproses secara lokal, langsung di tab ini.",
     "comingSoon": "Alat baru akan segera hadir.",
     "stats": {
@@ -19,7 +19,7 @@
     "noResultsHint": "Coba kata kunci lain, atau jelajahi alat berdasarkan kategori di bawah."
   },
   "sidebar": {
-    "note": "Alat baru ditambahkan secara rutin. Tidak ada yang Anda lakukan di sini yang pernah sampai ke server."
+    "note": "Alat baru ditambahkan secara rutin. File dan teks Anda diproses di tab ini, tidak pernah diunggah."
   },
   "nav": {
     "toggleMenu": "Buka/tutup menu",

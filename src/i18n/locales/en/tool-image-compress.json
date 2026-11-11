@@ -24,6 +24,7 @@
     "remove": "Remove",
     "clearAll": "Clear all",
     "skippedFiles": "{{count}} file(s) were skipped because they're not a supported image format.",
+    "animatedGifWarning": "{{count}} animated GIF: only the first frame is kept, so the result is a still image.",
     "resizeToggleLabel": "Resize before compressing",
     "maxDimensionLabel": "Max width/height: {{size}}px",
     "retry": "Retry",

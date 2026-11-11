@@ -5,7 +5,7 @@
   },
   "home": {
     "kicker": "Traitement local · Aucun envoi · Gratuit pour toujours",
-    "heading": "Tous les outils dont vous avez besoin. Zéro donnée ne quitte votre navigateur.",
+    "heading": "Tous les outils dont vous avez besoin. Vos fichiers ne quittent jamais votre navigateur.",
     "tagline": "Des utilitaires rapides, utilisables hors ligne, pour les images, PDF, texte et code — tout est traité localement, directement dans cet onglet.",
     "comingSoon": "Outils à venir.",
     "stats": {
@@ -19,7 +19,7 @@
     "noResultsHint": "Essayez un autre mot-clé, ou parcourez les outils par catégorie ci-dessous."
   },
   "sidebar": {
-    "note": "De nouveaux outils sont ajoutés régulièrement. Rien de ce que vous touchez ici n'atteint jamais un serveur."
+    "note": "De nouveaux outils sont ajoutés régulièrement. Vos fichiers et vos textes sont traités dans cet onglet, jamais envoyés."
   },
   "nav": {
     "toggleMenu": "Basculer le menu",

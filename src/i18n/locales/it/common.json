@@ -5,7 +5,7 @@
   },
   "home": {
     "kicker": "Elaborazione locale · Nessun upload · Gratis per sempre",
-    "heading": "Ogni strumento di cui hai bisogno. Zero dati lasciano il tuo browser.",
+    "heading": "Ogni strumento di cui hai bisogno. I tuoi file non lasciano mai il browser.",
     "tagline": "Strumenti veloci, utilizzabili offline, per immagini, PDF, testo e codice — tutto elaborato localmente, proprio in questa scheda.",
     "comingSoon": "Presto nuovi strumenti.",
     "stats": {
@@ -19,7 +19,7 @@
     "noResultsHint": "Prova con un'altra parola chiave oppure sfoglia gli strumenti per categoria qui sotto."
   },
   "sidebar": {
-    "note": "Nuovi strumenti vengono aggiunti regolarmente. Niente di ciò che tocchi qui raggiunge mai un server."
+    "note": "Nuovi strumenti vengono aggiunti regolarmente. I tuoi file e testi sono elaborati in questa scheda, mai caricati."
   },
   "nav": {
     "toggleMenu": "Apri/chiudi menu",

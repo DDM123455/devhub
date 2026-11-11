@@ -5,7 +5,7 @@
   },
   "home": {
     "kicker": "Przetwarzanie lokalne · Bez przesyłania na serwer · Zawsze za darmo",
-    "heading": "Każde narzędzie, jakiego potrzebujesz. Żadne dane nie opuszczają przeglądarki.",
+    "heading": "Każde narzędzie, jakiego potrzebujesz. Twoje pliki nie opuszczają przeglądarki.",
     "tagline": "Szybkie narzędzia do obrazów, plików PDF, tekstu i kodu, działające nawet offline — wszystko przetwarzane lokalnie, w tej właśnie karcie.",
     "comingSoon": "Wkrótce więcej narzędzi.",
     "stats": {
@@ -19,7 +19,7 @@
     "noResultsHint": "Spróbuj innego słowa kluczowego lub przeglądaj narzędzia według kategorii poniżej."
   },
   "sidebar": {
-    "note": "Regularnie dodajemy nowe narzędzia. Nic z tego, co tu robisz, nigdy nie trafia na serwer."
+    "note": "Regularnie dodajemy nowe narzędzia. Twoje pliki i teksty są przetwarzane w tej karcie i nigdy nie są wysyłane."
   },
   "nav": {
     "toggleMenu": "Przełącz menu",

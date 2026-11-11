@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	fitWithin,
 	inputMimeOf,
+	isAnimatedGif,
 	isAcceptedCompressInput,
 	isHeicLike,
 	resolveOutputFormat,
@@ -68,5 +69,38 @@ describe('fitWithin', () => {
 	});
 	it('thu theo cạnh dài', () => {
 		expect(fitWithin(4000, 2000, 1000)).toEqual({ width: 1000, height: 500 });
+	});
+});
+
+describe('isAnimatedGif', () => {
+	// GIF nhỏ dựng tay: header + Logical Screen Descriptor (không có Global Color Table),
+	// rồi `frames` lần [Image Descriptor + LZW min code size + một sub-block rỗng].
+	const gif = (frames: number, { withGct = false, extensionBefore = false } = {}) => {
+		const bytes: number[] = [...'GIF89a'].map((c) => c.charCodeAt(0));
+		bytes.push(1, 0, 1, 0, withGct ? 0x80 : 0x00, 0, 0);
+		if (withGct) bytes.push(0, 0, 0, 255, 255, 255); // 2 màu × 3 byte
+		for (let i = 0; i < frames; i++) {
+			// Graphic Control Extension: phải bỏ qua được, không được đếm nhầm thành khung hình.
+			if (extensionBefore) bytes.push(0x21, 0xf9, 0x04, 0x00, 0x0a, 0x00, 0x00, 0x00);
+			bytes.push(0x2c, 0, 0, 0, 0, 1, 0, 1, 0, 0x00, 0x02, 0x00);
+		}
+		bytes.push(0x3b);
+		return new Uint8Array(bytes);
+	};
+
+	it('GIF một khung -> không động', () => {
+		expect(isAnimatedGif(gif(1))).toBe(false);
+		expect(isAnimatedGif(gif(1, { withGct: true, extensionBefore: true }))).toBe(false);
+	});
+	it('GIF nhiều khung -> động', () => {
+		expect(isAnimatedGif(gif(2))).toBe(true);
+		expect(isAnimatedGif(gif(5, { withGct: true, extensionBefore: true }))).toBe(true);
+	});
+	it('không phải GIF -> false', () => {
+		expect(isAnimatedGif(new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))).toBe(false);
+		expect(isAnimatedGif(new Uint8Array(0))).toBe(false);
+	});
+	it('file cụt không làm treo vòng lặp', () => {
+		expect(isAnimatedGif(gif(2).subarray(0, 16))).toBe(false);
 	});
 });

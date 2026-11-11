@@ -13,6 +13,7 @@ import {
 	extensionFor,
 	inputMimeOf,
 	isAcceptedCompressInput,
+	isAnimatedGif,
 	isHeicLike,
 	isNativeInput,
 	resolveOutputFormat,
@@ -37,6 +38,7 @@ interface Messages {
 	remove: string;
 	clearAll: string;
 	skippedFiles: string;
+	animatedGifWarning: string;
 	resizeToggleLabel: string;
 	maxDimensionLabel: string;
 	retry: string;
@@ -146,9 +148,12 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 	const runningRef = useRef(false);
 	const [isZipping, setIsZipping] = useState(false);
 	const [skippedCount, setSkippedCount] = useState(0);
+	// Id của những item là GIF động: canvas chỉ vẽ khung đầu, nên phải báo trước khi người dùng bấm nén.
+	const [animatedGifIds, setAnimatedGifIds] = useState<ReadonlySet<string>>(new Set());
 	const objectUrls = useRef<Set<string>>(new Set());
 		const itemsRef = useRef<ImageItem[]>([]);
 	itemsRef.current = items;
+	const animatedGifCount = items.filter((it) => animatedGifIds.has(it.id)).length;
 	// File đã giải mã (HEIC -> PNG) theo item id: dùng cho preview và để nén không phải giải mã lần 2.
 	const decodedFiles = useRef<Map<string, File>>(new Map());
 
@@ -231,6 +236,20 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 			status: 'pending' as const,
 		}));
 		setItems((prev) => [...prev, ...newItems]);
+
+		// GIF: đọc phần đầu file để tìm khung hình thứ hai. Chỉ đọc 4 MB đầu để khỏi nạp cả file nặng
+		// vào RAM; GIF rất lớn mà khung đầu đã vượt 4 MB sẽ không được cảnh báo (vẫn nén được như cũ).
+		void (async () => {
+			for (const item of newItems.filter((it) => /^image\/gif$/i.test(it.file.type) || /\.gif$/i.test(it.file.name))) {
+				try {
+					const head = new Uint8Array(await item.file.slice(0, 4 * 1024 * 1024).arrayBuffer());
+					if (!isAnimatedGif(head)) continue;
+					setAnimatedGifIds((prev) => new Set(prev).add(item.id));
+				} catch {
+					/* không đọc được thì thôi, bước nén sẽ báo lỗi */
+				}
+			}
+		})();
 
 		// HEIC/HEIF: trình duyệt không hiển thị được -> giải mã tuần tự (heic2any nạp lazy) để có preview và
 		// để bước nén dùng luôn bản PNG đã giải mã.
@@ -616,6 +635,12 @@ export default function ImageCompressor({ messages }: { messages: Messages }) {
 			{skippedCount > 0 && (
 				<p role="status" className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
 					{messages.skippedFiles.replace('{{count}}', String(skippedCount))}
+				</p>
+			)}
+
+			{animatedGifCount > 0 && (
+				<p role="status" className="rounded-md bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+					{messages.animatedGifWarning.replace('{{count}}', String(animatedGifCount))}
 				</p>
 			)}
 

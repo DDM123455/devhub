@@ -5,7 +5,7 @@
   },
   "home": {
     "kicker": "Client-side · No uploads · Free forever",
-    "heading": "Every tool you need. Zero data leaves your browser.",
+    "heading": "Every tool you need. Your files never leave your browser.",
     "tagline": "Fast, offline-capable utilities for images, PDFs, text and code — all processed locally, right in this tab.",
     "comingSoon": "Tools coming soon.",
     "stats": {
@@ -19,7 +19,7 @@
     "noResultsHint": "Try a different keyword, or browse tools by category below."
   },
   "sidebar": {
-    "note": "New tools are added regularly. Nothing you touch here ever reaches a server."
+    "note": "New tools are added regularly. Your files and text are processed in this tab, never uploaded."
   },
   "nav": {
     "toggleMenu": "Toggle menu",

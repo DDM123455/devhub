@@ -5,7 +5,7 @@
   },
   "home": {
     "kicker": "Processamento local · Sem upload · Grátis para sempre",
-    "heading": "Todas as ferramentas que você precisa. Zero dados saem do seu navegador.",
+    "heading": "Todas as ferramentas que você precisa. Seus arquivos nunca saem do seu navegador.",
     "tagline": "Utilitários rápidos, com suporte offline, para imagens, PDFs, texto e código — tudo processado localmente, direto nesta aba.",
     "comingSoon": "Ferramentas em breve.",
     "stats": {
@@ -19,7 +19,7 @@
     "noResultsHint": "Tente outra palavra-chave ou navegue pelas ferramentas por categoria abaixo."
   },
   "sidebar": {
-    "note": "Novas ferramentas são adicionadas regularmente. Nada do que você usa aqui chega a um servidor."
+    "note": "Novas ferramentas são adicionadas regularmente. Seus arquivos e textos são processados nesta aba, nunca enviados."
   },
   "nav": {
     "toggleMenu": "Alternar menu",

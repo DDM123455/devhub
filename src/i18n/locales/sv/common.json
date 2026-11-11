@@ -5,7 +5,7 @@
   },
   "home": {
     "kicker": "Lokal bearbetning · Inga uppladdningar · Gratis för alltid",
-    "heading": "Varje verktyg du behöver. Ingen data lämnar din webbläsare.",
+    "heading": "Varje verktyg du behöver. Dina filer lämnar aldrig din webbläsare.",
     "tagline": "Snabba verktyg som fungerar offline för bilder, PDF:er, text och kod — allt bearbetas lokalt, direkt i den här fliken.",
     "comingSoon": "Fler verktyg är på väg.",
     "stats": {
@@ -19,7 +19,7 @@
     "noResultsHint": "Prova ett annat sökord eller bläddra bland verktygen per kategori nedan."
   },
   "sidebar": {
-    "note": "Nya verktyg läggs till regelbundet. Inget du gör här når någonsin en server."
+    "note": "Nya verktyg läggs till regelbundet. Dina filer och texter bearbetas i den här fliken och laddas aldrig upp."
   },
   "nav": {
     "toggleMenu": "Visa/dölj meny",
