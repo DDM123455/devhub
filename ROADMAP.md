@@ -1,5 +1,7 @@
 # ROADMAP.md — Web Tool Hub (Client-Side, Zero Server Cost)
 
+- [x] 2026-11-16 — Text Diff ghép nội dung trước whitespace, sửa tô nhầm field giống nhau trong bản tin debugger căn cột (cả Word/Character); 28 test hồi quy.
+
 - [x] 2026-11-16 — Text Diff giữ phần đầu/đuôi giống nhau ngoài highlight trên dòng dài, bảo toàn cụm Unicode và bổ sung test/hướng dẫn en+vi.
 
 - [x] 2026-11-08 — Rà crawl/SEO/test; sửa nén và cây XML mất whitespace; cập nhật hướng dẫn JSON/XML, Base64 en+vi.

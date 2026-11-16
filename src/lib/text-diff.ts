@@ -162,31 +162,50 @@ function diffTokenOps(leftTokens: string[], rightTokens: string[], options: Diff
 	return ops;
 }
 
-// A modified word/token is never highlighted as a solid block: wherever the word-level
-// diff yields a removed chunk immediately followed by an added chunk, that pair is
-// re-diffed per grapheme, so "hahah" → "hahahahah" highlights only the appended "ahah".
-// Above CHAR_REFINE_MAX_LEN the refinement is skipped to bound the O(n*d) cost.
+// Changed gaps between matching content tokens are refined per grapheme, so an
+// edited word need not be highlighted as a solid block. Word refinement is bounded
+// by CHAR_REFINE_MAX_LEN; Character mode has the larger CHAR_DIFF_MAX_LEN budget.
 const CHAR_REFINE_MAX_LEN = 2000;
 const CHAR_DIFF_MAX_LEN = 20000;
 
-function refineOps(ops: Op[], options: DiffOptions): Op[] {
-	const result: Op[] = [];
-	for (let i = 0; i < ops.length; i++) {
-		const current = ops[i];
-		const next = ops[i + 1];
-		if (
-			current.kind === 'removed' &&
-			next?.kind === 'added' &&
-			current.text.length <= CHAR_REFINE_MAX_LEN &&
-			next.text.length <= CHAR_REFINE_MAX_LEN
-		) {
-			result.push(...diffTokenOps(segmentGraphemes(current.text), segmentGraphemes(next.text), options));
-			i += 1;
-			continue;
+function diffContentOps(left: string, right: string, granularity: DiffGranularity, options: DiffOptions): Op[] {
+	// Debugger dumps often align fields with long runs of spaces. Treat content
+	// tokens as anchors first: matching padding must not displace an equal field.
+	const content = (text: string) => {
+		let offset = 0;
+		return tokenizeWords(text).map(value => {
+			const token = { value, start: offset, end: offset + value.length };
+			offset = token.end;
+			return token;
+		}).filter(token => !/^\s+$/.test(token.value));
+	};
+	const a = content(left);
+	const b = content(right);
+	const parts = diffArrays(a.map(t => tokenKey(t.value, options)), b.map(t => tokenKey(t.value, options)));
+	const ops: Op[] = [];
+	let li = 0, ri = 0, leftEnd = 0, rightEnd = 0;
+	const gap = (l: string, r: string) => {
+		if (l === r || (options.ignoreWhitespace && /^\s+$/.test(l) && /^\s+$/.test(r))) {
+			ops.push({ kind: 'common', left: l, right: r });
+			return;
 		}
-		result.push(current);
+		const limit = granularity === 'char' ? CHAR_DIFF_MAX_LEN : CHAR_REFINE_MAX_LEN;
+		if (l.length <= limit && r.length <= limit) ops.push(...diffTokenOps(segmentGraphemes(l), segmentGraphemes(r), options));
+		else ops.push({ kind: 'removed', text: l }, { kind: 'added', text: r });
+	};
+	for (const part of parts) {
+		if (part.removed) { li += part.value.length; continue; }
+		if (part.added) { ri += part.value.length; continue; }
+		for (let i = 0; i < part.value.length; i++) {
+			const l = a[li++], r = b[ri++];
+			gap(left.slice(leftEnd, l.start), right.slice(rightEnd, r.start));
+			ops.push({ kind: 'common', left: l.value, right: r.value });
+			leftEnd = l.end;
+			rightEnd = r.end;
+		}
 	}
-	return result;
+	gap(left.slice(leftEnd), right.slice(rightEnd));
+	return ops;
 }
 
 function opsToSegments(ops: Op[]): { leftSegments: DiffSegment[]; rightSegments: DiffSegment[] } {
@@ -254,10 +273,7 @@ function diffLinePair(leftLine: string, rightLine: string, granularity: DiffGran
 	const ops =
 		left.length + right.length > CHAR_DIFF_MAX_LEN
 			? [{ kind: 'removed' as const, text: left }, { kind: 'added' as const, text: right }]
-			:
-		granularity === 'char'
-			? diffTokenOps(segmentGraphemes(left), segmentGraphemes(right), options)
-			: refineOps(diffTokenOps(tokenizeWords(left), tokenizeWords(right), options), options);
+			: diffContentOps(left, right, granularity, options);
 	return opsToSegments([
 		{ kind: 'common', left: leftLine.slice(0, prefix), right: rightLine.slice(0, prefix) },
 		...ops,
