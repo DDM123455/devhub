@@ -115,7 +115,15 @@ export function segmentGraphemes(text: string): string[] {
 }
 
 function tokenizeWords(text: string): string[] {
-	return text.match(/\s+|[\p{L}\p{M}\p{N}_]+|[^\s\p{L}\p{M}\p{N}_]/gu) ?? [];
+	const tokens: string[] = [];
+	let previousKind = '';
+	for (const cluster of segmentGraphemes(text)) {
+		const kind = /^\s+$/.test(cluster) ? 'space' : /^[\p{L}\p{M}\p{N}_]+$/u.test(cluster) ? 'word' : 'symbol';
+		if (kind !== 'symbol' && kind === previousKind) tokens[tokens.length - 1] += cluster;
+		else tokens.push(cluster);
+		previousKind = kind;
+	}
+	return tokens;
 }
 
 type Op = { kind: 'common'; left: string; right: string } | { kind: 'removed'; text: string } | { kind: 'added'; text: string };
@@ -200,14 +208,61 @@ function opsToSegments(ops: Op[]): { leftSegments: DiffSegment[]; rightSegments:
 	return { leftSegments, rightSegments };
 }
 
+// Anchor identical edges before applying the cost limit. A long shared tail must
+// not become a change merely because the full line exceeds the refinement budget.
+// Round cuts to grapheme boundaries (e.g. combining marks, flags and ZWJ emoji).
+function commonEdges(left: string, right: string): { prefix: number; suffix: number } {
+	let prefix = 0;
+	while (prefix < Math.min(left.length, right.length) && left[prefix] === right[prefix]) prefix++;
+	let suffix = 0;
+	while (suffix < Math.min(left.length, right.length) - prefix && left[left.length - 1 - suffix] === right[right.length - 1 - suffix]) suffix++;
+	if (!prefix && !suffix) return { prefix, suffix };
+	type Segments = { containing(index: number): { index: number; segment: string } | undefined };
+	const Segmenter = (Intl as unknown as { Segmenter?: new (locale?: string, options?: { granularity: string }) => { segment(text: string): Segments } }).Segmenter;
+	if (Segmenter) {
+		const segmenter = new Segmenter(undefined, { granularity: 'grapheme' });
+		const a = segmenter.segment(left);
+		const b = segmenter.segment(right);
+		while (prefix > 0) {
+			const next = Math.min(a.containing(prefix)?.index ?? prefix, b.containing(prefix)?.index ?? prefix);
+			if (next === prefix) break;
+			prefix = next;
+		}
+		while (suffix > 0) {
+			const ai = left.length - suffix;
+			const bi = right.length - suffix;
+			const ac = a.containing(ai);
+			const bc = b.containing(bi);
+			const drop = Math.max(ac && ac.index < ai ? ac.index + ac.segment.length - ai : 0, bc && bc.index < bi ? bc.index + bc.segment.length - bi : 0);
+			if (!drop) break;
+			suffix = Math.max(0, suffix - drop);
+		}
+	} else {
+		// The non-Segmenter path elsewhere uses code points; match that boundary.
+		if (prefix && (/[\uDC00-\uDFFF]/.test(left[prefix] ?? '') || /[\uDC00-\uDFFF]/.test(right[prefix] ?? ''))) prefix--;
+		if (suffix && (/[\uDC00-\uDFFF]/.test(left[left.length - suffix]) || /[\uDC00-\uDFFF]/.test(right[right.length - suffix]))) suffix--;
+	}
+	return { prefix, suffix };
+}
+
 function diffLinePair(leftLine: string, rightLine: string, granularity: DiffGranularity, options: DiffOptions) {
 	if (granularity === 'line') return undefined;
-	if (leftLine.length + rightLine.length > CHAR_DIFF_MAX_LEN) return undefined;
+	const { prefix, suffix } = commonEdges(leftLine, rightLine);
+	const left = leftLine.slice(prefix, leftLine.length - suffix);
+	const right = rightLine.slice(prefix, rightLine.length - suffix);
+	if (!prefix && !suffix && left.length + right.length > CHAR_DIFF_MAX_LEN) return undefined;
 	const ops =
+		left.length + right.length > CHAR_DIFF_MAX_LEN
+			? [{ kind: 'removed' as const, text: left }, { kind: 'added' as const, text: right }]
+			:
 		granularity === 'char'
-			? diffTokenOps(segmentGraphemes(leftLine), segmentGraphemes(rightLine), options)
-			: refineOps(diffTokenOps(tokenizeWords(leftLine), tokenizeWords(rightLine), options), options);
-	return opsToSegments(ops);
+			? diffTokenOps(segmentGraphemes(left), segmentGraphemes(right), options)
+			: refineOps(diffTokenOps(tokenizeWords(left), tokenizeWords(right), options), options);
+	return opsToSegments([
+		{ kind: 'common', left: leftLine.slice(0, prefix), right: rightLine.slice(0, prefix) },
+		...ops,
+		{ kind: 'common', left: leftLine.slice(leftLine.length - suffix), right: rightLine.slice(rightLine.length - suffix) },
+	]);
 }
 
 export function lineKey(line: string, options: DiffOptions): string {

@@ -1,5 +1,7 @@
 # ROADMAP.md — Web Tool Hub (Client-Side, Zero Server Cost)
 
+- [x] 2026-11-16 — Text Diff giữ phần đầu/đuôi giống nhau ngoài highlight trên dòng dài, bảo toàn cụm Unicode và bổ sung test/hướng dẫn en+vi.
+
 - [x] 2026-11-08 — Rà crawl/SEO/test; sửa nén và cây XML mất whitespace; cập nhật hướng dẫn JSON/XML, Base64 en+vi.
 - [ ] 2026-11-08 — Bổ sung 285 key/locale còn thiếu ở 18 ngôn ngữ ngoài en/vi (ưu tiên ISO, SQL/Java, XML), rà bản ngữ trước khi index.
 - [ ] 2026-11-08 — Đo Lighthouse/CWV và tương tác công cụ nặng; xử lý 81 meta description dài còn lại.

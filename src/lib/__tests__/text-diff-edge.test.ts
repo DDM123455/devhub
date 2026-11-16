@@ -113,13 +113,14 @@ describe('empty and degenerate inputs', () => {
 		const removed = (e[0].leftSegments ?? []).filter((s) => s.removed);
 		expect(removed.map((s) => s.value)).toEqual(['A']);
 	});
-	it('beyond 20 000 combined characters the intra-line diff is skipped (whole line shown) and stays fast', () => {
+	it('long identical edges are retained even beyond the intra-line budget', () => {
 		const base = 'x'.repeat(25000);
 		const t0 = performance.now();
 		const e = diff(`${base}A${base}`, `${base}B${base}`, 'char');
 		expect(performance.now() - t0).toBeLessThan(1000);
 		expect(e[0].type).toBe('modified');
-		expect(e[0].leftSegments).toBeUndefined();
+		expect(e[0].leftSegments?.filter(s => s.removed).map(s => s.value)).toEqual(['A']);
+		expect(e[0].rightSegments?.filter(s => s.added).map(s => s.value)).toEqual(['B']);
 	});
 });
 
