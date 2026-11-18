@@ -630,12 +630,14 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 ## Phase 6 — Cụm trang SEO (programmatic)
 
 Nguyên tắc: chỉ sinh trang cho mốc người ta thật sự tìm, mỗi trang một đoạn nội dung riêng.
-Không sinh dàn trải mọi con số — xem lý do trong `src/data/weeks-from-today.ts`.
+Không sinh dàn trải mọi con số.
 
-- [x] Cụm A — "N weeks from today" (hub + 14 mốc, tiếng Anh)
-- [ ] Cụm B — "N hours from now"
-- [ ] Cụm C — "N days ago" / "N days from today"
+Các cụm theo ngày giờ hiện tại ("N weeks from today", "N hours from now", "N days ago")
+đã bị BỎ: kết quả phụ thuộc hôm nay là ngày nào, nên HTML tĩnh phải build lại hằng ngày mới
+không bị cũ. Chỉ làm các cụm cho ra trang đứng yên vĩnh viễn.
+
 - [ ] Cụm D — Cooking converters (tsp / tbsp / ml / oz / grams / cups)
-- [ ] Tự build lại hằng ngày để HTML luôn mang ngày hôm nay (cần người dùng đồng ý bật)
-- [ ] Category "Date & Time" trên trang chủ (chờ đủ từ 2 cụm trở lên)
-- [ ] Cụm E/F/G tiếng Việt (OCR landing, vòng quay random, photobooth)
+- [ ] Cụm E — Landing tiếng Việt cho OCR (chuyển ảnh sang text / văn bản / word)
+- [ ] Cụm F — Vòng quay random (tool mới)
+- [ ] Cụm G — Photobooth online (cần mở camera trong Permissions-Policy — phải hỏi trước)
+- [ ] Category "Date & Time" / "Cooking Converters" trên trang chủ (chờ đủ từ 2 cụm trở lên)

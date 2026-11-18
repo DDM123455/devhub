@@ -15,8 +15,6 @@ export function getStaticPaths() {
 
 const { locale } = Astro.params as { locale: Locale };
 const t = getFixedT(locale);
-// Chuỗi của cụm trang tính ngày: chỉ có bản tiếng Anh, chỉ dùng trong khối en bên dưới.
-const clusters = getFixedT('en', 'cluster-weeks');
 
 const toolCount = tools.length;
 const categoryCount = categories.length;
@@ -132,25 +130,6 @@ const websiteSchema = {
 			))
 		}
 	</section>
-
-	{
-		/* Cụm trang tính ngày mới chỉ có tiếng Anh, nên chỉ hiện ở /en/ — và phải có link từ đây,
-		   không thì trang hub mồ côi, chẳng ai (kể cả Google) tìm ra đường vào. */
-		locale === 'en' && (
-			<section class="px-4 pb-16 sm:px-8">
-				<div class="rounded-2xl border border-border bg-card p-6">
-					<h2 class="text-[17px] font-semibold tracking-tight text-foreground">{clusters('homeSection.heading')}</h2>
-					<p class="mt-1 text-sm text-muted-foreground">{clusters('homeSection.description')}</p>
-					<a
-						href="/en/weeks-from-today/"
-						class="mt-3 inline-block text-sm text-primary hover:underline"
-					>
-						{clusters('homeSection.linkLabel')}
-					</a>
-				</div>
-			</section>
-		)
-	}
 </Layout>
 
 <script>
