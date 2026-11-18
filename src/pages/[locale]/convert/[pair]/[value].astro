@@ -1,0 +1,196 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import FaqSection from '@/components/layout/FaqSection.astro';
+import KitchenConverter from '@/components/tools/KitchenConverter';
+import { getFixedT } from '@/i18n/i18next';
+import { jsonLd } from '@/lib/json-ld';
+import { CONVERT_PAIRS, findPair } from '@/data/convert-pairs';
+import {
+	INGREDIENTS,
+	amountToLabel,
+	amountToUrl,
+	convertVolume,
+	formatAmount,
+	toKitchenFraction,
+	volumeToGrams,
+} from '@/lib/kitchen-units';
+
+export function getStaticPaths() {
+	return CONVERT_PAIRS.flatMap((pair) =>
+		pair.values.map((value) => ({
+			params: { locale: 'en', pair: pair.slug, value: amountToUrl(value) },
+			props: { slug: pair.slug, value },
+		})),
+	);
+}
+
+const { slug, value } = Astro.props as { slug: string; value: number };
+const pair = findPair(slug)!;
+const t = getFixedT('en', 'cluster-convert');
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const unitShort = (unit: string) => t(`unitsShort.${unit}`);
+const amountLabel = amountToLabel(value);
+
+// Quy đổi sang gam phụ thuộc nguyên liệu; trang hiển thị cả bảng, con số nổi bật lấy theo nước.
+const isGrams = pair.to === 'grams';
+const result = isGrams ? volumeToGrams(value, pair.from, 'water') : convertVolume(value, pair.from, pair.to);
+const fraction = toKitchenFraction(result);
+
+const copy = t(`values.${slug}.${amountToUrl(value)}`, { returnObjects: true }) as {
+	p1: string;
+	p2: string;
+	q1: string;
+	a1: string;
+	q2: string;
+	a2: string;
+};
+
+const siblings = pair.values.filter((item) => item !== value);
+
+const faqItems = [
+	{ question: copy.q1, answer: copy.a1 },
+	{ question: copy.q2, answer: copy.a2 },
+	{ question: t(`pairs.${slug}.q1`), answer: t(`pairs.${slug}.a1`) },
+];
+
+const messages = {
+	amountLabel: t('ui.amountLabel'),
+	resultLabel: t('ui.resultLabel'),
+	ingredientLabel: t('ui.ingredientLabel'),
+	ingredientHint: t('ui.ingredientHint'),
+	swap: t('ui.swap'),
+	fractionNote: t('ui.fractionNote'),
+	unitNames: t('units', { returnObjects: true }) as Record<string, string>,
+	ingredientNames: t('ingredients', { returnObjects: true }) as Record<string, string>,
+};
+
+const interpolation = {
+	amount: amountLabel,
+	from: unitShort(pair.from),
+	to: unitShort(pair.to),
+	fromLong: t(`units.${pair.from}`),
+	result: formatAmount(result),
+	// Thẻ <title> viết hoa cho tử tế; H1 giữ nguyên chữ thường để khớp đúng cách người ta gõ tìm kiếm.
+	amountTitle: amountLabel,
+	fromTitle: t(`unitsTitle.${pair.from}`),
+	toTitle: t(`unitsTitle.${pair.to}`),
+};
+const title = t('value.metaTitle', interpolation);
+const description = t('value.metaDescription', interpolation);
+
+const schema = {
+	'@context': 'https://schema.org',
+	'@type': 'WebApplication',
+	name: t('value.heading', interpolation),
+	description,
+	url: canonicalUrl,
+	applicationCategory: 'UtilitiesApplication',
+	operatingSystem: 'Any',
+	offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+---
+
+<Layout title={title} description={description} lang="en" ogImage="/og/default.png">
+	<script type="application/ld+json" set:html={jsonLd(schema)} />
+	<section class="px-4 py-10">
+		<Breadcrumbs
+			items={[
+				{ label: t('ui.breadcrumbHome'), href: '/en/' },
+				{ label: t(`pairs.${slug}.heading`), href: `/en/convert/${slug}/` },
+				{ label: t('value.heading', interpolation), href: undefined },
+			]}
+		/>
+		<h1 class="mt-3 text-heading-1 text-foreground">{t('value.heading', interpolation)}</h1>
+
+		<p class="mt-6 text-sm text-muted-foreground">{t('value.resultPrefix', interpolation)}</p>
+		<p class="text-heading-1 text-foreground">
+			{formatAmount(result)} {unitShort(pair.to)}
+			{fraction && fraction !== formatAmount(result) && (
+				<span class="text-muted-foreground"> ({fraction})</span>
+			)}
+		</p>
+
+		<div class="mt-6">
+			<KitchenConverter client:load from={pair.from} to={pair.to} initialValue={value} messages={messages} />
+		</div>
+	</section>
+
+	{
+		isGrams && (
+			<section class="border-t border-border px-4 py-10">
+				<h2 class="text-heading-2 text-foreground">{t('ui.ingredientLabel')}</h2>
+				<div class="mt-4 overflow-x-auto">
+					<table class="w-full min-w-sm border-collapse text-sm">
+						<thead>
+							<tr class="border-b border-border text-left text-muted-foreground">
+								<th scope="col" class="py-2 pr-4 font-medium">
+									{t('ui.ingredientLabel')}
+								</th>
+								<th scope="col" class="py-2 font-medium">
+									{amountLabel} {unitShort(pair.from)}
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{INGREDIENTS.map((item) => (
+								<tr class="border-b border-border/60">
+									<th scope="row" class="py-1.5 pr-4 font-normal text-foreground">
+										{t(`ingredients.${item.id}`)}
+									</th>
+									<td class="py-1.5 text-foreground">
+										{formatAmount(volumeToGrams(value, pair.from, item.id))} g
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+				<p class="mt-3 max-w-3xl text-xs text-muted-foreground">{t('ui.ingredientHint')}</p>
+			</section>
+		)
+	}
+
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-heading-2 text-foreground">{t('value.articleHeading', interpolation)}</h2>
+		<div class="mt-4 flex max-w-3xl flex-col gap-4 text-muted-foreground">
+			<p>{copy.p1}</p>
+			<p>{copy.p2}</p>
+		</div>
+	</section>
+
+	<section class="border-t border-border px-4 py-10">
+		<FaqSection heading={t('ui.faqHeading')} items={faqItems} />
+	</section>
+
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-heading-2 text-foreground">{t('ui.otherHeading')}</h2>
+		<ul class="mt-4 flex flex-col gap-1">
+			<li>
+				<a href={`/en/convert/${slug}/`} class="text-sm text-primary hover:underline">
+					{t(`pairs.${slug}.heading`)}
+				</a>
+			</li>
+			{
+				siblings.map((item) => (
+					<li>
+						<a href={`/en/convert/${slug}/${amountToUrl(item)}/`} class="text-sm text-primary hover:underline">
+							{amountToLabel(item)} {unitShort(pair.from)} to {unitShort(pair.to)}
+						</a>
+					</li>
+				))
+			}
+			{
+				pair.reverse && (
+					<li>
+						<a href={`/en/convert/${pair.reverse}/`} class="text-sm text-primary hover:underline">
+							{t(`pairs.${pair.reverse}.heading`)}
+						</a>
+					</li>
+				)
+			}
+		</ul>
+		<p class="mt-6 max-w-3xl text-xs text-muted-foreground">{t('ui.standardsBody')}</p>
+	</section>
+</Layout>

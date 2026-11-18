@@ -1,0 +1,121 @@
+---
+/**
+ * Khung chung cho 3 trang landing tiếng Việt của công cụ OCR.
+ *
+ * Ba trang nhắm 3 từ khoá khác nhau và nhúng cùng một công cụ, nên mỗi trang BẮT BUỘC phải
+ * có nội dung riêng (xem `cluster-ocr-vi.json`) — nếu chỉ đổi tiêu đề thì Google coi là nội
+ * dung trùng lặp và nhiều khả năng chỉ giữ lại một trang.
+ */
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import FaqSection from '@/components/layout/FaqSection.astro';
+import ImageToText, { type ImageToTextMessages } from './ImageToText';
+import { getFixedT } from '@/i18n/i18next';
+import { jsonLd } from '@/lib/json-ld';
+import { tools } from '@/data/tools';
+import { OCR_LANGUAGES } from '@/lib/ocr-languages';
+import { IMAGE_TO_TEXT_UI_KEYS } from '@/lib/ocr-ui-keys';
+
+interface Props {
+	/** Khoá của trang trong `cluster-ocr-vi.json`. */
+	variant: 'text' | 'vanban' | 'word';
+}
+
+const { variant } = Astro.props;
+const t = getFixedT('vi', 'tool-image-to-text');
+const c = getFixedT('vi', 'cluster-ocr-vi');
+const page = (key: string) => c(`pages.${variant}.${key}`);
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+
+const messages = Object.fromEntries(
+	IMAGE_TO_TEXT_UI_KEYS.map((key) => [key, t(`ui.${key}`)]),
+) as unknown as ImageToTextMessages;
+const languageNames = Object.fromEntries(OCR_LANGUAGES.map((code) => [code, t(`languages.${code}`)]));
+
+const ocrTool = tools.find((item) => item.id === 'image-to-text')!;
+const textDiffTool = tools.find((item) => item.id === 'text-diff')!;
+const relatedIds = ['word-counter', 'text-case-converter', 'text-diff', 'image-compress'];
+const relatedTools = relatedIds.map((id) => tools.find((item) => item.id === id)!).filter(Boolean);
+
+const faqItems = [
+	{ question: page('q1'), answer: page('a1') },
+	{ question: page('q2'), answer: page('a2') },
+	{ question: page('q3'), answer: page('a3') },
+	{ question: c('common.sharedQ'), answer: c('common.sharedA') },
+];
+
+const schema = {
+	'@context': 'https://schema.org',
+	'@type': 'WebApplication',
+	name: page('heading'),
+	description: page('metaDescription'),
+	url: canonicalUrl,
+	applicationCategory: 'UtilitiesApplication',
+	operatingSystem: 'Any',
+	inLanguage: 'vi',
+	offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+---
+
+<Layout title={page('metaTitle')} description={page('metaDescription')} lang="vi" ogImage="/og/image.png">
+	<script type="application/ld+json" set:html={jsonLd(schema)} />
+	<section class="px-4 py-10">
+		<Breadcrumbs
+			items={[
+				{ label: c('common.breadcrumbHome'), href: '/vi/' },
+				{ label: page('heading'), href: undefined },
+			]}
+		/>
+		<h1 class="mt-3 text-heading-1 text-foreground">{page('heading')}</h1>
+		<p class="mt-2 max-w-3xl text-muted-foreground">{page('tagline')}</p>
+		<div class="mt-6">
+			<ImageToText
+				client:load
+				messages={messages}
+				languageNames={languageNames}
+				locale="vi"
+				textDiffHref={`/vi/tools/${textDiffTool.slugs.vi}/`}
+			/>
+		</div>
+	</section>
+
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-heading-2 text-foreground">{page('heading')}</h2>
+		<div class="mt-4 flex max-w-3xl flex-col gap-4 text-muted-foreground">
+			<p>{page('p1')}</p>
+			<p>{page('p2')}</p>
+			<p>{page('p3')}</p>
+			<p>{page('p4')}</p>
+		</div>
+	</section>
+
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-heading-2 text-foreground">{c('common.privacyHeading')}</h2>
+		<p class="mt-4 max-w-3xl text-muted-foreground">{c('common.privacyBody')}</p>
+	</section>
+
+	<section class="border-t border-border px-4 py-10">
+		<FaqSection heading={c('common.faqHeading')} items={faqItems} />
+	</section>
+
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-heading-2 text-foreground">{c('common.relatedHeading')}</h2>
+		<ul class="mt-4 flex flex-col gap-1">
+			<li>
+				<a href={`/vi/tools/${ocrTool.slugs.vi}/`} class="text-sm text-primary hover:underline">
+					{ocrTool.names.vi}
+				</a>
+			</li>
+			{
+				relatedTools.map((tool) => (
+					<li>
+						<a href={`/vi/tools/${tool.slugs.vi}/`} class="text-sm text-primary hover:underline">
+							{tool.names.vi}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+</Layout>

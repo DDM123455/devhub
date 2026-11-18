@@ -15,6 +15,16 @@ export function getStaticPaths() {
 
 const { locale } = Astro.params as { locale: Locale };
 const t = getFixedT(locale);
+// Cụm quy đổi đơn vị bếp chỉ có bản tiếng Anh, chỉ dùng trong khối `locale === 'en'` bên dưới.
+const convert = getFixedT('en', 'cluster-convert');
+const convertLinks = ['tsp-to-ml', 'tsp-to-tbsp', 'tsp-to-grams', 'ml-to-oz', 'ml-to-tbsp', 'tsp-to-cups'];
+// Landing OCR chỉ có bản tiếng Việt, chỉ dùng trong khối `locale === 'vi'` bên dưới.
+const ocrVi = getFixedT('vi', 'cluster-ocr-vi');
+const ocrViLinks = [
+	{ slug: 'chuyen-anh-sang-text', key: 'text' },
+	{ slug: 'chuyen-anh-thanh-van-ban', key: 'vanban' },
+	{ slug: 'chuyen-anh-sang-word', key: 'word' },
+];
 
 const toolCount = tools.length;
 const categoryCount = categories.length;
@@ -130,6 +140,48 @@ const websiteSchema = {
 			))
 		}
 	</section>
+
+	{
+		/* Cụm quy đổi đơn vị bếp mới chỉ có tiếng Anh nên chỉ hiện ở /en/ — và phải có link từ đây,
+		   không thì các trang hub mồ côi, chẳng ai (kể cả Google) tìm ra đường vào. */
+		locale === 'en' && (
+			<section class="px-4 pb-16 sm:px-8">
+				<div class="rounded-2xl border border-border bg-card p-6">
+					<h2 class="text-[17px] font-semibold tracking-tight text-foreground">{convert('homeSection.heading')}</h2>
+					<p class="mt-1 text-sm text-muted-foreground">{convert('homeSection.description')}</p>
+					<ul class="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+						{convertLinks.map((slug) => (
+							<li>
+								<a href={`/en/convert/${slug}/`} class="text-sm text-primary hover:underline">
+									{convert(`pairs.${slug}.heading`)}
+								</a>
+							</li>
+						))}
+					</ul>
+				</div>
+			</section>
+		)
+	}
+
+	{
+		locale === 'vi' && (
+			<section class="px-4 pb-16 sm:px-8">
+				<div class="rounded-2xl border border-border bg-card p-6">
+					<h2 class="text-[17px] font-semibold tracking-tight text-foreground">{ocrVi('homeSection.heading')}</h2>
+					<p class="mt-1 text-sm text-muted-foreground">{ocrVi('homeSection.description')}</p>
+					<ul class="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+						{ocrViLinks.map((link) => (
+							<li>
+								<a href={`/vi/${link.slug}/`} class="text-sm text-primary hover:underline">
+									{ocrVi(`pages.${link.key}.heading`)}
+								</a>
+							</li>
+						))}
+					</ul>
+				</div>
+			</section>
+		)
+	}
 </Layout>
 
 <script>

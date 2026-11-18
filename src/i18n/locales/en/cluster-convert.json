@@ -1,0 +1,330 @@
+{
+  "ui": {
+    "amountLabel": "Amount in {{unit}}",
+    "resultLabel": "Result in {{unit}}",
+    "ingredientLabel": "Ingredient",
+    "ingredientHint": "Weight depends on what you are measuring. Values follow common USDA conversions and are approximate — how tightly you pack a spoon changes the result.",
+    "swap": "Swap",
+    "fractionNote": "That is about {{fraction}} {{unit}} in kitchen measures.",
+    "tableHeading": "Full conversion table",
+    "colFrom": "From",
+    "colTo": "To",
+    "colFraction": "In kitchen measures",
+    "reverseHeading": "Going the other way",
+    "otherHeading": "Other kitchen conversions",
+    "faqHeading": "Frequently asked questions",
+    "breadcrumbHome": "Home",
+    "breadcrumbHub": "Kitchen converters",
+    "standardsHeading": "US, metric and Australian spoons are not the same",
+    "standardsBody": "Every figure on this page uses US customary measures: 1 teaspoon is 4.92892 ml and 1 tablespoon is exactly 3 teaspoons, or 14.79 ml. A metric teaspoon is a round 5 ml, which is 1.4% larger and almost never matters. The Australian tablespoon is the one that bites: it holds 20 ml, which is four teaspoons rather than three. If a recipe is Australian and calls for tablespoons of something potent like baking soda, using a US tablespoon leaves you a quarter short."
+  },
+  "units": {
+    "tsp": "teaspoons",
+    "tbsp": "tablespoons",
+    "ml": "millilitres",
+    "floz": "fluid ounces",
+    "cup": "cups",
+    "grams": "grams"
+  },
+  "unitsShort": {
+    "tsp": "tsp",
+    "tbsp": "tbsp",
+    "ml": "ml",
+    "floz": "fl oz",
+    "cup": "cups",
+    "grams": "g"
+  },
+  "ingredients": {
+    "water": "Water",
+    "sugar": "Granulated sugar",
+    "brownSugar": "Brown sugar (packed)",
+    "salt": "Table salt",
+    "flour": "All-purpose flour",
+    "butter": "Butter",
+    "oliveOil": "Olive oil",
+    "honey": "Honey",
+    "bakingSoda": "Baking soda",
+    "bakingPowder": "Baking powder",
+    "cocoa": "Cocoa powder",
+    "cinnamon": "Ground cinnamon"
+  },
+  "value": {
+    "metaTitle": "{{amountTitle}} {{fromTitle}} to {{toTitle}} — Exact Conversion",
+    "metaDescription": "{{amount}} {{from}} is {{result}} {{to}}. See the exact figure, the nearest kitchen measure, and a full conversion table.",
+    "heading": "{{amount}} {{from}} to {{to}}",
+    "resultPrefix": "{{amount}} {{fromLong}} is",
+    "articleHeading": "About {{amount}} {{from}} to {{to}}"
+  },
+  "pairs": {
+    "tsp-to-ml": {
+      "metaTitle": "Teaspoons to Millilitres Converter (tsp to ml)",
+      "metaDescription": "Convert teaspoons to millilitres. 1 US teaspoon is 4.93 ml. Two-way converter, full table and the US versus metric difference explained.",
+      "heading": "Teaspoons to Millilitres",
+      "tagline": "1 US teaspoon is 4.92892 ml. Type any amount to convert both ways.",
+      "p1": "The teaspoon is one of the few cooking measures defined by law rather than by tradition. In the United States it is fixed at exactly one sixth of a US fluid ounce, which works out to 4.92892 millilitres. That awkward number is a legacy of the gallon it descends from, and it is why American recipes almost never give volumes in millilitres.",
+      "p2": "In practice, nobody measures 4.93 ml. Most of the world rounds the teaspoon to a flat 5 ml, and nutrition labelling in the US does the same. The 1.4% difference is far smaller than the error you introduce by heaping the spoon instead of levelling it, so for cooking the two are interchangeable. The place it starts to matter is medicine, where dosing spoons are marked in millilitres precisely because kitchen teaspoons vary so much.",
+      "p3": "If you are converting because you only own metric measuring spoons, use 5 ml and stop worrying. If you are scaling a recipe up by a factor of ten or more, use the exact figure, because the rounding compounds.",
+      "q1": "How many ml is 1 teaspoon?",
+      "a1": "A US teaspoon is 4.92892 ml, which almost everyone rounds to 5 ml. A metric teaspoon is defined as exactly 5 ml.",
+      "q2": "Is a teaspoon the same everywhere?",
+      "a2": "The teaspoon is close to 5 ml nearly everywhere, so it travels well. The tablespoon does not: Australia uses a 20 ml tablespoon while the US and UK use roughly 15 ml.",
+      "q3": "Should I level or heap the spoon?",
+      "a3": "Level, unless the recipe says otherwise. A heaped teaspoon can hold half again as much as a level one, which is a far bigger error than any conversion rounding."
+    },
+    "tsp-to-tbsp": {
+      "metaTitle": "Teaspoons to Tablespoons Converter (tsp to tbsp)",
+      "metaDescription": "Convert teaspoons to tablespoons. 3 teaspoons make exactly 1 tablespoon. Two-way converter, full table and kitchen fractions.",
+      "heading": "Teaspoons to Tablespoons",
+      "tagline": "3 teaspoons make exactly 1 tablespoon. Type any amount to convert both ways.",
+      "p1": "This is the one kitchen conversion that is exact. Three teaspoons make one tablespoon, with no rounding and no decimals, in both the US and UK systems. It holds because both spoons were defined from the same fluid ounce: the tablespoon is half an ounce and the teaspoon is a sixth.",
+      "p2": "Because the ratio is three, the arithmetic is easy but the fractions are not always friendly. Four teaspoons is one and a third tablespoons, which no measuring spoon can give you directly — you measure a tablespoon and then a teaspoon. Only multiples of three land on whole tablespoons, which is why so many recipes quantify small amounts in teaspoons and jump straight to tablespoons at three.",
+      "p3": "The exception is Australia, where the tablespoon holds 20 ml and takes four teaspoons rather than three. If a recipe is Australian and the amount matters — raising agents, salt, strong spices — check which tablespoon it means before you measure.",
+      "q1": "How many teaspoons are in a tablespoon?",
+      "a1": "Three, exactly, in the US and UK systems. In Australia a tablespoon is 20 ml and holds four teaspoons.",
+      "q2": "Is 2 teaspoons the same as a tablespoon?",
+      "a2": "No. Two teaspoons is two thirds of a tablespoon. You need three teaspoons to make one full tablespoon.",
+      "q3": "Why do recipes use both spoons?",
+      "a3": "Because the teaspoon gets unwieldy above about four. Writing \"2 tbsp\" is clearer than \"6 tsp\", and it saves you six separate scoops of a small spoon."
+    },
+    "tsp-to-grams": {
+      "metaTitle": "Teaspoons to Grams Converter (by ingredient)",
+      "metaDescription": "Convert teaspoons to grams for sugar, salt, flour, butter, honey and more. Weight depends on the ingredient — pick yours from the list.",
+      "heading": "Teaspoons to Grams",
+      "tagline": "There is no single answer: a teaspoon of salt weighs more than twice a teaspoon of flour. Pick your ingredient.",
+      "p1": "A teaspoon measures space, a gram measures weight, so converting between them needs one more piece of information: how heavy the ingredient is for its size. A level teaspoon holds 4.93 millilitres of anything, but that volume of table salt weighs about 6 grams while the same spoon of all-purpose flour weighs about 2.6 grams. There is no universal tsp-to-gram number, and any site that gives you one is quietly assuming water.",
+      "p2": "Even with the right density, spoon measurements of dry goods are unreliable. Flour scooped straight from the bag compacts and can weigh 20% more than flour spooned in and levelled. Brown sugar changes weight depending on how hard you press it. Cocoa and powdered sugar clump. This is the reason professional baking recipes give weights, and why a cheap kitchen scale improves baking results more than almost any other purchase.",
+      "p3": "Use the figures here for seasoning, raising agents and liquids, where a few tenths of a gram will not change the outcome. For flour, sugar and anything structural in a bake, weigh it if you can.",
+      "q1": "How many grams is a teaspoon?",
+      "a1": "It depends entirely on the ingredient. A teaspoon of water is 4.93 g, table salt about 6 g, granulated sugar about 4.2 g and all-purpose flour about 2.6 g.",
+      "q2": "Why do different sites give different gram values?",
+      "a2": "Because densities vary with grind, moisture and how the spoon is filled. Published values are averages, and a 10% spread between sources is normal for powders.",
+      "q3": "Is a teaspoon of salt really 6 grams?",
+      "a3": "For fine table salt, roughly yes. Coarse kosher or flaky sea salt has large crystals with air between them, so the same spoon can hold as little as 3 grams. Salt is the worst ingredient to convert by volume."
+    },
+    "tsp-to-cups": {
+      "metaTitle": "Teaspoons to Cups Converter (tsp to cups)",
+      "metaDescription": "Convert teaspoons to cups. 48 teaspoons make 1 US cup. Two-way converter plus a full table of common amounts.",
+      "heading": "Teaspoons to Cups",
+      "tagline": "48 teaspoons make one US cup. Type any amount to convert both ways.",
+      "p1": "A US cup holds 48 teaspoons, or 16 tablespoons, or 236.588 millilitres. The number 48 falls out of the definition: a cup is 8 fluid ounces and each ounce is 6 teaspoons. That makes every neat cup fraction land on a whole number of teaspoons — a quarter cup is 12 teaspoons, an eighth is 6, a sixteenth is 3.",
+      "p2": "Converting teaspoons up to cups is mostly useful in one direction: realising that an amount is too small to be worth a measuring cup at all. Two teaspoons is one twenty-fourth of a cup, a quantity no cup marking can show you. If a conversion gives you an ugly fraction of a cup, that is usually a sign the recipe meant you to use spoons.",
+      "p3": "Note that the cup itself is not universal. A US legal cup used for nutrition labels is 240 ml, a metric cup in Australia and New Zealand is 250 ml, and the traditional US customary cup used in recipes is 236.588 ml. The conversions here use the customary cup.",
+      "q1": "How many teaspoons are in a cup?",
+      "a1": "Forty-eight in a US customary cup. That is 16 tablespoons, since each tablespoon holds three teaspoons.",
+      "q2": "How many teaspoons are in a quarter cup?",
+      "a2": "Twelve, which is the same as four tablespoons. An eighth of a cup is six teaspoons.",
+      "q3": "Which cup size do these conversions use?",
+      "a3": "The US customary cup of 236.588 ml, which is what American recipes mean. A metric cup is 250 ml and a US legal cup used on food labels is 240 ml."
+    },
+    "ml-to-oz": {
+      "metaTitle": "Millilitres to Fluid Ounces Converter (ml to oz)",
+      "metaDescription": "Convert millilitres to US fluid ounces. 1 fl oz is 29.5735 ml. Two-way converter, full table and the US versus UK ounce difference.",
+      "heading": "Millilitres to Fluid Ounces",
+      "tagline": "1 US fluid ounce is 29.5735 ml. Type any amount to convert both ways.",
+      "p1": "A fluid ounce measures volume, not weight, despite sharing a name with the ounce on your scales. The US fluid ounce is 29.5735 millilitres. The imperial fluid ounce still used in the UK for some purposes is 28.4131 ml — about 4% smaller — which means a US pint and a UK pint are noticeably different drinks.",
+      "p2": "The 4% gap rarely matters for cooking but it adds up over larger volumes. A US quart is 946 ml while an imperial quart is 1,137 ml, a difference of almost a cup. If you are following an old British recipe that gives volumes in fluid ounces, converting with the US figure will leave you short.",
+      "p3": "For bottles and cans, the number printed on the label is usually the one to trust rather than a conversion: manufacturers round to convenient figures in each market, so a 500 ml bottle is sold as 16.9 fl oz rather than a tidy 17.",
+      "q1": "How many ml is 1 fluid ounce?",
+      "a1": "A US fluid ounce is 29.5735 ml. An imperial fluid ounce, used in the UK, is 28.4131 ml.",
+      "q2": "Is a fluid ounce the same as an ounce?",
+      "a2": "No. A fluid ounce measures volume and an ounce measures weight. They only coincide for water, and even then only approximately.",
+      "q3": "Why is a UK pint bigger than a US pint?",
+      "a3": "A US pint is 16 US fluid ounces, about 473 ml. An imperial pint is 20 imperial fluid ounces, about 568 ml. The two systems split in the nineteenth century and never converged."
+    },
+    "ml-to-tbsp": {
+      "metaTitle": "Millilitres to Tablespoons Converter (ml to tbsp)",
+      "metaDescription": "Convert millilitres to tablespoons. 1 US tablespoon is 14.79 ml. Two-way converter, full table and the Australian 20 ml spoon explained.",
+      "heading": "Millilitres to Tablespoons",
+      "tagline": "1 US tablespoon is 14.78676 ml. Type any amount to convert both ways.",
+      "p1": "A US tablespoon holds 14.78676 ml, which almost everyone treats as 15 ml. The rounding is so widespread that metric measuring spoons are manufactured at a flat 15 ml, and most recipe writers outside the US use 15 ml as the definition rather than as an approximation.",
+      "p2": "This is the conversion where the Australian tablespoon causes real trouble. It is 20 ml, a third larger than the US spoon, and Australian recipes are written for it. Measuring an Australian recipe's tablespoon of baking powder with a US spoon leaves you 25% short, which is enough to flatten a cake. UK, Canadian and New Zealand tablespoons are all 15 ml, so Australia is the outlier.",
+      "p3": "For liquids measured in larger amounts, skip the spoon entirely. Anything above about four tablespoons is faster and more accurate to measure in a jug, where 60 ml is a single reading rather than four separate scoops.",
+      "q1": "How many ml is 1 tablespoon?",
+      "a1": "A US tablespoon is 14.78676 ml, usually rounded to 15 ml. An Australian tablespoon is 20 ml.",
+      "q2": "Is 15 ml exactly one tablespoon?",
+      "a2": "It is the metric definition and it is what measuring spoons are made to. The US customary tablespoon is 14.79 ml, so the two differ by about 1.4%.",
+      "q3": "How many tablespoons is 100 ml?",
+      "a3": "About 6.8 US tablespoons. That is an awkward amount to spoon out, so a measuring jug is the better tool at this size."
+    },
+    "ml-to-tsp": {
+      "metaTitle": "Millilitres to Teaspoons Converter (ml to tsp)",
+      "metaDescription": "Convert millilitres to teaspoons. 5 ml is roughly 1 teaspoon. Two-way converter plus a full table of common amounts.",
+      "heading": "Millilitres to Teaspoons",
+      "tagline": "5 ml is almost exactly 1 teaspoon. Type any amount to convert both ways.",
+      "p1": "Going from millilitres to teaspoons is the conversion most people reach for with a bottle of medicine in hand. Five millilitres is one teaspoon for every practical purpose — the US customary teaspoon is 4.93 ml, so the error is under 1.5%.",
+      "p2": "For medicine, though, the honest advice is not to use a kitchen spoon at all. Studies of dosing accuracy have repeatedly found that household spoons vary enormously in capacity and that people under- and over-dose by wide margins when using them. Pharmacies give out marked oral syringes and dosing cups for free, and they are far more accurate.",
+      "p3": "In cooking the conversion is more forgiving. If a European recipe gives you 10 ml of vanilla extract, two teaspoons is close enough that no one will taste the difference.",
+      "q1": "How many teaspoons is 5 ml?",
+      "a1": "One teaspoon, near enough. The US customary teaspoon is 4.93 ml and the metric teaspoon is exactly 5 ml.",
+      "q2": "Can I use a kitchen teaspoon for medicine?",
+      "a2": "It is not recommended. Ordinary spoons vary widely in capacity. Use the syringe or dosing cup supplied with the medicine, or ask a pharmacist for one.",
+      "q3": "How many teaspoons is 15 ml?",
+      "a3": "Three, which is also one tablespoon. Fifteen millilitres is the standard metric tablespoon."
+    },
+    "tbsp-to-tsp": {
+      "metaTitle": "Tablespoons to Teaspoons Converter (tbsp to tsp)",
+      "metaDescription": "Convert tablespoons to teaspoons. 1 tablespoon is exactly 3 teaspoons. Two-way converter and a full table.",
+      "heading": "Tablespoons to Teaspoons",
+      "tagline": "1 tablespoon is exactly 3 teaspoons. Type any amount to convert both ways.",
+      "p1": "One tablespoon is three teaspoons, exactly, which makes this the simplest conversion in the kitchen. It is also the most useful one to know by heart, because it rescues you when the tablespoon is in the dishwasher: three level teaspoons give you the same amount with no approximation.",
+      "p2": "The multiplication stays tidy in both directions. Half a tablespoon is one and a half teaspoons, two tablespoons is six teaspoons, and a quarter cup — four tablespoons — is twelve. Those four numbers cover most of what a recipe will ask for.",
+      "p3": "As ever, the Australian tablespoon is the exception at 20 ml and four teaspoons. If you are working from an Australian cookbook, multiply by four rather than three.",
+      "q1": "Is 1 tablespoon exactly 3 teaspoons?",
+      "a1": "Yes, in the US and UK systems both spoons derive from the same fluid ounce, so the ratio is exact. In Australia one tablespoon is four teaspoons.",
+      "q2": "How many teaspoons is half a tablespoon?",
+      "a2": "One and a half teaspoons. Measure a teaspoon and then a half-teaspoon rather than trying to judge it by eye.",
+      "q3": "How many teaspoons is 2 tablespoons?",
+      "a3": "Six. Two tablespoons is also one US fluid ounce and one eighth of a cup."
+    },
+    "tbsp-to-ml": {
+      "metaTitle": "Tablespoons to Millilitres Converter (tbsp to ml)",
+      "metaDescription": "Convert tablespoons to millilitres. 1 US tablespoon is 14.79 ml, usually rounded to 15 ml. Two-way converter and a full table.",
+      "heading": "Tablespoons to Millilitres",
+      "tagline": "1 US tablespoon is 14.78676 ml, normally rounded to 15. Type any amount to convert both ways.",
+      "p1": "The US tablespoon is 14.78676 ml, which the rest of the world has quietly rounded up to 15 ml. Metric measuring spoons are made at 15 ml, and recipe writers outside the US treat that as the definition. The difference is about a fifth of a millilitre per spoon — invisible in anything you cook.",
+      "p2": "Where it stops being invisible is at scale. Converting a recipe that calls for 16 tablespoons of oil using 15 ml gives 240 ml, while the exact figure is 236.6 ml. That gap is still under 1.5%, but if you are batching a sauce by the litre the rounding is worth doing properly.",
+      "p3": "Remember that the Australian tablespoon is 20 ml, not 15. It is the single most common source of error when cooking across the two systems.",
+      "q1": "Is a tablespoon 15 ml or 20 ml?",
+      "a1": "Fifteen millilitres in the US, UK, Canada and New Zealand. Twenty millilitres in Australia, where the tablespoon holds four teaspoons rather than three.",
+      "q2": "How many ml is 2 tablespoons?",
+      "a2": "About 29.6 ml, which is one US fluid ounce. Using the rounded 15 ml spoon gives 30 ml.",
+      "q3": "Why is the US tablespoon not a round number?",
+      "a3": "Because it is defined as half a US fluid ounce, and the fluid ounce itself descends from the gallon. None of those units were designed around the metric system."
+    },
+    "oz-to-ml": {
+      "metaTitle": "Fluid Ounces to Millilitres Converter (oz to ml)",
+      "metaDescription": "Convert US fluid ounces to millilitres. 1 fl oz is 29.5735 ml. Two-way converter, full table and the imperial ounce difference.",
+      "heading": "Fluid Ounces to Millilitres",
+      "tagline": "1 US fluid ounce is 29.5735 ml. Type any amount to convert both ways.",
+      "p1": "One US fluid ounce is 29.5735 millilitres, a number that comes from the US gallon rather than from anything metric. In practice people round it to 30 ml, which overstates by 1.4% — fine for a drink, less fine for a cocktail recipe scaled up for a party.",
+      "p2": "The trap is the imperial fluid ounce, which the UK still uses in places and which is 28.4131 ml. It is smaller than the US ounce, yet an imperial pint is larger than a US pint because it contains 20 ounces instead of 16. The two facts together catch almost everyone out at least once.",
+      "p3": "For bar work the useful anchors are that a US shot is 1.5 fl oz, about 44 ml, and that a standard wine pour of 5 fl oz is just under 150 ml.",
+      "q1": "How many ml in a fluid ounce?",
+      "a1": "29.5735 ml for a US fluid ounce, commonly rounded to 30 ml. An imperial fluid ounce is 28.4131 ml.",
+      "q2": "How many ml is 8 fluid ounces?",
+      "a2": "About 237 ml, which is one US customary cup. Rounding the ounce to 30 ml would give 240 ml instead.",
+      "q3": "Is a US fluid ounce bigger than an imperial one?",
+      "a3": "Yes, slightly. The US ounce is 29.57 ml and the imperial one is 28.41 ml, a difference of about 4%."
+    }
+  },
+  "values": {
+    "tsp-to-ml": {
+      "1": {
+        "p1": "One teaspoon is 4.92892 millilitres in the US customary system and exactly 5 millilitres under the metric definition. The gap is 1.4%, which is far smaller than the difference between a level spoon and a rounded one, so for cooking you can treat them as the same thing.",
+        "p2": "The teaspoon is the anchor the rest of the small measures hang from: three make a tablespoon, six make a fluid ounce, forty-eight make a cup. It is worth memorising those four numbers because they let you rescue almost any recipe when a measuring cup is missing. Where the teaspoon genuinely is not good enough is medicine, where pharmacists supply marked syringes precisely because household spoons vary so widely in capacity.",
+        "q1": "Is 1 teaspoon 5 ml?",
+        "a1": "Effectively yes. The metric teaspoon is defined as exactly 5 ml and the US customary teaspoon is 4.92892 ml, a difference of about 1.4%.",
+        "q2": "How many teaspoons are in a tablespoon?",
+        "a2": "Three, exactly, in the US and UK systems. Australia is the exception, where a 20 ml tablespoon takes four teaspoons."
+      },
+      "2": {
+        "p1": "Two teaspoons is 9.86 millilitres, just under 10 ml. This is the point where a recipe could reasonably have used a tablespoon instead but did not, usually because two thirds of a tablespoon is a worse instruction than two teaspoons.",
+        "p2": "Two teaspoons shows up constantly in savoury cooking: it is a typical amount of dried herbs for a pot of sauce, of cornflour for thickening, or of baking powder in a two-layer cake. If you are working from a European recipe that calls for 10 ml, two teaspoons is the right substitution and the 0.14 ml difference is not measurable with kitchen equipment.",
+        "q1": "How many ml is 2 teaspoons?",
+        "a1": "9.86 ml using US customary teaspoons, or exactly 10 ml using metric teaspoons.",
+        "q2": "Is 2 teaspoons a tablespoon?",
+        "a2": "No. Two teaspoons is two thirds of a tablespoon. You need a third teaspoon to make a full tablespoon."
+      },
+      "1-4": {
+        "p1": "A quarter teaspoon is 1.23 millilitres, and it is the smallest measure most spoon sets provide. Below this, recipes stop giving numbers and switch to words — a pinch, a dash, to taste — because no one can reliably measure an eighth of a teaspoon by eye.",
+        "p2": "This is the standard amount for potent dry ingredients in a small bake: salt in a single-portion recipe, cream of tartar, ground cloves or nutmeg where any more would dominate. Because the quantity is so small, levelling matters more here than anywhere else. A heaped quarter teaspoon of a strong spice can easily be double the intended amount, and in a batch of cookies that is the difference between warm and medicinal.",
+        "q1": "How many ml is a quarter teaspoon?",
+        "a1": "1.23 ml using the US customary teaspoon, or 1.25 ml if you work from the metric 5 ml teaspoon.",
+        "q2": "What do I do if I have no quarter-teaspoon spoon?",
+        "a2": "Measure a half teaspoon and divide it visually, or fill a half teaspoon and tip half of it back. For salt and spices the small error is acceptable; for raising agents, try to borrow a proper spoon."
+      },
+      "1-2": {
+        "p1": "Half a teaspoon is 2.46 millilitres and it is probably the most-used measure in home baking. It is the typical amount of salt in a single loaf of bread, of vanilla in a small batch of cookies, and of baking soda in a standard cake.",
+        "p2": "Half a teaspoon of baking soda is worth knowing precisely, because soda is the ingredient least forgiving of a generous hand. It is roughly four times stronger than baking powder, and too much leaves a soapy, metallic taste that no amount of sugar hides. If a recipe calls for half a teaspoon, measure it level with a straight edge rather than eyeballing a rounded spoon.",
+        "q1": "How many ml is half a teaspoon?",
+        "a1": "2.46 ml with the US customary teaspoon, or 2.5 ml with the metric 5 ml teaspoon.",
+        "q2": "Is half a teaspoon the same as a pinch?",
+        "a2": "No, a pinch is much smaller — roughly an eighth of a teaspoon or less, and it is not a standardised measure at all. Half a teaspoon is about four times a pinch."
+      },
+      "3-4": {
+        "p1": "Three quarters of a teaspoon is 3.70 millilitres, and it is the measure that most spoon sets refuse to provide. You make it from a half plus a quarter, which is why recipes that call for it are usually ones that were scaled from another quantity rather than written from scratch.",
+        "p2": "You see it most often when a recipe has been reduced. Three quarters of a teaspoon is half of a tablespoon and a half, or three quarters of what a full-sized batch needed. If you are halving a recipe that asked for a tablespoon and a half, this is where you land. When the ingredient is salt or a spice, rounding to a full teaspoon is usually safe; when it is a raising agent, measure it properly.",
+        "q1": "How many ml is 3/4 teaspoon?",
+        "a1": "3.70 ml using the US customary teaspoon, or 3.75 ml from the metric 5 ml teaspoon.",
+        "q2": "How do I measure 3/4 teaspoon without the right spoon?",
+        "a2": "Use a half teaspoon followed by a quarter teaspoon. If you only have a full teaspoon, fill it and remove roughly a quarter with the edge of a knife."
+      }
+    },
+    "tsp-to-tbsp": {
+      "3": {
+        "p1": "Three teaspoons is exactly one tablespoon. This is the only conversion on the site with no rounding at all: both spoons were defined from the US fluid ounce, the tablespoon as one half and the teaspoon as one sixth, so the ratio is precisely three.",
+        "p2": "It is the most useful kitchen fact to carry in your head. When the tablespoon is dirty, in the dishwasher, or simply missing from a rented holiday kitchen, three level teaspoons give you the same amount with no approximation. Measure each one level — three rounded teaspoons can hold noticeably more than a level tablespoon.",
+        "q1": "Is 3 teaspoons exactly 1 tablespoon?",
+        "a1": "Yes, in the US and UK systems. Both spoons derive from the same fluid ounce, so the three-to-one ratio is exact rather than rounded.",
+        "q2": "Does this hold in Australia?",
+        "a2": "No. The Australian tablespoon is 20 ml and holds four teaspoons. Three Australian teaspoons is three quarters of an Australian tablespoon."
+      },
+      "4": {
+        "p1": "Four teaspoons is 1.33 tablespoons — one tablespoon and one teaspoon, in the language of actual measuring spoons. You cannot measure a third of a tablespoon directly, so the practical instruction is always to measure the whole spoon first and the remainder second.",
+        "p2": "Four teaspoons usually appears when a recipe has been scaled. Doubling two teaspoons, or taking two thirds of two tablespoons, both land here. If you are scaling and keep hitting awkward thirds like this, it is often easier to convert the whole recipe to millilitres or grams and work in round numbers, especially if you are multiplying by more than two.",
+        "q1": "How many tablespoons is 4 teaspoons?",
+        "a1": "One and a third tablespoons, or 1.33 when written as a decimal. In practice you measure one tablespoon plus one teaspoon.",
+        "q2": "How much is 4 teaspoons in ml?",
+        "a2": "About 19.7 ml using US customary spoons, or 20 ml if you measure with metric 5 ml teaspoons."
+      },
+      "6": {
+        "p1": "Six teaspoons is exactly two tablespoons, and it is also exactly one US fluid ounce and one eighth of a cup. Few quantities line up this neatly across four different units, which is why two tablespoons turns up so often as a recipe measure.",
+        "p2": "At this size the spoon stops being the right tool. Six separate scoops of a teaspoon is slow and each one introduces a little error, so measuring two tablespoons — or 30 ml in a small jug — is both faster and more accurate. If you find yourself counting past four teaspoons, reach for the larger measure.",
+        "q1": "How many tablespoons is 6 teaspoons?",
+        "a1": "Exactly two tablespoons. Six teaspoons is also one US fluid ounce and one eighth of a cup.",
+        "q2": "How much is 6 teaspoons in ml?",
+        "a2": "About 29.6 ml, which is one US fluid ounce. Measured with metric 5 ml spoons it comes to 30 ml."
+      },
+      "8": {
+        "p1": "Eight teaspoons is 2.67 tablespoons — two tablespoons plus two teaspoons once you put it in terms of real spoons. Like every teaspoon count that is not a multiple of three, it leaves an untidy remainder.",
+        "p2": "Eight teaspoons is close to a sixth of a cup, which is not a marking any measuring cup carries. If a recipe has produced this number through scaling, it is usually worth converting the whole thing: 39.4 ml, or a rounded 40 ml, is a single clean reading in a measuring jug instead of eight separate scoops with eight chances to over- or under-fill.",
+        "q1": "How many tablespoons is 8 teaspoons?",
+        "a1": "Two and two thirds tablespoons, or about 2.67. In practice that is two tablespoons plus two teaspoons.",
+        "q2": "How much is 8 teaspoons in ml?",
+        "a2": "About 39.4 ml with US customary spoons, or 40 ml measured with metric 5 ml teaspoons."
+      }
+    },
+    "tsp-to-grams": {
+      "1": {
+        "p1": "There is no single answer to this one, and that is the important part. A teaspoon measures volume, so the weight depends entirely on what fills it. A level teaspoon of water weighs 4.93 grams, table salt about 6 grams, granulated sugar about 4.2 grams, and all-purpose flour only about 2.6 grams — less than half the salt figure from the identical spoon.",
+        "p2": "Salt is the ingredient where this causes the most damage. Fine table salt packs densely at around 6 grams per teaspoon, while coarse kosher salt has large crystals with air between them and can be as little as 3 grams for the same spoon. Swapping one for the other teaspoon-for-teaspoon can double or halve the salt in a dish. If a recipe specifies a type of salt, it matters; if you are substituting, go by weight.",
+        "q1": "How many grams is 1 teaspoon?",
+        "a1": "It depends on the ingredient. Water is 4.93 g, table salt about 6 g, granulated sugar about 4.2 g, and all-purpose flour about 2.6 g.",
+        "q2": "How many grams is a teaspoon of sugar?",
+        "a2": "About 4.2 grams for granulated white sugar. This is where the common figure of 4 grams of sugar per teaspoon on nutrition labels comes from."
+      }
+    },
+    "ml-to-oz": {
+      "60": {
+        "p1": "Sixty millilitres is 2.03 US fluid ounces — close enough to two ounces that most labels simply print 2 fl oz. It is a common size for travel toiletries, sample bottles, espresso servings and the small portion cups used for sauces.",
+        "p2": "In cooking terms, 60 ml is a quarter of a US cup, four tablespoons, or twelve teaspoons. That makes it one of the most convenient quantities in the kitchen: whatever measure you happen to have clean, 60 ml lands on a whole number of it. If you are working from a US recipe that calls for a quarter cup and you only have metric equipment, 60 ml is the figure you want.",
+        "q1": "How many ounces is 60 ml?",
+        "a1": "2.03 US fluid ounces. With the imperial fluid ounce used in the UK it works out to 2.11.",
+        "q2": "Is 60 ml a quarter cup?",
+        "a2": "Near enough. A quarter of a US customary cup is 59.15 ml, so 60 ml is about 1.4% larger — a difference you cannot measure in a kitchen."
+      }
+    },
+    "ml-to-tbsp": {
+      "30": {
+        "p1": "Thirty millilitres is 2.03 US tablespoons, which in practice everyone calls two tablespoons. It is also one US fluid ounce, six teaspoons and an eighth of a cup — another of those quantities that lands neatly in every unit at once.",
+        "p2": "Thirty millilitres is the standard single shot in much of Europe and the usual dose marking on a cough-syrup cup. In the kitchen it is the amount of oil for frying a single portion, or of lemon juice from roughly half a lemon. If your measuring spoons are metric 15 ml ones, two level spoons give you exactly 30 ml with no conversion at all.",
+        "q1": "How many tablespoons is 30 ml?",
+        "a1": "2.03 US tablespoons, which everyone treats as two. With metric 15 ml tablespoons it is exactly two.",
+        "q2": "Is 30 ml one fluid ounce?",
+        "a2": "Almost. A US fluid ounce is 29.57 ml, so 30 ml is about 1.4% more. Labels round to 30 ml routinely."
+      }
+    }
+  },
+  "unitsTitle": {
+    "tsp": "Tsp",
+    "tbsp": "Tbsp",
+    "ml": "mL",
+    "floz": "Fl Oz",
+    "cup": "Cups",
+    "grams": "Grams"
+  },
+  "homeSection": {
+    "heading": "Cooking converters",
+    "description": "Exact US measuring-spoon conversions, with kitchen fractions and the ingredient weights that spoons hide."
+  }
+}

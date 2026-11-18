@@ -1,0 +1,66 @@
+{
+  "common": {
+    "breadcrumbHome": "Trang chủ",
+    "privacyHeading": "Ảnh của bạn không rời khỏi máy",
+    "privacyBody": "Phần lớn trang chuyển ảnh sang chữ hoạt động bằng cách tải ảnh của bạn lên máy chủ của họ rồi gửi kết quả về. Trang này thì không. Toàn bộ việc nhận dạng chạy bằng WebAssembly ngay trong tab trình duyệt, nên ảnh không hề đi đâu cả. Thứ duy nhất được tải về từ mạng là gói dữ liệu ngôn ngữ (khoảng 1,4 MB cho tiếng Việt), tải một lần rồi trình duyệt giữ lại cho những lần sau. Điều này đáng kể khi ảnh là chứng minh thư, hợp đồng, bệnh án hay giấy tờ nội bộ của công ty.",
+    "faqHeading": "Câu hỏi thường gặp",
+    "relatedHeading": "Công cụ liên quan",
+    "toolHeading": "Chọn ảnh để bắt đầu",
+    "sharedQ": "Nhận dạng tiếng Việt có dấu được không?",
+    "sharedA": "Được. Hãy chọn tiếng Việt trong danh sách ngôn ngữ trước khi chạy — công cụ sẽ tải gói dữ liệu tiếng Việt và nhận đúng dấu thanh, dấu mũ, chữ đ. Nếu để nguyên tiếng Anh, chữ có dấu sẽ bị đọc sai thành chữ không dấu hoặc ký tự lạ."
+  },
+  "pages": {
+    "text": {
+      "metaTitle": "Chuyển ảnh sang text online — không tải ảnh lên server",
+      "metaDescription": "Chuyển ảnh sang text ngay trên trình duyệt, nhận dạng tiếng Việt có dấu. Dán ảnh bằng Ctrl+V, kéo thả, xử lý nhiều ảnh. Ảnh không rời khỏi máy bạn.",
+      "heading": "Chuyển ảnh sang text",
+      "tagline": "Dán hoặc kéo ảnh vào, lấy phần chữ bên trong, chép đi dùng tiếp. Ảnh không được tải lên máy chủ nào.",
+      "p1": "Công cụ này làm đúng một việc: bóc phần chữ ra khỏi ảnh để bạn chép đi dùng chỗ khác. Thích hợp nhất cho những thứ nhỏ và gấp — một dòng mã lỗi trong ảnh chụp màn hình, số tài khoản trong ảnh chụp màn hình chuyển khoản, một đoạn trong slide bài giảng, biển hiệu trong ảnh chụp.",
+      "p2": "Cách nhanh nhất là Ctrl+V. Chụp màn hình bằng phím Print Screen hoặc công cụ cắt ảnh của Windows, rồi dán thẳng vào trang này, không cần lưu thành file trước. Bạn cũng có thể kéo thả nhiều ảnh cùng lúc, hoặc bấm nút chọn file.",
+      "p3": "Nhớ chọn tiếng Việt trong phần ngôn ngữ trước khi chạy. Lần đầu dùng sẽ mất vài giây tải gói dữ liệu tiếng Việt khoảng 1,4 MB; những lần sau trình duyệt dùng lại bản đã lưu nên chạy ngay. Nếu ảnh có cả tiếng Việt lẫn tiếng Anh, chọn đồng thời cả hai ngôn ngữ.",
+      "p4": "Chất lượng ảnh quyết định phần lớn kết quả. Ảnh chụp màn hình thường cho kết quả gần như hoàn hảo vì chữ sắc nét và nền phẳng. Ảnh chụp bằng điện thoại thì nên chụp thẳng góc, đủ sáng, tránh bóng tay che ngang dòng chữ. Nếu chữ bị nghiêng hoặc nền quá tối, phần tuỳ chọn nâng cao có công cụ xoay ảnh và tăng tương phản trước khi nhận dạng.",
+      "q1": "Chuyển ảnh sang text có mất phí không?",
+      "a1": "Không. Không giới hạn số ảnh, không cần đăng ký tài khoản, không có bản trả phí. Việc nhận dạng chạy bằng máy của bạn nên trang này không tốn chi phí máy chủ cho mỗi lần dùng.",
+      "q2": "Có dán ảnh bằng Ctrl+V được không?",
+      "a2": "Được. Chụp màn hình rồi dán thẳng vào trang, không cần lưu thành file. Đây cũng là cách nhanh nhất khi bạn chỉ cần lấy một hai dòng chữ.",
+      "q3": "Ảnh mờ thì nhận dạng có được không?",
+      "a3": "Kết quả sẽ kém đi rõ rệt. Hãy thử bật tăng tương phản trong phần tuỳ chọn nâng cao, hoặc chụp lại ảnh thẳng góc và đủ sáng. Chữ viết tay thì gần như không nhận dạng được — công cụ này dành cho chữ in."
+    },
+    "vanban": {
+      "metaTitle": "Chuyển ảnh thành văn bản — OCR tiếng Việt, xử lý hàng loạt",
+      "metaDescription": "Chuyển ảnh thành văn bản với nhiều ảnh cùng lúc và PDF nhiều trang, nhận dạng tiếng Việt có dấu. Chạy hoàn toàn trên trình duyệt, không tải tài liệu lên server.",
+      "heading": "Chuyển ảnh thành văn bản",
+      "tagline": "Số hoá cả tập tài liệu: nhiều ảnh một lượt, PDF nhiều trang, ghép kết quả thành một văn bản.",
+      "p1": "Khi cần gõ lại cả một tài liệu chứ không chỉ vài dòng, việc đáng quan tâm không còn là tốc độ mà là thứ tự và tính toàn vẹn. Trang này nhận một lúc nhiều ảnh và cả file PDF nhiều trang, xử lý lần lượt, giữ nguyên thứ tự bạn đưa vào, và cho bạn tải từng phần riêng hoặc gộp tất cả thành một file.",
+      "p2": "Với tài liệu đã quét thành PDF, công cụ tự tách từng trang ra ảnh rồi nhận dạng lần lượt. Kết quả hiển thị theo từng trang kèm số trang, nên nếu một trang nào đó bị lệch hay mờ, bạn sửa đúng trang đó mà không phải chạy lại cả tập.",
+      "p3": "Một chi tiết hay bị bỏ qua: tuỳ chọn chế độ phân tích bố cục. Mặc định phù hợp với văn bản một cột thông thường. Nếu tài liệu của bạn chia hai cột như báo hoặc tạp chí, hoặc là bảng biểu, chọn đúng chế độ trong phần nâng cao sẽ thay đổi hẳn chất lượng — nếu không, chữ ở hai cột sẽ bị đọc xen kẽ vào nhau thành một mớ vô nghĩa.",
+      "p4": "Kết quả nhận dạng luôn cần đọc soát lại, nhất là với số liệu. Chữ số 0 và chữ O, số 1 và chữ l, dấu phẩy và dấu chấm trong số tiền là những chỗ máy hay nhầm nhất. Phần kết quả cho phép sửa trực tiếp, và có đánh dấu những từ máy không chắc chắn để bạn biết chỗ nào cần nhìn kỹ.",
+      "q1": "Xử lý được bao nhiêu ảnh một lần?",
+      "a1": "Không có giới hạn cứng, nhưng vì mọi thứ chạy bằng máy của bạn nên vài chục ảnh sẽ mất vài phút và tốn bộ nhớ. Nếu tài liệu rất dài, nên chia thành vài đợt.",
+      "q2": "Đọc được file PDF đã quét không?",
+      "a2": "Được. Công cụ tách từng trang PDF thành ảnh rồi nhận dạng, kết quả hiển thị kèm số trang. PDF vốn đã có sẵn lớp chữ thì bạn không cần OCR, chép thẳng từ file nhanh hơn.",
+      "q3": "Có giữ được bố cục gốc không?",
+      "a3": "Không. Kết quả là văn bản thuần, không giữ font, cỡ chữ, bảng biểu hay vị trí ảnh. Nếu tài liệu chia nhiều cột, hãy chọn chế độ bố cục phù hợp trong phần nâng cao để máy đọc đúng thứ tự."
+    },
+    "word": {
+      "metaTitle": "Chuyển ảnh sang Word (.docx) — OCR tiếng Việt miễn phí",
+      "metaDescription": "Chuyển ảnh sang file Word .docx ngay trên trình duyệt, nhận dạng tiếng Việt có dấu. File .docx được tạo trên máy bạn, ảnh không tải lên server.",
+      "heading": "Chuyển ảnh sang Word",
+      "tagline": "Nhận dạng chữ trong ảnh rồi tải thẳng về file .docx mở được bằng Word, LibreOffice hay Google Docs.",
+      "p1": "Khác với chỉ lấy chữ ra để chép, chuyển sang Word là bước dành cho tài liệu bạn còn phải sửa tiếp: đơn từ cần điền lại, hợp đồng cần soạn lại, bài viết cần biên tập. Sau khi nhận dạng xong, mỗi kết quả có nút tải .docx bên cạnh nút tải .txt.",
+      "p2": "File .docx được tạo ngay trong trình duyệt. Về bản chất, .docx chỉ là một file nén chứa vài file XML, nên máy bạn hoàn toàn dựng được mà không cần gửi gì lên máy chủ. File tạo ra mở bình thường bằng Microsoft Word, LibreOffice Writer, WPS và Google Docs, giữ đúng tiếng Việt có dấu.",
+      "p3": "Cần nói rõ giới hạn: file Word nhận được chứa văn bản thuần, mỗi dòng là một đoạn. Nó không giữ font chữ, cỡ chữ, in đậm, bảng biểu hay hình ảnh của tài liệu gốc, vì bước nhận dạng chỉ đọc ra chữ chứ không dựng lại bố cục. Bạn sẽ phải tự định dạng lại trong Word — nhưng việc đó vẫn nhanh hơn gõ lại toàn bộ.",
+      "p4": "Nếu tài liệu gốc là bảng biểu và bạn cần giữ nguyên dạng bảng, OCR không phải công cụ phù hợp. Khi đó, nhận dạng ra văn bản rồi tự dựng lại bảng trong Word thường cho kết quả gọn hơn là cố ép máy đoán cấu trúc bảng.",
+      "q1": "File .docx có mở được bằng Microsoft Word không?",
+      "a1": "Có. File tạo ra theo đúng chuẩn Office Open XML, mở được bằng Microsoft Word, LibreOffice Writer, WPS Office và Google Docs, giữ nguyên tiếng Việt có dấu.",
+      "q2": "File Word có giữ định dạng của ảnh gốc không?",
+      "a2": "Không. Bạn nhận được văn bản thuần, mỗi dòng một đoạn, không có font, in đậm, bảng hay hình. Phần định dạng bạn tự làm lại trong Word.",
+      "q3": "File Word được tạo ở đâu?",
+      "a3": "Ngay trên máy bạn, trong trình duyệt. Ảnh cũng như văn bản nhận dạng được không hề gửi lên máy chủ nào, nên dùng được cả với giấy tờ riêng tư."
+    }
+  },
+  "homeSection": {
+    "heading": "Chuyển ảnh sang chữ",
+    "description": "Nhận dạng chữ trong ảnh ngay trên trình duyệt, có tiếng Việt đủ dấu. Ảnh không tải lên máy chủ."
+  }
+}

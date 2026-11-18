@@ -41,6 +41,7 @@ export interface ResultMessages {
 	copy: string;
 	copied: string;
 	downloadTxt: string;
+	downloadDocx: string;
 	removeResult: string;
 	joinLines: string;
 	collapseBlank: string;
@@ -60,6 +61,7 @@ interface Props {
 	onChangeText: (id: string, text: string) => void;
 	onCopy: (item: OcrResultItem) => void;
 	onDownload: (item: OcrResultItem) => void;
+	onDownloadDocx: (item: OcrResultItem) => void;
 	onRemove: (id: string) => void;
 	onJoinLines: (id: string) => void;
 	onCollapseBlank: (id: string) => void;
@@ -82,6 +84,7 @@ export default function ImageToTextResult({
 	onChangeText,
 	onCopy,
 	onDownload,
+	onDownloadDocx,
 	onRemove,
 	onJoinLines,
 	onCollapseBlank,
@@ -133,6 +136,10 @@ export default function ImageToTextResult({
 							<Button type="button" variant="outline" className={BTN} onClick={() => onDownload(item)}>
 								<Download aria-hidden="true" />
 								{messages.downloadTxt}
+							</Button>
+							<Button type="button" variant="outline" className={BTN} onClick={() => onDownloadDocx(item)}>
+								<Download aria-hidden="true" />
+								{messages.downloadDocx}
 							</Button>
 						</>
 					)}

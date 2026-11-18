@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { buildDocxBlob } from '@/lib/docx-export';
 import { useLeaveWarning } from './useLeaveWarning';
 import { FileText, RotateCcw, RotateCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,7 @@ import {
 	mergedTxtName,
 	mergeResultTexts,
 	parsePageRange,
+	unitDocxName,
 	unitTxtName,
 	type MergeMode,
 } from '@/lib/ocr-text';
@@ -1160,6 +1162,11 @@ export default function ImageToText({ messages, languageNames, locale, textDiffH
 								onCopy={(result) => void copyText(result.id, result.text)}
 								onDownload={(result) =>
 									downloadBlob(new Blob([result.text], { type: 'text/plain;charset=utf-8' }), unitTxtName(result.sourceName, result.pageNumber))
+								}
+								onDownloadDocx={(result) =>
+									void buildDocxBlob(result.text).then((blob) =>
+										downloadBlob(blob, unitDocxName(result.sourceName, result.pageNumber)),
+									)
 								}
 								onRemove={(id) => {
 									const target = resultsRef.current.find((result) => result.id === id);

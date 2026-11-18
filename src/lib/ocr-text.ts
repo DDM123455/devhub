@@ -239,6 +239,10 @@ export function unitTxtName(sourceName: string, pageNumber: number | null): stri
 	return `${unitBaseName(sourceName, pageNumber)}.txt`;
 }
 
+export function unitDocxName(sourceName: string, pageNumber: number | null): string {
+	return `${unitBaseName(sourceName, pageNumber)}.docx`;
+}
+
 /** Tên file gộp tất cả: theo tên file nguồn nếu chỉ có 1 nguồn, ngược lại 'ocr-text'. */
 export function mergedTxtName(sourceNames: readonly string[]): string {
 	const unique = [...new Set(sourceNames)];

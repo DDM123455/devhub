@@ -105,6 +105,7 @@
     "copy": "Copy",
     "copied": "Copied!",
     "downloadTxt": "Download .txt",
+    "downloadDocx": "Download .docx",
     "removeResult": "Remove result for {{name}}",
     "joinLines": "Join broken lines",
     "collapseBlank": "Remove extra blank lines",

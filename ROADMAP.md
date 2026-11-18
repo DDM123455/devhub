@@ -636,8 +636,8 @@ Các cụm theo ngày giờ hiện tại ("N weeks from today", "N hours from no
 đã bị BỎ: kết quả phụ thuộc hôm nay là ngày nào, nên HTML tĩnh phải build lại hằng ngày mới
 không bị cũ. Chỉ làm các cụm cho ra trang đứng yên vĩnh viễn.
 
-- [ ] Cụm D — Cooking converters (tsp / tbsp / ml / oz / grams / cups)
-- [ ] Cụm E — Landing tiếng Việt cho OCR (chuyển ảnh sang text / văn bản / word)
+- [x] Cụm D — Cooking converters (10 hub + 12 trang giá trị, tiếng Anh)
+- [x] Cụm E — Landing tiếng Việt cho OCR (3 trang) + nút xuất .docx
 - [ ] Cụm F — Vòng quay random (tool mới)
 - [ ] Cụm G — Photobooth online (cần mở camera trong Permissions-Policy — phải hỏi trước)
 - [ ] Category "Date & Time" / "Cooking Converters" trên trang chủ (chờ đủ từ 2 cụm trở lên)

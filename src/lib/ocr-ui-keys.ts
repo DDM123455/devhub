@@ -15,6 +15,7 @@ export const IMAGE_TO_TEXT_UI_KEYS = [
 	'copy',
 	'copied',
 	'downloadTxt',
+	'downloadDocx',
 	'removeResult',
 	'joinLines',
 	'collapseBlank',

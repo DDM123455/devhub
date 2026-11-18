@@ -105,6 +105,7 @@
     "copy": "Sao chép",
     "copied": "Đã sao chép!",
     "downloadTxt": "Tải .txt",
+    "downloadDocx": "Tải .docx",
     "removeResult": "Xóa kết quả của {{name}}",
     "joinLines": "Nối dòng bị ngắt",
     "collapseBlank": "Xóa dòng trống thừa",

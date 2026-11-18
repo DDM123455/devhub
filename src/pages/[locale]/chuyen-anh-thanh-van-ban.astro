@@ -1,0 +1,10 @@
+---
+// Landing tiếng Việt cho công cụ OCR; chỉ sinh cho locale 'vi'.
+import OcrLandingPage from '@/components/tools/OcrLandingPage.astro';
+
+export function getStaticPaths() {
+	return [{ params: { locale: 'vi' } }];
+}
+---
+
+<OcrLandingPage variant="vanban" />

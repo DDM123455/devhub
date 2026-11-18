@@ -1,0 +1,173 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import FaqSection from '@/components/layout/FaqSection.astro';
+import KitchenConverter from '@/components/tools/KitchenConverter';
+import { getFixedT } from '@/i18n/i18next';
+import { jsonLd } from '@/lib/json-ld';
+import { CONVERT_PAIRS, findPair } from '@/data/convert-pairs';
+import { amountToLabel, amountToUrl, convertVolume, formatAmount, toKitchenFraction, volumeToGrams } from '@/lib/kitchen-units';
+
+// Cụm này chỉ có tiếng Anh, nên không sinh cho 19 locale còn lại.
+export function getStaticPaths() {
+	return CONVERT_PAIRS.map((pair) => ({ params: { locale: 'en', pair: pair.slug }, props: { slug: pair.slug } }));
+}
+
+const { slug } = Astro.props as { slug: string };
+const pair = findPair(slug)!;
+const t = getFixedT('en', 'cluster-convert');
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const unitShort = (unit: string) => t(`unitsShort.${unit}`);
+const unitLong = (unit: string) => t(`units.${unit}`);
+
+const convert = (value: number) =>
+	pair.to === 'grams' ? volumeToGrams(value, pair.from, 'water') : convertVolume(value, pair.from, pair.to);
+
+const rows = pair.tableValues.map((value) => {
+	const result = convert(value);
+	return {
+		from: amountToLabel(value),
+		to: formatAmount(result),
+		fraction: toKitchenFraction(result),
+		href: pair.values.includes(value) ? `/en/convert/${pair.slug}/${amountToUrl(value)}/` : null,
+	};
+});
+
+const reverse = pair.reverse ? findPair(pair.reverse) : undefined;
+const others = CONVERT_PAIRS.filter((item) => item.slug !== pair.slug && item.slug !== pair.reverse).slice(0, 6);
+
+const faqItems = [
+	{ question: t(`pairs.${slug}.q1`), answer: t(`pairs.${slug}.a1`) },
+	{ question: t(`pairs.${slug}.q2`), answer: t(`pairs.${slug}.a2`) },
+	{ question: t(`pairs.${slug}.q3`), answer: t(`pairs.${slug}.a3`) },
+];
+
+const messages = {
+	amountLabel: t('ui.amountLabel'),
+	resultLabel: t('ui.resultLabel'),
+	ingredientLabel: t('ui.ingredientLabel'),
+	ingredientHint: t('ui.ingredientHint'),
+	swap: t('ui.swap'),
+	fractionNote: t('ui.fractionNote'),
+	unitNames: t('units', { returnObjects: true }) as Record<string, string>,
+	ingredientNames: t('ingredients', { returnObjects: true }) as Record<string, string>,
+};
+
+const title = t(`pairs.${slug}.metaTitle`);
+const description = t(`pairs.${slug}.metaDescription`);
+
+const schema = {
+	'@context': 'https://schema.org',
+	'@type': 'WebApplication',
+	name: t(`pairs.${slug}.heading`),
+	description,
+	url: canonicalUrl,
+	applicationCategory: 'UtilitiesApplication',
+	operatingSystem: 'Any',
+	offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+---
+
+<Layout title={title} description={description} lang="en" ogImage="/og/default.png">
+	<script type="application/ld+json" set:html={jsonLd(schema)} />
+	<section class="px-4 py-10">
+		<Breadcrumbs
+			items={[
+				{ label: t('ui.breadcrumbHome'), href: '/en/' },
+				{ label: t(`pairs.${slug}.heading`), href: undefined },
+			]}
+		/>
+		<h1 class="mt-3 text-heading-1 text-foreground">{t(`pairs.${slug}.heading`)}</h1>
+		<p class="mt-2 text-muted-foreground">{t(`pairs.${slug}.tagline`)}</p>
+		<div class="mt-6">
+			<KitchenConverter client:load from={pair.from} to={pair.to} initialValue={1} messages={messages} />
+		</div>
+	</section>
+
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-heading-2 text-foreground">{t('ui.tableHeading')}</h2>
+		<div class="mt-4 overflow-x-auto">
+			<table class="w-full min-w-md border-collapse text-sm">
+				<thead>
+					<tr class="border-b border-border text-left text-muted-foreground">
+						<th scope="col" class="py-2 pr-4 font-medium">{t('ui.colFrom')}</th>
+						<th scope="col" class="py-2 pr-4 font-medium">{t('ui.colTo')}</th>
+						<th scope="col" class="py-2 font-medium">{t('ui.colFraction')}</th>
+					</tr>
+				</thead>
+				<tbody>
+					{
+						rows.map((row) => (
+							<tr class="border-b border-border/60">
+								<th scope="row" class="py-1.5 pr-4 font-normal text-foreground">
+									{row.href ? (
+										<a href={row.href} class="text-primary hover:underline">
+											{row.from} {unitShort(pair.from)}
+										</a>
+									) : (
+										<span>
+											{row.from} {unitShort(pair.from)}
+										</span>
+									)}
+								</th>
+								<td class="py-1.5 pr-4 text-foreground">
+									{row.to} {unitShort(pair.to)}
+								</td>
+								<td class="py-1.5 text-muted-foreground">{row.fraction ?? '—'}</td>
+							</tr>
+						))
+					}
+				</tbody>
+			</table>
+		</div>
+		{
+			pair.to === 'grams' && (
+				<p class="mt-3 max-w-3xl text-xs text-muted-foreground">{t('ui.ingredientHint')}</p>
+			)
+		}
+	</section>
+
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-heading-2 text-foreground">{t(`pairs.${slug}.heading`)}</h2>
+		<div class="mt-4 flex max-w-3xl flex-col gap-4 text-muted-foreground">
+			<p>{t(`pairs.${slug}.p1`)}</p>
+			<p>{t(`pairs.${slug}.p2`)}</p>
+			<p>{t(`pairs.${slug}.p3`)}</p>
+		</div>
+	</section>
+
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-heading-2 text-foreground">{t('ui.standardsHeading')}</h2>
+		<p class="mt-4 max-w-3xl text-muted-foreground">{t('ui.standardsBody')}</p>
+	</section>
+
+	<section class="border-t border-border px-4 py-10">
+		<FaqSection heading={t('ui.faqHeading')} items={faqItems} />
+	</section>
+
+	<section class="border-t border-border px-4 py-10">
+		{
+			reverse && (
+				<>
+					<h2 class="text-heading-2 text-foreground">{t('ui.reverseHeading')}</h2>
+					<a href={`/en/convert/${reverse.slug}/`} class="mt-3 inline-block text-sm text-primary hover:underline">
+						{t(`pairs.${reverse.slug}.heading`)}
+					</a>
+				</>
+			)
+		}
+		<h2 class="mt-8 text-heading-2 text-foreground">{t('ui.otherHeading')}</h2>
+		<ul class="mt-4 flex flex-col gap-1">
+			{
+				others.map((item) => (
+					<li>
+						<a href={`/en/convert/${item.slug}/`} class="text-sm text-primary hover:underline">
+							{t(`pairs.${item.slug}.heading`)}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+</Layout>
