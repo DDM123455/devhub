@@ -1,0 +1,156 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import FaqSection from '@/components/layout/FaqSection.astro';
+import WeeksFromTodayCard from '@/components/tools/WeeksFromTodayCard';
+import { getFixedT } from '@/i18n/i18next';
+import { jsonLd } from '@/lib/json-ld';
+import { WEEK_MILESTONES, neighbouringWeeks } from '@/data/weeks-from-today';
+import {
+	addWeeks,
+	countWeekdaysBetween,
+	formatIsoDate,
+	formatLongDate,
+	formatShortDate,
+	localTodayAsUtc,
+} from '@/lib/date-offset';
+
+// Cụm này chỉ có tiếng Anh (xem PROGRESS.md), nên không sinh cho 19 locale còn lại.
+export function getStaticPaths() {
+	return WEEK_MILESTONES.map((n) => ({ params: { locale: 'en', n: String(n) }, props: { n } }));
+}
+
+const { n } = Astro.props as { n: number };
+const t = getFixedT('en', 'cluster-weeks');
+
+// Ngày lúc build: cho trình thu thập một kết quả có sẵn trong HTML. Phía client, island
+// tính lại ngay theo múi giờ máy người dùng nên con người luôn thấy số đúng.
+const today = localTodayAsUtc();
+const target = addWeeks(today, n);
+const buildDateIso = formatIsoDate(today);
+const targetLong = formatLongDate(target);
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const hubHref = '/en/weeks-from-today/';
+const { previous, next } = neighbouringWeeks(n);
+const nearby = [previous, next].filter((value): value is number => value !== undefined);
+const popular = WEEK_MILESTONES.filter((m) => m !== n && m !== previous && m !== next).slice(0, 6);
+
+const milestone = t(`milestones.${n}`, { returnObjects: true }) as {
+	p1: string;
+	p2: string;
+	q1: string;
+	a1: string;
+	q2: string;
+	a2: string;
+};
+
+const faqItems = [
+	{ question: milestone.q1, answer: milestone.a1 },
+	{ question: milestone.q2, answer: milestone.a2 },
+	{ question: t('page.faqSharedQ'), answer: t('page.faqSharedA') },
+];
+
+const title = t('page.meta.title', { n });
+const description = t('page.meta.description', { n, date: targetLong });
+
+const messages = {
+	resultPrefix: t('page.resultPrefix'),
+	countedFrom: t('page.countedFrom'),
+	statWeekday: t('page.statWeekday'),
+	statTotalDays: t('page.statTotalDays'),
+	statWorkingDays: t('page.statWorkingDays'),
+	statDayOfYear: t('page.statDayOfYear'),
+	statDayOfYearValue: t('page.statDayOfYearValue'),
+	copyButton: t('page.copyButton'),
+	copiedButton: t('page.copiedButton'),
+	copyFailed: t('page.copyFailed'),
+	calendarButton: t('page.calendarButton'),
+	calendarEventTitle: t('page.calendarEventTitle'),
+	startDateLabel: t('page.startDateLabel'),
+	weeksLabel: t('page.weeksLabel'),
+	resetButton: t('page.resetButton'),
+};
+
+const schema = {
+	'@context': 'https://schema.org',
+	'@type': 'WebApplication',
+	name: t('page.heading', { n }),
+	description,
+	url: canonicalUrl,
+	applicationCategory: 'UtilitiesApplication',
+	operatingSystem: 'Any',
+	offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+---
+
+<Layout title={title} description={description} lang="en" ogImage="/og/default.png">
+	<script type="application/ld+json" set:html={jsonLd(schema)} />
+	<section class="px-4 py-10">
+		<Breadcrumbs
+			items={[
+				{ label: t('page.breadcrumbHome'), href: '/en/' },
+				{ label: t('page.breadcrumbHub'), href: hubHref },
+				{ label: `${n} weeks`, href: undefined },
+			]}
+		/>
+		<h1 class="mt-3 text-heading-1 text-foreground">{t('page.heading', { n })}</h1>
+		<div class="mt-6">
+			<WeeksFromTodayCard client:load weeks={n} buildDateIso={buildDateIso} messages={messages} />
+		</div>
+	</section>
+
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-heading-2 text-foreground">{t('page.articleHeading', { n })}</h2>
+		<div class="mt-4 flex max-w-3xl flex-col gap-4 text-muted-foreground">
+			<p>{milestone.p1}</p>
+			<p>{milestone.p2}</p>
+		</div>
+	</section>
+
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-heading-2 text-foreground">{t('page.nearbyHeading')}</h2>
+		<p class="mt-1 text-sm text-muted-foreground">{t('page.nearbyIntro')}</p>
+		<ul class="mt-4 grid gap-2 sm:grid-cols-2">
+			{
+				[...nearby, ...popular].map((m) => (
+					<li>
+						<a href={`/en/weeks-from-today/${m}/`} class="text-sm text-primary hover:underline">
+							{m} weeks from today
+						</a>
+						<span class="text-sm text-muted-foreground"> — {formatShortDate(addWeeks(today, m))}</span>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+
+	<section class="border-t border-border px-4 py-10">
+		<FaqSection heading={t('page.faqHeading')} items={faqItems} />
+	</section>
+
+	<section class="border-t border-border px-4 py-10">
+		<h2 class="text-heading-2 text-foreground">{t('page.relatedHeading')}</h2>
+		<ul class="mt-4 flex flex-col gap-1">
+			<li>
+				<a href={hubHref} class="text-sm text-primary hover:underline">
+					Weeks from today calculator
+				</a>
+			</li>
+			<li>
+				<a href="/en/tools/word-counter/" class="text-sm text-primary hover:underline">
+					Word &amp; character counter
+				</a>
+			</li>
+			<li>
+				<a href="/en/tools/qr-code-generator/" class="text-sm text-primary hover:underline">
+					QR code generator
+				</a>
+			</li>
+		</ul>
+		<p class="mt-4 text-xs text-muted-foreground">
+			Working days exclude Saturdays and Sundays only; public holidays are not deducted.
+			{' '}{countWeekdaysBetween(today, target)} working days fall between today and the date above.
+		</p>
+	</section>
+</Layout>

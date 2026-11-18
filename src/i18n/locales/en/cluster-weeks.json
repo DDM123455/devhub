@@ -1,0 +1,184 @@
+{
+  "hub": {
+    "meta": {
+      "title": "Weeks From Today Calculator — What Date Will It Be?",
+      "description": "Work out what date it will be any number of weeks from today. Pick a week count, see the exact day, the weekday and the working days in between."
+    },
+    "heading": "Weeks From Today",
+    "tagline": "Pick how many weeks ahead you need, and see the exact date it lands on.",
+    "inputLabel": "Number of weeks from today",
+    "inputHint": "Any whole number from 1 to 520.",
+    "goButton": "Show the date",
+    "tableHeading": "Quick reference: 1 to 52 weeks from today",
+    "tableIntro": "Every row below is counted from today. Week counts shown as a link have a page of their own with more detail.",
+    "colWeeks": "Weeks",
+    "colDate": "Date",
+    "colWeekday": "Weekday",
+    "colDays": "Days",
+    "article": {
+      "heading": "How counting weeks ahead actually works",
+      "p1": "Adding weeks to a date is the one piece of date arithmetic that never surprises you. A week is always exactly seven days, so the answer always falls on the same weekday you started from. Count forward six weeks from a Tuesday and you land on a Tuesday; count forward 30 and you still land on a Tuesday. That is why planners lean on week counts for anything repeating — sprint reviews, payroll runs, physiotherapy appointments, school terms.",
+      "p2": "Months behave nothing like this. \"Three months from today\" can mean 89, 90, 91 or 92 days depending on which months you cross, and if you start on the 31st there may be no matching day at the other end at all. Weeks dodge every one of those problems, which is why contracts and medical schedules so often set deadlines in weeks rather than months.",
+      "p3": "The one thing a week count hides is how much working time you really have. Twelve weeks sounds generous until you notice it contains only about 60 working days, and fewer once public holidays are taken out. Each page in this section shows the working-day count alongside the calendar date so you can see both numbers before you commit to a deadline."
+    },
+    "faq": {
+      "heading": "Frequently asked questions",
+      "q1": "Does the result change depending on my time zone?",
+      "a1": "Yes, and this page handles it for you. \"Today\" is whatever date it currently is where you are, so someone in Auckland and someone in Los Angeles can be on different dates at the same moment. The result is calculated in your browser using your device's own clock and time zone.",
+      "q2": "Why does every answer land on the same weekday?",
+      "a2": "Because a week is exactly seven days and seven divides evenly into the weekly cycle. Adding any whole number of weeks moves you a whole number of weeks around the cycle, so you always come back to the same weekday you started on.",
+      "q3": "Are public holidays taken out of the working-day count?",
+      "a3": "No. The working-day figure counts Monday to Friday and leaves out Saturdays and Sundays only. Public holidays differ by country and sometimes by region, so subtract your own from the figure shown."
+    }
+  },
+  "page": {
+    "meta": {
+      "title": "{{n}} Weeks From Today — What Date Is It?",
+      "description": "{{n}} weeks from today is {{date}}. See the exact date, the weekday, the working days in between, and add it to your calendar."
+    },
+    "heading": "{{n}} Weeks From Today",
+    "resultPrefix": "{{n}} weeks from today is",
+    "countedFrom": "Counted from {{date}}, using your device's time zone.",
+    "statWeekday": "Weekday",
+    "statTotalDays": "Total days",
+    "statWorkingDays": "Working days",
+    "statDayOfYear": "Day of the year",
+    "statDayOfYearValue": "{{day}} of {{total}}",
+    "copyButton": "Copy date",
+    "copiedButton": "Copied",
+    "copyFailed": "Copy failed",
+    "calendarButton": "Add to calendar",
+    "calendarEventTitle": "{{n}} weeks from {{start}}",
+    "startDateLabel": "Count from a different date",
+    "weeksLabel": "Number of weeks",
+    "resetButton": "Back to today",
+    "nearbyHeading": "Nearby week counts",
+    "nearbyIntro": "Counted from the same starting date.",
+    "articleHeading": "About {{n}} weeks from today",
+    "faqHeading": "Frequently asked questions",
+    "faqSharedQ": "Will this date shift if I come back tomorrow?",
+    "faqSharedA": "Yes. Everything here is counted from today, so the answer moves forward by one day every day. If you need a date that stays put, use the \"count from a different date\" box and set the exact starting date you have in mind.",
+    "breadcrumbHome": "Home",
+    "breadcrumbHub": "Weeks from today",
+    "relatedHeading": "Related tools"
+  },
+  "milestones": {
+    "1": {
+      "p1": "One week from today is the shortest horizon most people plan around, and it is the one your body already has a feel for. It is the same weekday as today, which makes it the natural unit for anything that repeats: a follow-up call, a trial that renews, a prescription that runs out. When someone says \"this time next week\", this is the date they mean.",
+      "p2": "A week is also the standard minimum notice in a lot of everyday arrangements — cancelling an appointment without a fee, giving a landlord warning about a viewing, returning something under a short store policy. Because it is only five working days, a week leaves very little slack. If something has to be done by this date and it depends on anyone else replying, it is worth checking today rather than on day six.",
+      "q1": "Is one week from today the same as seven days from today?",
+      "a1": "Yes, exactly. A week is defined as seven days, so the two phrases always give the same date. Both land on the same weekday as today.",
+      "q2": "How many working days are in one week?",
+      "a2": "Five, assuming a standard Monday to Friday week. If today is a Saturday or Sunday, the five working days still fall in the same stretch, just arranged differently across the seven days."
+    },
+    "2": {
+      "p1": "Two weeks from today is the classic notice period. It is how long most employees give before leaving a job in the United States, how often a large share of workers are paid, and the default gap between many routine medical check-ins. The older word for it, a fortnight, is still in everyday use across the UK, Ireland, Australia and New Zealand, though it has largely faded in American English.",
+      "p2": "Fourteen days is long enough to be useful and short enough to stay vivid, which is why so many consumer protections use it. Many countries give buyers a 14-day window to change their mind about something bought online, and plenty of free trials run the same length. If this date matters because a trial converts to a paid plan, set a reminder a day or two early rather than on the day itself.",
+      "q1": "Is two weeks from today the same as a fortnight?",
+      "a1": "Yes. A fortnight means exactly fourteen nights, which works out to the same date as two weeks. The word is common in British, Irish and Australian English and rare in American English.",
+      "q2": "Is two weeks the same as half a month?",
+      "a2": "Not quite. Two weeks is always 14 days, while half a month ranges from 14 to 15.5 days depending on the month. They only coincide in February of a non-leap year."
+    },
+    "3": {
+      "p1": "Three weeks from today is the point where a plan stops being something you remember and starts being something you need written down. Twenty-one days is the usual lead time for a passport renewal in many countries, a common turnaround for custom orders, and roughly how far ahead airlines stop offering their cheapest fares.",
+      "p2": "You may have heard that it takes 21 days to form a habit. That figure comes from a 1960 book by a plastic surgeon who noticed patients took about three weeks to adjust to their new appearance, and it was never a study of habits at all. Later research at University College London put the real range at anywhere from 18 to 254 days, with a median closer to two months. Three weeks is a reasonable checkpoint, not a finish line.",
+      "q1": "How many days is three weeks?",
+      "a1": "Twenty-one days exactly. Because 21 divides evenly by seven, the date lands on the same weekday as today.",
+      "q2": "Is three weeks enough notice for annual leave?",
+      "a2": "It depends entirely on your employer. Many companies ask for notice proportional to the length of the break — a few days for a single day off, several weeks for anything longer than a week. Check your own policy rather than assuming."
+    },
+    "4": {
+      "p1": "Four weeks from today is 28 days, and this is the mistake worth catching early: four weeks is not a month. Only February in a non-leap year is 28 days long. Every other month runs 30 or 31 days, so four weeks lands two or three days short of the same date next month.",
+      "p2": "That gap is why \"four-weekly\" and \"monthly\" billing drift apart over a year. A four-weekly cycle gives thirteen payments in a year; a monthly cycle gives twelve. Over time the four-weekly dates walk backwards through the calendar, which catches people out when a payment date they thought was fixed starts arriving earlier each cycle. If you are matching this date against a monthly bill, check the actual date on the bill rather than counting weeks.",
+      "q1": "Is four weeks from today the same as one month from today?",
+      "a1": "No, except in February of a non-leap year. Four weeks is always 28 days, while a month is 28, 29, 30 or 31 days. Four weeks usually falls two or three days before the same date next month.",
+      "q2": "How many four-week periods are there in a year?",
+      "a2": "Thirteen, with one or two days left over. That is why four-weekly pay schedules produce thirteen payslips a year rather than twelve."
+    },
+    "6": {
+      "p1": "Six weeks from today is the length of the most common recovery window in medicine. Simple bone fractures, many soft-tissue injuries and a long list of routine operations all come with roughly a six-week restriction on lifting, driving or exercise, and the standard post-operative check-up usually falls here too.",
+      "p2": "The figure is not arbitrary. Bone laid down after a break reaches enough strength to bear normal load in about six weeks in a healthy adult, though full remodelling continues for months afterwards. The same stretch shows up outside medicine as well: six weeks is a typical summer school holiday in the UK, a common probation review point, and roughly the lead time a printer needs for a large job. If this date is a medical one, treat it as the earliest review point rather than a guaranteed all-clear.",
+      "q1": "How many days is six weeks?",
+      "a1": "Forty-two days. It falls on the same weekday as today, which makes it easy to recognise on a calendar.",
+      "q2": "Is six weeks the same as a month and a half?",
+      "a2": "Close but not exact. Six weeks is 42 days, while a month and a half is between 42 and 46.5 days depending on the months involved. For planning purposes they are usually treated as the same thing."
+    },
+    "7": {
+      "p1": "Seven weeks from today is 49 days — a stretch that rarely gets its own name but turns up constantly once you look. It is a common gap between a first and second interview round at larger companies, a typical wait for a specialist referral in several public health systems, and about how long a well-run office move takes from decision to moving day.",
+      "p2": "Seven weeks sits in an awkward spot: too long to hold in your head, too short to feel urgent. That combination is exactly where deadlines get missed. The useful number here is not 49 days but the 35 working days inside it, which shrinks fast once holidays and anyone else's availability enter the picture. If this date is a deadline and other people have to act before it, work backwards from it now and mark the point where you need their answer.",
+      "q1": "How many days is seven weeks?",
+      "a1": "Forty-nine days. Since 49 is exactly seven weeks, the result lands on the same weekday as today.",
+      "q2": "How many working days are in seven weeks?",
+      "a2": "Thirty-five, counting Monday to Friday and excluding weekends. Public holidays are not deducted, so subtract any that fall in the period."
+    },
+    "9": {
+      "p1": "Nine weeks from today is 63 days, a little over two months. It is a common length for an intensive course, a bootcamp module or a structured training block, and it is about how far ahead most venues want a booking confirmed for anything that needs catering.",
+      "p2": "Nine weeks is also roughly the point where a plan made today stops feeling connected to the present. Research on planning consistently finds that people estimate far-off tasks optimistically and near tasks pessimistically — the same job feels easy in nine weeks and impossible next Tuesday. If you are committing to something on this date, it is worth asking what the first week of work on it actually looks like, because that is the part the distance hides.",
+      "q1": "How many days is nine weeks?",
+      "a1": "Sixty-three days. The date lands on the same weekday as today.",
+      "q2": "Is nine weeks the same as two months?",
+      "a2": "Not exactly. Nine weeks is 63 days, while two consecutive months run between 59 and 62 days. Nine weeks is usually one to four days longer than two months."
+    },
+    "12": {
+      "p1": "Twelve weeks from today is the standard business quarter in everything but name. Eighty-four days is close enough to three months that companies use it for goal cycles, reviews and planning sprints, and it is the length behind the whole genre of twelve-week fitness and training programmes.",
+      "p2": "The appeal is that twelve weeks is long enough for real change and short enough that you can still see the end from the start. It is also the point where the arithmetic gets interesting: twelve weeks contains 60 working days, and once you take out a typical allocation of public holidays and some annual leave, a \"quarter\" of work is often closer to 55 usable days. If this date is the end of a planning cycle, that smaller number is the one worth planning against.",
+      "q1": "Is twelve weeks the same as three months?",
+      "a1": "Almost. Twelve weeks is 84 days, while three consecutive months run from 89 to 92 days. Three months is typically five to eight days longer than twelve weeks.",
+      "q2": "How many working days are in twelve weeks?",
+      "a2": "Sixty, counting Monday to Friday only. Public holidays are not subtracted, so the usable figure is normally a few days lower."
+    },
+    "13": {
+      "p1": "Thirteen weeks from today is exactly 91 days, and that precision is why accountants like it. A year splits into four thirteen-week quarters with one day left over — two in a leap year — which makes thirteen weeks the cleanest possible quarter. Retailers and manufacturers often use a 13-week fiscal quarter precisely so that every quarter contains the same number of weekends and the same number of trading days, making year-on-year comparisons honest.",
+      "p2": "Thirteen weeks is also the closest week count to the widely used 90-day deadline. If a contract gives you 90 days, this date is one day later; if it gives you three months, the answer depends on which months you cross. When a legal or financial deadline is written in days, count the days rather than the weeks — the one-day gap has been the difference in more than one dispute.",
+      "q1": "Is thirteen weeks the same as 90 days?",
+      "a1": "No, thirteen weeks is 91 days, one day longer than 90. For a legal or contractual deadline written in days, count the days exactly rather than rounding to weeks.",
+      "q2": "Why do companies use thirteen-week quarters?",
+      "a2": "Because every 13-week quarter contains exactly the same number of weekends and working days. Calendar quarters vary between 90 and 92 days, which distorts comparisons between one quarter and the next."
+    },
+    "15": {
+      "p1": "Fifteen weeks from today is 105 days, and it is the length of a standard university semester in much of North America. A fifteen-week term typically runs fourteen weeks of teaching plus a week of examinations, which is why course outlines so often break down into fifteen numbered weeks.",
+      "p2": "Outside education, fifteen weeks is a common manufacturing lead time for anything made to order — furniture, windows, specialist equipment — and a typical gap between placing a large import order and seeing it arrive. It is far enough out that quoting it feels safe and close enough that it arrives sooner than anyone expects. The 75 working days inside it are the figure to plan with, especially if the period crosses a holiday season when suppliers shut down for a fortnight.",
+      "q1": "How many days is fifteen weeks?",
+      "a1": "One hundred and five days. Like every whole week count, it lands on the same weekday as today.",
+      "q2": "Is fifteen weeks about three and a half months?",
+      "a2": "Yes, roughly. Fifteen weeks is 105 days and three and a half months is around 106 days, so the two are usually within a day or two of each other."
+    },
+    "18": {
+      "p1": "Eighteen weeks from today is 126 days, a little over four months. In England it is a number with a specific meaning: the National Health Service sets eighteen weeks as the maximum wait from referral to the start of consultant-led treatment, so patients referred by a GP are measuring against exactly this date.",
+      "p2": "Eighteen weeks also turns up as a visa processing estimate, a long-lead construction item like bespoke steelwork, and the back half of a pregnancy's second trimester. It is long enough that the starting conditions usually change before you arrive — prices, staff, availability. If something was quoted to you as eighteen weeks, it is worth confirming at the halfway point rather than waiting to find out at the end.",
+      "q1": "How many days is eighteen weeks?",
+      "a1": "One hundred and twenty-six days, which is just over four months. The date falls on the same weekday as today.",
+      "q2": "How many working days are in eighteen weeks?",
+      "a2": "Ninety, counting Monday to Friday. Any public holidays in the period are not deducted and should be subtracted separately."
+    },
+    "24": {
+      "p1": "Twenty-four weeks from today is 168 days, which is as close as a whole number of weeks gets to half a year without going over. Half of 365 is 182.5 days, so twenty-four weeks lands about a fortnight short — a gap worth knowing about if you are measuring a six-month commitment.",
+      "p2": "The number carries real weight in medicine. Twenty-four weeks is widely treated as the threshold of viability in pregnancy, the point from which a baby born early has a meaningful chance of survival with intensive care, and it is written into the abortion law of several countries including the UK. In finance, twenty-four weeks is a common minimum employment period before certain benefits or protections apply. If the figure matters legally, check whether the rule counts weeks or months, because the two give different dates.",
+      "q1": "Is twenty-four weeks the same as six months?",
+      "a1": "No. Twenty-four weeks is 168 days, while six consecutive months run from 181 to 184 days. Six months is roughly two weeks longer than twenty-four weeks.",
+      "q2": "How many working days are in twenty-four weeks?",
+      "a2": "One hundred and twenty, counting Monday to Friday only and before deducting any public holidays."
+    },
+    "40": {
+      "p1": "Forty weeks from today is 280 days, and for most people searching this phrase there is one reason: it is the standard length of a human pregnancy. A due date is calculated as forty weeks from the first day of the last menstrual period, not from conception, which is why the count includes roughly two weeks before the pregnancy actually began.",
+      "p2": "A due date is an estimate, not an appointment. Only about one birth in twenty happens on the predicted day, and anything from 37 to 42 weeks is considered a normal term. If you are counting from the first day of your last period, this date is the standard estimated due date — but treat it as the centre of a window several weeks wide, and go by the dating scan if you have had one, since early ultrasound measurements are more accurate than period dates for most people.",
+      "q1": "Is forty weeks from today a due date?",
+      "a1": "It is if you are counting from the first day of the last menstrual period, which is how due dates are conventionally calculated. Counting from today only gives a due date if today is that first day.",
+      "q2": "How accurate is a forty-week due date?",
+      "a2": "Roughly one baby in twenty arrives on the estimated date. Births between 37 and 42 weeks are all considered full term, so the due date is best read as the middle of a wide normal range."
+    },
+    "52": {
+      "p1": "Fifty-two weeks from today is 364 days — one day short of a full year, and two days short in a leap year. That single day is the reason annual dates drift: if an event is scheduled every 52 weeks it creeps one weekday earlier each year, which is why most annual arrangements are set by calendar date instead.",
+      "p2": "The leftover day is also why a year occasionally contains 53 payroll weeks instead of 52. Those extra days accumulate until a 53rd weekly pay date falls inside the calendar year, roughly every five or six years, and it catches out anyone who budgets by multiplying a weekly figure by 52. If you are working out an annual total from a weekly one, check which years have the extra week rather than assuming twelve equal months.",
+      "q1": "Is fifty-two weeks the same as one year?",
+      "a1": "Not quite. Fifty-two weeks is 364 days, while a year is 365 days, or 366 in a leap year. A year is always one or two days longer.",
+      "q2": "Why do some years have 53 pay weeks?",
+      "a2": "Because the extra day each year accumulates. Once enough leftover days build up, a 53rd weekly pay date falls inside the calendar year, which happens roughly every five to six years."
+    }
+  },
+  "homeSection": {
+    "heading": "Date calculators",
+    "description": "Work out what date falls a given number of weeks ahead, with the weekday and the working days in between.",
+    "linkLabel": "Weeks from today"
+  }
+}

@@ -626,3 +626,16 @@ người dùng, phát hiện ngay sau khi Phase 3.12 xong)
 - [x] 2026-11-02 — cache: Đo lại production 9 request: TTFB 64–448 ms (cache HIT), khác lần đo đầu 1,7–4,2 giây; chưa thể quy toàn bộ độ trễ cho JS hay Cloudflare. HTML public cache trình duyệt 60 giây, warmup dùng force-cache và priority thấp. Nội dung có thể cũ tối đa 60 giây sau deploy. Chưa đo lại production sau triển khai. Build 602 trang và 980 test qua.
 
 - [x] 2026-11-02 — base64perf: Chỉ đọc header khi nhận dạng ảnh, tránh decode toàn bộ payload hai lần. Trình duyệt xác nhận Base64 PNG thuần hiển thị preview 1px và MIME image/png. File chooser encode chưa xác minh qua automation. 980 test qua; build 602 trang.
+
+## Phase 6 — Cụm trang SEO (programmatic)
+
+Nguyên tắc: chỉ sinh trang cho mốc người ta thật sự tìm, mỗi trang một đoạn nội dung riêng.
+Không sinh dàn trải mọi con số — xem lý do trong `src/data/weeks-from-today.ts`.
+
+- [x] Cụm A — "N weeks from today" (hub + 14 mốc, tiếng Anh)
+- [ ] Cụm B — "N hours from now"
+- [ ] Cụm C — "N days ago" / "N days from today"
+- [ ] Cụm D — Cooking converters (tsp / tbsp / ml / oz / grams / cups)
+- [ ] Tự build lại hằng ngày để HTML luôn mang ngày hôm nay (cần người dùng đồng ý bật)
+- [ ] Category "Date & Time" trên trang chủ (chờ đủ từ 2 cụm trở lên)
+- [ ] Cụm E/F/G tiếng Việt (OCR landing, vòng quay random, photobooth)
