@@ -104,7 +104,9 @@
     "q3": "Có thể chuyển JSON sang định dạng khác không?",
     "a3": "Có — xuất cùng dữ liệu đó sang XML, YAML hoặc CSV.",
     "q4": "Có thể định dạng và kiểm tra XML ở đây không?",
-    "a4": "Có. Chọn XML phía trên khung nhập, dán tài liệu rồi dùng Định dạng XML, Nén gọn hoặc Kiểm tra XML. Lỗi cú pháp có dòng/cột khi trình duyệt cung cấp. Kiểm tra XML chỉ kiểm cú pháp, không đối chiếu schema XSD. Nén gọn giữ khoảng trắng nội dung nên tài liệu vẫn có thể còn xuống dòng."
+    "a4": "Có. Chọn XML phía trên khung nhập, dán tài liệu rồi dùng Định dạng XML, Nén gọn hoặc Kiểm tra XML. Lỗi cú pháp có dòng/cột khi trình duyệt cung cấp. Kiểm tra XML chỉ kiểm cú pháp, không đối chiếu schema XSD. Nén gọn giữ khoảng trắng nội dung nên tài liệu vẫn có thể còn xuống dòng.",
+    "q5": "Nên dùng trang này hay Code Formatter?",
+    "a5": "Với JSON và XML thì ở lại đây: trang này có chế độ xem cây thu gọn được, sửa JSON hỏng, truy vấn JSONPath và nén gọn — Code Formatter không có những thứ đó. Sang Code Formatter khi file là JavaScript, TypeScript, CSS, HTML, YAML, Markdown hay GraphQL, hoặc khi bạn muốn một nút lo hết mọi loại dán vào."
   },
   "article": {
     "heading": "Vì sao nên định dạng và kiểm tra JSON ngay trên máy?",

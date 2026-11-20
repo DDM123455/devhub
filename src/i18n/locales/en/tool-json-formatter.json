@@ -104,7 +104,9 @@
     "q3": "Can I convert JSON to other formats?",
     "a3": "Yes — export the same data as XML, YAML, or CSV.",
     "q4": "Can I format and validate XML here?",
-    "a4": "Yes. Select XML above the editor, paste your document and choose Format XML, Minify or Validate XML. Syntax errors include a line and column when the browser provides them. XML validation checks well-formedness, not an XSD schema. Minify preserves text whitespace, so a document may still contain line breaks."
+    "a4": "Yes. Select XML above the editor, paste your document and choose Format XML, Minify or Validate XML. Syntax errors include a line and column when the browser provides them. XML validation checks well-formedness, not an XSD schema. Minify preserves text whitespace, so a document may still contain line breaks.",
+    "q5": "Should I use this or the Code Formatter?",
+    "a5": "Stay here for JSON and XML: this page adds a tree view you can collapse, repair for broken JSON, JSONPath queries and minifying, none of which the Code Formatter has. Go to the Code Formatter when the file is JavaScript, TypeScript, CSS, HTML, YAML, Markdown or GraphQL, or when you want one button that handles whichever of those you paste in."
   },
   "article": {
     "heading": "Why format and validate JSON locally?",

@@ -70,7 +70,9 @@
     "q2": "Cắt video có tải video lên đâu không?",
     "a2": "Không — việc cắt chạy bằng ffmpeg biên dịch WebAssembly ngay trên trình duyệt, file video không bao giờ được tải lên.",
     "q3": "Làm sao để chọn chính xác điểm bắt đầu/kết thúc?",
-    "a3": "Kéo một trong hai tay cầm trên timeline trực quan, hoặc phát video rồi bấm \"lấy thời điểm hiện tại\" để đánh dấu chính xác."
+    "a3": "Kéo một trong hai tay cầm trên timeline trực quan, hoặc phát video rồi bấm \"lấy thời điểm hiện tại\" để đánh dấu chính xác.",
+    "q4": "Muốn lấy tiếng từ video thì dùng trang này hay Audio Converter?",
+    "a4": "Dùng trang này khi bạn chỉ cần tiếng của một đoạn nhất định, vì ở đây bạn đặt được điểm đầu và điểm cuối rồi xuất riêng đoạn đó ra MP3. Dùng Audio Converter khi bạn cần cả phần tiếng của video, cần định dạng khác MP3, hoặc cần xử lý nhiều file một lượt."
   },
   "article": {
     "heading": "Cắt video mà không cần tải lên bất cứ đâu",

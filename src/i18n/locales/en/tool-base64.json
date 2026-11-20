@@ -20,6 +20,7 @@
     "copy": "Copy",
     "copied": "Copied!",
     "clear": "Clear",
+    "loadSample": "Load sample",
     "decodeError": "Couldn't decode this — it isn't valid Base64.",
     "sizeInfo": "Input: {{input}} characters → Output: {{output}} characters",
     "fileEncodeHeading": "Encode a file",
@@ -65,7 +66,7 @@
       "invalidBase64": "Not valid Base64",
       "badLength": "The length is impossible for Base64 (one stray character at the end).",
       "problemAt": "Invalid character \"{{char}}\" at line {{line}}, column {{column}} (character {{index}}).",
-      "tabAdvanced": "Convert & compress",
+      "tabAdvanced": "Encodings & gzip",
       "formats": {
         "text": "Text (UTF-8)",
         "base64": "Base64",

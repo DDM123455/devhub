@@ -128,7 +128,9 @@
     "q3": "Why can the formatter succeed while the checker reports an error?",
     "a3": "They are two different tools. The formatter only needs to recognise tokens and clauses, so it is forgiving. The checker uses a full grammar for the selected dialect and is stricter. When they disagree you get a warning: the result is still shown, but the flagged line deserves a look.",
     "q4": "Does minify change what my query does?",
-    "a4": "It only removes whitespace and comments. Strings, quoted identifiers, dollar-quoted blocks and optimizer hints are copied character for character, and tokens that were touching stay touching. As a precaution, do not minify scripts that rely on line breaks, such as MySQL DELIMITER blocks."
+    "a4": "It only removes whitespace and comments. Strings, quoted identifiers, dollar-quoted blocks and optimizer hints are copied character for character, and tokens that were touching stay touching. As a precaution, do not minify scripts that rely on line breaks, such as MySQL DELIMITER blocks.",
+    "q5": "Should I use this or the Code Formatter?",
+    "a5": "Stay here for SQL. This page knows the dialect you pick and reports syntax errors with the line and column, which matters because the same query is valid in one database and not another. The Code Formatter also reformats SQL, but with one generic style and no validation — use it when SQL is just one of several file types you are tidying up."
   },
   "article": {
     "heading": "Format, minify and check SQL in your browser",

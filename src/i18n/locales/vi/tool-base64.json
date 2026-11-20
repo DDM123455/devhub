@@ -20,6 +20,7 @@
     "copy": "Sao chép",
     "copied": "Đã sao chép!",
     "clear": "Xóa",
+    "loadSample": "Nạp ví dụ",
     "decodeError": "Không giải mã được — đây không phải chuỗi Base64 hợp lệ.",
     "sizeInfo": "Đầu vào: {{input}} ký tự → Kết quả: {{output}} ký tự",
     "fileEncodeHeading": "Mã hóa file",
@@ -65,7 +66,7 @@
       "invalidBase64": "Không phải Base64 hợp lệ",
       "badLength": "Độ dài không thể là Base64 (thừa một ký tự ở cuối).",
       "problemAt": "Ký tự không hợp lệ \"{{char}}\" ở dòng {{line}}, cột {{column}} (ký tự thứ {{index}}).",
-      "tabAdvanced": "Chuyển đổi & nén",
+      "tabAdvanced": "Bảng mã & gzip",
       "formats": {
         "text": "Văn bản (UTF-8)",
         "base64": "Base64",

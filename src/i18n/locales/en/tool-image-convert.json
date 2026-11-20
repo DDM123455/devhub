@@ -47,7 +47,9 @@
     "q2": "Is my browser's AVIF support checked automatically?",
     "a2": "Yes — if your browser can't export AVIF, the tool tells you clearly instead of producing a broken file.",
     "q3": "Can I convert several images to the same format at once?",
-    "a3": "Yes — select multiple images, pick one target format, and download them individually or all together as a .zip."
+    "a3": "Yes — select multiple images, pick one target format, and download them individually or all together as a .zip.",
+    "q4": "Should I use this or Merge PDF to turn images into a PDF?",
+    "a4": "Use this page when the images are already in the order you want and you care about the page size and margins. Use Merge PDF when you need to reorder, rotate or drop individual pages, or when you are mixing images with pages from an existing PDF."
   },
   "article": {
     "heading": "JPEG, PNG, WebP, AVIF — which format should you use?",

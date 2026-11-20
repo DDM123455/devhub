@@ -38,6 +38,7 @@ function CopyButton({
 
 interface Messages {
 	textTabLabel: string;
+	loadSample: string;
 	fileTabLabel: string;
 	encodeOption: string;
 	decodeOption: string;
@@ -83,6 +84,10 @@ interface Messages {
 
 type Mode = 'encode' | 'decode';
 type Tab = 'text' | 'file' | 'advanced';
+
+// Giải ra "Web Tool Hub — xin chào, 100% trong trình duyệt 👋": có dấu tiếng Việt, dấu gạch
+// ngang dài và emoji, nên vừa là ví dụ vừa chứng minh Base64 ở đây xử lý đúng UTF-8 nhiều byte.
+const SAMPLE_BASE64 = 'V2ViIFRvb2wgSHViIOKAlCB4aW4gY2jDoG8sIDEwMCUgdHJvbmcgdHLDrG5oIGR1eeG7h3Qg8J+Riw==';
 
 const EXTENSION_BY_MIME: Record<string, string> = {
 	'image/png': 'png',
@@ -469,9 +474,21 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 						</p>
 					)}
 
-					<div>
+					<div className="flex gap-2">
 						<Button type="button" size="sm" variant="ghost" onClick={() => setTextInput('')}>
 							{messages.clear}
+						</Button>
+						<Button
+							type="button"
+							size="sm"
+							variant="outline"
+							onClick={() => {
+								setMode('decode');
+								setLineMode(false);
+								setTextInput(SAMPLE_BASE64);
+							}}
+						>
+							{messages.loadSample}
 						</Button>
 					</div>
 				</div>

@@ -36,6 +36,7 @@
     "copy": "Sao chép",
     "copied": "Đã sao chép!",
     "clear": "Xóa",
+    "loadSample": "Nạp ví dụ",
     "cheatSheetHeading": "Bảng tra cứu nhanh",
     "cheat1": "\\d — một chữ số bất kỳ (0–9)",
     "cheat2": "\\w — một ký tự chữ/số/gạch dưới bất kỳ",

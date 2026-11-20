@@ -86,7 +86,9 @@
     "q4": "What happens when my code has a syntax error?",
     "a4": "The output stays empty, your input is left exactly as it was, and you get a short message with the line and column. Use the Show in input button to jump to that spot, fix it and press Format again.",
     "q5": "Can I minify code here?",
-    "a5": "Only JSON, where removing whitespace is always safe. Minifying JavaScript or CSS properly needs a dedicated minifier, because renaming variables or merging rules can change behaviour, so this tool does not attempt it. For a deeper SQL syntax check, use the SQL Formatter & Validator."
+    "a5": "Only JSON, where removing whitespace is always safe. Minifying JavaScript or CSS properly needs a dedicated minifier, because renaming variables or merging rules can change behaviour, so this tool does not attempt it. For a deeper SQL syntax check, use the SQL Formatter & Validator.",
+    "q6": "Should I use this or the JSON/XML Formatter?",
+    "a6": "Use this one when you want several languages behind a single button, or when the file is JavaScript, CSS, YAML or GraphQL. Use the JSON/XML Formatter when the file is JSON or XML and you need more than tidy indentation: a collapsible tree view, repair for broken JSON, JSONPath queries, or minifying. This page only reformats; it will not fix a file that does not parse."
   },
   "article": {
     "heading": "Format and beautify code in your browser",

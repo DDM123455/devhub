@@ -74,7 +74,9 @@
     "q2": "Có chuyển nhiều file cùng lúc được không?",
     "a2": "Có — chọn hoặc kéo thả nhiều file, chuyển một lượt rồi tải tất cả về dưới dạng một file .zip. Với MP3, M4A và OGG bạn còn chọn được bitrate.",
     "q3": "Chuyển đổi file âm thanh surround có bị mất kênh không?",
-    "a3": "File có nhiều hơn 2 kênh sẽ bị giảm về stereo, và công cụ giờ đã cảnh báo rõ trước khi việc đó xảy ra."
+    "a3": "File có nhiều hơn 2 kênh sẽ bị giảm về stereo, và công cụ giờ đã cảnh báo rõ trước khi việc đó xảy ra.",
+    "q4": "Muốn lấy tiếng từ video thì dùng trang này hay Trim video?",
+    "a4": "Dùng trang này khi cần cả phần tiếng, khi cần định dạng khác MP3, hoặc khi có nhiều file phải chuyển cùng lúc. Dùng Trim video khi bạn chỉ cần tiếng của một đoạn, vì bên đó đặt được điểm đầu và điểm cuối trước khi xuất."
   },
   "article": {
     "heading": "Chuyển đổi MP3 và WAV mà không cần server",

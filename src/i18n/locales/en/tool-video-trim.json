@@ -70,7 +70,9 @@
     "q2": "Does trimming a video upload it anywhere?",
     "a2": "No — trimming runs with ffmpeg compiled to WebAssembly directly in your browser; the video file itself is never uploaded.",
     "q3": "How do I pick the exact start and end points?",
-    "a3": "Drag either handle on the visual timeline, or play the video and click \"set to current time\" to mark a precise point."
+    "a3": "Drag either handle on the visual timeline, or play the video and click \"set to current time\" to mark a precise point.",
+    "q4": "Should I use this or the Audio Converter to get the sound out of a video?",
+    "a4": "Use this page when you want the sound from a specific stretch of the video, because you can set the in and out points first and export that section as MP3. Use the Audio Converter when you want the whole soundtrack, a format other than MP3, or several files converted in one go."
   },
   "article": {
     "heading": "Trimming a video without uploading it anywhere",

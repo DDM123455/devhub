@@ -46,7 +46,9 @@
     "q2": "Can I rotate or remove pages before merging?",
     "a2": "Yes — each page thumbnail has its own rotate and delete controls.",
     "q3": "Is there a limit on how many PDFs I can merge?",
-    "a3": "No fixed limit — merging runs entirely in your browser, so it's limited only by your device's memory."
+    "a3": "No fixed limit — merging runs entirely in your browser, so it's limited only by your device's memory.",
+    "q4": "Should I use this or Convert Image Format to turn images into a PDF?",
+    "a4": "Use this page when you need control over the pages: reordering, rotating, removing one, or mixing images with pages from an existing PDF. Use Convert Image Format when the images are already in order and you mainly want to choose the page size and margins."
   },
   "article": {
     "heading": "Why merge PDF files locally instead of uploading them?",

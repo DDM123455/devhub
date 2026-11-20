@@ -86,7 +86,9 @@
     "q4": "Nếu code có lỗi cú pháp thì sao?",
     "a4": "Ô kết quả để trống, nội dung nhập được giữ nguyên, và bạn nhận một thông báo ngắn kèm dòng và cột. Bấm nút Hiện trong ô nhập để nhảy tới đúng vị trí, sửa rồi bấm Format lại.",
     "q5": "Tôi có nén (minify) code ở đây được không?",
-    "a5": "Chỉ với JSON, nơi việc bỏ khoảng trắng luôn an toàn. Nén JavaScript hoặc CSS đúng cách cần một trình minify riêng, vì đổi tên biến hay gộp quy tắc có thể làm đổi hành vi, nên công cụ này không làm. Nếu cần kiểm tra cú pháp SQL sâu hơn, hãy dùng công cụ Định dạng & Kiểm tra SQL."
+    "a5": "Chỉ với JSON, nơi việc bỏ khoảng trắng luôn an toàn. Nén JavaScript hoặc CSS đúng cách cần một trình minify riêng, vì đổi tên biến hay gộp quy tắc có thể làm đổi hành vi, nên công cụ này không làm. Nếu cần kiểm tra cú pháp SQL sâu hơn, hãy dùng công cụ Định dạng & Kiểm tra SQL.",
+    "q6": "Nên dùng trang này hay JSON/XML Formatter?",
+    "a6": "Dùng trang này khi cần nhiều ngôn ngữ trong cùng một nút bấm, hoặc khi file là JavaScript, CSS, YAML, GraphQL. Dùng JSON/XML Formatter khi file là JSON hay XML và bạn cần hơn mức thụt lề cho gọn: xem dạng cây thu gọn được, sửa JSON hỏng, truy vấn JSONPath, hoặc nén gọn. Trang này chỉ định dạng lại, không sửa được file sai cú pháp."
   },
   "article": {
     "heading": "Định dạng và làm đẹp code ngay trong trình duyệt",

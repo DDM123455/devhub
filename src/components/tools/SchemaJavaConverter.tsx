@@ -187,9 +187,6 @@ export default function SchemaJavaConverter({
   };
   return (
     <div className="flex min-w-0 flex-col gap-5">
-      <p className="rounded border border-border bg-muted p-3 text-sm">
-        {m.scope}
-      </p>
       <div className="grid gap-3 sm:grid-cols-3">
         <label>
           {m.inputKind}
@@ -770,6 +767,13 @@ export default function SchemaJavaConverter({
           />
         </label>
       </div>
+
+      {/* Phạm vi hỗ trợ: để dưới cùng. Trước đây khối này nằm ngay dưới tiêu đề và đẩy
+          điều khiển đầu tiên xuống tận y=500px trên màn hình điện thoại — người dùng mở
+          trang ra chưa thấy chỗ nào để bấm. */}
+      <p className="rounded border border-border bg-muted p-3 text-sm text-muted-foreground">
+        {m.scope}
+      </p>
     </div>
   );
 }

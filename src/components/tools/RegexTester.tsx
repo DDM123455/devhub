@@ -57,6 +57,7 @@ interface Messages {
 	copy: string;
 	copied: string;
 	clear: string;
+	loadSample: string;
 	cheatSheetHeading: string;
 	cheat1: string;
 	cheat2: string;
@@ -95,6 +96,17 @@ interface FlagState {
 }
 
 const DEFAULT_FLAGS: FlagState = { g: true, i: false, m: false, s: false, u: false, y: false, d: false, v: false };
+
+// Mẫu dùng nhóm đặt tên để người mới thấy ngay thứ hữu ích nhất của regex, và cố tình
+// chứa 2026-02-30: một ngày không tồn tại nhưng vẫn khớp, nhắc rằng regex chỉ kiểm hình
+// dạng chuỗi chứ không kiểm ý nghĩa.
+const SAMPLE_PATTERN = '(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})';
+const SAMPLE_TEST_STRING = [
+	'2026-01-15  deploy finished',
+	'2026-02-30  not a real date, but it still matches',
+	'15/01/2026  different format, no match',
+	'2026-11-20  release',
+].join('\n');
 const DEBOUNCE_MS = 300;
 const WORKER_TIMEOUT_MS = 1500;
 const HISTORY_STORAGE_KEY = 'regex-tester-history';
@@ -507,6 +519,19 @@ export default function RegexTester({ messages }: { messages: Messages }) {
 						}}
 					>
 						{messages.clear}
+					</Button>
+					<Button
+						type="button"
+						size="sm"
+						variant="outline"
+						onClick={() => {
+							setPattern(SAMPLE_PATTERN);
+							setTestString(SAMPLE_TEST_STRING);
+							setReplacement('');
+							setFlags({ ...DEFAULT_FLAGS, g: true, m: true });
+						}}
+					>
+						{messages.loadSample}
 					</Button>
 					{pattern.trim() !== '' && (
 						<CopyButton value={shareLink} label={messages.copyShareLink} copiedLabel={messages.copied} failedLabel={messages.copyFailed} />

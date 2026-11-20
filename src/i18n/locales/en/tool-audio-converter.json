@@ -74,7 +74,9 @@
     "q2": "Can I convert many files at once?",
     "a2": "Yes — select or drop several files, convert them in one go and download everything as a single .zip. For MP3, M4A and OGG you can also choose the bitrate.",
     "q3": "Does converting a surround-sound file lose channels?",
-    "a3": "Files with more than 2 channels are downmixed to stereo, and the tool now warns you clearly before that happens."
+    "a3": "Files with more than 2 channels are downmixed to stereo, and the tool now warns you clearly before that happens.",
+    "q4": "Should I use this or the Video Trimmer to get the sound out of a video?",
+    "a4": "Use this page for the whole soundtrack, for formats other than MP3, or when you have several files to convert at once. Use the Video Trimmer when you only want the sound from one stretch of the video, since it lets you set the start and end points before exporting."
   },
   "article": {
     "heading": "Converting between MP3 and WAV without a server",

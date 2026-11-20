@@ -128,7 +128,9 @@
     "q3": "Vì sao bộ định dạng chạy được mà bộ kiểm tra vẫn báo lỗi?",
     "a3": "Hai thành phần này khác nhau. Bộ định dạng chỉ cần nhận ra các token và mệnh đề nên khá dễ tính. Bộ kiểm tra dùng ngữ pháp đầy đủ của dialect đã chọn nên nghiêm ngặt hơn. Khi hai bên không đồng ý, bạn sẽ thấy cảnh báo: kết quả vẫn được hiển thị, nhưng dòng bị đánh dấu đáng để xem lại.",
     "q4": "Nén (minify) có làm thay đổi ý nghĩa câu truy vấn không?",
-    "a4": "Chỉ khoảng trắng và comment bị loại bỏ. Chuỗi, tên đặt trong dấu quote, khối dollar-quote và optimizer hint được giữ nguyên từng ký tự, và các token vốn liền nhau vẫn liền nhau. Để an toàn, đừng nén các script phụ thuộc vào dấu xuống dòng, ví dụ khối DELIMITER của MySQL."
+    "a4": "Chỉ khoảng trắng và comment bị loại bỏ. Chuỗi, tên đặt trong dấu quote, khối dollar-quote và optimizer hint được giữ nguyên từng ký tự, và các token vốn liền nhau vẫn liền nhau. Để an toàn, đừng nén các script phụ thuộc vào dấu xuống dòng, ví dụ khối DELIMITER của MySQL.",
+    "q5": "Nên dùng trang này hay Code Formatter?",
+    "a5": "Với SQL thì ở lại đây. Trang này hiểu đúng dialect bạn chọn và báo lỗi cú pháp kèm dòng, cột — điều này quan trọng vì cùng một câu lệnh có thể hợp lệ ở CSDL này mà sai ở CSDL khác. Code Formatter cũng định dạng được SQL nhưng chỉ theo một kiểu chung và không kiểm lỗi; dùng nó khi SQL chỉ là một trong nhiều loại file bạn đang dọn."
   },
   "article": {
     "heading": "Định dạng, nén và kiểm tra SQL ngay trong trình duyệt",
