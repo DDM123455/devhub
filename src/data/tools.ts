@@ -1265,21 +1265,76 @@ export const tools: ToolDefinition[] = [
 	},
 ];
 
-// Topical cross-category links. A category with only two tools (PDF, Media) otherwise
-// leaves each of its pages with a single internal "related" link; these add the tools
-// a visitor of that page really needs next (verified against what each tool does).
-const CROSS_RELATED: Record<string, string[]> = {
-	'pdf-merge': ['image-convert', 'image-to-text'], // accepts JPG/PNG pages; scanned PDFs need OCR
-	'pdf-split': ['image-to-text'], // OCR the pages that come out
-	'audio-converter': ['base64-tool'], // audio as a data URI
-	'video-trim': ['image-convert'], // GIF export
+/**
+ * Tối đa bao nhiêu link "công cụ liên quan" mỗi trang — theo đúng checklist trong CLAUDE.md
+ * ("internal link tới 2–3 công cụ liên quan"), nới một chút thành 4.
+ *
+ * Trước đây hàm bên dưới trả về TOÀN BỘ công cụ cùng nhóm, không giới hạn. Nhóm `dev` có 14
+ * công cụ nên mỗi trang dev đổ ra 13 link. Khi trang nào cũng link tới mọi trang cùng nhóm
+ * thì không còn tín hiệu nào cho biết trang nào thật sự liên quan trang nào, và trên điện
+ * thoại đó là một bức tường link ở cuối trang.
+ */
+const MAX_RELATED = 4;
+
+/**
+ * Chỉ lấy thêm công cụ cùng nhóm khi danh sách chọn tay chưa đủ chừng này.
+ *
+ * Nếu cứ lấy cho đủ MAX_RELATED thì công cụ đứng đầu mảng `tools` trong nhóm sẽ bị nhét vào
+ * làm link cuối của gần như mọi trang cùng nhóm — vừa vô nghĩa, vừa dồn hết link nội bộ về
+ * đúng một trang.
+ */
+const MIN_RELATED = 3;
+
+/**
+ * Công cụ nên gợi ý tiếp, xếp theo thứ tự ưu tiên, chọn theo việc người dùng thường làm
+ * ngay sau đó chứ không theo việc cùng nhóm.
+ *
+ * Nhóm `dev` bắt buộc phải có mặt ở đây: 14 công cụ cùng nhóm thì "cùng nhóm" không còn là
+ * thông tin gì cả. Các nhóm nhỏ (image 5, text 4, pdf 2, media 2) có thể để trống và lấy
+ * nốt từ cùng nhóm.
+ */
+const RELATED: Record<string, string[]> = {
+	// Dev — bắt cặp theo luồng công việc thật.
+	'schema-java': ['sql-formatter', 'json-formatter', 'code-formatter'],
+	'json-formatter': ['code-formatter', 'csv-json-converter', 'json-excel-converter'],
+	'code-formatter': ['json-formatter', 'sql-formatter', 'text-diff'], // so sánh trước/sau khi format
+	'sql-formatter': ['schema-java', 'code-formatter', 'csv-json-converter'],
+	'csv-json-converter': ['json-excel-converter', 'json-formatter', 'sql-formatter'],
+	'json-excel-converter': ['csv-json-converter', 'json-formatter', 'schema-java'],
+	'jwt-decoder': ['base64-tool', 'json-formatter', 'iso-validator'], // payload JWT là Base64 + JSON
+	'base64-tool': ['jwt-decoder', 'json-formatter', 'image-convert'], // ảnh dưới dạng data URI
+	'iso-validator': ['jwt-decoder', 'json-formatter', 'regex-tester'],
+	'regex-tester': ['text-diff', 'code-formatter', 'json-formatter'],
+	'color-picker': ['svg-optimizer', 'qr-generator', 'image-convert'],
+	'qr-generator': ['color-picker', 'base64-tool', 'text-case-converter'],
+	'nginx-config-validator': ['kubernetes-yaml-validator', 'code-formatter', 'regex-tester'],
+	'kubernetes-yaml-validator': ['nginx-config-validator', 'code-formatter', 'json-formatter'],
+	// Image — chỉ `image-convert` cần chọn tay: nó xuất được PDF nên phải trỏ sang Merge PDF,
+	// nếu không người dùng gộp ảnh thành PDF sẽ không biết là có hai đường làm cùng việc đó.
+	'image-convert': ['image-compress', 'pdf-merge', 'svg-optimizer'],
+	// OCR xong thì việc tiếp theo là xử lý đoạn chữ vừa lấy ra, không phải sửa thêm ảnh.
+	'image-to-text': ['word-counter', 'text-diff', 'text-case-converter'],
+	// Nhóm nhỏ — thêm link chéo vì cùng nhóm không đủ số.
+	'pdf-merge': ['pdf-split', 'image-convert', 'image-to-text'], // nhận JPG/PNG làm trang; PDF scan cần OCR
+	'pdf-split': ['pdf-merge', 'image-to-text'], // OCR các trang tách ra
+	'audio-converter': ['video-trim', 'base64-tool'], // rút tiếng từ video; audio dưới dạng data URI
+	'video-trim': ['audio-converter', 'image-convert'], // xuất MP3; xuất GIF
 };
 
-/** Same-category tools first, then the curated cross-category ones; never the tool itself. */
+/**
+ * Danh sách chọn tay trước, rồi lấy thêm từ cùng nhóm cho đủ, cắt ở MAX_RELATED.
+ * Không bao giờ trả về chính nó và không trùng lặp.
+ */
 export function getRelatedTools(tool: ToolDefinition): ToolDefinition[] {
-	const same = tools.filter((item) => item.category === tool.category && item.id !== tool.id);
-	const extra = (CROSS_RELATED[tool.id] ?? [])
-		.map((id) => tools.find((item) => item.id === id))
-		.filter((item): item is ToolDefinition => item !== undefined && !same.includes(item));
-	return [...same, ...extra];
+	const picked: ToolDefinition[] = [];
+	const add = (item: ToolDefinition | undefined) => {
+		if (!item || item.id === tool.id || picked.includes(item)) return;
+		picked.push(item);
+	};
+	for (const id of RELATED[tool.id] ?? []) add(tools.find((item) => item.id === id));
+	for (const item of tools) {
+		if (picked.length >= MIN_RELATED) break;
+		if (item.category === tool.category) add(item);
+	}
+	return picked.slice(0, MAX_RELATED);
 }

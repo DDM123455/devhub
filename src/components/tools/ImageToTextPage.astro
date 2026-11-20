@@ -4,7 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import FaqSection from '@/components/layout/FaqSection.astro';
 import ImageToText, { type ImageToTextMessages } from './ImageToText';
 import { getFixedT } from '@/i18n/i18next';
-import { tools } from '@/data/tools';
+import { getRelatedTools, tools } from '@/data/tools';
 import { OCR_LANGUAGES } from '@/lib/ocr-languages';
 import { IMAGE_TO_TEXT_UI_KEYS } from '@/lib/ocr-ui-keys';
 import type { Locale } from '@/i18n/config';
@@ -20,8 +20,7 @@ const tool = tools.find((item) => item.id === 'image-to-text')!;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
 
 // Công cụ liên quan: xử lý tiếp văn bản sau OCR (so sánh, đếm từ, đổi kiểu chữ) + 1 công cụ ảnh gần nhất.
-const relatedIds = ['text-diff', 'word-counter', 'text-case-converter', 'image-compress'];
-const relatedTools = relatedIds.map((id) => tools.find((item) => item.id === id)!).filter(Boolean);
+const relatedTools = getRelatedTools(tool);
 const textDiffTool = tools.find((item) => item.id === 'text-diff')!;
 const textDiffHref = `/${lang}/tools/${textDiffTool.slugs[lang]}/`;
 

@@ -4,7 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import FaqSection from '@/components/layout/FaqSection.astro';
 import SqlFormatter from './SqlFormatter';
 import { getFixedT } from '@/i18n/i18next';
-import { tools } from '@/data/tools';
+import { getRelatedTools, tools } from '@/data/tools';
 import type { Locale } from '@/i18n/config';
 
 interface Props {
@@ -17,8 +17,7 @@ const t = getFixedT(lang, 'tool-sql-formatter');
 const tool = tools.find((item) => item.id === 'sql-formatter')!;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
 // Internal link tới 3 công cụ liên quan trực tiếp (định dạng JSON, regex, so sánh văn bản).
-const relatedIds = ['json-formatter', 'regex-tester', 'text-diff'];
-const relatedTools = relatedIds.map((id) => tools.find((item) => item.id === id)).filter((item) => item !== undefined);
+const relatedTools = getRelatedTools(tool);
 
 // Toàn bộ chuỗi giao diện nằm dưới `ui.*` (kể cả errors/hints/samples) và đi qua i18n.
 const messages = t('ui', { returnObjects: true }) as never;

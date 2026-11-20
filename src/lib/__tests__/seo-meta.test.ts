@@ -69,6 +69,39 @@ describe('internal "related tools" links', () => {
 			expect(getRelatedTools(tool).length, id).toBeGreaterThanOrEqual(2);
 		}
 	});
+
+	// Trước đây hàm này trả về cả nhóm, nên mỗi trang trong nhóm `dev` (14 công cụ) có 13 link.
+	it('never exceeds four links, even in the 14-tool dev category', () => {
+		const tooMany = tools
+			.map((tool) => ({ id: tool.id, count: getRelatedTools(tool).length }))
+			.filter((row) => row.count > 4);
+		expect(tooMany).toEqual([]);
+	});
+
+	it('points at tools that exist', () => {
+		const ids = new Set(tools.map((tool) => tool.id));
+		for (const tool of tools) {
+			for (const related of getRelatedTools(tool)) expect(ids.has(related.id), `${tool.id} -> ${related.id}`).toBe(true);
+		}
+	});
+
+	// Hai công cụ làm việc chồng nhau thì phải trỏ sang nhau, để người dùng còn biết đường
+	// so sánh — nếu chỉ một chiều thì nửa số người vào trang sai sẽ mắc kẹt ở đó.
+	it('links overlapping tools in both directions', () => {
+		const pairs = [
+			['code-formatter', 'json-formatter'],
+			['code-formatter', 'sql-formatter'],
+			['video-trim', 'audio-converter'],
+			['pdf-merge', 'image-convert'],
+			['csv-json-converter', 'json-excel-converter'],
+		];
+		for (const [a, b] of pairs) {
+			const toolA = tools.find((tool) => tool.id === a)!;
+			const toolB = tools.find((tool) => tool.id === b)!;
+			expect(getRelatedTools(toolA).map((t) => t.id), `${a} -> ${b}`).toContain(b);
+			expect(getRelatedTools(toolB).map((t) => t.id), `${b} -> ${a}`).toContain(a);
+		}
+	});
 });
 
 describe('localized slugs', () => {
