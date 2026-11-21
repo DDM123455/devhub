@@ -153,7 +153,8 @@
       "copy": "複製",
       "copied": "已複製！",
       "copyFailed": "複製失敗"
-    }
+    },
+    "loadSample": "載入範例"
   },
   "related": "相關工具",
   "faq": {

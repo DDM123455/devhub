@@ -63,7 +63,8 @@
     "downloadAll": "تنزيل الكل (.zip)",
     "removeFile": "إزالة",
     "zipError": "تعذّر إنشاء ملف .zip.",
-    "filesHeading": "الملفات"
+    "filesHeading": "الملفات",
+    "cancel": "إلغاء"
   },
   "related": "أدوات ذات صلة",
   "faq": {

@@ -69,7 +69,11 @@
     "fileReadError": "Dat bestand kon niet worden gelezen.",
     "fileLoaded": "{{name}} geladen.",
     "compareDiff": "Voor/na vergelijken in Tekstverschillen",
-    "compareTooLarge": "Te groot om via een link te vergelijken."
+    "compareTooLarge": "Te groot om via een link te vergelijken.",
+    "validateXml": "XML valideren",
+    "xmlValidationFailed": "Ongeldige XML: {{message}}",
+    "xmlValid": "De XML-syntaxis is geldig. De invoer is ongewijzigd.",
+    "xmlValidationHint": "Controleert syntaxis, bij elkaar horende tags, attributen en naamruimten. Geen validatie aan de hand van XSD."
   },
   "faq": {
     "heading": "Veelgestelde vragen",

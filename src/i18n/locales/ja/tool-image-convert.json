@@ -36,7 +36,8 @@
     "pdfPageSizeLabel": "PDF のページサイズ",
     "pdfPageFit": "画像に合わせる",
     "pdfMarginLabel": "余白：{{mm}} mm",
-    "downloadCombinedPdf": "すべてを 1 つの PDF としてダウンロード"
+    "downloadCombinedPdf": "すべてを 1 つの PDF としてダウンロード",
+    "cancel": "キャンセル"
   },
   "related": "関連ツール",
   "faq": {

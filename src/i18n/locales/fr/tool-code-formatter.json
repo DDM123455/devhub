@@ -69,7 +69,11 @@
     "fileReadError": "Impossible de lire ce fichier.",
     "fileLoaded": "{{name}} chargé.",
     "compareDiff": "Comparer avant/après dans Text Diff",
-    "compareTooLarge": "Trop volumineux pour être comparé via un lien."
+    "compareTooLarge": "Trop volumineux pour être comparé via un lien.",
+    "validateXml": "Valider le XML",
+    "xmlValidationFailed": "XML non valide : {{message}}",
+    "xmlValid": "La syntaxe XML est valide. La saisie est intacte.",
+    "xmlValidationHint": "Vérifie la syntaxe, les balises, les attributs et les espaces de noms. Pas de validation XSD."
   },
   "faq": {
     "heading": "Questions fréquentes",

@@ -90,7 +90,8 @@
       "pathNone": "Keine Treffer.",
       "pathSyntax": "Ungültiger JSONPath.",
       "pathHelp": "Unterstützt: $ .key ['key'] [0] [-1] [*] .* .. (rekursiv) [0,2] [1:3] [?(@.price < 10)]",
-      "pathsLabel": "Gefundene Pfade"
+      "pathsLabel": "Gefundene Pfade",
+      "clear": "Leeren"
     }
   },
   "related": "Ähnliche Tools",
@@ -109,5 +110,31 @@
     "p2": "Dieses Tool sendet niemals irgendetwas irgendwohin. Es basiert auf jsoneditor, einer JavaScript-Bibliothek, die dein JSON vollständig im Arbeitsspeicher deines Browsers parst und neu rendert. Das Parsen, die lesbare Formatierung und die Syntaxprüfung laufen alle lokal über die eigene JavaScript-Engine des Browsers ab — es ist kein Server involviert, also verlässt nichts, was du hier einfügst, jemals dein Gerät.",
     "p3": "Füge dein JSON im Textmodus in den Editor ein und nutze die Schaltfläche Format in der Werkzeugleiste, um es lesbar zu formatieren, oder Compact, um es wieder auf eine Zeile zu komprimieren. Enthält das JSON einen Syntaxfehler — ein überzähliges Komma, ein fehlendes Anführungszeichen, eine nicht geschlossene Klammer —, markiert der Editor das sofort mit einer klaren Fehlermeldung und der genauen Zeilennummer, statt dich das ganze Dokument mit den Augen durchsuchen zu lassen; eine Schaltfläche „Zur Fehlerzeile springen“ führt dich direkt dorthin und markiert die Zeile, damit du in einer langen Datei nicht danach suchen musst. Wechsle über das Dropdown-Menü oben in den Baummodus, um dieselben Daten als aufklappbaren, interaktiven Baum zu durchsuchen: verschachtelte Objekte und Arrays auf- und zuklappen, einzelne Werte direkt vor Ort bearbeiten, Felder umsortieren oder löschen — die Änderung spiegelt sich sofort im Text wider, sobald du wieder in den Textmodus wechselst.",
     "p4": "Diese Kombination deckt den größten Teil der alltäglichen JSON-Arbeit ab: eine API-Antwort bereinigen, bevor du sie in eine Dokumentation einfügst, eine Konfigurationsdatei validieren, bevor du sie committest, oder ein tief verschachteltes Payload erkunden, ohne den Überblick zu verlieren, in welchem Array du dich gerade befindest. Brauchst du die Daten in einem anderen Format? Die Schaltflächen unter dem Editor wandeln das aktuelle JSON direkt in XML, YAML oder CSV um — praktisch, wenn das Skript einer Kollegin eine YAML-Konfigurationsdatei erwartet oder eine Tabelle einfache Zeilen und Spalten statt verschachteltem JSON braucht — das Ergebnis wird direkt zum schnellen Kopieren oder vollständigen Herunterladen angezeigt. Da alles nur im Browser-Tab existiert, löscht das Schließen des Tabs den Editor vollständig — es gibt keinen gespeicherten Verlauf oder Entwurf, um den man sich sorgen müsste, genau das Verhalten, das du willst, wenn das JSON, mit dem du arbeitest, sensibel sein könnte."
+  },
+  "xml": {
+    "clear": "Leeren",
+    "copy": "Kopieren",
+    "copied": "Kopiert!",
+    "copyFailed": "Kopieren fehlgeschlagen",
+    "indentTab": "Tabulator",
+    "minify": "Minimieren",
+    "selector": "Datenformat",
+    "input": "XML-Eingabe",
+    "output": "Formatiertes XML",
+    "format": "XML formatieren",
+    "validate": "XML prüfen",
+    "invalid": "Ungültiges XML: {{message}}",
+    "location": "Zeile {{line}}, Spalte {{column}}",
+    "download": "XML herunterladen",
+    "indent": "Einzug",
+    "indentSpaces": "{{n}} Leerzeichen",
+    "viewText": "Text",
+    "viewTree": "Baum",
+    "expandAll": "Alle aufklappen",
+    "collapseAll": "Alle zuklappen",
+    "treeEmpty": "Keine Daten für die Baumansicht.",
+    "valid": "Die XML-Syntax ist gültig. Die Eingabe bleibt unverändert.",
+    "hint": "XML formatieren, komprimieren oder prüfen. Leerraum in Textinhalten bleibt beim Komprimieren erhalten. Ctrl+Enter formatiert. Prüft Syntax, Tag-Paare, Attribute und Namensräume. Keine Prüfung gegen XSD.",
+    "tooLarge": "Maximal 200.000 Zeichen. Bitte das Dokument kürzen."
   }
 }

@@ -153,7 +153,8 @@
       "copy": "Salin",
       "copied": "Tersalin!",
       "copyFailed": "Gagal menyalin"
-    }
+    },
+    "loadSample": "Muat contoh"
   },
   "related": "Alat terkait",
   "faq": {

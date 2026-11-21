@@ -63,7 +63,8 @@
     "downloadAll": "सभी डाउनलोड करें (.zip)",
     "removeFile": "हटाएँ",
     "zipError": ".zip फ़ाइल नहीं बन सकी।",
-    "filesHeading": "फ़ाइलें"
+    "filesHeading": "फ़ाइलें",
+    "cancel": "रद्द करें"
   },
   "related": "संबंधित टूल्स",
   "faq": {

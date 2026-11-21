@@ -63,7 +63,8 @@
     "downloadAll": "Descargar todo (.zip)",
     "removeFile": "Quitar",
     "zipError": "No se pudo crear el archivo .zip.",
-    "filesHeading": "Archivos"
+    "filesHeading": "Archivos",
+    "cancel": "Cancelar"
   },
   "related": "Herramientas relacionadas",
   "faq": {

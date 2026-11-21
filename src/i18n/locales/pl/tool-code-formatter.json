@@ -69,7 +69,11 @@
     "fileReadError": "Nie udało się odczytać tego pliku.",
     "fileLoaded": "Wczytano {{name}}.",
     "compareDiff": "Porównaj przed i po w Porównywarce tekstów",
-    "compareTooLarge": "Za duże, by porównać przez link."
+    "compareTooLarge": "Za duże, by porównać przez link.",
+    "validateXml": "Sprawdź XML",
+    "xmlValidationFailed": "Niepoprawny XML: {{message}}",
+    "xmlValid": "Składnia XML jest poprawna. Dane wejściowe pozostały bez zmian.",
+    "xmlValidationHint": "Sprawdza składnię, pary znaczników, atrybuty i przestrzenie nazw. Nie weryfikuje zgodności ze schematem XSD."
   },
   "faq": {
     "heading": "Najczęściej zadawane pytania",

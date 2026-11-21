@@ -90,7 +90,8 @@
       "pathNone": "Brak dopasowań.",
       "pathSyntax": "Niepoprawne JSONPath.",
       "pathHelp": "Obsługiwane: $ .key ['key'] [0] [-1] [*] .* .. (rekurencyjnie) [0,2] [1:3] [?(@.price < 10)]",
-      "pathsLabel": "Dopasowane ścieżki"
+      "pathsLabel": "Dopasowane ścieżki",
+      "clear": "Wyczyść"
     }
   },
   "related": "Powiązane narzędzia",
@@ -109,5 +110,31 @@
     "p2": "To narzędzie nigdy niczego nigdzie nie wysyła. Zostało zbudowane na jsoneditor, bibliotece JavaScript, która parsuje i ponownie renderuje Twój JSON w całości w pamięci przeglądarki. Parsowanie, formatowanie oraz walidacja składni odbywają się w całości lokalnie, przy użyciu silnika JavaScript samej przeglądarki — w tym procesie nie ma żadnego serwera, więc nic, co tu wkleisz, nigdy nie opuszcza Twojego urządzenia.",
     "p3": "Wklej swój JSON do edytora w trybie tekstowym i użyj przycisku Formatuj na pasku narzędzi, aby ładnie go sformatować, albo Kompaktuj, aby ścisnąć go z powrotem do jednej linii. Jeśli JSON zawiera błąd składni — końcowy przecinek, brakujący cudzysłów, niedopasowany nawias — edytor od razu go podświetla, pokazując jasny komunikat błędu wraz z dokładnym numerem linii, zamiast zostawiać Cię z koniecznością przeglądania całego dokumentu wzrokiem; przycisk „Przejdź do linii z błędem” przenosi bezpośrednio do tej linii i ją zaznacza, więc nie trzeba przewijać i szukać jej w długim pliku. Przełącz się na tryb drzewa z listy rozwijanej u góry, aby przeglądać te same dane jako zwijalne, interaktywne drzewo: rozwijaj i zwijaj zagnieżdżone obiekty i tablice, edytuj poszczególne wartości w miejscu, a także zmieniaj kolejność lub usuwaj pola bezpośrednio — zmiana natychmiast odzwierciedla się w tekście, gdy tylko ponownie przełączysz tryb.",
     "p4": "To połączenie funkcji obejmuje większość codziennej pracy z JSON-em: uporządkowanie odpowiedzi API przed wklejeniem jej do dokumentacji, walidację pliku konfiguracyjnego przed jego zatwierdzeniem albo eksplorację głęboko zagnieżdżonego ładunku danych bez gubienia się w tym, w której tablicy się znajdujesz. Potrzebujesz danych w innym formacie? Przyciski pod edytorem konwertują aktualny JSON bezpośrednio na XML, YAML lub CSV — przydatne, gdy skrypt kolegi z zespołu oczekuje pliku konfiguracyjnego YAML albo arkusz kalkulacyjny potrzebuje zwykłych wierszy i kolumn zamiast zagnieżdżonego JSON-a — a przekonwertowany wynik jest pokazywany od razu, gotowy do szybkiego skopiowania lub pełnego pobrania. Ponieważ wszystko istnieje wyłącznie w karcie przeglądarki, zamknięcie jej całkowicie czyści edytor — nie ma zapisanej historii ani szkicu, o który trzeba by się martwić, co jest dokładnie takim zachowaniem, jakiego oczekujesz, gdy JSON, nad którym pracujesz, może być poufny."
+  },
+  "xml": {
+    "clear": "Wyczyść",
+    "copy": "Kopiuj",
+    "copied": "Skopiowano!",
+    "copyFailed": "Nie udało się skopiować",
+    "indentTab": "Tabulator",
+    "minify": "Minifikuj",
+    "selector": "Format danych",
+    "input": "Wejściowy XML",
+    "output": "Sformatowany XML",
+    "format": "Formatuj XML",
+    "validate": "Sprawdź XML",
+    "invalid": "Niepoprawny XML: {{message}}",
+    "location": "wiersz {{line}}, kolumna {{column}}",
+    "download": "Pobierz XML",
+    "indent": "Wcięcie",
+    "indentSpaces": "Liczba spacji: {{n}}",
+    "viewText": "Tekst",
+    "viewTree": "Drzewo",
+    "expandAll": "Rozwiń wszystko",
+    "collapseAll": "Zwiń wszystko",
+    "treeEmpty": "Brak danych do wyświetlenia w drzewie.",
+    "valid": "Składnia XML jest poprawna. Dane wejściowe pozostały bez zmian.",
+    "hint": "Sformatuj XML, zminimalizuj go lub sprawdź składnię. Minimalizacja zachowuje białe znaki w tekście. Ctrl+Enter formatuje kod. Sprawdza składnię, pary znaczników, atrybuty i przestrzenie nazw. Nie weryfikuje zgodności ze schematem XSD.",
+    "tooLarge": "Limit wynosi 200 000 znaków. Skróć dokument."
   }
 }

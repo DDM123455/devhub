@@ -69,7 +69,11 @@
     "fileReadError": "ファイルを読み取れませんでした。",
     "fileLoaded": "{{name}}を読み込みました。",
     "compareDiff": "テキスト差分比較で整形前後を比較",
-    "compareTooLarge": "大きすぎるため、リンクでは比較できません。"
+    "compareTooLarge": "大きすぎるため、リンクでは比較できません。",
+    "validateXml": "XML を検証",
+    "xmlValidationFailed": "無効な XML：{{message}}",
+    "xmlValid": "XML の構文は正しく、入力内容はそのままです。",
+    "xmlValidationHint": "構文、開始・終了タグの対応、属性、名前空間を確認します。XSD スキーマによる検証には対応していません。"
   },
   "faq": {
     "heading": "よくある質問",

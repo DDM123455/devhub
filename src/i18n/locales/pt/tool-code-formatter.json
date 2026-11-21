@@ -69,7 +69,11 @@
     "fileReadError": "Não foi possível ler esse arquivo.",
     "fileLoaded": "{{name}} carregado.",
     "compareDiff": "Comparar antes/depois no Comparador de Texto",
-    "compareTooLarge": "Grande demais para comparar por link."
+    "compareTooLarge": "Grande demais para comparar por link.",
+    "validateXml": "Validar XML",
+    "xmlValidationFailed": "XML inválido: {{message}}",
+    "xmlValid": "A sintaxe XML é válida. A entrada permanece intacta.",
+    "xmlValidationHint": "Verifica sintaxe, pares de tags, atributos e espaços de nomes. Não valida esquemas XSD."
   },
   "faq": {
     "heading": "Perguntas frequentes",

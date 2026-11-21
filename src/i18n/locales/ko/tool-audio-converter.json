@@ -63,7 +63,8 @@
     "downloadAll": "모두 다운로드 (.zip)",
     "removeFile": "삭제",
     "zipError": ".zip 파일을 만들지 못했습니다.",
-    "filesHeading": "파일"
+    "filesHeading": "파일",
+    "cancel": "취소"
   },
   "related": "관련 도구",
   "faq": {

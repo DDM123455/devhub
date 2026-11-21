@@ -101,7 +101,8 @@
       "copy": "コピー",
       "copied": "コピーしました！",
       "copyFailed": "コピーに失敗しました"
-    }
+    },
+    "loadSample": "サンプルを読み込む"
   },
   "related": "関連ツール",
   "faq": {

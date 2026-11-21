@@ -63,7 +63,8 @@
     "downloadAll": "Ladda ner alla (.zip)",
     "removeFile": "Ta bort",
     "zipError": "Det gick inte att skapa .zip-filen.",
-    "filesHeading": "Filer"
+    "filesHeading": "Filer",
+    "cancel": "Avbryt"
   },
   "related": "Relaterade verktyg",
   "faq": {

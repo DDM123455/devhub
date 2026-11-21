@@ -153,7 +153,8 @@
       "copy": "Kopyala",
       "copied": "Kopyalandı!",
       "copyFailed": "Kopyalanamadı"
-    }
+    },
+    "loadSample": "Örnek yükle"
   },
   "related": "İlgili araçlar",
   "faq": {

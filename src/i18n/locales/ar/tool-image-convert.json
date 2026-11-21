@@ -36,7 +36,8 @@
     "pdfPageSizeLabel": "حجم صفحة PDF",
     "pdfPageFit": "مطابق للصورة",
     "pdfMarginLabel": "الهامش: {{mm}} مم",
-    "downloadCombinedPdf": "تنزيل الكل في ملف PDF واحد"
+    "downloadCombinedPdf": "تنزيل الكل في ملف PDF واحد",
+    "cancel": "إلغاء"
   },
   "related": "أدوات ذات صلة",
   "faq": {

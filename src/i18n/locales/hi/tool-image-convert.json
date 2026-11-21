@@ -36,7 +36,8 @@
     "pdfPageSizeLabel": "PDF पेज साइज़",
     "pdfPageFit": "इमेज के हिसाब से",
     "pdfMarginLabel": "मार्जिन: {{mm}} mm",
-    "downloadCombinedPdf": "सभी को एक PDF में डाउनलोड करें"
+    "downloadCombinedPdf": "सभी को एक PDF में डाउनलोड करें",
+    "cancel": "रद्द करें"
   },
   "related": "जुड़े हुए टूल्स",
   "faq": {

@@ -101,7 +101,8 @@
       "copy": "Copy",
       "copied": "Copied!",
       "copyFailed": "Copy failed"
-    }
+    },
+    "loadSample": "Muat contoh"
   },
   "related": "Alat terkait",
   "faq": {

@@ -69,7 +69,11 @@
     "fileReadError": "Impossibile leggere il file.",
     "fileLoaded": "Caricato {{name}}.",
     "compareDiff": "Confronta prima/dopo in Confronto testi",
-    "compareTooLarge": "Troppo grande per essere confrontato tramite un link."
+    "compareTooLarge": "Troppo grande per essere confrontato tramite un link.",
+    "validateXml": "Convalida XML",
+    "xmlValidationFailed": "XML non valido: {{message}}",
+    "xmlValid": "La sintassi XML è valida. Il testo inserito è rimasto invariato.",
+    "xmlValidationHint": "Controlla sintassi, corrispondenza dei tag, attributi e spazi dei nomi. Non verifica gli schemi XSD."
   },
   "faq": {
     "heading": "Domande frequenti",

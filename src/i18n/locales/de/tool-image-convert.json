@@ -36,7 +36,8 @@
     "pdfPageSizeLabel": "PDF-Seitengröße",
     "pdfPageFit": "An Bild anpassen",
     "pdfMarginLabel": "Rand: {{mm}} mm",
-    "downloadCombinedPdf": "Alle als ein PDF herunterladen"
+    "downloadCombinedPdf": "Alle als ein PDF herunterladen",
+    "cancel": "Abbrechen"
   },
   "related": "Ähnliche Tools",
   "faq": {

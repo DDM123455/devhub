@@ -36,7 +36,8 @@
     "pdfPageSizeLabel": "PDF 页面尺寸",
     "pdfPageFit": "适应图片",
     "pdfMarginLabel": "边距：{{mm}} mm",
-    "downloadCombinedPdf": "合并下载为一个 PDF"
+    "downloadCombinedPdf": "合并下载为一个 PDF",
+    "cancel": "取消"
   },
   "related": "相关工具",
   "faq": {

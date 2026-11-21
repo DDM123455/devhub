@@ -3,5 +3,12 @@
   "meta": {
     "title": "تحويل SQL إلى Java Entity وDTO — Web Tool Hub",
     "description": "حوّل جداول PostgreSQL وMySQL إلى Java Entity أو DTO أو record أو projection. راجع البيانات الوصفية وصدّر SQL محليًا في المتصفح دون رفع الشيفرة."
-  }
+  },
+  "ui": {
+    "cancel": "إلغاء",
+    "advanced": "خيارات متقدمة",
+    "length": "الطول",
+    "copied": "تم النسخ"
+  },
+  "related": "أدوات ذات صلة"
 }

@@ -180,6 +180,11 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+### 2026-11-21 — Bản dịch XML và kiểm lại các trạng thái nút
+
+- Bổ sung 256 khóa đổi đơn vị bếp tiếng Việt, bản địa hóa bảng XML, dùng lại nhãn đã dịch cùng nghĩa ở các trang công cụ. Chạy kiểm XML hợp lệ và sai cú pháp trên đủ 20 ngôn ngữ. Vi không thiếu khóa, tất cả locale khớp biến nội suy; 18 bản dịch còn thiếu khóa.
+- Kiểm bổ sung Base64 Copy/Swap, QR ZIP, thứ tự trang PDF, ngôn ngữ OCR và xóa kết quả Xóa nền. Firefox/WebKit mỗi engine mở đủ 27 công cụ ở 390 px. Build 647 trang, Vitest đạt 1.130, SEO P0–P3 bằng 0. Chi tiết trong báo cáo QA và CSV.
+
 ### 2026-11-21 — Sửa ba nhóm cảnh báo SEO còn lại
 
 - Rút gọn 81 mô tả bằng câu hoàn chỉnh từ nội dung cùng trang, sửa H1 trùng giữa các bản dịch và hai tiêu đề 404 tiếng Trung. Build 647 trang, sitemap và số URL cho index cùng bằng 83. Audit giữ nguyên tiêu chí và đạt P0/P1/P2/P3 = 0. Vitest đạt 1.130/1.130 với kiểm biên dịch Java.

@@ -69,7 +69,11 @@
     "fileReadError": "File itu tidak dapat dibaca.",
     "fileLoaded": "{{name}} dimuat.",
     "compareDiff": "Bandingkan sebelum/sesudah di Text Diff",
-    "compareTooLarge": "Terlalu besar untuk dibandingkan lewat tautan."
+    "compareTooLarge": "Terlalu besar untuk dibandingkan lewat tautan.",
+    "validateXml": "Periksa XML",
+    "xmlValidationFailed": "XML tidak valid: {{message}}",
+    "xmlValid": "Sintaks XML valid. Masukan tetap utuh.",
+    "xmlValidationHint": "Memeriksa sintaks, pasangan tag, atribut, dan namespace. Skema XSD tidak diperiksa."
   },
   "faq": {
     "heading": "Pertanyaan umum",

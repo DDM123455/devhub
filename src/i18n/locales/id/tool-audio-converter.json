@@ -63,7 +63,8 @@
     "downloadAll": "Unduh semua (.zip)",
     "removeFile": "Hapus",
     "zipError": "Tidak dapat membuat file .zip.",
-    "filesHeading": "File"
+    "filesHeading": "File",
+    "cancel": "Batal"
   },
   "related": "Alat terkait",
   "faq": {

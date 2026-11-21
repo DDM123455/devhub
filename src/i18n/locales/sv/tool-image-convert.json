@@ -36,7 +36,8 @@
     "pdfPageSizeLabel": "PDF-sidstorlek",
     "pdfPageFit": "Anpassa efter bilden",
     "pdfMarginLabel": "Marginal: {{mm}} mm",
-    "downloadCombinedPdf": "Ladda ner alla som en PDF"
+    "downloadCombinedPdf": "Ladda ner alla som en PDF",
+    "cancel": "Avbryt"
   },
   "related": "Relaterade verktyg",
   "faq": {

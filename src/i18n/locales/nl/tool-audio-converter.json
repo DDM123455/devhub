@@ -63,7 +63,8 @@
     "downloadAll": "Alles downloaden (.zip)",
     "removeFile": "Verwijderen",
     "zipError": "Het .zip-bestand kon niet worden aangemaakt.",
-    "filesHeading": "Bestanden"
+    "filesHeading": "Bestanden",
+    "cancel": "Annuleren"
   },
   "related": "Gerelateerde tools",
   "faq": {

@@ -3,7 +3,7 @@ const JSZip = require('jszip');
 const ExcelJS = require('exceljs');
 
 module.exports = {
-	async 'base64-encoder-decoder'({ input, root, click, contains, fixture, download }) {
+	async 'base64-encoder-decoder'({ page, input, root, click, contains, fixture, download }) {
 		await click('Decode');
 		await input.fill('%%%');
 		await contains(/Not valid Base64/);
@@ -18,6 +18,10 @@ module.exports = {
 		await root.locator('#b64-conv-to').selectOption('hex');
 		await root.locator('#b64-conv-input').fill('A');
 		assert.equal(await root.locator('#b64-conv-output').inputValue(), '41');
+		await click('Copy');
+		assert.equal(await page.evaluate(() => navigator.clipboard.readText()), '41');
+		await click('Swap');
+		assert.equal(await root.locator('#b64-conv-output').inputValue(), 'A');
 		await click('Compress');
 		await root.locator('#b64-zip-input').fill('Xin chào 👋');
 		await click('Run');
@@ -194,6 +198,12 @@ module.exports = {
 		assert.match((await download('Download SVG')).toString(), /<svg\b/);
 		assert.equal((await download('Download JPEG')).readUInt16BE(0), 0xffd8);
 		assert.equal((await download('Download PDF')).subarray(0, 5).toString(), '%PDF-');
+		await root.getByRole('checkbox', {name:/Batch mode/}).check();
+		const zipButton = /Generate & Download All/;
+		assert.ok(await button(zipButton).isDisabled());
+		await root.locator('#qr-batch-input').fill('https://example.com/a\nhttps://example.com/b');
+		const zip = await JSZip.loadAsync(await download(zipButton));
+		assert.equal(zip.file(/\.png$/i).length, 2);
 	},
 	async 'regex-tester'({ root, click, contains }) {
 		await click('Load sample');

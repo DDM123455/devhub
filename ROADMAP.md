@@ -1,5 +1,7 @@
 # ROADMAP.md — Web Tool Hub (Client-Side, Zero Server Cost)
 
+- [x] 2026-11-21 — Hoàn thiện các khóa tiếng Việt, bản địa hóa bảng XML, kiểm XML đúng/sai ở 20 ngôn ngữ, đối chiếu lại 14 trạng thái nút và kiểm nạp 27 công cụ trên Firefox/WebKit.
+
 - [x] 2026-11-21 — Đối chiếu lại audit 20–21/11. Tối ưu Text Diff cho hai văn bản lớn không có dòng chung, giữ nguyên phép ghép theo khóa chuẩn hóa. Tách kiểm thử schema Kubernetes theo phiên bản.
 
 - [x] 2026-11-21 — Kiểm thử chức năng 27 công cụ, 10 trang đổi đơn vị và trang chủ trên Chromium desktop/mobile. Thêm bộ kiểm thử chạy lại được, sửa lỗi xuất file cũ, worker Xóa nền, thanh công cụ JSON trên màn hình hẹp và các ca biên đã tái hiện. Phạm vi từng nút ghi trong `QA_FUNCTIONAL_2026-11-21.md`.
@@ -9,7 +11,7 @@
 - [x] 2026-11-16 — Text Diff giữ phần đầu/đuôi giống nhau ngoài highlight trên dòng dài, bảo toàn cụm Unicode và bổ sung test/hướng dẫn en+vi.
 
 - [x] 2026-11-08 — Rà crawl/SEO/test; sửa nén và cây XML mất whitespace; cập nhật hướng dẫn JSON/XML, Base64 en+vi.
-- [ ] Bổ sung bản dịch còn thiếu và rà bản ngữ trước khi index. Đo lại ngày 21/11: 559 khóa ở mỗi ngôn ngữ ngoài en/vi, gồm 256 khóa của cụm đổi đơn vị bếp hiện chỉ xuất bản tiếng Anh. Ưu tiên SQL/Java, ISO và JSON/XML trên các trang đã xuất bản.
+- [ ] Bổ sung bản dịch còn thiếu và rà bản ngữ trước khi index. Chạy `node scripts/check-i18n.mjs --locale <locale> --list` để lấy danh sách hiện hành. Mỗi ngôn ngữ ngoài en/vi còn thiếu file 256 khóa của cụm đổi đơn vị bếp hiện chỉ xuất bản tiếng Anh và các khóa trên trang công cụ, chủ yếu SQL/Java và ISO.
 - [x] 2026-11-21 — Rút gọn 81 meta description dài, bản địa hóa các H1 trùng và bổ sung tên site vào hai tiêu đề 404 tiếng Trung.
 - [ ] Đo Lighthouse/CWV và tương tác công cụ nặng.
 

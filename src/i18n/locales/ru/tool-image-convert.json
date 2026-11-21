@@ -36,7 +36,8 @@
     "pdfPageSizeLabel": "Размер страницы PDF",
     "pdfPageFit": "По размеру изображения",
     "pdfMarginLabel": "Поля: {{mm}} мм",
-    "downloadCombinedPdf": "Скачать всё одним PDF"
+    "downloadCombinedPdf": "Скачать всё одним PDF",
+    "cancel": "Отмена"
   },
   "related": "Похожие инструменты",
   "faq": {

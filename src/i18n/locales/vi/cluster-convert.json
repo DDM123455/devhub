@@ -1,0 +1,330 @@
+{
+  "ui": {
+    "amountLabel": "Số lượng ({{unit}})",
+    "resultLabel": "Kết quả ({{unit}})",
+    "ingredientLabel": "Nguyên liệu",
+    "ingredientHint": "Khối lượng chỉ là ước tính theo các bảng quy đổi thông dụng của USDA. Cùng một thìa, bột nén chặt sẽ nặng hơn bột được xúc nhẹ rồi gạt ngang.",
+    "swap": "Đổi chiều",
+    "fractionNote": "Tương đương khoảng {{fraction}} {{unit}} khi đong trong bếp.",
+    "tableHeading": "Bảng quy đổi",
+    "colFrom": "Lượng ban đầu",
+    "colTo": "Kết quả",
+    "colFraction": "Phân số dễ đong",
+    "reverseHeading": "Đổi theo chiều ngược lại",
+    "otherHeading": "Các phép đổi khác trong bếp",
+    "faqHeading": "Câu hỏi thường gặp",
+    "breadcrumbHome": "Trang chủ",
+    "breadcrumbHub": "Đổi đơn vị trong bếp",
+    "standardsHeading": "Thìa Mỹ, thìa hệ mét và thìa Úc khác nhau thế nào?",
+    "standardsBody": "Bảng dùng đơn vị Mỹ. Một thìa cà phê Mỹ bằng 4,92892 ml. Ba thìa cà phê bằng một thìa canh, khoảng 14,79 ml. Thìa cà phê hệ mét có dung tích 5 ml. Đặc biệt, thìa canh Úc chứa 20 ml, bằng bốn thìa cà phê hệ mét. Hãy xem công thức dùng bộ thìa nào trước khi đong."
+  },
+  "units": {
+    "tsp": "thìa cà phê",
+    "tbsp": "thìa canh",
+    "ml": "mililít",
+    "floz": "ounce chất lỏng Mỹ",
+    "cup": "cốc Mỹ",
+    "grams": "gam"
+  },
+  "unitsShort": {
+    "tsp": "tsp",
+    "tbsp": "tbsp",
+    "ml": "ml",
+    "floz": "fl oz",
+    "cup": "cups",
+    "grams": "g"
+  },
+  "ingredients": {
+    "water": "Nước",
+    "sugar": "Đường cát",
+    "brownSugar": "Đường nâu nén chặt",
+    "salt": "Muối ăn",
+    "flour": "Bột mì đa dụng",
+    "butter": "Bơ",
+    "oliveOil": "Dầu ô liu",
+    "honey": "Mật ong",
+    "bakingSoda": "Muối nở",
+    "bakingPowder": "Bột nở",
+    "cocoa": "Bột ca cao",
+    "cinnamon": "Bột quế"
+  },
+  "value": {
+    "metaTitle": "Đổi {{amountTitle}} {{fromTitle}} sang {{toTitle}}",
+    "metaDescription": "{{amount}} {{from}} tương đương {{result}} {{to}}. Xem kết quả, phân số dễ đong và bảng quy đổi để điều chỉnh công thức.",
+    "heading": "Đổi {{amount}} {{from}} sang {{to}}",
+    "resultPrefix": "{{amount}} {{fromLong}} tương đương",
+    "articleHeading": "Cách đổi {{amount}} {{from}} sang {{to}}"
+  },
+  "pairs": {
+    "tsp-to-ml": {
+      "metaTitle": "Đổi thìa cà phê sang mililít trong nấu ăn",
+      "metaDescription": "Nhân số thìa cà phê với 4,92892 để được số ml. Xem ví dụ và bảng quy đổi theo lượng cần đong.",
+      "heading": "Đổi thìa cà phê sang mililít",
+      "tagline": "Nhân số thìa cà phê với 4,92892 để được số ml.",
+      "p1": "Một thìa cà phê Mỹ bằng 4,92892 ml. Nếu bộ thìa ghi 5 ml, bạn đang dùng thìa hệ mét.",
+      "p2": "Với lượng nhỏ như vani, chênh lệch giữa hai chuẩn chỉ khoảng 0,07 ml mỗi thìa.",
+      "p3": "Khi nhân công thức nhiều lần, giữ số chưa làm tròn cho đến bước cuối.",
+      "q1": "Một thìa cà phê có đúng bằng 5 ml?",
+      "a1": "Đúng với thìa hệ mét. Thìa Mỹ nhỏ hơn khoảng 1,4%.",
+      "q2": "Nên làm tròn ở bước nào?",
+      "a2": "Tính theo toàn bộ lượng cần dùng trước, sau đó mới làm tròn đến vạch nhỏ nhất trên dụng cụ đong.",
+      "q3": "Có cần biết loại nguyên liệu không?",
+      "a3": "Khi đổi giữa hai đơn vị thể tích, tỉ lệ giữ nguyên với mọi nguyên liệu."
+    },
+    "tsp-to-tbsp": {
+      "metaTitle": "Đổi thìa cà phê sang thìa canh trong nấu ăn",
+      "metaDescription": "Chia số thìa cà phê Mỹ cho 3 để được số thìa canh Mỹ. Xem ví dụ và bảng quy đổi theo lượng cần đong.",
+      "heading": "Đổi thìa cà phê sang thìa canh",
+      "tagline": "Chia số thìa cà phê Mỹ cho 3 để được số thìa canh Mỹ.",
+      "p1": "Ba thìa cà phê vừa đúng một thìa canh Mỹ. Tỉ lệ này giúp đong nhanh khi chỉ có một loại thìa.",
+      "p2": "Ví dụ, sáu thìa cà phê bằng hai thìa canh. Bốn thìa cà phê bằng một thìa canh cộng một thìa cà phê.",
+      "p3": "Nếu kết quả có phần lẻ, hãy đong phần nguyên bằng thìa canh rồi dùng thìa cà phê cho phần còn lại.",
+      "q1": "Nửa thìa canh bằng mấy thìa cà phê?",
+      "a1": "Bằng một thìa rưỡi theo chuẩn Mỹ.",
+      "q2": "Nên làm tròn ở bước nào?",
+      "a2": "Tính theo toàn bộ lượng cần dùng trước, sau đó mới làm tròn đến vạch nhỏ nhất trên dụng cụ đong.",
+      "q3": "Có cần biết loại nguyên liệu không?",
+      "a3": "Khi đổi giữa hai đơn vị thể tích, tỉ lệ giữ nguyên với mọi nguyên liệu."
+    },
+    "tsp-to-grams": {
+      "metaTitle": "Đổi thìa cà phê sang gam trong nấu ăn",
+      "metaDescription": "Chọn nguyên liệu để ước tính khối lượng một thìa cà phê. Xem ví dụ và bảng quy đổi theo lượng cần đong.",
+      "heading": "Đổi thìa cà phê sang gam",
+      "tagline": "Chọn nguyên liệu để ước tính khối lượng một thìa cà phê.",
+      "p1": "Thìa đo thể tích, còn gam đo khối lượng. Một thìa nước nặng khoảng 4,93 g, nhưng cùng thể tích bột mì chỉ nặng khoảng 2,6 g.",
+      "p2": "Đường cát khoảng 4,2 g mỗi thìa, còn muối ăn hạt mịn khoảng 6 g. Kích thước hạt và độ ẩm đều ảnh hưởng đến kết quả.",
+      "p3": "Gạt ngang bột bằng cạnh thẳng. Nếu công thức yêu cầu độ chính xác cao, cân trực tiếp nguyên liệu.",
+      "q1": "Tại sao phải chọn loại muối?",
+      "a1": "Muối hạt to có nhiều khoảng trống giữa các hạt hơn muối mịn nên cùng một thìa có thể nhẹ hơn đáng kể.",
+      "q2": "Nên làm tròn ở bước nào?",
+      "a2": "Tính theo toàn bộ lượng cần dùng trước, sau đó mới làm tròn đến vạch nhỏ nhất trên dụng cụ đong.",
+      "q3": "Có cần biết loại nguyên liệu không?",
+      "a3": "Có. Đường, bột mì và muối có khối lượng riêng khác nhau."
+    },
+    "tsp-to-cups": {
+      "metaTitle": "Đổi thìa cà phê sang undefined trong nấu ăn",
+      "metaDescription": "Chia cho 48 để đổi thìa cà phê sang cốc Mỹ. Xem ví dụ và bảng quy đổi theo lượng cần đong.",
+      "heading": "Đổi thìa cà phê sang undefined",
+      "tagline": "Chia cho 48 để đổi thìa cà phê sang cốc Mỹ.",
+      "p1": "Một cốc Mỹ chia thành 16 thìa canh hoặc 48 thìa cà phê.",
+      "p2": "Mười hai thìa cà phê bằng một phần tư cốc. Với vài thìa nhỏ, bộ thìa đong thường dễ đọc hơn vạch trên cốc.",
+      "p3": "Cốc hệ mét 250 ml lớn hơn cốc Mỹ khoảng 236,59 ml. Kiểm tra ký hiệu trên cốc trước khi dùng.",
+      "q1": "Bao nhiêu thìa cà phê được nửa cốc Mỹ?",
+      "a1": "Hai mươi bốn thìa cà phê Mỹ bằng nửa cốc.",
+      "q2": "Nên làm tròn ở bước nào?",
+      "a2": "Tính theo toàn bộ lượng cần dùng trước, sau đó mới làm tròn đến vạch nhỏ nhất trên dụng cụ đong.",
+      "q3": "Có cần biết loại nguyên liệu không?",
+      "a3": "Khi đổi giữa hai đơn vị thể tích, tỉ lệ giữ nguyên với mọi nguyên liệu."
+    },
+    "ml-to-oz": {
+      "metaTitle": "Đổi mililít sang ounce chất lỏng Mỹ trong nấu ăn",
+      "metaDescription": "Chia số ml cho 29,5735 để đổi sang ounce chất lỏng Mỹ. Xem ví dụ và bảng quy đổi theo lượng cần đong.",
+      "heading": "Đổi mililít sang ounce chất lỏng Mỹ",
+      "tagline": "Chia số ml cho 29,5735 để đổi sang ounce chất lỏng Mỹ.",
+      "p1": "Một fl oz Mỹ bằng khoảng 29,57 ml. Đây là đơn vị thể tích, khác với ounce dùng để cân.",
+      "p2": "Ví dụ, 60 ml nước dùng được hơn 2 fl oz Mỹ một chút.",
+      "p3": "Nếu chai hoặc cốc ghi imperial fl oz, một đơn vị chỉ khoảng 28,41 ml.",
+      "q1": "Có thể dùng phép đổi này cho bột mì theo ounce không?",
+      "a1": "Chỉ khi công thức yêu cầu ounce chất lỏng. Với ounce khối lượng, hãy dùng cân.",
+      "q2": "Nên làm tròn ở bước nào?",
+      "a2": "Tính theo toàn bộ lượng cần dùng trước, sau đó mới làm tròn đến vạch nhỏ nhất trên dụng cụ đong.",
+      "q3": "Có cần biết loại nguyên liệu không?",
+      "a3": "Khi đổi giữa hai đơn vị thể tích, tỉ lệ giữ nguyên với mọi nguyên liệu."
+    },
+    "ml-to-tbsp": {
+      "metaTitle": "Đổi mililít sang thìa canh trong nấu ăn",
+      "metaDescription": "Chia số ml cho 14,78676 để đổi sang thìa canh Mỹ. Xem ví dụ và bảng quy đổi theo lượng cần đong.",
+      "heading": "Đổi mililít sang thìa canh",
+      "tagline": "Chia số ml cho 14,78676 để đổi sang thìa canh Mỹ.",
+      "p1": "Một thìa canh Mỹ chứa gần 14,79 ml. Theo hệ mét, thìa canh thường là 15 ml.",
+      "p2": "Ba mươi ml tương đương khoảng 2,03 thìa canh Mỹ hoặc đúng hai thìa canh 15 ml.",
+      "p3": "Trong công thức Úc, thìa canh thường là 20 ml. Dùng vạch ml nếu bạn chưa rõ chuẩn của bộ thìa.",
+      "q1": "Mười lăm ml có bằng một thìa canh không?",
+      "a1": "Đúng với thìa canh hệ mét 15 ml. Thìa Mỹ nhỏ hơn một chút.",
+      "q2": "Nên làm tròn ở bước nào?",
+      "a2": "Tính theo toàn bộ lượng cần dùng trước, sau đó mới làm tròn đến vạch nhỏ nhất trên dụng cụ đong.",
+      "q3": "Có cần biết loại nguyên liệu không?",
+      "a3": "Khi đổi giữa hai đơn vị thể tích, tỉ lệ giữ nguyên với mọi nguyên liệu."
+    },
+    "ml-to-tsp": {
+      "metaTitle": "Đổi mililít sang thìa cà phê trong nấu ăn",
+      "metaDescription": "Chia số ml cho 4,92892 để tính số thìa cà phê Mỹ. Xem ví dụ và bảng quy đổi theo lượng cần đong.",
+      "heading": "Đổi mililít sang thìa cà phê",
+      "tagline": "Chia số ml cho 4,92892 để tính số thìa cà phê Mỹ.",
+      "p1": "Với thìa hệ mét, 5 ml vừa một thìa cà phê. Bảng này dùng chuẩn Mỹ nên kết quả hơi lớn hơn một thìa.",
+      "p2": "Để đong 10 ml bằng bộ thìa 5 ml, hãy dùng hai thìa đầy ngang miệng.",
+      "p3": "Thìa ăn hằng ngày không có dung tích cố định. Dùng dụng cụ đong có vạch khi cần chính xác.",
+      "q1": "Đổi 1 ml ra bao nhiêu thìa cà phê Mỹ?",
+      "a1": "Khoảng 0,203 thìa. Dụng cụ chia vạch ml dễ đong lượng này hơn.",
+      "q2": "Nên làm tròn ở bước nào?",
+      "a2": "Tính theo toàn bộ lượng cần dùng trước, sau đó mới làm tròn đến vạch nhỏ nhất trên dụng cụ đong.",
+      "q3": "Có cần biết loại nguyên liệu không?",
+      "a3": "Khi đổi giữa hai đơn vị thể tích, tỉ lệ giữ nguyên với mọi nguyên liệu."
+    },
+    "tbsp-to-tsp": {
+      "metaTitle": "Đổi thìa canh sang thìa cà phê trong nấu ăn",
+      "metaDescription": "Nhân số thìa canh Mỹ với 3 để đổi sang thìa cà phê. Xem ví dụ và bảng quy đổi theo lượng cần đong.",
+      "heading": "Đổi thìa canh sang thìa cà phê",
+      "tagline": "Nhân số thìa canh Mỹ với 3 để đổi sang thìa cà phê.",
+      "p1": "Một thìa canh Mỹ bằng đúng ba thìa cà phê Mỹ. Tỉ lệ này không phụ thuộc vào nguyên liệu.",
+      "p2": "Nếu cần nửa thìa canh dầu, có thể dùng một thìa cà phê cộng nửa thìa cà phê.",
+      "p3": "Ở Úc, thìa canh 20 ml bằng bốn thìa cà phê 5 ml.",
+      "q1": "Hai thìa canh Mỹ bằng bao nhiêu thìa cà phê?",
+      "a1": "Bằng sáu thìa cà phê Mỹ.",
+      "q2": "Nên làm tròn ở bước nào?",
+      "a2": "Tính theo toàn bộ lượng cần dùng trước, sau đó mới làm tròn đến vạch nhỏ nhất trên dụng cụ đong.",
+      "q3": "Có cần biết loại nguyên liệu không?",
+      "a3": "Khi đổi giữa hai đơn vị thể tích, tỉ lệ giữ nguyên với mọi nguyên liệu."
+    },
+    "tbsp-to-ml": {
+      "metaTitle": "Đổi thìa canh sang mililít trong nấu ăn",
+      "metaDescription": "Nhân số thìa canh với 14,78676 để đổi sang ml. Xem ví dụ và bảng quy đổi theo lượng cần đong.",
+      "heading": "Đổi thìa canh sang mililít",
+      "tagline": "Nhân số thìa canh với 14,78676 để đổi sang ml.",
+      "p1": "Một thìa canh Mỹ chứa gần 14,79 ml. Hai thìa chứa khoảng 29,57 ml.",
+      "p2": "Khi đọc công thức có ghi cả tbsp và ml, hãy ưu tiên con số ml nếu dụng cụ của bạn có vạch chia.",
+      "p3": "Cùng ký hiệu tbsp nhưng một thìa Úc có thể chứa 20 ml.",
+      "q1": "Ba thìa canh Mỹ được bao nhiêu ml?",
+      "a1": "Khoảng 44,36 ml. Ba thìa hệ mét loại 15 ml được đúng 45 ml.",
+      "q2": "Nên làm tròn ở bước nào?",
+      "a2": "Tính theo toàn bộ lượng cần dùng trước, sau đó mới làm tròn đến vạch nhỏ nhất trên dụng cụ đong.",
+      "q3": "Có cần biết loại nguyên liệu không?",
+      "a3": "Khi đổi giữa hai đơn vị thể tích, tỉ lệ giữ nguyên với mọi nguyên liệu."
+    },
+    "oz-to-ml": {
+      "metaTitle": "Đổi ounce chất lỏng Mỹ sang mililít trong nấu ăn",
+      "metaDescription": "Nhân số fl oz Mỹ với 29,5735 để đổi sang ml. Xem ví dụ và bảng quy đổi theo lượng cần đong.",
+      "heading": "Đổi ounce chất lỏng Mỹ sang mililít",
+      "tagline": "Nhân số fl oz Mỹ với 29,5735 để đổi sang ml.",
+      "p1": "Ký hiệu fl oz tương ứng với thể tích. Nếu nhãn chỉ ghi oz theo khối lượng thì cần biết nguyên liệu mới đổi được sang ml.",
+      "p2": "Tám ounce chất lỏng Mỹ bằng một cốc Mỹ, khoảng 236,59 ml.",
+      "p3": "Một ounce chất lỏng Anh có dung tích khoảng 28,41 ml. Bảng này dùng đơn vị Mỹ.",
+      "q1": "Hai fl oz Mỹ bằng bao nhiêu ml?",
+      "a1": "Khoảng 59,15 ml, gần 60 ml khi làm tròn để nấu ăn.",
+      "q2": "Nên làm tròn ở bước nào?",
+      "a2": "Tính theo toàn bộ lượng cần dùng trước, sau đó mới làm tròn đến vạch nhỏ nhất trên dụng cụ đong.",
+      "q3": "Có cần biết loại nguyên liệu không?",
+      "a3": "Khi đổi giữa hai đơn vị thể tích, tỉ lệ giữ nguyên với mọi nguyên liệu."
+    }
+  },
+  "values": {
+    "tsp-to-ml": {
+      "1": {
+        "p1": "1 thìa cà phê tương đương 4,9289 ml. Nhân số thìa cà phê với 4,92892 để được số ml.",
+        "p2": "Khi nhân công thức nhiều lần, giữ số chưa làm tròn cho đến bước cuối.",
+        "q1": "Đong 1 thìa cà phê được bao nhiêu?",
+        "a1": "Kết quả là 4,9289 ml. Với lượng nhỏ như vani, chênh lệch giữa hai chuẩn chỉ khoảng 0,07 ml mỗi thìa.",
+        "q2": "Một thìa cà phê có đúng bằng 5 ml?",
+        "a2": "Đúng với thìa hệ mét. Thìa Mỹ nhỏ hơn khoảng 1,4%."
+      },
+      "2": {
+        "p1": "2 thìa cà phê tương đương 9,8578 ml. Nhân số thìa cà phê với 4,92892 để được số ml.",
+        "p2": "Khi nhân công thức nhiều lần, giữ số chưa làm tròn cho đến bước cuối.",
+        "q1": "Đong 2 thìa cà phê được bao nhiêu?",
+        "a1": "Kết quả là 9,8578 ml. Với lượng nhỏ như vani, chênh lệch giữa hai chuẩn chỉ khoảng 0,07 ml mỗi thìa.",
+        "q2": "Một thìa cà phê có đúng bằng 5 ml?",
+        "a2": "Đúng với thìa hệ mét. Thìa Mỹ nhỏ hơn khoảng 1,4%."
+      },
+      "1-4": {
+        "p1": "1/4 thìa cà phê tương đương 1,2322 ml. Nhân số thìa cà phê với 4,92892 để được số ml.",
+        "p2": "Khi nhân công thức nhiều lần, giữ số chưa làm tròn cho đến bước cuối.",
+        "q1": "Đong 1/4 thìa cà phê được bao nhiêu?",
+        "a1": "Kết quả là 1,2322 ml. Với lượng nhỏ như vani, chênh lệch giữa hai chuẩn chỉ khoảng 0,07 ml mỗi thìa.",
+        "q2": "Một thìa cà phê có đúng bằng 5 ml?",
+        "a2": "Đúng với thìa hệ mét. Thìa Mỹ nhỏ hơn khoảng 1,4%."
+      },
+      "1-2": {
+        "p1": "1/2 thìa cà phê tương đương 2,4645 ml. Nhân số thìa cà phê với 4,92892 để được số ml.",
+        "p2": "Khi nhân công thức nhiều lần, giữ số chưa làm tròn cho đến bước cuối.",
+        "q1": "Đong 1/2 thìa cà phê được bao nhiêu?",
+        "a1": "Kết quả là 2,4645 ml. Với lượng nhỏ như vani, chênh lệch giữa hai chuẩn chỉ khoảng 0,07 ml mỗi thìa.",
+        "q2": "Một thìa cà phê có đúng bằng 5 ml?",
+        "a2": "Đúng với thìa hệ mét. Thìa Mỹ nhỏ hơn khoảng 1,4%."
+      },
+      "3-4": {
+        "p1": "3/4 thìa cà phê tương đương 3,6967 ml. Nhân số thìa cà phê với 4,92892 để được số ml.",
+        "p2": "Khi nhân công thức nhiều lần, giữ số chưa làm tròn cho đến bước cuối.",
+        "q1": "Đong 3/4 thìa cà phê được bao nhiêu?",
+        "a1": "Kết quả là 3,6967 ml. Với lượng nhỏ như vani, chênh lệch giữa hai chuẩn chỉ khoảng 0,07 ml mỗi thìa.",
+        "q2": "Một thìa cà phê có đúng bằng 5 ml?",
+        "a2": "Đúng với thìa hệ mét. Thìa Mỹ nhỏ hơn khoảng 1,4%."
+      }
+    },
+    "tsp-to-tbsp": {
+      "3": {
+        "p1": "3 thìa cà phê tương đương 1 thìa canh Mỹ. Chia số thìa cà phê Mỹ cho 3 để được số thìa canh Mỹ.",
+        "p2": "Nếu kết quả có phần lẻ, hãy đong phần nguyên bằng thìa canh rồi dùng thìa cà phê cho phần còn lại.",
+        "q1": "Đong 3 thìa cà phê được bao nhiêu?",
+        "a1": "Kết quả là 1 thìa canh Mỹ. Ví dụ, sáu thìa cà phê bằng hai thìa canh. Bốn thìa cà phê bằng một thìa canh cộng một thìa cà phê.",
+        "q2": "Nửa thìa canh bằng mấy thìa cà phê?",
+        "a2": "Bằng một thìa rưỡi theo chuẩn Mỹ."
+      },
+      "4": {
+        "p1": "4 thìa cà phê tương đương 1,3333 thìa canh Mỹ. Chia số thìa cà phê Mỹ cho 3 để được số thìa canh Mỹ.",
+        "p2": "Nếu kết quả có phần lẻ, hãy đong phần nguyên bằng thìa canh rồi dùng thìa cà phê cho phần còn lại.",
+        "q1": "Đong 4 thìa cà phê được bao nhiêu?",
+        "a1": "Kết quả là 1,3333 thìa canh Mỹ. Ví dụ, sáu thìa cà phê bằng hai thìa canh. Bốn thìa cà phê bằng một thìa canh cộng một thìa cà phê.",
+        "q2": "Nửa thìa canh bằng mấy thìa cà phê?",
+        "a2": "Bằng một thìa rưỡi theo chuẩn Mỹ."
+      },
+      "6": {
+        "p1": "6 thìa cà phê tương đương 2 thìa canh Mỹ. Chia số thìa cà phê Mỹ cho 3 để được số thìa canh Mỹ.",
+        "p2": "Nếu kết quả có phần lẻ, hãy đong phần nguyên bằng thìa canh rồi dùng thìa cà phê cho phần còn lại.",
+        "q1": "Đong 6 thìa cà phê được bao nhiêu?",
+        "a1": "Kết quả là 2 thìa canh Mỹ. Ví dụ, sáu thìa cà phê bằng hai thìa canh. Bốn thìa cà phê bằng một thìa canh cộng một thìa cà phê.",
+        "q2": "Nửa thìa canh bằng mấy thìa cà phê?",
+        "a2": "Bằng một thìa rưỡi theo chuẩn Mỹ."
+      },
+      "8": {
+        "p1": "8 thìa cà phê tương đương 2,6667 thìa canh Mỹ. Chia số thìa cà phê Mỹ cho 3 để được số thìa canh Mỹ.",
+        "p2": "Nếu kết quả có phần lẻ, hãy đong phần nguyên bằng thìa canh rồi dùng thìa cà phê cho phần còn lại.",
+        "q1": "Đong 8 thìa cà phê được bao nhiêu?",
+        "a1": "Kết quả là 2,6667 thìa canh Mỹ. Ví dụ, sáu thìa cà phê bằng hai thìa canh. Bốn thìa cà phê bằng một thìa canh cộng một thìa cà phê.",
+        "q2": "Nửa thìa canh bằng mấy thìa cà phê?",
+        "a2": "Bằng một thìa rưỡi theo chuẩn Mỹ."
+      }
+    },
+    "tsp-to-grams": {
+      "1": {
+        "p1": "1 thìa cà phê tương đương khoảng 4,93 g nếu đong nước. Chọn nguyên liệu để ước tính khối lượng một thìa cà phê.",
+        "p2": "Gạt ngang bột bằng cạnh thẳng. Nếu công thức yêu cầu độ chính xác cao, cân trực tiếp nguyên liệu.",
+        "q1": "Đong 1 thìa cà phê được bao nhiêu?",
+        "a1": "Kết quả là khoảng 4,93 g nếu đong nước. Đường cát khoảng 4,2 g mỗi thìa, còn muối ăn hạt mịn khoảng 6 g. Kích thước hạt và độ ẩm đều ảnh hưởng đến kết quả.",
+        "q2": "Tại sao phải chọn loại muối?",
+        "a2": "Muối hạt to có nhiều khoảng trống giữa các hạt hơn muối mịn nên cùng một thìa có thể nhẹ hơn đáng kể."
+      }
+    },
+    "ml-to-oz": {
+      "60": {
+        "p1": "60 mililít tương đương 2,0288 fl oz Mỹ. Chia số ml cho 29,5735 để đổi sang ounce chất lỏng Mỹ.",
+        "p2": "Nếu chai hoặc cốc ghi imperial fl oz, một đơn vị chỉ khoảng 28,41 ml.",
+        "q1": "Đong 60 mililít được bao nhiêu?",
+        "a1": "Kết quả là 2,0288 fl oz Mỹ. Ví dụ, 60 ml nước dùng được hơn 2 fl oz Mỹ một chút.",
+        "q2": "Có thể dùng phép đổi này cho bột mì theo ounce không?",
+        "a2": "Chỉ khi công thức yêu cầu ounce chất lỏng. Với ounce khối lượng, hãy dùng cân."
+      }
+    },
+    "ml-to-tbsp": {
+      "30": {
+        "p1": "30 mililít tương đương 2,0288 thìa canh Mỹ. Chia số ml cho 14,78676 để đổi sang thìa canh Mỹ.",
+        "p2": "Trong công thức Úc, thìa canh thường là 20 ml. Dùng vạch ml nếu bạn chưa rõ chuẩn của bộ thìa.",
+        "q1": "Đong 30 mililít được bao nhiêu?",
+        "a1": "Kết quả là 2,0288 thìa canh Mỹ. Ba mươi ml tương đương khoảng 2,03 thìa canh Mỹ hoặc đúng hai thìa canh 15 ml.",
+        "q2": "Mười lăm ml có bằng một thìa canh không?",
+        "a2": "Đúng với thìa canh hệ mét 15 ml. Thìa Mỹ nhỏ hơn một chút."
+      }
+    }
+  },
+  "unitsTitle": {
+    "tsp": "thìa cà phê",
+    "tbsp": "thìa canh",
+    "ml": "ml",
+    "floz": "fl oz Mỹ",
+    "cup": "cốc Mỹ",
+    "grams": "gam"
+  },
+  "homeSection": {
+    "heading": "Đổi đơn vị trong bếp",
+    "description": "Đổi thìa, cốc Mỹ, ml và ounce chất lỏng. Khi đổi sang gam, chọn nguyên liệu để tính theo khối lượng riêng."
+  }
+}

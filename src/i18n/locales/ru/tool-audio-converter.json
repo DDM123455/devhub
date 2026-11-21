@@ -63,7 +63,8 @@
     "downloadAll": "Скачать всё (.zip)",
     "removeFile": "Удалить",
     "zipError": "Не удалось создать .zip-файл.",
-    "filesHeading": "Файлы"
+    "filesHeading": "Файлы",
+    "cancel": "Отмена"
   },
   "related": "Похожие инструменты",
   "faq": {

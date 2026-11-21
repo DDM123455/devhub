@@ -69,7 +69,11 @@
     "fileReadError": "無法讀取該檔案。",
     "fileLoaded": "已載入 {{name}}。",
     "compareDiff": "在文字差異比對工具中查看前後差異",
-    "compareTooLarge": "內容過大，無法透過連結比對。"
+    "compareTooLarge": "內容過大，無法透過連結比對。",
+    "validateXml": "驗證 XML",
+    "xmlValidationFailed": "XML 無效：{{message}}",
+    "xmlValid": "XML 語法正確，輸入內容保持不變。",
+    "xmlValidationHint": "檢查語法、標籤配對、屬性及命名空間，不會依 XSD 結構描述驗證。"
   },
   "faq": {
     "heading": "常見問題",

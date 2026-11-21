@@ -36,7 +36,8 @@
     "pdfPageSizeLabel": "Format de page PDF",
     "pdfPageFit": "Ajusté à l'image",
     "pdfMarginLabel": "Marge : {{mm}} mm",
-    "downloadCombinedPdf": "Tout télécharger en un seul PDF"
+    "downloadCombinedPdf": "Tout télécharger en un seul PDF",
+    "cancel": "Annuler"
   },
   "related": "Outils associés",
   "faq": {

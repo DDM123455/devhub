@@ -3,5 +3,11 @@
   "meta": {
     "title": "SQL से Java Entity और DTO में बदलें — Web Tool Hub",
     "description": "PostgreSQL और MySQL तालिकाओं को Java Entity, DTO, record या projection में बदलें। कोड अपलोड किए बिना ब्राउज़र में मेटाडेटा जाँचें और SQL निर्यात करें।"
+  },
+  "ui": {
+    "cancel": "रद्द करें",
+    "advanced": "एडवांस्ड विकल्प",
+    "length": "लंबाई",
+    "copied": "कॉपी हो गया"
   }
 }

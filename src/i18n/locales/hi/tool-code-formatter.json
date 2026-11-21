@@ -69,7 +69,11 @@
     "fileReadError": "वह फ़ाइल पढ़ी नहीं जा सकी।",
     "fileLoaded": "{{name}} लोड हो गई।",
     "compareDiff": "Text Diff में पहले/बाद की तुलना करें",
-    "compareTooLarge": "लिंक के ज़रिए तुलना करने के लिए बहुत बड़ा है।"
+    "compareTooLarge": "लिंक के ज़रिए तुलना करने के लिए बहुत बड़ा है।",
+    "validateXml": "XML की जाँच करें",
+    "xmlValidationFailed": "अमान्य XML: {{message}}",
+    "xmlValid": "XML सिंटैक्स सही है। इनपुट जस का तस है।",
+    "xmlValidationHint": "सिंटैक्स, टैग के जोड़े, एट्रिब्यूट और नेमस्पेस जाँचे जाते हैं। XSD स्कीमा की जाँच नहीं होती।"
   },
   "faq": {
     "heading": "अक्सर पूछे जाने वाले सवाल",

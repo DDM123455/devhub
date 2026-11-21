@@ -38,6 +38,13 @@ Bản build tĩnh có 27 công cụ. Bộ Playwright chạy đủ 27 công cụ,
 
 ## Đối chiếu và chạy lại
 
+### Cập nhật sau khi xử lý các mục còn mở
+
+- Build 647 trang, SEO P0–P3 bằng 0. Có 83 URL trong sitemap. Đã sửa 81 mô tả dài, các nhóm H1 trùng và hai tiêu đề trang 404.
+- Firefox và WebKit trên Windows đã mở và khởi tạo đủ 27 trang công cụ ở khổ 390 px. Đã kiểm tràn ngang, lỗi JavaScript khi mở trang và thao tác so sánh bằng bàn phím trên Text Diff. Chạy lại bằng `node scripts/qa/browser-engines.cjs` sau khi cài hai engine Playwright. Safari trên iPhone và trình đọc màn hình thật còn cần kiểm riêng.
+- 14 dòng từng ghi nhận nút khóa đã có kết luận chi tiết trong CSV. Đã kiểm thao tác ở trạng thái đủ dữ liệu với Base64, QR hàng loạt, PDF, OCR và Xóa nền. Năm dòng là nhãn tiến trình được khóa trong lúc chạy tác vụ.
+- JSON/XML đã được thử nhập XML đúng và XML sai trên cả 20 ngôn ngữ. Chạy lại bằng Node 22 với `node scripts/qa/xml-locales.mjs`. Tiếng Việt đạt đủ khóa; 18 ngôn ngữ còn lại vẫn còn khóa thiếu và cần rà bản ngữ. Các số liệu ở phần lịch sử bên dưới thuộc lần kiểm trước.
+
 ### Kiểm lại sau audit
 
 Đã đối chiếu danh sách ngày 20/11 với các thay đổi trong repo và chạy lại 29 nhóm trên cả hai kích thước Chromium. Hai ca hiệu năng Text Diff bị trượt khi máy bận. So sánh 2.000 dòng khác hoàn toàn từng mất 4,67 giây (ngưỡng 4 giây). Đảo ngược 2.000 dòng duy nhất từng mất 10,97 giây (ngưỡng 5 giây). Sau khi tối ưu hai trường hợp này, lần chạy toàn bộ cuối đo được lần lượt 1,14 giây và 0,012 giây trên máy kiểm thử. Thời gian phụ thuộc tải của máy.

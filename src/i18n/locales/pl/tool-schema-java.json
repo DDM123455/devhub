@@ -3,5 +3,12 @@
   "meta": {
     "title": "Konwertuj SQL na Java Entity i DTO — Web Tool Hub",
     "description": "Konwertuj tabele PostgreSQL i MySQL na Java Entity, DTO, record lub projekcje. Sprawdzaj metadane i eksportuj SQL lokalnie, bez przesyłania kodu."
-  }
+  },
+  "ui": {
+    "cancel": "Anuluj",
+    "advanced": "Opcje zaawansowane",
+    "length": "Długość",
+    "copied": "Skopiowano"
+  },
+  "related": "Powiązane narzędzia"
 }

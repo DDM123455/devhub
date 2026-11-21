@@ -90,7 +90,8 @@
       "pathNone": "Sin coincidencias.",
       "pathSyntax": "JSONPath no válido.",
       "pathHelp": "Admitido: $ .key ['key'] [0] [-1] [*] .* .. (recursivo) [0,2] [1:3] [?(@.price < 10)]",
-      "pathsLabel": "Rutas coincidentes"
+      "pathsLabel": "Rutas coincidentes",
+      "clear": "Borrar"
     }
   },
   "related": "Herramientas relacionadas",
@@ -109,5 +110,31 @@
     "p2": "Esta herramienta nunca envía nada a ningún sitio. Está construida sobre jsoneditor, una librería de JavaScript que analiza y vuelve a renderizar tu JSON enteramente dentro de la memoria de tu navegador. El análisis, el formateo legible y la validación de sintaxis ocurren en local usando el propio motor de JavaScript del navegador: no hay ningún servidor de por medio, así que nada de lo que pegues aquí sale de tu dispositivo.",
     "p3": "Pega tu JSON en el editor en modo texto y usa el botón Format de la barra de herramientas para formatearlo de forma legible, o Compact para reducirlo de nuevo a una sola línea. Si el JSON tiene un error de sintaxis —una coma sobrante, una comilla faltante, un corchete sin cerrar—, el editor lo resalta de inmediato con un mensaje de error claro y el número de línea exacto, en lugar de dejarte revisar todo el documento a simple vista; un botón «Ir a la línea del error» te lleva directo a esa línea y la selecciona, para que no tengas que desplazarte buscándola en un archivo largo. Cambia al modo árbol desde el menú desplegable superior para explorar los mismos datos como un árbol interactivo y colapsable: expande y contrae objetos y arrays anidados, edita valores individuales al momento, y reordena o elimina campos directamente, con el cambio reflejado en el texto en cuanto vuelvas a cambiar de modo.",
     "p4": "Esta combinación cubre la mayor parte del trabajo diario con JSON: limpiar una respuesta de API antes de pegarla en documentación, validar un archivo de configuración antes de confirmarlo, o explorar un payload profundamente anidado sin perder de vista en qué array estás. ¿Necesitas los datos en otro formato? Los botones debajo del editor convierten el JSON actual directamente a XML, YAML o CSV — útil cuando el script de un compañero espera un archivo YAML o una hoja de cálculo necesita filas y columnas planas en vez de JSON anidado — con el resultado mostrado ahí mismo para copiarlo rápido o descargarlo completo. Como todo vive únicamente en la pestaña del navegador, cerrarla borra por completo el editor: no hay historial ni borrador guardado de qué preocuparse, justo el comportamiento que quieres cuando el JSON con el que trabajas puede ser sensible."
+  },
+  "xml": {
+    "clear": "Borrar",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "copyFailed": "No se pudo copiar",
+    "minify": "Minificar",
+    "selector": "Formato de datos",
+    "input": "Entrada XML",
+    "output": "XML con formato",
+    "format": "Dar formato al XML",
+    "validate": "Validar XML",
+    "invalid": "XML no válido: {{message}}",
+    "location": "línea {{line}}, columna {{column}}",
+    "download": "Descargar XML",
+    "indent": "Sangría",
+    "indentSpaces": "{{n}} espacios",
+    "viewText": "Texto",
+    "viewTree": "Árbol",
+    "expandAll": "Expandir todo",
+    "collapseAll": "Contraer todo",
+    "treeEmpty": "No hay datos para la vista de árbol.",
+    "valid": "La sintaxis XML es válida. La entrada se conserva.",
+    "hint": "Da formato al XML, minifícalo o comprueba su sintaxis. Al minificar se conservan los espacios del texto. Ctrl+Enter aplica formato. Comprueba la sintaxis, las etiquetas, los atributos y los espacios de nombres. No valida esquemas XSD.",
+    "tooLarge": "Se admiten hasta 200.000 caracteres. Reduce el tamaño del documento.",
+    "indentTab": "Tabulación"
   }
 }

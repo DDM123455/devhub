@@ -69,7 +69,11 @@
     "fileReadError": "No se pudo leer ese archivo.",
     "fileLoaded": "Se cargó {{name}}.",
     "compareDiff": "Comparar antes y después en Comparador de textos",
-    "compareTooLarge": "Demasiado grande para compararlo mediante un enlace."
+    "compareTooLarge": "Demasiado grande para compararlo mediante un enlace.",
+    "validateXml": "Validar XML",
+    "xmlValidationFailed": "XML no válido: {{message}}",
+    "xmlValid": "La sintaxis XML es válida. La entrada se conserva.",
+    "xmlValidationHint": "Comprueba la sintaxis, las etiquetas, los atributos y los espacios de nombres. No valida esquemas XSD."
   },
   "faq": {
     "heading": "Preguntas frecuentes",

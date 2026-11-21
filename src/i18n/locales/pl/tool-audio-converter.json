@@ -63,7 +63,8 @@
     "downloadAll": "Pobierz wszystko (.zip)",
     "removeFile": "Usuń",
     "zipError": "Nie udało się utworzyć pliku .zip.",
-    "filesHeading": "Pliki"
+    "filesHeading": "Pliki",
+    "cancel": "Anuluj"
   },
   "related": "Powiązane narzędzia",
   "faq": {

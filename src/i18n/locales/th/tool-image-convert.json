@@ -36,7 +36,8 @@
     "pdfPageSizeLabel": "ขนาดหน้า PDF",
     "pdfPageFit": "พอดีกับรูปภาพ",
     "pdfMarginLabel": "ขอบกระดาษ: {{mm}} มม.",
-    "downloadCombinedPdf": "ดาวน์โหลดทั้งหมดเป็น PDF เดียว"
+    "downloadCombinedPdf": "ดาวน์โหลดทั้งหมดเป็น PDF เดียว",
+    "cancel": "ยกเลิก"
   },
   "related": "เครื่องมือที่เกี่ยวข้อง",
   "faq": {

@@ -69,7 +69,11 @@
     "fileReadError": "Det gick inte att läsa filen.",
     "fileLoaded": "{{name}} laddades.",
     "compareDiff": "Jämför före/efter i Textjämförelse",
-    "compareTooLarge": "För stor för att jämföras via en länk."
+    "compareTooLarge": "För stor för att jämföras via en länk.",
+    "validateXml": "Validera XML",
+    "xmlValidationFailed": "Ogiltig XML: {{message}}",
+    "xmlValid": "XML-syntaxen är giltig. Indata är oförändrade.",
+    "xmlValidationHint": "Kontrollerar syntax, taggpar, attribut och namnrymder. Ingen validering mot XSD-schema."
   },
   "faq": {
     "heading": "Vanliga frågor",

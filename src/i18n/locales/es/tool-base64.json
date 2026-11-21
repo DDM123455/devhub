@@ -101,7 +101,8 @@
       "copy": "Copiar",
       "copied": "¡Copiado!",
       "copyFailed": "No se pudo copiar"
-    }
+    },
+    "loadSample": "Cargar ejemplo"
   },
   "related": "Herramientas relacionadas",
   "faq": {

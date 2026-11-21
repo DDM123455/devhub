@@ -69,7 +69,11 @@
     "fileReadError": "Dosya okunamadı.",
     "fileLoaded": "{{name}} yüklendi.",
     "compareDiff": "Metin Karşılaştırma'da önce/sonra farkına bak",
-    "compareTooLarge": "Bağlantıyla karşılaştırmak için çok büyük."
+    "compareTooLarge": "Bağlantıyla karşılaştırmak için çok büyük.",
+    "validateXml": "XML doğrula",
+    "xmlValidationFailed": "Geçersiz XML: {{message}}",
+    "xmlValid": "XML söz dizimi geçerli. Girdi değiştirilmedi.",
+    "xmlValidationHint": "Söz dizimi, eşleşen etiketler, öznitelikler ve ad alanları denetlenir. XSD şeması doğrulanmaz."
   },
   "faq": {
     "heading": "Sık sorulan sorular",

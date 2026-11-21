@@ -3,5 +3,12 @@
   "meta": {
     "title": "SQLからJava Entity・DTOへ変換 — Web Tool Hub",
     "description": "PostgreSQL・MySQLのテーブルをJava Entity、DTO、record、projectionに変換。メタデータを確認してSQLを出力できます。コードを送信せず、ブラウザー内で処理します。"
-  }
+  },
+  "ui": {
+    "cancel": "キャンセル",
+    "advanced": "詳細オプション",
+    "length": "桁数",
+    "copied": "コピーしました"
+  },
+  "related": "関連ツール"
 }

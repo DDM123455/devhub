@@ -90,7 +90,8 @@
       "pathNone": "Eşleşme yok.",
       "pathSyntax": "Geçersiz JSONPath.",
       "pathHelp": "Desteklenenler: $ .key ['key'] [0] [-1] [*] .* .. (özyinelemeli) [0,2] [1:3] [?(@.price < 10)]",
-      "pathsLabel": "Eşleşen yollar"
+      "pathsLabel": "Eşleşen yollar",
+      "clear": "Temizle"
     }
   },
   "related": "İlgili araçlar",
@@ -109,5 +110,31 @@
     "p2": "Bu araç hiçbir şeyi hiçbir yere göndermez. JSON'ınızı tamamen tarayıcınızın belleği içinde ayrıştıran ve yeniden oluşturan bir JavaScript kütüphanesi olan jsoneditor üzerine kuruludur. Ayrıştırma, güzel biçimlendirme ve söz dizimi doğrulaması tamamen tarayıcının kendi JavaScript motorunu kullanarak yerel olarak gerçekleşir — devrede bir sunucu yoktur, bu yüzden buraya yapıştırdığınız hiçbir şey cihazınızdan çıkmaz.",
     "p3": "JSON'ınızı metin modundaki editöre yapıştırın ve araç çubuğundaki Biçimlendir düğmesiyle güzelce yazdırın ya da Sıkıştır ile tekrar tek bir satıra sıkıştırın. JSON'da bir söz dizimi hatası varsa — fazladan bir virgül, eksik bir tırnak, eşleşmeyen bir parantez — editör bunu tüm belgeyi göz gezdirmenize bırakmak yerine anında net bir hata mesajı ve tam satır numarasıyla vurgular; bir \"Hata satırına git\" düğmesi doğrudan o satıra atlayıp seçer, böylece uzun bir dosyada kaydırıp aramanıza gerek kalmaz. Aynı veriyi daraltılıp genişletilebilir, etkileşimli bir ağaç olarak taramak için üstteki açılır menüden ağaç moduna geçin: iç içe geçmiş nesneleri ve dizileri genişletip daraltın, tek tek değerleri yerinde düzenleyin, alanları doğrudan yeniden sıralayın ya da silin — değişiklik, tekrar mod değiştirdiğiniz anda metne yansır.",
     "p4": "Bu kombinasyon günlük JSON işlerinin çoğunu kapsar: bir API yanıtını belgelere yapıştırmadan önce temizlemek, bir yapılandırma dosyasını commit etmeden önce doğrulamak ya da hangi dizinin içinde olduğunuzu kaybetmeden derinlemesine iç içe geçmiş bir veri paketini keşfetmek. Veriye farklı bir formatta mı ihtiyacınız var? Editörün altındaki düğmeler mevcut JSON'ı doğrudan XML, YAML ya da CSV'ye dönüştürür — bir ekip arkadaşının betiği bir YAML yapılandırma dosyası beklediğinde ya da bir hesap tablosunun iç içe geçmiş JSON yerine düz satır ve sütunlara ihtiyacı olduğunda kullanışlıdır — dönüştürülmüş sonuç hızlı bir kopyalama ya da tam bir indirme için satır içinde gösterilir. Her şey yalnızca tarayıcı sekmesinde yaşadığından, sekmeyi kapatmak editörü tamamen temizler — endişelenecek kaydedilmiş bir geçmiş ya da taslak yoktur; bu da üzerinde çalıştığınız JSON hassas olabileceğinde tam olarak istediğiniz davranıştır."
+  },
+  "xml": {
+    "clear": "Temizle",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı!",
+    "copyFailed": "Kopyalanamadı",
+    "indentTab": "Sekme",
+    "minify": "Küçült",
+    "selector": "Veri biçimi",
+    "input": "XML girdisi",
+    "output": "Biçimlendirilmiş XML",
+    "format": "XML biçimlendir",
+    "validate": "XML doğrula",
+    "invalid": "Geçersiz XML: {{message}}",
+    "location": "satır {{line}}, sütun {{column}}",
+    "download": "XML indir",
+    "indent": "Girinti",
+    "indentSpaces": "{{n}} boşluk",
+    "viewText": "Metin",
+    "viewTree": "Ağaç",
+    "expandAll": "Tümünü genişlet",
+    "collapseAll": "Tümünü daralt",
+    "treeEmpty": "Ağaç görünümünde gösterilecek veri yok.",
+    "valid": "XML söz dizimi geçerli. Girdi değiştirilmedi.",
+    "hint": "XML biçimlendirme, küçültme ve söz dizimi denetimi yapabilirsiniz. Küçültme sırasında metindeki boşluklar korunur. Ctrl+Enter ile biçimlendirin. Söz dizimi, eşleşen etiketler, öznitelikler ve ad alanları denetlenir. XSD şeması doğrulanmaz.",
+    "tooLarge": "Girdi en fazla 200.000 karakter olabilir. Belgeyi kısaltın."
   }
 }

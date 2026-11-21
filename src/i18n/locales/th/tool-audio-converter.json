@@ -63,7 +63,8 @@
     "downloadAll": "ดาวน์โหลดทั้งหมด (.zip)",
     "removeFile": "ลบ",
     "zipError": "สร้างไฟล์ .zip ไม่สำเร็จ",
-    "filesHeading": "ไฟล์"
+    "filesHeading": "ไฟล์",
+    "cancel": "ยกเลิก"
   },
   "related": "เครื่องมือที่เกี่ยวข้อง",
   "faq": {

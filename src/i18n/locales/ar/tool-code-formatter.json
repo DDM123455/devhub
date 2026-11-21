@@ -69,7 +69,11 @@
     "fileReadError": "تعذّرت قراءة هذا الملف.",
     "fileLoaded": "تم تحميل {{name}}.",
     "compareDiff": "قارن قبل/بعد في أداة مقارنة النصوص",
-    "compareTooLarge": "أكبر من أن يُقارَن عبر رابط."
+    "compareTooLarge": "أكبر من أن يُقارَن عبر رابط.",
+    "validateXml": "التحقق من XML",
+    "xmlValidationFailed": "XML غير صالح: {{message}}",
+    "xmlValid": "صياغة XML صحيحة. بقي الإدخال كما هو.",
+    "xmlValidationHint": "يفحص الصياغة والوسوم والسمات ومساحات الأسماء. لا يفحص مخطط XSD."
   },
   "faq": {
     "heading": "الأسئلة الشائعة",

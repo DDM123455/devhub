@@ -69,7 +69,11 @@
     "fileReadError": "Die Datei konnte nicht gelesen werden.",
     "fileLoaded": "{{name}} geladen.",
     "compareDiff": "Vorher/nachher im Text-Diff vergleichen",
-    "compareTooLarge": "Zu groß, um per Link verglichen zu werden."
+    "compareTooLarge": "Zu groß, um per Link verglichen zu werden.",
+    "validateXml": "XML prüfen",
+    "xmlValidationFailed": "Ungültiges XML: {{message}}",
+    "xmlValid": "Die XML-Syntax ist gültig. Die Eingabe bleibt unverändert.",
+    "xmlValidationHint": "Prüft Syntax, Tag-Paare, Attribute und Namensräume. Keine Prüfung gegen XSD."
   },
   "faq": {
     "heading": "Häufig gestellte Fragen",

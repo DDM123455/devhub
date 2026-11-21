@@ -36,7 +36,8 @@
     "pdfPageSizeLabel": "PDF sayfa boyutu",
     "pdfPageFit": "Resme sığdır",
     "pdfMarginLabel": "Kenar boşluğu: {{mm}} mm",
-    "downloadCombinedPdf": "Tümünü tek PDF olarak indir"
+    "downloadCombinedPdf": "Tümünü tek PDF olarak indir",
+    "cancel": "İptal"
   },
   "related": "İlgili araçlar",
   "faq": {

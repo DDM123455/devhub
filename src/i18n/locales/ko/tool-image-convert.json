@@ -36,7 +36,8 @@
     "pdfPageSizeLabel": "PDF 페이지 크기",
     "pdfPageFit": "이미지에 맞춤",
     "pdfMarginLabel": "여백: {{mm}} mm",
-    "downloadCombinedPdf": "모두 PDF 하나로 다운로드"
+    "downloadCombinedPdf": "모두 PDF 하나로 다운로드",
+    "cancel": "취소"
   },
   "related": "관련 도구",
   "faq": {

@@ -101,7 +101,8 @@
       "copy": "Kopieren",
       "copied": "Kopiert!",
       "copyFailed": "Kopieren fehlgeschlagen"
-    }
+    },
+    "loadSample": "Beispiel laden"
   },
   "related": "Verwandte Tools",
   "faq": {

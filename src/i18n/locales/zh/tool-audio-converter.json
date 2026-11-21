@@ -63,7 +63,8 @@
     "downloadAll": "全部下载 (.zip)",
     "removeFile": "移除",
     "zipError": "无法创建 .zip 文件。",
-    "filesHeading": "文件"
+    "filesHeading": "文件",
+    "cancel": "取消"
   },
   "related": "相关工具",
   "faq": {

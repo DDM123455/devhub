@@ -36,7 +36,8 @@
     "pdfPageSizeLabel": "Ukuran halaman PDF",
     "pdfPageFit": "Sesuaikan dengan gambar",
     "pdfMarginLabel": "Margin: {{mm}} mm",
-    "downloadCombinedPdf": "Unduh semua sebagai satu PDF"
+    "downloadCombinedPdf": "Unduh semua sebagai satu PDF",
+    "cancel": "Batal"
   },
   "related": "Alat terkait",
   "faq": {

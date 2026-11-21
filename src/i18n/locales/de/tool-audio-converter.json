@@ -63,7 +63,8 @@
     "downloadAll": "Alle herunterladen (.zip)",
     "removeFile": "Entfernen",
     "zipError": "Die .zip-Datei konnte nicht erstellt werden.",
-    "filesHeading": "Dateien"
+    "filesHeading": "Dateien",
+    "cancel": "Abbrechen"
   },
   "related": "Ähnliche Tools",
   "faq": {

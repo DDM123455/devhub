@@ -36,7 +36,8 @@
     "pdfPageSizeLabel": "PDF 頁面大小",
     "pdfPageFit": "符合圖片大小",
     "pdfMarginLabel": "邊界：{{mm}} mm",
-    "downloadCombinedPdf": "全部合併成一個 PDF 下載"
+    "downloadCombinedPdf": "全部合併成一個 PDF 下載",
+    "cancel": "取消"
   },
   "related": "相關工具",
   "faq": {

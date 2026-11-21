@@ -51,6 +51,9 @@ module.exports = {
 		await rejectsFile();
 		await selectFile([fixture.pdf, fixture.image]);
 		await button('Rotate page 3').waitFor();
+		assert.ok(await button('Move earlier 1').isDisabled());
+		await click('Move earlier 2');
+		await click('Move later 1');
 		await click('Rotate page 1');
 		await click('Merge PDFs');
 		const pages = (await PDFDocument.load(await download(/Download merged/i))).getPages();
@@ -66,13 +69,17 @@ module.exports = {
 		assert.equal(entries.length, 2);
 		for (const entry of entries) assert.equal((await PDFDocument.load(await entry.async('uint8array'))).getPageCount(), 1);
 	},
-	async 'image-to-text'({ selectFile, rejectsFile, click, download, fixture }) {
+	async 'image-to-text'({ root, button, selectFile, rejectsFile, click, download, fixture }) {
 		await rejectsFile();
 		await selectFile(fixture.image);
 		await click(/^Extract text/);
 		assert.match((await download('Download .txt', 120000)).toString(), /LOCAL TEST 42/);
 		const docx = await JSZip.loadAsync(await download('Download .docx'));
 		assert.match(await docx.file('word/document.xml').async('string'), /LOCAL TEST 42/);
+		assert.ok(await button('Remove English').isDisabled());
+		await root.locator('section[aria-labelledby="ocr-lang-label"] select').selectOption('vie');
+		await click('Remove English');
+		assert.ok(await button('Remove Vietnamese').isDisabled());
 	},
 	async 'remove-background'({ root, page, selectFile, rejectsFile, click, download, fixture, url }) {
 		const entry = page.waitForResponse(r => r.url().startsWith(url + '/_astro/backgroundRemovalWorker-'));
@@ -91,6 +98,12 @@ module.exports = {
 		await click('Solid color');
 		await click('Edit mask');
 		await root.getByRole('button', {name:/cancel/i}).first().click();
+		await root.getByRole('button', {name: 'Remove ' + fixture.image.name, exact:true}).click();
+		assert.equal(await root.getByRole('button', {name:'Download',exact:true}).count(), 0);
+		await selectFile(fixture.image);
+		await root.getByRole('button', {name:'Download',exact:true}).waitFor({timeout:180000});
+		await click('Clear all');
+		assert.equal(await root.getByRole('button', {name:'Download',exact:true}).count(), 0);
 	},
 	async 'video-trimmer'({ selectFile, rejectsFile, click, download, fixture }) {
 		await rejectsFile(/video file|video format/i);

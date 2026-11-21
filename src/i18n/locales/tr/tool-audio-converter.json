@@ -63,7 +63,8 @@
     "downloadAll": "Tümünü indir (.zip)",
     "removeFile": "Kaldır",
     "zipError": ".zip dosyası oluşturulamadı.",
-    "filesHeading": "Dosyalar"
+    "filesHeading": "Dosyalar",
+    "cancel": "İptal"
   },
   "related": "İlgili araçlar",
   "faq": {
