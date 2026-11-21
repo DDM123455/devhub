@@ -180,6 +180,11 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+### 2026-11-21 — So sánh JSON, giữ khoảng trắng XML và xử lý lỗi Text Diff
+
+- So sánh JSON trong chế độ văn bản giữ đủ từng chữ số và từng lần xuất hiện của khóa trùng. Xóa kết quả cũ khi người dùng sửa đầu vào. Format XML giữ dấu cách và NBSP giữa các phần tử trên cùng dòng.
+- Text Diff ẩn kết quả cũ trong lúc đợi và khi worker lỗi. Đã chặn worker trên Chromium, sửa đầu vào rồi so sánh lại thành công. Build 647 trang, 1.132 test đạt, audit SEO P0–P3 bằng 0.
+
 ### 2026-11-21 — Base64: bảo toàn JSON sau giải mã
 
 - Pretty-print dùng bộ định dạng giữ nguyên token số và khóa trùng; bỏ lần decode dư khi kiểm tra đầu ra JSON. Đã kiểm số 9007199254740993 và 1e400 cùng hai khóa id qua giao diện. Build 647 trang, 1.130 test đạt.

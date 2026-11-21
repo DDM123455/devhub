@@ -858,6 +858,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 		setDiffError(false);
 		worker.onmessage = (event: MessageEvent<TextDiffResponse>) => {
 			if (event.data.error) {
+				setEntries([]);
 				setDiffError(true);
 			} else {
 				setEntries(event.data.entries);
@@ -868,6 +869,7 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 			worker.terminate();
 		};
 		worker.onerror = () => {
+			setEntries([]);
 			setDiffError(true);
 			diffInflightRef.current = false;
 			setIsComputing(false);
@@ -888,7 +890,11 @@ export default function TextDiffChecker({ messages }: { messages: Messages }) {
 			ignorePatterns: ignoreCompile.error ? [] : ignoreSources,
 		};
 		worker.postMessage(request);
-		return () => worker.terminate();
+		return () => {
+			worker.onmessage = null;
+			worker.onerror = null;
+			worker.terminate();
+		};
 	}, [
 		debouncedOriginal,
 		debouncedChanged,
@@ -1189,7 +1195,7 @@ buildDiffHtml(entries, { title: `${leftTitle} / ${rightTitle}`, left: leftTitle,
 		if (pending) return;
 		setCompareRequested(false);
 		const target = resultsRef.current;
-		if (target) {
+		if (target && !diffError) {
 			const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 			target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
 			target.focus({ preventScroll: true });
@@ -1655,10 +1661,11 @@ accept={FILE_ACCEPT}
 
 			<section
 				id="text-diff-results"
+				hidden={diffError || isComputing || originalText !== debouncedOriginal || changedText !== debouncedChanged}
 				ref={resultsRef}
 				tabIndex={-1}
 				aria-label={messages.resultsHeading}
-				className="flex scroll-mt-28 flex-col gap-6 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background md:scroll-mt-20"
+				className="flex scroll-mt-28 flex-col gap-6 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background md:scroll-mt-20 [&[hidden]]:hidden"
 			>
 			<h2 className="sr-only">{messages.resultsHeading}</h2>
 			{hasChanges ? (

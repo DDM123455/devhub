@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { autoFormatText } from '../text-format';
+import { autoFormatText, compareJsonText } from '../text-format';
 
 // The XML branch uses `DOMParser`, a browser-only global not present in Vitest's default
 // Node environment (no `jsdom`/`happy-dom` dependency in this repo, and adding one just for
@@ -35,5 +35,20 @@ describe('autoFormatText', () => {
 	it('does not misdetect a JSON array of objects as XML', () => {
 		const result = autoFormatText('[{"id":1},{"id":2}]');
 		expect(result?.detected).toBe('json');
+	});
+});
+describe('exact JSON comparison', () => {
+	it('preserves duplicate fields and reports exact numeric values', () => {
+		expect(compareJsonText('{"id":9007199254740993,"id":1e400}', '{"id":9007199254740992,"id":2e400}')).toEqual([
+			{ path: '$.id#1', type: 'changed', leftValue: '9007199254740993', rightValue: '9007199254740992' },
+			{ path: '$.id#2', type: 'changed', leftValue: '1e400', rightValue: '2e400' },
+		]);
+	});
+	it('ignores object key order and equivalent decimals without rounding', () => {
+		expect(compareJsonText('{"x":0.0010,"y":[-0,12e400]}','{"y":[0.0,1.2e401],"x":1e-3}')).toEqual([]);
+		expect(compareJsonText('["1"]','[1]')).toHaveLength(1);
+		expect(compareJsonText('{}','{')).toBe('invalidRight');
+		expect(compareJsonText('{}', '\u00a0{}')).toBe('invalidRight');
+		expect(compareJsonText('1' + '0'.repeat(500), '1e500')).toEqual([]);
 	});
 });

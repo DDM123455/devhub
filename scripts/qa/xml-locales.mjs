@@ -49,6 +49,10 @@ try {
 		await input.fill('<?xml-stylesheet href="example.css"?><root/>');
 		await root.getByRole('button', { name: xml.format, exact: true }).click();
 		assert.equal((await root.locator('textarea[readonly]').inputValue()).split('<?xml-stylesheet').length - 1, 1);
+		const inline = '<p><b>Hello</b> <i>world</i>\u00a0<u>!</u></p>';
+		await input.fill(inline);
+		await root.getByRole('button', { name: xml.format, exact: true }).click();
+		assert.equal(await root.locator('textarea[readonly]').inputValue(), inline);
 		console.log('PASS XML', locale);
 	}
 } finally {

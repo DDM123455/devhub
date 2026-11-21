@@ -31,6 +31,7 @@ type JsonNode =
 
 function parseJsonPreserving(text: string): { node: JsonNode; hasDuplicateKeys: boolean } {
 	let pos = 0;
+	const literalPattern = /(?:true|false|null|-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?)/y;
 	let hasDuplicateKeys = false;
 	const ws = () => {
 		while (pos < text.length && (text[pos] === ' ' || text[pos] === '\t' || text[pos] === '\n' || text[pos] === '\r')) pos++;
@@ -108,7 +109,8 @@ function parseJsonPreserving(text: string): { node: JsonNode; hasDuplicateKeys: 
 			}
 		}
 		if (ch === '"') return { t: 'raw', text: JSON.stringify(parseString()) };
-		const literal = /^(?:true|false|null|-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?)/.exec(text.slice(pos, pos + 400));
+		literalPattern.lastIndex = pos;
+		const literal = literalPattern.exec(text);
 		if (!literal) return fail();
 		pos += literal[0].length;
 		return { t: 'raw', text: literal[0] };
@@ -142,6 +144,59 @@ export function formatJsonLossless(text: string, compact = false, unit = '  '): 
 	} catch {
 		return null;
 	}
+}
+
+export interface JsonTextChange {
+	path: string;
+	type: 'added' | 'removed' | 'changed';
+	leftValue?: string;
+	rightValue?: string;
+}
+
+// Compare decimal tokens without converting the mantissa to a JS Number.
+function decimalKey(token: string): string {
+	const match = /^(-?)(\d+)(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/.exec(token);
+	if (!match) return token;
+	const fraction = match[3] ?? '';
+	const digits = (match[2] + fraction).replace(/^0+/, '');
+	if (!digits) return '0';
+	const significant = digits.replace(/0+$/, '');
+	const power = BigInt(match[4] ?? 0) + BigInt(digits.length - significant.length - fraction.length);
+	return match[1] + significant + 'e' + power;
+}
+
+export function compareJsonText(left: string, right: string): JsonTextChange[] | 'invalidLeft' | 'invalidRight' {
+	let a: JsonNode, b: JsonNode;
+	try { a = parseJsonPreserving(left).node; } catch { return 'invalidLeft'; }
+	try { b = parseJsonPreserving(right).node; } catch { return 'invalidRight'; }
+	const changes: JsonTextChange[] = [];
+	function group(entries: Array<[string, JsonNode]>) {
+		const byKey = new Map<string, JsonNode[]>();
+		for (const [key, node] of entries) {
+			const list = byKey.get(key);
+			if (list) list.push(node);
+			else byKey.set(key, [node]);
+		}
+		return byKey;
+	}
+	function visit(x: JsonNode | undefined, y: JsonNode | undefined, path: string) {
+		if (x?.t === 'object' && y?.t === 'object') {
+			const lhs = group(x.entries), rhs = group(y.entries);
+			for (const key of new Set([...lhs.keys(), ...rhs.keys()])) {
+				const l = lhs.get(key) ?? [], r = rhs.get(key) ?? [];
+				const field = /^[A-Za-z_$][\w$]*$/.test(key) ? '.' + key : '[' + JSON.stringify(key) + ']';
+				const count = Math.max(l.length, r.length);
+				for (let i = 0; i < count; i++) visit(l[i], r[i], path + field + (count > 1 ? '#' + (i + 1) : ''));
+			}
+		} else if (x?.t === 'array' && y?.t === 'array') {
+			for (let i = 0; i < Math.max(x.items.length, y.items.length); i++) visit(x.items[i], y.items[i], path + '[' + i + ']');
+		} else if (!(x?.t === 'raw' && y?.t === 'raw' && (x.text === y.text || decimalKey(x.text) === decimalKey(y.text)))) {
+			changes.push({ path, type: !x ? 'added' : !y ? 'removed' : 'changed',
+				leftValue: x && printJson(x, 0, true), rightValue: y && printJson(y, 0, true) });
+		}
+	}
+	visit(a, b, '$');
+	return changes;
 }
 
 function tryFormatJson(text: string, unit: string): FormatResult | null {
@@ -207,7 +262,9 @@ function indentXmlNode(node: Node, depth: number, lines: string[], unit = '  '):
 		.map((attr) => ` ${attr.name}="${escapeXmlAttr(attr.value)}"`)
 		.join('');
 	const meaningfulChildren = Array.from(element.childNodes).filter(
-		(child) => !(child.nodeType === Node.TEXT_NODE && (child.textContent ?? '').trim() === ''),
+		// Only discard existing multiline indentation. An inline space between
+		// <b>Hello</b> and <i>world</i> can separate two words. NBSP is data.
+		(child) => !(child.nodeType === Node.TEXT_NODE && /^[\t \n]*\n[\t \n]*$/.test(child.textContent ?? '')),
 	);
 	if (element.childNodes.length > 0 && Array.from(element.childNodes).every(child => child.nodeType === Node.TEXT_NODE)) {
 		lines.push(indent + serializeParsedNode(element));

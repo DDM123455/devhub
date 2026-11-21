@@ -9,11 +9,10 @@ import {
 	convertJsonToCsvDetailed,
 	convertJsonToXml,
 	convertJsonToYaml,
-	diffJson,
-	type DiffEntry,
 	type JsonTextWarnings,
 } from '@/lib/json-convert';
 import { decompressFromUrlSafeBase64 } from '@/lib/hash-share';
+import { compareJsonText, type JsonTextChange } from '@/lib/text-format';
 import { useCopyToClipboard } from './useCopyToClipboard';
 import JsonAdvancedPanel, { type JsonAdvancedMessages } from './JsonAdvancedPanel';
 
@@ -87,12 +86,6 @@ const EXPORT_MIME: Record<ExportFormat, string> = {
 	csv: 'text/csv',
 };
 
-function diffValueLabel(value: unknown): string {
-	if (value === undefined) return '—';
-	if (value !== null && typeof value === 'object') return JSON.stringify(value);
-	return JSON.stringify(value);
-}
-
 // jsoneditor's UMD bundle touches `self` at module load time, which only
 // exists in the browser. Astro still server-renders `client:load` islands
 // once during the build to produce the initial HTML, so the library must be
@@ -113,12 +106,18 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 		duplicateKeys: false,
 		collisions: [],
 	});
-	const [compareWarnings, setCompareWarnings] = useState<JsonTextWarnings | null>(null);
 	const [validationStatus, setValidationStatus] = useState<'valid' | 'invalid' | null>(null);
 	const [showCompare, setShowCompare] = useState(false);
 	const [compareInput, setCompareInput] = useState('');
 	const [compareError, setCompareError] = useState<string | null>(null);
-	const [diffResult, setDiffResult] = useState<DiffEntry[] | null>(null);
+	const [diffResult, setDiffResult] = useState<JsonTextChange[] | null>(null);
+	function clearDerivedResults() {
+		setExportResult(null);
+		setExportError(null);
+		setDiffResult(null);
+		setCompareError(null);
+		setValidationStatus(null);
+	}
 
 	useEffect(() => {
 		if (!containerRef.current) return;
@@ -149,10 +148,7 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 					setMode(newMode);
 					if (newMode !== 'text') setParseError(null);
 				},
-				onChange: () => {
-					setExportResult(null);
-					setExportError(null);
-				},
+				onChange: clearDerivedResults,
 				onValidationError: (errors) => {
 					const parseErr = errors.find(isParseError);
 					setParseError(parseErr ? { line: parseErr.line, message: parseErr.message.replace(/<br>/g, ' ') } : null);
@@ -180,9 +176,13 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 			// Share link: #json=<gzip+base64url> (the hash never leaves the browser).
 			const sharedValue = new URLSearchParams(window.location.hash.slice(1)).get('json');
 			if (sharedValue) {
+				const initialText = editor.getText();
 				decompressFromUrlSafeBase64(sharedValue)
 					.then((shared) => {
-						if (!cancelled) editor.setText(shared);
+						if (!cancelled && editor.getText() === initialText) {
+							editor.setText(shared);
+							clearDerivedResults();
+						}
 					})
 					.catch(() => {
 						// corrupt or truncated link: keep the sample
@@ -230,29 +230,10 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 	const handleCompare = () => {
 		setCompareError(null);
 		setDiffResult(null);
-		setCompareWarnings(null);
 		if (!editorRef.current) return;
-		let leftJson: unknown;
-		try {
-			leftJson = editorRef.current.get();
-		} catch {
-			setCompareError(messages.compareInvalidLeft);
-			return;
-		}
-		let rightJson: unknown;
-		try {
-			rightJson = JSON.parse(compareInput);
-		} catch {
-			setCompareError(messages.compareInvalidRight);
-			return;
-		}
-		const left = analyzeJsonText(editorRef.current.getText());
-		const right = analyzeJsonText(compareInput);
-		setCompareWarnings({
-			unsafeNumbers: left.unsafeNumbers || right.unsafeNumbers,
-			duplicateKeys: left.duplicateKeys || right.duplicateKeys,
-		});
-		setDiffResult(diffJson(leftJson, rightJson));
+		const compared = compareJsonText(editorRef.current.getText(), compareInput);
+		if (typeof compared === 'string') setCompareError(compared === 'invalidLeft' ? messages.compareInvalidLeft : messages.compareInvalidRight);
+		else setDiffResult(compared);
 	};
 
 	const handleCopy = () => {
@@ -308,7 +289,7 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 			<JsonAdvancedPanel
 				messages={messages.adv}
 				getText={() => editorRef.current?.getText() ?? ''}
-				setText={(text) => editorRef.current?.setText(text)}
+				setText={(text) => { editorRef.current?.setText(text); clearDerivedResults(); }}
 			/>
 
 			<div className="flex flex-col gap-2 rounded-lg border border-border p-4">
@@ -375,7 +356,7 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 							<textarea
 								id="json-compare-input"
 								value={compareInput}
-								onChange={(e) => setCompareInput(e.target.value)}
+								onChange={(e) => { setCompareInput(e.target.value); setDiffResult(null); setCompareError(null); }}
 								placeholder={messages.compareInputPlaceholder}
 								rows={6}
 								spellCheck={false}
@@ -388,12 +369,7 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 							</Button>
 						</div>
 						{compareError && <p role="alert" className="text-sm text-destructive">{compareError}</p>}
-													{diffResult && compareWarnings && (compareWarnings.unsafeNumbers || compareWarnings.duplicateKeys) && (
-								<ul role="status" className="list-disc rounded-md border border-amber-500/40 bg-amber-500/10 p-2 pl-6 text-xs text-amber-800 dark:text-amber-300">
-									{compareWarnings.unsafeNumbers && <li>{messages.warnUnsafeNumbers}</li>}
-									{compareWarnings.duplicateKeys && <li>{messages.warnDuplicateKeys}</li>}
-								</ul>
-							)}
+
 							{diffResult && diffResult.length === 0 && (
 							<p role="status" className="text-sm text-primary">{messages.compareIdentical}</p>
 						)}
@@ -423,14 +399,14 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 											<span className="text-foreground">{entry.path}</span>
 											{entry.type === 'changed' && (
 												<span className="text-muted-foreground">
-													{diffValueLabel(entry.leftValue)} → {diffValueLabel(entry.rightValue)}
+													{entry.leftValue} → {entry.rightValue}
 												</span>
 											)}
 											{entry.type === 'added' && (
-												<span className="text-muted-foreground">{diffValueLabel(entry.rightValue)}</span>
+												<span className="text-muted-foreground">{entry.rightValue}</span>
 											)}
 											{entry.type === 'removed' && (
-												<span className="text-muted-foreground">{diffValueLabel(entry.leftValue)}</span>
+												<span className="text-muted-foreground">{entry.leftValue}</span>
 											)}
 										</li>
 									))}

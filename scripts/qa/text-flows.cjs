@@ -9,6 +9,9 @@ module.exports = {
 		await contains(/Not valid Base64/);
 		await input.fill(Buffer.from('Đà Nẵng 👋').toString('base64'));
 		assert.equal(await root.locator('textarea').last().inputValue(), 'Đà Nẵng 👋');
+		await input.fill(Buffer.from('{"id":9007199254740993,"id":1e400}').toString('base64'));
+		await root.getByRole('checkbox', { name: 'Pretty-print JSON' }).check();
+		assert.equal(await root.locator('textarea').last().inputValue(), '{\n  "id": 9007199254740993,\n  "id": 1e400\n}');
 		await input.fill(fixture.image.buffer.toString('base64'));
 		assert.deepEqual(await download(/Download the decoded file/i), fixture.image.buffer);
 		await click('Clear');
@@ -110,6 +113,16 @@ module.exports = {
 	},
 	async 'json-formatter'({ root, input, click, download, contains }) {
 		const editor = root.locator('textarea.jsoneditor-text');
+		await editor.fill('{"id":9007199254740993,"id":1e400}');
+		await click('Compare JSON');
+		const other = root.locator('#json-compare-input');
+		await other.fill('{"id":9007199254740992,"id":2e400}');
+		await click('Compare');
+		await contains('9007199254740993 → 9007199254740992');
+		await contains('1e400 → 2e400');
+		await other.fill('{}');
+		assert.equal(await root.getByText('1e400 → 2e400').count(), 0);
+		await click('Compare JSON');
 		await editor.fill('{"city":"Hue","currency":"VND"}');
 		await root.getByTitle('Switch Editor Mode').click();
 		await root.getByTitle('Switch to tree editor').click();
@@ -285,6 +298,16 @@ module.exports = {
 		await right.press('Control+Enter');
 		await contains('Removed lines: 1999');
 		await contains('Added lines: 1999');
+		const workerUrl = '**/textDiffWorker-*.js';
+		await page.context().route(workerUrl, route => route.abort());
+		await right.fill('new input');
+		await contains(/The comparison failed/);
+		assert.equal(await root.locator('#text-diff-results').isVisible(), false);
+		await page.context().unroute(workerUrl);
+		await left.fill('new input');
+		await right.press('Control+Enter');
+		await root.locator('#text-diff-results').waitFor();
+		await contains(/identical|no differences/i);
 	},
 	async 'word-counter'({ input, click, button, contains, download }) {
 		assert.ok(await button('Copy').isDisabled());
