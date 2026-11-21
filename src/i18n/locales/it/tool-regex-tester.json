@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "Regex Tester Online Gratuito — Web Tool Hub",
-    "description": "Testa le espressioni regolari in tempo reale: corrispondenze evidenziate, gruppi di cattura, anteprima della sostituzione e un cheat sheet di riferimento rapido — direttamente nel tuo browser, senza upload."
+    "description": "Testa le espressioni regolari con evidenziazione in tempo reale, gruppi di cattura e anteprima della sostituzione — interamente nel tuo browser."
   },
-  "heading": "Regex Tester",
+  "heading": "Verifica delle espressioni regolari",
   "tagline": "Testa le espressioni regolari con evidenziazione in tempo reale, gruppi di cattura e anteprima della sostituzione — interamente nel tuo browser.",
   "ui": {
     "patternLabel": "Pattern",

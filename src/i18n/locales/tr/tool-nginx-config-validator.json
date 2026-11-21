@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Ücretsiz Nginx Yapılandırma Doğrulayıcı — Web Tool Hub",
-    "description": "nginx.conf sözdizimini doğrulayın; eksik noktalı virgül/parantezleri, yanlış bağlamdaki yönergeleri ve yaygın güvenlik yanlış yapılandırmalarını yakalayın — tarayıcınızda, yükleme yok."
+    "description": "Nginx'i yeniden yüklemeden önce bir nginx.conf yapıştırın; sözdizimi hatalarını, yanlış yerleştirilmiş yönergeleri ve yaygın güvenlik hatalarını yakalayın."
   },
   "heading": "Nginx Yapılandırma Doğrulayıcı",
   "tagline": "Nginx'i yeniden yüklemeden önce bir nginx.conf yapıştırın; sözdizimi hatalarını, yanlış yerleştirilmiş yönergeleri ve yaygın güvenlik hatalarını yakalayın.",

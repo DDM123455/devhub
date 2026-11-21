@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Ücretsiz Kubernetes YAML Doğrulayıcı — Web Tool Hub",
-    "description": "Kubernetes manifestolarını gerçek OpenAPI şemasına göre doğrulayın, kullanımdan kalkmış apiVersion'ları ve YAML söz dizimi hatalarını bulun — tamamen tarayıcınızda, yükleme yok."
+    "description": "kubectl apply yapmadan önce bir veya birden fazla Kubernetes manifestosunu (--- ile ayrılmış) yapıştırın ve gerçek şemaya göre doğrulayın."
   },
   "heading": "Kubernetes YAML Doğrulayıcı",
   "tagline": "kubectl apply yapmadan önce bir veya birden fazla Kubernetes manifestosunu (--- ile ayrılmış) yapıştırın ve gerçek şemaya göre doğrulayın.",

@@ -3,7 +3,7 @@
     "title": "Conversor de CSV para JSON Online Grátis — Web Tool Hub",
     "description": "Converta CSV em JSON e JSON em CSV na hora, no navegador — escolha o delimitador, use cabeçalhos, achate ou aninhe campos, baixe ou copie. Sem upload, sem servidor."
   },
-  "heading": "Conversor CSV ↔ JSON",
+  "heading": "Converter entre CSV e JSON",
   "tagline": "Converta entre CSV e JSON na hora — escolha o delimitador, use cabeçalhos, achate ou aninhe campos — tudo no seu navegador.",
   "ui": {
     "modeCsvToJson": "CSV → JSON",

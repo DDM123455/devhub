@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "JSON naar Excel-converter online — Web Tool Hub",
-    "description": "Zet JSON direct om in een echt .xlsx-Excelbestand in je browser — herkent automatisch meerdere werkbladen, maakt geneste velden plat en behoudt getallen en booleans. Geen upload, geen server."
+    "description": "Zet JSON direct om in een echt .xlsx-Excelbestand in je browser — herkent automatisch meerdere werkbladen, maakt geneste velden plat en behoudt getallen en booleans."
   },
   "heading": "JSON → Excel-converter",
   "tagline": "Zet JSON om in een echte, downloadbare .xlsx-werkmap — meerdere werkbladen, platgemaakte velden, echte getal-/booleancellen — volledig in je browser.",

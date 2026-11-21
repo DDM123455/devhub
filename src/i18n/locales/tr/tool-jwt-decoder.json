@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Ücretsiz Online JWT Çözücü ve Doğrulayıcı — Web Tool Hub",
-    "description": "JWT header ve payload'ını çözün, HS256/RS256 imzalarını doğrulayın, son kullanma tarihini kontrol edin ve düzenlenen token'ları yeniden imzalayın — hepsi tarayıcınızda, anında. Yükleme yok, kayıt yok."
+    "description": "JSON Web Token'ları anında çözün, doğrulayın ve yeniden imzalayın — tamamen tarayıcınızda."
   },
   "heading": "JWT Çözücü",
   "tagline": "JSON Web Token'ları anında çözün, doğrulayın ve yeniden imzalayın — tamamen tarayıcınızda.",

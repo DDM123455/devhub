@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Dekoder i Weryfikator JWT Online za Darmo — Web Tool Hub",
-    "description": "Dekoduj nagłówek i payload JWT, weryfikuj podpisy HS256/RS256, sprawdzaj datę wygaśnięcia i ponownie podpisuj edytowane tokeny — natychmiast w przeglądarce. Bez wysyłania plików, bez rejestracji."
+    "description": "Dekoduj nagłówek i payload JWT, weryfikuj podpisy HS256/RS256, sprawdzaj datę wygaśnięcia i ponownie podpisuj edytowane tokeny — natychmiast w przeglądarce."
   },
   "heading": "Dekoder JWT",
   "tagline": "Dekoduj, weryfikuj i podpisuj ponownie tokeny JSON Web Token natychmiast — w całości w Twojej przeglądarce.",

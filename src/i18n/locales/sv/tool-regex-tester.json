@@ -3,7 +3,7 @@
     "title": "Regex Tester Gratis Online — Web Tool Hub",
     "description": "Testa reguljära uttryck live: markerade träffar, capture groups, förhandsvisning av ersättningar och en snabbreferens — direkt i webbläsaren, ingen uppladdning."
   },
-  "heading": "Regex Tester",
+  "heading": "Testa reguljära uttryck",
   "tagline": "Testa reguljära uttryck med live-markering, capture groups och förhandsvisning av ersättningar — helt och hållet i din webbläsare.",
   "ui": {
     "patternLabel": "Mönster",

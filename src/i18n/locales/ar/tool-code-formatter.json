@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "منسّق الشيفرة أونلاين — JS وTS وCSS وHTML وJSON وSQL وYAML",
-    "description": "منسّق شيفرة مجاني أونلاين: الصق الشيفرة أو افتح ملفًا، ويكتشف الأداة اللغة تلقائيًا وتنسّق JavaScript وTypeScript وCSS وHTML وJSON وXML وSQL وYAML وMarkdown وGraphQL. تعمل داخل متصفحك ولا تُرفع شيفرتك أبدًا."
+    "description": "الصق الشيفرة أو افتح ملفًا، واضغط «تنسيق» لتحصل على شيفرة مرتبة."
   },
   "heading": "منسّق الشيفرة ومُجمِّلها",
   "tagline": "الصق الشيفرة أو افتح ملفًا، واضغط «تنسيق» لتحصل على شيفرة مرتبة. تُكتشف اللغة تلقائيًا: JavaScript وTypeScript وCSS وHTML وJSON وXML وSQL وYAML وMarkdown وGraphQL، وكل ذلك داخل متصفحك.",

@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Online SQL Biçimlendirici ve Doğrulayıcı — Ücretsiz",
-    "description": "MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, Snowflake ve daha fazlası için SQL'i biçimlendirin, küçültün ve söz dizimini denetleyin. Hataların satır ve sütununu gösterir. Tarayıcınızda çalışır, sorgularınız cihazınızdan çıkmaz."
+    "description": "MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, Snowflake ve daha fazlası için SQL'i biçimlendirin, küçültün ve söz dizimini denetleyin."
   },
   "heading": "SQL Biçimlendirici ve Doğrulayıcı",
   "tagline": "SQL'i düzenleyin veya küçültün, söz dizimi hatalarını tam satır ve sütunuyla bulun — 20 lehçe için, tamamen tarayıcınızda.",

@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Formatter i upiększacz kodu online — JS, TS, CSS, HTML, JSON, SQL",
-    "description": "Darmowy formatter kodu online: wklej kod lub otwórz plik, język zostanie wykryty automatycznie, a JavaScript, TypeScript, CSS, HTML, JSON, XML, SQL, YAML, Markdown i GraphQL będą czytelnie sformatowane. Działa w przeglądarce — kod nigdy nie jest wysyłany na serwer."
+    "description": "Wklej kod lub otwórz plik, kliknij Formatuj i gotowe."
   },
   "heading": "Formatter i upiększacz kodu",
   "tagline": "Wklej kod lub otwórz plik, kliknij Formatuj i gotowe. Język wykrywany jest automatycznie — JavaScript, TypeScript, CSS, HTML, JSON, XML, SQL, YAML, Markdown i GraphQL, wszystko w przeglądarce.",

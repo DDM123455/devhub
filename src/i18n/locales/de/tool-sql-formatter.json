@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "SQL-Formatierer & Validator online — formatieren, minimieren, prüfen",
-    "description": "SQL formatieren, verschönern, minimieren und auf Syntaxfehler prüfen — für MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, Snowflake und mehr. Mit Zeile und Spalte jedes Fehlers. Läuft im Browser, deine Abfragen bleiben auf deinem Gerät."
+    "description": "SQL formatieren, verschönern, minimieren und auf Syntaxfehler prüfen — für MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, Snowflake und mehr."
   },
   "heading": "SQL-Formatierer & Validator",
   "tagline": "SQL verschönern oder minimieren und auf Syntaxfehler mit genauer Zeile und Spalte prüfen — für 20 Dialekte, komplett in deinem Browser.",

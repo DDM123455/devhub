@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "SQL-formaterare och SQL-validerare online – gratis",
-    "description": "Formatera, komprimera och syntaxkontrollera SQL för MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, Snowflake med flera. Visar exakt rad och kolumn för fel. Körs i webbläsaren – dina frågor lämnar aldrig din enhet."
+    "description": "Formatera, komprimera och syntaxkontrollera SQL för MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, Snowflake med flera."
   },
   "heading": "SQL-formaterare och SQL-validerare",
   "tagline": "Gör SQL läsbar eller komprimera den, och kontrollera syntaxen med exakt rad och kolumn för felen – för 20 dialekter, helt i webbläsaren.",

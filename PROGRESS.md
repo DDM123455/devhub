@@ -180,6 +180,10 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+### 2026-11-21 — Sửa ba nhóm cảnh báo SEO còn lại
+
+- Rút gọn 81 mô tả bằng câu hoàn chỉnh từ nội dung cùng trang, sửa H1 trùng giữa các bản dịch và hai tiêu đề 404 tiếng Trung. Build 647 trang, sitemap và số URL cho index cùng bằng 83. Audit giữ nguyên tiêu chí và đạt P0/P1/P2/P3 = 0. Vitest đạt 1.130/1.130 với kiểm biên dịch Java.
+
 ### 2026-11-21 — Đối chiếu lại audit và sửa hai ca Text Diff chậm
 
 - Khi so 2.000 dòng khác hẳn hoặc đảo thứ tự các dòng duy nhất, Text Diff vượt ngưỡng 4 và 5 giây dưới tải. Dùng tập khóa dòng để nhận biết hai trường hợp, giữ đúng điểm ghép của thuật toán. Lần chạy cuối đạt 1,14 giây và 0,012 giây.

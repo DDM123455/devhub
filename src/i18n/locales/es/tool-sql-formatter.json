@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Formateador y validador SQL gratis — formatea, minifica y revisa",
-    "description": "Formatea, embellece, minifica y revisa la sintaxis de SQL para MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, Snowflake y más. Indica la línea y la columna de cada error. Funciona en tu navegador: tus consultas no salen de tu dispositivo."
+    "description": "Formatea, embellece, minifica y revisa la sintaxis de SQL para MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, Snowflake y más."
   },
   "heading": "Formateador y validador SQL",
   "tagline": "Embellece o minifica SQL y revisa sus errores de sintaxis con la línea y la columna exactas, para 20 dialectos y todo en tu navegador.",

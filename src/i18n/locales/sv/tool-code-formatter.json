@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Kodformaterare online – JS, TS, CSS, HTML, JSON, SQL, YAML",
-    "description": "Gratis kodformaterare online: klistra in kod eller öppna en fil, så identifieras språket automatiskt och JavaScript, TypeScript, CSS, HTML, JSON, XML, SQL, YAML, Markdown och GraphQL blir snyggt formaterade. Allt körs i webbläsaren – din kod laddas aldrig upp."
+    "description": "Klistra in kod eller öppna en fil, tryck på Formatera och få prydlig kod."
   },
   "heading": "Kodformaterare och kodförskönare",
   "tagline": "Klistra in kod eller öppna en fil, tryck på Formatera och få prydlig kod. Språket identifieras automatiskt – JavaScript, TypeScript, CSS, HTML, JSON, XML, SQL, YAML, Markdown och GraphQL, allt i webbläsaren.",

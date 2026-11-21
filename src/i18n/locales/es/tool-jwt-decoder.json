@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Decodificador y Verificador de JWT Online Gratis — Web Tool Hub",
-    "description": "Decodifica el header y el payload de un JWT, verifica firmas HS256/RS256, comprueba la caducidad y vuelve a firmar tokens editados — al instante, en tu navegador. Sin subidas, sin registro."
+    "description": "Decodifica el header y el payload de un JWT, verifica firmas HS256/RS256, comprueba la caducidad y vuelve a firmar tokens editados — al instante, en tu navegador."
   },
   "heading": "Decodificador de JWT",
   "tagline": "Decodifica, verifica y vuelve a firmar JSON Web Tokens al instante — todo dentro de tu navegador.",

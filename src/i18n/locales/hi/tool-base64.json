@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "Base64 Encode/Decode ऑनलाइन मुफ़्त — Web Tool Hub",
-    "description": "Text और files को Base64 में encode करें या Base64 को वापस text, images और files में decode करें — data URI और URL-safe support के साथ। तुरंत, आपके browser में ही, कोई upload नहीं।"
+    "description": "Text और files को Base64 में encode करें या Base64 को वापस text, images और files में decode करें — data URI और URL-safe support के साथ।"
   },
-  "heading": "Base64 Encode/Decode",
+  "heading": "Base64 एन्कोड और डिकोड करें",
   "tagline": "Text या files को Base64 में encode करें, या Base64 को वापस decode करें — पूरी तरह आपके browser में ही।",
   "ui": {
     "textTabLabel": "Text",

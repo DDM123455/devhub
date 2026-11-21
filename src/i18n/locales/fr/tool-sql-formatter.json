@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Formateur et validateur SQL en ligne — Formater, minifier",
-    "description": "Formatez, embellissez, minifiez et vérifiez la syntaxe de votre SQL (MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, Snowflake…). Ligne et colonne exactes des erreurs, tout dans votre navigateur."
+    "description": "Formatez, embellissez, minifiez et vérifiez la syntaxe de votre SQL (MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, Snowflake…)."
   },
   "heading": "Formateur et validateur SQL",
   "tagline": "Mettez en forme ou minifiez du SQL et vérifiez sa syntaxe avec la ligne et la colonne exactes de chaque erreur — pour 20 dialectes, entièrement dans votre navigateur.",

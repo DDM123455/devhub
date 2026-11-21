@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "Code Formatter Online — JS, TS, CSS, HTML, JSON, SQL, YAML",
-    "description": "Code formatter online gratis: tempel kode atau buka file, bahasa terdeteksi otomatis, lalu rapikan JavaScript, TypeScript, CSS, HTML, JSON, XML, SQL, YAML, Markdown, dan GraphQL. Berjalan di browser — kode Anda tidak pernah diunggah."
+    "description": "Tempel atau buka file, tekan Format, dan dapatkan kode yang rapi."
   },
-  "heading": "Code Formatter & Beautifier",
+  "heading": "Pemformat kode sumber",
   "tagline": "Tempel atau buka file, tekan Format, dan dapatkan kode yang rapi. Bahasa terdeteksi otomatis — JavaScript, TypeScript, CSS, HTML, JSON, XML, SQL, YAML, Markdown, dan GraphQL, semuanya di browser Anda.",
   "related": "Alat terkait",
   "ui": {

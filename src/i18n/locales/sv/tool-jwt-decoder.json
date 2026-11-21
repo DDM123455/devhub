@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Gratis JWT-avkodare och verifierare online — Web Tool Hub",
-    "description": "Avkoda JWT-header och payload, verifiera HS256/RS256-signaturer, kontrollera utgångsdatum och signera om redigerade tokens — direkt i din webbläsare. Ingen uppladdning, ingen registrering."
+    "description": "Avkoda JWT-header och payload, verifiera HS256/RS256-signaturer, kontrollera utgångsdatum och signera om redigerade tokens — direkt i din webbläsare."
   },
   "heading": "JWT-avkodare",
   "tagline": "Avkoda, verifiera och signera om JSON Web Tokens direkt — helt i din webbläsare.",

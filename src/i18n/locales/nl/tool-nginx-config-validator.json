@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Nginx-configvalidator online — Web Tool Hub",
-    "description": "Valideer de syntaxis van nginx.conf, spoor ontbrekende puntkomma's/accolades, directives in de verkeerde context en veelvoorkomende beveiligingsfouten op — volledig in je browser, zonder upload."
+    "description": "Plak een nginx.conf en vind syntaxfouten, verkeerd geplaatste directives en veelvoorkomende beveiligingsfouten — voordat je nginx herlaadt."
   },
   "heading": "Nginx-configuratievalidator",
   "tagline": "Plak een nginx.conf en vind syntaxfouten, verkeerd geplaatste directives en veelvoorkomende beveiligingsfouten — voordat je nginx herlaadt.",

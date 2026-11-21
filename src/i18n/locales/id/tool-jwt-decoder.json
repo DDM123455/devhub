@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "JWT Decoder & Verifier Online Gratis — Web Tool Hub",
-    "description": "Decode header dan payload JWT, verifikasi tanda tangan HS256/RS256, cek masa berlaku, dan tanda tangani ulang token yang diedit — langsung di browser Anda. Tanpa upload, tanpa perlu daftar."
+    "description": "Decode header dan payload JWT, verifikasi tanda tangan HS256/RS256, cek masa berlaku, dan tanda tangani ulang token yang diedit — langsung di browser Anda."
   },
-  "heading": "JWT Decoder",
+  "heading": "Dekoder dan pemeriksa JWT",
   "tagline": "Decode, verifikasi, dan tanda tangani ulang JSON Web Token secara instan — sepenuhnya di dalam browser Anda.",
   "ui": {
     "tokenLabel": "Token JWT",

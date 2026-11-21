@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "JWT Decoder & Verifier online gratis — Web Tool Hub",
-    "description": "Decodeer JWT-header en -payload, verifieer HS256/RS256-handtekeningen, controleer de vervaldatum en onderteken bewerkte tokens opnieuw — direct in je browser. Geen upload, geen registratie."
+    "description": "Decodeer JWT-header en -payload, verifieer HS256/RS256-handtekeningen, controleer de vervaldatum en onderteken bewerkte tokens opnieuw — direct in je browser."
   },
-  "heading": "JWT Decoder",
+  "heading": "JWT decoderen en controleren",
   "tagline": "Decodeer, verifieer en onderteken JSON Web Tokens opnieuw — volledig in je browser.",
   "ui": {
     "tokenLabel": "JWT-token",

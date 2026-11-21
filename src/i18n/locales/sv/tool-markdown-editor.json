@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Markdown-redigerare med live-förhandsvisning — Web Tool Hub",
-    "description": "Skriv Markdown med en live-förhandsvisning som följer GFM — formateringsverktygsfält, tabeller, uppgiftslistor, export som .md eller .html. Körs helt i webbläsaren, ingen uppladdning."
+    "description": "Skriv Markdown med en live-förhandsvisning som följer GFM — formateringsverktygsfält, tabeller, uppgiftslistor, export som .md eller .html."
   },
   "heading": "Markdown-visare/redigerare",
   "tagline": "Skriv Markdown på ena sidan och se en exakt live-förhandsvisning på den andra — formateringsverktygsfält, GFM-tabeller, export som .md eller .html, helt i din webbläsare.",

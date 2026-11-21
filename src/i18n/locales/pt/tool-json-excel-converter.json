@@ -3,7 +3,7 @@
     "title": "Conversor de JSON para Excel Online Grátis — Web Tool Hub",
     "description": "Converta JSON em um arquivo .xlsx de verdade na hora, no navegador — detecta várias planilhas, achata campos aninhados e preserva números e booleanos. Sem upload."
   },
-  "heading": "Conversor JSON → Excel",
+  "heading": "Converter dados JSON em planilhas Excel",
   "tagline": "Converta JSON em uma pasta de trabalho .xlsx de verdade — várias planilhas, campos achatados, células numéricas e booleanas reais — tudo no seu navegador.",
   "ui": {
     "sheetNameLabel": "Nome da planilha",

@@ -3,7 +3,7 @@
     "title": "Regex Tester Online Gratis — Web Tool Hub",
     "description": "Uji regular expression secara langsung: pencocokan yang disorot, capture group, pratinjau replace, dan cheat sheet referensi cepat — langsung di browser Anda, tanpa upload."
   },
-  "heading": "Regex Tester",
+  "heading": "Penguji ekspresi reguler",
   "tagline": "Uji regular expression dengan highlight langsung, capture group, dan pratinjau replace — sepenuhnya di dalam browser Anda.",
   "ui": {
     "patternLabel": "Pattern",

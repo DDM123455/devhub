@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Validador de configuración de Nginx online — Web Tool Hub",
-    "description": "Valida la sintaxis de nginx.conf, detecta punto y coma o llaves que faltan, directivas en un contexto incorrecto y errores de seguridad comunes, todo en tu navegador y sin subir nada."
+    "description": "Pega un nginx.conf y detecta errores de sintaxis, directivas mal ubicadas y fallos de seguridad comunes — antes de recargar nginx."
   },
   "heading": "Validador de Configuración Nginx",
   "tagline": "Pega un nginx.conf y detecta errores de sintaxis, directivas mal ubicadas y fallos de seguridad comunes — antes de recargar nginx.",

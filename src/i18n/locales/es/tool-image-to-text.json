@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Imagen a texto (OCR): extrae texto de imágenes y PDF escaneados",
-    "description": "Extrae texto de fotos, capturas y PDF escaneados con un OCR gratuito que funciona en tu navegador. 35 idiomas, modo por lotes, copia o descarga en .txt. Tus archivos no se suben."
+    "description": "Extrae texto de fotos, capturas y PDF escaneados con un OCR gratuito que funciona en tu navegador."
   },
   "heading": "Imagen a texto (OCR)",
   "tagline": "Convierte fotos, capturas de pantalla y PDF escaneados en texto editable: se reconoce en tu propio dispositivo, sin subir nada.",

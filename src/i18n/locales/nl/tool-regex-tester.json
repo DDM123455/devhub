@@ -3,7 +3,7 @@
     "title": "Regex Tester online gratis — Web Tool Hub",
     "description": "Test reguliere expressies live: gemarkeerde matches, capture groups, replace-voorbeeld en een handig overzicht met veelgebruikte syntax — direct in je browser, zonder upload."
   },
-  "heading": "Regex Tester",
+  "heading": "Reguliere expressies testen",
   "tagline": "Test reguliere expressies met live markering, capture groups en een replace-voorbeeld — volledig in je browser.",
   "ui": {
     "patternLabel": "Patroon",

@@ -10,7 +10,8 @@
 
 - [x] 2026-11-08 — Rà crawl/SEO/test; sửa nén và cây XML mất whitespace; cập nhật hướng dẫn JSON/XML, Base64 en+vi.
 - [ ] Bổ sung bản dịch còn thiếu và rà bản ngữ trước khi index. Đo lại ngày 21/11: 559 khóa ở mỗi ngôn ngữ ngoài en/vi, gồm 256 khóa của cụm đổi đơn vị bếp hiện chỉ xuất bản tiếng Anh. Ưu tiên SQL/Java, ISO và JSON/XML trên các trang đã xuất bản.
-- [ ] 2026-11-08 — Đo Lighthouse/CWV và tương tác công cụ nặng; xử lý 81 meta description dài còn lại.
+- [x] 2026-11-21 — Rút gọn 81 meta description dài, bản địa hóa các H1 trùng và bổ sung tên site vào hai tiêu đề 404 tiếng Trung.
+- [ ] Đo Lighthouse/CWV và tương tác công cụ nặng.
 
 - [x] 2026-11-02 — Base64 Decode hiển thị ảnh/file trực tiếp trong Output, không cần chuyển tab.
 

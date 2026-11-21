@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "SQL Formatter & Validator Online Gratis — Format, Minify",
-    "description": "Format, rapikan, minify, dan periksa sintaks SQL untuk MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, Snowflake, dan lainnya. Baris dan kolom error ditampilkan. Berjalan di browser — query Anda tidak keluar dari perangkat."
+    "description": "Format, rapikan, minify, dan periksa sintaks SQL untuk MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, Snowflake, dan lainnya."
   },
-  "heading": "SQL Formatter & Validator",
+  "heading": "Pemformat dan pemeriksa sintaks SQL",
   "tagline": "Rapikan atau minify SQL, lalu periksa kesalahan sintaksnya lengkap dengan baris dan kolom — untuk 20 dialek, sepenuhnya di browser Anda.",
   "related": "Alat terkait",
   "ui": {

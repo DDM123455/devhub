@@ -3,7 +3,7 @@
     "title": "Regex Tester Online za Darmo — Web Tool Hub",
     "description": "Testuj wyrażenia regularne na żywo: podświetlone dopasowania, grupy przechwytujące, podgląd zamiany i szybka ściąga — natychmiast w przeglądarce, bez wysyłania danych."
   },
-  "heading": "Regex Tester",
+  "heading": "Tester wyrażeń regularnych",
   "tagline": "Testuj wyrażenia regularne z podświetlaniem na żywo, grupami przechwytującymi i podglądem zamiany — w całości w przeglądarce.",
   "ui": {
     "patternLabel": "Wzorzec",

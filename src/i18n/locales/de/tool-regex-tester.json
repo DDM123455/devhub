@@ -3,7 +3,7 @@
     "title": "Regex Tester Online Kostenlos — Web Tool Hub",
     "description": "Teste reguläre Ausdrücke live: hervorgehobene Treffer, Capture Groups, Replace-Vorschau und ein Cheat Sheet zum schnellen Nachschlagen — direkt im Browser, ohne Upload."
   },
-  "heading": "Regex Tester",
+  "heading": "Reguläre Ausdrücke testen",
   "tagline": "Teste reguläre Ausdrücke mit Live-Hervorhebung, Capture Groups und einer Replace-Vorschau — komplett im Browser.",
   "ui": {
     "patternLabel": "Pattern",

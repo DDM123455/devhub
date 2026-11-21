@@ -3,7 +3,7 @@
     "title": "Validador ISO online: IBAN, ISO 8601, ISBN, VIN e mais",
     "description": "Cole um valor e confira nas normas ISO: IBAN, BIC, ISIN, datas ISO 8601, ISBN, ISSN, VIN, códigos de moeda, país e idioma. Roda no seu navegador."
   },
-  "heading": "Validador de normas ISO",
+  "heading": "Verificar códigos e mensagens ISO",
   "tagline": "Cole IBANs, datas, ISBNs, códigos de moeda e mais e veja na hora a qual norma ISO cada valor corresponde, ou exatamente por que falha.",
   "related": "Ferramentas relacionadas",
   "ui": {

@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Formattatore di codice online — JS, TS, CSS, HTML, JSON, SQL",
-    "description": "Formattatore di codice gratuito online: incolla o apri un file, il linguaggio viene riconosciuto da solo e abbellisci JavaScript, TypeScript, CSS, HTML, JSON, XML, SQL, YAML, Markdown e GraphQL. Tutto nel browser: il tuo codice non viene mai caricato."
+    "description": "Incolla il codice o apri un file, premi Formatta e ottieni un testo ordinato."
   },
   "heading": "Formattatore e abbellitore di codice",
   "tagline": "Incolla il codice o apri un file, premi Formatta e ottieni un testo ordinato. Il linguaggio è riconosciuto in automatico — JavaScript, TypeScript, CSS, HTML, JSON, XML, SQL, YAML, Markdown e GraphQL, tutto nel tuo browser.",

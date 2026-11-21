@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "Regex Tester online grátis — Web Tool Hub",
-    "description": "Teste expressões regulares ao vivo: correspondências destacadas, grupos de captura, prévia de substituição e uma folha de consulta rápida — direto no seu navegador, sem upload."
+    "description": "Teste expressões regulares com destaque ao vivo, grupos de captura e prévia de substituição — tudo direto no seu navegador."
   },
-  "heading": "Regex Tester",
+  "heading": "Testador de expressões regulares",
   "tagline": "Teste expressões regulares com destaque ao vivo, grupos de captura e prévia de substituição — tudo direto no seu navegador.",
   "ui": {
     "patternLabel": "Padrão",

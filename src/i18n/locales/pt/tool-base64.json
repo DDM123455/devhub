@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "Codificar/Decodificar Base64 Online Grátis — Web Tool Hub",
-    "description": "Codifique texto e arquivos para Base64 ou decodifique Base64 de volta para texto, imagens e arquivos — com suporte a data URI e URL-safe. Instantâneo, no seu navegador, sem upload."
+    "description": "Codifique texto e arquivos para Base64 ou decodifique Base64 de volta para texto, imagens e arquivos — com suporte a data URI e URL-safe."
   },
-  "heading": "Codificar/Decodificar Base64",
+  "heading": "Codificação e decodificação em Base64",
   "tagline": "Codifique texto ou arquivos para Base64, ou decodifique Base64 de volta — tudo direto no seu navegador.",
   "ui": {
     "textTabLabel": "Texto",

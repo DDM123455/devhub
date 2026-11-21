@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Formatador e validador de SQL online grátis — Web Tool Hub",
-    "description": "Formate, minifique e verifique a sintaxe de SQL para MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, Snowflake e mais. Mostra a linha e a coluna do erro. Roda no navegador — suas consultas não saem do seu dispositivo."
+    "description": "Formate, minifique e verifique a sintaxe de SQL para MySQL, PostgreSQL, SQL Server, SQLite, BigQuery, Snowflake e mais."
   },
   "heading": "Formatador e validador de SQL",
   "tagline": "Organize ou minifique SQL e verifique erros de sintaxe com a linha e a coluna exatas — para 20 dialetos, tudo no seu navegador.",

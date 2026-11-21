@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Formateur de code en ligne — JS, TS, CSS, HTML, JSON, SQL, YAML",
-    "description": "Formateur de code gratuit : collez ou ouvrez un fichier, le langage est détecté et JavaScript, TypeScript, CSS, HTML, JSON, XML, SQL, YAML, Markdown et GraphQL sont mis en forme. Tout reste dans votre navigateur, rien n'est envoyé."
+    "description": "Collez ou ouvrez un fichier, cliquez sur Formater et obtenez un code propre."
   },
   "heading": "Formateur et embellisseur de code",
   "tagline": "Collez ou ouvrez un fichier, cliquez sur Formater et obtenez un code propre. Le langage est détecté automatiquement — JavaScript, TypeScript, CSS, HTML, JSON, XML, SQL, YAML, Markdown et GraphQL, le tout dans votre navigateur.",

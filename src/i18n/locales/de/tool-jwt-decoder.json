@@ -1,9 +1,9 @@
 {
   "meta": {
     "title": "JWT Decoder & Verifizierer kostenlos online — Web Tool Hub",
-    "description": "JWT-Header und -Payload decodieren, HS256/RS256-Signaturen verifizieren, Ablaufdatum prüfen und bearbeitete Tokens neu signieren — sofort im Browser. Kein Upload, keine Anmeldung."
+    "description": "JWT-Header und -Payload decodieren, HS256/RS256-Signaturen verifizieren, Ablaufdatum prüfen und bearbeitete Tokens neu signieren — sofort im Browser."
   },
-  "heading": "JWT Decoder",
+  "heading": "JWT entschlüsseln und Signatur prüfen",
   "tagline": "JSON Web Tokens sofort decodieren, verifizieren und neu signieren — komplett in deinem Browser.",
   "ui": {
     "tokenLabel": "JWT-Token",

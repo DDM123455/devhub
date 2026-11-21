@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Formateador de código online — JS, TS, CSS, HTML, JSON, SQL, YAML",
-    "description": "Formateador de código online gratis: pega o abre un archivo, detecta el lenguaje solo y embellece JavaScript, TypeScript, CSS, HTML, JSON, XML, SQL, YAML, Markdown y GraphQL. Funciona en tu navegador: tu código nunca se sube."
+    "description": "Pega código o abre un archivo, pulsa Formatear y obtén un resultado ordenado."
   },
   "heading": "Formateador y embellecedor de código",
   "tagline": "Pega código o abre un archivo, pulsa Formatear y obtén un resultado ordenado. El lenguaje se detecta solo: JavaScript, TypeScript, CSS, HTML, JSON, XML, SQL, YAML, Markdown y GraphQL, todo en tu navegador.",
