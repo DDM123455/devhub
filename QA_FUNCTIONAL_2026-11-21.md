@@ -38,6 +38,14 @@ Bản build tĩnh có 27 công cụ. Bộ Playwright chạy đủ 27 công cụ,
 
 ## Đối chiếu và chạy lại
 
+### Kiểm lại sau audit
+
+Đã đối chiếu danh sách ngày 20/11 với các thay đổi trong repo và chạy lại 29 nhóm trên cả hai kích thước Chromium. Hai ca hiệu năng Text Diff bị trượt khi máy bận. So sánh 2.000 dòng khác hoàn toàn từng mất 4,67 giây (ngưỡng 4 giây). Đảo ngược 2.000 dòng duy nhất từng mất 10,97 giây (ngưỡng 5 giây). Sau khi tối ưu hai trường hợp này, lần chạy toàn bộ cuối đo được lần lượt 1,14 giây và 0,012 giây trên máy kiểm thử. Thời gian phụ thuộc tải của máy.
+
+Kiểm thử schema Kubernetes nay báo riêng từng phiên bản, vẫn đọc đủ 130 tổ hợp. Đã bật cả bài biên dịch Java bằng JDK 17 và chạy **1.130/1.130 test đạt**, gồm ca giữ lại dòng chung khi so sánh theo tùy chọn bỏ qua hoa thường và khoảng trắng. Số liệu 1.115 test phía dưới thuộc lần chạy trước khi đối chiếu.
+
+Trên bản build sau sửa, đã dán log 2.000 dòng bằng clipboard trong Chromium ở cả hai kích thước. Khi tất cả các dòng khác nhau, giao diện báo 2.000 dòng sửa. Khi đảo thứ tự, giao diện báo 1.999 dòng thêm và 1.999 dòng xóa. Build sinh 647 trang, audit SEO vẫn còn ba nhóm P3.
+
 Sổ kiểm có 674 dòng nhãn theo công cụ và trạng thái. Trong đó, 106 dòng ghi nhận thao tác trong kịch bản có kiểm kết quả, 554 dòng ghi nhận thao tác thăm dò và 14 dòng chỉ được quan sát khi đang khóa. Một nút có thể đổi nhãn khi đang xử lý hoặc sau khi sao chép. Vì vậy, các số này đo phạm vi tương tác theo nhãn.
 
 Kiểm tra bổ sung trên cả hai kích thước đã xác nhận nút đổi chế độ JSON Tree bấm được sau khi tách hàng tìm kiếm trên khung hẹp. Với lấy màu màn hình, đã mô phỏng hai kết quả từ API của trình duyệt (hủy và chọn màu), sau đó đọc lại màu qua clipboard. Với in Markdown, đã bấm nút và đọc nội dung tài liệu trong khung in.

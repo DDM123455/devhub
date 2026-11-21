@@ -180,6 +180,11 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+### 2026-11-21 — Đối chiếu lại audit và sửa hai ca Text Diff chậm
+
+- Khi so 2.000 dòng khác hẳn hoặc đảo thứ tự các dòng duy nhất, Text Diff vượt ngưỡng 4 và 5 giây dưới tải. Dùng tập khóa dòng để nhận biết hai trường hợp, giữ đúng điểm ghép của thuật toán. Lần chạy cuối đạt 1,14 giây và 0,012 giây.
+- Tách bài kiểm 130 schema Kubernetes theo phiên bản, thêm ca Text Diff có dòng chung sau chuẩn hóa. Bật kiểm biên dịch Java: 1.130/1.130 test đạt. Chi tiết kiểm và phần còn mở trong [báo cáo QA](QA_FUNCTIONAL_2026-11-21.md).
+
 ### 2026-11-21 — QA chức năng toàn site trên hai kích thước màn hình
 
 - Thêm `npm run test:browser` cho 27 công cụ, 10 trang đổi đơn vị và trang chủ. Dùng dữ liệu tổng hợp, đọc lại file đầu ra và chạy bản build với header production trên loopback. Ca JSON Tree trên mobile bắt được lỗi ô tìm kiếm che nút đổi chế độ. Chi tiết theo chức năng và từng nút ở [báo cáo QA](QA_FUNCTIONAL_2026-11-21.md).

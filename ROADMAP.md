@@ -1,5 +1,7 @@
 # ROADMAP.md — Web Tool Hub (Client-Side, Zero Server Cost)
 
+- [x] 2026-11-21 — Đối chiếu lại audit 20–21/11. Tối ưu Text Diff cho hai văn bản lớn không có dòng chung, giữ nguyên phép ghép theo khóa chuẩn hóa. Tách kiểm thử schema Kubernetes theo phiên bản.
+
 - [x] 2026-11-21 — Kiểm thử chức năng 27 công cụ, 10 trang đổi đơn vị và trang chủ trên Chromium desktop/mobile. Thêm bộ kiểm thử chạy lại được, sửa lỗi xuất file cũ, worker Xóa nền, thanh công cụ JSON trên màn hình hẹp và các ca biên đã tái hiện. Phạm vi từng nút ghi trong `QA_FUNCTIONAL_2026-11-21.md`.
 
 - [x] 2026-11-16 — Text Diff ghép nội dung trước whitespace, sửa tô nhầm field giống nhau trong bản tin debugger căn cột (cả Word/Character); 28 test hồi quy.
@@ -7,7 +9,7 @@
 - [x] 2026-11-16 — Text Diff giữ phần đầu/đuôi giống nhau ngoài highlight trên dòng dài, bảo toàn cụm Unicode và bổ sung test/hướng dẫn en+vi.
 
 - [x] 2026-11-08 — Rà crawl/SEO/test; sửa nén và cây XML mất whitespace; cập nhật hướng dẫn JSON/XML, Base64 en+vi.
-- [ ] 2026-11-08 — Bổ sung 285 key/locale còn thiếu ở 18 ngôn ngữ ngoài en/vi (ưu tiên ISO, SQL/Java, XML), rà bản ngữ trước khi index.
+- [ ] Bổ sung bản dịch còn thiếu và rà bản ngữ trước khi index. Đo lại ngày 21/11: 559 khóa ở mỗi ngôn ngữ ngoài en/vi, gồm 256 khóa của cụm đổi đơn vị bếp hiện chỉ xuất bản tiếng Anh. Ưu tiên SQL/Java, ISO và JSON/XML trên các trang đã xuất bản.
 - [ ] 2026-11-08 — Đo Lighthouse/CWV và tương tác công cụ nặng; xử lý 81 meta description dài còn lại.
 
 - [x] 2026-11-02 — Base64 Decode hiển thị ảnh/file trực tiếp trong Output, không cần chuyển tab.

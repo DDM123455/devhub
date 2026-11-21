@@ -245,12 +245,21 @@ describe('performance on large input', () => {
 		expect(stats(a, b).modified).toBe(2000);
 		expect(performance.now() - t0).toBeLessThan(4000);
 	});
+	it('preserves a shared normalized line between unequal replacement blocks', () => {
+		const a = lines(300, i => i === 100 ? '  Terminal  ' : `left ${i}`);
+		const b = lines(301, i => i === 101 ? 'terminal' : `right ${i}`);
+		const entries = diff(a, b, 'line', { ignoreCase: true, ignoreWhitespace: true });
+		expect(entries.filter(entry => entry.type === 'unchanged')).toMatchObject([
+			{ leftText: '  Terminal  ', rightText: 'terminal' },
+		]);
+		expect(countLineStats(entries)).toEqual({ modified: 299, added: 1, removed: 0 });
+	});
 	it('2 000 lines in reverse order', () => {
 		const a = lines(2000, (i) => `line ${i}`);
 		const b = lines(2000, (i) => `line ${1999 - i}`);
 		const t0 = performance.now();
 		const s = stats(a, b);
-		expect(s.added + s.removed + s.modified).toBeGreaterThan(0);
+		expect(s).toEqual({ added: 1999, removed: 1999, modified: 0 });
 		expect(performance.now() - t0).toBeLessThan(5000);
 	});
 });

@@ -303,13 +303,38 @@ function sortByKey(lines: string[], options: DiffOptions): string[] {
 		.map((item) => item.line);
 }
 
+function compareLineKeys(left: string[], right: string[]) {
+	// With no shared key, the edit script is one removal and one insertion.
+	// Avoid the quadratic search on large, unrelated documents.
+	if (Math.min(left.length, right.length) >= 256 && left[0] !== right[0]) {
+		const leftSet = new Set(left);
+		if (!right.some(key => leftSet.has(key))) {
+			return [
+				{ value: left, removed: true, added: false },
+				{ value: right, removed: false, added: true },
+			];
+		}
+		// A log sorted newest-first against the same log sorted oldest-first
+		// has a single-line LCS if every key is unique. Match diffArrays' tie
+		// break (the first line on the right) and keep moves as removes/adds.
+		if (left.length === right.length && leftSet.size === left.length &&
+			right.every((key, i) => key === left[left.length - 1 - i])) {
+			return [
+				{ value: left.slice(0, -1), removed: true, added: false },
+				{ value: right.slice(0, 1), removed: false, added: false },
+				{ value: right.slice(1), removed: false, added: true },
+			];
+		}
+	}
+	return diffArrays(left, right);
+}
+
 export function buildLineDiff(left: string, right: string, granularity: DiffGranularity, options: DiffOptions = {}): DiffLineEntry[] {
 	const leftLines = options.sortLines ? sortByKey(splitDocumentLines(left), options) : splitDocumentLines(left);
 	const rightLines = options.sortLines ? sortByKey(splitDocumentLines(right), options) : splitDocumentLines(right);
-	const lineParts = diffArrays(
-		leftLines.map((l) => lineKey(l, options)),
-		rightLines.map((l) => lineKey(l, options)),
-	);
+	const leftKeys = leftLines.map((line) => lineKey(line, options));
+	const rightKeys = rightLines.map((line) => lineKey(line, options));
+	const lineParts = compareLineKeys(leftKeys, rightKeys);
 	const entries: DiffLineEntry[] = [];
 	let li = 0;
 	let ri = 0;

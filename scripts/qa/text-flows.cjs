@@ -243,7 +243,7 @@ module.exports = {
 		await click('Clear');
 		assert.ok(await button('Copy').isDisabled());
 	},
-	async 'text-diff-checker'({ root, click, contains }) {
+	async 'text-diff-checker'({ page, root, click, contains }) {
 		const left = root.getByRole('textbox', { name: 'Original text', exact: true });
 		const right = root.getByRole('textbox', { name: 'Changed text', exact: true });
 		await left.fill('F39=00' + ' '.repeat(30) + 'F41=TERM0001    F49=704');
@@ -261,6 +261,20 @@ module.exports = {
 		await right.fill(await left.inputValue());
 		await right.press('Control+Enter');
 		await contains(/identical|no differences/i);
+		const log = Array.from({ length: 2000 }, (_, i) => 'left ' + i);
+		async function pasteLines(field, lines) {
+			await page.evaluate(text => navigator.clipboard.writeText(text), lines.join('\n'));
+			await field.press('Control+a');
+			await field.press('Control+v');
+		}
+		await pasteLines(left, log);
+		await pasteLines(right, log.map((_, i) => 'right ' + i));
+		await right.press('Control+Enter');
+		await contains('Modified lines: 2000');
+		await pasteLines(right, log.toReversed());
+		await right.press('Control+Enter');
+		await contains('Removed lines: 1999');
+		await contains('Added lines: 1999');
 	},
 	async 'word-counter'({ input, click, button, contains, download }) {
 		assert.ok(await button('Copy').isDisabled());
