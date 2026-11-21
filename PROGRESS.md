@@ -180,6 +180,10 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+### 2026-11-21 — Base64: bảo toàn JSON sau giải mã
+
+- Pretty-print dùng bộ định dạng giữ nguyên token số và khóa trùng; bỏ lần decode dư khi kiểm tra đầu ra JSON. Đã kiểm số 9007199254740993 và 1e400 cùng hai khóa id qua giao diện. Build 647 trang, 1.130 test đạt.
+
 ### 2026-11-21 — OCR: tải lần đầu và phục hồi lỗi tải mô hình
 
 - Đo ảnh mẫu tiếng Anh 640 × 120 trên production: lần đầu 4,05 giây, lần sau 0,42 giây. Giữ nguyên model, đóng gói Anh và Việt cùng site, hủy worker khi tải lỗi hoặc bị hủy. Máy kiểm thử local giảm từ 1,69 xuống 0,92 giây ở lần đầu. Các tổ hợp có ngôn ngữ khác vẫn dùng CDN.

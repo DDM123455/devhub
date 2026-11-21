@@ -1,5 +1,7 @@
 # ROADMAP.md — Web Tool Hub (Client-Side, Zero Server Cost)
 
+- [x] 2026-11-21 — Base64 Pretty-print JSON giữ số lớn, khóa trùng và chỉ giải mã văn bản một lần.
+
 - [x] 2026-11-21 — Đo OCR lần đầu/lần sau, tối ưu tải mô hình Anh/Việt, sửa treo khi tải lỗi và kiểm thử phục hồi.
 
 - [x] 2026-11-21 — Kiểm lại XML trên các engine trình duyệt: thẻ trùng tên chẩn đoán, dòng lỗi sau khoảng trắng đầu tài liệu, DOCTYPE, ký tự CR và chỉ thị stylesheet.

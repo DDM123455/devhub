@@ -97,5 +97,6 @@ describe('line helpers', () => {
 		expect(prettyPrintIfJson('{"a":1}')).toBe('{\n  "a": 1\n}');
 		expect(prettyPrintIfJson('hello')).toBeNull();
 		expect(prettyPrintIfJson('{bad')).toBeNull();
+		expect(prettyPrintIfJson('{"id":9007199254740993,"id":1e400}')).toBe('{\n  "id": 9007199254740993,\n  "id": 1e400\n}');
 	});
 });

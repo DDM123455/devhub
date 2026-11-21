@@ -3,6 +3,7 @@
 // (de)compression via the native Compression Streams API, and per-line processing.
 
 import { base64ToBytes, bytesToBase64, extractDataUri, fromUrlSafeOrStandard, toUrlSafe } from './base64';
+import { formatJsonLossless } from './text-format';
 
 /* ------------------------------------------------------------------ analysis */
 
@@ -372,9 +373,5 @@ export function mapLinesSafe(text: string, fn: (line: string) => string, onError
 export function prettyPrintIfJson(text: string): string | null {
 	const t = text.trim();
 	if (!(t.startsWith('{') || t.startsWith('['))) return null;
-	try {
-		return JSON.stringify(JSON.parse(t), null, 2);
-	} catch {
-		return null;
-	}
+	return formatJsonLossless(t)?.value ?? null;
 }

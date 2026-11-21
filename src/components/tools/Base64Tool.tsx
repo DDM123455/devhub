@@ -165,7 +165,7 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 	const [lineMode, setLineMode] = useState(false);
 	const [prettyJson, setPrettyJson] = useState(false);
 
-	const { textOutput, textError } = useMemo(() => {
+	const { textOutput: rawOutput, textError } = useMemo(() => {
 		if (textInput === '') return { textOutput: '', textError: null as string | null };
 		if (lineMode) {
 			// Each non-empty line is encoded/decoded on its own; failing lines are marked, not fatal.
@@ -186,11 +186,10 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 		}
 		const result = decodeText(textInput, decodeEncoding);
 		if (result.ok) {
-			const pretty = prettyJson ? prettyPrintIfJson(result.text) : null;
-			return { textOutput: pretty ?? result.text, textError: null as string | null };
+			return { textOutput: result.text, textError: null as string | null };
 		}
 		return { textOutput: '', textError: result.reason === 'notText' ? messages.decodeNotText : messages.decodeError };
-	}, [textInput, mode, urlSafe, lineWrap, decodeEncoding, lineMode, prettyJson, messages.decodeError, messages.decodeNotText, messages.x.lineError]);
+	}, [textInput, mode, urlSafe, lineWrap, decodeEncoding, lineMode, messages.decodeError, messages.decodeNotText, messages.x.lineError]);
 
 	const inlineFile = useMemo(() => {
 		if (mode !== 'decode' || lineMode || !textInput.trim()) return null;
@@ -210,11 +209,10 @@ export default function Base64Tool({ messages }: { messages: Messages }) {
 		setTimeout(() => URL.revokeObjectURL(url), 1000);
 	};
 	const analysis = useMemo(() => (mode === 'decode' && textInput.trim() !== '' && !lineMode ? analyzeBase64(textInput) : null), [mode, textInput, lineMode]);
-	const decodedLooksLikeJson = useMemo(() => {
-		if (mode !== 'decode' || lineMode || textInput.trim() === '') return false;
-		const result = decodeText(textInput, decodeEncoding);
-		return result.ok && prettyPrintIfJson(result.text) !== null;
-	}, [mode, lineMode, textInput, decodeEncoding]);
+	const formattedJson = useMemo(() => mode === 'decode' && !lineMode
+		? prettyPrintIfJson(rawOutput) : null, [mode, lineMode, rawOutput]);
+	const decodedLooksLikeJson = formattedJson !== null;
+	const textOutput = prettyJson && formattedJson !== null ? formattedJson : rawOutput;
 
 	const handleSwap = () => {
 		setMode((m) => (m === 'encode' ? 'decode' : 'encode'));
