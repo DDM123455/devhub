@@ -1,7 +1,7 @@
 // Vỏ mỏng quanh tesseract.js: một worker dùng lại cho nhiều ảnh/trang, chạy hoàn toàn trên
 // trình duyệt (Web Worker của chính thư viện). Worker + core WASM được tự host (ocr-assets.ts);
-// chỉ dữ liệu ngôn ngữ (.traineddata, là mô hình chứ không phải dữ liệu người dùng) tải từ
-// cdn.jsdelivr.net ở lần đầu rồi được tesseract.js lưu vào IndexedDB của trình duyệt.
+// English and Vietnamese model files ship with the site. Other language selections
+// use the upstream CDN. Tesseract caches language data in the browser's IndexedDB.
 
 import { averageConfidence, extractLines, type OcrLineInfo } from './ocr-text';
 import type { OcrPsm } from './ocr-languages';
@@ -60,17 +60,30 @@ function mapStatus(status: string): OcrPhase | null {
 export async function createOcrEngine(
 	langKey: string,
 	onProgress: ((progress: OcrProgress) => void) | null,
+	signal?: AbortSignal,
 ): Promise<OcrEngine> {
 	let handler = onProgress;
 	let worker: import('tesseract.js').Worker | null = null;
+	let nativeWorker: Worker | undefined;
+	let rejectLoad!: (reason: unknown) => void;
+	const loadFailure = new Promise<never>((_, reject) => { rejectLoad = reject; });
+	const abortLoad = () => rejectLoad(new Error('OCR cancelled'));
 	try {
 		// Nạp động: tesseract.js không nằm trong bundle ban đầu của trang.
-		const [{ default: Tesseract }, { resolveOcrAssets }] = await Promise.all([
-			import('tesseract.js/dist/tesseract.esm.min.js'),
+		const [{ default: createWorker }, { resolveOcrAssets }] = await Promise.all([
+			import('virtual:ocr-create-worker'),
 			import('./ocr-assets'),
 		]);
 		const assets = resolveOcrAssets();
-		worker = await Tesseract.createWorker(langKey.split('+'), Tesseract.OEM.LSTM_ONLY, {
+		signal?.throwIfAborted();
+		signal?.addEventListener('abort', abortLoad, { once: true });
+		const languages = langKey.split('+');
+		// OEM 1 is LSTM_ONLY. Preserve the upstream model and IndexedDB key.
+		worker = await Promise.race([loadFailure, createWorker(languages, 1, {
+			langPath: languages.every(lang => lang === 'eng' || lang === 'vie')
+				? new URL('/ocr-data/best-int-v1/', location.href).href : undefined,
+			onSpawn: instance => { nativeWorker = instance; },
+			errorHandler: error => rejectLoad(error),
 			workerPath: assets.workerPath,
 			corePath: assets.corePath,
 			// Worker chạy thẳng từ URL cùng origin (worker-src 'self'), không qua blob importScripts.
@@ -81,13 +94,17 @@ export async function createOcrEngine(
 					handler({ phase, progress: message.progress ?? 0, fromCache: /cache/i.test(message.status ?? '') });
 				}
 			},
-		});
+		})]);
 	} catch (error) {
-		if (worker) await worker.terminate().catch(() => {});
+		nativeWorker?.terminate();
 		throw new OcrEngineError('load', errorMessageOf(error));
+	} finally {
+		signal?.removeEventListener('abort', abortLoad);
 	}
 
 	const active = worker;
+	let previousPsm: OcrPsm | undefined;
+	let previousSpaces: boolean | undefined;
 	return {
 		langKey,
 		setProgressHandler(next) {
@@ -95,10 +112,14 @@ export async function createOcrEngine(
 		},
 		async recognize(image, options) {
 			try {
-				await active.setParameters({
-					tessedit_pageseg_mode: String(options.psm) as never,
-					preserve_interword_spaces: options.preserveSpaces ? '1' : '0',
-				});
+				if (options.psm !== previousPsm || options.preserveSpaces !== previousSpaces) {
+					await active.setParameters({
+						tessedit_pageseg_mode: String(options.psm) as never,
+						preserve_interword_spaces: options.preserveSpaces ? '1' : '0',
+					});
+					previousPsm = options.psm;
+					previousSpaces = options.preserveSpaces;
+				}
 				const { data } = await active.recognize(image, {}, { text: true, blocks: true });
 				const lines = extractLines(data.blocks);
 				const text = (data.text ?? '').replace(/\s+$/g, '');

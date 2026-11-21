@@ -1,0 +1,5 @@
+English and Vietnamese LSTM model data for Tesseract OCR.
+Distributed unmodified from the 4.0.0_best_int directory in
+@tesseract.js-data/eng@1.0.0 and @tesseract.js-data/vie@1.0.0.
+Upstream model project: https://github.com/tesseract-ocr/tessdata_best
+Model license: Apache License 2.0 (LICENSE.txt).

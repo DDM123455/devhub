@@ -6,6 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import { imglyStaticTensors } from './scripts/imgly-static-tensors.mjs';
+import { ocrBrowserClient } from './scripts/ocr-browser-client.mjs';
 
 // Một nguồn duy nhất cho danh sách locale: src/i18n/config.ts (đọc bằng regex để tránh import TS vào config).
 import { readFileSync } from 'node:fs';
@@ -38,7 +39,7 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [tailwindcss(), imglyStaticTensors()],
+    plugins: [tailwindcss(), imglyStaticTensors(), ocrBrowserClient()],
     worker: { plugins: () => [imglyStaticTensors()] },
     // Dev only: these are loaded with a dynamic import() inside client islands, so Vite would
     // otherwise discover and re-optimise them mid-session — which invalidates the page's

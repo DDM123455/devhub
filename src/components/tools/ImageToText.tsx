@@ -430,10 +430,12 @@ export default function ImageToText({ messages, languageNames, locale, textDiffH
 		if (!unitsNow || unitsNow.length === 0) return;
 		runningRef.current = true;
 		// `whenCancelled` giúp thoát khỏi các await không bao giờ kết thúc sau khi worker bị terminate.
+		const controller = new AbortController();
 		const session: Session = { cancelled: false, cancel: () => {}, whenCancelled: Promise.resolve() as Promise<never> };
 		session.whenCancelled = new Promise<never>((_, reject) => {
 			session.cancel = () => {
 				session.cancelled = true;
+				controller.abort();
 				reject(new Error('cancelled'));
 			};
 		});
@@ -447,7 +449,7 @@ export default function ImageToText({ messages, languageNames, locale, textDiffH
 		setStatus({ kind: 'preparing' });
 
 		const langKey = buildLangParam(languages);
-		const onProgress = (progress: OcrProgress) => setLive(progress);
+		const onProgress = (progress: OcrProgress) => { if (!session.cancelled) setLive(progress); };
 		const collected: OcrResultItem[] = [];
 
 		try {
@@ -463,7 +465,7 @@ export default function ImageToText({ messages, languageNames, locale, textDiffH
 					engine.setProgressHandler(onProgress);
 					return engine;
 				}
-				const creating = createOcrEngine(langKey, onProgress);
+				const creating = createOcrEngine(langKey, onProgress, controller.signal);
 				try {
 					engine = await Promise.race([creating, session.whenCancelled]);
 				} catch (error) {
@@ -503,14 +505,16 @@ export default function ImageToText({ messages, languageNames, locale, textDiffH
 					const rendered = renderForOcr(src, pre);
 					src.release();
 					src = null;
-					const preview = await makePreviewBlob(rendered.colorCanvas);
-					const previewUrl = trackUrl(URL.createObjectURL(preview.blob));
-					const blob = await canvasToBlob(rendered.ocrCanvas);
 					const canvasWidth = rendered.ocrCanvas.width;
 					const canvasHeight = rendered.ocrCanvas.height;
-					// Giải phóng canvas lớn càng sớm càng tốt.
-					rendered.ocrCanvas.width = rendered.ocrCanvas.height = 0;
-					rendered.colorCanvas.width = rendered.colorCanvas.height = 0;
+					const [preview, blob] = await Promise.all([
+						makePreviewBlob(rendered.colorCanvas), canvasToBlob(rendered.ocrCanvas),
+					]).finally(() => {
+						rendered.ocrCanvas.width = rendered.ocrCanvas.height = 0;
+						rendered.colorCanvas.width = rendered.colorCanvas.height = 0;
+					});
+					if (session.cancelled) break;
+					const previewUrl = trackUrl(URL.createObjectURL(preview.blob));
 					let page;
 					try {
 						page = await Promise.race([engine.recognize(blob, { psm, preserveSpaces }), session.whenCancelled]);

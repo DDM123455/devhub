@@ -180,6 +180,11 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+### 2026-11-21 — OCR: tải lần đầu và phục hồi lỗi tải mô hình
+
+- Đo ảnh mẫu tiếng Anh 640 × 120 trên production: lần đầu 4,05 giây, lần sau 0,42 giây. Giữ nguyên model, đóng gói Anh và Việt cùng site, hủy worker khi tải lỗi hoặc bị hủy. Máy kiểm thử local giảm từ 1,69 xuống 0,92 giây ở lần đầu. Các tổ hợp có ngôn ngữ khác vẫn dùng CDN.
+- Bản build 647 trang, 1.130 test đạt. Kiểm trình duyệt chặn tải model, bấm trích xuất lại và đọc TXT/DOCX.
+
 ### 2026-11-21 — Rà lại Validate, Format và Minify XML
 
 - Tái hiện tài liệu có thẻ `parsererror` hợp lệ bị báo sai. Phân biệt phần tử của người dùng với chẩn đoán của trình duyệt, giữ số dòng gốc khi có dòng trống đầu vào.

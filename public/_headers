@@ -38,6 +38,10 @@
   ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
+/ocr-data/best-int-v1/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
 # ONNX reads the WASM bytes it assembled in this dedicated worker from a local Blob URL.
 /_astro/backgroundRemovalWorker-*
   ! Content-Security-Policy

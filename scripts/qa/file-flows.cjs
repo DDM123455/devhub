@@ -69,9 +69,14 @@ module.exports = {
 		assert.equal(entries.length, 2);
 		for (const entry of entries) assert.equal((await PDFDocument.load(await entry.async('uint8array'))).getPageCount(), 1);
 	},
-	async 'image-to-text'({ root, button, selectFile, rejectsFile, click, download, fixture }) {
+	async 'image-to-text'({ page, root, button, selectFile, rejectsFile, click, download, fixture }) {
 		await rejectsFile();
 		await selectFile(fixture.image);
+		const model = '**/ocr-data/best-int-v1/eng.traineddata.gz';
+		await page.context().route(model, route => route.abort('internetdisconnected'));
+		await click(/^Extract text/);
+		await root.getByRole('alert').filter({hasText:/engine/i}).waitFor();
+		await page.context().unroute(model);
 		await click(/^Extract text/);
 		assert.match((await download('Download .txt', 120000)).toString(), /LOCAL TEST 42/);
 		const docx = await JSZip.loadAsync(await download('Download .docx'));
