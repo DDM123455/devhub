@@ -31,7 +31,7 @@ describe('validateK8sManifests v2', () => {
 		const schema = { type: 'object', properties: { spec: { type: 'object', properties: { size: { type: 'integer' } } } } };
 		const fetchMock = vi.fn(async () => ({ ok: true, json: async () => schema }) as unknown as Response);
 		global.fetch = fetchMock as unknown as typeof fetch;
-		const r = await validateK8sManifests(crd, 'v1.31.0');
+		const r = await validateK8sManifests(crd, 'v1.31.0', { crdCatalog: true });
 		expect(r.documents[0].schemaSource).toBe('crd');
 		expect(r.documents[0].issues.some((i) => i.key === 'schema-type')).toBe(true);
 		const calls = fetchMock.mock.calls as unknown as [string][];
@@ -48,9 +48,10 @@ describe('validateK8sManifests v2', () => {
 		expect(r2.documents[0].issues.some((i) => i.ruleId === 'unsupported-kind')).toBe(false);
 	});
 
-	it('does not look up the catalog when disabled', async () => {
+	it('does not look up the catalog by default or when explicitly disabled', async () => {
 		const fetchMock = vi.fn();
 		global.fetch = fetchMock as unknown as typeof fetch;
+		await validateK8sManifests(crd, 'v1.31.0');
 		await validateK8sManifests(crd, 'v1.31.0', { crdCatalog: false });
 		expect(fetchMock).not.toHaveBeenCalled();
 	});

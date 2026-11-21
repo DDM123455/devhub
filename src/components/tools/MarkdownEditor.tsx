@@ -295,7 +295,8 @@ const editorTheme = EditorView.theme({
 
 export default function MarkdownEditor({ messages, lang = 'en' }: { messages: Messages; lang?: string }) {
 	const [content, setContent] = useState('');
-	const [renderedHtml, setRenderedHtml] = useState('');
+	const [preview, setPreview] = useState({ source: '', html: '' });
+	const renderedHtml = preview.source === content ? preview.html : '';
 	const [viewMode, setViewMode] = useState<ViewMode>('split');
 	const [isDragOver, setIsDragOver] = useState(false);
 	const editorContainerRef = useRef<HTMLDivElement>(null);
@@ -437,7 +438,8 @@ export default function MarkdownEditor({ messages, lang = 'en' }: { messages: Me
 	useEffect(() => {
 		let cancelled = false;
 		if (content.length > MAX_MARKDOWN_RENDER_CHARS) {
-			setRenderedHtml('');
+			setPreview({ source: '', html: '' });
+			setOutline([]);
 			return;
 		}
 		const timer = setTimeout(async () => {
@@ -523,7 +525,7 @@ export default function MarkdownEditor({ messages, lang = 'en' }: { messages: Me
 				}
 			}
 			if (cancelled) return;
-			setRenderedHtml(html);
+			setPreview({ source: content, html });
 			setOutline(extractOutline(html));
 		}, RENDER_DEBOUNCE_MS);
 		return () => {
@@ -987,7 +989,7 @@ export default function MarkdownEditor({ messages, lang = 'en' }: { messages: Me
 							style={{ fontSize: `${(fontSize * 14) / 12}px` }}
 							className={`md-preview h-[var(--md-editor-height,27.5rem)] overflow-y-auto rounded-md border border-border bg-muted/40 p-3 text-sm text-foreground ${PREVIEW_CLASSES}`}
 							// eslint-disable-next-line react/no-danger
-							dangerouslySetInnerHTML={{ __html: renderedHtml }}
+						dangerouslySetInnerHTML={{ __html: content ? preview.html : '' }}
 						/>
 						<p className="text-xs text-muted-foreground">{messages.remoteImagesNote}</p>
 					</div>

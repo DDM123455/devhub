@@ -11,7 +11,8 @@
     "build": "astro build && node scripts/fix-404-output.mjs && node scripts/strip-katex-css.mjs",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:browser": "node scripts/qa/browser.cjs"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.1",
@@ -71,6 +72,7 @@
     "@resvg/resvg-js": "^2.6.2",
     "@types/jsoneditor": "^9.9.6",
     "@types/papaparse": "^5.3.14",
+    "playwright": "1.61.1",
     "vitest": "^4.1.10"
   }
 }

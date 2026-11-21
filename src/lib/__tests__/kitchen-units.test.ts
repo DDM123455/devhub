@@ -14,6 +14,9 @@ import {
 const near = (actual: number, expected: number, places = 2) => expect(actual).toBeCloseTo(expected, places);
 
 describe('convertVolume', () => {
+	it('keeps a representable result for large amounts', () => {
+		expect(convertVolume(1e308, 'tbsp', 'tbsp')).toBe(1e308);
+	});
 	it('các con số then chốt trong spec', () => {
 		near(convertVolume(1, 'tsp', 'ml'), 4.93);
 		near(convertVolume(4, 'tsp', 'tbsp'), 1.333, 3);
@@ -89,6 +92,12 @@ describe('toKitchenFraction', () => {
 });
 
 describe('formatAmount', () => {
+	it('distinguishes tiny amounts, zero and an overflowing result', () => {
+		expect(formatAmount(convertVolume(0.00001, 'tsp', 'ml'))).toBe('0.0000493');
+		expect(toKitchenFraction(0.0000493)).toBeNull();
+		expect(formatAmount(0)).toBe('0');
+		expect(formatAmount(convertVolume(1e308, 'tsp', 'ml'))).toBe('—');
+	});
 	it('số càng lớn càng ít số lẻ', () => {
 		expect(formatAmount(236.588)).toBe('237');
 		expect(formatAmount(14.78676)).toBe('14.8');

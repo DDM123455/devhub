@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLeaveWarning } from './useLeaveWarning';
-import { removeBackground } from '@imgly/background-removal';
+import { BackgroundRemovalClient } from './backgroundRemovalClient';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { BeforeAfterSlider } from '@/components/ui/before-after-slider';
 import { baseNameOf, dedupeName } from '@/lib/file-utils';
-import { isHeicLike } from '@/lib/image-compress-utils';
+import { fitWithin, isHeicLike } from '@/lib/image-compress-utils';
 import {
 	blurDownscaleFactor,
 	computeContainLayout,
@@ -442,8 +442,8 @@ async function buildDisplayBlob(cutoutBlob: Blob, options: DisplayOptions): Prom
 
 		const { maxDimension } = options;
 		if (maxDimension && (finalCanvas.width > maxDimension || finalCanvas.height > maxDimension)) {
-			const scale = maxDimension / Math.max(finalCanvas.width, finalCanvas.height);
-			const resized = createCanvas(Math.round(finalCanvas.width * scale), Math.round(finalCanvas.height * scale));
+			const { width, height } = fitWithin(finalCanvas.width, finalCanvas.height, maxDimension);
+			const resized = createCanvas(width, height);
 			get2d(resized).drawImage(finalCanvas, 0, 0, resized.width, resized.height);
 			finalCanvas = resized;
 		}
@@ -505,9 +505,13 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 	itemsRef.current = items;
 	// Khoá chống chạy song song 2 vòng xử lý (effect auto-start + nút bấm).
 	const runningRef = useRef(false);
+	const engine = useRef<BackgroundRemovalClient | null>(null);
 
 	useEffect(() => {
 		return () => {
+			itemsRef.current = [];
+			engine.current?.close();
+			engine.current = null;
 			for (const url of objectUrls.current) URL.revokeObjectURL(url);
 		};
 	}, []);
@@ -729,18 +733,15 @@ export default function BackgroundRemover({ messages }: { messages: Messages }) 
 					),
 				);
 				try {
-					const resultBlob = await removeBackground(await getDecodedSource(item), {
-						output: { format: 'image/png' },
-						// `key` is namespaced by the library itself: "fetch:*" while
-						// downloading the model/wasm runtime, "compute:*" while actually
-						// running inference on this image — see note on `ImageItem.stage`.
-						progress: (key, current, total) => {
-							const percent = total > 0 ? Math.round((current / total) * 100) : 0;
-							const stage = key.startsWith('fetch:') ? 'loading-model' : 'processing';
-							setItems((prev) =>
-								prev.map((it) => (it.id === item.id ? { ...it, progress: percent, stage } : it)),
-							);
-						},
+					const source = await getDecodedSource(item);
+					if (!itemsRef.current.some((queued) => queued.id === item.id)) continue;
+					engine.current ??= new BackgroundRemovalClient();
+					const resultBlob = await engine.current.run(source, (key, current, total) => {
+						const percent = total > 0 ? Math.round((current / total) * 100) : 0;
+						const stage = key.startsWith('fetch:') ? 'loading-model' : 'processing';
+						setItems((prev) =>
+							prev.map((it) => (it.id === item.id ? { ...it, progress: percent, stage } : it)),
+						);
 					});
 					setItems((prev) =>
 						prev.map((it) => (it.id === item.id ? { ...it, status: 'done', resultBlob } : it)),

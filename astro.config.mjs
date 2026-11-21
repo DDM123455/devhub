@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
+import { imglyStaticTensors } from './scripts/imgly-static-tensors.mjs';
 
 // Một nguồn duy nhất cho danh sách locale: src/i18n/config.ts (đọc bằng regex để tránh import TS vào config).
 import { readFileSync } from 'node:fs';
@@ -37,12 +38,14 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), imglyStaticTensors()],
+    worker: { plugins: () => [imglyStaticTensors()] },
     // Dev only: these are loaded with a dynamic import() inside client islands, so Vite would
     // otherwise discover and re-optimise them mid-session — which invalidates the page's
     // `?v=` hash and makes the import fail ("Failed to fetch dynamically imported module",
     // blank QR preview / OCR error) until the dev server is restarted. Pre-bundle them up front.
     optimizeDeps: {
+      exclude: ['@imgly/background-removal'],
       include: [
         'jszip',
         'qr-code-styling',

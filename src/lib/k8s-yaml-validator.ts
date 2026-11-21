@@ -12,6 +12,7 @@
 //    OpenAPI-derived JSON Schema, so this is the natural fit.
 // Both run as devDependency-free runtime deps (bundled into the client, same
 // as every other per-tool library already in this repo — svgo, pdf-lib, etc).
+import schemaManifest from '../data/k8s-schema-files.json';
 import { validateJsonSchema, type SchemaError } from './json-schema-validate';
 import { LineCounter, isMap, isScalar, parseAllDocuments, type Document } from 'yaml';
 import { crossCheckManifests, type CrossCheckInput } from './k8s-crosscheck';
@@ -91,7 +92,7 @@ export interface K8sValidationResult {
 }
 
 export interface ValidateOptions {
-	/** Look up kinds without a built-in schema in the Datree CRD catalog (default true). */
+	/** Look up kinds without a built-in schema in the Datree CRD catalog when enabled. */
 	crdCatalog?: boolean;
 	/** Do not warn about kinds that have no schema at all (default false). */
 	skipUnknownKinds?: boolean;
@@ -101,40 +102,10 @@ export interface ValidateOptions {
 	crossCheck?: boolean;
 }
 
-// Schema filename suffix (after the lowercased kind) in yannh/kubernetes-json-schema's
-// "-standalone" directories, e.g. kind "Deployment" -> "deployment-apps-v1.json".
-// Verified against the live CDN mirror for v1.28.0 and v1.31.0 before writing
-// this — see PROGRESS.md 2026-08-09 for the exact URLs checked. Core-group
-// kinds (Service/ConfigMap/Secret/PersistentVolumeClaim) have no group
-// segment, just "-v1".
-const SCHEMA_FILENAME_BY_KIND: Record<string, string> = {
-	Deployment: 'deployment-apps-v1.json',
-	Service: 'service-v1.json',
-	Ingress: 'ingress-networking-v1.json',
-	ConfigMap: 'configmap-v1.json',
-	Secret: 'secret-v1.json',
-	StatefulSet: 'statefulset-apps-v1.json',
-	DaemonSet: 'daemonset-apps-v1.json',
-	Job: 'job-batch-v1.json',
-	CronJob: 'cronjob-batch-v1.json',
-	PersistentVolumeClaim: 'persistentvolumeclaim-v1.json',
-};
-
-export const SUPPORTED_KINDS = Object.keys(SCHEMA_FILENAME_BY_KIND);
-
-// Common released Kubernetes minor versions with schemas available in the
-// yannh/kubernetes-json-schema CDN mirror, newest first. "master" tracks the
-// repo's rolling latest (whatever the current dev branch's OpenAPI spec is).
-export const K8S_VERSION_OPTIONS = [
-	'master',
-	'v1.31.0',
-	'v1.30.0',
-	'v1.29.0',
-	'v1.28.0',
-	'v1.27.0',
-	'v1.26.0',
-];
-export const DEFAULT_K8S_VERSION = 'v1.31.0';
+const schemaFiles: Record<string, Record<string, string>> = schemaManifest.versions;
+export const DEFAULT_K8S_VERSION = 'v1.37.0';
+export const SUPPORTED_KINDS = Object.keys(schemaFiles[DEFAULT_K8S_VERSION]);
+export const K8S_VERSION_OPTIONS = Object.keys(schemaFiles);
 
 // Well-known apiVersion deprecations for the resource kinds this tool
 // supports — not exhaustive of every Kubernetes deprecation ever, just the
@@ -250,17 +221,13 @@ function schemaIssueFromError(schemaError: SchemaError, doc: Document, lineCount
 // UI's Retry button) tries the network again instead of showing "unavailable" until reload.
 const schemaCache = new Map<string, Promise<Record<string, unknown> | null>>();
 
-// The yannh mirror publishes no release tags — only the rolling `master` branch — so the URL is
-// pinned to a commit SHA that was verified to serve every file listed in SCHEMA_FILENAME_BY_KIND for
-// every entry of K8S_VERSION_OPTIONS through jsDelivr (checked 2026-10-01). Bump deliberately.
-export const K8S_SCHEMA_REPO_REF = '8df8a883b68a24a104b4a9e43c1288090ae60b3b';
+export const K8S_SCHEMA_REPO_REF = schemaManifest.ref;
 // Datree CRD catalog (`group/kind_version.json`). Same idea: pinned to a verified commit.
 export const CRD_CATALOG_REPO_REF = 'd373c2da9702bc9509a004db83e57263fe3bdfc1';
 
 function schemaUrl(kind: string, version: string): string | null {
-	const filename = SCHEMA_FILENAME_BY_KIND[kind];
-	if (!filename) return null;
-	return `https://cdn.jsdelivr.net/gh/yannh/kubernetes-json-schema@${K8S_SCHEMA_REPO_REF}/${version}-standalone/${filename}`;
+	const file = schemaFiles[version]?.[kind];
+	return typeof file === 'string' ? '/schemas/k8s/' + file : null;
 }
 
 // Groups served by Kubernetes itself: never looked up in the CRD catalog.
@@ -380,7 +347,7 @@ export async function validateK8sManifests(
 	k8sVersion: string,
 	options: ValidateOptions = {},
 ): Promise<K8sValidationResult> {
-	const { crdCatalog = true, skipUnknownKinds = false, security: runSecurity = true, crossCheck = true } = options;
+	const { crdCatalog = false, skipUnknownKinds = false, security: runSecurity = true, crossCheck = true } = options;
 	const { documents } = parseK8sManifests(input);
 	const results: K8sDocumentResult[] = [];
 	const crossInputs: CrossCheckInput[] = [];

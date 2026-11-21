@@ -35,4 +35,10 @@
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data:; connect-src 'self' https://cdn.jsdelivr.net https://staticimgly.com; worker-src 'self' blob:; child-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
 
 /_astro/*
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
+
+# ONNX reads the WASM bytes it assembled in this dedicated worker from a local Blob URL.
+/_astro/backgroundRemovalWorker-*
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'none'; script-src 'self' blob: 'wasm-unsafe-eval'; connect-src 'self' blob: https://staticimgly.com; worker-src 'self' blob:; base-uri 'none'; frame-ancestors 'none'

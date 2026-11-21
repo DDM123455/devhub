@@ -1,5 +1,7 @@
 # ROADMAP.md — Web Tool Hub (Client-Side, Zero Server Cost)
 
+- [x] 2026-11-21 — Kiểm thử chức năng 27 công cụ, 10 trang đổi đơn vị và trang chủ trên Chromium desktop/mobile. Thêm bộ kiểm thử chạy lại được, sửa lỗi xuất file cũ, worker Xóa nền, thanh công cụ JSON trên màn hình hẹp và các ca biên đã tái hiện. Phạm vi từng nút ghi trong `QA_FUNCTIONAL_2026-11-21.md`.
+
 - [x] 2026-11-16 — Text Diff ghép nội dung trước whitespace, sửa tô nhầm field giống nhau trong bản tin debugger căn cột (cả Word/Character); 28 test hồi quy.
 
 - [x] 2026-11-16 — Text Diff giữ phần đầu/đuôi giống nhau ngoài highlight trên dòng dài, bảo toàn cụm Unicode và bổ sung test/hướng dẫn en+vi.

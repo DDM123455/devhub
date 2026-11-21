@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { BeforeAfterSlider } from '@/components/ui/before-after-slider';
 import { baseNameOf, dedupeName } from '@/lib/file-utils';
+import { fitWithin } from '@/lib/image-compress-utils';
 import {
 	computePdfPlacement,
 	isHexColor,
@@ -392,12 +393,7 @@ async function convertImage(
 		return blob;
 	}
 
-	let { width, height } = bitmap;
-	if (maxDimension && (width > maxDimension || height > maxDimension)) {
-		const scale = maxDimension / Math.max(width, height);
-		width = Math.round(width * scale);
-		height = Math.round(height * scale);
-	}
+	const { width, height } = fitWithin(bitmap.width, bitmap.height, maxDimension);
 
 	try {
 		assertCanvasSize(width, height);

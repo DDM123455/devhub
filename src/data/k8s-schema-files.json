@@ -1,0 +1,161 @@
+{
+  "ref": "8df8a883b68a24a104b4a9e43c1288090ae60b3b",
+  "versions": {
+    "master": {
+      "Deployment": "deployment-apps-v1-a20cb3d017d6b3ca.json",
+      "Service": "service-v1-03b929e2624f91c5.json",
+      "Ingress": "ingress-networking-v1-67b69f97062f1f7d.json",
+      "ConfigMap": "configmap-v1-9f811f9b3573e5b5.json",
+      "Secret": "secret-v1-7f97ba9fdef9e895.json",
+      "StatefulSet": "statefulset-apps-v1-187339ec21ff1f65.json",
+      "DaemonSet": "daemonset-apps-v1-4c4c34c8f98db22a.json",
+      "Job": "job-batch-v1-de2563293c6160e2.json",
+      "CronJob": "cronjob-batch-v1-53c303b8f0e87607.json",
+      "PersistentVolumeClaim": "persistentvolumeclaim-v1-3d6fb07339cda83e.json"
+    },
+    "v1.37.0": {
+      "Deployment": "deployment-apps-v1-b275343b76a4e0cd.json",
+      "Service": "service-v1-9e5e42964a559d0e.json",
+      "Ingress": "ingress-networking-v1-0539d1382b58dc71.json",
+      "ConfigMap": "configmap-v1-9f811f9b3573e5b5.json",
+      "Secret": "secret-v1-7f97ba9fdef9e895.json",
+      "StatefulSet": "statefulset-apps-v1-2a7c122092764b53.json",
+      "DaemonSet": "daemonset-apps-v1-ab05b558773b7555.json",
+      "Job": "job-batch-v1-123e26a60aacaa4b.json",
+      "CronJob": "cronjob-batch-v1-8c4ec616916a1a70.json",
+      "PersistentVolumeClaim": "persistentvolumeclaim-v1-dd31e3c33c33d6fe.json"
+    },
+    "v1.36.0": {
+      "Deployment": "deployment-apps-v1-b2c84da21c3a88c0.json",
+      "Service": "service-v1-9e5e42964a559d0e.json",
+      "Ingress": "ingress-networking-v1-0539d1382b58dc71.json",
+      "ConfigMap": "configmap-v1-9f811f9b3573e5b5.json",
+      "Secret": "secret-v1-7f97ba9fdef9e895.json",
+      "StatefulSet": "statefulset-apps-v1-c1455927d1ab5592.json",
+      "DaemonSet": "daemonset-apps-v1-98324df1814387c4.json",
+      "Job": "job-batch-v1-0c1ac7cfb6a39d94.json",
+      "CronJob": "cronjob-batch-v1-aa1119b12051fd87.json",
+      "PersistentVolumeClaim": "persistentvolumeclaim-v1-fff3843aac3ccb9a.json"
+    },
+    "v1.35.0": {
+      "Deployment": "deployment-apps-v1-1cdcd2cdaf35a3cd.json",
+      "Service": "service-v1-9e5e42964a559d0e.json",
+      "Ingress": "ingress-networking-v1-0539d1382b58dc71.json",
+      "ConfigMap": "configmap-v1-9f811f9b3573e5b5.json",
+      "Secret": "secret-v1-7f97ba9fdef9e895.json",
+      "StatefulSet": "statefulset-apps-v1-e2c87412146ce460.json",
+      "DaemonSet": "daemonset-apps-v1-e809861c5cf6bbcc.json",
+      "Job": "job-batch-v1-ec6407a470912ee6.json",
+      "CronJob": "cronjob-batch-v1-1bf944697197db3d.json",
+      "PersistentVolumeClaim": "persistentvolumeclaim-v1-fff3843aac3ccb9a.json"
+    },
+    "v1.34.0": {
+      "Deployment": "deployment-apps-v1-dfb688067d1d49e7.json",
+      "Service": "service-v1-9e5e42964a559d0e.json",
+      "Ingress": "ingress-networking-v1-0539d1382b58dc71.json",
+      "ConfigMap": "configmap-v1-9f811f9b3573e5b5.json",
+      "Secret": "secret-v1-7f97ba9fdef9e895.json",
+      "StatefulSet": "statefulset-apps-v1-a3a5354aebe29731.json",
+      "DaemonSet": "daemonset-apps-v1-ac6e25b0a78a5987.json",
+      "Job": "job-batch-v1-ef38b4aa6ace0096.json",
+      "CronJob": "cronjob-batch-v1-5fce76026829280e.json",
+      "PersistentVolumeClaim": "persistentvolumeclaim-v1-fff3843aac3ccb9a.json"
+    },
+    "v1.33.0": {
+      "Deployment": "deployment-apps-v1-baad0a72218c17a8.json",
+      "Service": "service-v1-9e5e42964a559d0e.json",
+      "Ingress": "ingress-networking-v1-0539d1382b58dc71.json",
+      "ConfigMap": "configmap-v1-9f811f9b3573e5b5.json",
+      "Secret": "secret-v1-7f97ba9fdef9e895.json",
+      "StatefulSet": "statefulset-apps-v1-70ecffc03e660e40.json",
+      "DaemonSet": "daemonset-apps-v1-1fb534ada9827d28.json",
+      "Job": "job-batch-v1-eb54e4f5e5cda03f.json",
+      "CronJob": "cronjob-batch-v1-9db16b09d198d39d.json",
+      "PersistentVolumeClaim": "persistentvolumeclaim-v1-fff3843aac3ccb9a.json"
+    },
+    "v1.32.0": {
+      "Deployment": "deployment-apps-v1-fd68536fe9de6dbd.json",
+      "Service": "service-v1-9e5e42964a559d0e.json",
+      "Ingress": "ingress-networking-v1-0539d1382b58dc71.json",
+      "ConfigMap": "configmap-v1-9f811f9b3573e5b5.json",
+      "Secret": "secret-v1-7f97ba9fdef9e895.json",
+      "StatefulSet": "statefulset-apps-v1-114798e4e15cf8aa.json",
+      "DaemonSet": "daemonset-apps-v1-99712b63cbffc83d.json",
+      "Job": "job-batch-v1-9d90ae9bcab5df77.json",
+      "CronJob": "cronjob-batch-v1-441a0da42d1c7f7d.json",
+      "PersistentVolumeClaim": "persistentvolumeclaim-v1-fff3843aac3ccb9a.json"
+    },
+    "v1.31.0": {
+      "Deployment": "deployment-apps-v1-a32a88acccf9e33a.json",
+      "Service": "service-v1-9e5e42964a559d0e.json",
+      "Ingress": "ingress-networking-v1-0539d1382b58dc71.json",
+      "ConfigMap": "configmap-v1-9f811f9b3573e5b5.json",
+      "Secret": "secret-v1-7f97ba9fdef9e895.json",
+      "StatefulSet": "statefulset-apps-v1-a490f2df362c9167.json",
+      "DaemonSet": "daemonset-apps-v1-216ef98ac346a324.json",
+      "Job": "job-batch-v1-8154a509de781694.json",
+      "CronJob": "cronjob-batch-v1-a699e56bbee93f73.json",
+      "PersistentVolumeClaim": "persistentvolumeclaim-v1-fff3843aac3ccb9a.json"
+    },
+    "v1.30.0": {
+      "Deployment": "deployment-apps-v1-58258615549d4b25.json",
+      "Service": "service-v1-9e5e42964a559d0e.json",
+      "Ingress": "ingress-networking-v1-a070c4b0503e876f.json",
+      "ConfigMap": "configmap-v1-9f811f9b3573e5b5.json",
+      "Secret": "secret-v1-7f97ba9fdef9e895.json",
+      "StatefulSet": "statefulset-apps-v1-a0340c20f02e1fdf.json",
+      "DaemonSet": "daemonset-apps-v1-d29bae0291fbf705.json",
+      "Job": "job-batch-v1-449323725a8610a1.json",
+      "CronJob": "cronjob-batch-v1-079c65851a9735b1.json",
+      "PersistentVolumeClaim": "persistentvolumeclaim-v1-fff3843aac3ccb9a.json"
+    },
+    "v1.29.0": {
+      "Deployment": "deployment-apps-v1-27cbf3d6d4183685.json",
+      "Service": "service-v1-4426f24e28ed4f42.json",
+      "Ingress": "ingress-networking-v1-610826753afb7afa.json",
+      "ConfigMap": "configmap-v1-53313fdc238e78bc.json",
+      "Secret": "secret-v1-4041616229ded193.json",
+      "StatefulSet": "statefulset-apps-v1-5d720d107a525a32.json",
+      "DaemonSet": "daemonset-apps-v1-3e65fc5855aa185f.json",
+      "Job": "job-batch-v1-0b7f6392afc7e671.json",
+      "CronJob": "cronjob-batch-v1-7d4a48b3a3cfce40.json",
+      "PersistentVolumeClaim": "persistentvolumeclaim-v1-fe6cac37340730eb.json"
+    },
+    "v1.28.0": {
+      "Deployment": "deployment-apps-v1-a8e9589c7ce4514c.json",
+      "Service": "service-v1-a87fab47e70831b3.json",
+      "Ingress": "ingress-networking-v1-610826753afb7afa.json",
+      "ConfigMap": "configmap-v1-53313fdc238e78bc.json",
+      "Secret": "secret-v1-4041616229ded193.json",
+      "StatefulSet": "statefulset-apps-v1-28ef86357eb87ec1.json",
+      "DaemonSet": "daemonset-apps-v1-0cb4bd8d2d11f4a2.json",
+      "Job": "job-batch-v1-d5caad44b7971ca0.json",
+      "CronJob": "cronjob-batch-v1-5176bc6a4ad239b0.json",
+      "PersistentVolumeClaim": "persistentvolumeclaim-v1-f0da86f7111b9173.json"
+    },
+    "v1.27.0": {
+      "Deployment": "deployment-apps-v1-626490152028af38.json",
+      "Service": "service-v1-a87fab47e70831b3.json",
+      "Ingress": "ingress-networking-v1-610826753afb7afa.json",
+      "ConfigMap": "configmap-v1-53313fdc238e78bc.json",
+      "Secret": "secret-v1-4041616229ded193.json",
+      "StatefulSet": "statefulset-apps-v1-2f590ccc894cbb51.json",
+      "DaemonSet": "daemonset-apps-v1-7df6f25ec0177348.json",
+      "Job": "job-batch-v1-a3c13e078f9ec1f6.json",
+      "CronJob": "cronjob-batch-v1-5ecd09a70586332f.json",
+      "PersistentVolumeClaim": "persistentvolumeclaim-v1-53b0418b31d6d8e4.json"
+    },
+    "v1.26.0": {
+      "Deployment": "deployment-apps-v1-48a202481d6d99b5.json",
+      "Service": "service-v1-a87fab47e70831b3.json",
+      "Ingress": "ingress-networking-v1-610826753afb7afa.json",
+      "ConfigMap": "configmap-v1-53313fdc238e78bc.json",
+      "Secret": "secret-v1-4041616229ded193.json",
+      "StatefulSet": "statefulset-apps-v1-4b9b335bf38702e9.json",
+      "DaemonSet": "daemonset-apps-v1-5fa9644a3d6172f1.json",
+      "Job": "job-batch-v1-effec0de8f5a9b62.json",
+      "CronJob": "cronjob-batch-v1-6a142295e6a89570.json",
+      "PersistentVolumeClaim": "persistentvolumeclaim-v1-adf8bbd000c3f5b1.json"
+    }
+  }
+}

@@ -69,6 +69,8 @@ describe('fitWithin', () => {
 	});
 	it('thu theo cạnh dài', () => {
 		expect(fitWithin(4000, 2000, 1000)).toEqual({ width: 1000, height: 500 });
+		expect(fitWithin(1, 6000, 1920)).toEqual({ width: 1, height: 1920 });
+		expect(fitWithin(6000, 1, 1920)).toEqual({ width: 1920, height: 1 });
 	});
 });
 

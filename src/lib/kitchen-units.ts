@@ -31,7 +31,7 @@ const ML_PER: Record<VolumeUnit, number> = {
 };
 
 export function convertVolume(value: number, from: VolumeUnit, to: VolumeUnit): number {
-	return (value * ML_PER[from]) / ML_PER[to];
+	return value * (ML_PER[from] / ML_PER[to]);
 }
 
 export interface Ingredient {
@@ -93,7 +93,7 @@ export function toKitchenFraction(value: number, tolerance = 0.005): string | nu
 	const whole = Math.floor(value);
 	const remainder = value - whole;
 
-	if (remainder < tolerance) return String(whole);
+	if (remainder < tolerance) return whole === 0 && value > 0 ? null : String(whole);
 
 	let best: { numerator: number; denominator: number; error: number } | null = null;
 	for (const denominator of KITCHEN_DENOMINATORS) {
@@ -118,8 +118,9 @@ export function toKitchenFraction(value: number, tolerance = 0.005): string | nu
  * cho số lớn (237 ml).
  */
 export function formatAmount(value: number): string {
-	if (!Number.isFinite(value)) return '0';
+	if (!Number.isFinite(value)) return '—';
 	const abs = Math.abs(value);
+	if (abs > 0 && abs < 0.001) return String(Number(value.toPrecision(3)));
 	const decimals = abs >= 100 ? 0 : abs >= 10 ? 1 : abs >= 1 ? 2 : 3;
 	return String(Number(value.toFixed(decimals)));
 }

@@ -273,7 +273,7 @@ export default function JsonFormatter({ messages }: { messages: Messages }) {
 
 	return (
 		<div className="flex flex-col gap-3">
-			<div ref={containerRef} className="h-[550px] w-full overflow-hidden rounded-md border border-border" />
+			<div ref={containerRef} className="json-editor-frame h-[550px] w-full overflow-hidden rounded-md border border-border" />
 			<div className="flex flex-wrap items-center justify-between gap-2">
 				<p className="text-xs text-muted-foreground">{messages.themeNotice}</p>
 				{validationStatus === 'valid' && (

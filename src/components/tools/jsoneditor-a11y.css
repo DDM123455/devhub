@@ -10,3 +10,30 @@
 .jsoneditor-statusbar .jsoneditor-curserinfo-label {
 	color: #4b5563 !important;
 }
+
+.json-editor-frame {
+	container-type: inline-size;
+}
+
+/* The tree search is absolutely positioned inside the editor's toolbar. */
+@container (max-width: 560px) {
+	.jsoneditor-menu:has(.jsoneditor-search) {
+		height: 67px;
+	}
+
+	.jsoneditor-menu .jsoneditor-search {
+		top: 35px;
+		left: 4px;
+		right: auto;
+	}
+
+	.jsoneditor-menu:has(.jsoneditor-search) ~ div.jsoneditor-outer.has-main-menu-bar {
+		margin-top: -67px;
+		padding-top: 67px;
+	}
+
+	.jsoneditor-menu:has(.jsoneditor-search) ~ div.jsoneditor-outer.has-main-menu-bar.has-nav-bar {
+		margin-top: -93px;
+		padding-top: 93px;
+	}
+}

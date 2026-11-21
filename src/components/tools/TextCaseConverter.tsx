@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { convertCase, type CaseMode, type StylizedStyle } from '@/lib/text-case';
 import { useCopyToClipboard } from './useCopyToClipboard';
+import { countGraphemes, extractWords } from '@/lib/word-count';
 
 interface Messages {
 	placeholder: string;
@@ -74,8 +75,7 @@ export default function TextCaseConverter({ messages }: { messages: Messages }) 
 		() => convertCase(text, mode, { naturalSort, prefix, suffix, startNumber, stylizedStyle }),
 		[text, mode, naturalSort, prefix, suffix, startNumber, stylizedStyle],
 	);
-	const charCount = output.length;
-	const wordCount = output.trim() === '' ? 0 : output.trim().split(/\s+/).length;
+	const [charCount, wordCount] = useMemo(() => [countGraphemes(output), extractWords(output).length], [output]);
 
 	const handleFileUpload = (input: HTMLInputElement) => {
 		const file = input.files?.[0];

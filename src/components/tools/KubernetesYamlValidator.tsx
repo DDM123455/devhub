@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
 	autoFixDeprecatedApiVersions,
@@ -115,54 +115,41 @@ export default function KubernetesYamlValidator({ messages }: { messages: Messag
 	const [input, setInput] = useState('');
 	const [k8sVersion, setK8sVersion] = useState(DEFAULT_K8S_VERSION);
 	const [isDragOver, setIsDragOver] = useState(false);
-	const [isValidating, setIsValidating] = useState(false);
-	const [documents, setDocuments] = useState<K8sDocumentResult[]>([]);
 	const { copied, failed: copyFailed, copy } = useCopyToClipboard();
 	const [retryCount, setRetryCount] = useState(0);
-	const [validationFailed, setValidationFailed] = useState(false);
 	const [fileError, setFileError] = useState(false);
-	const [crdCatalog, setCrdCatalog] = useState(true);
+	const [crdCatalog, setCrdCatalog] = useState(false);
 	const [skipUnknownKinds, setSkipUnknownKinds] = useState(false);
 	const [security, setSecurity] = useState(true);
 	const [crossCheck, setCrossCheck] = useState(true);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
-	const requestIdRef = useRef(0);
+	const request = useMemo(() => ({
+		input, k8sVersion, retryCount, options: { crdCatalog, skipUnknownKinds, security, crossCheck },
+	}), [input, k8sVersion, retryCount, crdCatalog, skipUnknownKinds, security, crossCheck]);
+	const [result, setResult] = useState<{ request: typeof request; documents: K8sDocumentResult[]; failed: boolean } | null>(null);
+	const current = result?.request === request ? result : null;
+	const documents = current?.documents ?? [];
+	const isValidating = input.trim() !== '' && current === null;
+	const validationFailed = current?.failed ?? false;
 
-	// Schema validation is async (fetches the schema over the network the
-	// first time a kind/version combo is seen), unlike the nginx tool's
-	// synchronous useMemo — a request counter guards against an in-flight
-	// validation from a stale keystroke overwriting a newer one that
-	// resolved first (same pattern as RegexTester's Web Worker requestId).
-	// Debounced (typing in a large manifest must not re-validate on every keystroke) and
-	// guarded on every path: a rejected validation clears the spinner instead of leaving it
-	// spinning forever (.catch + .finally).
+	// Tie results (including exports and quick fixes) to the exact input and options.
 	useEffect(() => {
-		const requestId = ++requestIdRef.current;
-		if (input.trim() === '') {
-			setDocuments([]);
-			setIsValidating(false);
-			setValidationFailed(false);
+		if (request.input.trim() === '') {
+			setResult(null);
 			return;
 		}
-		setIsValidating(true);
+		let cancelled = false;
 		const timer = setTimeout(() => {
-			validateK8sManifests(input, k8sVersion, { crdCatalog, skipUnknownKinds, security, crossCheck })
-				.then((result) => {
-					if (requestId !== requestIdRef.current) return;
-					setDocuments(result.documents);
-					setValidationFailed(false);
+			validateK8sManifests(request.input, request.k8sVersion, request.options)
+				.then(({ documents }) => {
+					if (!cancelled) setResult({ request, documents, failed: false });
 				})
 				.catch(() => {
-					if (requestId !== requestIdRef.current) return;
-					setDocuments([]);
-					setValidationFailed(true);
-				})
-				.finally(() => {
-					if (requestId === requestIdRef.current) setIsValidating(false);
+					if (!cancelled) setResult({ request, documents: [], failed: true });
 				});
 		}, VALIDATE_DEBOUNCE_MS);
-		return () => clearTimeout(timer);
-	}, [input, k8sVersion, retryCount, crdCatalog, skipUnknownKinds, security, crossCheck]);
+		return () => { cancelled = true; clearTimeout(timer); };
+	}, [request]);
 
 	const hasAutoFixableApiVersion = documents.some((doc) => doc.suggestedApiVersion !== null);
 	const fixedManifest = hasAutoFixableApiVersion ? autoFixDeprecatedApiVersions(input) : input;

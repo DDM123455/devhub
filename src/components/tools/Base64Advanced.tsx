@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
 	BYTE_FORMATS,
@@ -126,9 +126,12 @@ export default function Base64Advanced({ m }: { m: Base64ExtraMessages }) {
 	const [inFormat, setInFormat] = useState<ByteFormat>('base64');
 	const [outFormat, setOutFormat] = useState<ByteFormat>('text');
 	const [zipInput, setZipInput] = useState('');
-	const [zipOutput, setZipOutput] = useState('');
-	const [zipInfo, setZipInfo] = useState<string | null>(null);
-	const [zipError, setZipError] = useState<string | null>(null);
+	const request = useMemo(() => ({ action, algorithm, inFormat, outFormat, zipInput }), [action, algorithm, inFormat, outFormat, zipInput]);
+	const [result, setResult] = useState<{ request: typeof request; output?: string; info?: string; error?: string } | null>(null);
+	const current = result?.request === request ? result : null;
+	const zipOutput = current?.output ?? '';
+	const zipInfo = current?.info;
+	const zipError = current?.error;
 	const [busy, setBusy] = useState(false);
 
 	const switchAction = (next: 'decompress' | 'compress') => {
@@ -136,15 +139,11 @@ export default function Base64Advanced({ m }: { m: Base64ExtraMessages }) {
 		setAlgorithm(next === 'compress' ? 'gzip' : 'auto');
 		setInFormat(next === 'compress' ? 'text' : 'base64');
 		setOutFormat(next === 'compress' ? 'base64' : 'text');
-		setZipOutput('');
-		setZipInfo(null);
-		setZipError(null);
+		setResult(null);
 	};
 
 	const runZip = async () => {
-		setZipError(null);
-		setZipInfo(null);
-		setZipOutput('');
+		setResult(null);
 		setBusy(true);
 		try {
 			const bytes = decodeToBytes(inFormat, zipInput);
@@ -168,10 +167,9 @@ export default function Base64Advanced({ m }: { m: Base64ExtraMessages }) {
 					info += ' ' + m.convertErrNotText;
 				} else throw err;
 			}
-			setZipOutput(out);
-			setZipInfo(info);
+			setResult({ request, output: out, info });
 		} catch (err) {
-			setZipError(err instanceof ConvertError ? convertErrorText(err, m) : m.compressFailed);
+			setResult({ request, error: err instanceof ConvertError ? convertErrorText(err, m) : m.compressFailed });
 		} finally {
 			setBusy(false);
 		}
