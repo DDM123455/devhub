@@ -157,7 +157,7 @@ function tryFormatJson(text: string, unit: string): FormatResult | null {
 // ---------------------------------------------------------------------------
 
 export function escapeXmlText(value: string): string {
-	return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\r/g, '&#13;');
 }
 
 export function escapeXmlAttr(value: string): string {
@@ -176,6 +176,11 @@ export function escapeXmlAttr(value: string): string {
 // whose only child is a single text node are kept inline (`<tag>value</tag>`), and
 // MIXED content (text interleaved with child elements, e.g. `<p>Hi <b>x</b></p>`) is
 // emitted verbatim on one line since re-indenting it would change the document's text.
+function serializeParsedNode(node: Node): string {
+	// Literal CR is normalized to LF when reparsed. Preserve CR from &#13;.
+	return new XMLSerializer().serializeToString(node).replace(/\r/g, '&#13;');
+}
+
 function indentXmlNode(node: Node, depth: number, lines: string[], unit = '  '): void {
 	const indent = unit.repeat(depth);
 	if (node.nodeType === Node.COMMENT_NODE) {
@@ -195,7 +200,7 @@ function indentXmlNode(node: Node, depth: number, lines: string[], unit = '  '):
 	const element = node as Element;
 	// Formatting must not alter whitespace explicitly preserved by the document.
 	if (element.getAttributeNS('http://www.w3.org/XML/1998/namespace', 'space') === 'preserve') {
-		lines.push(indent + new XMLSerializer().serializeToString(element));
+		lines.push(indent + serializeParsedNode(element));
 		return;
 	}
 	const attrs = Array.from(element.attributes)
@@ -205,7 +210,7 @@ function indentXmlNode(node: Node, depth: number, lines: string[], unit = '  '):
 		(child) => !(child.nodeType === Node.TEXT_NODE && (child.textContent ?? '').trim() === ''),
 	);
 	if (element.childNodes.length > 0 && Array.from(element.childNodes).every(child => child.nodeType === Node.TEXT_NODE)) {
-		lines.push(indent + new XMLSerializer().serializeToString(element));
+		lines.push(indent + serializeParsedNode(element));
 		return;
 	}
 
@@ -221,7 +226,7 @@ function indentXmlNode(node: Node, depth: number, lines: string[], unit = '  '):
 	}
 	const hasTextChild = meaningfulChildren.some((child) => child.nodeType === Node.TEXT_NODE || child.nodeType === Node.CDATA_SECTION_NODE);
 	if (hasTextChild) {
-		lines.push(indent + new XMLSerializer().serializeToString(element));
+		lines.push(indent + serializeParsedNode(element));
 		return;
 	}
 	lines.push(`${indent}<${element.tagName}${attrs}>`);
@@ -229,18 +234,64 @@ function indentXmlNode(node: Node, depth: number, lines: string[], unit = '  '):
 	lines.push(`${indent}</${element.tagName}>`);
 }
 
+function xmlParserError(doc: Document, source: string): Element | null {
+	const find = (d: Document) => d.getElementsByTagNameNS('http://www.mozilla.org/newlayout/xml/parsererror.xml', 'parsererror')[0]
+		?? d.getElementsByTagNameNS('http://www.w3.org/1999/xhtml', 'parsererror')[0];
+	const candidate = find(doc);
+	if (!candidate) return null;
+	// A document can itself contain an XHTML <parsererror>. Rename that local
+	// name in a diagnostic copy so only errors emitted by the parser remain.
+	if (source.includes('parsererror')) {
+		let name = 'xmlDiagnosticElement';
+		while (source.includes(name)) name += '_';
+		const probe = new DOMParser().parseFromString(source.replaceAll('parsererror', name), 'application/xml');
+		if (!find(probe)) return null;
+	}
+	return candidate;
+}
+
+// XMLSerializer drops the internal DTD subset. Copy the original declaration
+// from the already validated prolog, respecting quotes, comments and PIs.
+function originalDoctype(source: string): string {
+	const tokens = source.matchAll(/<!--[\s\S]*?-->|<\?[\s\S]*?\?>|<!DOCTYPE\s/g);
+	for (const match of tokens) {
+		if (!match[0].startsWith('<!DOCTYPE')) continue;
+		const start = match.index;
+		let subset = false;
+		for (let i = start + match[0].length; i < source.length; i++) {
+			const char = source[i];
+			if (char === '"' || char === "'") i = source.indexOf(char, i + 1);
+			else if (source.startsWith('<!--', i)) i = source.indexOf('-->', i + 4) + 2;
+			else if (source.startsWith('<?', i)) i = source.indexOf('?>', i + 2) + 1;
+			else if (char === '[') subset = true;
+			else if (char === ']') subset = false;
+			else if (char === '>' && !subset) return source.slice(start, i + 1);
+		}
+		break;
+	}
+	return '';
+}
+
+export function minifyValidatedXml(source: string): string {
+	const doc = new DOMParser().parseFromString(source, 'application/xml');
+	const declaration = source.trimStart().match(/^<\?xml\s[^>]*\?>/)?.[0] ?? '';
+	return declaration + Array.from(doc.childNodes, node => node.nodeType === Node.DOCUMENT_TYPE_NODE
+		? originalDoctype(source) : serializeParsedNode(node)).join('');
+}
+
 function tryFormatXml(text: string, unit: string): FormatResult | null {
 	const trimmed = text.trim();
 	if (!trimmed.startsWith('<')) return null;
-	const doc = new DOMParser().parseFromString(trimmed, 'application/xml');
+	const doc = new DOMParser().parseFromString(text, 'application/xml');
 	// A malformed document doesn't throw — the browser injects a `<parsererror>` element
 	// into the returned Document instead, so that's the actual failure signal to check for.
-	if (doc.getElementsByTagName('parsererror').length > 0) return null;
+	if (xmlParserError(doc, text)) return null;
 
 	const lines: string[] = [];
-	const declarationMatch = trimmed.match(/^<\?xml[^>]*\?>/);
+	const declarationMatch = trimmed.match(/^<\?xml\s[^>]*\?>/);
 	if (declarationMatch) lines.push(declarationMatch[0]);
 	for (const child of Array.from(doc.childNodes)) {
+		if (child.nodeType === Node.DOCUMENT_TYPE_NODE) lines.push(originalDoctype(text));
 		if (
 			child.nodeType === Node.ELEMENT_NODE ||
 			child.nodeType === Node.COMMENT_NODE ||
@@ -270,10 +321,10 @@ export function autoFormatText(text: string, unit = '  '): FormatResult | null {
 export function formatXmlStrict(text: string, unit = '  '): FormatResult | { error: { line?: number; column?: number; message: string } } {
 	const trimmed = text.trim();
 	if (typeof DOMParser === 'undefined' || !trimmed.startsWith('<')) return { error: { message: 'Not XML' } };
-	const result = tryFormatXml(trimmed, unit);
+	const result = tryFormatXml(text, unit);
 	if (result) return result;
-	const doc = new DOMParser().parseFromString(trimmed, 'application/xml');
-	const raw = doc.getElementsByTagName('parsererror')[0]?.textContent ?? '';
+	const doc = new DOMParser().parseFromString(text, 'application/xml');
+	const raw = xmlParserError(doc, text)?.textContent ?? '';
 	const pos = /line(?: number)?\s*:?\s*(\d+)[^\d]{1,12}column(?: number)?\s*:?\s*(\d+)/i.exec(raw);
 	const detail =
 		/column\s*\d+\s*:\s*([^\n]+)/i.exec(raw)?.[1] ??

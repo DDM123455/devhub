@@ -1,5 +1,7 @@
 # ROADMAP.md — Web Tool Hub (Client-Side, Zero Server Cost)
 
+- [x] 2026-11-21 — Kiểm lại XML trên các engine trình duyệt: thẻ trùng tên chẩn đoán, dòng lỗi sau khoảng trắng đầu tài liệu, DOCTYPE, ký tự CR và chỉ thị stylesheet.
+
 - [x] 2026-11-21 — Hoàn thiện các khóa tiếng Việt, bản địa hóa bảng XML, kiểm XML đúng/sai ở 20 ngôn ngữ, đối chiếu lại 14 trạng thái nút và kiểm nạp 27 công cụ trên Firefox/WebKit.
 
 - [x] 2026-11-21 — Đối chiếu lại audit 20–21/11. Tối ưu Text Diff cho hai văn bản lớn không có dòng chung, giữ nguyên phép ghép theo khóa chuẩn hóa. Tách kiểm thử schema Kubernetes theo phiên bản.

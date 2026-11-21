@@ -180,6 +180,11 @@
 
 ## Nhật ký (mới nhất ở trên cùng, rút gọn)
 
+### 2026-11-21 — Rà lại Validate, Format và Minify XML
+
+- Tái hiện tài liệu có thẻ `parsererror` hợp lệ bị báo sai. Phân biệt phần tử của người dùng với chẩn đoán của trình duyệt, giữ số dòng gốc khi có dòng trống đầu vào.
+- Giữ DOCTYPE cùng tập khai báo thực thể nội bộ, khai báo XML khi minify và ký tự CR từ `&#13;`. Sửa lặp chỉ thị `xml-stylesheet` ở đầu tài liệu. Bổ sung ca trình duyệt cho XML và chế độ cây; build 647 trang, 1.130 test đạt, audit SEO P0–P3 bằng 0.
+
 ### 2026-11-21 — Bản dịch XML và kiểm lại các trạng thái nút
 
 - Bổ sung 256 khóa đổi đơn vị bếp tiếng Việt, bản địa hóa bảng XML, dùng lại nhãn đã dịch cùng nghĩa ở các trang công cụ. Chạy kiểm XML hợp lệ và sai cú pháp trên đủ 20 ngôn ngữ. Vi không thiếu khóa, tất cả locale khớp biến nội suy; 18 bản dịch còn thiếu khóa.

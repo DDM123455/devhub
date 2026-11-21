@@ -1,7 +1,7 @@
 import { useMemo, useState, type ComponentProps } from 'react';
 import JsonFormatter from './JsonFormatter';
 import { Button } from '@/components/ui/button';
-import { formatXmlStrict } from '@/lib/text-format';
+import { formatXmlStrict, minifyValidatedXml } from '@/lib/text-format';
 import { useCopyToClipboard } from './useCopyToClipboard';
 
 interface XmlMessages {
@@ -65,7 +65,7 @@ export default function JsonXmlFormatter({ messages, xml }: {
     if (action === 'format') setOutput(result.value);
     // Serialize the original document: trimming formatted lines corrupts text/CDATA.
     // Preserve all text whitespace because its significance requires a schema.
-    if (action === 'minify') setOutput(new XMLSerializer().serializeToString(new DOMParser().parseFromString(input, 'application/xml')));
+    if (action === 'minify') setOutput(minifyValidatedXml(input));
     setStatus({ error: false, text: xml.valid });
   }
   function reset() { setInput(''); setOutput(''); setStatus(null); setOpenAll(null); }
@@ -77,7 +77,7 @@ export default function JsonXmlFormatter({ messages, xml }: {
   const root = useMemo(() => {
     if (!output || view !== 'tree') return null;
     const doc = new DOMParser().parseFromString(output, 'application/xml');
-    return doc.getElementsByTagName('parsererror').length ? null : doc.documentElement;
+    return doc.documentElement;
   }, [output, view]);
 
   const seg = (active: boolean) => `rounded-md border px-3 py-1.5 text-sm font-medium ${active ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-background hover:bg-muted'}`;
